@@ -65,8 +65,8 @@
     background: rgba(168,85,247,0.2);
     color: var(--text-accent);
     border: 1px solid rgba(168,85,247,0.3);
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 0.85rem;
@@ -232,8 +232,8 @@
     background: rgba(0,0,0,0.5);
     color: rgba(255,255,255,0.6);
     border: none;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 0.8rem;
@@ -257,8 +257,8 @@
     background: rgba(0,0,0,0.5);
     color: rgba(255,255,255,0.5);
     border: none;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 0.9rem;
@@ -283,12 +283,12 @@
 .osu-copy-btn {
     position: absolute;
     top: 8px;
-    right: 40px;
+    right: 44px;
     background: rgba(0,0,0,0.5);
     color: rgba(255,255,255,0.6);
     border: none;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 0.75rem;
@@ -317,8 +317,8 @@
     background: rgba(0,0,0,0.5);
     color: rgba(255,255,255,0.7);
     border: none;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 0.75rem;
@@ -334,6 +334,15 @@
     color: #fff;
     background: rgba(244,114,182,0.6);
     transform: translateX(-50%) scale(1.1);
+}
+
+/* Touch devices have no :hover, so these hover-reveal action buttons would
+   otherwise be permanently invisible and untappable — show them by default
+   there instead (UX audit: "hover vs tap" + "touch target size", both High). */
+@media (hover: none) {
+    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-play-btn {
+        opacity: 0.85;
+    }
 }
 .osu-play-btn.playing {
     opacity: 1;
