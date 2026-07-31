@@ -12,7 +12,7 @@ exports.handler = async (event) => {
 
     try {
         const res = await fetch(`https://a.ppy.sh/${id}`, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-hanabi.netlify.app/)' },
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
         });
         if (!res.ok) {
             // Don't cache failures for long — osu recovering shouldn't stay masked by a stale error.
