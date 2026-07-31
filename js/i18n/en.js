@@ -1,7 +1,8 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Beatmap Collection + PP Lookup ✦',
     back_to_main: '← Back to Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'PP Lookup',
+    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_feedback: 'Suggestions',
+    feedback_title: '✦ Suggestions & Improvements ✦', feedback_hint: "Think something on this site could be better? Let me know here — only I can see your message, other visitors can't.", feedback_placeholder: 'Write your suggestion...', feedback_submit: 'Send', feedback_success: 'Your message has been sent — thank you for the feedback!',
 
     osu_title: '♫ Add Beatmap ♫', osu_placeholder: 'Enter ID or paste osu! URL', osu_add: 'Add',
     osu_password: '🔒 Set Password',

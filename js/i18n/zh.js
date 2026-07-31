@@ -1,7 +1,8 @@
 I18N.zh = {
     title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ Beatmap 收藏 + PP 查詢 ✦',
     back_to_main: '← 返回 Hanabiの小天地',
-    nav_collection: '收藏', nav_lookup: 'PP 查詢',
+    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_feedback: '建議&改進',
+    feedback_title: '✦ 建議&改進 ✦', feedback_hint: '覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。', feedback_placeholder: '寫下你的建議...', feedback_submit: '送出', feedback_success: '您的回覆訊息已傳送，感謝您的回饋！',
 
     osu_title: '♫ 新增 Beatmap ♫', osu_placeholder: '輸入 ID 或貼上 osu! 網址', osu_add: '新增',
     osu_password: '🔒 設定密碼',

@@ -1,7 +1,8 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ ビートマップコレクション＋PP検索 ✦',
     back_to_main: '← Hanabiの小天地に戻る',
-    nav_collection: 'コレクション', nav_lookup: 'PP検索',
+    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_feedback: 'ご意見&改善',
+    feedback_title: '✦ ご意見&改善 ✦', feedback_hint: 'サイトで改善できそうな点があれば教えてください。あなたのメッセージは私だけが見ることができ、他の訪問者には表示されません。', feedback_placeholder: 'ご意見を書いてください...', feedback_submit: '送信', feedback_success: 'メッセージを送信しました。フィードバックありがとうございます！',
 
     osu_title: '♫ ビートマップ追加 ♫', osu_placeholder: 'IDまたはURLを入力', osu_add: '追加',
     osu_password: '🔒 パスワード設定',

@@ -1,7 +1,8 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 비트맵 컬렉션 + PP 조회 ✦',
     back_to_main: '← Hanabiの小天地로 돌아가기',
-    nav_collection: '컬렉션', nav_lookup: 'PP 조회',
+    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_feedback: '제안&개선',
+    feedback_title: '✦ 제안&개선 ✦', feedback_hint: '사이트에서 개선이 필요한 부분이 있나요? 여기에 알려주세요. 이 메시지는 저만 볼 수 있고 다른 방문자는 볼 수 없습니다.', feedback_placeholder: '제안 사항을 적어주세요...', feedback_submit: '보내기', feedback_success: '메시지가 전송되었습니다. 소중한 의견 감사합니다!',
 
     osu_title: '♫ 비트맵 추가 ♫', osu_placeholder: 'ID 또는 URL 입력', osu_add: '추가',
     osu_password: '🔒 비밀번호 설정',

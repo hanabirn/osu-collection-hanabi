@@ -57,6 +57,7 @@
     <nav class="site-nav">
         <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
         <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+        <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
 
@@ -193,6 +194,21 @@
         </div>
     </section>
 
+    <section id="page-feedback" class="site-page" style="display:none;">
+        <div class="osu-add-card feedback-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="feedback_title">✦ 建議&改進 ✦</h3>
+            <p class="feedback-hint" data-i18n="feedback_hint">覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。</p>
+            <form class="feedback-form" onsubmit="return handleFeedbackSubmit(event)">
+                <textarea class="feedback-textarea" name="message" data-i18n-placeholder="feedback_placeholder" placeholder="寫下你的建議..." rows="5" required></textarea>
+                <input type="text" name="website" class="feedback-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <button type="submit" class="btn feedback-submit" data-i18n="feedback_submit">送出</button>
+            </form>
+            <div id="feedback-success" class="feedback-success" style="display:none;" data-i18n="feedback_success">您的回覆訊息已傳送，感謝您的回饋！</div>
+        </div>
+    </section>
+
 </main>
 
 <footer class="site-footer">
@@ -211,6 +227,7 @@
 <script src="js/i18n/es.js"></script>
 <script src="js/i18n/de.js"></script>
 <script src="js/osu.js"></script>
+<script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

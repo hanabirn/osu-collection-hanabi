@@ -1,7 +1,8 @@
 I18N.ru = {
     title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Коллекция битмапов + поиск PP ✦',
     back_to_main: '← Назад на Hanabiの小天地',
-    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP',
+    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_feedback: 'Предложения',
+    feedback_title: '✦ Предложения и улучшения ✦', feedback_hint: 'Думаете, что-то на сайте можно улучшить? Напишите здесь — ваше сообщение увижу только я, другие посетители его не увидят.', feedback_placeholder: 'Напишите ваше предложение...', feedback_submit: 'Отправить', feedback_success: 'Ваше сообщение отправлено, спасибо за отзыв!',
 
     osu_title: '♫ Добавить битмап ♫', osu_placeholder: 'Введите ID или URL', osu_add: 'Добавить',
     osu_password: '🔒 Пароль',

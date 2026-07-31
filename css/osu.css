@@ -34,6 +34,52 @@
     letter-spacing: 3px;
 }
 
+.feedback-card { max-width: 480px; margin: 0 auto; }
+.feedback-hint {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: -4px 0 16px;
+}
+.feedback-textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    margin-bottom: 12px;
+}
+.feedback-textarea:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 15px rgba(192,132,252,0.25);
+}
+.feedback-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+.feedback-submit {
+    display: block;
+    margin: 0 auto;
+}
+.feedback-success {
+    text-align: center;
+    color: var(--text-pink);
+    font-size: 1rem;
+    padding: 12px;
+}
+
 .osu-volume {
     display: flex;
     flex-wrap: wrap;
