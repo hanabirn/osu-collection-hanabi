@@ -387,10 +387,94 @@ async function refreshAllOsuSets() {
     }
 }
 
+/* ===== Collection overview stats (total sets / favorites / star range) —
+   purely derived from localStorage, no API calls needed. ===== */
+function renderOsuStats() {
+    const el = document.getElementById('osu-stats-panel');
+    if (!el) return;
+    const col = getOsuCollection();
+    const seen = new Set();
+    const allSets = OSU_MODES.flatMap(m => col[m]).filter(s => {
+        if (seen.has(s.beatmapset_id)) return false;
+        seen.add(s.beatmapset_id);
+        return true;
+    });
+
+    if (allSets.length === 0) {
+        el.style.display = 'none';
+        return;
+    }
+    el.style.display = '';
+
+    const allRatings = allSets.flatMap(s => s.beatmaps.map(b => b.difficulty_rating)).filter(r => r > 0);
+    const avgRating = allRatings.length ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 0;
+    const maxRating = allRatings.length ? Math.max(...allRatings) : 0;
+    const favCount = getOsuFavorites().filter(id => allSets.some(s => s.beatmapset_id === id)).length;
+
+    el.innerHTML = `
+        <div class="osu-stat">
+            <div class="osu-stat-value">${allSets.length}</div>
+            <div class="osu-stat-label">${t('osu_stats_total')}</div>
+        </div>
+        <div class="osu-stat">
+            <div class="osu-stat-value">${favCount}</div>
+            <div class="osu-stat-label">${t('osu_fav')}</div>
+        </div>
+        <div class="osu-stat">
+            <div class="osu-stat-value">${avgRating.toFixed(2)}⭐</div>
+            <div class="osu-stat-label">${t('osu_stats_avg_rating')}</div>
+        </div>
+        <div class="osu-stat">
+            <div class="osu-stat-value">${maxRating.toFixed(2)}⭐</div>
+            <div class="osu-stat-label">${t('osu_stats_max_rating')}</div>
+        </div>
+    `;
+}
+
+/* ===== Today's featured beatmap: a deterministic daily pick from the whole
+   collection (all modes combined), so today's pick is the same across tabs/
+   reloads but changes once a day — same pattern as the pjsekai/wuwa sibling
+   sites' "featured character of the day". ===== */
+function renderFeaturedBeatmap() {
+    const el = document.getElementById('featured-beatmap-banner');
+    if (!el) return;
+    const col = getOsuCollection();
+    const seen = new Set();
+    const allSets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __mode: m }))).filter(s => {
+        if (seen.has(s.beatmapset_id)) return false;
+        seen.add(s.beatmapset_id);
+        return true;
+    });
+
+    if (allSets.length === 0) {
+        el.style.display = 'none';
+        return;
+    }
+
+    const modeIcons = { standard: '⭕', taiko: '🥁', catch: '🍎', mania: '🎹' };
+    const dayIndex = Math.floor(Date.now() / 86400000) % allSets.length;
+    const set = allSets[dayIndex];
+    const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/cover.jpg`;
+
+    el.style.display = 'flex';
+    el.onclick = () => window.open(`https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}`, '_blank');
+    el.innerHTML = `
+        <div class="featured-beatmap-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="featured-beatmap-overlay"></div>
+        <div class="featured-beatmap-info">
+            <div class="featured-beatmap-label">${t('featured_beatmap_label')}</div>
+            <div class="featured-beatmap-title">${modeIcons[set.__mode]} ${set.title}</div>
+            <div class="featured-beatmap-artist">${set.artist} · ${t('mapped_by', { n: set.creator })}</div>
+        </div>
+    `;
+}
+
 function renderOsuCollection() {
     const container = document.getElementById('osu-collection');
     const paginationEl = document.getElementById('osu-pagination');
     if (!container || !paginationEl) return;
+    renderOsuStats();
+    renderFeaturedBeatmap();
     const col = getOsuCollection();
     let sets;
 
@@ -500,6 +584,34 @@ function renderOsuModeStats(mode) {
     document.getElementById('osu-pp').textContent = u.pp_raw != null ? Math.round(parseFloat(u.pp_raw)).toLocaleString() : '—';
     document.getElementById('osu-accuracy').textContent = u.accuracy != null ? parseFloat(u.accuracy).toFixed(2) + '%' : '—';
     document.getElementById('osu-playcount').textContent = u.playcount != null ? parseInt(u.playcount).toLocaleString() : '—';
+    renderOsuRankBadges(u);
+}
+
+/* ===== Rank badge distribution (SS/S/A counts) — the osu! API already
+   returns count_rank_ss/ssh/s/sh/a per mode alongside everything else
+   fetchOsuProfile() pulls, so this needs no extra requests. ===== */
+function renderOsuRankBadges(u) {
+    const el = document.getElementById('osu-rank-badges');
+    if (!el) return;
+    const ss = (parseInt(u.count_rank_ss) || 0) + (parseInt(u.count_rank_ssh) || 0);
+    const s = (parseInt(u.count_rank_s) || 0) + (parseInt(u.count_rank_sh) || 0);
+    const a = parseInt(u.count_rank_a) || 0;
+    const bars = [
+        { label: 'SS', count: ss, rankClass: 'ss' },
+        { label: 'S', count: s, rankClass: 's' },
+        { label: 'A', count: a, rankClass: 'a' },
+    ];
+    const max = Math.max(1, ...bars.map(b => b.count));
+
+    el.innerHTML = bars.map(b => `
+        <div class="rank-badge-row">
+            <span class="rank-badge-tag rank-${b.rankClass}">${b.label}</span>
+            <div class="rank-badge-bar-track">
+                <div class="rank-badge-bar-fill rank-${b.rankClass}" style="width:${(b.count / max) * 100}%"></div>
+            </div>
+            <span class="rank-badge-count">${b.count.toLocaleString()}</span>
+        </div>
+    `).join('');
 }
 
 function calcOsuAccuracy(r, mode) {

@@ -22,6 +22,8 @@ I18N.en = {
     osu_search_placeholder: 'Search by title or artist...', osu_search_empty: 'No matching beatmaps found',
     osu_sort_default: 'Default Order', osu_sort_rating_desc: 'Star Rating (High to Low)', osu_sort_rating_asc: 'Star Rating (Low to High)',
     pp_history_title: 'PP Growth', pp_history_empty: 'Not enough history yet — visit again later to build up the trend.',
+    osu_stats_total: 'Total Collected', osu_stats_avg_rating: 'Avg Rating', osu_stats_max_rating: 'Max Rating',
+    featured_beatmap_label: '✦ Featured Today ✦',
     osu_export: 'Export Collection', osu_import: 'Import Collection',
     osu_export_done: 'Collection exported!', osu_import_done: 'Collection imported!', osu_import_fail: 'Import failed. Please check the file format.',
 };

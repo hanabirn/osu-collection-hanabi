@@ -22,6 +22,8 @@ I18N.ru = {
     osu_search_placeholder: 'Поиск по названию или автору...', osu_search_empty: 'Битмапы не найдены',
     osu_sort_default: 'По умолчанию', osu_sort_rating_desc: 'Звёзды (по убыванию)', osu_sort_rating_asc: 'Звёзды (по возрастанию)',
     pp_history_title: 'Рост PP', pp_history_empty: 'Пока недостаточно данных — зайдите позже, чтобы накопить историю.',
+    osu_stats_total: 'Всего собрано', osu_stats_avg_rating: 'Средняя сложность', osu_stats_max_rating: 'Макс. сложность',
+    featured_beatmap_label: '✦ Рекомендация дня ✦',
     osu_export: 'Экспорт коллекции', osu_import: 'Импорт коллекции',
     osu_export_done: 'Коллекция экспортирована!', osu_import_done: 'Коллекция импортирована!', osu_import_fail: 'Ошибка импорта. Проверьте формат файла',
 };

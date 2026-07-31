@@ -14,6 +14,8 @@ function switchTab(tab, el) {
 function refreshDynamicContent() {
     renderOsuCollection();
     renderPpHistoryChart();
+    const activeModeTab = document.querySelector('#osu-mode-tabs .osu-mode-tab.active');
+    if (activeModeTab) renderOsuModeStats(parseInt(activeModeTab.dataset.mode));
 }
 
 /* ===== Init ===== */

@@ -704,3 +704,116 @@
 .trend-chart-axis-label { font-size: 8px; fill: var(--text-label); }
 .trend-chart-value-label { font-size: 10px; font-weight: bold; }
 .pp-history-panel .osu-empty { padding: 12px 4px; font-size: 0.82rem; }
+
+/* ===== Collection overview stats ===== */
+.osu-stats-panel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+/* ===== Today's featured beatmap banner ===== */
+.featured-beatmap-banner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 110px;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: transform 0.25s;
+}
+.featured-beatmap-banner:hover { transform: translateY(-2px); }
+.featured-beatmap-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+.featured-beatmap-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--osu-overlay);
+}
+.featured-beatmap-info {
+    position: relative;
+    z-index: 2;
+    padding: 12px 16px;
+    width: 100%;
+}
+.featured-beatmap-label {
+    font-size: 0.7rem;
+    color: var(--accent-yellow);
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    margin-bottom: 2px;
+}
+.featured-beatmap-title {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.featured-beatmap-artist {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.8rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Rank badge distribution ===== */
+.rank-badges-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 1rem;
+}
+.rank-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.rank-badge-tag {
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    border-radius: 6px;
+    padding: 2px 0;
+    font-size: 0.72rem;
+    font-weight: bold;
+}
+.rank-badge-tag.rank-ss { background: linear-gradient(135deg, #f4d03f, #f7ecb5); color: #6b5900; }
+.rank-badge-tag.rank-s { background: linear-gradient(135deg, #f4c542, #e8a628); color: #5c3d00; }
+.rank-badge-tag.rank-a { background: #6ee7b7; color: #064e3b; }
+.rank-badge-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-stat);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.rank-badge-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s;
+}
+.rank-badge-bar-fill.rank-ss { background: linear-gradient(90deg, #f4d03f, #f7ecb5); }
+.rank-badge-bar-fill.rank-s { background: linear-gradient(90deg, #f4c542, #e8a628); }
+.rank-badge-bar-fill.rank-a { background: #6ee7b7; }
+.rank-badge-count {
+    flex-shrink: 0;
+    min-width: 32px;
+    text-align: right;
+    font-size: 0.78rem;
+    color: var(--text-label);
+}
+@media (max-width: 480px) {
+    .osu-stats-panel { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+}

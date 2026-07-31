@@ -22,6 +22,8 @@ I18N.ja = {
     osu_search_placeholder: '曲名またはアーティストで検索...', osu_search_empty: '該当するビートマップが見つかりません',
     osu_sort_default: 'デフォルト順', osu_sort_rating_desc: '星評価（高い順）', osu_sort_rating_asc: '星評価（低い順）',
     pp_history_title: 'PP成長推移', pp_history_empty: 'まだ記録が少ないです。また訪れると推移グラフが増えていきます。',
+    osu_stats_total: '収集数', osu_stats_avg_rating: '平均難易度', osu_stats_max_rating: '最高難易度',
+    featured_beatmap_label: '✦ 本日のおすすめ ✦',
     osu_export: 'コレクションをエクスポート', osu_import: 'コレクションをインポート',
     osu_export_done: 'エクスポートしました！', osu_import_done: 'インポートしました！', osu_import_fail: 'インポート失敗。ファイル形式を確認してください',
 };

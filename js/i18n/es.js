@@ -22,6 +22,8 @@ I18N.es = {
     osu_search_placeholder: 'Buscar por título o artista...', osu_search_empty: 'No se encontraron beatmaps',
     osu_sort_default: 'Orden predeterminado', osu_sort_rating_desc: 'Estrellas (mayor a menor)', osu_sort_rating_asc: 'Estrellas (menor a mayor)',
     pp_history_title: 'Evolución del PP', pp_history_empty: 'Aún no hay suficiente historial — vuelve más tarde para ver la tendencia.',
+    osu_stats_total: 'Total recopilado', osu_stats_avg_rating: 'Dificultad media', osu_stats_max_rating: 'Dificultad máx.',
+    featured_beatmap_label: '✦ Destacado de hoy ✦',
     osu_export: 'Exportar colección', osu_import: 'Importar colección',
     osu_export_done: '¡Colección exportada!', osu_import_done: '¡Colección importada!', osu_import_fail: 'Error al importar. Verifica el formato del archivo',
 };
