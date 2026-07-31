@@ -1,8 +1,11 @@
 I18N.es = {
     title: 'osu! Colección', site_title: 'osu! Colección', site_tagline: '✦ Colección de beatmaps + búsqueda de PP ✦',
     back_to_main: '← Volver a Hanabiの小天地',
-    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_feedback: 'Sugerencias',
+    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_feedback: 'Sugerencias',
     feedback_title: '✦ Sugerencias y mejoras ✦', feedback_hint: '¿Crees que algo en el sitio podría mejorar? Cuéntamelo aquí — solo yo puedo ver tu mensaje, otros visitantes no lo verán.', feedback_placeholder: 'Escribe tu sugerencia...', feedback_submit: 'Enviar', feedback_success: '¡Tu mensaje ha sido enviado, gracias por tu opinión!',
+    skins_title: '🎵 Mis skins 🎵', skins_hint: 'Sube los archivos de skins de osu! (.osk) que quieras conservar y descárgalos de nuevo cuando quieras. Los archivos solo se guardan en este navegador, nunca se suben a ningún servidor — cambiar de dispositivo o borrar los datos del navegador los eliminará, así que haz tu propia copia de seguridad de lo importante.', skins_list_title: '💾 Skins guardados',
+    skins_empty: 'Aún no hay skins guardados', skins_download: 'Descargar', skins_delete: 'Eliminar', skins_delete_confirm: '¿Eliminar este archivo de skin?',
+    skins_upload_done: '{n} archivo(s) añadido(s)', skins_upload_fail: 'Error al subir "{n}"', skins_load_fail: 'No se pudo cargar la lista de skins — comprueba que el navegador permite almacenamiento local',
 
     osu_title: '♫ Añadir Beatmap ♫', osu_placeholder: 'Ingrese ID o URL', osu_add: 'Añadir',
     osu_password: '🔒 Contraseña',

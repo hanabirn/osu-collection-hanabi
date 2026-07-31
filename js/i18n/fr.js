@@ -1,8 +1,11 @@
 I18N.fr = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Collection de beatmaps + recherche PP ✦',
     back_to_main: '← Retour à Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_feedback: 'Suggestions',
+    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_feedback: 'Suggestions',
     feedback_title: '✦ Suggestions et améliorations ✦', feedback_hint: "Vous pensez qu'un aspect du site pourrait être amélioré ? Dites-le-moi ici — seul moi peux voir votre message, les autres visiteurs ne le verront pas.", feedback_placeholder: 'Écrivez votre suggestion...', feedback_submit: 'Envoyer', feedback_success: 'Votre message a été envoyé, merci pour votre retour !',
+    skins_title: '🎵 Mes skins 🎵', skins_hint: "Téléversez les fichiers de skins osu! (.osk) que vous voulez conserver, et retéléchargez-les à tout moment. Les fichiers sont stockés uniquement dans ce navigateur, jamais envoyés à un serveur — changer d'appareil ou effacer les données du navigateur les fera disparaître, pensez à sauvegarder ce qui est important.", skins_list_title: '💾 Skins enregistrés',
+    skins_empty: 'Aucun skin enregistré pour le moment', skins_download: 'Télécharger', skins_delete: 'Supprimer', skins_delete_confirm: 'Supprimer ce fichier de skin ?',
+    skins_upload_done: '{n} fichier(s) ajouté(s)', skins_upload_fail: "Échec de l'envoi de « {n} »", skins_load_fail: "Échec du chargement de la liste des skins — vérifiez que le navigateur autorise le stockage local",
 
     osu_title: '♫ Ajouter Beatmap ♫', osu_placeholder: 'Entrez ID ou URL', osu_add: 'Ajouter',
     osu_password: '🔒 Mot de passe',

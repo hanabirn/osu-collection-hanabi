@@ -60,6 +60,7 @@
     <nav class="site-nav">
         <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
         <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+        <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
@@ -197,6 +198,25 @@
         </div>
     </section>
 
+    <section id="page-skins" class="site-page" style="display:none;">
+        <div class="osu-add-card skins-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="skins_title">&#127925; 我的皮膚 &#127925;</h3>
+            <p class="skins-hint" data-i18n="skins_hint">上傳你想收藏的 osu! 皮膚檔案（.osk），之後隨時可以下載回來。檔案只存在你目前這個瀏覽器裡，不會上傳到任何伺服器，換裝置或清除瀏覽器資料就會遺失，請自行備份重要檔案。</p>
+            <div class="skin-upload-row">
+                <input type="file" id="skin-file-input" accept=".osk" multiple onchange="handleSkinUpload(event)">
+            </div>
+            <p id="skin-upload-status" class="status"></p>
+        </div>
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="skins_list_title">&#128190; 已收藏的皮膚</h3>
+            <div id="skins-list" class="skins-list"></div>
+        </div>
+    </section>
+
     <section id="page-feedback" class="site-page" style="display:none;">
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
@@ -230,6 +250,7 @@
 <script src="js/i18n/es.js"></script>
 <script src="js/i18n/de.js"></script>
 <script src="js/osu.js"></script>
+<script src="js/skins.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
 </body>

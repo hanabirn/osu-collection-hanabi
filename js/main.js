@@ -4,6 +4,7 @@ function switchTab(tab, el) {
     document.getElementById('page-' + tab).style.display = 'block';
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
+    if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
 }
 
 /* ===== Re-render already-rendered dynamic content after a language switch =====
@@ -16,6 +17,7 @@ function refreshDynamicContent() {
     renderPpHistoryChart();
     const activeModeTab = document.querySelector('#osu-mode-tabs .osu-mode-tab.active');
     if (activeModeTab) renderOsuModeStats(parseInt(activeModeTab.dataset.mode));
+    if (typeof renderSkinsList === 'function') renderSkinsList();
 }
 
 /* ===== Init ===== */

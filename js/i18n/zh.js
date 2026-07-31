@@ -1,8 +1,11 @@
 I18N.zh = {
     title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ Beatmap 收藏 + PP 查詢 ✦',
     back_to_main: '← 返回 Hanabiの小天地',
-    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_feedback: '建議&改進',
+    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_feedback: '建議&改進',
     feedback_title: '✦ 建議&改進 ✦', feedback_hint: '覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。', feedback_placeholder: '寫下你的建議...', feedback_submit: '送出', feedback_success: '您的回覆訊息已傳送，感謝您的回饋！',
+    skins_title: '🎵 我的皮膚 🎵', skins_hint: '上傳你想收藏的 osu! 皮膚檔案（.osk），之後隨時可以下載回來。檔案只存在你目前這個瀏覽器裡，不會上傳到任何伺服器，換裝置或清除瀏覽器資料就會遺失，請自行備份重要檔案。', skins_list_title: '💾 已收藏的皮膚',
+    skins_empty: '還沒有收藏的皮膚', skins_download: '下載', skins_delete: '刪除', skins_delete_confirm: '確定要刪除這個皮膚檔案嗎？',
+    skins_upload_done: '已新增 {n} 個檔案', skins_upload_fail: '「{n}」上傳失敗', skins_load_fail: '讀取皮膚清單失敗，請確認瀏覽器允許本機儲存空間',
 
     osu_title: '♫ 新增 Beatmap ♫', osu_placeholder: '輸入 ID 或貼上 osu! 網址', osu_add: '新增',
     osu_password: '🔒 設定密碼',

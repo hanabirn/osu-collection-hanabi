@@ -34,6 +34,80 @@
     letter-spacing: 3px;
 }
 
+.skins-hint {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: -4px 0 16px;
+}
+.skin-upload-row { display: flex; gap: 8px; }
+.skin-upload-row input[type="file"] {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.85rem;
+}
+.skins-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.skin-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+.skin-item:hover {
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 12px rgba(var(--accent-purple-rgb), 0.18);
+}
+.skin-item-info { min-width: 0; }
+.skin-item-name {
+    font-weight: bold;
+    color: var(--text-pink);
+    word-break: break-all;
+}
+.skin-item-meta {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+.skin-item-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.skin-download-btn, .skin-delete-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    color: var(--text);
+    transition: all 0.2s;
+}
+.skin-download-btn { border-color: var(--accent-pink); color: var(--accent-pink); }
+.skin-download-btn:hover { background: var(--accent-pink); color: #fff; }
+.skin-download-btn:active, .skin-delete-btn:active { transform: scale(0.95); }
+.skin-delete-btn:hover { border-color: #f87171; color: #f87171; }
+.skins-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px 0;
+    font-size: 0.9rem;
+}
+
 .feedback-card { max-width: 480px; margin: 0 auto; }
 .feedback-hint {
     text-align: center;
