@@ -21,16 +21,24 @@ a:hover { text-decoration: underline; }
     backdrop-filter: blur(var(--glass-blur));
 }
 
+.title-notes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
 .title-note {
     display: block;
-    font-size: 2.3rem;
     line-height: 1;
-    color: var(--accent-pink);
-    filter: drop-shadow(0 0 10px rgba(var(--accent-pink-rgb), 0.5));
     animation: titleNoteFloat 3.2s ease-in-out infinite;
 }
-.title-note-left { animation-delay: 0s; }
-.title-note-right { color: var(--accent-purple); filter: drop-shadow(0 0 10px rgba(var(--accent-purple-rgb), 0.5)); animation-delay: 1.6s; }
+/* Tapered so the notes closest to the title are largest, trailing off smaller outward. */
+.tn-1, .tn-6 { font-size: 1.1rem; }
+.tn-2, .tn-5 { font-size: 1.6rem; }
+.tn-3, .tn-4 { font-size: 2.2rem; }
+
+.tn-1, .tn-4 { color: var(--accent-pink); filter: drop-shadow(0 0 10px rgba(var(--accent-pink-rgb), 0.5)); animation-delay: 0s; }
+.tn-2, .tn-5 { color: var(--accent-light-purple); filter: drop-shadow(0 0 10px var(--accent-light-purple)); animation-delay: 0.6s; }
+.tn-3, .tn-6 { color: var(--accent-purple); filter: drop-shadow(0 0 10px rgba(var(--accent-purple-rgb), 0.5)); animation-delay: 1.2s; }
 
 @keyframes titleNoteFloat {
     0%, 100% { transform: translateY(0) rotate(-6deg); }
@@ -40,8 +48,11 @@ a:hover { text-decoration: underline; }
     .title-note { animation: none; }
 }
 @media (max-width: 600px) {
-    .title-note { font-size: 1.6rem; }
-    .header-logo { gap: 6px; }
+    .tn-1, .tn-6 { display: none; }
+    .tn-2, .tn-5 { font-size: 1.1rem; }
+    .tn-3, .tn-4 { font-size: 1.6rem; }
+    .header-logo { gap: 4px; }
+    .title-notes { gap: 2px; }
 }
 
 .site-header-top {
