@@ -1,0 +1,73 @@
+/* ===== Theme Variables =====
+   Ported verbatim from the main site's css/theme.css so the ported osu.css/
+   profile-card CSS (which reference these exact custom property names) needs
+   zero rewriting. */
+:root {
+    /* Dark theme (default) */
+    --bg-body-1: #1a0a2e;
+    --bg-body-2: #16213e;
+    --bg-body-3: #2d1b4e;
+    --bg-card: rgba(25, 15, 45, 0.88);
+    --bg-card-alt: rgba(255,255,255,0.06);
+    --bg-input: rgba(25, 15, 45, 0.9);
+    --bg-stat: rgba(255,255,255,0.06);
+    --text: #fff;
+    --text-secondary: rgba(255,255,255,0.7);
+    --text-label: rgba(255,255,255,0.6);
+    --text-accent: #c8a2e0;
+    --text-pink: #f9a8d4;
+    --text-dim2: rgba(200,162,224,0.6);
+    --border-card: rgba(168,85,247,0.25);
+    --border-light: rgba(255,255,255,0.15);
+    --border-input: rgba(168,85,247,0.25);
+    --accent-pink: #f472b6;
+    --accent-purple: #a855f7;
+    --accent-light-purple: #c084fc;
+    --accent-yellow: #fbbf24;
+    --shadow-card: 0 0 25px rgba(168,85,247,0.08);
+    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.05);
+    --lang-pill-bg: rgba(255,255,255,0.08);
+    --lang-pill-border: rgba(255,255,255,0.15);
+    --lang-pill-text: rgba(255,255,255,0.6);
+    --osu-card-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    --osu-overlay: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0.92) 100%);
+    --theme-toggle-bg: rgba(255,255,255,0.08);
+    --theme-toggle-border: rgba(255,255,255,0.15);
+}
+
+[data-theme="light"] {
+    --bg-body-1: #f8f4ff;
+    --bg-body-2: #ede4f7;
+    --bg-body-3: #f0e8f8;
+    --bg-card: rgba(255, 255, 255, 0.92);
+    --bg-card-alt: rgba(168,85,247,0.06);
+    --bg-input: rgba(255, 255, 255, 0.95);
+    --bg-stat: rgba(168,85,247,0.06);
+    --text: #2d1b4e;
+    --text-secondary: rgba(45,27,78,0.7);
+    --text-label: rgba(45,27,78,0.6);
+    --text-accent: #7c3aed;
+    --text-pink: #be185d;
+    --text-dim2: rgba(100,70,140,0.6);
+    --border-card: rgba(147,51,234,0.2);
+    --border-light: rgba(0,0,0,0.1);
+    --border-input: rgba(147,51,234,0.2);
+    --accent-pink: #db2777;
+    --accent-purple: #9333ea;
+    --accent-light-purple: #a855f7;
+    --accent-yellow: #d97706;
+    --shadow-card: 0 2px 15px rgba(147,51,234,0.08);
+    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.8);
+    --lang-pill-bg: rgba(147,51,234,0.06);
+    --lang-pill-border: rgba(147,51,234,0.15);
+    --lang-pill-text: rgba(45,27,78,0.6);
+    --osu-card-shadow: 0 8px 30px rgba(147,51,234,0.12);
+    --osu-overlay: linear-gradient(to bottom, rgba(147,51,234,0.05) 0%, rgba(147,51,234,0.1) 40%, rgba(45,27,78,0.7) 80%, rgba(45,27,78,0.85) 100%);
+    --theme-toggle-bg: rgba(147,51,234,0.06);
+    --theme-toggle-border: rgba(147,51,234,0.15);
+}
+
+/* Smooth transition */
+*, *::before, *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}

@@ -1,0 +1,670 @@
+/* ===== osu! Collection =====
+   Ported verbatim from the main site's css/osu.css. */
+.osu-page-title {
+    margin: 0 0 16px;
+    text-align: center;
+    font-size: 1.15rem;
+    background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+}
+
+.osu-add-card {
+    position: relative;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card), var(--shadow-card-inset);
+}
+
+.osu-add-card h3 {
+    margin: 0 0 14px;
+    text-align: center;
+    font-size: 1.1rem;
+    background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 3px;
+}
+
+.osu-volume {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: center;
+    color: var(--text-accent);
+    font-size: 0.85rem;
+}
+.osu-volume input[type="range"] {
+    width: 120px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(168,85,247,0.3);
+    border-radius: 2px;
+    outline: none;
+}
+.osu-volume input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-light-purple));
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(244,114,182,0.4);
+}
+
+.osu-refresh-all {
+    background: rgba(168,85,247,0.2);
+    color: var(--text-accent);
+    border: 1px solid rgba(168,85,247,0.3);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.osu-refresh-all:hover {
+    color: #fff;
+    background: rgba(168,85,247,0.4);
+    border-color: var(--accent-purple);
+}
+.osu-refresh-all.spinning {
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.osu-io-btns {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+}
+.osu-io-btn {
+    background: rgba(168,85,247,0.15);
+    color: var(--text-accent);
+    border: 1px solid var(--border-card);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.osu-io-btn:hover {
+    background: rgba(168,85,247,0.3);
+    color: #fff;
+    border-color: var(--accent-purple);
+}
+
+.osu-mode-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.osu-tab {
+    flex: 1;
+    background: var(--bg-card);
+    color: var(--text-accent);
+    border: 1px solid var(--border-card);
+    padding: 11px 8px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    font-weight: 500;
+}
+.osu-tab:hover { color: var(--text); border-color: var(--accent-purple); }
+.osu-tab.active {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    color: #fff;
+    font-weight: bold;
+    border-color: transparent;
+    box-shadow: 0 0 18px rgba(244,114,182,0.3);
+}
+
+.osu-search-row {
+    margin-bottom: 16px;
+}
+#osu-search-input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+#osu-search-input:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 15px rgba(192,132,252,0.25);
+}
+
+.osu-collection {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.osu-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-accent);
+    padding: 40px 20px;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+.osu-empty span {
+    font-size: 0.85rem;
+    color: var(--text-dim2);
+}
+
+.osu-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 4 / 1.6;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.osu-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--osu-card-shadow);
+}
+
+.osu-card-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.4s;
+}
+.osu-card:hover .osu-card-bg {
+    transform: scale(1.05);
+}
+
+.osu-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--osu-overlay);
+}
+
+.osu-delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .osu-delete-btn { opacity: 1; }
+.osu-delete-btn:hover {
+    color: #f87171;
+    background: rgba(248,113,113,0.3);
+}
+
+.osu-fav-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.5);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .osu-fav-btn { opacity: 1; }
+.osu-fav-btn.active {
+    opacity: 1;
+    color: #f43f5e;
+    text-shadow: 0 0 8px rgba(244,63,94,0.6);
+}
+.osu-fav-btn:hover {
+    color: #f43f5e;
+    transform: scale(1.15);
+}
+
+.osu-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 40px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .osu-copy-btn { opacity: 1; }
+.osu-copy-btn:hover {
+    color: #fff;
+    background: rgba(168,85,247,0.5);
+}
+.osu-copy-btn.copied {
+    opacity: 1;
+    color: #34d399;
+}
+
+.osu-play-btn {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.7);
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .osu-play-btn { opacity: 1; }
+.osu-play-btn:hover {
+    color: #fff;
+    background: rgba(244,114,182,0.6);
+    transform: translateX(-50%) scale(1.1);
+}
+.osu-play-btn.playing {
+    opacity: 1;
+    color: #fff;
+    background: rgba(244,114,182,0.7);
+    animation: playPulse 1s ease-in-out infinite;
+}
+@keyframes playPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(244,114,182,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(244,114,182,0); }
+}
+
+.osu-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 14px;
+    z-index: 2;
+}
+
+.osu-card-title {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.osu-card-stars {
+    color: var(--accent-yellow);
+    font-size: 0.8rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    margin-top: 1px;
+}
+
+.osu-card-artist {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.osu-card-mapper {
+    color: rgba(255,255,255,0.4);
+    font-size: 0.72rem;
+    margin-top: 2px;
+}
+
+/* ===== Pagination ===== */
+.osu-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+.osu-page-btn {
+    background: var(--bg-card);
+    color: var(--text-accent);
+    border: 1px solid var(--border-card);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.osu-page-btn:hover:not(:disabled) {
+    color: #fff;
+    border-color: var(--accent-purple);
+    background: rgba(168,85,247,0.3);
+}
+.osu-page-btn.active {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    color: #fff;
+    font-weight: bold;
+    border-color: transparent;
+    box-shadow: 0 0 12px rgba(244,114,182,0.3);
+}
+.osu-page-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+/* ===== osu! Profile Card =====
+   Ported verbatim from the main site's css/about.css lines 133-391. */
+.osu-profile-card {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto 20px;
+    background: var(--bg-card-alt);
+    border: 1px solid rgba(255,102,153,0.2);
+    border-radius: 20px;
+    padding: 1.8rem 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+.osu-profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 1.2rem;
+}
+.osu-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,102,153,0.5);
+    box-shadow: 0 0 15px rgba(255,102,153,0.3);
+    object-fit: cover;
+}
+.osu-profile-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--text);
+    text-align: left;
+}
+.osu-profile-country {
+    font-size: 0.85rem;
+    color: var(--text-label);
+    text-align: left;
+}
+.osu-profile-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.osu-stat {
+    background: var(--bg-stat);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 10px 6px;
+}
+.osu-stat-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-pink);
+}
+.osu-stat-label {
+    font-size: 0.72rem;
+    color: var(--text-label);
+    margin-top: 3px;
+}
+.osu-mode-tabs {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.osu-mode-tab {
+    background: var(--bg-stat);
+    border: 1px solid rgba(255,102,153,0.15);
+    border-radius: 20px;
+    padding: 5px 14px;
+    color: var(--text-label);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: inherit;
+}
+.osu-mode-tab:hover {
+    background: rgba(255,102,153,0.15);
+    color: var(--text-pink);
+}
+.osu-mode-tab.active {
+    background: rgba(255,102,153,0.25);
+    border-color: rgba(255,102,153,0.5);
+    color: var(--text-pink);
+}
+#visitor-recent-mode-tabs {
+    margin-top: 1rem;
+}
+.osu-total-pp {
+    margin-top: 1rem;
+    padding: 10px;
+    background: var(--bg-stat);
+    border: 1px solid rgba(255,102,153,0.15);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-label);
+}
+.osu-total-pp-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--text-pink);
+}
+
+/* ===== Recent Plays ===== */
+.osu-recent-plays {
+    margin-top: 1rem;
+}
+.osu-recent-title {
+    font-size: 0.85rem;
+    color: var(--text-label);
+    margin-bottom: 8px;
+    text-align: left;
+}
+.osu-recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.osu-recent-item {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 1.4;
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: left;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--bg-stat);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+.osu-recent-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--osu-card-shadow);
+}
+.osu-recent-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+.osu-recent-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--osu-overlay);
+}
+.osu-recent-rank {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.75rem;
+    color: #fff;
+}
+.osu-recent-rank.rank-ss { background: linear-gradient(135deg, #f4d03f, #f7ecb5); color: #6b5900; }
+.osu-recent-rank.rank-s { background: linear-gradient(135deg, #f4c542, #e8a628); color: #5c3d00; }
+.osu-recent-rank.rank-a { background: #6ee7b7; color: #064e3b; }
+.osu-recent-rank.rank-b { background: #60a5fa; color: #1e3a8a; }
+.osu-recent-rank.rank-c { background: #c084fc; color: #3b0764; }
+.osu-recent-rank.rank-d { background: #f87171; color: #7f1d1d; }
+.osu-recent-rank.rank-f { background: #94a3b8; color: #1e293b; }
+.osu-recent-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 8px 10px;
+}
+.osu-recent-song {
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.osu-recent-meta {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    margin-top: 2px;
+}
+
+/* ===== Visitor Lookup ===== */
+.visitor-lookup-card {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto 20px;
+    background: var(--bg-card-alt);
+    border: 1px solid rgba(255,102,153,0.2);
+    border-radius: 20px;
+    padding: 1.8rem 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+.visitor-lookup-card h3 {
+    color: var(--text-pink);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+.visitor-lookup-input-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.visitor-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+.visitor-result-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text);
+    text-align: left;
+}
+.visitor-result-country {
+    font-size: 0.8rem;
+    color: var(--text-label);
+    text-align: left;
+}
+.visitor-modes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 0.8rem;
+}
+.visitor-mode-mini {
+    background: var(--bg-stat);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 8px 4px;
+}
+.visitor-mode-name {
+    font-size: 0.7rem;
+    color: var(--text-label);
+    margin-bottom: 4px;
+}
+.visitor-mode-pp {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text-pink);
+}

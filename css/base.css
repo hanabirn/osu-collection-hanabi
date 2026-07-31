@@ -1,0 +1,211 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Noto Sans TC", "Microsoft JhengHei", 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(160deg, var(--bg-body-1) 0%, var(--bg-body-2) 35%, var(--bg-body-1) 60%, var(--bg-body-3) 100%);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+a { color: var(--accent-light-purple); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.site-header {
+    padding: 20px 24px 0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-card);
+}
+
+.site-header-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+.site-title-block h1 {
+    font-size: 1.5rem;
+    background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+}
+.site-tagline {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.site-header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lang-pill {
+    background: var(--lang-pill-bg);
+    border: 1px solid var(--lang-pill-border);
+    color: var(--lang-pill-text);
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.lang-pill.active {
+    background: var(--accent-purple);
+    color: #fff;
+    font-weight: bold;
+}
+
+.theme-toggle-btn {
+    background: var(--theme-toggle-bg);
+    border: 1px solid var(--theme-toggle-border);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.back-to-main {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.site-nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    overflow-x: auto;
+}
+.site-nav-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.site-nav-btn.active {
+    color: var(--text-pink);
+    border-bottom-color: var(--accent-pink);
+    font-weight: bold;
+}
+
+.site-main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+}
+
+.site-footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.status {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 4px 0;
+}
+
+.input-group {
+    display: flex;
+    gap: 8px;
+}
+.input-group input {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 15px rgba(192,132,252,0.25);
+}
+.input-group button, .btn {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    color: #fff;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.input-group button:hover, .btn:hover { filter: brightness(1.1); }
+
+.guestbook-input {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.card-corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--accent-light-purple);
+    opacity: 0.6;
+}
+.card-corner.tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.card-corner.tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+.card-corner.bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+.card-corner.br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+/* ===== Share Toast (ported from the main site's quiz.css — used by
+   export/import collection feedback) ===== */
+.share-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s ease;
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+    white-space: nowrap;
+}
+.share-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 600px) {
+    .site-header-top { flex-direction: column; }
+    .osu-profile-stats { grid-template-columns: repeat(2, 1fr) !important; }
+    .osu-collection { grid-template-columns: 1fr !important; }
+}

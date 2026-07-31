@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>osu! 收藏</title>
+<meta name="theme-color" content="#a855f7">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/osu.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-header-top">
+        <div class="site-title-block">
+            <h1 data-i18n="site_title">osu! 收藏</h1>
+            <p class="site-tagline" data-i18n="site_tagline">✦ Beatmap 收藏 + PP 查詢 ✦</p>
+        </div>
+        <div class="site-header-controls">
+            <button class="lang-pill active" data-lang="zh" onclick="applyLang('zh')">中文</button>
+            <button class="lang-pill" data-lang="en" onclick="applyLang('en')">EN</button>
+            <button class="lang-pill" data-lang="ja" onclick="applyLang('ja')">日本語</button>
+            <button class="lang-pill" data-lang="ko" onclick="applyLang('ko')">한국어</button>
+            <button class="lang-pill" data-lang="ru" onclick="applyLang('ru')">Русский</button>
+            <button class="lang-pill" data-lang="fr" onclick="applyLang('fr')">Français</button>
+            <button class="lang-pill" data-lang="es" onclick="applyLang('es')">Español</button>
+            <button class="lang-pill" data-lang="de" onclick="applyLang('de')">Deutsch</button>
+            <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+        </div>
+    </div>
+    <a class="back-to-main" href="https://hanabirn.github.io/" data-i18n="back_to_main">← 返回 Hanabiの小天地</a>
+    <nav class="site-nav">
+        <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
+        <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+    </nav>
+</header>
+
+<main class="site-main">
+
+    <section id="page-collection" class="site-page">
+        <h2 class="osu-page-title" data-i18n="osu_page_title">✦ osu!歌曲收藏+查詢個人總PP ✦</h2>
+
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="osu_title">♫ 新增 Beatmap ♫</h3>
+            <div class="input-group">
+                <input type="text" id="osuInput" data-i18n-placeholder="osu_placeholder" placeholder="輸入 ID 或貼上 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
+                <button onclick="addOsuBeatmap()" data-i18n="osu_add">新增</button>
+            </div>
+            <p id="osu-status" class="status"></p>
+            <div class="osu-volume">
+                <span>🔈</span>
+                <input type="range" id="osu-volume" min="0" max="1" step="0.05" value="0.4" oninput="osuSetVolume(this.value)">
+                <button class="osu-refresh-all" onclick="refreshAllOsuSets()" title="更新Beatmap">↻</button>
+                <button class="osu-refresh-all" onclick="exportOsuCollection()" data-i18n-title="osu_export" title="匯出收藏">📤</button>
+                <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="匯入收藏">📥</button>
+                <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
+                <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="🔒 設定密碼">🔒</button>
+            </div>
+        </div>
+
+        <div class="osu-mode-tabs">
+            <button class="osu-tab" onclick="switchOsuTab('favorites', this)" data-i18n="osu_fav">♥ 最愛</button>
+            <button class="osu-tab active" onclick="switchOsuTab('standard', this)">⭕ Standard</button>
+            <button class="osu-tab" onclick="switchOsuTab('taiko', this)">🥁 Taiko</button>
+            <button class="osu-tab" onclick="switchOsuTab('catch', this)">🍎 Catch</button>
+            <button class="osu-tab" onclick="switchOsuTab('mania', this)">🎹 Mania</button>
+        </div>
+
+        <div class="osu-search-row">
+            <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
+        </div>
+
+        <div id="osu-collection" class="osu-collection"></div>
+        <div id="osu-pagination" class="osu-pagination"></div>
+    </section>
+
+    <section id="page-lookup" class="site-page" style="display:none;">
+        <div class="osu-profile-card" id="osu-profile-card" style="display:none;">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div class="osu-profile-header">
+                <img id="osu-avatar" class="osu-avatar" src="" alt="avatar" onerror="this.onerror=null; this.style.display='none';">
+                <div class="osu-profile-info">
+                    <div class="osu-profile-name" id="osu-profile-name"></div>
+                    <div class="osu-profile-country" id="osu-profile-country"></div>
+                </div>
+            </div>
+            <div class="osu-mode-tabs" id="osu-mode-tabs">
+                <button class="osu-mode-tab active" data-mode="0">⭕ Standard</button>
+                <button class="osu-mode-tab" data-mode="1">🥁 Taiko</button>
+                <button class="osu-mode-tab" data-mode="2">🍎 Catch</button>
+                <button class="osu-mode-tab" data-mode="3">🎹 Mania</button>
+            </div>
+            <div class="osu-profile-stats" id="osu-profile-stats">
+                <div class="osu-stat">
+                    <div class="osu-stat-value" id="osu-rank">#—</div>
+                    <div class="osu-stat-label" data-i18n="osu_stat_global">全球排名</div>
+                </div>
+                <div class="osu-stat">
+                    <div class="osu-stat-value" id="osu-pp">—</div>
+                    <div class="osu-stat-label">pp</div>
+                </div>
+                <div class="osu-stat">
+                    <div class="osu-stat-value" id="osu-accuracy">—</div>
+                    <div class="osu-stat-label" data-i18n="osu_stat_accuracy">準確率</div>
+                </div>
+                <div class="osu-stat">
+                    <div class="osu-stat-value" id="osu-playcount">—</div>
+                    <div class="osu-stat-label" data-i18n="osu_stat_playcount">遊戲數</div>
+                </div>
+            </div>
+            <div class="osu-total-pp" id="osu-total-pp" style="display:none;">
+                <span data-i18n="osu_total_pp">全模式 PP</span>
+                <span class="osu-total-pp-value" id="osu-total-pp-value">—</span>
+            </div>
+            <div class="osu-recent-plays" id="osu-recent-plays" style="display:none;">
+                <div class="osu-recent-title" data-i18n="osu_recent_title">🎮 最近遊玩</div>
+                <div class="osu-recent-list" id="osu-recent-list"></div>
+            </div>
+        </div>
+
+        <div class="visitor-lookup-card" id="visitor-lookup-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="visitor_lookup_title">✦ 查詢你的 osu! PP ✦</h3>
+            <div class="visitor-lookup-input-row">
+                <input type="text" id="visitor-lookup-input" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input">
+                <button class="btn" onclick="lookupVisitorProfile()" data-i18n="visitor_lookup_btn">查詢</button>
+            </div>
+            <div id="visitor-lookup-status" class="status"></div>
+            <div id="visitor-lookup-result" style="display:none;">
+                <div class="visitor-result-header">
+                    <img id="visitor-avatar" class="osu-avatar" src="" alt="avatar" style="width:48px;height:48px;" onerror="this.onerror=null; this.style.display='none';">
+                    <div>
+                        <div class="visitor-result-name" id="visitor-result-name"></div>
+                        <div class="visitor-result-country" id="visitor-result-country"></div>
+                    </div>
+                </div>
+                <div class="visitor-modes-grid" id="visitor-modes-grid"></div>
+                <div class="osu-total-pp" id="visitor-total-pp">
+                    <span data-i18n="osu_total_pp">全模式 PP</span>
+                    <span class="osu-total-pp-value" id="visitor-total-pp-value">—</span>
+                </div>
+                <div class="osu-mode-tabs" id="visitor-recent-mode-tabs">
+                    <button class="osu-mode-tab active" data-mode="0" onclick="switchVisitorRecentMode(0,this)">⭕ Standard</button>
+                    <button class="osu-mode-tab" data-mode="1" onclick="switchVisitorRecentMode(1,this)">🥁 Taiko</button>
+                    <button class="osu-mode-tab" data-mode="2" onclick="switchVisitorRecentMode(2,this)">🍎 Catch</button>
+                    <button class="osu-mode-tab" data-mode="3" onclick="switchVisitorRecentMode(3,this)">🎹 Mania</button>
+                </div>
+                <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
+                    <div class="osu-recent-title" data-i18n="osu_recent_title">🎮 最近遊玩</div>
+                    <div class="osu-recent-list" id="visitor-recent-list"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <p>osu! 收藏 ✦ osu! is a trademark of ppy Pty Ltd</p>
+</footer>
+
+<script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/i18n/zh.js"></script>
+<script src="js/i18n/en.js"></script>
+<script src="js/i18n/ja.js"></script>
+<script src="js/i18n/ko.js"></script>
+<script src="js/i18n/ru.js"></script>
+<script src="js/i18n/fr.js"></script>
+<script src="js/i18n/es.js"></script>
+<script src="js/i18n/de.js"></script>
+<script src="js/osu.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
