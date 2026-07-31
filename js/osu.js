@@ -180,7 +180,9 @@ function initOsuBgCarousel() {
     const ids = [...new Set(OSU_MODES.flatMap(mode => col[mode].map(s => s.beatmapset_id)))];
     if (ids.length === 0) return;
     const shuffled = ids.slice().sort(() => Math.random() - 0.5);
-    const urls = shuffled.map(id => `https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg`);
+    // cover.jpg is only 900x250 — visibly blurry stretched across a full-page
+    // background. cover@2x.jpg is the same crop at double resolution.
+    const urls = shuffled.map(id => `https://assets.ppy.sh/beatmaps/${id}/covers/cover@2x.jpg`);
     renderOsuBgCarousel(urls);
 }
 
