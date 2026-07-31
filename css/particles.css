@@ -1,0 +1,89 @@
+/* ===== Ambient background layer =====
+   Ported from the Bolt.new "osu! Player Tool" reference design
+   (bolt.new/~/sb1-2gkeccgn, Version 6): three slow-drifting glow blobs,
+   a twinkling star-particle canvas, and faint pulsing "hit circle" rings
+   (osu!'s own gameplay motif) — layered behind the existing page content,
+   using this site's own pink/purple/cyan accent variables rather than
+   Bolt's hardcoded hex values. */
+
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#particles-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ── Drifting glow blobs ── */
+.bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: driftGlow 12s ease-in-out infinite alternate;
+}
+.glow-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(var(--accent-pink-rgb), 0.9), transparent 70%);
+    top: -150px; left: -150px;
+    animation-delay: 0s;
+}
+.glow-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(var(--accent-cyan-rgb), 0.9), transparent 70%);
+    bottom: -100px; right: -100px;
+    animation-delay: -5s;
+}
+.glow-3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(var(--accent-purple-rgb), 0.9), transparent 70%);
+    top: 40%; left: 50%;
+    animation: driftGlow3 12s ease-in-out infinite alternate;
+    animation-delay: -9s;
+}
+@keyframes driftGlow {
+    0%   { transform: translate(0, 0) scale(1); opacity: 0.15; }
+    50%  { opacity: 0.22; }
+    100% { transform: translate(40px, 30px) scale(1.1); opacity: 0.15; }
+}
+@keyframes driftGlow3 {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
+    50%  { opacity: 0.22; }
+    100% { transform: translate(calc(-50% + 40px), calc(-50% + 30px)) scale(1.1); opacity: 0.15; }
+}
+
+/* ── Hit-circle geometry (osu!'s own ring motif, used as faint ambient decoration) ── */
+.hit-circles { position: absolute; inset: 0; }
+.hit-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(var(--accent-pink-rgb), 0.15);
+    animation: hitPulse 6s ease-in-out infinite;
+}
+.hit-circle::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 1px solid rgba(var(--accent-pink-rgb), 0.08);
+}
+.hc-1 { width: 180px; height: 180px; top: 10%; left: 5%;  animation-delay: 0s; }
+.hc-2 { width: 120px; height: 120px; top: 60%; left: 15%; animation-delay: -2s; }
+.hc-3 { width: 200px; height: 200px; top: 20%; right: 8%; animation-delay: -4s; }
+.hc-4 { width: 90px;  height: 90px;  bottom: 15%; right: 20%; animation-delay: -1s; }
+.hc-5 { width: 140px; height: 140px; bottom: 30%; left: 40%; animation-delay: -3s; }
+@keyframes hitPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50%      { opacity: 0.7; transform: scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bg-glow, .hit-circle { animation: none; }
+}

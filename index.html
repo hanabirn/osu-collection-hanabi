@@ -7,9 +7,24 @@
 <meta name="theme-color" content="#a855f7">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/particles.css">
 <link rel="stylesheet" href="css/osu.css">
 </head>
 <body>
+
+<div class="bg-layer" aria-hidden="true">
+    <canvas id="particles-canvas"></canvas>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+    <div class="bg-glow glow-3"></div>
+    <div class="hit-circles">
+        <div class="hit-circle hc-1"></div>
+        <div class="hit-circle hc-2"></div>
+        <div class="hit-circle hc-3"></div>
+        <div class="hit-circle hc-4"></div>
+        <div class="hit-circle hc-5"></div>
+    </div>
+</div>
 
 <header class="site-header">
     <div class="site-header-top">
@@ -176,6 +191,7 @@
 </footer>
 
 <script src="js/theme.js"></script>
+<script src="js/particles.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/i18n/zh.js"></script>
 <script src="js/i18n/en.js"></script>

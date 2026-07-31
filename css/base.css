@@ -134,12 +134,16 @@ a:hover { text-decoration: underline; }
 }
 
 .site-main {
+    position: relative;
+    z-index: 1;
     max-width: 640px;
     margin: 0 auto;
     padding: 24px 16px 60px;
 }
 
 .site-footer {
+    position: relative;
+    z-index: 1;
     text-align: center;
     padding: 20px;
     color: var(--text-secondary);
