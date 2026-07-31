@@ -24,8 +24,8 @@
     --accent-purple: #a855f7;
     --accent-light-purple: #c084fc;
     --accent-yellow: #fbbf24;
-    --shadow-card: 0 0 25px rgba(168,85,247,0.08);
-    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.05);
+    --shadow-card: 0 0 25px rgba(168,85,247,0.08), 0 10px 34px rgba(0,0,0,0.25);
+    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.07);
     --lang-pill-bg: rgba(255,255,255,0.08);
     --lang-pill-border: rgba(255,255,255,0.15);
     --lang-pill-text: rgba(255,255,255,0.6);
@@ -33,6 +33,12 @@
     --osu-overlay: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0.92) 100%);
     --theme-toggle-bg: rgba(255,255,255,0.08);
     --theme-toggle-border: rgba(255,255,255,0.15);
+    /* RGB triplets for building rgba() glows/shadows from the theme's own accents. */
+    --accent-pink-rgb: 244, 114, 182;
+    --accent-purple-rgb: 168, 85, 247;
+    --glass-blur: 16px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 [data-theme="light"] {
@@ -56,7 +62,7 @@
     --accent-purple: #9333ea;
     --accent-light-purple: #a855f7;
     --accent-yellow: #d97706;
-    --shadow-card: 0 2px 15px rgba(147,51,234,0.08);
+    --shadow-card: 0 2px 15px rgba(147,51,234,0.08), 0 8px 26px rgba(45,27,78,0.08);
     --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.8);
     --lang-pill-bg: rgba(147,51,234,0.06);
     --lang-pill-border: rgba(147,51,234,0.15);
@@ -65,9 +71,47 @@
     --osu-overlay: linear-gradient(to bottom, rgba(147,51,234,0.05) 0%, rgba(147,51,234,0.1) 40%, rgba(45,27,78,0.7) 80%, rgba(45,27,78,0.85) 100%);
     --theme-toggle-bg: rgba(147,51,234,0.06);
     --theme-toggle-border: rgba(147,51,234,0.15);
+    --accent-pink-rgb: 219, 39, 119;
+    --accent-purple-rgb: 147, 51, 234;
 }
 
 /* Smooth transition */
 *, *::before, *::after {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== Ambient background glow =====
+   Two slow-drifting radial blobs behind the content, in the theme's own
+   pink/purple accents — same "ambient light" pattern as the main site,
+   kept faint (0.08-0.12 opacity) so it reads as depth, not decoration. */
+body::before, body::after {
+    content: '';
+    position: fixed;
+    width: 46vw;
+    height: 46vw;
+    max-width: 560px;
+    max-height: 560px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(80px);
+    animation: orb-drift 14s ease-in-out infinite;
+}
+body::before {
+    top: -12%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(var(--accent-pink-rgb), 0.12) 0%, transparent 70%);
+}
+body::after {
+    bottom: -14%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(var(--accent-purple-rgb), 0.10) 0%, transparent 70%);
+    animation-delay: -7s;
+}
+@keyframes orb-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(3%, 4%) scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+    body::before, body::after { animation: none; }
 }

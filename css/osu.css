@@ -14,7 +14,8 @@
 .osu-add-card {
     position: relative;
     background: var(--bg-card);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     padding: 24px;
     border-radius: 16px;
     margin-bottom: 20px;
@@ -126,17 +127,23 @@
     border-radius: 10px;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: border-color 0.25s var(--ease-out), color 0.25s var(--ease-out),
+        box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring), background 0.25s var(--ease-out);
     text-align: center;
     font-weight: 500;
 }
-.osu-tab:hover { color: var(--text); border-color: var(--accent-purple); }
+.osu-tab:hover {
+    color: var(--text);
+    border-color: var(--accent-purple);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(var(--accent-purple-rgb), 0.18);
+}
 .osu-tab.active {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: #fff;
     font-weight: bold;
     border-color: transparent;
-    box-shadow: 0 0 18px rgba(244,114,182,0.3);
+    box-shadow: 0 0 18px rgba(var(--accent-pink-rgb), 0.3);
 }
 
 .osu-search-row {
@@ -201,11 +208,13 @@
     overflow: hidden;
     cursor: pointer;
     aspect-ratio: 4 / 1.6;
-    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid transparent;
+    transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
 }
 .osu-card:hover {
     transform: translateY(-4px) scale(1.02);
-    box-shadow: var(--osu-card-shadow);
+    border-color: rgba(var(--accent-pink-rgb), 0.4);
+    box-shadow: var(--osu-card-shadow), 0 0 22px rgba(var(--accent-pink-rgb), 0.18);
 }
 
 .osu-card-bg {
@@ -283,7 +292,7 @@
 .osu-copy-btn {
     position: absolute;
     top: 8px;
-    right: 44px;
+    right: 48px;
     background: rgba(0,0,0,0.5);
     color: rgba(255,255,255,0.6);
     border: none;
@@ -415,19 +424,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: border-color 0.25s var(--ease-out), color 0.25s var(--ease-out),
+        background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
 }
 .osu-page-btn:hover:not(:disabled) {
     color: #fff;
     border-color: var(--accent-purple);
     background: rgba(168,85,247,0.3);
+    transform: translateY(-1px);
 }
 .osu-page-btn.active {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: #fff;
     font-weight: bold;
     border-color: transparent;
-    box-shadow: 0 0 12px rgba(244,114,182,0.3);
+    box-shadow: 0 0 12px rgba(var(--accent-pink-rgb), 0.3);
 }
 .osu-page-btn:disabled {
     opacity: 0.3;
@@ -445,7 +456,9 @@
     border-radius: 20px;
     padding: 1.8rem 1.5rem;
     text-align: center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--shadow-card-inset);
 }
 .osu-profile-header {
     display: flex;
@@ -640,7 +653,9 @@
     border-radius: 20px;
     padding: 1.8rem 1.5rem;
     text-align: center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--shadow-card-inset);
 }
 .visitor-lookup-card h3 {
     color: var(--text-pink);
