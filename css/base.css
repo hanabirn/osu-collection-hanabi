@@ -48,12 +48,21 @@ a:hover { text-decoration: underline; }
 .site-title-block h1 {
     font-size: 2.3rem;
     font-weight: 800;
-    background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple));
+    background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple), var(--accent-pink), var(--text-pink));
+    background-size: 300% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: 2px;
-    filter: drop-shadow(0 0 12px rgba(var(--accent-pink-rgb), 0.30));
+    animation: titleShimmer 5s linear infinite, titleGlowPulse 4s ease-in-out infinite;
+}
+@keyframes titleShimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 300% center; }
+}
+@keyframes titleGlowPulse {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(var(--accent-pink-rgb), 0.30)); }
+    50% { filter: drop-shadow(0 0 20px rgba(var(--accent-pink-rgb), 0.5)) drop-shadow(0 0 32px rgba(var(--accent-purple-rgb), 0.25)); }
 }
 .site-tagline {
     font-size: 0.8rem;
@@ -89,6 +98,7 @@ a:hover { text-decoration: underline; }
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.25);
     transform: translateY(-1px);
 }
+.lang-pill:active { transform: scale(0.94); }
 .lang-pill.active {
     background: var(--accent-purple);
     color: #fff;
@@ -113,6 +123,7 @@ a:hover { text-decoration: underline; }
     border-color: var(--accent-purple);
     box-shadow: 0 0 12px rgba(var(--accent-purple-rgb), 0.35);
 }
+.theme-toggle-btn:active { transform: scale(0.92) rotate(15deg); }
 
 .back-to-main {
     display: block;
@@ -130,24 +141,47 @@ a:hover { text-decoration: underline; }
     overflow-x: auto;
 }
 .site-nav-btn {
+    position: relative;
     background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
     color: var(--text-secondary);
     padding: 10px 16px;
     font-size: 0.95rem;
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
+    transition: color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
+}
+.site-nav-btn::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+    height: 3px;
+    border-radius: 2px 2px 0 0;
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), var(--accent-pink));
+    background-size: 200% auto;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.35s var(--ease-spring);
 }
 .site-nav-btn:hover {
     color: var(--text-pink);
     transform: translateY(-1px);
 }
+.site-nav-btn:active { transform: translateY(0) scale(0.96); }
 .site-nav-btn.active {
     color: var(--text-pink);
-    border-bottom-color: var(--accent-pink);
     font-weight: bold;
+    filter: drop-shadow(0 2px 8px rgba(var(--accent-pink-rgb), 0.3));
+}
+.site-nav-btn.active::after {
+    transform: scaleX(1);
+    animation: navShimmer 3s linear infinite;
+}
+@keyframes navShimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
 }
 
 .site-main {
@@ -194,6 +228,8 @@ a:hover { text-decoration: underline; }
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
 .input-group button, .btn {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: #fff;
     border: none;
@@ -206,6 +242,16 @@ a:hover { text-decoration: underline; }
     box-shadow: 0 4px 14px rgba(var(--accent-pink-rgb), 0.25);
     transition: filter 0.25s var(--ease-out), transform 0.2s var(--ease-spring), box-shadow 0.25s var(--ease-out);
 }
+.input-group button::after, .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+.input-group button:hover::after, .btn:hover::after { transform: translateX(100%); }
 .input-group button:hover, .btn:hover {
     filter: brightness(1.1);
     transform: translateY(-1px);

@@ -185,6 +185,7 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 14px rgba(var(--accent-purple-rgb), 0.18);
 }
+.osu-tab:active { transform: translateY(0) scale(0.96); }
 .osu-tab.active {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: #fff;
