@@ -4,9 +4,9 @@
    zero rewriting. */
 :root {
     /* Dark theme (default) */
-    --bg-body-1: #1a0a2e;
-    --bg-body-2: #16213e;
-    --bg-body-3: #2d1b4e;
+    --bg-body-1: #13091f;
+    --bg-body-2: #1a0d2e;
+    --bg-body-3: #24102f;
     --bg-card: rgba(25, 15, 45, 0.88);
     --bg-card-alt: rgba(255,255,255,0.06);
     --bg-input: rgba(25, 15, 45, 0.9);
@@ -44,9 +44,9 @@
 }
 
 [data-theme="light"] {
-    --bg-body-1: #f8f4ff;
-    --bg-body-2: #ede4f7;
-    --bg-body-3: #f0e8f8;
+    --bg-body-1: #fdf3fa;
+    --bg-body-2: #f7e6f2;
+    --bg-body-3: #fbeef7;
     --bg-card: rgba(255, 255, 255, 0.92);
     --bg-card-alt: rgba(168,85,247,0.06);
     --bg-input: rgba(255, 255, 255, 0.95);
