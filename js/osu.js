@@ -171,6 +171,44 @@ function saveOsuCollection(col) {
     localStorage.setItem('osu_collection', JSON.stringify(col));
 }
 
+/* ===== Background carousel from the visitor's own collected beatmap covers =====
+   osu! has no character roster to draw on (unlike the pjsekai/wuwa sibling
+   sites), so this fades between covers of whatever is actually in the
+   visitor's collection instead — personalized, no art curation needed. */
+function initOsuBgCarousel() {
+    const col = getOsuCollection();
+    const ids = [...new Set(OSU_MODES.flatMap(mode => col[mode].map(s => s.beatmapset_id)))];
+    if (ids.length === 0) return;
+    const shuffled = ids.slice().sort(() => Math.random() - 0.5).slice(0, 10);
+    const urls = shuffled.map(id => `https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg`);
+    renderOsuBgCarousel(urls);
+}
+
+function renderOsuBgCarousel(urls) {
+    const container = document.getElementById('bg-carousel');
+    if (!container || !urls.length) return;
+    const half = Math.ceil(urls.length / 2);
+    container.innerHTML =
+        urls.slice(0, half).map(u => `<div class="bg-slide bg-slide-left" style="background-image:url('${u}')"></div>`).join('') +
+        urls.slice(half).map(u => `<div class="bg-slide bg-slide-right" style="background-image:url('${u}')"></div>`).join('');
+    runOsuBgSlideCarousel('.bg-slide-left', 7000, 0);
+    runOsuBgSlideCarousel('.bg-slide-right', 7000, 3500);
+}
+
+function runOsuBgSlideCarousel(selector, intervalMs, delayMs) {
+    const slides = document.querySelectorAll('#bg-carousel ' + selector);
+    if (!slides.length) return;
+    let idx = 0;
+    slides[0].classList.add('active');
+    setTimeout(() => {
+        setInterval(() => {
+            slides[idx].classList.remove('active');
+            idx = (idx + 1) % slides.length;
+            slides[idx].classList.add('active');
+        }, intervalMs);
+    }, delayMs);
+}
+
 function exportOsuCollection() {
     const data = {
         collection: getOsuCollection(),

@@ -14,10 +14,34 @@ a:hover { text-decoration: underline; }
 .site-header {
     position: relative;
     z-index: 1;
+    overflow: hidden;
     padding: 20px 24px 0;
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-card);
     backdrop-filter: blur(var(--glass-blur));
+}
+
+.title-note {
+    display: block;
+    font-size: 2.3rem;
+    line-height: 1;
+    color: var(--accent-pink);
+    filter: drop-shadow(0 0 10px rgba(var(--accent-pink-rgb), 0.5));
+    animation: titleNoteFloat 3.2s ease-in-out infinite;
+}
+.title-note-left { animation-delay: 0s; }
+.title-note-right { color: var(--accent-purple); filter: drop-shadow(0 0 10px rgba(var(--accent-purple-rgb), 0.5)); animation-delay: 1.6s; }
+
+@keyframes titleNoteFloat {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%      { transform: translateY(-10px) rotate(6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .title-note { animation: none; }
+}
+@media (max-width: 600px) {
+    .title-note { font-size: 1.6rem; }
+    .header-logo { gap: 6px; }
 }
 
 .site-header-top {

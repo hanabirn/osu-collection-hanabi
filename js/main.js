@@ -22,4 +22,5 @@ function refreshDynamicContent() {
 document.addEventListener('DOMContentLoaded', () => {
     applyLang(siteLang);
     fetchOsuProfile();
+    initOsuBgCarousel();
 });
