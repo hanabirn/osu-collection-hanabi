@@ -8,10 +8,11 @@
 
 /* ── Background carousel of the visitor's own collected beatmap covers ──
    osu! has no official mascot cast like the pjsekai/wuwa sibling sites, so
-   instead of character art this fades between covers pulled from whatever
-   beatmaps are actually in the visitor's own collection — personalized,
-   and needs no hand-picked art. Sits behind .bg-layer (z-index 0) so the
-   glow/particles/hit-circles render as a translucent layer on top of it. */
+   instead of character art this cross-fades through one centered cover at
+   a time, pulled from whatever beatmaps are actually in the visitor's own
+   collection — personalized, and needs no hand-picked art. Sits behind
+   .bg-layer (z-index 0) so the glow/particles/hit-circles render as a
+   translucent layer on top of it. */
 #bg-carousel {
     position: fixed;
     inset: 0;
@@ -24,21 +25,16 @@
     inset: 0;
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center center;
     opacity: 0;
     transition: opacity 2.5s ease;
     animation: bgSlideDrift 12s ease-in-out infinite;
 }
-.bg-slide-left { background-position: left center; }
-.bg-slide-right { background-position: right center; }
 .bg-slide.active { opacity: 0.4; }
 @keyframes bgSlideDrift {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.06); }
     100% { transform: scale(1); }
-}
-@media (max-width: 768px) {
-    .bg-slide-left { display: none; }
-    .bg-slide-right { background-position: center 20%; }
 }
 @media (prefers-reduced-motion: reduce) {
     .bg-slide { animation: none; }

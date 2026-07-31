@@ -189,26 +189,20 @@ function initOsuBgCarousel() {
 function renderOsuBgCarousel(urls) {
     const container = document.getElementById('bg-carousel');
     if (!container || !urls.length) return;
-    const half = Math.ceil(urls.length / 2);
-    container.innerHTML =
-        urls.slice(0, half).map(u => `<div class="bg-slide bg-slide-left" style="background-image:url('${u}')"></div>`).join('') +
-        urls.slice(half).map(u => `<div class="bg-slide bg-slide-right" style="background-image:url('${u}')"></div>`).join('');
-    runOsuBgSlideCarousel('.bg-slide-left', 7000, 0);
-    runOsuBgSlideCarousel('.bg-slide-right', 7000, 3500);
+    container.innerHTML = urls.map(u => `<div class="bg-slide" style="background-image:url('${u}')"></div>`).join('');
+    runOsuBgSlideCarousel(7000);
 }
 
-function runOsuBgSlideCarousel(selector, intervalMs, delayMs) {
-    const slides = document.querySelectorAll('#bg-carousel ' + selector);
+function runOsuBgSlideCarousel(intervalMs) {
+    const slides = document.querySelectorAll('#bg-carousel .bg-slide');
     if (!slides.length) return;
     let idx = 0;
     slides[0].classList.add('active');
-    setTimeout(() => {
-        setInterval(() => {
-            slides[idx].classList.remove('active');
-            idx = (idx + 1) % slides.length;
-            slides[idx].classList.add('active');
-        }, intervalMs);
-    }, delayMs);
+    setInterval(() => {
+        slides[idx].classList.remove('active');
+        idx = (idx + 1) % slides.length;
+        slides[idx].classList.add('active');
+    }, intervalMs);
 }
 
 function exportOsuCollection() {
