@@ -20,6 +20,8 @@ I18N.ko = {
     osu_stat_global: '글로벌 랭크', osu_stat_accuracy: '정확도', osu_stat_playcount: '플레이 수', osu_total_pp: '전 모드 PP 합계',
     osu_recent_title: '🎮 최근 플레이',
     osu_search_placeholder: '곡명 또는 아티스트로 검색...', osu_search_empty: '일치하는 비트맵을 찾을 수 없습니다',
+    osu_sort_default: '기본 정렬', osu_sort_rating_desc: '난이도 (높은순)', osu_sort_rating_asc: '난이도 (낮은순)',
+    pp_history_title: 'PP 성장 추이', pp_history_empty: '아직 기록이 부족합니다. 다시 방문하면 추이가 쌓입니다.',
     osu_export: '컬렉션 내보내기', osu_import: '컬렉션 가져오기',
     osu_export_done: '내보내기 완료!', osu_import_done: '가져오기 완료!', osu_import_fail: '가져오기 실패. 파일 형식을 확인하세요',
 };

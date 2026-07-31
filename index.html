@@ -71,6 +71,11 @@
 
         <div class="osu-search-row">
             <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
+            <select id="osu-sort-select" onchange="switchOsuSort(this.value)">
+                <option value="default" data-i18n="osu_sort_default">預設排序</option>
+                <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>
+                <option value="rating-asc" data-i18n="osu_sort_rating_asc">星數（低到高）</option>
+            </select>
         </div>
 
         <div id="osu-collection" class="osu-collection"></div>
@@ -116,6 +121,7 @@
                 <span data-i18n="osu_total_pp">全模式 PP</span>
                 <span class="osu-total-pp-value" id="osu-total-pp-value">—</span>
             </div>
+            <div class="pp-history-panel" id="pp-history-panel"></div>
             <div class="osu-recent-plays" id="osu-recent-plays" style="display:none;">
                 <div class="osu-recent-title" data-i18n="osu_recent_title">🎮 最近遊玩</div>
                 <div class="osu-recent-list" id="osu-recent-list"></div>

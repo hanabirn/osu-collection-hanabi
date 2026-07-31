@@ -13,6 +13,7 @@ function switchTab(tab, el) {
    refreshDynamicContent() for quiz content. */
 function refreshDynamicContent() {
     renderOsuCollection();
+    renderPpHistoryChart();
 }
 
 /* ===== Init ===== */

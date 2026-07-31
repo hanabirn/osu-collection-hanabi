@@ -25,6 +25,7 @@ let osuCurrentTab = 'standard';
 let osuCurrentAudio = null;
 let osuVolume = 0.4;
 let osuPage = 0;
+let osuSortMode = 'default';
 let osuSearchQuery = '';
 const OSU_PAGE_SIZE = 8;
 
@@ -36,6 +37,22 @@ function filterOsuCollection(query) {
     osuSearchQuery = query.trim();
     osuPage = 0;
     renderOsuCollection();
+}
+
+function switchOsuSort(mode) {
+    osuSortMode = mode;
+    osuPage = 0;
+    renderOsuCollection();
+}
+
+function osuSetMaxRating(set) {
+    return Math.max(...set.beatmaps.map(b => b.difficulty_rating));
+}
+
+function sortOsuSets(sets) {
+    if (osuSortMode === 'rating-desc') return [...sets].sort((a, b) => osuSetMaxRating(b) - osuSetMaxRating(a));
+    if (osuSortMode === 'rating-asc') return [...sets].sort((a, b) => osuSetMaxRating(a) - osuSetMaxRating(b));
+    return sets;
 }
 
 async function sha256(str) {
@@ -406,6 +423,8 @@ function renderOsuCollection() {
         );
     }
 
+    sets = sortOsuSets(sets);
+
     if (sets.length === 0) {
         const msg = osuSearchQuery
             ? t('osu_search_empty')
@@ -564,6 +583,103 @@ async function renderOsuRecentPlays(userId, mode, listId, wrapId) {
     }
 }
 
+/* ===== PP growth trend: daily localStorage snapshots of total PP, rendered
+   as a small SVG line chart. There's no historical PP endpoint on the osu!
+   v1 API, so this only accumulates data from whenever a visitor first loads
+   the site forward — it can't backfill past progress. ===== */
+const OSU_PP_HISTORY_KEY = 'osu_pp_history';
+const OSU_PP_HISTORY_MAX_DAYS = 90;
+
+function getPpHistory() {
+    try { return JSON.parse(localStorage.getItem(OSU_PP_HISTORY_KEY)) || []; }
+    catch { return []; }
+}
+
+function savePpHistory(history) {
+    localStorage.setItem(OSU_PP_HISTORY_KEY, JSON.stringify(history));
+}
+
+function recordPpSnapshot(totalPP) {
+    const today = new Date().toISOString().slice(0, 10);
+    const value = Math.round(totalPP);
+    const history = getPpHistory();
+    const last = history[history.length - 1];
+    if (last && last.date === today && last.pp === value) return;
+    if (last && last.date === today) history[history.length - 1] = { date: today, pp: value };
+    else history.push({ date: today, pp: value });
+    savePpHistory(history.length > OSU_PP_HISTORY_MAX_DAYS ? history.slice(-OSU_PP_HISTORY_MAX_DAYS) : history);
+}
+
+function formatPpChartDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+function ppTrendChartSvg(history) {
+    const width = 600, height = 150;
+    const padL = 40, padR = 14, padT = 14, padB = 20;
+    const innerW = width - padL - padR;
+    const innerH = height - padT - padB;
+
+    const xs = history.map(p => new Date(p.date + 'T00:00:00').getTime());
+    const xMin = xs[0];
+    const xSpan = Math.max(1, xs[xs.length - 1] - xMin);
+
+    let yMin = Math.min(...history.map(p => p.pp));
+    let yMax = Math.max(...history.map(p => p.pp));
+    if (yMin === yMax) { yMin -= 1; yMax += 1; }
+    const yPad = (yMax - yMin) * 0.1;
+    yMin = Math.max(0, Math.floor(yMin - yPad));
+    yMax = Math.ceil(yMax + yPad);
+
+    const xPos = t => padL + (xs.length === 1 ? innerW / 2 : ((t - xMin) / xSpan) * innerW);
+    const yPos = v => padT + innerH - ((v - yMin) / (yMax - yMin)) * innerH;
+
+    const baseline = `<line x1="${padL}" y1="${padT + innerH}" x2="${padL + innerW}" y2="${padT + innerH}" class="trend-chart-grid" />`;
+    const yLabels = `<text x="${padL - 6}" y="${padT + innerH + 3}" text-anchor="end" class="trend-chart-axis-label">${yMin.toLocaleString()}</text>
+        <text x="${padL - 6}" y="${padT + 8}" text-anchor="end" class="trend-chart-axis-label">${yMax.toLocaleString()}</text>`;
+    const xLabels = `<text x="${padL}" y="${height - 4}" text-anchor="start" class="trend-chart-axis-label">${formatPpChartDate(history[0].date)}</text>
+        <text x="${padL + innerW}" y="${height - 4}" text-anchor="end" class="trend-chart-axis-label">${formatPpChartDate(history[history.length - 1].date)}</text>`;
+
+    const pts = history.map(p => `${xPos(new Date(p.date + 'T00:00:00').getTime())},${yPos(p.pp)}`);
+    const line = history.length > 1
+        ? `<polyline points="${pts.join(' ')}" fill="none" stroke="var(--accent-pink)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />`
+        : '';
+    const dots = history.map(p => {
+        const cx = xPos(new Date(p.date + 'T00:00:00').getTime());
+        const cy = yPos(p.pp);
+        return `<circle cx="${cx}" cy="${cy}" r="2.5" fill="var(--accent-pink)"><title>${formatPpChartDate(p.date)}: ${p.pp.toLocaleString()}pp</title></circle>`;
+    }).join('');
+    const last = history[history.length - 1];
+    const lastX = xPos(new Date(last.date + 'T00:00:00').getTime());
+    const lastY = yPos(last.pp);
+    const valueLabel = `<circle cx="${lastX}" cy="${lastY}" r="4" fill="var(--accent-pink)"><title>${formatPpChartDate(last.date)}: ${last.pp.toLocaleString()}pp</title></circle>
+        <text x="${lastX + 6}" y="${lastY - 6}" class="trend-chart-value-label" fill="var(--accent-pink)">${last.pp.toLocaleString()}</text>`;
+
+    return `<svg viewBox="0 0 ${width} ${height}" class="trend-chart-svg" preserveAspectRatio="none">
+        ${baseline}${yLabels}${xLabels}${line}${dots}${valueLabel}
+    </svg>`;
+}
+
+function renderPpHistoryChart() {
+    const el = document.getElementById('pp-history-panel');
+    if (!el) return;
+    const history = getPpHistory();
+
+    if (history.length < 2) {
+        el.innerHTML = `
+            <div class="trend-chart-label">${t('pp_history_title')}</div>
+            <p class="osu-empty">${t('pp_history_empty')}</p>
+        `;
+        return;
+    }
+
+    el.innerHTML = `
+        <div class="trend-chart-label">${t('pp_history_title')}</div>
+        <div class="trend-chart-wrap">${ppTrendChartSvg(history)}</div>
+    `;
+}
+
 async function fetchOsuProfile() {
     if (osuProfileLoaded) return;
     try {
@@ -581,6 +697,11 @@ async function fetchOsuProfile() {
         const totalPP = osuModeData.reduce((sum, m) => sum + (m && m.pp_raw != null ? parseFloat(m.pp_raw) : 0), 0);
         document.getElementById('osu-total-pp-value').textContent = Math.round(totalPP).toLocaleString();
         document.getElementById('osu-total-pp').style.display = totalPP > 0 ? '' : 'none';
+
+        if (totalPP > 0) {
+            recordPpSnapshot(totalPP);
+            renderPpHistoryChart();
+        }
 
         document.getElementById('osu-profile-card').style.display = 'block';
         osuProfileLoaded = true;

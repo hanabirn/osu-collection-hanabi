@@ -20,6 +20,8 @@ I18N.fr = {
     osu_stat_global: 'Rang mondial', osu_stat_accuracy: 'Précision', osu_stat_playcount: 'Parties', osu_total_pp: 'PP total (tous modes)',
     osu_recent_title: '🎮 Parties récentes',
     osu_search_placeholder: 'Rechercher par titre ou artiste...', osu_search_empty: 'Aucune beatmap trouvée',
+    osu_sort_default: 'Ordre par défaut', osu_sort_rating_desc: 'Étoiles (décroissant)', osu_sort_rating_asc: 'Étoiles (croissant)',
+    pp_history_title: 'Évolution du PP', pp_history_empty: "Pas encore assez d'historique — revenez plus tard pour voir la tendance.",
     osu_export: 'Exporter la collection', osu_import: 'Importer la collection',
     osu_export_done: 'Collection exportée !', osu_import_done: 'Collection importée !', osu_import_fail: "Échec de l'import. Vérifiez le format du fichier",
 };

@@ -20,6 +20,8 @@ I18N.en = {
     osu_stat_global: 'Global Rank', osu_stat_accuracy: 'Accuracy', osu_stat_playcount: 'Play Count', osu_total_pp: 'Total PP (All Modes)',
     osu_recent_title: '🎮 Recent Plays',
     osu_search_placeholder: 'Search by title or artist...', osu_search_empty: 'No matching beatmaps found',
+    osu_sort_default: 'Default Order', osu_sort_rating_desc: 'Star Rating (High to Low)', osu_sort_rating_asc: 'Star Rating (Low to High)',
+    pp_history_title: 'PP Growth', pp_history_empty: 'Not enough history yet — visit again later to build up the trend.',
     osu_export: 'Export Collection', osu_import: 'Import Collection',
     osu_export_done: 'Collection exported!', osu_import_done: 'Collection imported!', osu_import_fail: 'Import failed. Please check the file format.',
 };

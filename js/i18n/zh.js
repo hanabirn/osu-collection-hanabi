@@ -20,6 +20,8 @@ I18N.zh = {
     osu_stat_global: '全球排名', osu_stat_accuracy: '準確率', osu_stat_playcount: '遊戲數', osu_total_pp: '全模式 PP',
     osu_recent_title: '🎮 最近遊玩',
     osu_search_placeholder: '搜尋曲名或作者...', osu_search_empty: '找不到符合的 Beatmap',
+    osu_sort_default: '預設排序', osu_sort_rating_desc: '星數（高到低）', osu_sort_rating_asc: '星數（低到高）',
+    pp_history_title: 'PP 成長趨勢', pp_history_empty: '還沒有足夠的紀錄，多來看看就會累積趨勢圖！',
     osu_export: '匯出收藏', osu_import: '匯入收藏',
     osu_export_done: '已匯出收藏！', osu_import_done: '已匯入收藏！', osu_import_fail: '匯入失敗，請確認檔案格式正確',
 };

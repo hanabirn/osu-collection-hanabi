@@ -20,6 +20,8 @@ I18N.ru = {
     osu_stat_global: 'Мировой рейтинг', osu_stat_accuracy: 'Точность', osu_stat_playcount: 'Игр', osu_total_pp: 'Всего PP (все режимы)',
     osu_recent_title: '🎮 Недавние игры',
     osu_search_placeholder: 'Поиск по названию или автору...', osu_search_empty: 'Битмапы не найдены',
+    osu_sort_default: 'По умолчанию', osu_sort_rating_desc: 'Звёзды (по убыванию)', osu_sort_rating_asc: 'Звёзды (по возрастанию)',
+    pp_history_title: 'Рост PP', pp_history_empty: 'Пока недостаточно данных — зайдите позже, чтобы накопить историю.',
     osu_export: 'Экспорт коллекции', osu_import: 'Импорт коллекции',
     osu_export_done: 'Коллекция экспортирована!', osu_import_done: 'Коллекция импортирована!', osu_import_fail: 'Ошибка импорта. Проверьте формат файла',
 };

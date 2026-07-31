@@ -140,10 +140,13 @@
 }
 
 .osu-search-row {
+    display: flex;
+    gap: 10px;
     margin-bottom: 16px;
 }
 #osu-search-input {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     padding: 11px 14px;
     border-radius: 10px;
     border: 1px solid var(--border-input);
@@ -157,6 +160,20 @@
     outline: none;
     border-color: var(--accent-light-purple);
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
+}
+#osu-sort-select {
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+@media (max-width: 480px) {
+    .osu-search-row { flex-wrap: wrap; }
+    #osu-search-input { flex: 1 1 100%; }
+    #osu-sort-select { flex: 1; }
 }
 
 .osu-collection {
@@ -668,3 +685,22 @@
     font-weight: bold;
     color: var(--text-pink);
 }
+
+/* ===== PP growth trend chart ===== */
+.pp-history-panel { margin-top: 1rem; text-align: left; }
+.trend-chart-label {
+    font-size: 0.85rem;
+    color: var(--text-label);
+    margin-bottom: 8px;
+}
+.trend-chart-wrap {
+    background: var(--bg-stat);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 6px 8px;
+}
+.trend-chart-svg { width: 100%; height: auto; display: block; }
+.trend-chart-grid { stroke: var(--border-light); stroke-width: 1; }
+.trend-chart-axis-label { font-size: 8px; fill: var(--text-label); }
+.trend-chart-value-label { font-size: 10px; font-weight: bold; }
+.pp-history-panel .osu-empty { padding: 12px 4px; font-size: 0.82rem; }
