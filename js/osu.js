@@ -179,7 +179,7 @@ function initOsuBgCarousel() {
     const col = getOsuCollection();
     const ids = [...new Set(OSU_MODES.flatMap(mode => col[mode].map(s => s.beatmapset_id)))];
     if (ids.length === 0) return;
-    const shuffled = ids.slice().sort(() => Math.random() - 0.5).slice(0, 10);
+    const shuffled = ids.slice().sort(() => Math.random() - 0.5);
     const urls = shuffled.map(id => `https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg`);
     renderOsuBgCarousel(urls);
 }
