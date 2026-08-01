@@ -35,4 +35,10 @@ I18N.zh = {
     pp_calc_calculating: '計算中...', pp_calc_error: '計算失敗，請稍後再試', pp_calc_stars_label: '星數',
     pp_calc_strain_title: '難度曲線', pp_calc_strain_unsupported: '此譜面暫無難度曲線資料', pp_calc_acc_invalid: '請輸入 0～100 之間的準確率',
     pp_calc_hint: '選擇難度、勾選 Mods、輸入準確率後按「計算」，即可重新試算星數與 PP，並顯示這張圖的難度曲線。',
+
+    osu_share_link_btn: '分享收藏連結', osu_share_link_done: '收藏連結已複製！分享給朋友，他們點開就能一鍵匯入。',
+    osu_share_link_fail: '產生分享連結失敗', osu_share_link_empty: '收藏是空的，先新增幾張圖再分享吧',
+    osu_share_link_import_confirm: '這個連結包含 {n} 個 Beatmap，要匯入到你的收藏嗎？（不會覆蓋現有收藏，只會加入你還沒有的）',
+    osu_share_link_imported: '已匯入 {n} 個新 Beatmap！', osu_share_link_import_fail: '匯入連結失敗，連結可能已損毀',
+    stats_card_btn: '產生戰績卡', stats_card_done: '戰績卡已下載！', stats_card_fail: '產生戰績卡失敗',
 };

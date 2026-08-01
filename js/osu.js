@@ -243,6 +243,90 @@ async function importOsuCollection(event) {
     }
 }
 
+/* ===== Shareable collection link =====
+   Encodes the collection as gzip+base64url into a URL hash fragment (never
+   sent to any server, so there's no size limit imposed by a backend) —
+   anyone who opens the link gets prompted to merge those beatmaps into
+   their own collection, skipping ones they already have. */
+function base64UrlEncode(bytes) {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64UrlDecode(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    const binary = atob(str);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+}
+
+async function compressToBase64Url(obj) {
+    const stream = new Blob([JSON.stringify(obj)]).stream().pipeThrough(new CompressionStream('gzip'));
+    const buf = await new Response(stream).arrayBuffer();
+    return base64UrlEncode(new Uint8Array(buf));
+}
+
+async function decompressFromBase64Url(encoded) {
+    const stream = new Blob([base64UrlDecode(encoded)]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const text = await new Response(stream).text();
+    return JSON.parse(text);
+}
+
+async function shareOsuCollectionLink() {
+    const col = getOsuCollection();
+    const totalSets = OSU_MODES.reduce((sum, m) => sum + col[m].length, 0);
+    if (totalSets === 0) {
+        showShareToast(t('osu_share_link_empty'));
+        return;
+    }
+    try {
+        const encoded = await compressToBase64Url({ collection: col });
+        const url = `${location.origin}${location.pathname}#import=${encoded}`;
+        await navigator.clipboard.writeText(url);
+        showShareToast(t('osu_share_link_done'));
+    } catch (e) {
+        console.error('Share link generation failed:', e);
+        showShareToast(t('osu_share_link_fail'));
+    }
+}
+
+async function checkImportFromHash() {
+    const hash = location.hash;
+    if (!hash.startsWith('#import=')) return;
+    const encoded = hash.slice('#import='.length);
+    history.replaceState(null, '', location.pathname + location.search);
+
+    try {
+        const data = await decompressFromBase64Url(encoded);
+        if (!data.collection || !OSU_MODES.every(m => Array.isArray(data.collection[m]))) throw new Error('invalid format');
+
+        const incomingCount = OSU_MODES.reduce((sum, m) => sum + data.collection[m].length, 0);
+        if (!confirm(t('osu_share_link_import_confirm', { n: incomingCount }))) return;
+
+        const col = getOsuCollection();
+        let added = 0;
+        for (const mode of OSU_MODES) {
+            const existingIds = new Set(col[mode].map(s => s.beatmapset_id));
+            for (const set of data.collection[mode]) {
+                if (!existingIds.has(set.beatmapset_id)) {
+                    col[mode].push(set);
+                    existingIds.add(set.beatmapset_id);
+                    added++;
+                }
+            }
+        }
+        saveOsuCollection(col);
+        renderOsuCollection();
+        showShareToast(t('osu_share_link_imported', { n: added }));
+    } catch (e) {
+        console.error('Import from link failed:', e);
+        showShareToast(t('osu_share_link_import_fail'));
+    }
+}
+
 function parseOsuInput(input) {
     const urlMatch = input.match(/osu\.ppy\.sh\/(?:beatmaps?|beatmapsets?)\/(\d+)/);
     if (urlMatch) return { type: 'url', id: urlMatch[1], isSet: input.includes('beatmapsets') };
@@ -859,6 +943,7 @@ async function fetchOsuProfile() {
                 document.querySelector('.osu-mode-tab.active').classList.remove('active');
                 this.classList.add('active');
                 const mode = parseInt(this.dataset.mode);
+                osuCurrentMode = mode;
                 renderOsuModeStats(mode);
                 renderOsuRecentPlays(OSU_USER_ID, mode, 'osu-recent-list', 'osu-recent-plays');
             });
@@ -870,10 +955,13 @@ async function fetchOsuProfile() {
 
 /* ===== Visitor Profile Lookup ===== */
 let visitorLookupUserId = null;
+let visitorModeData = [];
+let visitorCurrentMode = 0;
 
 function switchVisitorRecentMode(mode, el) {
     document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
+    visitorCurrentMode = mode;
     if (visitorLookupUserId) renderOsuRecentPlays(visitorLookupUserId, mode, 'visitor-recent-list', 'visitor-recent-plays');
 }
 
@@ -892,6 +980,8 @@ async function lookupVisitorProfile() {
     try {
         const results = await Promise.all([0,1,2,3].map(m => osuFetch(`${param}&m=${m}`)));
         const modeData = results.map(r => (r && r.length > 0) ? r[0] : null);
+        visitorModeData = modeData;
+        visitorCurrentMode = 0;
         const u = modeData[0];
         if (!u) { status.innerText = t('osu_not_found') || 'Not found'; status.style.color = '#ff5252'; return; }
 
@@ -1092,4 +1182,141 @@ function renderPpCalcResult(data) {
         graphWrap.innerHTML = `<p class="osu-empty">${t('pp_calc_strain_unsupported')}</p>`;
     }
     graphWrap.style.display = 'block';
+}
+
+/* ===== Shareable stats card =====
+   Draws a downloadable PNG summary (avatar, rank, PP, accuracy, playcount)
+   for either the owner's profile or a visitor lookup result, entirely on
+   a canvas — the avatar is fetched through the same-origin osu-avatar
+   function, so it never taints the canvas. */
+function roundRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+function loadImageEl(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+const STATS_CARD_MODE_NAMES = ['⭕ Standard', '🥁 Taiko', '🍎 Catch', '🎹 Mania'];
+
+async function generateStatsCard({ avatarUrl, username, country, modeLabel, rank, pp, accuracy, playcount }) {
+    const width = 640, height = 320;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#1a0b2e');
+    bgGrad.addColorStop(1, '#2d1b4e');
+    ctx.fillStyle = bgGrad;
+    roundRectPath(ctx, 0, 0, width, height, 20);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(192,132,252,0.5)';
+    ctx.lineWidth = 2;
+    roundRectPath(ctx, 1, 1, width - 2, height - 2, 20);
+    ctx.stroke();
+
+    try {
+        const avatarImg = await loadImageEl(avatarUrl);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(80, 80, 44, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(avatarImg, 36, 36, 88, 88);
+        ctx.restore();
+    } catch (e) {
+        console.error('Avatar load failed for stats card:', e);
+    }
+    ctx.strokeStyle = 'rgba(244,114,182,0.8)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(80, 80, 44, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 26px sans-serif';
+    ctx.fillText(username, 144, 68);
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.font = '15px sans-serif';
+    ctx.fillText(`${country} · ${modeLabel}`, 144, 94);
+
+    const stats = [[t('osu_stat_global'), rank], ['PP', pp], [t('osu_stat_accuracy'), accuracy], [t('osu_stat_playcount'), playcount]];
+    const boxGap = 10;
+    const boxW = (width - 48 - boxGap * 3) / 4, boxY = 160, boxH = 100;
+    stats.forEach(([label, value], i) => {
+        const x = 24 + i * (boxW + boxGap);
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        roundRectPath(ctx, x, boxY, boxW, boxH, 12);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1;
+        roundRectPath(ctx, x, boxY, boxW, boxH, 12);
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#f9a8d4';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(String(value), x + boxW / 2, boxY + 46);
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(label, x + boxW / 2, boxY + 72);
+        ctx.textAlign = 'left';
+    });
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(location.host, width / 2, height - 16);
+    ctx.textAlign = 'left';
+
+    return canvas;
+}
+
+async function downloadStatsCardFor(u, mode) {
+    if (!u) return;
+    try {
+        const canvas = await generateStatsCard({
+            avatarUrl: osuAvatarUrl(u.user_id),
+            username: u.username,
+            country: COUNTRY_NAMES[u.country] || u.country,
+            modeLabel: STATS_CARD_MODE_NAMES[mode],
+            rank: u.pp_rank != null ? '#' + parseInt(u.pp_rank).toLocaleString() : '—',
+            pp: u.pp_raw != null ? Math.round(parseFloat(u.pp_raw)).toLocaleString() : '—',
+            accuracy: u.accuracy != null ? parseFloat(u.accuracy).toFixed(2) + '%' : '—',
+            playcount: u.playcount != null ? parseInt(u.playcount).toLocaleString() : '—',
+        });
+        canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `osu-stats-${u.username}-${STATS_CARD_MODE_NAMES[mode].replace(/[^\w]+/g, '')}.png`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showShareToast(t('stats_card_done'));
+        }, 'image/png');
+    } catch (e) {
+        console.error('Stats card generation failed:', e);
+        showShareToast(t('stats_card_fail'));
+    }
+}
+
+function downloadOwnStatsCard() {
+    downloadStatsCardFor(osuModeData[osuCurrentMode], osuCurrentMode);
+}
+
+function downloadVisitorStatsCard() {
+    downloadStatsCardFor(visitorModeData[visitorCurrentMode], visitorCurrentMode);
 }

@@ -35,4 +35,10 @@ I18N.es = {
     pp_calc_calculating: 'Calculando...', pp_calc_error: 'Error en el cálculo, inténtalo de nuevo más tarde', pp_calc_stars_label: 'Estrellas',
     pp_calc_strain_title: 'Curva de dificultad', pp_calc_strain_unsupported: 'No hay datos de dificultad disponibles para este mapa', pp_calc_acc_invalid: 'Introduce una precisión entre 0 y 100',
     pp_calc_hint: 'Elige una dificultad, marca mods, introduce una precisión y pulsa "Calcular" para recalcular estrellas y PP, y ver la curva de dificultad de este mapa abajo.',
+
+    osu_share_link_btn: 'Compartir enlace de colección', osu_share_link_done: '¡Enlace copiado! Compártelo con amigos — al abrirlo podrán importar con un clic.',
+    osu_share_link_fail: 'Error al generar el enlace para compartir', osu_share_link_empty: 'Tu colección está vacía — añade algunos beatmaps primero',
+    osu_share_link_import_confirm: 'Este enlace contiene {n} beatmap(s). ¿Importarlos a tu colección? (No se sobrescribirá nada — solo se añadirán los que aún no tienes.)',
+    osu_share_link_imported: '¡Se importaron {n} beatmap(s) nuevo(s)!', osu_share_link_import_fail: 'Error al importar desde el enlace — puede estar dañado',
+    stats_card_btn: 'Generar tarjeta de estadísticas', stats_card_done: '¡Tarjeta de estadísticas descargada!', stats_card_fail: 'Error al generar la tarjeta de estadísticas',
 };

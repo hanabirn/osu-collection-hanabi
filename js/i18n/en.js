@@ -35,4 +35,10 @@ I18N.en = {
     pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
     pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',
     pp_calc_hint: 'Pick a difficulty, toggle mods, enter an accuracy, then hit "Calculate" to recompute stars and PP, plus see this map\'s difficulty curve below.',
+
+    osu_share_link_btn: 'Share Collection Link', osu_share_link_done: 'Link copied! Share it with friends — opening it lets them import with one click.',
+    osu_share_link_fail: 'Failed to generate share link', osu_share_link_empty: 'Your collection is empty — add some beatmaps first',
+    osu_share_link_import_confirm: "This link contains {n} beatmap(s). Import them into your collection? (Won't overwrite anything — only adds ones you don't already have.)",
+    osu_share_link_imported: 'Imported {n} new beatmap(s)!', osu_share_link_import_fail: 'Failed to import from link — it may be corrupted',
+    stats_card_btn: 'Generate Stats Card', stats_card_done: 'Stats card downloaded!', stats_card_fail: 'Failed to generate stats card',
 };

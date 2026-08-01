@@ -35,4 +35,10 @@ I18N.de = {
     pp_calc_calculating: 'Berechnung läuft...', pp_calc_error: 'Berechnung fehlgeschlagen, bitte später erneut versuchen', pp_calc_stars_label: 'Sterne',
     pp_calc_strain_title: 'Schwierigkeitskurve', pp_calc_strain_unsupported: 'Für diese Beatmap sind keine Schwierigkeitsdaten verfügbar', pp_calc_acc_invalid: 'Bitte eine Genauigkeit zwischen 0 und 100 eingeben',
     pp_calc_hint: 'Schwierigkeit wählen, Mods anhaken, Genauigkeit eingeben und auf „Berechnen" klicken, um Sterne und PP neu zu berechnen und die Schwierigkeitskurve dieser Karte darunter anzuzeigen.',
+
+    osu_share_link_btn: 'Sammlungslink teilen', osu_share_link_done: 'Link kopiert! Teile ihn mit Freunden — beim Öffnen können sie mit einem Klick importieren.',
+    osu_share_link_fail: 'Freigabelink konnte nicht erstellt werden', osu_share_link_empty: 'Deine Sammlung ist leer — füge zuerst ein paar Beatmaps hinzu',
+    osu_share_link_import_confirm: 'Dieser Link enthält {n} Beatmap(s). In deine Sammlung importieren? (Nichts wird überschrieben — es werden nur Einträge hinzugefügt, die du noch nicht hast.)',
+    osu_share_link_imported: '{n} neue Beatmap(s) importiert!', osu_share_link_import_fail: 'Import über den Link fehlgeschlagen — er ist möglicherweise beschädigt',
+    stats_card_btn: 'Statistik-Karte erstellen', stats_card_done: 'Statistik-Karte heruntergeladen!', stats_card_fail: 'Statistik-Karte konnte nicht erstellt werden',
 };

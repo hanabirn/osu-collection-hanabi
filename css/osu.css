@@ -59,7 +59,6 @@
 .skin-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     padding: 12px 14px;
     border-radius: 12px;
@@ -71,7 +70,25 @@
     border-color: var(--accent-purple);
     box-shadow: 0 0 12px rgba(var(--accent-purple-rgb), 0.18);
 }
-.skin-item-info { min-width: 0; }
+.skin-item-thumb {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--bg-stat);
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    overflow: hidden;
+}
+.skin-item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.skin-item-info { flex: 1 1 auto; min-width: 0; }
 .skin-item-name {
     font-weight: bold;
     color: var(--text-pink);
@@ -1116,3 +1133,12 @@
 .strain-chart-svg { width: 100%; height: auto; display: block; }
 .strain-chart-fill { fill: rgba(192,132,252,0.18); stroke: none; }
 .strain-chart-line { fill: none; stroke: var(--accent-light-purple); stroke-width: 1.5; }
+
+/* ===== Stats card download button ===== */
+.stats-card-btn {
+    display: block;
+    width: 100%;
+    margin: 4px 0 14px;
+    padding: 9px 14px;
+    font-size: 0.85rem;
+}

@@ -35,4 +35,10 @@ I18N.ja = {
     pp_calc_calculating: '計算中...', pp_calc_error: '計算に失敗しました。しばらくしてから再試行してください', pp_calc_stars_label: '☆数',
     pp_calc_strain_title: '難易度カーブ', pp_calc_strain_unsupported: 'この譜面には難易度カーブのデータがありません', pp_calc_acc_invalid: '0～100の範囲で正確率を入力してください',
     pp_calc_hint: '難易度を選び、Modsにチェックを入れて正確率を入力し「計算」を押すと、☆数とPPを再計算し、下に難易度カーブを表示します。',
+
+    osu_share_link_btn: '収蔵リンクを共有', osu_share_link_done: 'リンクをコピーしました！友達に共有すると、開くだけでワンクリックで取り込めます。',
+    osu_share_link_fail: '共有リンクの生成に失敗しました', osu_share_link_empty: 'コレクションが空です。先にビートマップを追加してください',
+    osu_share_link_import_confirm: 'このリンクには{n}件のビートマップが含まれています。あなたのコレクションに取り込みますか？（既存のコレクションは上書きされず、まだ持っていないものだけ追加されます）',
+    osu_share_link_imported: '{n}件の新しいビートマップを取り込みました！', osu_share_link_import_fail: 'リンクからの取り込みに失敗しました。リンクが壊れている可能性があります',
+    stats_card_btn: '戦績カードを生成', stats_card_done: '戦績カードをダウンロードしました！', stats_card_fail: '戦績カードの生成に失敗しました',
 };

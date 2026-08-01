@@ -88,6 +88,50 @@ async function confirmDeleteSkin(id) {
     renderSkinsList();
 }
 
+/* ===== Skin thumbnail preview =====
+   .osk files are plain zip archives. Instead of unzipping the whole thing
+   (files run 10-200+ MB), fflate's filter option skips decompressing every
+   entry except the one candidate image we actually want, so this stays fast
+   even for large skins. Extracted blob URLs are cached per skin id for the
+   session so re-renders (after upload/delete) don't redo the work. */
+const SKIN_THUMB_CANDIDATES = ['cursor.png', 'cursor@2x.png', 'menu-background.png', 'menu-background@2x.png', 'hitcircle.png', 'hitcircle@2x.png'];
+const skinThumbCache = new Map();
+
+function extractSkinThumbnail(file) {
+    if (typeof fflate === 'undefined') return Promise.resolve(null);
+    return file.arrayBuffer().then(buf => new Promise(resolve => {
+        try {
+            fflate.unzip(new Uint8Array(buf), {
+                filter: entry => SKIN_THUMB_CANDIDATES.includes(entry.name.toLowerCase()),
+            }, (err, unzipped) => {
+                if (err) { resolve(null); return; }
+                for (const name of SKIN_THUMB_CANDIDATES) {
+                    const key = Object.keys(unzipped).find(k => k.toLowerCase() === name);
+                    if (key) {
+                        resolve(URL.createObjectURL(new Blob([unzipped[key]], { type: 'image/png' })));
+                        return;
+                    }
+                }
+                resolve(null);
+            });
+        } catch {
+            resolve(null);
+        }
+    })).catch(() => null);
+}
+
+function loadSkinThumbnails(skins) {
+    for (const skin of skins) {
+        if (skinThumbCache.has(skin.id)) continue;
+        skinThumbCache.set(skin.id, null);
+        extractSkinThumbnail(skin.file).then(url => {
+            skinThumbCache.set(skin.id, url);
+            const el = document.getElementById(`skin-thumb-${skin.id}`);
+            if (el && url) el.innerHTML = `<img src="${url}" alt="">`;
+        });
+    }
+}
+
 function formatSkinSize(bytes) {
     if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
     return (bytes / 1024 / 1024).toFixed(1) + ' MB';
@@ -116,6 +160,7 @@ async function renderSkinsList() {
     }
     container.innerHTML = skins.map(s => `
         <div class="skin-item">
+            <div class="skin-item-thumb" id="skin-thumb-${s.id}">${skinThumbCache.get(s.id) ? `<img src="${skinThumbCache.get(s.id)}" alt="">` : '🎵'}</div>
             <div class="skin-item-info">
                 <div class="skin-item-name">${escapeSkinName(s.name)}</div>
                 <div class="skin-item-meta">${formatSkinSize(s.size)} &middot; ${new Date(s.addedAt).toLocaleDateString()}</div>
@@ -126,4 +171,5 @@ async function renderSkinsList() {
             </div>
         </div>
     `).join('');
+    loadSkinThumbnails(skins);
 }

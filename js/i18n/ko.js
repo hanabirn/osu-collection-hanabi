@@ -35,4 +35,10 @@ I18N.ko = {
     pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
     pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',
     pp_calc_hint: '난이도를 선택하고 Mods를 체크한 뒤 정확도를 입력하고 "계산"을 누르면 별점과 PP를 다시 계산하고, 아래에 난이도 곡선을 보여줍니다.',
+
+    osu_share_link_btn: '컬렉션 링크 공유', osu_share_link_done: '링크가 복사되었습니다! 친구에게 공유하면 열기만 해도 한 번에 가져올 수 있어요.',
+    osu_share_link_fail: '공유 링크 생성 실패', osu_share_link_empty: '컬렉션이 비어 있습니다. 먼저 비트맵을 추가해주세요',
+    osu_share_link_import_confirm: '이 링크에는 {n}개의 비트맵이 포함되어 있습니다. 내 컬렉션으로 가져올까요? (기존 컬렉션을 덮어쓰지 않고, 없는 항목만 추가됩니다)',
+    osu_share_link_imported: '{n}개의 새 비트맵을 가져왔습니다!', osu_share_link_import_fail: '링크에서 가져오기에 실패했습니다. 링크가 손상되었을 수 있습니다',
+    stats_card_btn: '전적 카드 생성', stats_card_done: '전적 카드가 다운로드되었습니다!', stats_card_fail: '전적 카드 생성 실패',
 };

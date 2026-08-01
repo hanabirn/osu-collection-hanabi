@@ -94,6 +94,7 @@
                 <button class="osu-refresh-all" onclick="exportOsuCollection()" data-i18n-title="osu_export" title="匯出收藏">📤</button>
                 <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="匯入收藏">📥</button>
                 <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
+                <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="分享收藏連結">🔗</button>
                 <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="🔒 設定密碼">🔒</button>
             </div>
         </div>
@@ -158,6 +159,7 @@
                     <div class="osu-stat-label" data-i18n="osu_stat_playcount">遊戲數</div>
                 </div>
             </div>
+            <button class="btn stats-card-btn" onclick="downloadOwnStatsCard()">📸 <span data-i18n="stats_card_btn">產生戰績卡</span></button>
             <div class="rank-badges-panel" id="osu-rank-badges"></div>
             <div class="osu-total-pp" id="osu-total-pp" style="display:none;">
                 <span data-i18n="osu_total_pp">全模式 PP</span>
@@ -198,6 +200,7 @@
                     <button class="osu-mode-tab" data-mode="2" onclick="switchVisitorRecentMode(2,this)">🍎 Catch</button>
                     <button class="osu-mode-tab" data-mode="3" onclick="switchVisitorRecentMode(3,this)">🎹 Mania</button>
                 </div>
+                <button class="btn stats-card-btn" onclick="downloadVisitorStatsCard()">📸 <span data-i18n="stats_card_btn">產生戰績卡</span></button>
                 <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
                     <div class="osu-recent-title" data-i18n="osu_recent_title">🎮 最近遊玩</div>
                     <div class="osu-recent-list" id="visitor-recent-list"></div>
@@ -277,6 +280,7 @@
 <script src="js/i18n/fr.js"></script>
 <script src="js/i18n/es.js"></script>
 <script src="js/i18n/de.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
 <script src="js/osu.js"></script>
 <script src="js/skins.js"></script>
 <script src="js/feedback.js"></script>
