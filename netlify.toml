@@ -2,5 +2,8 @@
   publish = "."
   functions = "netlify/functions"
 
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
 [functions."osu-pp"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
