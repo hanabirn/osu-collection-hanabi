@@ -34,4 +34,5 @@ I18N.en = {
     pp_calc_btn_title: 'PP Calculator & Strain Graph', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Accuracy', pp_calc_run: 'Calculate',
     pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
     pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',
+    pp_calc_hint: 'Pick a difficulty, toggle mods, enter an accuracy, then hit "Calculate" to recompute stars and PP, plus see this map\'s difficulty curve below.',
 };

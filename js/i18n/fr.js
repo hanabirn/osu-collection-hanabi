@@ -34,4 +34,5 @@ I18N.fr = {
     pp_calc_btn_title: 'Calculateur de PP et courbe de difficulté', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Précision', pp_calc_run: 'Calculer',
     pp_calc_calculating: 'Calcul en cours...', pp_calc_error: 'Échec du calcul, veuillez réessayer plus tard', pp_calc_stars_label: 'Étoiles',
     pp_calc_strain_title: 'Courbe de difficulté', pp_calc_strain_unsupported: 'Aucune donnée de difficulté disponible pour cette carte', pp_calc_acc_invalid: 'Entrez une précision entre 0 et 100',
+    pp_calc_hint: "Choisissez une difficulté, cochez des mods, entrez une précision puis cliquez sur « Calculer » pour recalculer les étoiles et les PP, et afficher la courbe de difficulté de cette carte ci-dessous.",
 };

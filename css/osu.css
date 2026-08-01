@@ -1043,6 +1043,13 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+.pp-calc-hint {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: -6px 0 14px;
+}
 .pp-calc-diff-select {
     width: 100%;
     padding: 10px 12px;

@@ -34,4 +34,5 @@ I18N.ko = {
     pp_calc_btn_title: 'PP 계산 & 난이도 곡선', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '정확도', pp_calc_run: '계산',
     pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
     pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',
+    pp_calc_hint: '난이도를 선택하고 Mods를 체크한 뒤 정확도를 입력하고 "계산"을 누르면 별점과 PP를 다시 계산하고, 아래에 난이도 곡선을 보여줍니다.',
 };

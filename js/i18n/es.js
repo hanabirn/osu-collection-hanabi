@@ -34,4 +34,5 @@ I18N.es = {
     pp_calc_btn_title: 'Calculadora de PP y curva de dificultad', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Precisión', pp_calc_run: 'Calcular',
     pp_calc_calculating: 'Calculando...', pp_calc_error: 'Error en el cálculo, inténtalo de nuevo más tarde', pp_calc_stars_label: 'Estrellas',
     pp_calc_strain_title: 'Curva de dificultad', pp_calc_strain_unsupported: 'No hay datos de dificultad disponibles para este mapa', pp_calc_acc_invalid: 'Introduce una precisión entre 0 y 100',
+    pp_calc_hint: 'Elige una dificultad, marca mods, introduce una precisión y pulsa "Calcular" para recalcular estrellas y PP, y ver la curva de dificultad de este mapa abajo.',
 };
