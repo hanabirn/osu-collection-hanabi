@@ -30,4 +30,8 @@ I18N.ru = {
     featured_beatmap_label: '✦ Рекомендация дня ✦',
     osu_export: 'Экспорт коллекции', osu_import: 'Импорт коллекции',
     osu_export_done: 'Коллекция экспортирована!', osu_import_done: 'Коллекция импортирована!', osu_import_fail: 'Ошибка импорта. Проверьте формат файла',
+
+    pp_calc_btn_title: 'Калькулятор PP и график сложности', pp_calc_mods_label: 'Моды', pp_calc_acc_label: 'Точность', pp_calc_run: 'Рассчитать',
+    pp_calc_calculating: 'Расчёт...', pp_calc_error: 'Не удалось выполнить расчёт, попробуйте позже', pp_calc_stars_label: 'Звёзды',
+    pp_calc_strain_title: 'График сложности', pp_calc_strain_unsupported: 'Для этой карты нет данных о сложности во времени', pp_calc_acc_invalid: 'Введите точность от 0 до 100',
 };

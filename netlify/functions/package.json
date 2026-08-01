@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "rosu-pp-js": "^4.0.1"
+  }
+}

@@ -30,4 +30,8 @@ I18N.ja = {
     featured_beatmap_label: '✦ 本日のおすすめ ✦',
     osu_export: 'コレクションをエクスポート', osu_import: 'コレクションをインポート',
     osu_export_done: 'エクスポートしました！', osu_import_done: 'インポートしました！', osu_import_fail: 'インポート失敗。ファイル形式を確認してください',
+
+    pp_calc_btn_title: 'PP試算・難易度カーブ', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '正確率', pp_calc_run: '計算',
+    pp_calc_calculating: '計算中...', pp_calc_error: '計算に失敗しました。しばらくしてから再試行してください', pp_calc_stars_label: '☆数',
+    pp_calc_strain_title: '難易度カーブ', pp_calc_strain_unsupported: 'この譜面には難易度カーブのデータがありません', pp_calc_acc_invalid: '0～100の範囲で正確率を入力してください',
 };

@@ -30,4 +30,8 @@ I18N.es = {
     featured_beatmap_label: '✦ Destacado de hoy ✦',
     osu_export: 'Exportar colección', osu_import: 'Importar colección',
     osu_export_done: '¡Colección exportada!', osu_import_done: '¡Colección importada!', osu_import_fail: 'Error al importar. Verifica el formato del archivo',
+
+    pp_calc_btn_title: 'Calculadora de PP y curva de dificultad', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Precisión', pp_calc_run: 'Calcular',
+    pp_calc_calculating: 'Calculando...', pp_calc_error: 'Error en el cálculo, inténtalo de nuevo más tarde', pp_calc_stars_label: 'Estrellas',
+    pp_calc_strain_title: 'Curva de dificultad', pp_calc_strain_unsupported: 'No hay datos de dificultad disponibles para este mapa', pp_calc_acc_invalid: 'Introduce una precisión entre 0 y 100',
 };

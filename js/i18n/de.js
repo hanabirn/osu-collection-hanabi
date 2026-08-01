@@ -30,4 +30,8 @@ I18N.de = {
     featured_beatmap_label: '✦ Heute empfohlen ✦',
     osu_export: 'Sammlung exportieren', osu_import: 'Sammlung importieren',
     osu_export_done: 'Sammlung exportiert!', osu_import_done: 'Sammlung importiert!', osu_import_fail: 'Import fehlgeschlagen. Bitte Dateiformat prüfen',
+
+    pp_calc_btn_title: 'PP-Rechner & Schwierigkeitskurve', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Genauigkeit', pp_calc_run: 'Berechnen',
+    pp_calc_calculating: 'Berechnung läuft...', pp_calc_error: 'Berechnung fehlgeschlagen, bitte später erneut versuchen', pp_calc_stars_label: 'Sterne',
+    pp_calc_strain_title: 'Schwierigkeitskurve', pp_calc_strain_unsupported: 'Für diese Beatmap sind keine Schwierigkeitsdaten verfügbar', pp_calc_acc_invalid: 'Bitte eine Genauigkeit zwischen 0 und 100 eingeben',
 };

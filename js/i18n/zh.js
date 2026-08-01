@@ -30,4 +30,8 @@ I18N.zh = {
     featured_beatmap_label: '✦ 今日推薦 ✦',
     osu_export: '匯出收藏', osu_import: '匯入收藏',
     osu_export_done: '已匯出收藏！', osu_import_done: '已匯入收藏！', osu_import_fail: '匯入失敗，請確認檔案格式正確',
+
+    pp_calc_btn_title: 'PP 試算與難度曲線', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '準確率', pp_calc_run: '計算',
+    pp_calc_calculating: '計算中...', pp_calc_error: '計算失敗，請稍後再試', pp_calc_stars_label: '星數',
+    pp_calc_strain_title: '難度曲線', pp_calc_strain_unsupported: '此譜面暫無難度曲線資料', pp_calc_acc_invalid: '請輸入 0～100 之間的準確率',
 };

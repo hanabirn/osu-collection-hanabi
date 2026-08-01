@@ -30,4 +30,8 @@ I18N.en = {
     featured_beatmap_label: '✦ Featured Today ✦',
     osu_export: 'Export Collection', osu_import: 'Import Collection',
     osu_export_done: 'Collection exported!', osu_import_done: 'Collection imported!', osu_import_fail: 'Import failed. Please check the file format.',
+
+    pp_calc_btn_title: 'PP Calculator & Strain Graph', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Accuracy', pp_calc_run: 'Calculate',
+    pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
+    pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',
 };

@@ -570,6 +570,7 @@ function renderOsuCollection() {
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="複製 ID">📋</button>
+            <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">📊</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="播放預覽">&#9654;</button>
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">&#x2715;</button>
@@ -919,4 +920,176 @@ async function lookupVisitorProfile() {
         status.innerText = 'Error';
         status.style.color = '#ff5252';
     }
+}
+
+/* ===== PP calculator + strain graph =====
+   Recomputes stars/PP for arbitrary mods/accuracy and renders a difficulty-
+   over-time curve, via the osu-pp function (rosu-pp-js parsing the raw .osu
+   file server-side — the v1 API used elsewhere in this file has no mod-aware
+   recalculation or strain data). */
+function findOsuSetById(setId) {
+    const col = getOsuCollection();
+    for (const mode of OSU_MODES) {
+        const found = col[mode].find(s => s.beatmapset_id === setId);
+        if (found) return found;
+    }
+    return null;
+}
+
+const PP_MOD_GROUPS = {
+    DT: ['DT', 'NC', 'HT'], NC: ['DT', 'NC', 'HT'], HT: ['DT', 'NC', 'HT'],
+    EZ: ['EZ', 'HR'], HR: ['EZ', 'HR'],
+    SD: ['SD', 'PF'], PF: ['SD', 'PF'],
+};
+const PP_MOD_LIST = ['EZ', 'HR', 'HD', 'HT', 'DT', 'NC', 'FL', 'SD', 'PF', 'NF'];
+
+let ppCalcState = null;
+
+function openPpCalcModal(setId, event) {
+    if (event) event.stopPropagation();
+    const set = findOsuSetById(setId);
+    if (!set || !set.beatmaps.length) return;
+
+    const hardest = set.beatmaps[set.beatmaps.length - 1];
+    ppCalcState = { setId, beatmapId: hardest.beatmap_id, mods: new Set() };
+
+    document.getElementById('pp-calc-title').textContent = `${set.artist} - ${set.title}`;
+    document.getElementById('pp-calc-diff-select').innerHTML = set.beatmaps.map(b =>
+        `<option value="${b.beatmap_id}" ${b.beatmap_id === hardest.beatmap_id ? 'selected' : ''}>${escHtml(b.version)} (${b.difficulty_rating.toFixed(2)}★)</option>`
+    ).join('');
+
+    document.getElementById('pp-calc-acc').value = 100;
+    document.getElementById('pp-calc-status').innerText = '';
+    document.getElementById('pp-calc-result').style.display = 'none';
+    document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    renderPpCalcMods();
+
+    document.getElementById('pp-calc-modal').style.display = 'flex';
+}
+
+function closePpCalcModal() {
+    document.getElementById('pp-calc-modal').style.display = 'none';
+}
+
+function selectPpCalcDiff(beatmapIdStr) {
+    if (!ppCalcState) return;
+    ppCalcState.beatmapId = parseInt(beatmapIdStr);
+    document.getElementById('pp-calc-status').innerText = '';
+    document.getElementById('pp-calc-result').style.display = 'none';
+    document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+}
+
+function togglePpCalcMod(mod) {
+    if (!ppCalcState) return;
+    const group = PP_MOD_GROUPS[mod];
+    if (ppCalcState.mods.has(mod)) {
+        ppCalcState.mods.delete(mod);
+    } else {
+        if (group) group.forEach(m => ppCalcState.mods.delete(m));
+        ppCalcState.mods.add(mod);
+    }
+    renderPpCalcMods();
+    document.getElementById('pp-calc-result').style.display = 'none';
+    document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+}
+
+function renderPpCalcMods() {
+    document.getElementById('pp-calc-mods-row').innerHTML = PP_MOD_LIST.map(mod =>
+        `<button type="button" class="pp-calc-mod-chip ${ppCalcState.mods.has(mod) ? 'active' : ''}" onclick="togglePpCalcMod('${mod}')">${mod}</button>`
+    ).join('');
+}
+
+async function osuPpFetch(beatmapId, mods, accList, timeoutMs = 15000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const params = new URLSearchParams({ id: beatmapId, mods, acc: accList.join(',') });
+    let res;
+    try {
+        res = await fetch(`/.netlify/functions/osu-pp?${params.toString()}`, { signal: controller.signal });
+    } catch (e) {
+        if (e.name === 'AbortError') throw new Error(`${timeoutMs / 1000}s timeout`);
+        throw e;
+    } finally {
+        clearTimeout(timer);
+    }
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
+    return data;
+}
+
+async function runPpCalc() {
+    if (!ppCalcState) return;
+    const acc = parseFloat(document.getElementById('pp-calc-acc').value);
+    const status = document.getElementById('pp-calc-status');
+    document.getElementById('pp-calc-result').style.display = 'none';
+    document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+
+    if (!Number.isFinite(acc) || acc < 0 || acc > 100) {
+        status.innerText = t('pp_calc_acc_invalid');
+        status.style.color = '#ff5252';
+        return;
+    }
+
+    status.innerText = t('pp_calc_calculating');
+    status.style.color = '#c8a2e0';
+
+    const accList = [...new Set([acc, 95, 98, 100])].sort((a, b) => a - b);
+    const modsStr = [...ppCalcState.mods].join('');
+
+    try {
+        const data = await osuPpFetch(ppCalcState.beatmapId, modsStr, accList);
+        status.innerText = '';
+        renderPpCalcResult(data);
+    } catch (e) {
+        console.error('PP calc failed:', e);
+        status.innerText = `${t('pp_calc_error')}${e.message ? ' (' + e.message + ')' : ''}`;
+        status.style.color = '#ff5252';
+    }
+}
+
+function strainChartSvg(values, sectionLengthMs) {
+    const width = 600, height = 140;
+    const padL = 6, padR = 6, padT = 10, padB = 20;
+    const innerW = width - padL - padR;
+    const innerH = height - padT - padB;
+    const n = values.length;
+    const maxV = Math.max(1, ...values);
+
+    const xPos = i => padL + (n <= 1 ? 0 : (i / (n - 1)) * innerW);
+    const yPos = v => padT + innerH - (v / maxV) * innerH;
+
+    const pts = values.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ');
+    const areaPts = `${padL},${padT + innerH} ${pts} ${padL + innerW},${padT + innerH}`;
+
+    const totalSec = Math.round((n * sectionLengthMs) / 1000);
+    const fmtTime = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+    const baseline = `<line x1="${padL}" y1="${padT + innerH}" x2="${padL + innerW}" y2="${padT + innerH}" class="trend-chart-grid" />`;
+    const xLabels = `<text x="${padL}" y="${height - 4}" text-anchor="start" class="trend-chart-axis-label">0:00</text>
+        <text x="${padL + innerW}" y="${height - 4}" text-anchor="end" class="trend-chart-axis-label">${fmtTime(totalSec)}</text>`;
+
+    return `<svg viewBox="0 0 ${width} ${height}" class="strain-chart-svg" preserveAspectRatio="none">
+        <polygon points="${areaPts}" class="strain-chart-fill" />
+        <polyline points="${pts}" class="strain-chart-line" />
+        ${baseline}${xLabels}
+    </svg>`;
+}
+
+function renderPpCalcResult(data) {
+    const resultEl = document.getElementById('pp-calc-result');
+    const boxes = [`<div class="osu-stat"><div class="osu-stat-value">${data.stars.toFixed(2)}⭐</div><div class="osu-stat-label">${t('pp_calc_stars_label')}</div></div>`];
+    Object.keys(data.pp).map(Number).sort((a, b) => a - b).forEach(acc => {
+        boxes.push(`<div class="osu-stat"><div class="osu-stat-value">${Math.round(data.pp[acc])}pp</div><div class="osu-stat-label">${acc}%</div></div>`);
+    });
+    resultEl.innerHTML = boxes.join('');
+    resultEl.style.display = 'grid';
+
+    const graphWrap = document.getElementById('pp-calc-graph-wrap');
+    if (data.strains && data.strains.values && data.strains.values.length) {
+        graphWrap.innerHTML = `<div class="pp-calc-section-label">${t('pp_calc_strain_title')}</div>
+            <div class="trend-chart-wrap">${strainChartSvg(data.strains.values, data.strains.sectionLength)}</div>`;
+    } else {
+        graphWrap.innerHTML = `<p class="osu-empty">${t('pp_calc_strain_unsupported')}</p>`;
+    }
+    graphWrap.style.display = 'block';
 }

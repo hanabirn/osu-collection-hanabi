@@ -242,6 +242,25 @@
 
 </main>
 
+<div id="pp-calc-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closePpCalcModal()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closePpCalcModal()">&#x2715;</button>
+        <h3 class="pp-calc-title" id="pp-calc-title"></h3>
+        <select class="pp-calc-diff-select" id="pp-calc-diff-select" onchange="selectPpCalcDiff(this.value)"></select>
+        <div class="pp-calc-section-label" data-i18n="pp_calc_mods_label">Mods</div>
+        <div class="pp-calc-mods-row" id="pp-calc-mods-row"></div>
+        <div class="pp-calc-acc-row">
+            <label data-i18n="pp_calc_acc_label">準確率</label>
+            <input type="number" id="pp-calc-acc" min="0" max="100" step="0.01" value="100">
+            <span>%</span>
+            <button class="btn" onclick="runPpCalc()" data-i18n="pp_calc_run">計算</button>
+        </div>
+        <div id="pp-calc-status" class="status"></div>
+        <div id="pp-calc-result" class="pp-calc-result" style="display:none;"></div>
+        <div id="pp-calc-graph-wrap" class="pp-calc-graph-wrap" style="display:none;"></div>
+    </div>
+</div>
+
 <footer class="site-footer">
     <p>osu! 收藏 ✦ osu! is a trademark of ppy Pty Ltd</p>
 </footer>

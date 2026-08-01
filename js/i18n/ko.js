@@ -30,4 +30,8 @@ I18N.ko = {
     featured_beatmap_label: '✦ 오늘의 추천 ✦',
     osu_export: '컬렉션 내보내기', osu_import: '컬렉션 가져오기',
     osu_export_done: '내보내기 완료!', osu_import_done: '가져오기 완료!', osu_import_fail: '가져오기 실패. 파일 형식을 확인하세요',
+
+    pp_calc_btn_title: 'PP 계산 & 난이도 곡선', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '정확도', pp_calc_run: '계산',
+    pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
+    pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',
 };
