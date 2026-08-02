@@ -598,7 +598,7 @@ function renderOsuCollection() {
 
     if (osuCurrentTab === 'favorites') {
         const favIds = getOsuFavorites();
-        const allSets = [...col.standard, ...col.taiko, ...col.catch, ...col.mania];
+        const allSets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __mode: m })));
         const seen = new Set();
         sets = allSets.filter(s => {
             if (favIds.includes(s.beatmapset_id) && !seen.has(s.beatmapset_id)) {
@@ -613,7 +613,7 @@ function renderOsuCollection() {
             if (seen.has(s.beatmapset_id)) return false;
             seen.add(s.beatmapset_id);
             return true;
-        });
+        }).map(s => ({ ...s, __mode: osuCurrentTab }));
     }
 
     if (osuSearchQuery) {
@@ -643,6 +643,7 @@ function renderOsuCollection() {
     if (osuPage < 0) osuPage = 0;
     const pageSets = sets.slice(osuPage * OSU_PAGE_SIZE, (osuPage + 1) * OSU_PAGE_SIZE);
 
+    const modeIcons = { standard: '⭕', taiko: '🥁', catch: '🍎', mania: '🎹' };
     container.innerHTML = pageSets.map(set => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         const isFav = isOsuFavorited(set.beatmapset_id);
@@ -659,7 +660,7 @@ function renderOsuCollection() {
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">&#x2715;</button>
             <div class="osu-card-info">
-                <div class="osu-card-title">${set.title}</div>
+                <div class="osu-card-title">${modeIcons[set.__mode] || ''} ${set.title}</div>
                 ${starsText}
                 <div class="osu-card-artist">${set.artist}</div>
                 <div class="osu-card-mapper">${t('mapped_by', { n: set.creator })}</div>
