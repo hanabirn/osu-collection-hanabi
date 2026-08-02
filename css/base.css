@@ -115,14 +115,6 @@ a:hover { text-decoration: underline; }
     margin-top: 5px;
 }
 
-.site-header-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
 .lang-pill {
     background: var(--lang-pill-bg);
     border: 1px solid var(--lang-pill-border);
