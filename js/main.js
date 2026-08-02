@@ -5,6 +5,7 @@ function switchTab(tab, el) {
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
+    if (tab === 'updates') ensureUpdatesLoaded();
 }
 
 /* ===== 🌐 Language Dropdown ===== */

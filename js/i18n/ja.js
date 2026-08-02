@@ -1,7 +1,8 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ ビートマップコレクション＋PP検索 ✦',
     back_to_main: '← Hanabiの小天地に戻る',
-    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_feedback: 'ご意見&改善',
+    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_feedback: 'ご意見&改善',
+    updates_title: '✦ 更新情報 ✦', updates_loading: '更新情報を読み込み中...', updates_empty: '現在、更新情報はありません', updates_load_fail: '更新情報の読み込みに失敗しました',
     feedback_title: '✦ ご意見&改善 ✦', feedback_hint: 'サイトで改善できそうな点があれば教えてください。あなたのメッセージは私だけが見ることができ、他の訪問者には表示されません。', feedback_placeholder: 'ご意見を書いてください...', feedback_submit: '送信', feedback_success: 'メッセージを送信しました。フィードバックありがとうございます！',
     skins_title: '🎵 マイスキン 🎵', skins_hint: '保存したい osu! スキンファイル（.osk）をアップロードすると、いつでもダウンロードし直せます。ファイルはこのブラウザにのみ保存され、サーバーにはアップロードされません。端末を変えたりブラウザのデータを消去すると失われるので、大事なファイルは自分でバックアップしてください。', skins_list_title: '💾 保存済みスキン',
     skins_empty: 'まだ保存されたスキンはありません', skins_download: 'ダウンロード', skins_delete: '削除', skins_delete_confirm: 'このスキンファイルを削除しますか？',

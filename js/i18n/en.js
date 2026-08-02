@@ -1,7 +1,8 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Beatmap Collection + PP Lookup ✦',
     back_to_main: '← Back to Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_feedback: 'Suggestions',
+    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_feedback: 'Suggestions',
+    updates_title: '✦ News ✦', updates_loading: 'Loading news...', updates_empty: 'No news right now', updates_load_fail: 'Failed to load news, please try again later',
     feedback_title: '✦ Suggestions & Improvements ✦', feedback_hint: "Think something on this site could be better? Let me know here — only I can see your message, other visitors can't.", feedback_placeholder: 'Write your suggestion...', feedback_submit: 'Send', feedback_success: 'Your message has been sent — thank you for the feedback!',
     skins_title: '🎵 My Skins 🎵', skins_hint: "Upload osu! skin files (.osk) you want to keep, and download them again anytime. Files are stored only in this browser, never uploaded to any server — switching devices or clearing browser data will lose them, so back up anything important yourself.", skins_list_title: '💾 Saved Skins',
     skins_empty: 'No skins saved yet', skins_download: 'Download', skins_delete: 'Delete', skins_delete_confirm: 'Delete this skin file?',

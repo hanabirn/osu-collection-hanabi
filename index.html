@@ -49,29 +49,34 @@
                     <span class="title-note tn-5">&#9834;</span>
                     <span class="title-note tn-6">&#9835;</span>
                 </span>
-                <div class="lang-globe" id="lang-globe">
-                    <button class="lang-globe-btn" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language">&#127760;</button>
-                    <div class="lang-globe-menu" id="lang-globe-menu">
-                        <button class="lang-pill active" data-lang="zh" onclick="applyLang('zh'); toggleLangMenu(false)">中文</button>
-                        <button class="lang-pill" data-lang="en" onclick="applyLang('en'); toggleLangMenu(false)">EN</button>
-                        <button class="lang-pill" data-lang="ja" onclick="applyLang('ja'); toggleLangMenu(false)">日本語</button>
-                        <button class="lang-pill" data-lang="ko" onclick="applyLang('ko'); toggleLangMenu(false)">한국어</button>
-                        <button class="lang-pill" data-lang="ru" onclick="applyLang('ru'); toggleLangMenu(false)">Русский</button>
-                        <button class="lang-pill" data-lang="fr" onclick="applyLang('fr'); toggleLangMenu(false)">Français</button>
-                        <button class="lang-pill" data-lang="es" onclick="applyLang('es'); toggleLangMenu(false)">Español</button>
-                        <button class="lang-pill" data-lang="de" onclick="applyLang('de'); toggleLangMenu(false)">Deutsch</button>
-                    </div>
-                </div>
-                <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
             </div>
             <p class="site-tagline" data-i18n="site_tagline">✦ Beatmap 收藏 + PP 查詢 ✦</p>
         </div>
     </div>
-    <a class="back-to-main" href="https://hanabirn.github.io/" data-i18n="back_to_main">← 返回 Hanabiの小天地</a>
+    <div class="header-bottom-row">
+        <a class="back-to-main" href="https://hanabirn.github.io/" data-i18n="back_to_main">← 返回 Hanabiの小天地</a>
+        <div class="header-icons">
+            <div class="lang-globe" id="lang-globe">
+                <button class="lang-globe-btn" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language">&#127760;</button>
+                <div class="lang-globe-menu" id="lang-globe-menu">
+                    <button class="lang-pill active" data-lang="zh" onclick="applyLang('zh'); toggleLangMenu(false)">中文</button>
+                    <button class="lang-pill" data-lang="en" onclick="applyLang('en'); toggleLangMenu(false)">EN</button>
+                    <button class="lang-pill" data-lang="ja" onclick="applyLang('ja'); toggleLangMenu(false)">日本語</button>
+                    <button class="lang-pill" data-lang="ko" onclick="applyLang('ko'); toggleLangMenu(false)">한국어</button>
+                    <button class="lang-pill" data-lang="ru" onclick="applyLang('ru'); toggleLangMenu(false)">Русский</button>
+                    <button class="lang-pill" data-lang="fr" onclick="applyLang('fr'); toggleLangMenu(false)">Français</button>
+                    <button class="lang-pill" data-lang="es" onclick="applyLang('es'); toggleLangMenu(false)">Español</button>
+                    <button class="lang-pill" data-lang="de" onclick="applyLang('de'); toggleLangMenu(false)">Deutsch</button>
+                </div>
+            </div>
+            <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+        </div>
+    </div>
     <nav class="site-nav">
         <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
         <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
+        <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
@@ -231,6 +236,15 @@
         </div>
     </section>
 
+    <section id="page-updates" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="updates_title">✦ 更新情報 ✦</h2>
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div id="osu-news-list" class="news-list"></div>
+        </div>
+    </section>
+
     <section id="page-feedback" class="site-page" style="display:none;">
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
@@ -286,6 +300,7 @@
 <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
 <script src="js/osu.js"></script>
 <script src="js/skins.js"></script>
+<script src="js/updates.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
 </body>
