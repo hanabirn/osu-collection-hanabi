@@ -13,12 +13,18 @@ a:hover { text-decoration: underline; }
 
 .site-header {
     position: relative;
-    z-index: 1;
+    z-index: 5;
     overflow: hidden;
     padding: 20px 24px 0;
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-card);
     backdrop-filter: blur(var(--glass-blur));
+}
+/* The title-note float animation never needs to escape the header box, but
+   the language dropdown menu does — temporarily lift the clip while it's
+   open instead of removing overflow:hidden outright. */
+.site-header.lang-menu-open {
+    overflow: visible;
 }
 
 .title-notes {
@@ -53,6 +59,7 @@ a:hover { text-decoration: underline; }
     .tn-3, .tn-4 { font-size: 1.6rem; }
     .header-logo { gap: 4px; }
     .title-notes { gap: 2px; }
+    .lang-globe-btn { width: 32px; height: 32px; font-size: 1rem; }
 }
 
 .site-header-top {
@@ -81,7 +88,7 @@ a:hover { text-decoration: underline; }
     50%      { opacity: 1; transform: scale(1.06); }
 }
 .site-title-block h1 {
-    font-size: 2.3rem;
+    font-size: 2.5rem;
     font-weight: 800;
     background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple), var(--accent-pink), var(--text-pink));
     background-size: 300% auto;
@@ -139,6 +146,54 @@ a:hover { text-decoration: underline; }
     color: #fff;
     font-weight: bold;
     box-shadow: 0 0 14px rgba(var(--accent-purple-rgb), 0.35);
+}
+
+.lang-globe {
+    position: relative;
+}
+.lang-globe-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--lang-pill-bg);
+    border: 1px solid var(--lang-pill-border);
+    color: var(--lang-pill-text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+}
+.lang-globe-btn:hover,
+.lang-globe.open .lang-globe-btn {
+    background: rgba(var(--accent-pink-rgb), 0.14);
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+}
+.lang-globe-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 150px;
+    padding: 8px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    z-index: 210;
+}
+.lang-globe.open .lang-globe-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .theme-toggle-btn {
