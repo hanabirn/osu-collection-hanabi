@@ -21,6 +21,18 @@ function showShareToast(msg) {
 /* ===== osu! Collection ===== */
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const OSU_MODE_NAMES = { 0: 'standard', 1: 'taiko', 2: 'catch', 3: 'mania' };
+
+const MODE_ICON_PATHS = {
+    standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
+    taiko: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/>',
+    catch: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/>',
+    mania: '<circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/>'
+};
+function modeIconSvg(mode) {
+    const path = MODE_ICON_PATHS[mode];
+    if (!path) return '';
+    return `<svg class="mode-icon-inline" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">${path}</svg>`;
+}
 let osuCurrentTab = 'standard';
 let osuCurrentAudio = null;
 let osuVolume = 0.4;
@@ -569,7 +581,6 @@ function renderFeaturedBeatmap() {
         return;
     }
 
-    const modeIcons = { standard: '⭕', taiko: '🥁', catch: '🍎', mania: '🎹' };
     const dayIndex = Math.floor(Date.now() / 86400000) % allSets.length;
     const set = allSets[dayIndex];
     const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/cover.jpg`;
@@ -581,7 +592,7 @@ function renderFeaturedBeatmap() {
         <div class="featured-beatmap-overlay"></div>
         <div class="featured-beatmap-info">
             <div class="featured-beatmap-label">${t('featured_beatmap_label')}</div>
-            <div class="featured-beatmap-title">${modeIcons[set.__mode]} ${set.title}</div>
+            <div class="featured-beatmap-title">${modeIconSvg(set.__mode)} ${set.title}</div>
             <div class="featured-beatmap-artist">${set.artist} · ${t('mapped_by', { n: set.creator })}</div>
         </div>
     `;
@@ -643,7 +654,6 @@ function renderOsuCollection() {
     if (osuPage < 0) osuPage = 0;
     const pageSets = sets.slice(osuPage * OSU_PAGE_SIZE, (osuPage + 1) * OSU_PAGE_SIZE);
 
-    const modeIcons = { standard: '⭕', taiko: '🥁', catch: '🍎', mania: '🎹' };
     container.innerHTML = pageSets.map(set => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         const isFav = isOsuFavorited(set.beatmapset_id);
@@ -660,7 +670,7 @@ function renderOsuCollection() {
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">&#x2715;</button>
             <div class="osu-card-info">
-                <div class="osu-card-title">${modeIcons[set.__mode] || ''} ${set.title}</div>
+                <div class="osu-card-title">${modeIconSvg(set.__mode)} ${set.title}</div>
                 ${starsText}
                 <div class="osu-card-artist">${set.artist}</div>
                 <div class="osu-card-mapper">${t('mapped_by', { n: set.creator })}</div>
