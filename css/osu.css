@@ -286,6 +286,13 @@
     margin-bottom: 20px;
 }
 
+.mode-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: -5px;
+    margin-right: 4px;
+}
+
 .osu-tab {
     flex: 1;
     background: var(--bg-card);

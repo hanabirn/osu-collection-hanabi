@@ -52,6 +52,7 @@ a:hover { text-decoration: underline; }
 }
 @media (prefers-reduced-motion: reduce) {
     .title-note { animation: none; }
+    .logo-icon, .logo-icon::after { animation: none; }
 }
 @media (max-width: 600px) {
     .tn-1, .tn-6 { display: none; }
@@ -78,14 +79,34 @@ a:hover { text-decoration: underline; }
 }
 .logo-icon {
     display: flex;
+    position: relative;
     color: var(--accent-pink);
     filter: drop-shadow(0 0 8px rgba(var(--accent-pink-rgb), 0.55));
-    animation: logoPulse 6s ease-in-out infinite;
+    animation: logoBeatHit 1.6s cubic-bezier(.36,.07,.19,.97) infinite;
 }
-.logo-icon svg { width: 42px; height: 42px; }
-@keyframes logoPulse {
-    0%, 100% { opacity: 0.85; transform: scale(1); }
-    50%      { opacity: 1; transform: scale(1.06); }
+.logo-icon svg { width: 42px; height: 42px; display: block; }
+.logo-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--accent-pink);
+    opacity: 0;
+    animation: logoHitRing 1.6s cubic-bezier(.36,.07,.19,.97) infinite;
+}
+@keyframes logoBeatHit {
+    0%        { transform: scale(1); }
+    10%       { transform: scale(0.86); }
+    28%       { transform: scale(1.14); }
+    45%       { transform: scale(0.97); }
+    62%       { transform: scale(1.04); }
+    80%, 100% { transform: scale(1); }
+}
+@keyframes logoHitRing {
+    0%   { opacity: 0;   transform: scale(0.8); }
+    10%  { opacity: 0.7; transform: scale(0.9); }
+    45%  { opacity: 0;   transform: scale(1.6); }
+    100% { opacity: 0;   transform: scale(1.6); }
 }
 .site-title-block h1 {
     font-size: 2.5rem;
