@@ -15,11 +15,15 @@ let osuTournamentsModeFilter = 'all';
    no structured mode field, so this looks for the bracket tags tournament
    hosts conventionally prefix their thread titles with (e.g. "[osu!] 5WC",
    "[Taiko] ..."). Titles that don't match any tag only show under "All". */
+/* Order matters: checked top to bottom, first match wins. Tags like
+   "[osu!mania 4k]" contain "osu!" as a substring of the mania tag, so the
+   more specific mania/taiko/catch checks must run before the loose
+   osu!/std/standard one or they'd never get a chance to match. */
 const TOURNAMENT_MODE_PATTERNS = [
+    ['mania', /\bmania\b/i],
+    ['taiko', /\btaiko\b/i],
+    ['catch', /\b(catch|ctb)\b/i],
     ['standard', /\[?\s*(osu!?|std|standard)\s*\]?/i],
-    ['taiko', /\[?\s*taiko\s*\]?/i],
-    ['catch', /\[?\s*(catch|ctb)\s*\]?/i],
-    ['mania', /\[?\s*mania\s*\]?/i],
 ];
 
 function detectTournamentMode(title) {
