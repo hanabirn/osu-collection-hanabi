@@ -1,8 +1,9 @@
 I18N.fr = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Collection de beatmaps + recherche PP ✦',
     back_to_main: '← Retour à Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_feedback: 'Suggestions',
+    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_tournaments: 'Tournois', nav_feedback: 'Suggestions',
     updates_title: '✦ Actualités ✦', updates_loading: 'Chargement des actualités...', updates_empty: 'Aucune actualité pour le moment', updates_load_fail: 'Échec du chargement des actualités, réessayez plus tard',
+    tournaments_title: '✦ Tournois ✦', tournaments_hint: "Fils de tournois communautaires du sous-forum officiel « Tournaments » — ce ne sont pas des événements officiels, vérifiez les règles de l'organisateur avant de vous inscrire.",
     feedback_title: '✦ Suggestions et améliorations ✦', feedback_hint: "Vous pensez qu'un aspect du site pourrait être amélioré ? Dites-le-moi ici — seul moi peux voir votre message, les autres visiteurs ne le verront pas.", feedback_placeholder: 'Écrivez votre suggestion...', feedback_submit: 'Envoyer', feedback_success: 'Votre message a été envoyé, merci pour votre retour !',
     skins_title: '🎵 Mes skins 🎵', skins_hint: "Téléversez les fichiers de skins osu! (.osk) que vous voulez conserver, et retéléchargez-les à tout moment. Les fichiers sont stockés uniquement dans ce navigateur, jamais envoyés à un serveur — changer d'appareil ou effacer les données du navigateur les fera disparaître, pensez à sauvegarder ce qui est important.", skins_list_title: '💾 Skins enregistrés',
     skins_empty: 'Aucun skin enregistré pour le moment', skins_download: 'Télécharger', skins_delete: 'Supprimer', skins_delete_confirm: 'Supprimer ce fichier de skin ?',

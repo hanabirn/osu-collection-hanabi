@@ -6,6 +6,7 @@ function switchTab(tab, el) {
     if (el) el.classList.add('active');
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
+    if (tab === 'tournaments') ensureTournamentsLoaded();
 }
 
 /* ===== 🌐 Language Dropdown ===== */

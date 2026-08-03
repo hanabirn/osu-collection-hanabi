@@ -77,6 +77,7 @@
         <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
+        <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
@@ -245,6 +246,16 @@
         </div>
     </section>
 
+    <section id="page-tournaments" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="tournaments_title">✦ 賽事 ✦</h2>
+        <p class="tournaments-hint" data-i18n="tournaments_hint">來自官方論壇「Tournaments」版的社群賽事貼文，非官方主辦活動，報名前請自行確認主辦方規則。</p>
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div id="osu-tournaments-list" class="news-list"></div>
+        </div>
+    </section>
+
     <section id="page-feedback" class="site-page" style="display:none;">
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
@@ -301,6 +312,7 @@
 <script src="js/osu.js"></script>
 <script src="js/skins.js"></script>
 <script src="js/updates.js"></script>
+<script src="js/tournaments.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
 </body>

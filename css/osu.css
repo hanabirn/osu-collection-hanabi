@@ -81,9 +81,11 @@
     background: var(--bg-stat);
 }
 .news-item-body { min-width: 0; flex: 1; }
-.news-item-header { font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 4px; }
+.news-item-header { display: flex; justify-content: space-between; gap: 8px; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 4px; }
+.news-item-stats { flex-shrink: 0; white-space: nowrap; }
 .news-title { display: block; color: var(--text); font-size: 0.85rem; line-height: 1.4; }
 .news-loading, .news-empty { color: var(--text-secondary); font-size: 0.85rem; padding: 12px 0; }
+.tournaments-hint { text-align: center; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px; }
 .skin-item {
     display: flex;
     align-items: center;

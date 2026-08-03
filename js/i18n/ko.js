@@ -1,8 +1,9 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 비트맵 컬렉션 + PP 조회 ✦',
     back_to_main: '← Hanabiの小天地로 돌아가기',
-    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_feedback: '제안&개선',
+    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_tournaments: '대회', nav_feedback: '제안&개선',
     updates_title: '✦ 업데이트 소식 ✦', updates_loading: '업데이트 소식을 불러오는 중...', updates_empty: '현재 업데이트 소식이 없습니다', updates_load_fail: '업데이트 소식을 불러오지 못했습니다',
+    tournaments_title: '✦ 대회 ✦', tournaments_hint: '공식 포럼 「Tournaments」 게시판의 커뮤니티 대회 게시물입니다. 공식 주최가 아니므로 참가 전 주최자의 규칙을 직접 확인해 주세요.',
     feedback_title: '✦ 제안&개선 ✦', feedback_hint: '사이트에서 개선이 필요한 부분이 있나요? 여기에 알려주세요. 이 메시지는 저만 볼 수 있고 다른 방문자는 볼 수 없습니다.', feedback_placeholder: '제안 사항을 적어주세요...', feedback_submit: '보내기', feedback_success: '메시지가 전송되었습니다. 소중한 의견 감사합니다!',
     skins_title: '🎵 내 스킨 🎵', skins_hint: '보관하고 싶은 osu! 스킨 파일(.osk)을 업로드하면 언제든 다시 다운로드할 수 있습니다. 파일은 현재 브라우저에만 저장되며 서버에는 업로드되지 않습니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 사라지니 중요한 파일은 직접 백업해 주세요.', skins_list_title: '💾 저장된 스킨',
     skins_empty: '아직 저장된 스킨이 없습니다', skins_download: '다운로드', skins_delete: '삭제', skins_delete_confirm: '이 스킨 파일을 삭제하시겠습니까?',
