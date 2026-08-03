@@ -142,53 +142,6 @@
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
-        <div class="osu-profile-card" id="osu-profile-card" style="display:none;">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <div class="osu-profile-header">
-                <img id="osu-avatar" class="osu-avatar" alt="avatar" onerror="this.style.display='none';">
-                <div class="osu-profile-info">
-                    <div class="osu-profile-name" id="osu-profile-name"></div>
-                    <div class="osu-profile-country" id="osu-profile-country"></div>
-                </div>
-            </div>
-            <div class="osu-mode-tabs" id="osu-mode-tabs">
-                <button class="osu-mode-tab active" data-mode="0"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
-                <button class="osu-mode-tab" data-mode="1"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
-                <button class="osu-mode-tab" data-mode="2"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
-                <button class="osu-mode-tab" data-mode="3"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
-            </div>
-            <div class="osu-profile-stats" id="osu-profile-stats">
-                <div class="osu-stat">
-                    <div class="osu-stat-value" id="osu-rank">#—</div>
-                    <div class="osu-stat-label" data-i18n="osu_stat_global">全球排名</div>
-                </div>
-                <div class="osu-stat">
-                    <div class="osu-stat-value" id="osu-pp">—</div>
-                    <div class="osu-stat-label">pp</div>
-                </div>
-                <div class="osu-stat">
-                    <div class="osu-stat-value" id="osu-accuracy">—</div>
-                    <div class="osu-stat-label" data-i18n="osu_stat_accuracy">準確率</div>
-                </div>
-                <div class="osu-stat">
-                    <div class="osu-stat-value" id="osu-playcount">—</div>
-                    <div class="osu-stat-label" data-i18n="osu_stat_playcount">遊戲數</div>
-                </div>
-            </div>
-            <button class="btn stats-card-btn" onclick="downloadOwnStatsCard()">📸 <span data-i18n="stats_card_btn">產生戰績卡</span></button>
-            <div class="rank-badges-panel" id="osu-rank-badges"></div>
-            <div class="osu-total-pp" id="osu-total-pp" style="display:none;">
-                <span data-i18n="osu_total_pp">全模式 PP</span>
-                <span class="osu-total-pp-value" id="osu-total-pp-value">—</span>
-            </div>
-            <div class="pp-history-panel" id="pp-history-panel"></div>
-            <div class="osu-recent-plays" id="osu-recent-plays" style="display:none;">
-                <div class="osu-recent-title" data-i18n="osu_recent_title">🎮 最近遊玩</div>
-                <div class="osu-recent-list" id="osu-recent-list"></div>
-            </div>
-        </div>
-
         <div class="visitor-lookup-card" id="visitor-lookup-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>

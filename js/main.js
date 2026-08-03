@@ -41,10 +41,7 @@ function onLangMenuEscape(e) {
    refreshDynamicContent() for quiz content. */
 function refreshDynamicContent() {
     renderOsuCollection();
-    renderPpHistoryChart();
     if (visitorLookupUserId) renderPpHistoryChart(null, ppHistoryKeyFor(visitorLookupUserId), 'visitor-pp-history-panel');
-    const activeModeTab = document.querySelector('#osu-mode-tabs .osu-mode-tab.active');
-    if (activeModeTab) renderOsuModeStats(parseInt(activeModeTab.dataset.mode));
     if (typeof renderSkinsList === 'function') renderSkinsList();
     if (typeof renderReplayHistory === 'function') renderReplayHistory();
 }
@@ -52,7 +49,6 @@ function refreshDynamicContent() {
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
     applyLang(siteLang);
-    fetchOsuProfile();
     initOsuBgCarousel();
     checkImportFromHash();
     checkOsuLoginFromUrl();

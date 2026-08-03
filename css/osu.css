@@ -782,50 +782,15 @@
     cursor: default;
 }
 
-/* ===== osu! Profile Card =====
-   Ported verbatim from the main site's css/about.css lines 133-391. */
-.osu-profile-card {
-    position: relative;
-    max-width: 520px;
-    margin: 0 auto 20px;
-    background: var(--bg-card-alt);
-    border: 1px solid rgba(255,102,153,0.2);
-    border-radius: 20px;
-    padding: 1.8rem 1.5rem;
-    text-align: center;
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    box-shadow: var(--shadow-card-inset);
-}
-.osu-profile-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 1.2rem;
-}
+/* ===== osu! Profile stat tiles =====
+   Ported verbatim from the main site's css/about.css lines 133-391. Shared by
+   the visitor lookup card and the tournament filter's mode-tab styling. */
 .osu-avatar {
     width: 72px; height: 72px;
     border-radius: 50%;
     border: 3px solid rgba(255,102,153,0.5);
     box-shadow: 0 0 15px rgba(255,102,153,0.3);
     object-fit: cover;
-}
-.osu-profile-name {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--text);
-    text-align: left;
-}
-.osu-profile-country {
-    font-size: 0.85rem;
-    color: var(--text-label);
-    text-align: left;
-}
-.osu-profile-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
 }
 .osu-stat {
     background: var(--bg-stat);
@@ -1129,52 +1094,6 @@
     text-overflow: ellipsis;
 }
 
-/* ===== Rank badge distribution ===== */
-.rank-badges-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 1rem;
-}
-.rank-badge-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.rank-badge-tag {
-    flex-shrink: 0;
-    width: 28px;
-    text-align: center;
-    border-radius: 6px;
-    padding: 2px 0;
-    font-size: 0.72rem;
-    font-weight: bold;
-}
-.rank-badge-tag.rank-ss { background: linear-gradient(135deg, #f4d03f, #f7ecb5); color: #6b5900; }
-.rank-badge-tag.rank-s { background: linear-gradient(135deg, #f4c542, #e8a628); color: #5c3d00; }
-.rank-badge-tag.rank-a { background: #6ee7b7; color: #064e3b; }
-.rank-badge-bar-track {
-    flex: 1;
-    height: 8px;
-    background: var(--bg-stat);
-    border-radius: 4px;
-    overflow: hidden;
-}
-.rank-badge-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s;
-}
-.rank-badge-bar-fill.rank-ss { background: linear-gradient(90deg, #f4d03f, #f7ecb5); }
-.rank-badge-bar-fill.rank-s { background: linear-gradient(90deg, #f4c542, #e8a628); }
-.rank-badge-bar-fill.rank-a { background: #6ee7b7; }
-.rank-badge-count {
-    flex-shrink: 0;
-    min-width: 32px;
-    text-align: right;
-    font-size: 0.78rem;
-    color: var(--text-label);
-}
 @media (max-width: 480px) {
     .osu-stats-panel { grid-template-columns: repeat(2, 1fr); gap: 6px; }
 }

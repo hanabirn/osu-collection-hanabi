@@ -704,12 +704,6 @@ function renderOsuCollection() {
     }
 }
 
-/* ===== osu! Profile ===== */
-const OSU_USER_ID = 26696007;
-let osuProfileLoaded = false;
-let osuModeData = [];
-let osuCurrentMode = 0;
-
 const COUNTRY_NAMES = {
     TW: 'Taiwan', JP: 'Japan', KR: 'South Korea', US: 'United States',
     CN: 'China', HK: 'Hong Kong', RU: 'Russia', FR: 'France',
@@ -717,43 +711,6 @@ const COUNTRY_NAMES = {
     ID: 'Indonesia', TH: 'Thailand', PL: 'Poland', AU: 'Australia',
     CA: 'Canada', MX: 'Mexico', AR: 'Argentina', CL: 'Chile',
 };
-
-function renderOsuModeStats(mode) {
-    const u = osuModeData[mode];
-    if (!u) return;
-    document.getElementById('osu-rank').textContent = u.pp_rank != null ? '#' + parseInt(u.pp_rank).toLocaleString() : '#—';
-    document.getElementById('osu-pp').textContent = u.pp_raw != null ? Math.round(parseFloat(u.pp_raw)).toLocaleString() : '—';
-    document.getElementById('osu-accuracy').textContent = u.accuracy != null ? parseFloat(u.accuracy).toFixed(2) + '%' : '—';
-    document.getElementById('osu-playcount').textContent = u.playcount != null ? parseInt(u.playcount).toLocaleString() : '—';
-    renderOsuRankBadges(u);
-}
-
-/* ===== Rank badge distribution (SS/S/A counts) — the osu! API already
-   returns count_rank_ss/ssh/s/sh/a per mode alongside everything else
-   fetchOsuProfile() pulls, so this needs no extra requests. ===== */
-function renderOsuRankBadges(u) {
-    const el = document.getElementById('osu-rank-badges');
-    if (!el) return;
-    const ss = (parseInt(u.count_rank_ss) || 0) + (parseInt(u.count_rank_ssh) || 0);
-    const s = (parseInt(u.count_rank_s) || 0) + (parseInt(u.count_rank_sh) || 0);
-    const a = parseInt(u.count_rank_a) || 0;
-    const bars = [
-        { label: 'SS', count: ss, rankClass: 'ss' },
-        { label: 'S', count: s, rankClass: 's' },
-        { label: 'A', count: a, rankClass: 'a' },
-    ];
-    const max = Math.max(1, ...bars.map(b => b.count));
-
-    el.innerHTML = bars.map(b => `
-        <div class="rank-badge-row">
-            <span class="rank-badge-tag rank-${b.rankClass}">${b.label}</span>
-            <div class="rank-badge-bar-track">
-                <div class="rank-badge-bar-fill rank-${b.rankClass}" style="width:${(b.count / max) * 100}%"></div>
-            </div>
-            <span class="rank-badge-count">${b.count.toLocaleString()}</span>
-        </div>
-    `).join('');
-}
 
 function calcOsuAccuracy(r, mode) {
     const c300 = parseInt(r.count300) || 0;
@@ -842,27 +799,25 @@ async function renderOsuRecentPlays(userId, mode, listId, wrapId) {
    loads the site forward. To backfill actual past progress, fetchOsuTrackHistory()
    below pulls per-mode history from the osu!Track API (github.com/Ameobea/osutrack-api,
    proxied through netlify/functions/osu-pp-history.js) and merges it in. ===== */
-const OSU_PP_HISTORY_KEY = 'osu_pp_history';
 const OSU_PP_HISTORY_MAX_DAYS = 90;
 
-/* Logged-in visitors (see the osu! OAuth login section below) get their own
-   PP history bucket, separate from the site owner's fixed OSU_USER_ID one,
-   so the functions below all take the storage key as a parameter — call
-   sites that omit it keep tracking the owner's dashboard as before. */
+/* Each looked-up/logged-in visitor gets their own PP history bucket in
+   localStorage, keyed by osu! user id, so the functions below all take the
+   storage key as a parameter (see loadVisitorProfileById). */
 function ppHistoryKeyFor(userId) {
-    return userId ? `osu_pp_history_${userId}` : OSU_PP_HISTORY_KEY;
+    return `osu_pp_history_${userId}`;
 }
 
-function getPpHistory(key = OSU_PP_HISTORY_KEY) {
+function getPpHistory(key) {
     try { return JSON.parse(localStorage.getItem(key)) || []; }
     catch { return []; }
 }
 
-function savePpHistory(history, key = OSU_PP_HISTORY_KEY) {
+function savePpHistory(history, key) {
     localStorage.setItem(key, JSON.stringify(history));
 }
 
-function recordPpSnapshot(totalPP, key = OSU_PP_HISTORY_KEY) {
+function recordPpSnapshot(totalPP, key) {
     const today = new Date().toISOString().slice(0, 10);
     const value = Math.round(totalPP);
     const history = getPpHistory(key);
@@ -964,7 +919,7 @@ function mergePpHistory(remote, local) {
     return [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([date, pp]) => ({ date, pp }));
 }
 
-function renderPpHistoryChart(historyOverride, key = OSU_PP_HISTORY_KEY, panelId = 'pp-history-panel') {
+function renderPpHistoryChart(historyOverride, key, panelId) {
     const el = document.getElementById(panelId);
     if (!el) return;
     const history = historyOverride || getPpHistory(key);
@@ -981,51 +936,6 @@ function renderPpHistoryChart(historyOverride, key = OSU_PP_HISTORY_KEY, panelId
         <div class="trend-chart-label">${t('pp_history_title')}</div>
         <div class="trend-chart-wrap">${ppTrendChartSvg(history)}</div>
     `;
-}
-
-async function fetchOsuProfile() {
-    if (osuProfileLoaded) return;
-    try {
-        const results = await Promise.all([0,1,2,3].map(m => osuFetch(`u=${OSU_USER_ID}&m=${m}`)));
-        osuModeData = results.map(r => (r && r.length > 0) ? r[0] : null);
-        const u = osuModeData[0];
-        if (!u) return;
-
-        document.getElementById('osu-avatar').src = osuAvatarUrl(u.user_id);
-        document.getElementById('osu-profile-name').textContent = u.username;
-        document.getElementById('osu-profile-country').textContent = COUNTRY_NAMES[u.country] || u.country;
-
-        renderOsuModeStats(0);
-
-        const totalPP = osuModeData.reduce((sum, m) => sum + (m && m.pp_raw != null ? parseFloat(m.pp_raw) : 0), 0);
-        document.getElementById('osu-total-pp-value').textContent = Math.round(totalPP).toLocaleString();
-        document.getElementById('osu-total-pp').style.display = totalPP > 0 ? '' : 'none';
-
-        if (totalPP > 0) {
-            recordPpSnapshot(totalPP);
-            renderPpHistoryChart();
-            fetchOsuTrackHistory(OSU_USER_ID).then(remote => {
-                if (remote.length) renderPpHistoryChart(mergePpHistory(remote, getPpHistory()));
-            });
-        }
-
-        document.getElementById('osu-profile-card').style.display = 'block';
-        osuProfileLoaded = true;
-        renderOsuRecentPlays(OSU_USER_ID, 0, 'osu-recent-list', 'osu-recent-plays');
-
-        document.querySelectorAll('.osu-mode-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelector('.osu-mode-tab.active').classList.remove('active');
-                this.classList.add('active');
-                const mode = parseInt(this.dataset.mode);
-                osuCurrentMode = mode;
-                renderOsuModeStats(mode);
-                renderOsuRecentPlays(OSU_USER_ID, mode, 'osu-recent-list', 'osu-recent-plays');
-            });
-        });
-    } catch (e) {
-        console.error('Failed to load osu! profile:', e);
-    }
 }
 
 /* ===== Visitor Profile Lookup ===== */
@@ -1454,10 +1364,6 @@ async function downloadStatsCardFor(u, mode) {
         console.error('Stats card generation failed:', e);
         showShareToast(t('stats_card_fail'));
     }
-}
-
-function downloadOwnStatsCard() {
-    downloadStatsCardFor(osuModeData[osuCurrentMode], osuCurrentMode);
 }
 
 function downloadVisitorStatsCard() {
