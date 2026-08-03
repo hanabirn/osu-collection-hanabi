@@ -8,9 +8,39 @@ const OSU_TOURNAMENTS_TOPIC_BASE = 'https://osu.ppy.sh/community/forums/topics/'
 const OSU_TOURNAMENTS_CACHE_KEY = 'osu_tournaments_cache';
 
 let osuTournamentsLoaded = false;
+let osuTournamentsCurrentItems = [];
+let osuTournamentsModeFilter = 'all';
+
+/* Best-effort mode detection from the topic title — the forum API gives us
+   no structured mode field, so this looks for the bracket tags tournament
+   hosts conventionally prefix their thread titles with (e.g. "[osu!] 5WC",
+   "[Taiko] ..."). Titles that don't match any tag only show under "All". */
+const TOURNAMENT_MODE_PATTERNS = [
+    ['standard', /\[?\s*(osu!?|std|standard)\s*\]?/i],
+    ['taiko', /\[?\s*taiko\s*\]?/i],
+    ['catch', /\[?\s*(catch|ctb)\s*\]?/i],
+    ['mania', /\[?\s*mania\s*\]?/i],
+];
+
+function detectTournamentMode(title) {
+    if (!title) return null;
+    const bracketTag = title.match(/^\s*\[([^\]]+)\]/);
+    const haystack = bracketTag ? bracketTag[1] : title;
+    for (const [mode, pattern] of TOURNAMENT_MODE_PATTERNS) {
+        if (pattern.test(haystack)) return mode;
+    }
+    return null;
+}
 
 function ensureTournamentsLoaded() {
     if (!osuTournamentsLoaded) loadOsuTournaments();
+}
+
+function filterOsuTournamentsByMode(mode, btn) {
+    osuTournamentsModeFilter = mode;
+    document.querySelectorAll('.tournament-mode-filter .osu-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderOsuTournaments(osuTournamentsCurrentItems);
 }
 
 async function loadOsuTournaments() {
@@ -21,7 +51,8 @@ async function loadOsuTournaments() {
     const cached = localStorage.getItem(OSU_TOURNAMENTS_CACHE_KEY);
     if (cached) {
         try {
-            renderOsuTournaments(JSON.parse(cached));
+            osuTournamentsCurrentItems = JSON.parse(cached);
+            renderOsuTournaments(osuTournamentsCurrentItems);
         } catch (e) {
             // ignore corrupt cache, network fetch below will repopulate it
         }
@@ -35,6 +66,7 @@ async function loadOsuTournaments() {
         const data = await res.json();
         const items = (data.topics || []).slice(0, 25);
         localStorage.setItem(OSU_TOURNAMENTS_CACHE_KEY, JSON.stringify(items));
+        osuTournamentsCurrentItems = items;
         renderOsuTournaments(items);
     } catch (e) {
         console.error('osu! tournaments load failed:', e);
@@ -42,9 +74,12 @@ async function loadOsuTournaments() {
     }
 }
 
-function renderOsuTournaments(items) {
+function renderOsuTournaments(allItems) {
     const container = document.getElementById('osu-tournaments-list');
     if (!container) return;
+    const items = osuTournamentsModeFilter === 'all'
+        ? allItems
+        : (allItems || []).filter(topic => detectTournamentMode(topic.title) === osuTournamentsModeFilter);
     if (!items || items.length === 0) {
         container.innerHTML = `<div class="news-empty">${t('updates_empty')}</div>`;
         return;

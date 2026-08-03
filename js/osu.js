@@ -845,24 +845,32 @@ async function renderOsuRecentPlays(userId, mode, listId, wrapId) {
 const OSU_PP_HISTORY_KEY = 'osu_pp_history';
 const OSU_PP_HISTORY_MAX_DAYS = 90;
 
-function getPpHistory() {
-    try { return JSON.parse(localStorage.getItem(OSU_PP_HISTORY_KEY)) || []; }
+/* Logged-in visitors (see the osu! OAuth login section below) get their own
+   PP history bucket, separate from the site owner's fixed OSU_USER_ID one,
+   so the functions below all take the storage key as a parameter — call
+   sites that omit it keep tracking the owner's dashboard as before. */
+function ppHistoryKeyFor(userId) {
+    return userId ? `osu_pp_history_${userId}` : OSU_PP_HISTORY_KEY;
+}
+
+function getPpHistory(key = OSU_PP_HISTORY_KEY) {
+    try { return JSON.parse(localStorage.getItem(key)) || []; }
     catch { return []; }
 }
 
-function savePpHistory(history) {
-    localStorage.setItem(OSU_PP_HISTORY_KEY, JSON.stringify(history));
+function savePpHistory(history, key = OSU_PP_HISTORY_KEY) {
+    localStorage.setItem(key, JSON.stringify(history));
 }
 
-function recordPpSnapshot(totalPP) {
+function recordPpSnapshot(totalPP, key = OSU_PP_HISTORY_KEY) {
     const today = new Date().toISOString().slice(0, 10);
     const value = Math.round(totalPP);
-    const history = getPpHistory();
+    const history = getPpHistory(key);
     const last = history[history.length - 1];
     if (last && last.date === today && last.pp === value) return;
     if (last && last.date === today) history[history.length - 1] = { date: today, pp: value };
     else history.push({ date: today, pp: value });
-    savePpHistory(history.length > OSU_PP_HISTORY_MAX_DAYS ? history.slice(-OSU_PP_HISTORY_MAX_DAYS) : history);
+    savePpHistory(history.length > OSU_PP_HISTORY_MAX_DAYS ? history.slice(-OSU_PP_HISTORY_MAX_DAYS) : history, key);
 }
 
 function formatPpChartDate(dateStr) {
@@ -956,10 +964,10 @@ function mergePpHistory(remote, local) {
     return [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([date, pp]) => ({ date, pp }));
 }
 
-function renderPpHistoryChart(historyOverride) {
-    const el = document.getElementById('pp-history-panel');
+function renderPpHistoryChart(historyOverride, key = OSU_PP_HISTORY_KEY, panelId = 'pp-history-panel') {
+    const el = document.getElementById(panelId);
     if (!el) return;
-    const history = historyOverride || getPpHistory();
+    const history = historyOverride || getPpHistory(key);
 
     if (history.length < 2) {
         el.innerHTML = `
@@ -1032,17 +1040,14 @@ function switchVisitorRecentMode(mode, el) {
     if (visitorLookupUserId) renderOsuRecentPlays(visitorLookupUserId, mode, 'visitor-recent-list', 'visitor-recent-plays');
 }
 
-async function lookupVisitorProfile() {
-    const input = document.getElementById('visitor-lookup-input').value.trim();
-    if (!input) return;
+async function loadVisitorProfileById(input, isUsername) {
     const status = document.getElementById('visitor-lookup-status');
     const result = document.getElementById('visitor-lookup-result');
     status.innerText = t('osu_searching') || 'Searching...';
     status.style.color = '#f9a8d4';
     result.style.display = 'none';
 
-    const isId = /^\d+$/.test(input);
-    const param = isId ? `u=${input}` : `u=${encodeURIComponent(input)}&type=string`;
+    const param = isUsername ? `u=${encodeURIComponent(input)}&type=string` : `u=${input}`;
 
     try {
         const results = await Promise.all([0,1,2,3].map(m => osuFetch(`${param}&m=${m}`)));
@@ -1072,11 +1077,82 @@ async function lookupVisitorProfile() {
         document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
         document.querySelector('#visitor-recent-mode-tabs .osu-mode-tab[data-mode="0"]').classList.add('active');
         renderOsuRecentPlays(u.user_id, 0, 'visitor-recent-list', 'visitor-recent-plays');
+
+        if (totalPP > 0) {
+            const key = ppHistoryKeyFor(u.user_id);
+            recordPpSnapshot(totalPP, key);
+            renderPpHistoryChart(null, key, 'visitor-pp-history-panel');
+            fetchOsuTrackHistory(u.user_id).then(remote => {
+                if (remote.length) renderPpHistoryChart(mergePpHistory(remote, getPpHistory(key)), key, 'visitor-pp-history-panel');
+            });
+        }
     } catch (e) {
         console.error('Visitor lookup failed:', e);
         status.innerText = 'Error';
         status.style.color = '#ff5252';
     }
+}
+
+async function lookupVisitorProfile() {
+    const input = document.getElementById('visitor-lookup-input').value.trim();
+    if (!input) return;
+    loadVisitorProfileById(input, !/^\d+$/.test(input));
+}
+
+/* ===== osu! OAuth login =====
+   netlify/functions/osu-login.js + osu-callback.js run the authorization-code
+   flow and redirect back here with ?osu_login=<id>&osu_login_name=<name> (or
+   ?osu_login_error=1 on failure) — the access token itself is never handed to
+   the client or stored anywhere, since the id is all loadVisitorProfileById()
+   needs to personalize the Lookup tab the same way a manual search does. */
+const OSU_LOGIN_STORAGE_KEY = 'osu_logged_in_user';
+
+function getLoggedInOsuUser() {
+    try { return JSON.parse(localStorage.getItem(OSU_LOGIN_STORAGE_KEY)); }
+    catch { return null; }
+}
+
+function logoutOsuUser() {
+    localStorage.removeItem(OSU_LOGIN_STORAGE_KEY);
+    applyLoggedInOsuUser();
+}
+
+function applyLoggedInOsuUser() {
+    const user = getLoggedInOsuUser();
+    const loginBtn = document.getElementById('osu-login-btn');
+    const pill = document.getElementById('osu-logged-in-pill');
+    if (!loginBtn || !pill) return;
+
+    loginBtn.style.display = user ? 'none' : '';
+    pill.style.display = user ? '' : 'none';
+    if (!user) return;
+
+    document.getElementById('osu-logged-in-name').textContent = user.username || `#${user.id}`;
+    document.getElementById('osu-logged-in-avatar').src = osuAvatarUrl(user.id);
+
+    const input = document.getElementById('visitor-lookup-input');
+    if (input) input.value = user.id;
+    loadVisitorProfileById(user.id, false);
+}
+
+function checkOsuLoginFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('osu_login');
+    const loginFailed = params.get('osu_login_error');
+
+    if (id) {
+        localStorage.setItem(OSU_LOGIN_STORAGE_KEY, JSON.stringify({ id, username: params.get('osu_login_name') || '' }));
+    }
+    if (id || loginFailed) {
+        params.delete('osu_login');
+        params.delete('osu_login_name');
+        params.delete('osu_login_error');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+        if (loginFailed) showShareToast(t('osu_login_fail'));
+    }
+
+    applyLoggedInOsuUser();
 }
 
 /* ===== PP calculator + strain graph =====

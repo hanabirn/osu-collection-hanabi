@@ -55,6 +55,14 @@
     <div class="header-bottom-row">
         <a class="back-to-main" href="https://hanabirn.github.io/" data-i18n="back_to_main">← 返回 Hanabiの小天地</a>
         <div class="header-icons">
+            <div class="osu-login-widget" id="osu-login-widget">
+                <a id="osu-login-btn" class="osu-login-btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">🔑 osu! 登入</a>
+                <div id="osu-logged-in-pill" class="osu-logged-in-pill" style="display:none;">
+                    <img id="osu-logged-in-avatar" class="osu-logged-in-avatar" alt="">
+                    <span id="osu-logged-in-name" class="osu-logged-in-name"></span>
+                    <button class="osu-logout-btn" onclick="logoutOsuUser()" data-i18n-title="osu_logout_btn" title="登出">&#x2715;</button>
+                </div>
+            </div>
             <div class="lang-globe" id="lang-globe">
                 <button class="lang-globe-btn" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language">&#127760;</button>
                 <div class="lang-globe-menu" id="lang-globe-menu">
@@ -203,6 +211,7 @@
                     <span data-i18n="osu_total_pp">全模式 PP</span>
                     <span class="osu-total-pp-value" id="visitor-total-pp-value">—</span>
                 </div>
+                <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
                 <div class="osu-mode-tabs" id="visitor-recent-mode-tabs">
                     <button class="osu-mode-tab active" data-mode="0" onclick="switchVisitorRecentMode(0,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
                     <button class="osu-mode-tab" data-mode="1" onclick="switchVisitorRecentMode(1,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
@@ -249,6 +258,14 @@
     <section id="page-tournaments" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="tournaments_title">✦ 賽事 ✦</h2>
         <p class="tournaments-hint" data-i18n="tournaments_hint">來自官方論壇「Tournaments」版的社群賽事貼文，非官方主辦活動，報名前請自行確認主辦方規則。</p>
+        <p class="tournaments-hint" data-i18n="tournaments_filter_hint">遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。</p>
+        <div class="osu-mode-tabs tournament-mode-filter">
+            <button class="osu-tab active" onclick="filterOsuTournamentsByMode('all', this)" data-i18n="osu_filter_all">全部</button>
+            <button class="osu-tab" onclick="filterOsuTournamentsByMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+            <button class="osu-tab" onclick="filterOsuTournamentsByMode('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+            <button class="osu-tab" onclick="filterOsuTournamentsByMode('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+            <button class="osu-tab" onclick="filterOsuTournamentsByMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+        </div>
         <div class="osu-add-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>

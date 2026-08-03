@@ -228,6 +228,63 @@ a:hover { text-decoration: underline; }
 }
 .theme-toggle-btn:active { transform: scale(0.92) rotate(15deg); }
 
+.osu-login-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 17px;
+    background: var(--lang-pill-bg);
+    border: 1px solid var(--lang-pill-border);
+    color: var(--lang-pill-text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+.osu-login-btn:hover {
+    background: rgba(var(--accent-pink-rgb), 0.14);
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+}
+.osu-logged-in-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 6px 0 4px;
+    border-radius: 17px;
+    background: var(--lang-pill-bg);
+    border: 1px solid var(--lang-pill-border);
+}
+.osu-logged-in-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.osu-logged-in-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.osu-logout-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s var(--ease-out);
+}
+.osu-logout-btn:hover { color: var(--accent-pink); }
+
 .header-bottom-row {
     display: flex;
     align-items: center;
