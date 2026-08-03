@@ -1,9 +1,11 @@
 I18N.es = {
     title: 'osu! Colección', site_title: 'osu! Colección', site_tagline: '✦ Colección de beatmaps + búsqueda de PP ✦',
     back_to_main: '← Volver a Hanabiの小天地',
-    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias', nav_tournaments: 'Torneos', nav_feedback: 'Sugerencias',
+    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias', nav_tournaments: 'Torneos', nav_replay: 'Replay', nav_feedback: 'Sugerencias',
     updates_title: '✦ Noticias ✦', updates_loading: 'Cargando noticias...', updates_empty: 'No hay noticias por ahora', updates_load_fail: 'Error al cargar las noticias, inténtalo más tarde',
     tournaments_title: '✦ Torneos ✦', tournaments_hint: 'Publicaciones de torneos comunitarios del subforo oficial «Tournaments» — no son eventos oficiales, confirma las reglas del organizador antes de inscribirte.',
+    replay_title: '✦ Renderizado de Replay ✦', replay_hint: 'Sube un archivo de replay .osr para generar un vídeo gratis a través del servicio de código abierto o!rdr (ordr.issou.best). El renderizado suele tardar de 1 a 5 minutos según la carga del servidor; el vídeo se aloja en los servidores de o!rdr, no en este sitio.', replay_upload_title: 'Subir Replay', replay_username_placeholder: 'Nombre mostrado (opcional)', replay_skin_placeholder: 'Buscar skin...', replay_submit: 'Generar vídeo', replay_history_title: 'Mis vídeos',
+    replay_submitting: 'Subiendo...', replay_rendering: 'Enviado, renderizado iniciado...', replay_submit_fail: 'Error al enviar: {n}', replay_render_fail: 'Error de renderizado (código {n})', replay_render_fail_short: 'Error de renderizado', replay_render_done: '¡Vídeo listo!', replay_progress: 'Renderizando: {n}', replay_skin_none: 'No se encontraron skins', replay_history_empty: 'Aún no hay vídeos generados', replay_watch: 'Ver vídeo', replay_history_pending: 'Renderizando...',
     feedback_title: '✦ Sugerencias y mejoras ✦', feedback_hint: '¿Crees que algo en el sitio podría mejorar? Cuéntamelo aquí — solo yo puedo ver tu mensaje, otros visitantes no lo verán.', feedback_placeholder: 'Escribe tu sugerencia...', feedback_submit: 'Enviar', feedback_success: '¡Tu mensaje ha sido enviado, gracias por tu opinión!',
     skins_title: '🎵 Mis skins 🎵', skins_hint: 'Sube los archivos de skins de osu! (.osk) que quieras conservar y descárgalos de nuevo cuando quieras. Los archivos solo se guardan en este navegador, nunca se suben a ningún servidor — cambiar de dispositivo o borrar los datos del navegador los eliminará, así que haz tu propia copia de seguridad de lo importante.', skins_list_title: '💾 Skins guardados',
     skins_empty: 'Aún no hay skins guardados', skins_download: 'Descargar', skins_delete: 'Eliminar', skins_delete_confirm: '¿Eliminar este archivo de skin?',
@@ -33,6 +35,7 @@ I18N.es = {
     osu_export: 'Exportar colección', osu_import: 'Importar colección',
     osu_export_done: '¡Colección exportada!', osu_import_done: '¡Colección importada!', osu_import_fail: 'Error al importar. Verifica el formato del archivo',
 
+    osu_download_btn_title: 'Descarga directa (mirror sin inicio de sesión)',
     pp_calc_btn_title: 'Calculadora de PP y curva de dificultad', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Precisión', pp_calc_run: 'Calcular',
     pp_calc_calculating: 'Calculando...', pp_calc_error: 'Error en el cálculo, inténtalo de nuevo más tarde', pp_calc_stars_label: 'Estrellas',
     pp_calc_strain_title: 'Curva de dificultad', pp_calc_strain_unsupported: 'No hay datos de dificultad disponibles para este mapa', pp_calc_acc_invalid: 'Introduce una precisión entre 0 y 100',

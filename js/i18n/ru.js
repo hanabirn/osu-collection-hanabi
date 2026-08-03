@@ -1,9 +1,11 @@
 I18N.ru = {
     title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Коллекция битмапов + поиск PP ✦',
     back_to_main: '← Назад на Hanabiの小天地',
-    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_tournaments: 'Турниры', nav_feedback: 'Предложения',
+    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_tournaments: 'Турниры', nav_replay: 'Реплей', nav_feedback: 'Предложения',
     updates_title: '✦ Новости ✦', updates_loading: 'Загрузка новостей...', updates_empty: 'Новостей пока нет', updates_load_fail: 'Не удалось загрузить новости, попробуйте позже',
     tournaments_title: '✦ Турниры ✦', tournaments_hint: 'Посты о турнирах сообщества с официального подфорума «Tournaments» — это не официальные мероприятия, уточняйте правила у организаторов перед регистрацией.',
+    replay_title: '✦ Рендер реплея ✦', replay_hint: 'Загрузите файл реплея .osr, чтобы бесплатно создать видео через открытый сервис o!rdr (ordr.issou.best). Рендеринг обычно занимает 1–5 минут в зависимости от загрузки сервера; видео хранится на серверах o!rdr, а не на этом сайте.', replay_upload_title: 'Загрузить реплей', replay_username_placeholder: 'Отображаемое имя (необязательно)', replay_skin_placeholder: 'Поиск скина...', replay_submit: 'Создать видео', replay_history_title: 'Мои видео',
+    replay_submitting: 'Загрузка...', replay_rendering: 'Отправлено, рендеринг начат...', replay_submit_fail: 'Ошибка отправки: {n}', replay_render_fail: 'Ошибка рендеринга (код {n})', replay_render_fail_short: 'Ошибка рендеринга', replay_render_done: 'Видео готово!', replay_progress: 'Рендеринг: {n}', replay_skin_none: 'Скины не найдены', replay_history_empty: 'Пока нет созданных видео', replay_watch: 'Смотреть видео', replay_history_pending: 'Рендеринг...',
     feedback_title: '✦ Предложения и улучшения ✦', feedback_hint: 'Думаете, что-то на сайте можно улучшить? Напишите здесь — ваше сообщение увижу только я, другие посетители его не увидят.', feedback_placeholder: 'Напишите ваше предложение...', feedback_submit: 'Отправить', feedback_success: 'Ваше сообщение отправлено, спасибо за отзыв!',
     skins_title: '🎵 Мои скины 🎵', skins_hint: 'Загрузите файлы скинов osu! (.osk), которые хотите сохранить, и скачивайте их снова в любое время. Файлы хранятся только в этом браузере и никогда не загружаются на сервер — при смене устройства или очистке данных браузера они будут потеряны, поэтому сохраняйте важное самостоятельно.', skins_list_title: '💾 Сохранённые скины',
     skins_empty: 'Пока нет сохранённых скинов', skins_download: 'Скачать', skins_delete: 'Удалить', skins_delete_confirm: 'Удалить этот файл скина?',
@@ -33,6 +35,7 @@ I18N.ru = {
     osu_export: 'Экспорт коллекции', osu_import: 'Импорт коллекции',
     osu_export_done: 'Коллекция экспортирована!', osu_import_done: 'Коллекция импортирована!', osu_import_fail: 'Ошибка импорта. Проверьте формат файла',
 
+    osu_download_btn_title: 'Прямая загрузка (зеркало без входа)',
     pp_calc_btn_title: 'Калькулятор PP и график сложности', pp_calc_mods_label: 'Моды', pp_calc_acc_label: 'Точность', pp_calc_run: 'Рассчитать',
     pp_calc_calculating: 'Расчёт...', pp_calc_error: 'Не удалось выполнить расчёт, попробуйте позже', pp_calc_stars_label: 'Звёзды',
     pp_calc_strain_title: 'График сложности', pp_calc_strain_unsupported: 'Для этой карты нет данных о сложности во времени', pp_calc_acc_invalid: 'Введите точность от 0 до 100',

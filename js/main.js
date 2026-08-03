@@ -45,6 +45,7 @@ function refreshDynamicContent() {
     const activeModeTab = document.querySelector('#osu-mode-tabs .osu-mode-tab.active');
     if (activeModeTab) renderOsuModeStats(parseInt(activeModeTab.dataset.mode));
     if (typeof renderSkinsList === 'function') renderSkinsList();
+    if (typeof renderReplayHistory === 'function') renderReplayHistory();
 }
 
 /* ===== Init ===== */

@@ -1,9 +1,11 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ ビートマップコレクション＋PP検索 ✦',
     back_to_main: '← Hanabiの小天地に戻る',
-    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_tournaments: '大会', nav_feedback: 'ご意見&改善',
+    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_tournaments: '大会', nav_replay: 'Replay動画', nav_feedback: 'ご意見&改善',
     updates_title: '✦ 更新情報 ✦', updates_loading: '更新情報を読み込み中...', updates_empty: '現在、更新情報はありません', updates_load_fail: '更新情報の読み込みに失敗しました',
     tournaments_title: '✦ 大会 ✦', tournaments_hint: '公式フォーラム「Tournaments」板のコミュニティ大会投稿です。公式主催ではないため、参加前に主催者のルールをご確認ください。',
+    replay_title: '✦ Replay動画生成 ✦', replay_hint: '.osr リプレイファイルをアップロードすると、オープンソースサービス o!rdr（ordr.issou.best）が無料で再生動画を生成します。生成時間はサーバーの混雑状況により通常1～5分。動画は o!rdr のサーバーに保存され、このサイトには保存されません。', replay_upload_title: 'リプレイをアップロード', replay_username_placeholder: '表示名（任意）', replay_skin_placeholder: 'スキン名で検索...', replay_submit: '動画を生成', replay_history_title: 'マイ動画',
+    replay_submitting: 'アップロード中...', replay_rendering: '送信しました、生成を開始します...', replay_submit_fail: '送信失敗：{n}', replay_render_fail: '生成失敗（エラーコード {n}）', replay_render_fail_short: '生成失敗', replay_render_done: '動画が完成しました！', replay_progress: '生成中：{n}', replay_skin_none: '一致するスキンが見つかりません', replay_history_empty: 'まだ生成した動画はありません', replay_watch: '動画を見る', replay_history_pending: '生成中...',
     feedback_title: '✦ ご意見&改善 ✦', feedback_hint: 'サイトで改善できそうな点があれば教えてください。あなたのメッセージは私だけが見ることができ、他の訪問者には表示されません。', feedback_placeholder: 'ご意見を書いてください...', feedback_submit: '送信', feedback_success: 'メッセージを送信しました。フィードバックありがとうございます！',
     skins_title: '🎵 マイスキン 🎵', skins_hint: '保存したい osu! スキンファイル（.osk）をアップロードすると、いつでもダウンロードし直せます。ファイルはこのブラウザにのみ保存され、サーバーにはアップロードされません。端末を変えたりブラウザのデータを消去すると失われるので、大事なファイルは自分でバックアップしてください。', skins_list_title: '💾 保存済みスキン',
     skins_empty: 'まだ保存されたスキンはありません', skins_download: 'ダウンロード', skins_delete: '削除', skins_delete_confirm: 'このスキンファイルを削除しますか？',
@@ -33,6 +35,7 @@ I18N.ja = {
     osu_export: 'コレクションをエクスポート', osu_import: 'コレクションをインポート',
     osu_export_done: 'エクスポートしました！', osu_import_done: 'インポートしました！', osu_import_fail: 'インポート失敗。ファイル形式を確認してください',
 
+    osu_download_btn_title: '直接ダウンロード（ログイン不要ミラー）',
     pp_calc_btn_title: 'PP試算・難易度カーブ', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '正確率', pp_calc_run: '計算',
     pp_calc_calculating: '計算中...', pp_calc_error: '計算に失敗しました。しばらくしてから再試行してください', pp_calc_stars_label: '☆数',
     pp_calc_strain_title: '難易度カーブ', pp_calc_strain_unsupported: 'この譜面には難易度カーブのデータがありません', pp_calc_acc_invalid: '0～100の範囲で正確率を入力してください',

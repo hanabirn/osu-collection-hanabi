@@ -155,6 +155,112 @@
     font-size: 0.9rem;
 }
 
+.replay-card { max-width: 560px; margin: 0 auto 16px; }
+
+.replay-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.replay-file-input {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+.replay-form-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.replay-form-row select {
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+.replay-skin-picker {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+.replay-skin-results {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 10px;
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+.replay-skin-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.82rem;
+}
+.replay-skin-option:hover { background: rgba(var(--accent-pink-rgb), 0.15); }
+.replay-skin-option img {
+    width: 40px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.replay-skin-empty {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.replay-submit-btn { align-self: flex-start; }
+
+.replay-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.replay-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-stat);
+    border-radius: 10px;
+    border: 1px solid var(--border-card);
+}
+.replay-history-title {
+    font-size: 0.85rem;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.replay-history-status {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.replay-history-status.fail { color: #f87171; }
+.replay-watch-btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
 .feedback-card { max-width: 480px; margin: 0 auto; }
 .feedback-hint {
     text-align: center;
@@ -494,6 +600,31 @@
     color: #34d399;
 }
 
+.osu-download-btn {
+    position: absolute;
+    top: 8px;
+    right: 88px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .osu-download-btn { opacity: 1; }
+.osu-download-btn:hover {
+    color: #fff;
+    background: rgba(52,211,153,0.5);
+}
+
 .osu-play-btn {
     position: absolute;
     top: 8px;
@@ -525,7 +656,7 @@
    otherwise be permanently invisible and untappable — show them by default
    there instead (UX audit: "hover vs tap" + "touch target size", both High). */
 @media (hover: none) {
-    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-play-btn {
+    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-play-btn, .osu-download-btn {
         opacity: 0.85;
     }
 }

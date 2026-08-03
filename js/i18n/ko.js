@@ -1,9 +1,11 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 비트맵 컬렉션 + PP 조회 ✦',
     back_to_main: '← Hanabiの小天地로 돌아가기',
-    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_tournaments: '대회', nav_feedback: '제안&개선',
+    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_tournaments: '대회', nav_replay: 'Replay 영상', nav_feedback: '제안&개선',
     updates_title: '✦ 업데이트 소식 ✦', updates_loading: '업데이트 소식을 불러오는 중...', updates_empty: '현재 업데이트 소식이 없습니다', updates_load_fail: '업데이트 소식을 불러오지 못했습니다',
     tournaments_title: '✦ 대회 ✦', tournaments_hint: '공식 포럼 「Tournaments」 게시판의 커뮤니티 대회 게시물입니다. 공식 주최가 아니므로 참가 전 주최자의 규칙을 직접 확인해 주세요.',
+    replay_title: '✦ Replay 영상 생성 ✦', replay_hint: '.osr 리플레이 파일을 업로드하면 오픈소스 서비스 o!rdr(ordr.issou.best)이 무료로 재생 영상을 생성합니다. 생성 시간은 서버 상황에 따라 보통 1~5분이며, 영상은 이 사이트가 아닌 o!rdr 서버에 저장됩니다.', replay_upload_title: '리플레이 업로드', replay_username_placeholder: '표시 이름(선택)', replay_skin_placeholder: '스킨 이름 검색...', replay_submit: '영상 생성', replay_history_title: '내 영상',
+    replay_submitting: '업로드 중...', replay_rendering: '제출됨, 생성을 시작합니다...', replay_submit_fail: '제출 실패: {n}', replay_render_fail: '생성 실패 (오류 코드 {n})', replay_render_fail_short: '생성 실패', replay_render_done: '영상이 완성되었습니다!', replay_progress: '생성 중: {n}', replay_skin_none: '일치하는 스킨을 찾을 수 없습니다', replay_history_empty: '아직 생성한 영상이 없습니다', replay_watch: '영상 보기', replay_history_pending: '생성 중...',
     feedback_title: '✦ 제안&개선 ✦', feedback_hint: '사이트에서 개선이 필요한 부분이 있나요? 여기에 알려주세요. 이 메시지는 저만 볼 수 있고 다른 방문자는 볼 수 없습니다.', feedback_placeholder: '제안 사항을 적어주세요...', feedback_submit: '보내기', feedback_success: '메시지가 전송되었습니다. 소중한 의견 감사합니다!',
     skins_title: '🎵 내 스킨 🎵', skins_hint: '보관하고 싶은 osu! 스킨 파일(.osk)을 업로드하면 언제든 다시 다운로드할 수 있습니다. 파일은 현재 브라우저에만 저장되며 서버에는 업로드되지 않습니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 사라지니 중요한 파일은 직접 백업해 주세요.', skins_list_title: '💾 저장된 스킨',
     skins_empty: '아직 저장된 스킨이 없습니다', skins_download: '다운로드', skins_delete: '삭제', skins_delete_confirm: '이 스킨 파일을 삭제하시겠습니까?',
@@ -33,6 +35,7 @@ I18N.ko = {
     osu_export: '컬렉션 내보내기', osu_import: '컬렉션 가져오기',
     osu_export_done: '내보내기 완료!', osu_import_done: '가져오기 완료!', osu_import_fail: '가져오기 실패. 파일 형식을 확인하세요',
 
+    osu_download_btn_title: '직접 다운로드 (로그인 불필요 미러)',
     pp_calc_btn_title: 'PP 계산 & 난이도 곡선', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '정확도', pp_calc_run: '계산',
     pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
     pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',

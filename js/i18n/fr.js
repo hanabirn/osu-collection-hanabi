@@ -1,9 +1,11 @@
 I18N.fr = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Collection de beatmaps + recherche PP ✦',
     back_to_main: '← Retour à Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_tournaments: 'Tournois', nav_feedback: 'Suggestions',
+    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_tournaments: 'Tournois', nav_replay: 'Replay', nav_feedback: 'Suggestions',
     updates_title: '✦ Actualités ✦', updates_loading: 'Chargement des actualités...', updates_empty: 'Aucune actualité pour le moment', updates_load_fail: 'Échec du chargement des actualités, réessayez plus tard',
     tournaments_title: '✦ Tournois ✦', tournaments_hint: "Fils de tournois communautaires du sous-forum officiel « Tournaments » — ce ne sont pas des événements officiels, vérifiez les règles de l'organisateur avant de vous inscrire.",
+    replay_title: '✦ Rendu de replay ✦', replay_hint: "Téléversez un fichier replay .osr pour générer gratuitement une vidéo via le service open source o!rdr (ordr.issou.best). Le rendu prend généralement 1 à 5 minutes selon la charge du serveur ; la vidéo est hébergée sur les serveurs d'o!rdr, pas sur ce site.", replay_upload_title: 'Téléverser un replay', replay_username_placeholder: 'Nom affiché (facultatif)', replay_skin_placeholder: 'Rechercher un skin...', replay_submit: 'Générer la vidéo', replay_history_title: 'Mes vidéos',
+    replay_submitting: 'Téléversement...', replay_rendering: 'Envoyé, rendu en cours...', replay_submit_fail: "Échec de l'envoi : {n}", replay_render_fail: 'Échec du rendu (erreur {n})', replay_render_fail_short: 'Échec du rendu', replay_render_done: 'Vidéo prête !', replay_progress: 'Rendu en cours : {n}', replay_skin_none: 'Aucun skin correspondant', replay_history_empty: 'Aucune vidéo générée pour le moment', replay_watch: 'Voir la vidéo', replay_history_pending: 'Rendu en cours...',
     feedback_title: '✦ Suggestions et améliorations ✦', feedback_hint: "Vous pensez qu'un aspect du site pourrait être amélioré ? Dites-le-moi ici — seul moi peux voir votre message, les autres visiteurs ne le verront pas.", feedback_placeholder: 'Écrivez votre suggestion...', feedback_submit: 'Envoyer', feedback_success: 'Votre message a été envoyé, merci pour votre retour !',
     skins_title: '🎵 Mes skins 🎵', skins_hint: "Téléversez les fichiers de skins osu! (.osk) que vous voulez conserver, et retéléchargez-les à tout moment. Les fichiers sont stockés uniquement dans ce navigateur, jamais envoyés à un serveur — changer d'appareil ou effacer les données du navigateur les fera disparaître, pensez à sauvegarder ce qui est important.", skins_list_title: '💾 Skins enregistrés',
     skins_empty: 'Aucun skin enregistré pour le moment', skins_download: 'Télécharger', skins_delete: 'Supprimer', skins_delete_confirm: 'Supprimer ce fichier de skin ?',
@@ -33,6 +35,7 @@ I18N.fr = {
     osu_export: 'Exporter la collection', osu_import: 'Importer la collection',
     osu_export_done: 'Collection exportée !', osu_import_done: 'Collection importée !', osu_import_fail: "Échec de l'import. Vérifiez le format du fichier",
 
+    osu_download_btn_title: 'Téléchargement direct (miroir sans connexion)',
     pp_calc_btn_title: 'Calculateur de PP et courbe de difficulté', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Précision', pp_calc_run: 'Calculer',
     pp_calc_calculating: 'Calcul en cours...', pp_calc_error: 'Échec du calcul, veuillez réessayer plus tard', pp_calc_stars_label: 'Étoiles',
     pp_calc_strain_title: 'Courbe de difficulté', pp_calc_strain_unsupported: 'Aucune donnée de difficulté disponible pour cette carte', pp_calc_acc_invalid: 'Entrez une précision entre 0 et 100',

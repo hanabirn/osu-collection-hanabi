@@ -1,9 +1,11 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Beatmap Collection + PP Lookup ✦',
     back_to_main: '← Back to Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_tournaments: 'Tournaments', nav_feedback: 'Suggestions',
+    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_tournaments: 'Tournaments', nav_replay: 'Replay', nav_feedback: 'Suggestions',
     updates_title: '✦ News ✦', updates_loading: 'Loading news...', updates_empty: 'No news right now', updates_load_fail: 'Failed to load news, please try again later',
     tournaments_title: '✦ Tournaments ✦', tournaments_hint: "Community tournament posts from the official \"Tournaments\" subforum — these aren't official events, so check each organizer's rules before signing up.",
+    replay_title: '✦ Replay Render ✦', replay_hint: "Upload a .osr replay file to generate a playback video for free via the open-source o!rdr service (ordr.issou.best). Rendering usually takes 1–5 minutes depending on server load; the video is hosted on o!rdr's servers, not this site.", replay_upload_title: 'Upload Replay', replay_username_placeholder: 'Display name (optional)', replay_skin_placeholder: 'Search for a skin...', replay_submit: 'Generate Video', replay_history_title: 'My Videos',
+    replay_submitting: 'Uploading...', replay_rendering: 'Submitted, rendering started...', replay_submit_fail: 'Submit failed: {n}', replay_render_fail: 'Render failed (error {n})', replay_render_fail_short: 'Render failed', replay_render_done: 'Video ready!', replay_progress: 'Rendering: {n}', replay_skin_none: 'No matching skins found', replay_history_empty: 'No videos rendered yet', replay_watch: 'Watch Video', replay_history_pending: 'Rendering...',
     feedback_title: '✦ Suggestions & Improvements ✦', feedback_hint: "Think something on this site could be better? Let me know here — only I can see your message, other visitors can't.", feedback_placeholder: 'Write your suggestion...', feedback_submit: 'Send', feedback_success: 'Your message has been sent — thank you for the feedback!',
     skins_title: '🎵 My Skins 🎵', skins_hint: "Upload osu! skin files (.osk) you want to keep, and download them again anytime. Files are stored only in this browser, never uploaded to any server — switching devices or clearing browser data will lose them, so back up anything important yourself.", skins_list_title: '💾 Saved Skins',
     skins_empty: 'No skins saved yet', skins_download: 'Download', skins_delete: 'Delete', skins_delete_confirm: 'Delete this skin file?',
@@ -33,6 +35,7 @@ I18N.en = {
     osu_export: 'Export Collection', osu_import: 'Import Collection',
     osu_export_done: 'Collection exported!', osu_import_done: 'Collection imported!', osu_import_fail: 'Import failed. Please check the file format.',
 
+    osu_download_btn_title: 'Direct download (no-login mirror)',
     pp_calc_btn_title: 'PP Calculator & Strain Graph', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Accuracy', pp_calc_run: 'Calculate',
     pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
     pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',

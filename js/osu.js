@@ -116,6 +116,15 @@ function copyBeatmapId(setId, event) {
     });
 }
 
+/* Direct beatmapset download via hinai (mirror.hinamizawa.ai), an open-source
+   no-login mirror — osu.ppy.sh's own download requires an account/supporter.
+   no_video keeps the .osz small; ?redirect=true has it 307 to the fastest
+   working mirror host so the browser just follows it and saves the file. */
+function downloadBeatmapset(setId, event) {
+    event.stopPropagation();
+    window.open(`https://mirror.hinamizawa.ai/d/${setId}?no_video=true&redirect=true`, '_blank');
+}
+
 function osuSetVolume(val) {
     osuVolume = parseFloat(val);
     if (osuCurrentAudio && !osuCurrentAudio.ended) osuCurrentAudio.volume = osuVolume;
@@ -665,6 +674,7 @@ function renderOsuCollection() {
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="複製 ID">📋</button>
+            <button class="osu-download-btn" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">⬇</button>
             <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">📊</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="播放預覽">&#9654;</button>
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
