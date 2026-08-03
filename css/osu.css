@@ -676,7 +676,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 12px 14px;
+    padding: 12px 52px 12px 14px;
     z-index: 2;
 }
 
@@ -697,6 +697,27 @@
     margin-right: 2px;
     flex-shrink: 0;
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
+}
+
+.osu-card-mode-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+}
+.osu-card-mode-badge .mode-icon-inline {
+    width: 22px;
+    height: 22px;
+    margin-right: 0;
+    color: #fff;
 }
 
 .osu-card-stars {

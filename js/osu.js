@@ -679,8 +679,9 @@ function renderOsuCollection() {
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="播放預覽">&#9654;</button>
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">&#x2715;</button>
+            <div class="osu-card-mode-badge">${modeIconSvg(set.__mode)}</div>
             <div class="osu-card-info">
-                <div class="osu-card-title">${modeIconSvg(set.__mode)} ${set.title}</div>
+                <div class="osu-card-title">${set.title}</div>
                 ${starsText}
                 <div class="osu-card-artist">${set.artist}</div>
                 <div class="osu-card-mapper">${t('mapped_by', { n: set.creator })}</div>
