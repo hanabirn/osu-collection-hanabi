@@ -21,6 +21,7 @@ function showShareToast(msg) {
 /* ===== osu! Collection ===== */
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const OSU_MODE_NAMES = { 0: 'standard', 1: 'taiko', 2: 'catch', 3: 'mania' };
+const OSU_MODE_LABELS = ['Standard', 'Taiko', 'Catch', 'Mania'];
 
 const MODE_ICON_PATHS = {
     standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
@@ -443,8 +444,7 @@ async function addOsuBeatmap() {
         col[modeKey].unshift(setInfo);
         saveOsuCollection(col);
 
-        const modeNames = { standard: '⭕ Standard', taiko: '🥁 Taiko', catch: '🍎 Catch', mania: '🎹 Mania' };
-        status.innerText = t('osu_added', { n: `${setInfo.artist} - ${setInfo.title}`, m: modeNames[modeKey], k: setInfo.beatmaps.length });
+        status.innerText = t('osu_added', { n: `${setInfo.artist} - ${setInfo.title}`, m: OSU_MODE_LABELS[modeNum], k: setInfo.beatmaps.length });
         status.style.color = '#34d399';
         input.value = '';
 
@@ -972,11 +972,11 @@ async function loadVisitorProfileById(input, isUsername) {
         document.getElementById('visitor-result-name').textContent = u.username;
         document.getElementById('visitor-result-country').textContent = COUNTRY_NAMES[u.country] || u.country;
 
-        const modeNames = ['⭕ Standard', '🥁 Taiko', '🍎 Catch', '🎹 Mania'];
         const grid = document.getElementById('visitor-modes-grid');
         grid.innerHTML = modeData.map((m, i) => {
-            if (!m || m.pp_raw == null) return `<div class="visitor-mode-mini"><div class="visitor-mode-name">${modeNames[i]}</div><div class="visitor-mode-pp">—</div></div>`;
-            return `<div class="visitor-mode-mini"><div class="visitor-mode-name">${modeNames[i]}</div><div class="visitor-mode-pp">${Math.round(parseFloat(m.pp_raw)).toLocaleString()}</div></div>`;
+            const label = `${modeIconSvg(OSU_MODES[i])} ${OSU_MODE_LABELS[i]}`;
+            if (!m || m.pp_raw == null) return `<div class="visitor-mode-mini"><div class="visitor-mode-name">${label}</div><div class="visitor-mode-pp">—</div></div>`;
+            return `<div class="visitor-mode-mini"><div class="visitor-mode-name">${label}</div><div class="visitor-mode-pp">${Math.round(parseFloat(m.pp_raw)).toLocaleString()}</div></div>`;
         }).join('');
 
         const totalPP = modeData.reduce((sum, m) => sum + (m && m.pp_raw != null ? parseFloat(m.pp_raw) : 0), 0);
@@ -1261,8 +1261,6 @@ function loadImageEl(src) {
     });
 }
 
-const STATS_CARD_MODE_NAMES = ['⭕ Standard', '🥁 Taiko', '🍎 Catch', '🎹 Mania'];
-
 async function generateStatsCard({ avatarUrl, username, country, modeLabel, rank, pp, accuracy, playcount }) {
     const width = 640, height = 320;
     const canvas = document.createElement('canvas');
@@ -1345,7 +1343,7 @@ async function downloadStatsCardFor(u, mode) {
             avatarUrl: osuAvatarUrl(u.user_id),
             username: u.username,
             country: COUNTRY_NAMES[u.country] || u.country,
-            modeLabel: STATS_CARD_MODE_NAMES[mode],
+            modeLabel: OSU_MODE_LABELS[mode],
             rank: u.pp_rank != null ? '#' + parseInt(u.pp_rank).toLocaleString() : '—',
             pp: u.pp_raw != null ? Math.round(parseFloat(u.pp_raw)).toLocaleString() : '—',
             accuracy: u.accuracy != null ? parseFloat(u.accuracy).toFixed(2) + '%' : '—',
@@ -1355,7 +1353,7 @@ async function downloadStatsCardFor(u, mode) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `osu-stats-${u.username}-${STATS_CARD_MODE_NAMES[mode].replace(/[^\w]+/g, '')}.png`;
+            a.download = `osu-stats-${u.username}-${OSU_MODE_LABELS[mode]}.png`;
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
             showShareToast(t('stats_card_done'));
