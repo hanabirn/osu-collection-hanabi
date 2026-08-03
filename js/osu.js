@@ -827,8 +827,10 @@ async function renderOsuRecentPlays(userId, mode, listId, wrapId) {
 
 /* ===== PP growth trend: daily localStorage snapshots of total PP, rendered
    as a small SVG line chart. There's no historical PP endpoint on the osu!
-   v1 API, so this only accumulates data from whenever a visitor first loads
-   the site forward — it can't backfill past progress. ===== */
+   v1 API, so this alone only accumulates data from whenever a visitor first
+   loads the site forward. To backfill actual past progress, fetchOsuTrackHistory()
+   below pulls per-mode history from the osu!Track API (github.com/Ameobea/osutrack-api,
+   proxied through netlify/functions/osu-pp-history.js) and merges it in. ===== */
 const OSU_PP_HISTORY_KEY = 'osu_pp_history';
 const OSU_PP_HISTORY_MAX_DAYS = 90;
 
@@ -903,10 +905,50 @@ function ppTrendChartSvg(history) {
     </svg>`;
 }
 
-function renderPpHistoryChart() {
+/* Fetches per-mode stats_history from osu!Track for the given user and
+   collapses it to one daily total-PP point per day: each mode's history is
+   bucketed to its last value per calendar day, then summed across modes with
+   forward-fill (a mode with no update that day keeps its last known value)
+   so a day only shown for e.g. taiko still counts the visitor's standard pp. */
+async function fetchOsuTrackHistory(userId) {
+    const perMode = await Promise.all([0, 1, 2, 3].map(async mode => {
+        try {
+            const res = await fetch(`/.netlify/functions/osu-pp-history?user=${userId}&mode=${mode}`);
+            if (!res.ok) return new Map();
+            const data = await res.json();
+            const entries = (Array.isArray(data) ? data : [])
+                .filter(e => e.pp_raw != null && e.timestamp)
+                .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+            const byDay = new Map();
+            for (const e of entries) byDay.set(e.timestamp.slice(0, 10), parseFloat(e.pp_raw));
+            return byDay;
+        } catch { return new Map(); }
+    }));
+
+    const allDates = [...new Set(perMode.flatMap(m => [...m.keys()]))].sort();
+    const lastKnown = [null, null, null, null];
+    const totals = [];
+    for (const date of allDates) {
+        let sum = 0, hasAny = false;
+        for (let i = 0; i < 4; i++) {
+            if (perMode[i].has(date)) lastKnown[i] = perMode[i].get(date);
+            if (lastKnown[i] != null) { sum += lastKnown[i]; hasAny = true; }
+        }
+        if (hasAny) totals.push({ date, pp: Math.round(sum) });
+    }
+    return totals;
+}
+
+function mergePpHistory(remote, local) {
+    const byDate = new Map(remote.map(p => [p.date, p.pp]));
+    for (const p of local) byDate.set(p.date, p.pp);
+    return [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([date, pp]) => ({ date, pp }));
+}
+
+function renderPpHistoryChart(historyOverride) {
     const el = document.getElementById('pp-history-panel');
     if (!el) return;
-    const history = getPpHistory();
+    const history = historyOverride || getPpHistory();
 
     if (history.length < 2) {
         el.innerHTML = `
@@ -943,6 +985,9 @@ async function fetchOsuProfile() {
         if (totalPP > 0) {
             recordPpSnapshot(totalPP);
             renderPpHistoryChart();
+            fetchOsuTrackHistory(OSU_USER_ID).then(remote => {
+                if (remote.length) renderPpHistoryChart(mergePpHistory(remote, getPpHistory()));
+            });
         }
 
         document.getElementById('osu-profile-card').style.display = 'block';
