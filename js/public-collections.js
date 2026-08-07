@@ -233,7 +233,7 @@ async function openGalleryDetailModal(id) {
         // viewer's own categories (see importPublicCollectionData, which
         // only ever touches `collection`), so only show ones the publisher
         // actually put beatmaps in.
-        const categoriesWithItems = (data.categories || [])
+        const categoriesWithItems = sortCategoriesByName(data.categories || [])
             .filter(c => ((data.categoryMembers && data.categoryMembers[c.id]) || []).length > 0);
 
         if (modesWithItems.length === 0 && categoriesWithItems.length === 0) {

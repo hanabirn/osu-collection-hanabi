@@ -20,7 +20,7 @@ I18N.zh = {
     osu_category_add_title: '新增分類', osu_category_rename_title: '重新命名', osu_category_delete_title: '刪除分類',
     osu_category_btn_title: '加入分類...', osu_category_picker_title: '選擇分類',
     osu_category_picker_empty: '還沒有任何分類，點擊 ＋ 新增！', osu_empty_category: '這個分類還沒有圖譜',
-    osu_category_select_label: '分類', osu_category_manage_title: '管理分類',
+    osu_category_manage_title: '管理分類',
     osu_searching: '搜尋中...', osu_not_found: '找不到該 Beatmap，請確認 ID 或網址是否正確',
     osu_input_error: '請輸入 Beatmap ID、Set ID 或 osu! 網址',
     osu_already_exists: '「{n}」已在收藏庫中', osu_added: '已新增「{n}」至 {m}（{k} 個難度）',

@@ -20,7 +20,7 @@ I18N.ko = {
     osu_category_add_title: '카테고리 추가', osu_category_rename_title: '이름 변경', osu_category_delete_title: '카테고리 삭제',
     osu_category_btn_title: '카테고리에 추가...', osu_category_picker_title: '카테고리 선택',
     osu_category_picker_empty: '아직 카테고리가 없습니다. +를 눌러 추가해보세요!', osu_empty_category: '이 카테고리에는 아직 비트맵이 없습니다',
-    osu_category_select_label: '카테고리', osu_category_manage_title: '카테고리 관리',
+    osu_category_manage_title: '카테고리 관리',
     osu_searching: '검색 중...', osu_not_found: '비트맵을 찾을 수 없습니다',
     osu_input_error: 'ID 또는 URL을 입력하세요',
     osu_already_exists: '"{n}"이(가) 이미 컬렉션에 있습니다', osu_added: '"{n}"을(를) {m}에 추가 ({k}개 난이도)',

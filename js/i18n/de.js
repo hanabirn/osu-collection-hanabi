@@ -20,7 +20,7 @@ I18N.de = {
     osu_category_add_title: 'Kategorie hinzufügen', osu_category_rename_title: 'Umbenennen', osu_category_delete_title: 'Kategorie löschen',
     osu_category_btn_title: 'Zu Kategorien hinzufügen...', osu_category_picker_title: 'Kategorien wählen',
     osu_category_picker_empty: 'Noch keine Kategorien — klicke auf +, um eine hinzuzufügen!', osu_empty_category: 'Noch keine Beatmaps in dieser Kategorie',
-    osu_category_select_label: 'Kategorien', osu_category_manage_title: 'Kategorien verwalten',
+    osu_category_manage_title: 'Kategorien verwalten',
     osu_searching: 'Suche...', osu_not_found: 'Beatmap nicht gefunden',
     osu_input_error: 'ID oder URL eingeben',
     osu_already_exists: '"{n}" ist bereits in der Sammlung', osu_added: '"{n}" zu {m} hinzugefügt ({k} Schwierigkeiten)',

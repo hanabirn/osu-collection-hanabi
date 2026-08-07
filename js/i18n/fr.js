@@ -20,7 +20,7 @@ I18N.fr = {
     osu_category_add_title: 'Ajouter une catégorie', osu_category_rename_title: 'Renommer', osu_category_delete_title: 'Supprimer la catégorie',
     osu_category_btn_title: 'Assigner à des catégories...', osu_category_picker_title: 'Choisir les catégories',
     osu_category_picker_empty: 'Pas encore de catégories — cliquez sur + pour en ajouter !', osu_empty_category: 'Aucune beatmap dans cette catégorie pour le moment',
-    osu_category_select_label: 'Catégories', osu_category_manage_title: 'Gérer les catégories',
+    osu_category_manage_title: 'Gérer les catégories',
     osu_searching: 'Recherche...', osu_not_found: 'Beatmap introuvable',
     osu_input_error: 'Entrez un ID ou URL',
     osu_already_exists: '"{n}" est déjà dans la collection', osu_added: 'Ajouté "{n}" à {m} ({k} difficultés)',

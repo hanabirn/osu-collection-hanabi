@@ -20,7 +20,7 @@ I18N.ja = {
     osu_category_add_title: 'カテゴリを追加', osu_category_rename_title: '名前を変更', osu_category_delete_title: 'カテゴリを削除',
     osu_category_btn_title: 'カテゴリに追加...', osu_category_picker_title: 'カテゴリを選択',
     osu_category_picker_empty: 'まだカテゴリがありません。＋をクリックして追加しましょう！', osu_empty_category: 'このカテゴリにはまだビートマップがありません',
-    osu_category_select_label: 'カテゴリ', osu_category_manage_title: 'カテゴリを管理',
+    osu_category_manage_title: 'カテゴリを管理',
     osu_searching: '検索中...', osu_not_found: 'ビートマップが見つかりません',
     osu_input_error: 'IDまたはURLを入力してください',
     osu_already_exists: '「{n}」は既にコレクションにあります', osu_added: '「{n}」を{m}に追加（{k}難易度）',

@@ -20,7 +20,7 @@ I18N.en = {
     osu_category_add_title: 'Add category', osu_category_rename_title: 'Rename', osu_category_delete_title: 'Delete category',
     osu_category_btn_title: 'Assign to categories...', osu_category_picker_title: 'Choose categories',
     osu_category_picker_empty: 'No categories yet — click + to add one!', osu_empty_category: 'No beatmaps in this category yet',
-    osu_category_select_label: 'Categories', osu_category_manage_title: 'Manage Categories',
+    osu_category_manage_title: 'Manage Categories',
     osu_searching: 'Searching...', osu_not_found: 'Beatmap not found. Please check the ID or URL.',
     osu_input_error: 'Enter a Beatmap ID, Set ID, or osu! URL',
     osu_already_exists: '"{n}" is already in your collection', osu_added: 'Added "{n}" to {m} ({k} difficulties)',

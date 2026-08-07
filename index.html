@@ -131,14 +131,10 @@
             <button class="osu-tab" data-mode="taiko" onclick="switchOsuTab('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
             <button class="osu-tab" data-mode="catch" onclick="switchOsuTab('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
             <button class="osu-tab" data-mode="mania" onclick="switchOsuTab('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
-            <div class="osu-category-select" id="osu-category-select">
-                <button class="osu-tab osu-category-select-btn" id="osu-category-select-btn" onclick="toggleCategoryMenu(event)">
-                    🏷 <span id="osu-category-select-label" data-i18n="osu_category_select_label">分類</span> ▾
-                </button>
-                <div class="osu-category-menu" id="osu-category-menu"></div>
-            </div>
             <button class="osu-tab osu-category-manage-btn" onclick="openCategoryManageModal()" title="管理分類" data-i18n-title="osu_category_manage_title">⚙</button>
         </div>
+
+        <div class="osu-category-tabs-row" id="osu-category-tabs-row"></div>
 
         <div class="osu-search-row">
             <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">

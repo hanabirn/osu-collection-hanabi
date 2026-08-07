@@ -20,7 +20,7 @@ I18N.es = {
     osu_category_add_title: 'Añadir categoría', osu_category_rename_title: 'Renombrar', osu_category_delete_title: 'Eliminar categoría',
     osu_category_btn_title: 'Asignar a categorías...', osu_category_picker_title: 'Elegir categorías',
     osu_category_picker_empty: '¡Aún no hay categorías — haz clic en + para añadir una!', osu_empty_category: 'Todavía no hay beatmaps en esta categoría',
-    osu_category_select_label: 'Categorías', osu_category_manage_title: 'Gestionar categorías',
+    osu_category_manage_title: 'Gestionar categorías',
     osu_searching: 'Buscando...', osu_not_found: 'Beatmap no encontrado',
     osu_input_error: 'Ingrese un ID o URL',
     osu_already_exists: '"{n}" ya está en la colección', osu_added: 'Añadido "{n}" a {m} ({k} dificultades)',

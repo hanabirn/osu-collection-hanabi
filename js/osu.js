@@ -188,8 +188,18 @@ async function toggleOsuFavorite(setId, event) {
    many-to-many with beatmaps. Local-only — deliberately not included in
    shareOsuCollectionLink()/checkImportFromHash() or the public gallery
    publish, same reach as favorites today. */
+/* Locale-aware sort so categories display in a sensible order regardless
+   of what script their names happen to be in: 'ja' collation gives real
+   alphabetical order for Latin names, gojuon (あいうえお) order for kana,
+   and falls back to code-point order for kanji/hanzi (no single "correct"
+   order exists there without per-character reading data, so this is
+   intentionally just "consistent", not linguistically meaningful). */
+function sortCategoriesByName(cats) {
+    return [...cats].sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+}
+
 function getOsuCategories() {
-    try { return JSON.parse(localStorage.getItem('osu_categories')) || []; }
+    try { return sortCategoriesByName(JSON.parse(localStorage.getItem('osu_categories')) || []); }
     catch { return []; }
 }
 
@@ -245,57 +255,34 @@ async function deleteOsuCategory(categoryId, event) {
     renderOsuCollection();
 }
 
-/* ===== Category select dropdown (right end of .osu-mode-tabs) =====
-   Keeps the main tab row to just Favorites + the 4 modes; picking a
-   category from this menu is what actually switches osuCurrentTab to a
-   category id. Open/close mechanics mirror the #lang-globe dropdown
-   (js/main.js's toggleLangMenu) — outside-click and Escape both close it. */
-function renderOsuCategoryUI() {
-    const btn = document.getElementById('osu-category-select-btn');
-    const label = document.getElementById('osu-category-select-label');
-    const menu = document.getElementById('osu-category-menu');
-    if (!btn || !label || !menu) return;
-
+/* ===== Category tabs row (between the mode-tabs row and the search bar) =====
+   A second .osu-mode-tabs-style row, one plain clickable .osu-tab per
+   category — clicking reuses switchOsuTab() directly (it doesn't care
+   whether "mode" is a real mode key or a category id, it just toggles
+   .active and re-renders). Doesn't wrap; overflow scrolls horizontally,
+   including via a plain vertical mouse wheel (initCategoryTabsWheelScroll)
+   since most mice don't have a horizontal scroll axis. Add/rename/delete
+   live in the ⚙ manage modal (openCategoryManageModal below), not here —
+   this row is pure navigation. */
+function renderOsuCategoryTabsRow() {
+    const row = document.getElementById('osu-category-tabs-row');
+    if (!row) return;
     const cats = getOsuCategories();
-    const selected = cats.find(c => c.id === osuCurrentTab);
-    label.textContent = selected ? selected.name : t('osu_category_select_label');
-    btn.classList.toggle('active', !!selected);
-
-    menu.innerHTML = cats.length === 0
-        ? `<div class="osu-category-menu-empty">${t('osu_category_picker_empty')}</div>`
-        : cats.map(c => `<button class="osu-category-menu-item ${c.id === osuCurrentTab ? 'active' : ''}" onclick="selectOsuCategory('${c.id}')">${escHtml(c.name)}</button>`).join('');
+    row.innerHTML = cats.map(c =>
+        `<button class="osu-tab ${c.id === osuCurrentTab ? 'active' : ''}" data-mode="${c.id}" onclick="switchOsuTab('${c.id}', this)">🏷 ${escHtml(c.name)}</button>`
+    ).join('');
+    initCategoryTabsWheelScroll();
 }
 
-function selectOsuCategory(categoryId) {
-    osuCurrentTab = categoryId;
-    osuPage = 0;
-    document.getElementById('osu-collection-tabs').querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
-    closeCategoryMenu();
-    renderOsuCollection();
-}
-
-function toggleCategoryMenu(event) {
-    if (event) event.stopPropagation();
-    const wrap = document.getElementById('osu-category-select');
-    if (!wrap) return;
-    if (wrap.classList.contains('open')) { closeCategoryMenu(); return; }
-    wrap.classList.add('open');
-    document.addEventListener('click', onCategoryMenuOutsideClick);
-    document.addEventListener('keydown', onCategoryMenuEscape);
-}
-
-function closeCategoryMenu() {
-    document.getElementById('osu-category-select')?.classList.remove('open');
-    document.removeEventListener('click', onCategoryMenuOutsideClick);
-    document.removeEventListener('keydown', onCategoryMenuEscape);
-}
-
-function onCategoryMenuOutsideClick(e) {
-    if (!e.target.closest('#osu-category-select')) closeCategoryMenu();
-}
-
-function onCategoryMenuEscape(e) {
-    if (e.key === 'Escape') closeCategoryMenu();
+function initCategoryTabsWheelScroll() {
+    const row = document.getElementById('osu-category-tabs-row');
+    if (!row || row.dataset.wheelBound) return;
+    row.dataset.wheelBound = '1';
+    row.addEventListener('wheel', e => {
+        if (e.deltaY === 0) return;
+        e.preventDefault();
+        row.scrollLeft += e.deltaY;
+    }, { passive: false });
 }
 
 /* ===== Category manage modal (⚙ button next to the select dropdown) =====
@@ -708,9 +695,8 @@ async function addOsuBeatmap() {
         input.value = '';
 
         osuCurrentTab = modeKey;
-        const tabsBar = document.getElementById('osu-collection-tabs');
-        tabsBar.querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
-        const targetTab = tabsBar.querySelector(`[data-mode="${modeKey}"]`);
+        clearAllOsuTabActive();
+        const targetTab = document.querySelector(`#osu-collection-tabs [data-mode="${modeKey}"]`);
         if (targetTab) targetTab.classList.add('active');
         renderOsuCollection();
     } catch (e) {
@@ -720,8 +706,16 @@ async function addOsuBeatmap() {
     }
 }
 
+/* .osu-collection-tabs (Favorites/modes) and #osu-category-tabs-row (custom
+   categories) are two separate rows but only one tab across both should
+   ever be active at once — this clears both before applying the new one. */
+function clearAllOsuTabActive() {
+    document.getElementById('osu-collection-tabs')?.querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('osu-category-tabs-row')?.querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
+}
+
 function switchOsuTab(mode, btn) {
-    document.getElementById('osu-collection-tabs').querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
+    clearAllOsuTabActive();
     btn.classList.add('active');
     osuCurrentTab = mode;
     osuPage = 0;
@@ -874,7 +868,7 @@ function renderOsuCollection() {
     if (!container || !paginationEl) return;
     renderOsuStats();
     renderFeaturedBeatmap();
-    renderOsuCategoryUI();
+    renderOsuCategoryTabsRow();
     const col = getOsuCollection();
     let sets;
 

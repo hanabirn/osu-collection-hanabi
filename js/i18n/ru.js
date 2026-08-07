@@ -20,7 +20,7 @@ I18N.ru = {
     osu_category_add_title: 'Добавить категорию', osu_category_rename_title: 'Переименовать', osu_category_delete_title: 'Удалить категорию',
     osu_category_btn_title: 'Добавить в категории...', osu_category_picker_title: 'Выберите категории',
     osu_category_picker_empty: 'Пока нет категорий — нажмите +, чтобы добавить!', osu_empty_category: 'В этой категории пока нет битмапов',
-    osu_category_select_label: 'Категории', osu_category_manage_title: 'Управление категориями',
+    osu_category_manage_title: 'Управление категориями',
     osu_searching: 'Поиск...', osu_not_found: 'Битмап не найден',
     osu_input_error: 'Введите ID или URL',
     osu_already_exists: '"{n}" уже в коллекции', osu_added: 'Добавлен "{n}" в {m} ({k} сложностей)',

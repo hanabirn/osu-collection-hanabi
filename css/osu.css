@@ -428,61 +428,30 @@
     box-shadow: 0 0 18px rgba(var(--accent-pink-rgb), 0.3);
 }
 
-/* ===== Category select dropdown (right end of .osu-mode-tabs) =====
-   .osu-category-select-btn is a plain .osu-tab (gets its active/hover
-   styling for free) — only the wrapper + dropdown panel need new rules.
-   Panel styling mirrors .lang-globe-menu (css/base.css) closely. */
-.osu-category-select {
-    position: relative;
-}
+/* ===== Category manage button (right end of .osu-mode-tabs) ===== */
 .osu-category-manage-btn {
     flex: 0 0 auto;
     padding: 11px 14px;
 }
-.osu-category-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    min-width: 160px;
-    max-height: 260px;
-    overflow-y: auto;
+
+/* ===== Category tabs row (between the mode-tabs row and the search bar) =====
+   Plain .osu-tab buttons, one per category — but unlike .osu-mode-tabs this
+   row must NOT wrap: it needs a single scrollable line so overflow tabs are
+   reachable by horizontal scroll (including via plain vertical mouse wheel,
+   see initCategoryTabsWheelScroll() in js/osu.js) rather than spilling onto
+   a second line. */
+.osu-category-tabs-row {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px;
-    border-radius: 14px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
-    z-index: 210;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
 }
-.osu-category-select.open .osu-category-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-.osu-category-menu-item {
-    background: none;
-    border: none;
-    text-align: left;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.15s;
-}
-.osu-category-menu-item:hover { background: var(--bg-stat); }
-.osu-category-menu-item.active { color: var(--text-pink); font-weight: bold; }
-.osu-category-menu-empty {
-    font-size: 0.8rem;
-    color: var(--text-label);
-    padding: 8px;
-    text-align: center;
+.osu-category-tabs-row:empty { margin-bottom: 0; }
+.osu-category-tabs-row .osu-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 /* ===== Category manage modal ===== */
