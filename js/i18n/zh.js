@@ -55,7 +55,7 @@ I18N.zh = {
     collection_card_btn: '產生收藏卡', collection_card_title: '我的 osu! 收藏', collection_card_done: '收藏卡已下載！', collection_card_fail: '產生收藏卡失敗',
 
     nav_public_collections: '收藏廣場', gallery_page_title: '✦ 玩家收藏廣場 ✦',
-    publish_btn: '📤 發布我的收藏', publish_login_required: '請先登入 osu! 才能發布收藏',
+    publish_btn: '📤 發布我的收藏', publish_update_btn: '🔄 更新我的發布收藏', publish_login_required: '請先登入 osu! 才能發布收藏',
     publish_confirm: '要公開發布你的收藏（{n} 個 Beatmap）嗎？之後可以隨時重新發布或取消發布',
     publish_done: '已發布你的收藏！', publish_fail: '發布失敗，請稍後再試',
     unpublish_btn: '🗑️ 取消發布', unpublish_confirm: '確定要將你的收藏從廣場移除嗎？', unpublish_done: '已取消發布',

@@ -55,7 +55,7 @@ I18N.ru = {
     collection_card_btn: 'Создать карточку коллекции', collection_card_title: 'Моя коллекция osu!', collection_card_done: 'Карточка коллекции скачана!', collection_card_fail: 'Не удалось создать карточку коллекции',
 
     nav_public_collections: 'Галерея', gallery_page_title: '✦ Галерея коллекций игроков ✦',
-    publish_btn: '📤 Опубликовать мою коллекцию', publish_login_required: 'Сначала войдите через osu!, чтобы опубликовать коллекцию',
+    publish_btn: '📤 Опубликовать мою коллекцию', publish_update_btn: '🔄 Обновить опубликованную коллекцию', publish_login_required: 'Сначала войдите через osu!, чтобы опубликовать коллекцию',
     publish_confirm: 'Опубликовать вашу коллекцию ({n} карт) публично? Вы можете переопубликовать или удалить её в любое время',
     publish_done: 'Ваша коллекция опубликована!', publish_fail: 'Не удалось опубликовать, попробуйте позже',
     unpublish_btn: '🗑️ Снять с публикации', unpublish_confirm: 'Удалить вашу коллекцию из галереи?', unpublish_done: 'Снято с публикации',

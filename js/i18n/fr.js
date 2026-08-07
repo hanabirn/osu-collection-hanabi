@@ -55,7 +55,7 @@ I18N.fr = {
     collection_card_btn: 'Générer une carte de collection', collection_card_title: 'Ma collection osu!', collection_card_done: 'Carte de collection téléchargée !', collection_card_fail: 'Échec de la génération de la carte de collection',
 
     nav_public_collections: 'Galerie', gallery_page_title: '✦ Galerie des collections des joueurs ✦',
-    publish_btn: '📤 Publier ma collection', publish_login_required: "Connectez-vous d'abord avec osu! pour publier votre collection",
+    publish_btn: '📤 Publier ma collection', publish_update_btn: '🔄 Mettre à jour ma collection publiée', publish_login_required: "Connectez-vous d'abord avec osu! pour publier votre collection",
     publish_confirm: 'Publier votre collection ({n} beatmaps) publiquement ? Vous pouvez la republier ou la retirer à tout moment',
     publish_done: 'Votre collection a été publiée !', publish_fail: 'Échec de la publication, veuillez réessayer plus tard',
     unpublish_btn: '🗑️ Retirer la publication', unpublish_confirm: 'Retirer votre collection de la galerie ?', unpublish_done: 'Publication retirée',

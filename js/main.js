@@ -46,6 +46,7 @@ function refreshDynamicContent() {
     if (typeof renderSkinsList === 'function') renderSkinsList();
     if (typeof renderReplayHistory === 'function') renderReplayHistory();
     if (typeof renderPublicCollectionsList === 'function') renderPublicCollectionsList();
+    if (typeof updatePublishButtonLabel === 'function') updatePublishButtonLabel();
 }
 
 /* ===== Init ===== */

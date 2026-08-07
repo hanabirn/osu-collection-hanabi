@@ -55,7 +55,7 @@ I18N.es = {
     collection_card_btn: 'Generar tarjeta de colección', collection_card_title: 'Mi colección de osu!', collection_card_done: '¡Tarjeta de colección descargada!', collection_card_fail: 'Error al generar la tarjeta de colección',
 
     nav_public_collections: 'Galería', gallery_page_title: '✦ Galería de colecciones de jugadores ✦',
-    publish_btn: '📤 Publicar mi colección', publish_login_required: 'Inicia sesión con osu! primero para publicar tu colección',
+    publish_btn: '📤 Publicar mi colección', publish_update_btn: '🔄 Actualizar mi colección publicada', publish_login_required: 'Inicia sesión con osu! primero para publicar tu colección',
     publish_confirm: '¿Publicar tu colección ({n} beatmaps) públicamente? Puedes volver a publicarla o retirarla en cualquier momento',
     publish_done: '¡Tu colección ha sido publicada!', publish_fail: 'Error al publicar, inténtalo de nuevo más tarde',
     unpublish_btn: '🗑️ Retirar publicación', unpublish_confirm: '¿Retirar tu colección de la galería?', unpublish_done: 'Publicación retirada',

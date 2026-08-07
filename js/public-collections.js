@@ -14,7 +14,25 @@ let publicCollectionsItems = [];
 let publicCollectionsTotal = 0;
 
 function ensurePublicCollectionsLoaded() {
+    updatePublishButtonLabel();
     if (!publicCollectionsLoaded) loadPublicCollectionsPage(0);
+}
+
+/* The Publish button's label reflects whether this browser has published
+   before (osu_last_published_at, set on a successful publish and cleared on
+   unpublish) — "發布" the first time, "更新" every time after, since
+   publishing is always an overwrite (see collections-publish.js) rather
+   than creating a second entry. This is a local-only convenience flag, not
+   authoritative — if published from another browser/device it won't know,
+   but re-publishing is harmless (still just overwrites the same entry). */
+function getLastPublishedAt() {
+    return localStorage.getItem('osu_last_published_at');
+}
+
+function updatePublishButtonLabel() {
+    const btn = document.getElementById('publish-collection-btn');
+    if (!btn) return;
+    btn.textContent = getLastPublishedAt() ? t('publish_update_btn') : t('publish_btn');
 }
 
 function switchPublicCollectionsSort(sort) {
@@ -121,6 +139,8 @@ async function publishMyCollection() {
             return;
         }
         if (!res.ok) throw new Error('publish failed');
+        localStorage.setItem('osu_last_published_at', new Date().toISOString());
+        updatePublishButtonLabel();
         showShareToast(t('publish_done'));
         if (publicCollectionsLoaded) loadPublicCollectionsPage(0);
     } catch (e) {
@@ -143,6 +163,8 @@ async function unpublishMyCollection() {
             headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('unpublish failed');
+        localStorage.removeItem('osu_last_published_at');
+        updatePublishButtonLabel();
         showShareToast(t('unpublish_done'));
         if (publicCollectionsLoaded) loadPublicCollectionsPage(publicCollectionsPage);
     } catch (e) {

@@ -55,7 +55,7 @@ I18N.de = {
     collection_card_btn: 'Sammlungskarte erstellen', collection_card_title: 'Meine osu!-Sammlung', collection_card_done: 'Sammlungskarte heruntergeladen!', collection_card_fail: 'Sammlungskarte konnte nicht erstellt werden',
 
     nav_public_collections: 'Galerie', gallery_page_title: '✦ Spieler-Sammlungsgalerie ✦',
-    publish_btn: '📤 Meine Sammlung veröffentlichen', publish_login_required: 'Melde dich zuerst mit osu! an, um deine Sammlung zu veröffentlichen',
+    publish_btn: '📤 Meine Sammlung veröffentlichen', publish_update_btn: '🔄 Veröffentlichte Sammlung aktualisieren', publish_login_required: 'Melde dich zuerst mit osu! an, um deine Sammlung zu veröffentlichen',
     publish_confirm: 'Deine Sammlung ({n} Beatmaps) öffentlich veröffentlichen? Du kannst sie jederzeit erneut veröffentlichen oder entfernen',
     publish_done: 'Deine Sammlung wurde veröffentlicht!', publish_fail: 'Veröffentlichung fehlgeschlagen, bitte später erneut versuchen',
     unpublish_btn: '🗑️ Veröffentlichung aufheben', unpublish_confirm: 'Deine Sammlung aus der Galerie entfernen?', unpublish_done: 'Veröffentlichung aufgehoben',

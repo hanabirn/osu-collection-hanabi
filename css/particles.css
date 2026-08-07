@@ -24,7 +24,14 @@
     position: absolute;
     inset: 0;
     background-repeat: no-repeat;
-    background-size: cover;
+    /* cover.jpg/@2x is a wide ~3.6:1 banner crop — background-size:cover
+       forces it to fill the (much taller) viewport height, which blows the
+       image up until only a thin, heavily-zoomed vertical sliver of the
+       middle is visible. Sizing to 100% width instead keeps the banner's
+       own proportions intact; whatever's left top/bottom just shows the
+       page's own gradient background, which reads better than an
+       unrecognisable close-up crop. */
+    background-size: 100% auto;
     background-position: center center;
     opacity: 0;
     transition: opacity 2.5s ease;

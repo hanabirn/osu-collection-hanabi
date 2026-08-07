@@ -55,7 +55,7 @@ I18N.ja = {
     collection_card_btn: '収蔵カードを生成', collection_card_title: '私の osu! コレクション', collection_card_done: '収蔵カードをダウンロードしました！', collection_card_fail: '収蔵カードの生成に失敗しました',
 
     nav_public_collections: 'コレクション広場', gallery_page_title: '✦ プレイヤーコレクション広場 ✦',
-    publish_btn: '📤 自分のコレクションを公開', publish_login_required: '公開するには先に osu! でログインしてください',
+    publish_btn: '📤 自分のコレクションを公開', publish_update_btn: '🔄 公開中のコレクションを更新', publish_login_required: '公開するには先に osu! でログインしてください',
     publish_confirm: 'あなたのコレクション（{n} 個の Beatmap）を公開しますか？いつでも再公開や公開停止ができます',
     publish_done: 'コレクションを公開しました！', publish_fail: '公開に失敗しました。後でもう一度お試しください',
     unpublish_btn: '🗑️ 公開を停止', unpublish_confirm: 'コレクションを広場から削除しますか？', unpublish_done: '公開を停止しました',
