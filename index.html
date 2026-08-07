@@ -125,12 +125,19 @@
 
         <div class="osu-stats-panel" id="osu-stats-panel" style="display:none;"></div>
 
-        <div class="osu-mode-tabs">
-            <button class="osu-tab" onclick="switchOsuTab('favorites', this)" data-i18n="osu_fav">♥ 最愛</button>
-            <button class="osu-tab active" onclick="switchOsuTab('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
-            <button class="osu-tab" onclick="switchOsuTab('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
-            <button class="osu-tab" onclick="switchOsuTab('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
-            <button class="osu-tab" onclick="switchOsuTab('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+        <div class="osu-mode-tabs" id="osu-collection-tabs">
+            <button class="osu-tab" data-mode="favorites" onclick="switchOsuTab('favorites', this)" data-i18n="osu_fav">♥ 最愛</button>
+            <button class="osu-tab active" data-mode="standard" onclick="switchOsuTab('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+            <button class="osu-tab" data-mode="taiko" onclick="switchOsuTab('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+            <button class="osu-tab" data-mode="catch" onclick="switchOsuTab('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+            <button class="osu-tab" data-mode="mania" onclick="switchOsuTab('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+            <div class="osu-category-select" id="osu-category-select">
+                <button class="osu-tab osu-category-select-btn" id="osu-category-select-btn" onclick="toggleCategoryMenu(event)">
+                    🏷 <span id="osu-category-select-label" data-i18n="osu_category_select_label">分類</span> ▾
+                </button>
+                <div class="osu-category-menu" id="osu-category-menu"></div>
+            </div>
+            <button class="osu-tab osu-category-manage-btn" onclick="openCategoryManageModal()" title="管理分類" data-i18n-title="osu_category_manage_title">⚙</button>
         </div>
 
         <div class="osu-search-row">
@@ -334,6 +341,18 @@
         <div class="osu-mode-tabs" id="gallery-detail-mode-tabs"></div>
         <div id="gallery-detail-body"></div>
         <button class="btn gallery-detail-download-btn" id="gallery-detail-download-btn" onclick="downloadGalleryDetailCollection()" data-i18n="gallery_download_btn_title">⬇ 匯入這個收藏</button>
+    </div>
+</div>
+
+<div id="category-manage-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCategoryManageModal()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closeCategoryManageModal()">&#x2715;</button>
+        <h3 class="pp-calc-title" data-i18n="osu_category_manage_title">管理分類</h3>
+        <div class="osu-category-manage-add-row">
+            <input type="text" id="osu-category-manage-input" data-i18n-placeholder="osu_category_add_prompt" placeholder="輸入新分類名稱..." onkeydown="if(event.key==='Enter')addOsuCategoryFromModal()">
+            <button class="btn" onclick="addOsuCategoryFromModal()" data-i18n="osu_category_add_title">新增</button>
+        </div>
+        <div id="osu-category-manage-list"></div>
     </div>
 </div>
 
