@@ -46,4 +46,16 @@ I18N.es = {
     osu_share_link_import_confirm: 'Este enlace contiene {n} beatmap(s). ¿Importarlos a tu colección? (No se sobrescribirá nada — solo se añadirán los que aún no tienes.)',
     osu_share_link_imported: '¡Se importaron {n} beatmap(s) nuevo(s)!', osu_share_link_import_fail: 'Error al importar desde el enlace — puede estar dañado',
     stats_card_btn: 'Generar tarjeta de estadísticas', stats_card_done: '¡Tarjeta de estadísticas descargada!', stats_card_fail: 'Error al generar la tarjeta de estadísticas',
+    collection_card_btn: 'Generar tarjeta de colección', collection_card_title: 'Mi colección de osu!', collection_card_done: '¡Tarjeta de colección descargada!', collection_card_fail: 'Error al generar la tarjeta de colección',
+
+    nav_public_collections: 'Galería', gallery_page_title: '✦ Galería de colecciones de jugadores ✦',
+    publish_btn: '📤 Publicar mi colección', publish_login_required: 'Inicia sesión con osu! primero para publicar tu colección',
+    publish_confirm: '¿Publicar tu colección ({n} beatmaps) públicamente? Puedes volver a publicarla o retirarla en cualquier momento',
+    publish_done: '¡Tu colección ha sido publicada!', publish_fail: 'Error al publicar, inténtalo de nuevo más tarde',
+    unpublish_btn: '🗑️ Retirar publicación', unpublish_confirm: '¿Retirar tu colección de la galería?', unpublish_done: 'Publicación retirada',
+    gallery_loading: 'Cargando galería...', gallery_load_fail: 'Error al cargar la galería, inténtalo de nuevo más tarde',
+    gallery_empty: 'Nadie ha publicado una colección todavía — ¡sé el primero!',
+    gallery_sort_recent: 'Publicadas recientemente', gallery_sort_sets: 'Más beatmaps', gallery_sort_rating: 'Mayor puntuación',
+    gallery_import_confirm: 'Esta es la colección de {name} ({n} beatmaps). ¿Importar a tu colección? (No sobrescribe las existentes, solo añade las que no tienes)',
+    gallery_download_btn_title: 'Importar esta colección',
 };

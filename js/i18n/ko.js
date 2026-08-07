@@ -46,4 +46,16 @@ I18N.ko = {
     osu_share_link_import_confirm: '이 링크에는 {n}개의 비트맵이 포함되어 있습니다. 내 컬렉션으로 가져올까요? (기존 컬렉션을 덮어쓰지 않고, 없는 항목만 추가됩니다)',
     osu_share_link_imported: '{n}개의 새 비트맵을 가져왔습니다!', osu_share_link_import_fail: '링크에서 가져오기에 실패했습니다. 링크가 손상되었을 수 있습니다',
     stats_card_btn: '전적 카드 생성', stats_card_done: '전적 카드가 다운로드되었습니다!', stats_card_fail: '전적 카드 생성 실패',
+    collection_card_btn: '컬렉션 카드 생성', collection_card_title: '내 osu! 컬렉션', collection_card_done: '컬렉션 카드가 다운로드되었습니다!', collection_card_fail: '컬렉션 카드 생성 실패',
+
+    nav_public_collections: '컬렉션 광장', gallery_page_title: '✦ 플레이어 컬렉션 광장 ✦',
+    publish_btn: '📤 내 컬렉션 발행하기', publish_login_required: '발행하려면 먼저 osu! 로그인이 필요합니다',
+    publish_confirm: '내 컬렉션({n}개의 비트맵)을 공개로 발행할까요? 언제든 다시 발행하거나 취소할 수 있어요',
+    publish_done: '컬렉션이 발행되었습니다!', publish_fail: '발행에 실패했습니다. 잠시 후 다시 시도해주세요',
+    unpublish_btn: '🗑️ 발행 취소', unpublish_confirm: '광장에서 내 컬렉션을 제거할까요?', unpublish_done: '발행이 취소되었습니다',
+    gallery_loading: '광장을 불러오는 중...', gallery_load_fail: '광장을 불러오지 못했습니다. 잠시 후 다시 시도해주세요',
+    gallery_empty: '아직 발행된 컬렉션이 없습니다. 첫 번째가 되어보세요!',
+    gallery_sort_recent: '최신 발행순', gallery_sort_sets: '비트맵 많은순', gallery_sort_rating: '최고 별점순',
+    gallery_import_confirm: '{name}님의 컬렉션({n}개의 비트맵)입니다. 내 컬렉션으로 가져올까요? (기존 항목은 덮어쓰지 않고, 없는 것만 추가됩니다)',
+    gallery_download_btn_title: '이 컬렉션 가져오기',
 };

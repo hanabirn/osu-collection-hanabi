@@ -7,7 +7,16 @@
    back to the client via a redirect query param. Downstream personalization
    (stats, recent plays, PP history) reuses the existing anonymous v1 API
    proxy (netlify/functions/osu.js) the same way manual profile lookup
-   already does — the id is all that's needed for that. */
+   already does — the id is all that's needed for that.
+
+   Also mints a signed osu_login_token (see _auth-token.js) alongside the
+   plain id/username — the plain params are trivially spoofable (anyone can
+   type ?osu_login=<id> into the URL bar) which is fine for read-only
+   personalization, but not for collections-publish.js/unpublish.js, which
+   need real proof of identity before writing public data under someone's
+   name. */
+const { signAuthToken } = require('./_auth-token');
+
 exports.handler = async (event) => {
     const code = event.queryStringParameters && event.queryStringParameters.code;
     if (!code) {
@@ -35,7 +44,11 @@ exports.handler = async (event) => {
         if (!meRes.ok) throw new Error('/me request failed');
         const me = await meRes.json();
 
-        const params = new URLSearchParams({ osu_login: me.id, osu_login_name: me.username });
+        const params = new URLSearchParams({
+            osu_login: me.id,
+            osu_login_name: me.username,
+            osu_login_token: signAuthToken({ id: me.id, username: me.username }),
+        });
         return { statusCode: 302, headers: { Location: `/?${params.toString()}` }, body: '' };
     } catch (err) {
         return { statusCode: 302, headers: { Location: '/?osu_login_error=1' }, body: '' };

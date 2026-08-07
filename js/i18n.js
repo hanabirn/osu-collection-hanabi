@@ -4,7 +4,19 @@
    this file declares I18N, and BEFORE any code below calls t()/applyLang(). ===== */
 const I18N = {};
 
-let siteLang = localStorage.getItem('site_lang') || 'zh';
+const SUPPORTED_LANGS = ['zh', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de'];
+
+function detectBrowserLang() {
+    for (const tag of navigator.languages || [navigator.language]) {
+        const code = tag.toLowerCase();
+        if (code.startsWith('zh')) return 'zh';
+        const short = code.split('-')[0];
+        if (SUPPORTED_LANGS.includes(short)) return short;
+    }
+    return 'zh';
+}
+
+let siteLang = localStorage.getItem('site_lang') || detectBrowserLang();
 
 function applyLang(lang) {
     siteLang = lang;

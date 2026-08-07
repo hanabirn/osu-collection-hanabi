@@ -7,6 +7,11 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
 }
+/* Per-language CJK font: html[lang] is kept in sync with the active UI
+   language by applyLang() in js/i18n.js, so this swaps the CJK face to
+   match rather than rendering Japanese/Korean through a Chinese font. */
+html[lang="ja"] body { font-family: "Noto Sans JP", 'Segoe UI', Arial, sans-serif; }
+html[lang="ko"] body { font-family: "Noto Sans KR", 'Segoe UI', Arial, sans-serif; }
 
 a { color: var(--accent-light-purple); text-decoration: none; }
 a:hover { text-decoration: underline; }

@@ -7,6 +7,7 @@ function switchTab(tab, el) {
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
     if (tab === 'tournaments') ensureTournamentsLoaded();
+    if (tab === 'public-collections') ensurePublicCollectionsLoaded();
 }
 
 /* ===== 🌐 Language Dropdown ===== */
@@ -44,6 +45,7 @@ function refreshDynamicContent() {
     if (visitorLookupUserId) renderPpHistoryChart(null, ppHistoryKeyFor(visitorLookupUserId), 'visitor-pp-history-panel');
     if (typeof renderSkinsList === 'function') renderSkinsList();
     if (typeof renderReplayHistory === 'function') renderReplayHistory();
+    if (typeof renderPublicCollectionsList === 'function') renderPublicCollectionsList();
 }
 
 /* ===== Init ===== */

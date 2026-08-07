@@ -315,6 +315,26 @@ async function shareOsuCollectionLink() {
     }
 }
 
+/* Merges an incoming collection (from a share link or, later, a public
+   gallery download) into the visitor's own — never overwrites, only adds
+   beatmapsets they don't already have. Returns how many were added. */
+function mergeIncomingCollection(incoming) {
+    const col = getOsuCollection();
+    let added = 0;
+    for (const mode of OSU_MODES) {
+        const existingIds = new Set(col[mode].map(s => s.beatmapset_id));
+        for (const set of (incoming[mode] || [])) {
+            if (!existingIds.has(set.beatmapset_id)) {
+                col[mode].push(set);
+                existingIds.add(set.beatmapset_id);
+                added++;
+            }
+        }
+    }
+    saveOsuCollection(col);
+    return added;
+}
+
 async function checkImportFromHash() {
     const hash = location.hash;
     if (!hash.startsWith('#import=')) return;
@@ -328,19 +348,7 @@ async function checkImportFromHash() {
         const incomingCount = OSU_MODES.reduce((sum, m) => sum + data.collection[m].length, 0);
         if (!confirm(t('osu_share_link_import_confirm', { n: incomingCount }))) return;
 
-        const col = getOsuCollection();
-        let added = 0;
-        for (const mode of OSU_MODES) {
-            const existingIds = new Set(col[mode].map(s => s.beatmapset_id));
-            for (const set of data.collection[mode]) {
-                if (!existingIds.has(set.beatmapset_id)) {
-                    col[mode].push(set);
-                    existingIds.add(set.beatmapset_id);
-                    added++;
-                }
-            }
-        }
-        saveOsuCollection(col);
+        const added = mergeIncomingCollection(data.collection);
         renderOsuCollection();
         showShareToast(t('osu_share_link_imported', { n: added }));
     } catch (e) {
@@ -833,50 +841,19 @@ function formatPpChartDate(dateStr) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-function ppTrendChartSvg(history) {
-    const width = 600, height = 150;
-    const padL = 40, padR = 14, padT = 14, padB = 20;
-    const innerW = width - padL - padR;
-    const innerH = height - padT - padB;
-
-    const xs = history.map(p => new Date(p.date + 'T00:00:00').getTime());
-    const xMin = xs[0];
-    const xSpan = Math.max(1, xs[xs.length - 1] - xMin);
-
-    let yMin = Math.min(...history.map(p => p.pp));
-    let yMax = Math.max(...history.map(p => p.pp));
-    if (yMin === yMax) { yMin -= 1; yMax += 1; }
-    const yPad = (yMax - yMin) * 0.1;
-    yMin = Math.max(0, Math.floor(yMin - yPad));
-    yMax = Math.ceil(yMax + yPad);
-
-    const xPos = t => padL + (xs.length === 1 ? innerW / 2 : ((t - xMin) / xSpan) * innerW);
-    const yPos = v => padT + innerH - ((v - yMin) / (yMax - yMin)) * innerH;
-
-    const baseline = `<line x1="${padL}" y1="${padT + innerH}" x2="${padL + innerW}" y2="${padT + innerH}" class="trend-chart-grid" />`;
-    const yLabels = `<text x="${padL - 6}" y="${padT + innerH + 3}" text-anchor="end" class="trend-chart-axis-label">${yMin.toLocaleString()}</text>
-        <text x="${padL - 6}" y="${padT + 8}" text-anchor="end" class="trend-chart-axis-label">${yMax.toLocaleString()}</text>`;
-    const xLabels = `<text x="${padL}" y="${height - 4}" text-anchor="start" class="trend-chart-axis-label">${formatPpChartDate(history[0].date)}</text>
-        <text x="${padL + innerW}" y="${height - 4}" text-anchor="end" class="trend-chart-axis-label">${formatPpChartDate(history[history.length - 1].date)}</text>`;
-
-    const pts = history.map(p => `${xPos(new Date(p.date + 'T00:00:00').getTime())},${yPos(p.pp)}`);
-    const line = history.length > 1
-        ? `<polyline points="${pts.join(' ')}" fill="none" stroke="var(--accent-pink)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />`
-        : '';
-    const dots = history.map(p => {
-        const cx = xPos(new Date(p.date + 'T00:00:00').getTime());
-        const cy = yPos(p.pp);
-        return `<circle cx="${cx}" cy="${cy}" r="2.5" fill="var(--accent-pink)"><title>${formatPpChartDate(p.date)}: ${p.pp.toLocaleString()}pp</title></circle>`;
-    }).join('');
-    const last = history[history.length - 1];
-    const lastX = xPos(new Date(last.date + 'T00:00:00').getTime());
-    const lastY = yPos(last.pp);
-    const valueLabel = `<circle cx="${lastX}" cy="${lastY}" r="4" fill="var(--accent-pink)"><title>${formatPpChartDate(last.date)}: ${last.pp.toLocaleString()}pp</title></circle>
-        <text x="${lastX + 6}" y="${lastY - 6}" class="trend-chart-value-label" fill="var(--accent-pink)">${last.pp.toLocaleString()}</text>`;
-
-    return `<svg viewBox="0 0 ${width} ${height}" class="trend-chart-svg" preserveAspectRatio="none">
-        ${baseline}${yLabels}${xLabels}${line}${dots}${valueLabel}
-    </svg>`;
+/* Reads theme colors fresh each render/redraw since Chart.js bakes them
+   into canvas pixels rather than resolving CSS var() live like the old SVG
+   version did — see the theme-toggle listener below renderPpHistoryChart. */
+function ppChartColors() {
+    const css = getComputedStyle(document.documentElement);
+    const pick = (name, fallback) => css.getPropertyValue(name).trim() || fallback;
+    return {
+        accent: pick('--accent-pink', '#f472b6'),
+        grid: pick('--border-light', 'rgba(255,255,255,0.15)'),
+        label: pick('--text-label', 'rgba(255,255,255,0.6)'),
+        text: pick('--text', '#fff'),
+        tooltipBg: pick('--bg-card', 'rgba(25,15,45,0.95)'),
+    };
 }
 
 /* Fetches per-mode stats_history from osu!Track for the given user and
@@ -919,12 +896,22 @@ function mergePpHistory(remote, local) {
     return [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([date, pp]) => ({ date, pp }));
 }
 
+/* Single shared Chart.js instance — only one pp-history panel (the visitor
+   lookup card) is ever on screen at a time, so each render destroys the
+   previous chart before creating the next rather than tracking one per
+   panelId. */
+let ppHistoryChart = null;
+let ppHistoryChartArgs = null;
+
 function renderPpHistoryChart(historyOverride, key, panelId) {
     const el = document.getElementById(panelId);
     if (!el) return;
     const history = historyOverride || getPpHistory(key);
 
+    if (ppHistoryChart) { ppHistoryChart.destroy(); ppHistoryChart = null; }
+
     if (history.length < 2) {
+        ppHistoryChartArgs = null;
         el.innerHTML = `
             <div class="trend-chart-label">${t('pp_history_title')}</div>
             <p class="osu-empty">${t('pp_history_empty')}</p>
@@ -932,11 +919,72 @@ function renderPpHistoryChart(historyOverride, key, panelId) {
         return;
     }
 
+    ppHistoryChartArgs = [historyOverride, key, panelId];
     el.innerHTML = `
         <div class="trend-chart-label">${t('pp_history_title')}</div>
-        <div class="trend-chart-wrap">${ppTrendChartSvg(history)}</div>
+        <div class="trend-chart-wrap"><canvas></canvas></div>
     `;
+    const canvas = el.querySelector('canvas');
+    const colors = ppChartColors();
+
+    ppHistoryChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: history.map(p => formatPpChartDate(p.date)),
+            datasets: [{
+                data: history.map(p => p.pp),
+                borderColor: colors.accent,
+                backgroundColor: colors.accent + '2a',
+                pointBackgroundColor: colors.accent,
+                pointBorderColor: colors.accent,
+                pointRadius: 2.5,
+                pointHoverRadius: 5,
+                borderWidth: 2,
+                tension: 0.25,
+                fill: true,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: colors.tooltipBg,
+                    titleColor: colors.text,
+                    bodyColor: colors.accent,
+                    borderColor: colors.grid,
+                    borderWidth: 1,
+                    padding: 8,
+                    displayColors: false,
+                    callbacks: { label: ctx => `${ctx.parsed.y.toLocaleString()}pp` },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.label, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 },
+                },
+                y: {
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.label, font: { size: 10 }, callback: v => v.toLocaleString() },
+                },
+            },
+        },
+    });
 }
+
+/* Re-render with fresh colors on theme toggle so the chart doesn't keep
+   its old-theme palette baked into the canvas (unlike the previous SVG
+   version, which resolved CSS var() live and needed no such hook). */
+(function () {
+    const themeBtn = document.getElementById('theme-toggle');
+    if (!themeBtn) return;
+    themeBtn.addEventListener('click', () => setTimeout(() => {
+        if (ppHistoryChartArgs) renderPpHistoryChart(...ppHistoryChartArgs);
+    }, 0));
+})();
 
 /* ===== Visitor Profile Lookup ===== */
 let visitorLookupUserId = null;
@@ -1051,11 +1099,16 @@ function checkOsuLoginFromUrl() {
     const loginFailed = params.get('osu_login_error');
 
     if (id) {
-        localStorage.setItem(OSU_LOGIN_STORAGE_KEY, JSON.stringify({ id, username: params.get('osu_login_name') || '' }));
+        localStorage.setItem(OSU_LOGIN_STORAGE_KEY, JSON.stringify({
+            id,
+            username: params.get('osu_login_name') || '',
+            token: params.get('osu_login_token') || null,
+        }));
     }
     if (id || loginFailed) {
         params.delete('osu_login');
         params.delete('osu_login_name');
+        params.delete('osu_login_token');
         params.delete('osu_login_error');
         const qs = params.toString();
         history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
@@ -1063,6 +1116,15 @@ function checkOsuLoginFromUrl() {
     }
 
     applyLoggedInOsuUser();
+}
+
+/* Signed proof of identity for the currently logged-in osu! user (see
+   netlify/functions/_auth-token.js) — null for visitors who logged in before
+   this existed, until they log in again. Only needed for actions that write
+   public data under the visitor's name (collections-publish/unpublish). */
+function getOsuAuthToken() {
+    const user = getLoggedInOsuUser();
+    return user && user.token ? user.token : null;
 }
 
 /* ===== PP calculator + strain graph =====
@@ -1237,133 +1299,141 @@ function renderPpCalcResult(data) {
     graphWrap.style.display = 'block';
 }
 
-/* ===== Shareable stats card =====
-   Draws a downloadable PNG summary (avatar, rank, PP, accuracy, playcount)
-   for either the owner's profile or a visitor lookup result, entirely on
-   a canvas — the avatar is fetched through the same-origin osu-avatar
-   function, so it never taints the canvas. */
-function roundRectPath(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
+/* ===== Shareable PNG cards =====
+   Builds a themed card off-screen as real DOM/CSS (see .share-card in
+   css/osu.css), rasterizes it with html-to-image, then downloads it as a
+   PNG. Using real DOM instead of hand-rolled canvas drawing means the card
+   markup can be restyled with plain CSS. Colors are fixed rather than
+   theme-token-driven so an exported image looks the same regardless of the
+   viewer's dark/light mode. */
+function buildStatTile(value, label) {
+    const tile = document.createElement('div');
+    tile.className = 'osu-stat';
+    const v = document.createElement('div');
+    v.className = 'osu-stat-value';
+    v.textContent = value;
+    const l = document.createElement('div');
+    l.className = 'osu-stat-label';
+    l.textContent = label;
+    tile.append(v, l);
+    return tile;
 }
 
-function loadImageEl(src) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
-    });
-}
+function buildShareCard({ title, avatarUrl, name, sub, stats }) {
+    const card = document.createElement('div');
+    card.className = 'share-card';
 
-async function generateStatsCard({ avatarUrl, username, country, modeLabel, rank, pp, accuracy, playcount }) {
-    const width = 640, height = 320;
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-
-    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    bgGrad.addColorStop(0, '#1a0b2e');
-    bgGrad.addColorStop(1, '#2d1b4e');
-    ctx.fillStyle = bgGrad;
-    roundRectPath(ctx, 0, 0, width, height, 20);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(192,132,252,0.5)';
-    ctx.lineWidth = 2;
-    roundRectPath(ctx, 1, 1, width - 2, height - 2, 20);
-    ctx.stroke();
-
-    try {
-        const avatarImg = await loadImageEl(avatarUrl);
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(80, 80, 44, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(avatarImg, 36, 36, 88, 88);
-        ctx.restore();
-    } catch (e) {
-        console.error('Avatar load failed for stats card:', e);
+    if (title) {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'share-card-title';
+        titleEl.textContent = title;
+        card.appendChild(titleEl);
     }
-    ctx.strokeStyle = 'rgba(244,114,182,0.8)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(80, 80, 44, 0, Math.PI * 2);
-    ctx.stroke();
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 26px sans-serif';
-    ctx.fillText(username, 144, 68);
-    ctx.fillStyle = 'rgba(255,255,255,0.65)';
-    ctx.font = '15px sans-serif';
-    ctx.fillText(`${country} · ${modeLabel}`, 144, 94);
+    if (name) {
+        const header = document.createElement('div');
+        header.className = 'share-card-header';
+        if (avatarUrl) {
+            const img = document.createElement('img');
+            img.className = 'share-card-avatar';
+            img.src = avatarUrl;
+            header.appendChild(img);
+        }
+        const info = document.createElement('div');
+        const nameEl = document.createElement('div');
+        nameEl.className = 'share-card-name';
+        nameEl.textContent = name;
+        info.appendChild(nameEl);
+        if (sub) {
+            const subEl = document.createElement('div');
+            subEl.className = 'share-card-sub';
+            subEl.textContent = sub;
+            info.appendChild(subEl);
+        }
+        header.appendChild(info);
+        card.appendChild(header);
+    }
 
-    const stats = [[t('osu_stat_global'), rank], ['PP', pp], [t('osu_stat_accuracy'), accuracy], [t('osu_stat_playcount'), playcount]];
-    const boxGap = 10;
-    const boxW = (width - 48 - boxGap * 3) / 4, boxY = 160, boxH = 100;
-    stats.forEach(([label, value], i) => {
-        const x = 24 + i * (boxW + boxGap);
-        ctx.fillStyle = 'rgba(255,255,255,0.06)';
-        roundRectPath(ctx, x, boxY, boxW, boxH, 12);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.lineWidth = 1;
-        roundRectPath(ctx, x, boxY, boxW, boxH, 12);
-        ctx.stroke();
+    const grid = document.createElement('div');
+    grid.className = 'share-card-stats';
+    stats.forEach(([label, value]) => grid.appendChild(buildStatTile(value, label)));
+    card.appendChild(grid);
 
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#f9a8d4';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText(String(value), x + boxW / 2, boxY + 46);
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.font = '12px sans-serif';
-        ctx.fillText(label, x + boxW / 2, boxY + 72);
-        ctx.textAlign = 'left';
-    });
+    const footer = document.createElement('div');
+    footer.className = 'share-card-footer';
+    footer.textContent = location.host;
+    card.appendChild(footer);
 
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.font = '12px sans-serif';
-    ctx.fillText(location.host, width / 2, height - 16);
-    ctx.textAlign = 'left';
+    return card;
+}
 
-    return canvas;
+async function downloadShareCardPng(card, filename, doneMsg, failMsg) {
+    document.body.appendChild(card);
+    try {
+        const dataUrl = await htmlToImage.toPng(card, { pixelRatio: 2, cacheBust: true });
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = filename;
+        a.click();
+        showShareToast(doneMsg);
+    } catch (e) {
+        console.error('Share card generation failed:', e);
+        showShareToast(failMsg);
+    } finally {
+        card.remove();
+    }
 }
 
 async function downloadStatsCardFor(u, mode) {
     if (!u) return;
-    try {
-        const canvas = await generateStatsCard({
-            avatarUrl: osuAvatarUrl(u.user_id),
-            username: u.username,
-            country: COUNTRY_NAMES[u.country] || u.country,
-            modeLabel: OSU_MODE_LABELS[mode],
-            rank: u.pp_rank != null ? '#' + parseInt(u.pp_rank).toLocaleString() : '—',
-            pp: u.pp_raw != null ? Math.round(parseFloat(u.pp_raw)).toLocaleString() : '—',
-            accuracy: u.accuracy != null ? parseFloat(u.accuracy).toFixed(2) + '%' : '—',
-            playcount: u.playcount != null ? parseInt(u.playcount).toLocaleString() : '—',
-        });
-        canvas.toBlob(blob => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `osu-stats-${u.username}-${OSU_MODE_LABELS[mode]}.png`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showShareToast(t('stats_card_done'));
-        }, 'image/png');
-    } catch (e) {
-        console.error('Stats card generation failed:', e);
-        showShareToast(t('stats_card_fail'));
-    }
+    const card = buildShareCard({
+        avatarUrl: osuAvatarUrl(u.user_id),
+        name: u.username,
+        sub: `${COUNTRY_NAMES[u.country] || u.country} · ${OSU_MODE_LABELS[mode]}`,
+        stats: [
+            [t('osu_stat_global'), u.pp_rank != null ? '#' + parseInt(u.pp_rank).toLocaleString() : '—'],
+            ['PP', u.pp_raw != null ? Math.round(parseFloat(u.pp_raw)).toLocaleString() : '—'],
+            [t('osu_stat_accuracy'), u.accuracy != null ? parseFloat(u.accuracy).toFixed(2) + '%' : '—'],
+            [t('osu_stat_playcount'), u.playcount != null ? parseInt(u.playcount).toLocaleString() : '—'],
+        ],
+    });
+    await downloadShareCardPng(card, `osu-stats-${u.username}-${OSU_MODE_LABELS[mode]}.png`, t('stats_card_done'), t('stats_card_fail'));
 }
 
 function downloadVisitorStatsCard() {
     downloadStatsCardFor(visitorModeData[visitorCurrentMode], visitorCurrentMode);
+}
+
+/* ===== Shareable collection card =====
+   Same off-screen html-to-image approach as the PP stats card above, but
+   summarizing the local Beatmap collection instead of an osu! profile —
+   purely derived from localStorage, no API calls needed. */
+async function downloadCollectionShareCard() {
+    const col = getOsuCollection();
+    const seen = new Set();
+    const allSets = OSU_MODES.flatMap(m => col[m]).filter(s => {
+        if (seen.has(s.beatmapset_id)) return false;
+        seen.add(s.beatmapset_id);
+        return true;
+    });
+    if (allSets.length === 0) {
+        showShareToast(t('osu_share_link_empty'));
+        return;
+    }
+
+    const allRatings = allSets.flatMap(s => s.beatmaps.map(b => b.difficulty_rating)).filter(r => r > 0);
+    const avgRating = allRatings.length ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 0;
+    const maxRating = allRatings.length ? Math.max(...allRatings) : 0;
+    const favCount = getOsuFavorites().filter(id => allSets.some(s => s.beatmapset_id === id)).length;
+
+    const card = buildShareCard({
+        title: t('collection_card_title'),
+        stats: [
+            [t('osu_stats_total'), allSets.length],
+            [t('osu_fav'), favCount],
+            [t('osu_stats_avg_rating'), avgRating.toFixed(2) + '⭐'],
+            [t('osu_stats_max_rating'), maxRating.toFixed(2) + '⭐'],
+        ],
+    });
+    await downloadShareCardPng(card, `osu-collection-${Date.now()}.png`, t('collection_card_done'), t('collection_card_fail'));
 }
