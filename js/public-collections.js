@@ -58,7 +58,7 @@ function renderPublicCollectionsList() {
     }
 
     listEl.innerHTML = publicCollectionsItems.map(item => `
-        <div class="public-collection-card">
+        <div class="public-collection-card" onclick="openGalleryDetailModal(${item.id})">
             <div class="pcc-header">
                 <img class="pcc-avatar" src="${osuAvatarUrl(item.id)}" alt="" onerror="this.style.visibility='hidden';">
                 <div>
@@ -70,7 +70,10 @@ function renderPublicCollectionsList() {
                 <span>${item.totalSets.toLocaleString()} ${t('osu_stats_total')}</span>
                 <span>${item.maxRating.toFixed(2)}⭐</span>
             </div>
-            <button class="btn pcc-download-btn" onclick="downloadPublicCollection(${item.id})" title="${t('gallery_download_btn_title')}">⬇ ${t('gallery_download_btn_title')}</button>
+            <div class="pcc-btn-row">
+                <button class="btn pcc-view-btn" onclick="event.stopPropagation();openGalleryDetailModal(${item.id})" title="${t('gallery_view_btn_title')}">🔍</button>
+                <button class="btn pcc-download-btn" onclick="event.stopPropagation();downloadPublicCollection(${item.id})" title="${t('gallery_download_btn_title')}">⬇ ${t('gallery_download_btn_title')}</button>
+            </div>
         </div>
     `).join('');
 
@@ -148,22 +151,88 @@ async function unpublishMyCollection() {
     }
 }
 
+/* Shared by the direct card download button and the detail modal's download
+   button (openGalleryDetailModal already has the full data in hand, so it
+   calls this directly instead of re-fetching). */
+function importPublicCollectionData(data, fallbackName) {
+    const incomingCount = OSU_MODES.reduce((sum, m) => sum + (data.collection[m] || []).length, 0);
+    const name = data.username || fallbackName;
+    if (!confirm(t('gallery_import_confirm', { name, n: incomingCount }))) return;
+
+    const added = mergeIncomingCollection(data.collection);
+    renderOsuCollection();
+    showShareToast(t('osu_share_link_imported', { n: added }));
+}
+
 async function downloadPublicCollection(id) {
     const item = publicCollectionsItems.find(i => String(i.id) === String(id));
     try {
         const res = await fetch(`/.netlify/functions/collections-get?id=${id}`);
         if (!res.ok) throw new Error('fetch failed');
         const data = await res.json();
-
-        const incomingCount = OSU_MODES.reduce((sum, m) => sum + (data.collection[m] || []).length, 0);
-        const name = (item && item.username) || data.username || `#${id}`;
-        if (!confirm(t('gallery_import_confirm', { name, n: incomingCount }))) return;
-
-        const added = mergeIncomingCollection(data.collection);
-        renderOsuCollection();
-        showShareToast(t('osu_share_link_imported', { n: added }));
+        importPublicCollectionData(data, (item && item.username) || `#${id}`);
     } catch (e) {
         console.error('Download public collection failed:', e);
         showShareToast(t('osu_share_link_import_fail'));
     }
+}
+
+/* ===== Gallery detail modal — view the beatmap list before downloading ===== */
+let galleryDetailData = null;
+
+async function openGalleryDetailModal(id) {
+    const item = publicCollectionsItems.find(i => String(i.id) === String(id));
+    const modal = document.getElementById('gallery-detail-modal');
+    const titleEl = document.getElementById('gallery-detail-title');
+    const bodyEl = document.getElementById('gallery-detail-body');
+    const downloadBtn = document.getElementById('gallery-detail-download-btn');
+
+    galleryDetailData = null;
+    titleEl.textContent = (item && item.username) || `#${id}`;
+    bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    downloadBtn.style.display = 'none';
+    modal.style.display = 'flex';
+
+    try {
+        const res = await fetch(`/.netlify/functions/collections-get?id=${id}`);
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        galleryDetailData = data;
+        if (data.username) titleEl.textContent = data.username;
+
+        const groups = OSU_MODES.map((mode, i) => {
+            const sets = data.collection[mode] || [];
+            if (sets.length === 0) return '';
+            const rows = sets.map(set => {
+                const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);
+                const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
+                return `<a class="gallery-detail-item" href="https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}" target="_blank" rel="noopener noreferrer">
+                    <img class="gallery-detail-item-bg" src="${coverUrl}" alt="" loading="lazy" onerror="this.style.visibility='hidden';">
+                    <div class="gallery-detail-item-overlay"></div>
+                    <div class="gallery-detail-item-info">
+                        <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
+                        <span class="gallery-detail-item-stars">${maxDiff.toFixed(2)}⭐</span>
+                    </div>
+                </a>`;
+            }).join('');
+            return `<div class="gallery-detail-mode-label">${modeIconSvg(mode)}${OSU_MODE_LABELS[i]} (${sets.length})</div>${rows}`;
+        }).join('');
+
+        bodyEl.innerHTML = groups || `<p class="osu-empty">${t('gallery_empty')}</p>`;
+        downloadBtn.style.display = '';
+    } catch (e) {
+        console.error('Gallery detail load failed:', e);
+        bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_load_fail')}</p>`;
+    }
+}
+
+function closeGalleryDetailModal() {
+    document.getElementById('gallery-detail-modal').style.display = 'none';
+    galleryDetailData = null;
+}
+
+function downloadGalleryDetailCollection() {
+    if (!galleryDetailData) return;
+    importPublicCollectionData(galleryDetailData, document.getElementById('gallery-detail-title').textContent);
+    closeGalleryDetailModal();
 }

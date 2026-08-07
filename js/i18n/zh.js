@@ -57,5 +57,5 @@ I18N.zh = {
     gallery_empty: '目前還沒有人發布收藏，成為第一個吧！',
     gallery_sort_recent: '最新發布', gallery_sort_sets: '收藏數量', gallery_sort_rating: '最高星數',
     gallery_import_confirm: '這是 {name} 的收藏，包含 {n} 個 Beatmap，要匯入到你的收藏嗎？（不會覆蓋現有收藏，只會加入你還沒有的）',
-    gallery_download_btn_title: '匯入這個收藏',
+    gallery_download_btn_title: '匯入這個收藏', gallery_view_btn_title: '查看清單',
 };

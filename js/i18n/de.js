@@ -57,5 +57,5 @@ I18N.de = {
     gallery_empty: 'Noch niemand hat eine Sammlung veröffentlicht — sei der Erste!',
     gallery_sort_recent: 'Kürzlich veröffentlicht', gallery_sort_sets: 'Meiste Beatmaps', gallery_sort_rating: 'Höchste Sternebewertung',
     gallery_import_confirm: 'Dies ist die Sammlung von {name} ({n} Beatmaps). In deine Sammlung importieren? (Vorhandene Einträge werden nicht überschrieben, nur fehlende werden hinzugefügt)',
-    gallery_download_btn_title: 'Diese Sammlung importieren',
+    gallery_download_btn_title: 'Diese Sammlung importieren', gallery_view_btn_title: 'Beatmap-Liste ansehen',
 };

@@ -57,5 +57,5 @@ I18N.en = {
     gallery_empty: 'No one has published a collection yet — be the first!',
     gallery_sort_recent: 'Recently published', gallery_sort_sets: 'Most beatmaps', gallery_sort_rating: 'Highest star rating',
     gallery_import_confirm: "This is {name}'s collection with {n} beatmaps. Import into your collection? (Won't overwrite existing entries, only adds ones you don't have)",
-    gallery_download_btn_title: 'Import this collection',
+    gallery_download_btn_title: 'Import this collection', gallery_view_btn_title: 'View beatmap list',
 };

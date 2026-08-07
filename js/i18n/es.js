@@ -57,5 +57,5 @@ I18N.es = {
     gallery_empty: 'Nadie ha publicado una colección todavía — ¡sé el primero!',
     gallery_sort_recent: 'Publicadas recientemente', gallery_sort_sets: 'Más beatmaps', gallery_sort_rating: 'Mayor puntuación',
     gallery_import_confirm: 'Esta es la colección de {name} ({n} beatmaps). ¿Importar a tu colección? (No sobrescribe las existentes, solo añade las que no tienes)',
-    gallery_download_btn_title: 'Importar esta colección',
+    gallery_download_btn_title: 'Importar esta colección', gallery_view_btn_title: 'Ver lista de beatmaps',
 };
