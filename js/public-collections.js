@@ -177,18 +177,24 @@ async function downloadPublicCollection(id) {
     }
 }
 
-/* ===== Gallery detail modal — view the beatmap list before downloading ===== */
+/* ===== Gallery detail modal — view the beatmap list before downloading.
+   Shows one mode's beatmaps at a time as a 4-column thumbnail grid, switched
+   via mode tabs (same .osu-mode-tabs pattern as the visitor-lookup recent
+   plays switcher), rather than stacking all four modes in one long list. ===== */
 let galleryDetailData = null;
+let galleryDetailMode = 'standard';
 
 async function openGalleryDetailModal(id) {
     const item = publicCollectionsItems.find(i => String(i.id) === String(id));
     const modal = document.getElementById('gallery-detail-modal');
     const titleEl = document.getElementById('gallery-detail-title');
+    const tabsEl = document.getElementById('gallery-detail-mode-tabs');
     const bodyEl = document.getElementById('gallery-detail-body');
     const downloadBtn = document.getElementById('gallery-detail-download-btn');
 
     galleryDetailData = null;
     titleEl.textContent = (item && item.username) || `#${id}`;
+    tabsEl.innerHTML = '';
     bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     downloadBtn.style.display = 'none';
     modal.style.display = 'flex';
@@ -200,30 +206,54 @@ async function openGalleryDetailModal(id) {
         galleryDetailData = data;
         if (data.username) titleEl.textContent = data.username;
 
-        const groups = OSU_MODES.map((mode, i) => {
-            const sets = data.collection[mode] || [];
-            if (sets.length === 0) return '';
-            const rows = sets.map(set => {
-                const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);
-                const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
-                return `<a class="gallery-detail-item" href="https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}" target="_blank" rel="noopener noreferrer">
-                    <img class="gallery-detail-item-bg" src="${coverUrl}" alt="" loading="lazy" onerror="this.style.visibility='hidden';">
-                    <div class="gallery-detail-item-overlay"></div>
-                    <div class="gallery-detail-item-info">
-                        <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
-                        <span class="gallery-detail-item-stars">${maxDiff.toFixed(2)}⭐</span>
-                    </div>
-                </a>`;
-            }).join('');
-            return `<div class="gallery-detail-mode-label">${modeIconSvg(mode)}${OSU_MODE_LABELS[i]} (${sets.length})</div>${rows}`;
+        const modesWithItems = OSU_MODES.filter(m => (data.collection[m] || []).length > 0);
+        if (modesWithItems.length === 0) {
+            bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_empty')}</p>`;
+            return;
+        }
+
+        galleryDetailMode = modesWithItems.includes(galleryDetailMode) ? galleryDetailMode : modesWithItems[0];
+        tabsEl.innerHTML = modesWithItems.map(mode => {
+            const i = OSU_MODES.indexOf(mode);
+            const count = data.collection[mode].length;
+            return `<button class="osu-mode-tab ${mode === galleryDetailMode ? 'active' : ''}" data-mode="${mode}" onclick="switchGalleryDetailMode('${mode}')">${modeIconSvg(mode)}${OSU_MODE_LABELS[i]} (${count})</button>`;
         }).join('');
 
-        bodyEl.innerHTML = groups || `<p class="osu-empty">${t('gallery_empty')}</p>`;
+        renderGalleryDetailGrid();
         downloadBtn.style.display = '';
     } catch (e) {
         console.error('Gallery detail load failed:', e);
         bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_load_fail')}</p>`;
     }
+}
+
+function switchGalleryDetailMode(mode) {
+    galleryDetailMode = mode;
+    document.querySelectorAll('#gallery-detail-mode-tabs .osu-mode-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    renderGalleryDetailGrid();
+}
+
+function renderGalleryDetailGrid() {
+    const bodyEl = document.getElementById('gallery-detail-body');
+    if (!galleryDetailData) return;
+    const sets = galleryDetailData.collection[galleryDetailMode] || [];
+
+    const cards = sets.map(set => {
+        const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);
+        const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
+        return `<a class="gallery-detail-item" href="https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}" target="_blank" rel="noopener noreferrer">
+            <img class="gallery-detail-item-bg" src="${coverUrl}" alt="" loading="lazy" onerror="this.style.visibility='hidden';">
+            <div class="gallery-detail-item-overlay"></div>
+            <div class="gallery-detail-item-info">
+                <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
+                <span class="gallery-detail-item-stars">${maxDiff.toFixed(2)}⭐</span>
+            </div>
+        </a>`;
+    }).join('');
+
+    bodyEl.innerHTML = `<div class="gallery-detail-grid">${cards}</div>`;
 }
 
 function closeGalleryDetailModal() {

@@ -1159,32 +1159,32 @@
 /* ===== Gallery detail modal — beatmap list for one published collection,
    shown before importing. Reuses the .pp-calc-modal-* shell (see
    pp-calc-modal-overlay/pp-calc-modal/pp-calc-close/pp-calc-title above),
-   just with its own body content. ===== */
-.gallery-detail-mode-label {
-    display: flex;
-    align-items: center;
-    font-size: 0.78rem;
-    font-weight: bold;
-    color: var(--text-label);
-    margin: 14px 0 6px;
+   widened here since a 4-column grid needs more room than the PP-calc
+   form the shell was originally built for. Mode tabs (.osu-mode-tabs,
+   already used for the visitor-lookup/recent-plays mode switchers) pick
+   which single mode's grid is shown, rather than stacking all four. */
+#gallery-detail-modal .pp-calc-modal { max-width: 900px; }
+.gallery-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
 }
-.gallery-detail-mode-label .mode-icon-inline { filter: none; }
-.gallery-detail-mode-label:first-child { margin-top: 0; }
-/* Banner-style rows, same visual language as .osu-recent-item (js/osu.js's
-   recent-plays list) — cover art background with a gradient overlay and
-   song info on top. Uses a real <img loading="lazy"> for the cover (rather
-   than an inline background-image div like .osu-recent-bg) since a
-   published collection can have hundreds of entries and native lazy
-   loading matters here in a way it didn't for the 5-item recent list. */
+@media (max-width: 640px) {
+    .gallery-detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+/* Square-ish thumbnail cards — same cover+overlay+text-on-top visual
+   language as .osu-recent-item, just resized to fit a 4-column grid
+   instead of a single-column banner list. Uses a real <img loading="lazy">
+   (rather than an inline background-image div) since a published
+   collection can run into the hundreds of entries. */
 .gallery-detail-item {
     position: relative;
     display: block;
-    aspect-ratio: 4 / 1.4;
+    aspect-ratio: 1 / 1;
     border-radius: 10px;
     overflow: hidden;
     cursor: pointer;
     background: var(--bg-stat);
-    margin-bottom: 8px;
     transition: transform 0.25s, box-shadow 0.25s;
 }
 .gallery-detail-item:hover {
@@ -1209,14 +1209,11 @@
     left: 0;
     right: 0;
     z-index: 2;
-    padding: 8px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 8px;
+    padding: 6px 8px;
 }
 .gallery-detail-item-title {
-    font-size: 0.82rem;
+    display: block;
+    font-size: 0.72rem;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 1px 4px rgba(0,0,0,0.6);
@@ -1225,12 +1222,12 @@
     text-overflow: ellipsis;
 }
 .gallery-detail-item-stars {
-    flex-shrink: 0;
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
+#gallery-detail-mode-tabs { margin: 10px 0 14px; }
 .gallery-detail-download-btn { width: 100%; margin-top: 16px; }
 
 /* ===== Today's featured beatmap banner ===== */
