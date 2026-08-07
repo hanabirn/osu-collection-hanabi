@@ -57,5 +57,5 @@ I18N.ja = {
     gallery_empty: 'まだ誰もコレクションを公開していません。最初の一人になりましょう！',
     gallery_sort_recent: '新着順', gallery_sort_sets: 'Beatmap 数', gallery_sort_rating: '最高星数',
     gallery_import_confirm: 'これは {name} さんのコレクション（{n} 個の Beatmap）です。あなたのコレクションに取り込みますか？（既存のものは上書きせず、持っていないものだけ追加されます）',
-    gallery_download_btn_title: 'このコレクションを取り込む',
+    gallery_download_btn_title: 'このコレクションを取り込む', gallery_view_btn_title: '曲目一覧を見る',
 };

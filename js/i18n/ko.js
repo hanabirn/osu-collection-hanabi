@@ -57,5 +57,5 @@ I18N.ko = {
     gallery_empty: '아직 발행된 컬렉션이 없습니다. 첫 번째가 되어보세요!',
     gallery_sort_recent: '최신 발행순', gallery_sort_sets: '비트맵 많은순', gallery_sort_rating: '최고 별점순',
     gallery_import_confirm: '{name}님의 컬렉션({n}개의 비트맵)입니다. 내 컬렉션으로 가져올까요? (기존 항목은 덮어쓰지 않고, 없는 것만 추가됩니다)',
-    gallery_download_btn_title: '이 컬렉션 가져오기',
+    gallery_download_btn_title: '이 컬렉션 가져오기', gallery_view_btn_title: '목록 보기',
 };

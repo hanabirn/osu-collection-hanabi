@@ -327,6 +327,16 @@
     </div>
 </div>
 
+<div id="gallery-detail-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeGalleryDetailModal()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closeGalleryDetailModal()">&#x2715;</button>
+        <h3 class="pp-calc-title" id="gallery-detail-title"></h3>
+        <div class="osu-mode-tabs" id="gallery-detail-mode-tabs"></div>
+        <div id="gallery-detail-body"></div>
+        <button class="btn gallery-detail-download-btn" id="gallery-detail-download-btn" onclick="downloadGalleryDetailCollection()" data-i18n="gallery_download_btn_title">⬇ 匯入這個收藏</button>
+    </div>
+</div>
+
 <footer class="site-footer">
     <p>osu! 收藏 ✦ osu! is a trademark of ppy Pty Ltd</p>
 </footer>

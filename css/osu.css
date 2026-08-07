@@ -1133,6 +1133,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 10px;
+    cursor: pointer;
     transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
 }
 .public-collection-card:hover {
@@ -1151,7 +1152,83 @@
     color: var(--text-pink);
     font-weight: bold;
 }
-.pcc-download-btn { width: 100%; padding: 8px; font-size: 0.85rem; }
+.pcc-btn-row { display: flex; gap: 8px; }
+.pcc-view-btn { flex: 0 0 auto; padding: 8px 12px; font-size: 0.85rem; }
+.pcc-download-btn { flex: 1; padding: 8px; font-size: 0.85rem; }
+
+/* ===== Gallery detail modal — beatmap list for one published collection,
+   shown before importing. Reuses the .pp-calc-modal-* shell (see
+   pp-calc-modal-overlay/pp-calc-modal/pp-calc-close/pp-calc-title above),
+   widened here since a 4-column grid needs more room than the PP-calc
+   form the shell was originally built for. Mode tabs (.osu-mode-tabs,
+   already used for the visitor-lookup/recent-plays mode switchers) pick
+   which single mode's grid is shown, rather than stacking all four. */
+#gallery-detail-modal .pp-calc-modal { max-width: 900px; }
+.gallery-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+@media (max-width: 640px) {
+    .gallery-detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+/* Square-ish thumbnail cards — same cover+overlay+text-on-top visual
+   language as .osu-recent-item, just resized to fit a 4-column grid
+   instead of a single-column banner list. Uses a real <img loading="lazy">
+   (rather than an inline background-image div) since a published
+   collection can run into the hundreds of entries. */
+.gallery-detail-item {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-stat);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+.gallery-detail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--osu-card-shadow);
+}
+.gallery-detail-item-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.gallery-detail-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--osu-overlay);
+}
+.gallery-detail-item-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 6px 8px;
+}
+.gallery-detail-item-title {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gallery-detail-item-stars {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+#gallery-detail-mode-tabs { margin: 10px 0 14px; }
+.gallery-detail-download-btn { width: 100%; margin-top: 16px; }
 
 /* ===== Today's featured beatmap banner ===== */
 .featured-beatmap-banner {
