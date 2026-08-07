@@ -89,7 +89,7 @@ a:hover { text-decoration: underline; }
     filter: drop-shadow(0 0 8px rgba(var(--accent-pink-rgb), 0.55));
     animation: logoBeatHit 1.6s cubic-bezier(.36,.07,.19,.97) infinite;
 }
-.logo-icon svg { width: 42px; height: 42px; display: block; }
+.logo-icon svg { width: 56px; height: 56px; display: block; }
 .logo-icon::after {
     content: '';
     position: absolute;
