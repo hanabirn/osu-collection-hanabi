@@ -542,6 +542,11 @@
     position: fixed;
     min-width: 190px;
     max-width: 220px;
+    /* Caps the list to roughly 7 visible categories before scrolling,
+       rather than growing unbounded and running off-screen once someone
+       has a lot of categories. */
+    max-height: 250px;
+    overflow-y: auto;
     padding: 8px;
     border-radius: 14px;
     background: var(--bg-card);
