@@ -183,6 +183,246 @@ async function toggleOsuFavorite(setId, event) {
     renderOsuCollection();
 }
 
+/* ===== Custom collection categories =====
+   Generalizes the single "Favorites" tag into user-defined named tags,
+   many-to-many with beatmaps. Local-only — deliberately not included in
+   shareOsuCollectionLink()/checkImportFromHash() or the public gallery
+   publish, same reach as favorites today. */
+function getOsuCategories() {
+    try { return JSON.parse(localStorage.getItem('osu_categories')) || []; }
+    catch { return []; }
+}
+
+function saveOsuCategories(cats) {
+    localStorage.setItem('osu_categories', JSON.stringify(cats));
+}
+
+function getOsuCategoryMembers() {
+    try { return JSON.parse(localStorage.getItem('osu_category_members')) || {}; }
+    catch { return {}; }
+}
+
+function saveOsuCategoryMembers(members) {
+    localStorage.setItem('osu_category_members', JSON.stringify(members));
+}
+
+function getCategoryMemberIds(categoryId) {
+    return getOsuCategoryMembers()[categoryId] || [];
+}
+
+/* Refreshes the modal's list too when the mutating action was triggered
+   from inside it (openCategoryManageModal), so rename/delete stay in sync
+   with the modal view without every caller needing to remember to do it. */
+function refreshCategoryManageModalIfOpen() {
+    const modal = document.getElementById('category-manage-modal');
+    if (modal && modal.style.display !== 'none') renderCategoryManageList();
+}
+
+async function renameOsuCategory(categoryId, event) {
+    if (event) event.stopPropagation();
+    if (!await verifyOsuPassword()) return;
+    const cats = getOsuCategories();
+    const cat = cats.find(c => c.id === categoryId);
+    if (!cat) return;
+    const name = prompt(t('osu_category_rename_prompt'), cat.name);
+    if (!name || !name.trim()) return;
+    cat.name = name.trim();
+    saveOsuCategories(cats);
+    refreshCategoryManageModalIfOpen();
+    renderOsuCollection();
+}
+
+async function deleteOsuCategory(categoryId, event) {
+    if (event) event.stopPropagation();
+    if (!await verifyOsuPassword()) return;
+    if (!confirm(t('osu_category_delete_confirm'))) return;
+    saveOsuCategories(getOsuCategories().filter(c => c.id !== categoryId));
+    const members = getOsuCategoryMembers();
+    delete members[categoryId];
+    saveOsuCategoryMembers(members);
+    if (osuCurrentTab === categoryId) osuCurrentTab = 'standard';
+    refreshCategoryManageModalIfOpen();
+    renderOsuCollection();
+}
+
+/* ===== Category select dropdown (right end of .osu-mode-tabs) =====
+   Keeps the main tab row to just Favorites + the 4 modes; picking a
+   category from this menu is what actually switches osuCurrentTab to a
+   category id. Open/close mechanics mirror the #lang-globe dropdown
+   (js/main.js's toggleLangMenu) — outside-click and Escape both close it. */
+function renderOsuCategoryUI() {
+    const btn = document.getElementById('osu-category-select-btn');
+    const label = document.getElementById('osu-category-select-label');
+    const menu = document.getElementById('osu-category-menu');
+    if (!btn || !label || !menu) return;
+
+    const cats = getOsuCategories();
+    const selected = cats.find(c => c.id === osuCurrentTab);
+    label.textContent = selected ? selected.name : t('osu_category_select_label');
+    btn.classList.toggle('active', !!selected);
+
+    menu.innerHTML = cats.length === 0
+        ? `<div class="osu-category-menu-empty">${t('osu_category_picker_empty')}</div>`
+        : cats.map(c => `<button class="osu-category-menu-item ${c.id === osuCurrentTab ? 'active' : ''}" onclick="selectOsuCategory('${c.id}')">${escHtml(c.name)}</button>`).join('');
+}
+
+function selectOsuCategory(categoryId) {
+    osuCurrentTab = categoryId;
+    osuPage = 0;
+    document.getElementById('osu-collection-tabs').querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
+    closeCategoryMenu();
+    renderOsuCollection();
+}
+
+function toggleCategoryMenu(event) {
+    if (event) event.stopPropagation();
+    const wrap = document.getElementById('osu-category-select');
+    if (!wrap) return;
+    if (wrap.classList.contains('open')) { closeCategoryMenu(); return; }
+    wrap.classList.add('open');
+    document.addEventListener('click', onCategoryMenuOutsideClick);
+    document.addEventListener('keydown', onCategoryMenuEscape);
+}
+
+function closeCategoryMenu() {
+    document.getElementById('osu-category-select')?.classList.remove('open');
+    document.removeEventListener('click', onCategoryMenuOutsideClick);
+    document.removeEventListener('keydown', onCategoryMenuEscape);
+}
+
+function onCategoryMenuOutsideClick(e) {
+    if (!e.target.closest('#osu-category-select')) closeCategoryMenu();
+}
+
+function onCategoryMenuEscape(e) {
+    if (e.key === 'Escape') closeCategoryMenu();
+}
+
+/* ===== Category manage modal (⚙ button next to the select dropdown) =====
+   Add/rename/delete all live here — reuses the .pp-calc-modal-* shell
+   (see gallery-detail-modal for the other user of that pattern). */
+function openCategoryManageModal() {
+    const modal = document.getElementById('category-manage-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    renderCategoryManageList();
+}
+
+function closeCategoryManageModal() {
+    const modal = document.getElementById('category-manage-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function renderCategoryManageList() {
+    const listEl = document.getElementById('osu-category-manage-list');
+    if (!listEl) return;
+    const cats = getOsuCategories();
+    listEl.innerHTML = cats.length === 0
+        ? `<p class="osu-empty">${t('osu_category_picker_empty')}</p>`
+        : cats.map(c => `
+            <div class="osu-category-manage-item">
+                <span class="osu-category-manage-name">${escHtml(c.name)}</span>
+                <span class="osu-category-manage-actions">
+                    <button class="osu-cat-rename" onclick="renameOsuCategory('${c.id}', event)" title="${t('osu_category_rename_title')}">✎</button>
+                    <button class="osu-cat-delete" onclick="deleteOsuCategory('${c.id}', event)" title="${t('osu_category_delete_title')}">🗑</button>
+                </span>
+            </div>`).join('');
+}
+
+async function addOsuCategoryFromModal() {
+    if (!await verifyOsuPassword()) return;
+    const input = document.getElementById('osu-category-manage-input');
+    const name = input.value.trim();
+    if (!name) return;
+    const cats = getOsuCategories();
+    cats.push({ id: crypto.randomUUID(), name });
+    saveOsuCategories(cats);
+    input.value = '';
+    renderCategoryManageList();
+    renderOsuCollection();
+}
+
+/* ===== Per-card category assignment popover =====
+   A single document.body-level singleton (same lazy-singleton pattern as
+   #share-toast, see showShareToast() above) rather than a per-card popover,
+   because .osu-card has overflow:hidden (load-bearing for the cover-image
+   hover-zoom) which would clip anything absolutely-positioned inside it,
+   and renderOsuCollection() replaces #osu-collection's innerHTML on every
+   re-render (including the one triggered by ticking a checkbox), which
+   would destroy a popover embedded in a card mid-interaction. */
+function ensureCategoryPickerEl() {
+    let el = document.getElementById('osu-category-picker');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'osu-category-picker';
+        el.className = 'osu-category-picker';
+        document.body.appendChild(el);
+    }
+    return el;
+}
+
+let osuCategoryPickerSetId = null;
+
+function toggleCategoryPicker(setId, event) {
+    event.stopPropagation();
+    const el = ensureCategoryPickerEl();
+    if (osuCategoryPickerSetId === setId && el.classList.contains('open')) {
+        closeCategoryPicker();
+        return;
+    }
+    osuCategoryPickerSetId = setId;
+    renderCategoryPickerContent(setId);
+    const r = event.currentTarget.getBoundingClientRect();
+    el.style.top = `${r.bottom + window.scrollY + 6}px`;
+    el.style.left = `${Math.min(r.left + window.scrollX, window.innerWidth - 220)}px`;
+    el.classList.add('open');
+    document.addEventListener('click', onCategoryPickerOutsideClick);
+    document.addEventListener('keydown', onCategoryPickerEscape);
+}
+
+function closeCategoryPicker() {
+    const el = document.getElementById('osu-category-picker');
+    if (el) el.classList.remove('open');
+    osuCategoryPickerSetId = null;
+    document.removeEventListener('click', onCategoryPickerOutsideClick);
+    document.removeEventListener('keydown', onCategoryPickerEscape);
+}
+
+function onCategoryPickerOutsideClick(e) {
+    if (!e.target.closest('#osu-category-picker') && !e.target.closest('.osu-category-btn')) closeCategoryPicker();
+}
+
+function onCategoryPickerEscape(e) {
+    if (e.key === 'Escape') closeCategoryPicker();
+}
+
+function renderCategoryPickerContent(setId) {
+    const el = document.getElementById('osu-category-picker');
+    const cats = getOsuCategories();
+    if (cats.length === 0) {
+        el.innerHTML = `<div class="osu-category-picker-empty">${t('osu_category_picker_empty')}</div>`;
+        return;
+    }
+    const members = getOsuCategoryMembers();
+    el.innerHTML = `<div class="osu-category-picker-title">${t('osu_category_picker_title')}</div>` +
+        cats.map(c => `
+        <label class="osu-category-picker-item">
+            <input type="checkbox" ${(members[c.id] || []).includes(setId) ? 'checked' : ''} onchange="toggleCategoryMembership('${c.id}', ${setId})">
+            <span>${escHtml(c.name)}</span>
+        </label>`).join('');
+}
+
+async function toggleCategoryMembership(categoryId, setId) {
+    if (!await verifyOsuPassword()) { renderCategoryPickerContent(setId); return; }
+    const members = getOsuCategoryMembers();
+    const arr = members[categoryId] || (members[categoryId] = []);
+    const idx = arr.indexOf(setId);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(setId);
+    saveOsuCategoryMembers(members);
+    renderCategoryPickerContent(setId);
+    renderOsuCollection();
+}
+
 function getOsuCollection() {
     try {
         return JSON.parse(localStorage.getItem('osu_collection')) || { standard: [], taiko: [], catch: [], mania: [] };
@@ -231,6 +471,8 @@ function exportOsuCollection() {
     const data = {
         collection: getOsuCollection(),
         favorites: getOsuFavorites(),
+        categories: getOsuCategories(),
+        categoryMembers: getOsuCategoryMembers(),
         exportedAt: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -255,6 +497,10 @@ async function importOsuCollection(event) {
         }
         saveOsuCollection(data.collection);
         if (Array.isArray(data.favorites)) saveOsuFavorites(data.favorites);
+        if (Array.isArray(data.categories)) saveOsuCategories(data.categories);
+        if (data.categoryMembers && typeof data.categoryMembers === 'object' && !Array.isArray(data.categoryMembers)) {
+            saveOsuCategoryMembers(data.categoryMembers);
+        }
         renderOsuCollection();
         showShareToast(t('osu_import_done'));
     } catch (e) {
@@ -457,8 +703,10 @@ async function addOsuBeatmap() {
         input.value = '';
 
         osuCurrentTab = modeKey;
-        document.querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.osu-tab')[modeNum + 1].classList.add('active');
+        const tabsBar = document.getElementById('osu-collection-tabs');
+        tabsBar.querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
+        const targetTab = tabsBar.querySelector(`[data-mode="${modeKey}"]`);
+        if (targetTab) targetTab.classList.add('active');
         renderOsuCollection();
     } catch (e) {
         console.error('osu! fetch error:', e);
@@ -468,7 +716,7 @@ async function addOsuBeatmap() {
 }
 
 function switchOsuTab(mode, btn) {
-    document.querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('osu-collection-tabs').querySelectorAll('.osu-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
     osuCurrentTab = mode;
     osuPage = 0;
@@ -478,7 +726,7 @@ function switchOsuTab(mode, btn) {
 async function removeOsuSet(setId) {
     if (!await verifyOsuPassword()) return;
     const col = getOsuCollection();
-    col[osuCurrentTab] = col[osuCurrentTab].filter(s => s.beatmapset_id !== setId);
+    OSU_MODES.forEach(m => { col[m] = col[m].filter(s => s.beatmapset_id !== setId); });
     saveOsuCollection(col);
     renderOsuCollection();
 }
@@ -621,15 +869,16 @@ function renderOsuCollection() {
     if (!container || !paginationEl) return;
     renderOsuStats();
     renderFeaturedBeatmap();
+    renderOsuCategoryUI();
     const col = getOsuCollection();
     let sets;
 
-    if (osuCurrentTab === 'favorites') {
-        const favIds = getOsuFavorites();
+    if (!OSU_MODES.includes(osuCurrentTab)) {
+        const memberIds = osuCurrentTab === 'favorites' ? getOsuFavorites() : getCategoryMemberIds(osuCurrentTab);
         const allSets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __mode: m })));
         const seen = new Set();
         sets = allSets.filter(s => {
-            if (favIds.includes(s.beatmapset_id) && !seen.has(s.beatmapset_id)) {
+            if (memberIds.includes(s.beatmapset_id) && !seen.has(s.beatmapset_id)) {
                 seen.add(s.beatmapset_id);
                 return true;
             }
@@ -660,7 +909,9 @@ function renderOsuCollection() {
             ? t('osu_search_empty')
             : osuCurrentTab === 'favorites'
                 ? `${t('osu_empty_fav')}<br><span>${t('osu_empty_fav_hint')}</span>`
-                : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span>`;
+                : !OSU_MODES.includes(osuCurrentTab)
+                    ? t('osu_empty_category')
+                    : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span>`;
         container.innerHTML = `<div class="osu-empty">${msg}</div>`;
         paginationEl.innerHTML = '';
         return;
@@ -686,6 +937,7 @@ function renderOsuCollection() {
             <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">📊</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="播放預覽">&#9654;</button>
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
+            <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">🏷</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">&#x2715;</button>
             <div class="osu-card-mode-badge">${modeIconSvg(set.__mode)}</div>
             <div class="osu-card-info">
