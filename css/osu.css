@@ -1159,15 +1159,18 @@
 /* ===== Gallery detail modal — beatmap list for one published collection,
    shown before importing. Reuses the .pp-calc-modal-* shell (see
    pp-calc-modal-overlay/pp-calc-modal/pp-calc-close/pp-calc-title above),
-   widened here since a 4-column grid needs more room than the PP-calc
+   widened here since a 6-column grid needs more room than the PP-calc
    form the shell was originally built for. Mode tabs (.osu-mode-tabs,
    already used for the visitor-lookup/recent-plays mode switchers) pick
    which single mode's grid is shown, rather than stacking all four. */
 #gallery-detail-modal .pp-calc-modal { max-width: 900px; }
 .gallery-detail-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 10px;
+}
+@media (max-width: 900px) {
+    .gallery-detail-grid { grid-template-columns: repeat(4, 1fr); }
 }
 @media (max-width: 640px) {
     .gallery-detail-grid { grid-template-columns: repeat(2, 1fr); }
