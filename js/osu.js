@@ -372,9 +372,14 @@ function toggleCategoryPicker(setId, event) {
     }
     osuCategoryPickerSetId = setId;
     renderCategoryPickerContent(setId);
+    // .osu-category-picker is position:fixed, so getBoundingClientRect()'s
+    // viewport-relative coordinates are exactly what's needed here — adding
+    // window.scrollY/scrollX (which is correct for position:absolute) double-
+    // counts the scroll offset and drifts the popover away from the button
+    // the further down the page you've scrolled.
     const r = event.currentTarget.getBoundingClientRect();
-    el.style.top = `${r.bottom + window.scrollY + 6}px`;
-    el.style.left = `${Math.min(r.left + window.scrollX, window.innerWidth - 220)}px`;
+    el.style.top = `${r.bottom + 6}px`;
+    el.style.left = `${Math.min(r.left, window.innerWidth - 220)}px`;
     el.classList.add('open');
     document.addEventListener('click', onCategoryPickerOutsideClick);
     document.addEventListener('keydown', onCategoryPickerEscape);

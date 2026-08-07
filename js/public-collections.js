@@ -132,7 +132,7 @@ async function publishMyCollection() {
         const res = await fetch('/.netlify/functions/collections-publish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ collection: col }),
+            body: JSON.stringify({ collection: col, categories: getOsuCategories(), categoryMembers: getOsuCategoryMembers() }),
         });
         if (res.status === 401) {
             showShareToast(t('publish_login_required'));
@@ -229,17 +229,31 @@ async function openGalleryDetailModal(id) {
         if (data.username) titleEl.textContent = data.username;
 
         const modesWithItems = OSU_MODES.filter(m => (data.collection[m] || []).length > 0);
-        if (modesWithItems.length === 0) {
+        // Categories are browse/filter-only here — never merged into the
+        // viewer's own categories (see importPublicCollectionData, which
+        // only ever touches `collection`), so only show ones the publisher
+        // actually put beatmaps in.
+        const categoriesWithItems = (data.categories || [])
+            .filter(c => ((data.categoryMembers && data.categoryMembers[c.id]) || []).length > 0);
+
+        if (modesWithItems.length === 0 && categoriesWithItems.length === 0) {
             bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_empty')}</p>`;
             return;
         }
 
-        galleryDetailMode = modesWithItems.includes(galleryDetailMode) ? galleryDetailMode : modesWithItems[0];
-        tabsEl.innerHTML = modesWithItems.map(mode => {
+        const allTabIds = [...modesWithItems, ...categoriesWithItems.map(c => c.id)];
+        galleryDetailMode = allTabIds.includes(galleryDetailMode) ? galleryDetailMode : (modesWithItems[0] || categoriesWithItems[0].id);
+
+        const modeTabsHtml = modesWithItems.map(mode => {
             const i = OSU_MODES.indexOf(mode);
             const count = data.collection[mode].length;
             return `<button class="osu-mode-tab ${mode === galleryDetailMode ? 'active' : ''}" data-mode="${mode}" onclick="switchGalleryDetailMode('${mode}')">${modeIconSvg(mode)}${OSU_MODE_LABELS[i]} (${count})</button>`;
         }).join('');
+        const categoryTabsHtml = categoriesWithItems.map(c => {
+            const count = data.categoryMembers[c.id].length;
+            return `<button class="osu-mode-tab ${c.id === galleryDetailMode ? 'active' : ''}" data-mode="${c.id}" onclick="switchGalleryDetailMode('${c.id}')">🏷 ${escapeHtmlOsu(c.name)} (${count})</button>`;
+        }).join('');
+        tabsEl.innerHTML = modeTabsHtml + categoryTabsHtml;
 
         renderGalleryDetailGrid();
         downloadBtn.style.display = '';
@@ -260,7 +274,18 @@ function switchGalleryDetailMode(mode) {
 function renderGalleryDetailGrid() {
     const bodyEl = document.getElementById('gallery-detail-body');
     if (!galleryDetailData) return;
-    const sets = galleryDetailData.collection[galleryDetailMode] || [];
+
+    let sets;
+    if (OSU_MODES.includes(galleryDetailMode)) {
+        sets = galleryDetailData.collection[galleryDetailMode] || [];
+    } else {
+        // A category id — cross-mode, deduped, same pattern as
+        // renderOsuCollection()'s own favorites/category filter branch.
+        const memberIds = (galleryDetailData.categoryMembers && galleryDetailData.categoryMembers[galleryDetailMode]) || [];
+        const seen = new Set();
+        sets = OSU_MODES.flatMap(m => galleryDetailData.collection[m] || [])
+            .filter(s => memberIds.includes(s.beatmapset_id) && !seen.has(s.beatmapset_id) && seen.add(s.beatmapset_id));
+    }
 
     const cards = sets.map(set => {
         const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);

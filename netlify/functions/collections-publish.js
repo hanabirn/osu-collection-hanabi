@@ -8,6 +8,7 @@ const { verifyAuthToken } = require('./_auth-token');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const MAX_SETS = 3000;
+const MAX_CATEGORIES = 100;
 const MAX_BODY_BYTES = 1.5 * 1024 * 1024;
 
 exports.handler = async (event) => {
@@ -66,6 +67,34 @@ exports.handler = async (event) => {
         return { statusCode: 413, headers, body: JSON.stringify({ error: `Collection exceeds the ${MAX_SETS}-beatmap limit` }) };
     }
 
+    /* Categories are optional and browse/filter-only on the gallery side —
+       never merged into a downloader's own categories (see
+       js/public-collections.js's importPublicCollectionData, which only
+       ever touches `collection`). Validated loosely and cross-checked
+       against `seen` so a publisher can't smuggle arbitrary junk into
+       categoryMembers under the guise of beatmapset ids. */
+    let categories = [];
+    let categoryMembers = {};
+    if (body.categories !== undefined || body.categoryMembers !== undefined) {
+        if (!Array.isArray(body.categories) || typeof body.categoryMembers !== 'object' || body.categoryMembers === null || Array.isArray(body.categoryMembers)) {
+            return { statusCode: 422, headers, body: JSON.stringify({ error: 'Invalid categories format' }) };
+        }
+        if (body.categories.length > MAX_CATEGORIES) {
+            return { statusCode: 413, headers, body: JSON.stringify({ error: `Exceeds the ${MAX_CATEGORIES}-category limit` }) };
+        }
+        for (const cat of body.categories) {
+            if (typeof cat.id !== 'string' || typeof cat.name !== 'string' || !cat.id || !cat.name) {
+                return { statusCode: 422, headers, body: JSON.stringify({ error: 'Invalid categories format' }) };
+            }
+        }
+        categories = body.categories.map(c => ({ id: c.id, name: c.name }));
+        const validIds = new Set(categories.map(c => c.id));
+        for (const [categoryId, memberIds] of Object.entries(body.categoryMembers)) {
+            if (!validIds.has(categoryId) || !Array.isArray(memberIds)) continue;
+            categoryMembers[categoryId] = memberIds.filter(id => seen.has(id));
+        }
+    }
+
     try {
         const store = getCollectionsStore();
         const updatedAt = new Date().toISOString();
@@ -74,6 +103,8 @@ exports.handler = async (event) => {
             id: user.id,
             username: user.username,
             collection,
+            categories,
+            categoryMembers,
             updatedAt,
         });
 
