@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "rosu-pp-js": "^4.0.1"
+    "rosu-pp-js": "^4.0.1",
+    "@netlify/blobs": "^10.0.0"
   }
 }

@@ -46,4 +46,16 @@ I18N.zh = {
     osu_share_link_import_confirm: '這個連結包含 {n} 個 Beatmap，要匯入到你的收藏嗎？（不會覆蓋現有收藏，只會加入你還沒有的）',
     osu_share_link_imported: '已匯入 {n} 個新 Beatmap！', osu_share_link_import_fail: '匯入連結失敗，連結可能已損毀',
     stats_card_btn: '產生戰績卡', stats_card_done: '戰績卡已下載！', stats_card_fail: '產生戰績卡失敗',
+    collection_card_btn: '產生收藏卡', collection_card_title: '我的 osu! 收藏', collection_card_done: '收藏卡已下載！', collection_card_fail: '產生收藏卡失敗',
+
+    nav_public_collections: '收藏廣場', gallery_page_title: '✦ 玩家收藏廣場 ✦',
+    publish_btn: '📤 發布我的收藏', publish_login_required: '請先登入 osu! 才能發布收藏',
+    publish_confirm: '要公開發布你的收藏（{n} 個 Beatmap）嗎？之後可以隨時重新發布或取消發布',
+    publish_done: '已發布你的收藏！', publish_fail: '發布失敗，請稍後再試',
+    unpublish_btn: '🗑️ 取消發布', unpublish_confirm: '確定要將你的收藏從廣場移除嗎？', unpublish_done: '已取消發布',
+    gallery_loading: '載入收藏廣場中...', gallery_load_fail: '載入收藏廣場失敗，稍後再試',
+    gallery_empty: '目前還沒有人發布收藏，成為第一個吧！',
+    gallery_sort_recent: '最新發布', gallery_sort_sets: '收藏數量', gallery_sort_rating: '最高星數',
+    gallery_import_confirm: '這是 {name} 的收藏，包含 {n} 個 Beatmap，要匯入到你的收藏嗎？（不會覆蓋現有收藏，只會加入你還沒有的）',
+    gallery_download_btn_title: '匯入這個收藏',
 };

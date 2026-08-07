@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>osu! 收藏</title>
 <meta name="theme-color" content="#a855f7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/particles.css">
@@ -81,6 +84,7 @@
     </div>
     <nav class="site-nav">
         <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
+        <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-i18n="nav_public_collections">🌐 收藏廣場</button>
         <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
@@ -112,6 +116,7 @@
                 <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="匯入收藏">📥</button>
                 <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
                 <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="分享收藏連結">🔗</button>
+                <button class="osu-refresh-all" onclick="downloadCollectionShareCard()" data-i18n-title="collection_card_btn" title="產生收藏卡">📸</button>
                 <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="🔒 設定密碼">🔒</button>
             </div>
         </div>
@@ -139,6 +144,30 @@
 
         <div id="osu-collection" class="osu-collection"></div>
         <div id="osu-pagination" class="osu-pagination"></div>
+    </section>
+
+    <section id="page-public-collections" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="gallery_page_title">✦ 玩家收藏廣場 ✦</h2>
+
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div class="osu-volume">
+                <button class="btn" onclick="publishMyCollection()" data-i18n="publish_btn">📤 發布我的收藏</button>
+                <button class="btn" onclick="unpublishMyCollection()" data-i18n="unpublish_btn">🗑️ 取消發布</button>
+            </div>
+        </div>
+
+        <div class="osu-search-row">
+            <select id="gallery-sort-select" onchange="switchPublicCollectionsSort(this.value)">
+                <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
+                <option value="sets" data-i18n="gallery_sort_sets">收藏數量</option>
+                <option value="rating" data-i18n="gallery_sort_rating">最高星數</option>
+            </select>
+        </div>
+
+        <div id="public-collections-list" class="osu-collection"></div>
+        <div id="public-collections-pagination" class="osu-pagination"></div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -314,7 +343,10 @@
 <script src="js/i18n/es.js"></script>
 <script src="js/i18n/de.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="js/osu.js"></script>
+<script src="js/public-collections.js"></script>
 <script src="js/skins.js"></script>
 <script src="js/updates.js"></script>
 <script src="js/tournaments.js"></script>

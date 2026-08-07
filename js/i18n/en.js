@@ -46,4 +46,16 @@ I18N.en = {
     osu_share_link_import_confirm: "This link contains {n} beatmap(s). Import them into your collection? (Won't overwrite anything — only adds ones you don't already have.)",
     osu_share_link_imported: 'Imported {n} new beatmap(s)!', osu_share_link_import_fail: 'Failed to import from link — it may be corrupted',
     stats_card_btn: 'Generate Stats Card', stats_card_done: 'Stats card downloaded!', stats_card_fail: 'Failed to generate stats card',
+    collection_card_btn: 'Generate Collection Card', collection_card_title: 'My osu! Collection', collection_card_done: 'Collection card downloaded!', collection_card_fail: 'Failed to generate collection card',
+
+    nav_public_collections: 'Gallery', gallery_page_title: '✦ Player Collection Gallery ✦',
+    publish_btn: '📤 Publish My Collection', publish_login_required: 'Log in with osu! first to publish your collection',
+    publish_confirm: 'Publish your collection ({n} beatmaps) publicly? You can republish or unpublish anytime',
+    publish_done: 'Your collection has been published!', publish_fail: 'Failed to publish, please try again later',
+    unpublish_btn: '🗑️ Unpublish', unpublish_confirm: 'Remove your collection from the gallery?', unpublish_done: 'Unpublished',
+    gallery_loading: 'Loading gallery...', gallery_load_fail: 'Failed to load the gallery, please try again later',
+    gallery_empty: 'No one has published a collection yet — be the first!',
+    gallery_sort_recent: 'Recently published', gallery_sort_sets: 'Most beatmaps', gallery_sort_rating: 'Highest star rating',
+    gallery_import_confirm: "This is {name}'s collection with {n} beatmaps. Import into your collection? (Won't overwrite existing entries, only adds ones you don't have)",
+    gallery_download_btn_title: 'Import this collection',
 };

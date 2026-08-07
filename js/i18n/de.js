@@ -46,4 +46,16 @@ I18N.de = {
     osu_share_link_import_confirm: 'Dieser Link enthält {n} Beatmap(s). In deine Sammlung importieren? (Nichts wird überschrieben — es werden nur Einträge hinzugefügt, die du noch nicht hast.)',
     osu_share_link_imported: '{n} neue Beatmap(s) importiert!', osu_share_link_import_fail: 'Import über den Link fehlgeschlagen — er ist möglicherweise beschädigt',
     stats_card_btn: 'Statistik-Karte erstellen', stats_card_done: 'Statistik-Karte heruntergeladen!', stats_card_fail: 'Statistik-Karte konnte nicht erstellt werden',
+    collection_card_btn: 'Sammlungskarte erstellen', collection_card_title: 'Meine osu!-Sammlung', collection_card_done: 'Sammlungskarte heruntergeladen!', collection_card_fail: 'Sammlungskarte konnte nicht erstellt werden',
+
+    nav_public_collections: 'Galerie', gallery_page_title: '✦ Spieler-Sammlungsgalerie ✦',
+    publish_btn: '📤 Meine Sammlung veröffentlichen', publish_login_required: 'Melde dich zuerst mit osu! an, um deine Sammlung zu veröffentlichen',
+    publish_confirm: 'Deine Sammlung ({n} Beatmaps) öffentlich veröffentlichen? Du kannst sie jederzeit erneut veröffentlichen oder entfernen',
+    publish_done: 'Deine Sammlung wurde veröffentlicht!', publish_fail: 'Veröffentlichung fehlgeschlagen, bitte später erneut versuchen',
+    unpublish_btn: '🗑️ Veröffentlichung aufheben', unpublish_confirm: 'Deine Sammlung aus der Galerie entfernen?', unpublish_done: 'Veröffentlichung aufgehoben',
+    gallery_loading: 'Galerie wird geladen...', gallery_load_fail: 'Galerie konnte nicht geladen werden, bitte später erneut versuchen',
+    gallery_empty: 'Noch niemand hat eine Sammlung veröffentlicht — sei der Erste!',
+    gallery_sort_recent: 'Kürzlich veröffentlicht', gallery_sort_sets: 'Meiste Beatmaps', gallery_sort_rating: 'Höchste Sternebewertung',
+    gallery_import_confirm: 'Dies ist die Sammlung von {name} ({n} Beatmaps). In deine Sammlung importieren? (Vorhandene Einträge werden nicht überschrieben, nur fehlende werden hinzugefügt)',
+    gallery_download_btn_title: 'Diese Sammlung importieren',
 };

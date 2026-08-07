@@ -46,4 +46,16 @@ I18N.fr = {
     osu_share_link_import_confirm: "Ce lien contient {n} beatmap(s). Les importer dans votre collection ? (Rien ne sera écrasé — seuls les éléments que vous n'avez pas encore seront ajoutés.)",
     osu_share_link_imported: '{n} nouvelle(s) beatmap(s) importée(s) !', osu_share_link_import_fail: "Échec de l'import depuis le lien — il est peut-être corrompu",
     stats_card_btn: 'Générer une carte de stats', stats_card_done: 'Carte de stats téléchargée !', stats_card_fail: 'Échec de la génération de la carte de stats',
+    collection_card_btn: 'Générer une carte de collection', collection_card_title: 'Ma collection osu!', collection_card_done: 'Carte de collection téléchargée !', collection_card_fail: 'Échec de la génération de la carte de collection',
+
+    nav_public_collections: 'Galerie', gallery_page_title: '✦ Galerie des collections des joueurs ✦',
+    publish_btn: '📤 Publier ma collection', publish_login_required: "Connectez-vous d'abord avec osu! pour publier votre collection",
+    publish_confirm: 'Publier votre collection ({n} beatmaps) publiquement ? Vous pouvez la republier ou la retirer à tout moment',
+    publish_done: 'Votre collection a été publiée !', publish_fail: 'Échec de la publication, veuillez réessayer plus tard',
+    unpublish_btn: '🗑️ Retirer la publication', unpublish_confirm: 'Retirer votre collection de la galerie ?', unpublish_done: 'Publication retirée',
+    gallery_loading: 'Chargement de la galerie...', gallery_load_fail: 'Échec du chargement de la galerie, veuillez réessayer plus tard',
+    gallery_empty: "Personne n'a encore publié de collection — soyez le premier !",
+    gallery_sort_recent: 'Publiées récemment', gallery_sort_sets: 'Le plus de beatmaps', gallery_sort_rating: 'Note la plus élevée',
+    gallery_import_confirm: "Voici la collection de {name} ({n} beatmaps). L'importer dans votre collection ? (N'écrase pas les entrées existantes, ajoute seulement celles que vous n'avez pas)",
+    gallery_download_btn_title: 'Importer cette collection',
 };
