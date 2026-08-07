@@ -1,7 +1,7 @@
 /* Removes the caller's collection from the public gallery. Idempotent —
    always returns 200 even if nothing was published, so the client doesn't
    need to pre-check publish state before showing an "Unpublish" button. */
-const { getStore } = require('@netlify/blobs');
+const { getCollectionsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 
 exports.handler = async (event) => {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
     }
 
     try {
-        const store = getStore('osu-public-collections');
+        const store = getCollectionsStore();
         await store.delete(`full:${user.id}`);
 
         const index = (await store.get('index', { type: 'json' })) || [];

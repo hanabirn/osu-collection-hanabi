@@ -3,7 +3,7 @@
    id; id/username always come from the verified auth token (_auth-token.js),
    never from the request body, so a caller can't publish under someone
    else's name no matter what they put in the body. */
-const { getStore } = require('@netlify/blobs');
+const { getCollectionsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
@@ -67,7 +67,7 @@ exports.handler = async (event) => {
     }
 
     try {
-        const store = getStore('osu-public-collections');
+        const store = getCollectionsStore();
         const updatedAt = new Date().toISOString();
 
         await store.setJSON(`full:${user.id}`, {

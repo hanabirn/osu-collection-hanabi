@@ -2,7 +2,7 @@
    auth required. Returns metadata only (never full collections, see
    collections-get.js for that) so browsing the list stays cheap regardless
    of how large individual published collections are. */
-const { getStore } = require('@netlify/blobs');
+const { getCollectionsStore } = require('./_blobs-store');
 
 const PAGE_SIZE = 20;
 const SORTERS = {
@@ -29,7 +29,7 @@ exports.handler = async (event) => {
     const sort = SORTERS[qs.sort] ? qs.sort : 'recent';
 
     try {
-        const store = getStore('osu-public-collections');
+        const store = getCollectionsStore();
         const index = (await store.get('index', { type: 'json' })) || [];
         const sorted = [...index].sort(SORTERS[sort]);
         const items = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);

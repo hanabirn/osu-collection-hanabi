@@ -1,7 +1,7 @@
 /* Full published-collection payload for one user, fed straight into
    mergeIncomingCollection() (js/osu.js) by the gallery's download/import
    action — no auth required, this is public data by definition. */
-const { getStore } = require('@netlify/blobs');
+const { getCollectionsStore } = require('./_blobs-store');
 
 exports.handler = async (event) => {
     const headers = {
@@ -22,7 +22,7 @@ exports.handler = async (event) => {
     }
 
     try {
-        const store = getStore('osu-public-collections');
+        const store = getCollectionsStore();
         const data = await store.get(`full:${id}`, { type: 'json' });
         if (!data) {
             return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
