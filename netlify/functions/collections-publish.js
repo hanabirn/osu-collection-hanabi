@@ -10,6 +10,10 @@ const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const MAX_SETS = 3000;
 const MAX_CATEGORIES = 100;
 const MAX_BODY_BYTES = 1.5 * 1024 * 1024;
+// The full index array is read/written on every publish and every gallery
+// list request, so each entry's `tags` is capped well below MAX_CATEGORIES
+// to keep that array cheap regardless of how many categories a publisher has.
+const MAX_INDEX_TAGS = 12;
 
 exports.handler = async (event) => {
     const headers = {
@@ -109,8 +113,29 @@ exports.handler = async (event) => {
         });
 
         const index = (await store.get('index', { type: 'json' })) || [];
+        const existing = index.find(entry => entry.id === user.id);
         const filtered = index.filter(entry => entry.id !== user.id);
-        filtered.push({ id: user.id, username: user.username, totalSets: seen.size, maxRating, updatedAt });
+        // Tags are just the publisher's own category names, filtered to ones
+        // that actually have beatmaps in them (an empty category tells a
+        // gallery visitor nothing) and capped/deduped for the index's sake.
+        const tags = [...new Set(
+            categories
+                .filter(c => (categoryMembers[c.id] || []).length > 0)
+                .map(c => c.name.trim())
+                .filter(Boolean)
+        )].slice(0, MAX_INDEX_TAGS);
+        filtered.push({
+            id: user.id,
+            username: user.username,
+            totalSets: seen.size,
+            maxRating,
+            updatedAt,
+            tags,
+            // Likes belong to the collection slot, not any one publish —
+            // carry the count forward across republishes instead of
+            // resetting it, since collections-like.js maintains it separately.
+            likeCount: (existing && existing.likeCount) || 0,
+        });
         await store.setJSON('index', filtered);
 
         return { statusCode: 200, headers, body: JSON.stringify({ ok: true, updatedAt }) };

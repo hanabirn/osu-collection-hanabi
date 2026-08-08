@@ -27,6 +27,14 @@ exports.handler = async (event) => {
     try {
         const store = getCollectionsStore();
         await store.delete(`full:${user.id}`);
+        // Drop the liker list too, so a like from before this unpublish
+        // doesn't silently resurrect as a stale count if the same user id
+        // republishes later. The reverse index (likedBy:{likerId} on
+        // whoever liked it) is left as-is — those visitors' "liked" lists
+        // may reference a currently-unpublished collection, which is
+        // harmless since collections-list.js only ever returns entries that
+        // are still in `index`.
+        await store.delete(`likers:${user.id}`);
 
         const index = (await store.get('index', { type: 'json' })) || [];
         const hadEntry = index.some(entry => entry.id === user.id);

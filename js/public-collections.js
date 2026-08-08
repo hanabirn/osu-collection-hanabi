@@ -12,6 +12,10 @@ let publicCollectionsPage = 0;
 let publicCollectionsSort = 'recent';
 let publicCollectionsItems = [];
 let publicCollectionsTotal = 0;
+let publicCollectionsQuery = '';
+let publicCollectionsTag = '';
+let publicCollectionsLikedOnly = false;
+let publicCollectionsSearchDebounce = null;
 
 function ensurePublicCollectionsLoaded() {
     updatePublishButtonLabel();
@@ -40,6 +44,36 @@ function switchPublicCollectionsSort(sort) {
     loadPublicCollectionsPage(0);
 }
 
+/* Debounced so every keystroke doesn't fire a request — this is a server-
+   side (keyword + tag) search over the gallery index, not a client-side
+   filter over an already-loaded page, since only the server holds the full
+   index. */
+function searchPublicCollections(value) {
+    publicCollectionsQuery = value.trim();
+    clearTimeout(publicCollectionsSearchDebounce);
+    publicCollectionsSearchDebounce = setTimeout(() => loadPublicCollectionsPage(0), 350);
+}
+
+function filterPublicCollectionsByTag(tag) {
+    publicCollectionsTag = publicCollectionsTag === tag ? '' : tag;
+    loadPublicCollectionsPage(0);
+}
+
+function toggleGalleryLikedOnly(checked) {
+    if (checked && !getOsuAuthToken()) {
+        showShareToast(t('gallery_like_login_required'));
+        syncGalleryLikedOnlyCheckbox();
+        return;
+    }
+    publicCollectionsLikedOnly = checked;
+    loadPublicCollectionsPage(0);
+}
+
+function syncGalleryLikedOnlyCheckbox() {
+    const cb = document.getElementById('gallery-liked-only-checkbox');
+    if (cb) cb.checked = publicCollectionsLikedOnly;
+}
+
 async function loadPublicCollectionsPage(page) {
     publicCollectionsLoaded = true;
     const listEl = document.getElementById('public-collections-list');
@@ -51,7 +85,20 @@ async function loadPublicCollectionsPage(page) {
 
     try {
         const params = new URLSearchParams({ page, sort: publicCollectionsSort });
-        const res = await fetch(`/.netlify/functions/collections-list?${params}`);
+        if (publicCollectionsQuery) params.set('q', publicCollectionsQuery);
+        if (publicCollectionsTag) params.set('tag', publicCollectionsTag);
+        if (publicCollectionsLikedOnly) params.set('likedOnly', '1');
+        const token = getOsuAuthToken();
+        const res = await fetch(`/.netlify/functions/collections-list?${params}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.status === 401) {
+            // Only happens for a likedOnly request whose token has expired
+            // since the checkbox was checked — fall back to browsing everyone.
+            publicCollectionsLikedOnly = false;
+            syncGalleryLikedOnlyCheckbox();
+            return loadPublicCollectionsPage(0);
+        }
         if (!res.ok) throw new Error('bad response');
         const data = await res.json();
         publicCollectionsPage = data.page || 0;
@@ -69,13 +116,29 @@ function renderPublicCollectionsList() {
     const pageEl = document.getElementById('public-collections-pagination');
     if (!listEl || !publicCollectionsLoaded) return;
 
+    renderGalleryActiveFilters();
+    syncGalleryLikedOnlyCheckbox();
+
     if (publicCollectionsItems.length === 0) {
-        listEl.innerHTML = `<p class="osu-empty">${t('gallery_empty')}</p>`;
+        const hasFilter = !!(publicCollectionsQuery || publicCollectionsTag || publicCollectionsLikedOnly);
+        listEl.innerHTML = `<p class="osu-empty">${t(hasFilter ? 'gallery_no_results' : 'gallery_empty')}</p>`;
         if (pageEl) pageEl.innerHTML = '';
         return;
     }
 
-    listEl.innerHTML = publicCollectionsItems.map(item => `
+    const loggedInUser = getLoggedInOsuUser();
+
+    listEl.innerHTML = publicCollectionsItems.map(item => {
+        const isOwnCard = loggedInUser && String(loggedInUser.id) === String(item.id);
+        const likeBtnHtml = isOwnCard ? '' : `
+            <button class="pcc-like-btn ${item.likedByMe ? 'liked' : ''}" onclick="event.stopPropagation();toggleGalleryLike(${item.id}, this)" title="${t('gallery_like_btn_title')}">
+                <span class="pcc-like-icon">${item.likedByMe ? '♥' : '♡'}</span><span class="pcc-like-count">${(item.likeCount || 0).toLocaleString()}</span>
+            </button>`;
+        const tagsHtml = (item.tags && item.tags.length) ? `<div class="pcc-tags">${item.tags.map(tag => `
+            <span class="pcc-tag ${tag === publicCollectionsTag ? 'active' : ''}" onclick="event.stopPropagation();filterPublicCollectionsByTag(decodeURIComponent('${encodeURIComponent(tag)}'))">🏷 ${escapeHtmlOsu(tag)}</span>
+        `).join('')}</div>` : '';
+
+        return `
         <div class="public-collection-card" onclick="openGalleryDetailModal(${item.id})">
             <div class="pcc-header">
                 <img class="pcc-avatar" src="${osuAvatarUrl(item.id)}" alt="" onerror="this.style.visibility='hidden';">
@@ -83,7 +146,9 @@ function renderPublicCollectionsList() {
                     <div class="pcc-name">${escapeHtmlOsu(item.username || ('#' + item.id))}</div>
                     <div class="pcc-updated">${escapeHtmlOsu(String(item.updatedAt || '').slice(0, 10))}</div>
                 </div>
+                ${likeBtnHtml}
             </div>
+            ${tagsHtml}
             <div class="pcc-stats">
                 <span>${item.totalSets.toLocaleString()} ${t('osu_stats_total')}</span>
                 <span>${item.maxRating.toFixed(2)}⭐</span>
@@ -92,8 +157,8 @@ function renderPublicCollectionsList() {
                 <button class="btn pcc-view-btn" onclick="event.stopPropagation();openGalleryDetailModal(${item.id})" title="${t('gallery_view_btn_title')}">🔍</button>
                 <button class="btn pcc-download-btn" onclick="event.stopPropagation();downloadPublicCollection(${item.id})" title="${t('gallery_download_btn_title')}">⬇ ${t('gallery_download_btn_title')}</button>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 
     if (!pageEl) return;
     const totalPages = Math.max(1, Math.ceil(publicCollectionsTotal / PUBLIC_COLLECTIONS_PAGE_SIZE));
@@ -110,6 +175,62 @@ function renderPublicCollectionsList() {
     pages += `<button class="osu-page-btn" onclick="loadPublicCollectionsPage(Math.min(${totalPages - 1},${publicCollectionsPage}+1))" ${publicCollectionsPage >= totalPages - 1 ? 'disabled' : ''}>›</button>`;
     pages += `<button class="osu-page-btn" onclick="loadPublicCollectionsPage(${totalPages - 1})" ${publicCollectionsPage >= totalPages - 1 ? 'disabled' : ''}>»</button>`;
     pageEl.innerHTML = pages;
+}
+
+function renderGalleryActiveFilters() {
+    const el = document.getElementById('gallery-active-tag');
+    if (!el) return;
+    if (!publicCollectionsTag) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+    }
+    el.style.display = '';
+    el.innerHTML = `<span class="gallery-active-tag-pill">🏷 ${escapeHtmlOsu(publicCollectionsTag)}
+        <button onclick="filterPublicCollectionsByTag(decodeURIComponent('${encodeURIComponent(publicCollectionsTag)}'))" title="${t('gallery_tag_filter_clear_title')}">✕</button></span>`;
+}
+
+/* Optimistic-ish toggle: waits for the server's actual liked/count rather
+   than flipping local state blindly, since the like might be rejected
+   (expired login, or the target got unpublished between page load and
+   click) — but only re-renders the one button touched instead of the whole
+   list, so the rest of the grid (and scroll position) doesn't jump. */
+async function toggleGalleryLike(id, btnEl) {
+    const token = getOsuAuthToken();
+    if (!token) {
+        showShareToast(t('gallery_like_login_required'));
+        return;
+    }
+    if (btnEl) btnEl.disabled = true;
+    try {
+        const res = await fetch('/.netlify/functions/collections-like', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ targetId: id }),
+        });
+        if (res.status === 401) {
+            showShareToast(t('gallery_like_login_required'));
+            return;
+        }
+        if (!res.ok) throw new Error('like failed');
+        const data = await res.json();
+
+        const item = publicCollectionsItems.find(i => String(i.id) === String(id));
+        if (item) {
+            item.likedByMe = data.liked;
+            item.likeCount = data.likeCount;
+        }
+        if (btnEl) {
+            btnEl.classList.toggle('liked', data.liked);
+            btnEl.querySelector('.pcc-like-icon').textContent = data.liked ? '♥' : '♡';
+            btnEl.querySelector('.pcc-like-count').textContent = data.likeCount.toLocaleString();
+        }
+    } catch (e) {
+        console.error('Toggle gallery like failed:', e);
+        showShareToast(t('gallery_like_fail'));
+    } finally {
+        if (btnEl) btnEl.disabled = false;
+    }
 }
 
 async function publishMyCollection() {
