@@ -545,6 +545,7 @@ a:hover { text-decoration: underline; }
 .input-group button, .btn {
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: #fff;
     border: none;
@@ -626,4 +627,5 @@ a:hover { text-decoration: underline; }
     .site-header-top { flex-direction: column; }
     .osu-profile-stats { grid-template-columns: repeat(2, 1fr) !important; }
     .osu-collection { grid-template-columns: 1fr !important; }
+    .site-nav { justify-content: flex-start; }
 }

@@ -3,7 +3,10 @@ function switchTab(tab, el) {
     document.querySelectorAll('.site-page').forEach(p => p.style.display = 'none');
     document.getElementById('page-' + tab).style.display = 'block';
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
-    if (el) el.classList.add('active');
+    if (el) {
+        el.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (tab === 'updates') { ensureUpdatesLoaded(); if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList(); }
