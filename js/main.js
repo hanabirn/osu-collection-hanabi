@@ -56,6 +56,7 @@ function refreshDynamicContent() {
 
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof renderStaticIcons === 'function') renderStaticIcons();
     applyLang(siteLang);
     initOsuBgCarousel();
     checkImportFromHash();

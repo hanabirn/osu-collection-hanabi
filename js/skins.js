@@ -202,9 +202,9 @@ async function renderSkinsList() {
                 <div class="skin-item-ini-info" id="skin-ini-info-${s.id}">${cached && cached.info ? formatSkinIniInfo(cached.info) : ''}</div>
             </div>
             <div class="skin-item-actions">
-                <button class="skin-backup-btn" onclick="backupSkinToCloud(${s.id})" title="${t('skins_backup_btn')}">☁️</button>
-                <button class="skin-download-btn" onclick="downloadSkinFile(${s.id})">${t('skins_download')}</button>
-                <button class="skin-delete-btn" onclick="confirmDeleteSkin(${s.id})">${t('skins_delete')}</button>
+                <button class="skin-backup-btn" onclick="backupSkinToCloud(${s.id})" title="${t('skins_backup_btn')}">${icon('cloudUpload')}</button>
+                <button class="skin-download-btn" onclick="downloadSkinFile(${s.id})">${icon('download', { extraClass: 'icon-label-gap' })}${t('skins_download')}</button>
+                <button class="skin-delete-btn" onclick="confirmDeleteSkin(${s.id})">${icon('trash2', { extraClass: 'icon-label-gap' })}${t('skins_delete')}</button>
             </div>
         </div>
     `;
@@ -288,8 +288,8 @@ async function renderCloudSkinsList() {
                     <div class="skin-item-meta">${formatSkinSize(it.size)} &middot; ${new Date(it.uploadedAt).toLocaleDateString()}</div>
                 </div>
                 <div class="skin-item-actions">
-                    <button class="skin-download-btn" onclick="restoreCloudSkinToLocal('${it.id}', decodeURIComponent('${encodeURIComponent(it.name)}'))">${t('skins_backup_restore')}</button>
-                    <button class="skin-delete-btn" onclick="confirmDeleteCloudSkin('${it.id}')">${t('skins_delete')}</button>
+                    <button class="skin-download-btn" onclick="restoreCloudSkinToLocal('${it.id}', decodeURIComponent('${encodeURIComponent(it.name)}'))">${icon('download', { extraClass: 'icon-label-gap' })}${t('skins_backup_restore')}</button>
+                    <button class="skin-delete-btn" onclick="confirmDeleteCloudSkin('${it.id}')">${icon('trash2', { extraClass: 'icon-label-gap' })}${t('skins_delete')}</button>
                 </div>
             </div>
         `).join('');

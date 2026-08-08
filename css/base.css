@@ -16,6 +16,12 @@ html[lang="ko"] body { font-family: "Noto Sans KR", 'Segoe UI', Arial, sans-seri
 a { color: var(--accent-light-purple); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* Inline Lucide icons (js/icons.js) — vertical-align nudges the SVG onto
+   the surrounding text's baseline the way a glyph would sit; flex-shrink:0
+   keeps it from getting squashed inside flex button layouts. */
+.icon-svg { vertical-align: -0.15em; flex-shrink: 0; }
+.icon-label-gap { margin-right: 0.4em; }
+
 .site-header {
     position: relative;
     z-index: 5;

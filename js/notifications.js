@@ -81,6 +81,10 @@ async function checkTrackedPlayersPp() {
                 });
             }
             player.lastPp = totalPp;
+            // Backfills the flag for players tracked before country was
+            // stored — this periodic check already fetches mode 0's profile,
+            // which carries it, so no extra request is needed for that.
+            if (results[0] && results[0][0] && results[0][0].country) player.country = results[0][0].country;
             anyUpdated = true;
         } catch (e) {
             console.error('Tracked player PP check failed:', player.id, e);
@@ -206,9 +210,9 @@ function renderNotificationBell() {
 
     list.innerHTML = notifs.map(n => {
         const timeStr = new Date(n.createdAt).toLocaleString();
-        const icon = n.type === 'pp' ? '📈' : n.type === 'mapper' ? '🎨' : '🏆';
+        const iconName = n.type === 'pp' ? 'trendingUp' : n.type === 'mapper' ? 'palette' : 'trophy';
         const body = `
-            <span class="notif-item-icon">${icon}</span>
+            <span class="notif-item-icon">${icon(iconName)}</span>
             <div class="notif-item-body">
                 <div class="notif-item-title">${escapeHtmlOsu(n.title)}</div>
                 <div class="notif-item-detail">${escapeHtmlOsu(n.detail)}</div>

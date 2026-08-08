@@ -99,6 +99,11 @@ exports.handler = async (event) => {
         }
     }
 
+    // Purely cosmetic (a flag badge on the gallery card) so it's validated
+    // and defaulted rather than rejected outright — a malformed value just
+    // means no flag shows, not a failed publish.
+    const country = typeof body.country === 'string' && /^[A-Za-z]{2}$/.test(body.country) ? body.country.toUpperCase() : null;
+
     try {
         const store = getCollectionsStore();
         const updatedAt = new Date().toISOString();
@@ -131,6 +136,7 @@ exports.handler = async (event) => {
             maxRating,
             updatedAt,
             tags,
+            country,
             // Likes belong to the collection slot, not any one publish —
             // carry the count forward across republishes instead of
             // resetting it, since collections-like.js maintains it separately.

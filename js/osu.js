@@ -112,8 +112,8 @@ function copyBeatmapId(setId, event) {
     navigator.clipboard.writeText(String(setId)).then(() => {
         const btn = event.currentTarget;
         btn.classList.add('copied');
-        btn.innerText = '✓';
-        setTimeout(() => { btn.classList.remove('copied'); btn.innerText = '📋'; }, 1200);
+        btn.innerHTML = icon('check');
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = icon('copy'); }, 1200);
     });
 }
 
@@ -269,7 +269,7 @@ function renderOsuCategoryTabsRow() {
     if (!row) return;
     const cats = getOsuCategories();
     row.innerHTML = cats.map(c =>
-        `<button class="osu-tab ${c.id === osuCurrentTab ? 'active' : ''}" data-mode="${c.id}" onclick="switchOsuTab('${c.id}', this)">🏷 ${escHtml(c.name)}</button>`
+        `<button class="osu-tab ${c.id === osuCurrentTab ? 'active' : ''}" data-mode="${c.id}" onclick="switchOsuTab('${c.id}', this)">${icon('tag', { extraClass: 'icon-label-gap' })}${escHtml(c.name)}</button>`
     ).join('');
     initCategoryTabsWheelScroll();
 }
@@ -310,8 +310,8 @@ function renderCategoryManageList() {
             <div class="osu-category-manage-item">
                 <span class="osu-category-manage-name">${escHtml(c.name)}</span>
                 <span class="osu-category-manage-actions">
-                    <button class="osu-cat-rename" onclick="renameOsuCategory('${c.id}', event)" title="${t('osu_category_rename_title')}">✎</button>
-                    <button class="osu-cat-delete" onclick="deleteOsuCategory('${c.id}', event)" title="${t('osu_category_delete_title')}">🗑</button>
+                    <button class="osu-cat-rename" onclick="renameOsuCategory('${c.id}', event)" title="${t('osu_category_rename_title')}">${icon('pencil')}</button>
+                    <button class="osu-cat-delete" onclick="deleteOsuCategory('${c.id}', event)" title="${t('osu_category_delete_title')}">${icon('trash2')}</button>
                 </span>
             </div>`).join('');
 }
@@ -1239,13 +1239,13 @@ function renderOsuCollection() {
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
-            <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="複製 ID">📋</button>
-            <button class="osu-download-btn" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">⬇</button>
-            <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">📊</button>
-            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="播放預覽">&#9654;</button>
-            <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">♥</button>
-            <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">🏷</button>
-            <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">&#x2715;</button>
+            <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="複製 ID">${icon('copy')}</button>
+            <button class="osu-download-btn" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
+            <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>
+            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="播放預覽">${icon('play', { filled: true })}</button>
+            <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">${icon('heart', { filled: isFav })}</button>
+            <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
+            <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">${icon('x')}</button>
             <div class="osu-card-mode-badge">${modeIconSvg(set.__mode)}</div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${set.title}</div>
@@ -1556,14 +1556,24 @@ async function fetchPlayerTotalPpAndHistory(input, isUsername) {
     if (totalPP > 0) recordPpSnapshot(totalPP, key);
     const remote = await fetchOsuTrackHistory(u.user_id);
     const history = mergePpHistory(remote, getPpHistory(key));
-    return { id: u.user_id, username: u.username, totalPP, history };
+    return { id: u.user_id, username: u.username, country: u.country, totalPP, history };
+}
+
+/* flagcdn.com serves flags keyed by lowercase ISO 3166-1 alpha-2 — exactly
+   what osu!'s `country` field already is, no lookup table needed. */
+function flagUrl(countryCode) {
+    return countryCode ? `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png` : '';
 }
 
 function renderPpCompareSide(elId, player) {
     const el = document.getElementById(elId);
     if (!el) return;
+    const flag = flagUrl(player.country);
     el.innerHTML = `
-        <img class="osu-avatar pp-compare-avatar" src="${osuAvatarUrl(player.id)}" alt="" onerror="this.style.visibility='hidden';">
+        <div class="avatar-with-flag">
+            <img class="osu-avatar pp-compare-avatar" src="${osuAvatarUrl(player.id)}" alt="" onerror="this.style.visibility='hidden';">
+            ${flag ? `<img class="avatar-flag-badge" src="${flag}" alt="" onerror="this.style.display='none';">` : ''}
+        </div>
         <div class="pp-compare-side-name">${escHtml(player.username)}</div>
         <div class="pp-compare-side-pp">${Math.round(player.totalPP).toLocaleString()}pp</div>
     `;
@@ -1693,6 +1703,7 @@ async function comparePlayers() {
 /* ===== Visitor Profile Lookup ===== */
 let visitorLookupUserId = null;
 let visitorLookupUsername = '';
+let visitorLookupCountry = '';
 let visitorLookupTotalPp = 0;
 let visitorPlaysType = 'recent';
 let visitorModeData = [];
@@ -1823,6 +1834,14 @@ async function loadVisitorProfileById(input, isUsername) {
         document.getElementById('visitor-avatar').src = osuAvatarUrl(u.user_id);
         document.getElementById('visitor-result-name').textContent = u.username;
         document.getElementById('visitor-result-country').textContent = COUNTRY_NAMES[u.country] || u.country;
+        const flagEl = document.getElementById('visitor-flag');
+        if (u.country) {
+            flagEl.src = flagUrl(u.country);
+            flagEl.alt = COUNTRY_NAMES[u.country] || u.country;
+            flagEl.style.display = '';
+        } else {
+            flagEl.style.display = 'none';
+        }
 
         const grid = document.getElementById('visitor-modes-grid');
         grid.innerHTML = modeData.map((m, i) => {
@@ -1837,6 +1856,7 @@ async function loadVisitorProfileById(input, isUsername) {
 
         visitorLookupUserId = u.user_id;
         visitorLookupUsername = u.username;
+        visitorLookupCountry = u.country;
         visitorLookupTotalPp = totalPP;
         renderTrackButtonState();
         document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
@@ -1897,7 +1917,7 @@ function toggleTrackVisitorPlayer() {
         list.splice(idx, 1);
         showShareToast(t('untrack_done'));
     } else {
-        list.push({ id: visitorLookupUserId, username: visitorLookupUsername || `#${visitorLookupUserId}`, lastPp: visitorLookupTotalPp || 0 });
+        list.push({ id: visitorLookupUserId, username: visitorLookupUsername || `#${visitorLookupUserId}`, country: visitorLookupCountry, lastPp: visitorLookupTotalPp || 0 });
         showShareToast(t('track_done'));
     }
     saveTrackedPlayers(list);
@@ -1930,15 +1950,18 @@ function renderTrackedPlayersList() {
         return;
     }
     const leaderboardBtn = list.length >= 2
-        ? `<button class="tracked-leaderboard-btn" onclick="openTrackedLeaderboard()">${t('leaderboard_btn')}</button>` : '';
+        ? `<button class="tracked-leaderboard-btn" onclick="openTrackedLeaderboard()">${icon('trophy', { extraClass: 'icon-label-gap' })}${t('leaderboard_btn')}</button>` : '';
     panel.innerHTML = `
         <div class="tracked-players-title">${t('tracked_players_title')}${leaderboardBtn}</div>
         <div class="tracked-players-list">${list.map(p => `
             <div class="tracked-player-card" onclick="loadVisitorProfileById('${p.id}', false)">
-                <img class="tracked-player-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
+                <div class="avatar-with-flag">
+                    <img class="tracked-player-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
+                    ${p.country ? `<img class="avatar-flag-badge" src="${flagUrl(p.country)}" alt="" onerror="this.style.display='none';">` : ''}
+                </div>
                 <span class="tracked-player-name">${escapeHtmlOsu(p.username || ('#' + p.id))}</span>
                 <span class="tracked-player-pp">${Math.round(p.lastPp || 0).toLocaleString()}pp</span>
-                <button class="tracked-player-remove" onclick="event.stopPropagation();untrackPlayerById('${p.id}')" title="${t('untrack_player_btn')}">✕</button>
+                <button class="tracked-player-remove" onclick="event.stopPropagation();untrackPlayerById('${p.id}')" title="${t('untrack_player_btn')}">${icon('x')}</button>
             </div>`).join('')}
         </div>`;
 }
@@ -1963,7 +1986,10 @@ async function openTrackedLeaderboard() {
         listEl.innerHTML = ranked.map((p, i) => `
             <div class="leaderboard-row" onclick="closeTrackedLeaderboard();loadVisitorProfileById('${p.id}', false)">
                 <span class="leaderboard-rank">#${i + 1}</span>
-                <img class="leaderboard-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
+                <div class="avatar-with-flag">
+                    <img class="leaderboard-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
+                    ${p.country ? `<img class="avatar-flag-badge" src="${flagUrl(p.country)}" alt="" onerror="this.style.display='none';">` : ''}
+                </div>
                 <span class="leaderboard-name">${escHtml(p.username)}</span>
                 <span class="leaderboard-pp">${Math.round(p.totalPP).toLocaleString()}pp</span>
             </div>

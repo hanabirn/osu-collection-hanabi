@@ -34,9 +34,9 @@ function getLastPublishedAt() {
 }
 
 function updatePublishButtonLabel() {
-    const btn = document.getElementById('publish-collection-btn');
-    if (!btn) return;
-    btn.textContent = getLastPublishedAt() ? t('publish_update_btn') : t('publish_btn');
+    const label = document.getElementById('publish-collection-label');
+    if (!label) return;
+    label.textContent = getLastPublishedAt() ? t('publish_update_btn') : t('publish_btn');
 }
 
 function switchPublicCollectionsSort(sort) {
@@ -132,16 +132,19 @@ function renderPublicCollectionsList() {
         const isOwnCard = loggedInUser && String(loggedInUser.id) === String(item.id);
         const likeBtnHtml = isOwnCard ? '' : `
             <button class="pcc-like-btn ${item.likedByMe ? 'liked' : ''}" onclick="event.stopPropagation();toggleGalleryLike(${item.id}, this)" title="${t('gallery_like_btn_title')}">
-                <span class="pcc-like-icon">${item.likedByMe ? '♥' : '♡'}</span><span class="pcc-like-count">${(item.likeCount || 0).toLocaleString()}</span>
+                <span class="pcc-like-icon">${icon('heart', { filled: item.likedByMe })}</span><span class="pcc-like-count">${(item.likeCount || 0).toLocaleString()}</span>
             </button>`;
         const tagsHtml = (item.tags && item.tags.length) ? `<div class="pcc-tags">${item.tags.map(tag => `
-            <span class="pcc-tag ${tag === publicCollectionsTag ? 'active' : ''}" onclick="event.stopPropagation();filterPublicCollectionsByTag(decodeURIComponent('${encodeURIComponent(tag)}'))">🏷 ${escapeHtmlOsu(tag)}</span>
+            <span class="pcc-tag ${tag === publicCollectionsTag ? 'active' : ''}" onclick="event.stopPropagation();filterPublicCollectionsByTag(decodeURIComponent('${encodeURIComponent(tag)}'))">${icon('tag', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(tag)}</span>
         `).join('')}</div>` : '';
 
         return `
         <div class="public-collection-card" onclick="openGalleryDetailModal(${item.id})">
             <div class="pcc-header">
-                <img class="pcc-avatar" src="${osuAvatarUrl(item.id)}" alt="" onerror="this.style.visibility='hidden';">
+                <div class="avatar-with-flag">
+                    <img class="pcc-avatar" src="${osuAvatarUrl(item.id)}" alt="" onerror="this.style.visibility='hidden';">
+                    ${item.country ? `<img class="avatar-flag-badge" src="${flagUrl(item.country)}" alt="" onerror="this.style.display='none';">` : ''}
+                </div>
                 <div>
                     <div class="pcc-name">${escapeHtmlOsu(item.username || ('#' + item.id))}</div>
                     <div class="pcc-updated">${escapeHtmlOsu(String(item.updatedAt || '').slice(0, 10))}</div>
@@ -154,8 +157,8 @@ function renderPublicCollectionsList() {
                 <span>${item.maxRating.toFixed(2)}⭐</span>
             </div>
             <div class="pcc-btn-row">
-                <button class="btn pcc-view-btn" onclick="event.stopPropagation();openGalleryDetailModal(${item.id})" title="${t('gallery_view_btn_title')}">🔍</button>
-                <button class="btn pcc-download-btn" onclick="event.stopPropagation();downloadPublicCollection(${item.id})" title="${t('gallery_download_btn_title')}">⬇ ${t('gallery_download_btn_title')}</button>
+                <button class="btn pcc-view-btn" onclick="event.stopPropagation();openGalleryDetailModal(${item.id})" title="${t('gallery_view_btn_title')}">${icon('search')}</button>
+                <button class="btn pcc-download-btn" onclick="event.stopPropagation();downloadPublicCollection(${item.id})" title="${t('gallery_download_btn_title')}">${icon('download', { extraClass: 'icon-label-gap' })}${t('gallery_download_btn_title')}</button>
             </div>
         </div>`;
     }).join('');
@@ -186,8 +189,8 @@ function renderGalleryActiveFilters() {
         return;
     }
     el.style.display = '';
-    el.innerHTML = `<span class="gallery-active-tag-pill">🏷 ${escapeHtmlOsu(publicCollectionsTag)}
-        <button onclick="filterPublicCollectionsByTag(decodeURIComponent('${encodeURIComponent(publicCollectionsTag)}'))" title="${t('gallery_tag_filter_clear_title')}">✕</button></span>`;
+    el.innerHTML = `<span class="gallery-active-tag-pill">${icon('tag', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(publicCollectionsTag)}
+        <button onclick="filterPublicCollectionsByTag(decodeURIComponent('${encodeURIComponent(publicCollectionsTag)}'))" title="${t('gallery_tag_filter_clear_title')}">${icon('x')}</button></span>`;
 }
 
 /* Optimistic-ish toggle: waits for the server's actual liked/count rather
@@ -222,7 +225,7 @@ async function toggleGalleryLike(id, btnEl) {
         }
         if (btnEl) {
             btnEl.classList.toggle('liked', data.liked);
-            btnEl.querySelector('.pcc-like-icon').textContent = data.liked ? '♥' : '♡';
+            btnEl.querySelector('.pcc-like-icon').innerHTML = icon('heart', { filled: data.liked });
             btnEl.querySelector('.pcc-like-count').textContent = data.likeCount.toLocaleString();
         }
     } catch (e) {
@@ -249,11 +252,22 @@ async function publishMyCollection() {
     }
     if (!confirm(t('publish_confirm', { n: seen.size }))) return;
 
+    // Best-effort — a failed lookup just means the gallery card shows no
+    // flag, not a failed publish, so this is never allowed to block it.
+    let country = null;
+    try {
+        const user = getLoggedInOsuUser();
+        const profile = await osuFetch(`u=${user.id}&m=0`);
+        country = profile && profile[0] && profile[0].country;
+    } catch (e) {
+        console.error('Failed to fetch country for publish:', e);
+    }
+
     try {
         const res = await fetch('/.netlify/functions/collections-publish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ collection: col, categories: getOsuCategories(), categoryMembers: getOsuCategoryMembers() }),
+            body: JSON.stringify({ collection: col, categories: getOsuCategories(), categoryMembers: getOsuCategoryMembers(), country }),
         });
         if (res.status === 401) {
             showShareToast(t('publish_login_required'));
@@ -372,7 +386,7 @@ async function openGalleryDetailModal(id) {
         }).join('');
         const categoryTabsHtml = categoriesWithItems.map(c => {
             const count = data.categoryMembers[c.id].length;
-            return `<button class="osu-mode-tab ${c.id === galleryDetailMode ? 'active' : ''}" data-mode="${c.id}" onclick="switchGalleryDetailMode('${c.id}')">🏷 ${escapeHtmlOsu(c.name)} (${count})</button>`;
+            return `<button class="osu-mode-tab ${c.id === galleryDetailMode ? 'active' : ''}" data-mode="${c.id}" onclick="switchGalleryDetailMode('${c.id}')">${icon('tag', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(c.name)} (${count})</button>`;
         }).join('');
         tabsEl.innerHTML = modeTabsHtml + categoryTabsHtml;
 

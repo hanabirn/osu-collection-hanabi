@@ -21,7 +21,7 @@ const SHELL_ASSETS = [
     '/css/base.css', '/css/theme.css', '/css/particles.css', '/css/osu.css',
     '/js/main.js', '/js/osu.js', '/js/public-collections.js', '/js/skins.js',
     '/js/updates.js', '/js/tournaments.js', '/js/notifications.js', '/js/replay.js', '/js/feedback.js',
-    '/js/theme.js', '/js/particles.js', '/js/pwa.js', '/js/i18n.js',
+    '/js/icons.js', '/js/theme.js', '/js/particles.js', '/js/pwa.js', '/js/i18n.js',
     '/js/i18n/zh.js', '/js/i18n/en.js', '/js/i18n/ja.js', '/js/i18n/ko.js',
     '/js/i18n/ru.js', '/js/i18n/fr.js', '/js/i18n/es.js', '/js/i18n/de.js',
     '/assets/icons/icon-192.png', '/assets/icons/icon-512.png',

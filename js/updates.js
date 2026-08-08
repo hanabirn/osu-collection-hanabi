@@ -115,8 +115,8 @@ function renderTrackedMappersList() {
     }
     panel.innerHTML = `<div class="tracked-players-list">${list.map(m => `
         <div class="tracked-player-card tracked-mapper-card">
-            <span class="tracked-player-name">🎨 ${escapeHtmlOsu(m.name)}</span>
-            <button class="tracked-player-remove" onclick="untrackMapperByName(decodeURIComponent('${encodeURIComponent(m.name)}'))" title="${t('untrack_player_btn')}">✕</button>
+            <span class="tracked-player-name">${icon('palette', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(m.name)}</span>
+            <button class="tracked-player-remove" onclick="untrackMapperByName(decodeURIComponent('${encodeURIComponent(m.name)}'))" title="${t('untrack_player_btn')}">${icon('x')}</button>
         </div>`).join('')}
     </div>`;
 }

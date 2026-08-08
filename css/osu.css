@@ -996,6 +996,23 @@
     box-shadow: 0 0 15px rgba(255,102,153,0.3);
     object-fit: cover;
 }
+
+/* Small flag badge pinned to an avatar's bottom-right corner — sized off
+   the wrapper rather than a fixed px value so it scales with whichever
+   avatar size the containing UI uses (48px lookup avatar, 40px compare
+   avatar, etc.) instead of needing a variant per size. */
+.avatar-with-flag { position: relative; display: inline-flex; flex-shrink: 0; }
+.avatar-flag-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -6px;
+    width: 60%;
+    height: auto;
+    border-radius: 3px;
+    border: 2px solid var(--bg-card);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    object-fit: cover;
+}
 .osu-stat {
     background: var(--bg-stat);
     border: 1px solid var(--border-light);
