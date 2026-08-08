@@ -85,6 +85,17 @@ I18N.ja = {
     gallery_like_login_required: 'いいねするには osu! でログインしてください', gallery_like_fail: 'いいねに失敗しました。しばらくしてからお試しください',
     gallery_no_results: '条件に一致するコレクションがありません。別のキーワードやタグをお試しください', gallery_tag_filter_clear_title: 'タグ絞り込みを解除',
 
+    nav_farm_maps: 'Farm譜面', farm_page_title: '✦ Farm譜面 ✦',
+    farm_hint: 'PP／星評価／BPM／Modで ranked 譜面プールを絞り込めます。PPは本サイトが独自に計算した値です（推定ではなく、SS 想定）。データベースはまだ構築中で、すべての ranked 譜面を網羅しているとは限りません。',
+    farm_search_placeholder: '曲名やアーティストを検索...',
+    farm_sort_pp_desc: 'PP 高い順', farm_sort_pp_asc: 'PP 低い順',
+    farm_sort_star_desc: '星評価 高い順', farm_sort_star_asc: '星評価 低い順',
+    farm_sort_bpm_desc: 'BPM 高い順', farm_sort_length_desc: '長さ 長い順',
+    farm_filter_length: '秒', farm_add_btn_title: 'コレクションに追加',
+    farm_load_fail: 'Farm譜面の読み込みに失敗しました。しばらくしてから再試行してください', farm_empty: '条件に一致する譜面がありません。絞り込み条件を緩めてみてください',
+    farm_coverage_pending: 'データベースを準備中です。しばらくしてからまた確認してください',
+    farm_coverage: '{n} 件の譜面を収録・最終更新 {t}（データベースは構築中で、まだすべての ranked 譜面を網羅していません）',
+
     pp_goal_tab: 'PP目標', pp_goal_hint: '現在の{mode}の合計PP：{current}pp。目標を入力すると、新しいプレイに最低限必要なPPがわかります。',
     pp_goal_placeholder: '目標の合計PP', pp_goal_btn: '計算', pp_goal_invalid: '有効な目標PPを入力してください',
     pp_goal_achieved: '🎉 すでに達成しています！', pp_goal_result_label: '新しいプレイに最低限必要なPP',

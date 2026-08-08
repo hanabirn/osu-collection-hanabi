@@ -85,6 +85,17 @@ I18N.zh = {
     gallery_like_login_required: '請先登入 osu! 才能按讚', gallery_like_fail: '按讚失敗，請稍後再試',
     gallery_no_results: '沒有符合條件的收藏，換個關鍵字或標籤試試', gallery_tag_filter_clear_title: '清除標籤篩選',
 
+    nav_farm_maps: 'Farm 圖', farm_page_title: '✦ Farm 圖 ✦',
+    farm_hint: '依 PP／星等／BPM／Mod 篩選 ranked 圖池，PP 由本站自行計算（非估算，採 SS 成績），資料庫仍在持續擴充中，可能尚未涵蓋全部 ranked 圖。',
+    farm_search_placeholder: '搜尋曲名或作者...',
+    farm_sort_pp_desc: 'PP 高到低', farm_sort_pp_asc: 'PP 低到高',
+    farm_sort_star_desc: '星等高到低', farm_sort_star_asc: '星等低到高',
+    farm_sort_bpm_desc: 'BPM 高到低', farm_sort_length_desc: '長度長到短',
+    farm_filter_length: '秒', farm_add_btn_title: '加入收藏',
+    farm_load_fail: '載入 Farm 圖失敗，稍後再試', farm_empty: '沒有符合條件的圖，換個篩選條件試試',
+    farm_coverage_pending: '資料庫尚在準備中，稍後再回來看看',
+    farm_coverage: '已收錄 {n} 張圖・上次更新於 {t}（資料庫持續擴充中，尚未涵蓋全部 ranked 圖）',
+
     pp_goal_tab: 'PP 目標', pp_goal_hint: '{mode} 目前總 PP：{current}pp。輸入目標，看新增一張成績最少要打多少 PP。',
     pp_goal_placeholder: '目標總 PP', pp_goal_btn: '計算', pp_goal_invalid: '請輸入有效的目標 PP',
     pp_goal_achieved: '🎉 已經達標！', pp_goal_result_label: '新成績至少需要',

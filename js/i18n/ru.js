@@ -85,6 +85,17 @@ I18N.ru = {
     gallery_like_login_required: 'Войдите через osu!, чтобы ставить лайки', gallery_like_fail: 'Не удалось поставить лайк, попробуйте позже',
     gallery_no_results: 'Нет коллекций по вашему запросу — попробуйте другое слово или тег', gallery_tag_filter_clear_title: 'Сбросить фильтр по тегу',
 
+    nav_farm_maps: 'Farm-карты', farm_page_title: '✦ Farm-карты ✦',
+    farm_hint: 'Фильтруйте пул ranked карт по PP / звёздам / BPM / модам. PP считается самим сайтом (не оценка, при SS) — база данных ещё пополняется и может охватывать не все ranked карты.',
+    farm_search_placeholder: 'Поиск по названию или автору...',
+    farm_sort_pp_desc: 'PP: сначала больше', farm_sort_pp_asc: 'PP: сначала меньше',
+    farm_sort_star_desc: 'Звёзды: сначала больше', farm_sort_star_asc: 'Звёзды: сначала меньше',
+    farm_sort_bpm_desc: 'BPM: сначала больше', farm_sort_length_desc: 'Длина: сначала длиннее',
+    farm_filter_length: 'сек', farm_add_btn_title: 'Добавить в коллекцию',
+    farm_load_fail: 'Не удалось загрузить Farm-карты, попробуйте позже', farm_empty: 'Нет карт по этим фильтрам — попробуйте ослабить условия',
+    farm_coverage_pending: 'База данных ещё формируется, загляните позже',
+    farm_coverage: 'Проиндексировано карт: {n} · обновлено {t} (база пополняется, охватывает не все ranked карты)',
+
     pp_goal_tab: 'Цель по PP', pp_goal_hint: 'Текущий общий PP в {mode}: {current}pp. Введите цель, чтобы узнать минимальный PP новой игры.',
     pp_goal_placeholder: 'Целевой общий PP', pp_goal_btn: 'Рассчитать', pp_goal_invalid: 'Введите корректный целевой PP',
     pp_goal_achieved: '🎉 Уже достигнуто!', pp_goal_result_label: 'Новой игре нужно минимум',

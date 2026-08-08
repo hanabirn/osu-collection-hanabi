@@ -25,4 +25,12 @@ function getSkinBackupsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore };
+function getFarmMapsStore() {
+    return getStore({
+        name: 'osu-farm-maps',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore };

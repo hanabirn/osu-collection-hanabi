@@ -85,6 +85,17 @@ I18N.de = {
     gallery_like_login_required: 'Melde dich mit osu! an, um zu liken', gallery_like_fail: 'Liken fehlgeschlagen, bitte später erneut versuchen',
     gallery_no_results: 'Keine passenden Sammlungen — versuche ein anderes Stichwort oder Tag', gallery_tag_filter_clear_title: 'Tag-Filter entfernen',
 
+    nav_farm_maps: 'Farm-Maps', farm_page_title: '✦ Farm-Maps ✦',
+    farm_hint: 'Filtere den ranked Map-Pool nach PP / Sternebewertung / BPM / Mods. Die PP-Werte werden von dieser Seite selbst berechnet (nicht geschätzt, bei SS) — die Datenbank wächst noch und deckt evtl. noch nicht alle ranked Maps ab.',
+    farm_search_placeholder: 'Titel oder Künstler suchen...',
+    farm_sort_pp_desc: 'PP: hoch zu niedrig', farm_sort_pp_asc: 'PP: niedrig zu hoch',
+    farm_sort_star_desc: 'Sterne: hoch zu niedrig', farm_sort_star_asc: 'Sterne: niedrig zu hoch',
+    farm_sort_bpm_desc: 'BPM: hoch zu niedrig', farm_sort_length_desc: 'Länge: lang zu kurz',
+    farm_filter_length: 'Sek.', farm_add_btn_title: 'Zur Sammlung hinzufügen',
+    farm_load_fail: 'Farm-Maps konnten nicht geladen werden, später erneut versuchen', farm_empty: 'Keine Maps entsprechen diesen Filtern — versuche es mit weniger strengen Filtern',
+    farm_coverage_pending: 'Die Datenbank wird noch aufgebaut, schau bald wieder vorbei',
+    farm_coverage: '{n} Maps erfasst · zuletzt aktualisiert {t} (Datenbank wächst noch, deckt noch nicht alle ranked Maps ab)',
+
     pp_goal_tab: 'PP-Ziel', pp_goal_hint: 'Aktuelles Gesamt-PP in {mode}: {current}pp. Ziel eingeben, um das minimal benötigte PP für einen neuen Play zu sehen.',
     pp_goal_placeholder: 'Ziel-Gesamt-PP', pp_goal_btn: 'Berechnen', pp_goal_invalid: 'Bitte ein gültiges Ziel-PP eingeben',
     pp_goal_achieved: '🎉 Bereits erreicht!', pp_goal_result_label: 'Neuer Play braucht mindestens',

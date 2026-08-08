@@ -85,6 +85,17 @@ I18N.en = {
     gallery_like_login_required: 'Log in with osu! to like collections', gallery_like_fail: 'Failed to like, please try again later',
     gallery_no_results: 'No collections match your search — try a different keyword or tag', gallery_tag_filter_clear_title: 'Clear tag filter',
 
+    nav_farm_maps: 'Farm Maps', farm_page_title: '✦ Farm Maps ✦',
+    farm_hint: 'Filter the ranked map pool by PP / star rating / BPM / mods. PP is computed by this site itself (not estimated, assuming an SS play) — the dataset is still growing and may not cover every ranked map yet.',
+    farm_search_placeholder: 'Search title or artist...',
+    farm_sort_pp_desc: 'PP: high to low', farm_sort_pp_asc: 'PP: low to high',
+    farm_sort_star_desc: 'Stars: high to low', farm_sort_star_asc: 'Stars: low to high',
+    farm_sort_bpm_desc: 'BPM: high to low', farm_sort_length_desc: 'Length: long to short',
+    farm_filter_length: 'sec', farm_add_btn_title: 'Add to collection',
+    farm_load_fail: 'Failed to load Farm Maps, try again later', farm_empty: 'No maps match these filters — try loosening them',
+    farm_coverage_pending: 'The dataset is still being built, check back soon',
+    farm_coverage: '{n} maps indexed · last updated {t} (dataset still growing, not yet covering every ranked map)',
+
     pp_goal_tab: 'PP Goal', pp_goal_hint: 'Current {mode} total PP: {current}pp. Enter a target to see the minimum PP a new play needs.',
     pp_goal_placeholder: 'Target total PP', pp_goal_btn: 'Calculate', pp_goal_invalid: 'Please enter a valid target PP',
     pp_goal_achieved: '🎉 Already there!', pp_goal_result_label: 'New play needs at least',

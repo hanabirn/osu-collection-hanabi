@@ -784,11 +784,11 @@ async function osuFetch(params, timeoutMs = 12000) {
     catch { throw new Error(`Function 回傳非 JSON (HTTP ${res.status}): ${text.substring(0, 200)}`); }
 }
 
-async function addOsuBeatmap() {
+async function addOsuBeatmap(explicitId) {
     if (!await verifyOsuPassword()) return;
     const input = document.getElementById('osuInput');
     const status = document.getElementById('osu-status');
-    const raw = input.value.trim();
+    const raw = explicitId !== undefined ? String(explicitId).trim() : input.value.trim();
     if (!raw) return;
 
     const parsed = parseOsuInput(raw);
@@ -804,7 +804,7 @@ async function addOsuBeatmap() {
     try {
         let beatmaps = [];
 
-        if (parsed.isSet || parsed.type === 'url' && input.value.includes('beatmapsets')) {
+        if (parsed.isSet || parsed.type === 'url' && raw.includes('beatmapsets')) {
             beatmaps = await osuFetch(`s=${parsed.id}`);
         }
 
@@ -831,8 +831,10 @@ async function addOsuBeatmap() {
 
         const alreadyExists = col[modeKey].some(s => s.beatmapset_id === parseInt(beatmaps[0].beatmapset_id));
         if (alreadyExists) {
-            status.innerText = t('osu_already_exists', { n: `${beatmaps[0].artist} - ${beatmaps[0].title}` });
+            const msg = t('osu_already_exists', { n: `${beatmaps[0].artist} - ${beatmaps[0].title}` });
+            status.innerText = msg;
             status.style.color = '#f59e0b';
+            if (explicitId !== undefined && typeof showShareToast === 'function') showShareToast(msg);
             return;
         }
 
@@ -858,7 +860,8 @@ async function addOsuBeatmap() {
 
         status.innerText = t('osu_added', { n: `${setInfo.artist} - ${setInfo.title}`, m: OSU_MODE_LABELS[modeNum], k: setInfo.beatmaps.length });
         status.style.color = '#34d399';
-        input.value = '';
+        if (explicitId === undefined) input.value = '';
+        else if (typeof showShareToast === 'function') showShareToast(t('osu_added', { n: `${setInfo.artist} - ${setInfo.title}`, m: OSU_MODE_LABELS[modeNum], k: setInfo.beatmaps.length }));
 
         osuCurrentTab = modeKey;
         clearAllOsuTabActive();

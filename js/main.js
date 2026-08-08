@@ -12,6 +12,7 @@ function switchTab(tab, el) {
     if (tab === 'updates') { ensureUpdatesLoaded(); if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList(); }
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
+    if (tab === 'farm-maps') ensureFarmMapsLoaded();
 }
 
 /* ===== 🌐 Language Dropdown ===== */
@@ -55,6 +56,7 @@ function refreshDynamicContent() {
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
+    if (typeof renderFarmMapsList === 'function') renderFarmMapsList();
 }
 
 /* ===== Init ===== */

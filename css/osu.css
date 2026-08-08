@@ -612,6 +612,43 @@
     #osu-sort-select { flex: 1; }
 }
 
+/* ===== Farm Maps filter row + coverage note ===== */
+.farm-range-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-bottom: 12px;
+}
+.farm-range-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.farm-range-field input {
+    width: 60px;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+.farm-range-field input:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 12px rgba(192,132,252,0.25);
+}
+.farm-coverage {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-dim2);
+    margin-bottom: 16px;
+}
+
 .gallery-filter-row { align-items: center; margin-top: -6px; flex-wrap: wrap; }
 .gallery-liked-only-label {
     display: flex;
@@ -860,10 +897,55 @@
    otherwise be permanently invisible and untappable — show them by default
    there instead (UX audit: "hover vs tap" + "touch target size", both High). */
 @media (hover: none) {
-    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn {
+    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn, .farm-add-btn {
         opacity: 0.85;
     }
 }
+.farm-add-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .farm-add-btn { opacity: 1; }
+.farm-add-btn:hover {
+    color: #fff;
+    background: rgba(52,211,153,0.5);
+    transform: scale(1.1);
+}
+
+.farm-card-version {
+    color: rgba(255,255,255,0.6);
+    font-weight: normal;
+    font-size: 0.85em;
+}
+.farm-card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    margin-top: 1px;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.farm-card-pp {
+    color: var(--accent-yellow);
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
 .osu-play-btn.playing {
     opacity: 1;
     color: #fff;

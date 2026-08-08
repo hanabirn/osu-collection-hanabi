@@ -85,6 +85,17 @@ I18N.es = {
     gallery_like_login_required: 'Inicia sesión con osu! para dar me gusta', gallery_like_fail: 'Error al dar me gusta, inténtalo más tarde',
     gallery_no_results: 'Ninguna colección coincide — prueba otra palabra clave o etiqueta', gallery_tag_filter_clear_title: 'Quitar filtro de etiqueta',
 
+    nav_farm_maps: 'Mapas Farm', farm_page_title: '✦ Mapas Farm ✦',
+    farm_hint: 'Filtra el catálogo ranked por PP / estrellas / BPM / mods. El PP lo calcula este sitio (no es una estimación, asume SS) — la base de datos aún está creciendo y puede no cubrir todos los mapas ranked todavía.',
+    farm_search_placeholder: 'Buscar título o artista...',
+    farm_sort_pp_desc: 'PP: mayor a menor', farm_sort_pp_asc: 'PP: menor a mayor',
+    farm_sort_star_desc: 'Estrellas: mayor a menor', farm_sort_star_asc: 'Estrellas: menor a mayor',
+    farm_sort_bpm_desc: 'BPM: mayor a menor', farm_sort_length_desc: 'Duración: larga a corta',
+    farm_filter_length: 'seg', farm_add_btn_title: 'Añadir a mi colección',
+    farm_load_fail: 'No se pudieron cargar los Mapas Farm, inténtalo más tarde', farm_empty: 'Ningún mapa coincide con estos filtros — prueba a relajarlos',
+    farm_coverage_pending: 'La base de datos aún se está preparando, vuelve pronto',
+    farm_coverage: '{n} mapas indexados · última actualización {t} (la base de datos sigue creciendo, aún no cubre todos los mapas ranked)',
+
     pp_goal_tab: 'Meta de PP', pp_goal_hint: 'PP total actual en {mode}: {current}pp. Introduce una meta para ver el PP mínimo que necesita una nueva partida.',
     pp_goal_placeholder: 'PP total objetivo', pp_goal_btn: 'Calcular', pp_goal_invalid: 'Introduce un PP objetivo válido',
     pp_goal_achieved: '🎉 ¡Ya lo has conseguido!', pp_goal_result_label: 'La nueva partida necesita al menos',

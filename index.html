@@ -106,6 +106,7 @@
     <nav class="site-nav">
         <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
         <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
+        <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
         <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
@@ -203,6 +204,50 @@
 
         <div id="public-collections-list" class="osu-collection"></div>
         <div id="public-collections-pagination" class="osu-pagination"></div>
+    </section>
+
+    <section id="page-farm-maps" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="farm_page_title">✦ Farm 圖 ✦</h2>
+        <p class="tournaments-hint" data-i18n="farm_hint">依 PP／星等／BPM／Mod 篩選 ranked 圖池，PP 由本站自行計算（非估算，採 SS 成績），資料庫仍在持續擴充中，可能尚未涵蓋全部 ranked 圖。</p>
+
+        <div class="osu-mode-tabs" id="farm-mode-tabs">
+            <button class="osu-tab active" onclick="switchFarmMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+            <button class="osu-tab" onclick="switchFarmMode('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+            <button class="osu-tab" onclick="switchFarmMode('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+            <button class="osu-tab" onclick="switchFarmMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+        </div>
+
+        <div class="osu-mode-tabs" id="farm-mods-tabs">
+            <button class="osu-tab active" onclick="switchFarmMods('NM', this)">NM</button>
+            <button class="osu-tab" onclick="switchFarmMods('DT', this)">DT</button>
+            <button class="osu-tab" onclick="switchFarmMods('HD', this)">HD</button>
+            <button class="osu-tab" onclick="switchFarmMods('HDDT', this)">HDDT</button>
+            <button class="osu-tab" onclick="switchFarmMods('HR', this)">HR</button>
+            <button class="osu-tab" onclick="switchFarmMods('HDHR', this)">HDHR</button>
+        </div>
+
+        <div class="osu-search-row">
+            <input type="text" id="farm-search-input" data-i18n-placeholder="farm_search_placeholder" placeholder="搜尋曲名或作者..." oninput="searchFarmMaps(this.value)">
+            <select id="farm-sort-select" onchange="switchFarmSort(this.value)">
+                <option value="pp_desc" data-i18n="farm_sort_pp_desc">PP 高到低</option>
+                <option value="pp_asc" data-i18n="farm_sort_pp_asc">PP 低到高</option>
+                <option value="star_desc" data-i18n="farm_sort_star_desc">星等高到低</option>
+                <option value="star_asc" data-i18n="farm_sort_star_asc">星等低到高</option>
+                <option value="bpm_desc" data-i18n="farm_sort_bpm_desc">BPM 高到低</option>
+                <option value="length_desc" data-i18n="farm_sort_length_desc">長度長到短</option>
+            </select>
+        </div>
+
+        <div class="farm-range-row">
+            <label class="farm-range-field"><span>PP</span><input type="number" id="farm-pp-min" placeholder="min" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-pp-max" placeholder="max" oninput="debounceFarmFilters()"></label>
+            <label class="farm-range-field"><span>★</span><input type="number" id="farm-star-min" placeholder="min" step="0.1" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-star-max" placeholder="max" step="0.1" oninput="debounceFarmFilters()"></label>
+            <label class="farm-range-field"><span>BPM</span><input type="number" id="farm-bpm-min" placeholder="min" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-bpm-max" placeholder="max" oninput="debounceFarmFilters()"></label>
+            <label class="farm-range-field"><span data-i18n="farm_filter_length">秒</span><input type="number" id="farm-length-min" placeholder="min" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-length-max" placeholder="max" oninput="debounceFarmFilters()"></label>
+        </div>
+
+        <div id="farm-coverage" class="farm-coverage"></div>
+        <div id="farm-maps-list" class="osu-collection"></div>
+        <div id="farm-maps-pagination" class="osu-pagination"></div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -491,6 +536,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="js/osu.js"></script>
 <script src="js/public-collections.js"></script>
+<script src="js/farm-maps.js"></script>
 <script src="js/skins.js"></script>
 <script src="js/updates.js"></script>
 <script src="js/tournaments.js"></script>

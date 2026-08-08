@@ -7,3 +7,10 @@
 
 [functions."osu-pp"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
+
+[functions."farm-crawl-cron"]
+  schedule = "*/10 * * * *"
+  included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
+
+[functions."farm-crawl-run"]
+  included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]

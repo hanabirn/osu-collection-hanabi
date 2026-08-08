@@ -85,6 +85,17 @@ I18N.ko = {
     gallery_like_login_required: '좋아요를 누르려면 osu! 로그인이 필요합니다', gallery_like_fail: '좋아요 실패, 잠시 후 다시 시도해주세요',
     gallery_no_results: '조건에 맞는 컬렉션이 없습니다. 다른 키워드나 태그를 시도해보세요', gallery_tag_filter_clear_title: '태그 필터 해제',
 
+    nav_farm_maps: '팜맵', farm_page_title: '✦ 팜맵 ✦',
+    farm_hint: 'PP / 별 난이도 / BPM / 모드로 ranked 맵 풀을 필터링합니다. PP는 이 사이트가 직접 계산한 값입니다(추정치 아님, SS 기준) — 데이터베이스는 아직 구축 중이며 모든 ranked 맵을 다루지 못할 수 있습니다.',
+    farm_search_placeholder: '곡 제목 또는 아티스트 검색...',
+    farm_sort_pp_desc: 'PP 높은순', farm_sort_pp_asc: 'PP 낮은순',
+    farm_sort_star_desc: '별 높은순', farm_sort_star_asc: '별 낮은순',
+    farm_sort_bpm_desc: 'BPM 높은순', farm_sort_length_desc: '길이 긴순',
+    farm_filter_length: '초', farm_add_btn_title: '내 컬렉션에 추가',
+    farm_load_fail: '팜맵을 불러오지 못했습니다. 나중에 다시 시도해주세요', farm_empty: '조건에 맞는 맵이 없습니다. 필터를 완화해보세요',
+    farm_coverage_pending: '데이터베이스를 아직 준비 중입니다. 잠시 후 다시 확인해주세요',
+    farm_coverage: '{n}개 맵 수집됨 · 마지막 업데이트 {t} (데이터베이스가 계속 늘어나는 중이며 아직 모든 ranked 맵을 다루지 못합니다)',
+
     pp_goal_tab: 'PP 목표', pp_goal_hint: '현재 {mode} 총 PP: {current}pp. 목표를 입력하면 새 기록에 필요한 최소 PP를 계산합니다.',
     pp_goal_placeholder: '목표 총 PP', pp_goal_btn: '계산', pp_goal_invalid: '유효한 목표 PP를 입력해주세요',
     pp_goal_achieved: '🎉 이미 달성했습니다!', pp_goal_result_label: '새 기록에 최소 필요한 PP',
