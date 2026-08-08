@@ -68,3 +68,55 @@ function escapeHtmlOsu(str) {
     div.textContent = str;
     return div.innerHTML;
 }
+
+/* ===== Mapper tracking — same lightweight localStorage pattern as tracked
+   players (js/osu.js), just for "has this mapper ranked anything new"
+   instead of PP. Tracked by username directly (get_beatmaps' u=&type=string
+   filter accepts it), so there's no separate lookup step first — see
+   js/notifications.js's checkTrackedMappers() for the actual polling. */
+const TRACKED_MAPPERS_KEY = 'osu_tracked_mappers';
+
+function getTrackedMappers() {
+    try { return JSON.parse(localStorage.getItem(TRACKED_MAPPERS_KEY)) || []; }
+    catch { return []; }
+}
+function saveTrackedMappers(list) {
+    localStorage.setItem(TRACKED_MAPPERS_KEY, JSON.stringify(list));
+}
+
+function trackMapperFromInput() {
+    const input = document.getElementById('mapper-track-input');
+    const name = input.value.trim();
+    if (!name) return;
+    const list = getTrackedMappers();
+    if (list.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+        showShareToast(t('mapper_already_tracked'));
+        return;
+    }
+    list.push({ name, lastMaxApprovedDate: null });
+    saveTrackedMappers(list);
+    input.value = '';
+    showShareToast(t('mapper_track_done'));
+    renderTrackedMappersList();
+}
+
+function untrackMapperByName(name) {
+    saveTrackedMappers(getTrackedMappers().filter(m => m.name !== name));
+    renderTrackedMappersList();
+}
+
+function renderTrackedMappersList() {
+    const panel = document.getElementById('tracked-mappers-panel');
+    if (!panel) return;
+    const list = getTrackedMappers();
+    if (list.length === 0) {
+        panel.innerHTML = `<div class="tracked-players-empty">${t('tracked_mappers_empty')}</div>`;
+        return;
+    }
+    panel.innerHTML = `<div class="tracked-players-list">${list.map(m => `
+        <div class="tracked-player-card tracked-mapper-card">
+            <span class="tracked-player-name">🎨 ${escapeHtmlOsu(m.name)}</span>
+            <button class="tracked-player-remove" onclick="untrackMapperByName(decodeURIComponent('${encodeURIComponent(m.name)}'))" title="${t('untrack_player_btn')}">✕</button>
+        </div>`).join('')}
+    </div>`;
+}

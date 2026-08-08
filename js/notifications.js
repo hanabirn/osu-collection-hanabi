@@ -124,12 +124,67 @@ async function checkNewTournamentPosts() {
     if (maxId > stored) localStorage.setItem(NOTIF_TOURNAMENTS_SEEN_KEY, String(maxId));
 }
 
+/* Tracked mappers (js/updates.js) get the exact same "baseline on first
+   check, then diff" treatment as checkNewTournamentPosts() below — a
+   prolific mapper's whole back catalog would otherwise fire as "new" the
+   moment someone starts tracking them. Diffs by approved_date per
+   beatmapset rather than by id, since get_beatmaps' `u=` filter returns
+   every difficulty of every set the mapper has ever made. */
+async function checkTrackedMappers() {
+    if (typeof getTrackedMappers !== 'function') return;
+    const mappers = getTrackedMappers();
+    if (mappers.length === 0) return;
+
+    let anyUpdated = false;
+    for (const mapper of mappers) {
+        try {
+            const beatmaps = await osuFetch(`mapper=${encodeURIComponent(mapper.name)}&mapper_type=string`);
+            if (!Array.isArray(beatmaps) || beatmaps.length === 0) continue;
+
+            const bySet = new Map();
+            beatmaps.forEach(b => {
+                if (!b.beatmapset_id || !b.approved_date) return;
+                const existing = bySet.get(b.beatmapset_id);
+                if (!existing || b.approved_date > existing.approved_date) bySet.set(b.beatmapset_id, b);
+            });
+            const sets = [...bySet.values()].sort((a, b) => b.approved_date.localeCompare(a.approved_date));
+            if (sets.length === 0) continue;
+
+            if (mapper.lastMaxApprovedDate === null) {
+                mapper.lastMaxApprovedDate = sets[0].approved_date;
+                anyUpdated = true;
+                continue;
+            }
+
+            const newSets = sets.filter(b => b.approved_date > mapper.lastMaxApprovedDate).slice(0, 5);
+            newSets.forEach(b => {
+                addNotification({
+                    id: `mapper-${b.beatmapset_id}`,
+                    type: 'mapper',
+                    title: t('notif_mapper_new_title', { name: mapper.name }),
+                    detail: `${b.artist} - ${b.title}`,
+                    url: `https://osu.ppy.sh/beatmapsets/${b.beatmapset_id}`,
+                    createdAt: Date.now(),
+                    read: false,
+                });
+            });
+            if (newSets.length > 0) { mapper.lastMaxApprovedDate = sets[0].approved_date; anyUpdated = true; }
+        } catch (e) {
+            console.error('Tracked mapper check failed:', mapper.name, e);
+        }
+    }
+    if (anyUpdated) {
+        saveTrackedMappers(mappers);
+        if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
+    }
+}
+
 async function checkForNotifications(force) {
     const last = parseInt(localStorage.getItem(NOTIF_LAST_CHECK_KEY), 10) || 0;
     if (!force && Date.now() - last < NOTIF_CHECK_INTERVAL_MS) return;
     localStorage.setItem(NOTIF_LAST_CHECK_KEY, String(Date.now()));
 
-    await Promise.all([checkTrackedPlayersPp(), checkNewTournamentPosts()]);
+    await Promise.all([checkTrackedPlayersPp(), checkNewTournamentPosts(), checkTrackedMappers()]);
     renderNotificationBell();
 }
 
@@ -151,7 +206,7 @@ function renderNotificationBell() {
 
     list.innerHTML = notifs.map(n => {
         const timeStr = new Date(n.createdAt).toLocaleString();
-        const icon = n.type === 'pp' ? '📈' : '🏆';
+        const icon = n.type === 'pp' ? '📈' : n.type === 'mapper' ? '🎨' : '🏆';
         const body = `
             <span class="notif-item-icon">${icon}</span>
             <div class="notif-item-body">
@@ -160,7 +215,7 @@ function renderNotificationBell() {
                 <div class="notif-item-time">${timeStr}</div>
             </div>`;
         const cls = `notif-item${n.read ? '' : ' unread'}`;
-        if (n.type === 'tournament' && n.url) {
+        if ((n.type === 'tournament' || n.type === 'mapper') && n.url) {
             return `<a href="${n.url}" target="_blank" rel="noopener noreferrer" class="${cls}">${body}</a>`;
         }
         if (n.type === 'pp' && n.playerId) {

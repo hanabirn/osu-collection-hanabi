@@ -42,6 +42,19 @@ exports.handler = async (event) => {
             return { statusCode: 200, headers, body: JSON.stringify(data) };
         }
 
+        if (qs.mapper) {
+            // get_beatmaps' own `u` param filters by mapper (not by whoever
+            // played it, despite the name) — same endpoint the no-param
+            // branch below uses, just with an author filter instead of a
+            // specific b=/s= id.
+            params.set('u', qs.mapper);
+            params.set('type', qs.mapper_type === 'string' ? 'string' : 'id');
+            if (qs.m !== undefined) params.set('m', qs.m);
+            const res = await fetch(`https://osu.ppy.sh/api/get_beatmaps?${params.toString()}`);
+            const data = await res.json();
+            return { statusCode: 200, headers, body: JSON.stringify(data) };
+        }
+
         if (qs.b) params.set('b', qs.b);
         if (qs.s) params.set('s', qs.s);
 

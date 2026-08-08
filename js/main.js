@@ -6,7 +6,7 @@ function switchTab(tab, el) {
     if (el) el.classList.add('active');
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
-    if (tab === 'updates') ensureUpdatesLoaded();
+    if (tab === 'updates') { ensureUpdatesLoaded(); if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList(); }
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
 }
@@ -50,6 +50,7 @@ function refreshDynamicContent() {
     if (typeof updatePublishButtonLabel === 'function') updatePublishButtonLabel();
     if (typeof renderTrackButtonState === 'function') renderTrackButtonState();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
+    if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
 }
 
