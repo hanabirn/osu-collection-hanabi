@@ -19,7 +19,7 @@ I18N.ja = {
     skins_backup_hint: 'あなた専用です。最大30個、各4MB以下。「端末に復元」で上のリストに追加されます。',
     skins_backup_login_required: 'クラウドバックアップを使うには osu! でログインしてください', skins_backup_too_large: 'このスキンは {limit}MB を超えているため、この端末にのみ保存できます',
     skins_backup_done: 'クラウドにバックアップしました', skins_backup_fail: 'クラウドバックアップに失敗しました。しばらくしてからお試しください', skins_backup_empty: 'クラウドにバックアップされたスキンはまだありません',
-    skins_backup_restore: '端末に復元', skins_backup_restored: 'この端末に復元しました',
+    skins_backup_restore: '端末に復元', skins_backup_restored: 'この端末に復元しました', skins_by_author: '作者：{author}',
     skins_empty: 'まだ保存されたスキンはありません', skins_download: 'ダウンロード', skins_delete: '削除', skins_delete_confirm: 'このスキンファイルを削除しますか？',
     skins_upload_done: '{n} 件のファイルを追加しました', skins_upload_fail: '「{n}」のアップロードに失敗しました', skins_load_fail: 'スキン一覧の読み込みに失敗しました。ブラウザのローカルストレージが許可されているか確認してください',
 
@@ -59,6 +59,8 @@ I18N.ja = {
     pp_calc_calculating: '計算中...', pp_calc_error: '計算に失敗しました。しばらくしてから再試行してください', pp_calc_stars_label: '☆数',
     pp_calc_strain_title: '難易度カーブ', pp_calc_strain_unsupported: 'この譜面には難易度カーブのデータがありません', pp_calc_acc_invalid: '0～100の範囲で正確率を入力してください',
     pp_calc_hint: '難易度を選び、Modsにチェックを入れて正確率を入力し「計算」を押すと、☆数とPPを再計算し、下に難易度カーブを表示します。',
+    pp_calc_combo_label: 'コンボ', pp_calc_combo_placeholder: 'フルコンボ', pp_calc_miss_label: 'ミス数',
+    pp_calc_combo_invalid: '有効なコンボ数・ミス数を入力してください', pp_calc_combo_full: 'フルコンボ（{max}x）', pp_calc_combo_misses: ' ・ {n} ミス',
 
     osu_share_link_btn: '収蔵リンクを共有', osu_share_link_done: 'リンクをコピーしました！友達に共有すると、開くだけでワンクリックで取り込めます。',
     osu_share_link_fail: '共有リンクの生成に失敗しました', osu_share_link_empty: 'コレクションが空です。先にビートマップを追加してください',

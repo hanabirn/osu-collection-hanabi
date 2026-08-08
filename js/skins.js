@@ -88,46 +88,79 @@ async function confirmDeleteSkin(id) {
     renderSkinsList();
 }
 
-/* ===== Skin thumbnail preview =====
+/* ===== Skin thumbnail + skin.ini info preview =====
    .osk files are plain zip archives. Instead of unzipping the whole thing
    (files run 10-200+ MB), fflate's filter option skips decompressing every
-   entry except the one candidate image we actually want, so this stays fast
-   even for large skins. Extracted blob URLs are cached per skin id for the
-   session so re-renders (after upload/delete) don't redo the work. */
+   entry except the one candidate image and skin.ini itself, so this stays
+   fast even for large skins — both come out of the same unzip() pass rather
+   than two. Only matches files sitting at the zip root (same as real .osk
+   layout), not inside a subfolder. Extracted results are cached per skin id
+   for the session so re-renders (after upload/delete) don't redo the work. */
 const SKIN_THUMB_CANDIDATES = ['cursor.png', 'cursor@2x.png', 'menu-background.png', 'menu-background@2x.png', 'hitcircle.png', 'hitcircle@2x.png'];
-const skinThumbCache = new Map();
+const skinAssetCache = new Map();
 
-function extractSkinThumbnail(file) {
-    if (typeof fflate === 'undefined') return Promise.resolve(null);
+/* skin.ini is a plain key:value INI file; only the [General] section's
+   Name/Author/Version are worth surfacing here. */
+function parseSkinIni(text) {
+    const generalMatch = text.match(/\[General\]([\s\S]*?)(?:\r?\n\[|$)/i);
+    if (!generalMatch) return null;
+    const section = generalMatch[1];
+    const grab = (key) => {
+        const m = section.match(new RegExp(`^[ \\t]*${key}[ \\t]*:[ \\t]*(.+?)[ \\t]*$`, 'im'));
+        return m ? m[1].trim() : '';
+    };
+    const info = { name: grab('Name'), author: grab('Author'), version: grab('Version') };
+    return (info.name || info.author || info.version) ? info : null;
+}
+
+function extractSkinAssets(file) {
+    if (typeof fflate === 'undefined') return Promise.resolve({ thumbUrl: null, info: null });
     return file.arrayBuffer().then(buf => new Promise(resolve => {
         try {
             fflate.unzip(new Uint8Array(buf), {
-                filter: entry => SKIN_THUMB_CANDIDATES.includes(entry.name.toLowerCase()),
+                filter: entry => SKIN_THUMB_CANDIDATES.includes(entry.name.toLowerCase()) || entry.name.toLowerCase() === 'skin.ini',
             }, (err, unzipped) => {
-                if (err) { resolve(null); return; }
+                if (err) { resolve({ thumbUrl: null, info: null }); return; }
+
+                let thumbUrl = null;
                 for (const name of SKIN_THUMB_CANDIDATES) {
                     const key = Object.keys(unzipped).find(k => k.toLowerCase() === name);
-                    if (key) {
-                        resolve(URL.createObjectURL(new Blob([unzipped[key]], { type: 'image/png' })));
-                        return;
-                    }
+                    if (key) { thumbUrl = URL.createObjectURL(new Blob([unzipped[key]], { type: 'image/png' })); break; }
                 }
-                resolve(null);
+
+                let info = null;
+                const iniKey = Object.keys(unzipped).find(k => k.toLowerCase() === 'skin.ini');
+                if (iniKey) {
+                    try { info = parseSkinIni(new TextDecoder('utf-8').decode(unzipped[iniKey])); }
+                    catch { info = null; }
+                }
+
+                resolve({ thumbUrl, info });
             });
         } catch {
-            resolve(null);
+            resolve({ thumbUrl: null, info: null });
         }
-    })).catch(() => null);
+    })).catch(() => ({ thumbUrl: null, info: null }));
+}
+
+function formatSkinIniInfo(info) {
+    const parts = [];
+    if (info.name) parts.push(escapeSkinName(info.name));
+    if (info.author) parts.push(t('skins_by_author', { author: escapeSkinName(info.author) }));
+    if (info.version) parts.push(`v${escapeSkinName(info.version)}`);
+    return parts.join(' &middot; ');
 }
 
 function loadSkinThumbnails(skins) {
     for (const skin of skins) {
-        if (skinThumbCache.has(skin.id)) continue;
-        skinThumbCache.set(skin.id, null);
-        extractSkinThumbnail(skin.file).then(url => {
-            skinThumbCache.set(skin.id, url);
-            const el = document.getElementById(`skin-thumb-${skin.id}`);
-            if (el && url) el.innerHTML = `<img src="${url}" alt="">`;
+        if (skinAssetCache.has(skin.id)) continue;
+        skinAssetCache.set(skin.id, null);
+        extractSkinAssets(skin.file).then(assets => {
+            skinAssetCache.set(skin.id, assets);
+            const thumbEl = document.getElementById(`skin-thumb-${skin.id}`);
+            if (thumbEl && assets.thumbUrl) thumbEl.innerHTML = `<img src="${assets.thumbUrl}" alt="">`;
+            const infoEl = document.getElementById(`skin-ini-info-${skin.id}`);
+            if (infoEl && assets.info) infoEl.innerHTML = formatSkinIniInfo(assets.info);
         });
     }
 }
@@ -158,12 +191,15 @@ async function renderSkinsList() {
         container.innerHTML = `<p class="skins-empty">${t('skins_empty')}</p>`;
         return;
     }
-    container.innerHTML = skins.map(s => `
+    container.innerHTML = skins.map(s => {
+        const cached = skinAssetCache.get(s.id);
+        return `
         <div class="skin-item">
-            <div class="skin-item-thumb" id="skin-thumb-${s.id}">${skinThumbCache.get(s.id) ? `<img src="${skinThumbCache.get(s.id)}" alt="">` : '🎵'}</div>
+            <div class="skin-item-thumb" id="skin-thumb-${s.id}">${cached && cached.thumbUrl ? `<img src="${cached.thumbUrl}" alt="">` : '🎵'}</div>
             <div class="skin-item-info">
                 <div class="skin-item-name">${escapeSkinName(s.name)}</div>
                 <div class="skin-item-meta">${formatSkinSize(s.size)} &middot; ${new Date(s.addedAt).toLocaleDateString()}</div>
+                <div class="skin-item-ini-info" id="skin-ini-info-${s.id}">${cached && cached.info ? formatSkinIniInfo(cached.info) : ''}</div>
             </div>
             <div class="skin-item-actions">
                 <button class="skin-backup-btn" onclick="backupSkinToCloud(${s.id})" title="${t('skins_backup_btn')}">☁️</button>
@@ -171,7 +207,8 @@ async function renderSkinsList() {
                 <button class="skin-delete-btn" onclick="confirmDeleteSkin(${s.id})">${t('skins_delete')}</button>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
     loadSkinThumbnails(skins);
 }
 

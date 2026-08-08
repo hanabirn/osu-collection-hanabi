@@ -19,7 +19,7 @@ I18N.de = {
     skins_backup_hint: 'Nur für dich — bis zu 30 Skins, jeweils unter 4MB. „Auf Gerät wiederherstellen" fügt ihn wieder zur obigen Liste hinzu.',
     skins_backup_login_required: 'Melde dich mit osu! an, um das Cloud-Backup zu nutzen', skins_backup_too_large: 'Dieser Skin überschreitet {limit}MB und kann daher nur auf diesem Gerät bleiben',
     skins_backup_done: 'In der Cloud gesichert', skins_backup_fail: 'Cloud-Backup fehlgeschlagen, bitte später erneut versuchen', skins_backup_empty: 'Noch keine Skins in der Cloud gesichert',
-    skins_backup_restore: 'Auf Gerät wiederherstellen', skins_backup_restored: 'Auf diesem Gerät wiederhergestellt',
+    skins_backup_restore: 'Auf Gerät wiederherstellen', skins_backup_restored: 'Auf diesem Gerät wiederhergestellt', skins_by_author: 'von {author}',
     skins_empty: 'Noch keine Skins gespeichert', skins_download: 'Herunterladen', skins_delete: 'Löschen', skins_delete_confirm: 'Diese Skin-Datei löschen?',
     skins_upload_done: '{n} Datei(en) hinzugefügt', skins_upload_fail: 'Hochladen von „{n}" fehlgeschlagen', skins_load_fail: 'Skin-Liste konnte nicht geladen werden — prüfe, ob der Browser lokalen Speicher erlaubt',
 
@@ -59,6 +59,8 @@ I18N.de = {
     pp_calc_calculating: 'Berechnung läuft...', pp_calc_error: 'Berechnung fehlgeschlagen, bitte später erneut versuchen', pp_calc_stars_label: 'Sterne',
     pp_calc_strain_title: 'Schwierigkeitskurve', pp_calc_strain_unsupported: 'Für diese Beatmap sind keine Schwierigkeitsdaten verfügbar', pp_calc_acc_invalid: 'Bitte eine Genauigkeit zwischen 0 und 100 eingeben',
     pp_calc_hint: 'Schwierigkeit wählen, Mods anhaken, Genauigkeit eingeben und auf „Berechnen" klicken, um Sterne und PP neu zu berechnen und die Schwierigkeitskurve dieser Karte darunter anzuzeigen.',
+    pp_calc_combo_label: 'Combo', pp_calc_combo_placeholder: 'Voller Combo', pp_calc_miss_label: 'Misses',
+    pp_calc_combo_invalid: 'Bitte eine gültige Combo-/Miss-Zahl eingeben', pp_calc_combo_full: 'Voller Combo ({max}x)', pp_calc_combo_misses: ' · {n} Miss(es)',
 
     osu_share_link_btn: 'Sammlungslink teilen', osu_share_link_done: 'Link kopiert! Teile ihn mit Freunden — beim Öffnen können sie mit einem Klick importieren.',
     osu_share_link_fail: 'Freigabelink konnte nicht erstellt werden', osu_share_link_empty: 'Deine Sammlung ist leer — füge zuerst ein paar Beatmaps hinzu',

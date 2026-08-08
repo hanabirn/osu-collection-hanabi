@@ -385,7 +385,14 @@
             <span>%</span>
             <button class="btn" onclick="runPpCalc()" data-i18n="pp_calc_run">計算</button>
         </div>
+        <div class="pp-calc-acc-row pp-calc-combo-row">
+            <label data-i18n="pp_calc_combo_label">Combo</label>
+            <input type="number" id="pp-calc-combo" min="0" step="1" data-i18n-placeholder="pp_calc_combo_placeholder" placeholder="滿 Combo">
+            <label data-i18n="pp_calc_miss_label">Miss 數</label>
+            <input type="number" id="pp-calc-miss" min="0" step="1" value="0">
+        </div>
         <div id="pp-calc-status" class="status"></div>
+        <div id="pp-calc-combo-label" class="pp-calc-combo-label" style="display:none;"></div>
         <div id="pp-calc-result" class="pp-calc-result" style="display:none;"></div>
         <div id="pp-calc-graph-wrap" class="pp-calc-graph-wrap" style="display:none;"></div>
     </div>

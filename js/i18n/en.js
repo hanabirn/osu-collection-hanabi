@@ -19,7 +19,7 @@ I18N.en = {
     skins_backup_hint: 'Just for you — up to 30 skins, each under 4MB. "Restore to device" adds it back to the list above.',
     skins_backup_login_required: 'Log in with osu! to use cloud backup', skins_backup_too_large: 'This skin exceeds {limit}MB, so it can only stay on this device',
     skins_backup_done: 'Backed up to the cloud', skins_backup_fail: 'Cloud backup failed, please try again later', skins_backup_empty: 'No skins backed up to the cloud yet',
-    skins_backup_restore: 'Restore to device', skins_backup_restored: 'Restored to this device',
+    skins_backup_restore: 'Restore to device', skins_backup_restored: 'Restored to this device', skins_by_author: 'by {author}',
     skins_empty: 'No skins saved yet', skins_download: 'Download', skins_delete: 'Delete', skins_delete_confirm: 'Delete this skin file?',
     skins_upload_done: 'Added {n} file(s)', skins_upload_fail: 'Failed to upload "{n}"', skins_load_fail: 'Failed to load the skins list — check that your browser allows local storage',
 
@@ -59,6 +59,8 @@ I18N.en = {
     pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
     pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',
     pp_calc_hint: 'Pick a difficulty, toggle mods, enter an accuracy, then hit "Calculate" to recompute stars and PP, plus see this map\'s difficulty curve below.',
+    pp_calc_combo_label: 'Combo', pp_calc_combo_placeholder: 'Full combo', pp_calc_miss_label: 'Misses',
+    pp_calc_combo_invalid: 'Please enter a valid combo / miss count', pp_calc_combo_full: 'Full combo ({max}x)', pp_calc_combo_misses: ' · {n} miss(es)',
 
     osu_share_link_btn: 'Share Collection Link', osu_share_link_done: 'Link copied! Share it with friends — opening it lets them import with one click.',
     osu_share_link_fail: 'Failed to generate share link', osu_share_link_empty: 'Your collection is empty — add some beatmaps first',

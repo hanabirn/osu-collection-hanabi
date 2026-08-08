@@ -1649,9 +1649,12 @@ function openPpCalcModal(setId, event) {
     ).join('');
 
     document.getElementById('pp-calc-acc').value = 100;
+    document.getElementById('pp-calc-combo').value = '';
+    document.getElementById('pp-calc-miss').value = 0;
     document.getElementById('pp-calc-status').innerText = '';
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-combo-label').style.display = 'none';
     renderPpCalcMods();
 
     document.getElementById('pp-calc-modal').style.display = 'flex';
@@ -1667,6 +1670,7 @@ function selectPpCalcDiff(beatmapIdStr) {
     document.getElementById('pp-calc-status').innerText = '';
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-combo-label').style.display = 'none';
 }
 
 function togglePpCalcMod(mod) {
@@ -1681,6 +1685,7 @@ function togglePpCalcMod(mod) {
     renderPpCalcMods();
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-combo-label').style.display = 'none';
 }
 
 function renderPpCalcMods() {
@@ -1689,10 +1694,12 @@ function renderPpCalcMods() {
     ).join('');
 }
 
-async function osuPpFetch(beatmapId, mods, accList, timeoutMs = 15000) {
+async function osuPpFetch(beatmapId, mods, accList, combo, misses, timeoutMs = 15000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const params = new URLSearchParams({ id: beatmapId, mods, acc: accList.join(',') });
+    if (combo !== undefined) params.set('combo', combo);
+    if (misses !== undefined) params.set('misses', misses);
     let res;
     try {
         res = await fetch(`/.netlify/functions/osu-pp?${params.toString()}`, { signal: controller.signal });
@@ -1710,12 +1717,22 @@ async function osuPpFetch(beatmapId, mods, accList, timeoutMs = 15000) {
 async function runPpCalc() {
     if (!ppCalcState) return;
     const acc = parseFloat(document.getElementById('pp-calc-acc').value);
+    const comboRaw = document.getElementById('pp-calc-combo').value.trim();
+    const missRaw = document.getElementById('pp-calc-miss').value.trim();
     const status = document.getElementById('pp-calc-status');
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-combo-label').style.display = 'none';
 
     if (!Number.isFinite(acc) || acc < 0 || acc > 100) {
         status.innerText = t('pp_calc_acc_invalid');
+        status.style.color = '#ff5252';
+        return;
+    }
+    const combo = comboRaw === '' ? undefined : parseInt(comboRaw, 10);
+    const misses = missRaw === '' ? 0 : parseInt(missRaw, 10);
+    if ((combo !== undefined && (!Number.isInteger(combo) || combo < 0)) || !Number.isInteger(misses) || misses < 0) {
+        status.innerText = t('pp_calc_combo_invalid');
         status.style.color = '#ff5252';
         return;
     }
@@ -1727,9 +1744,9 @@ async function runPpCalc() {
     const modsStr = [...ppCalcState.mods].join('');
 
     try {
-        const data = await osuPpFetch(ppCalcState.beatmapId, modsStr, accList);
+        const data = await osuPpFetch(ppCalcState.beatmapId, modsStr, accList, combo, misses);
         status.innerText = '';
-        renderPpCalcResult(data);
+        renderPpCalcResult(data, combo, misses);
     } catch (e) {
         console.error('PP calc failed:', e);
         status.innerText = `${t('pp_calc_error')}${e.message ? ' (' + e.message + ')' : ''}`;
@@ -1765,8 +1782,16 @@ function strainChartSvg(values, sectionLengthMs) {
     </svg>`;
 }
 
-function renderPpCalcResult(data) {
+function renderPpCalcResult(data, combo, misses) {
     const resultEl = document.getElementById('pp-calc-result');
+    const comboLabel = document.getElementById('pp-calc-combo-label');
+    if (comboLabel) {
+        const comboStr = combo !== undefined ? `${Math.min(combo, data.maxCombo).toLocaleString()}x/${data.maxCombo.toLocaleString()}x` : t('pp_calc_combo_full', { max: data.maxCombo.toLocaleString() });
+        const missStr = misses ? t('pp_calc_combo_misses', { n: misses }) : '';
+        comboLabel.textContent = `${comboStr}${missStr}`;
+        comboLabel.style.display = '';
+    }
+
     const boxes = [`<div class="osu-stat"><div class="osu-stat-value">${data.stars.toFixed(2)}⭐</div><div class="osu-stat-label">${t('pp_calc_stars_label')}</div></div>`];
     Object.keys(data.pp).map(Number).sort((a, b) => a - b).forEach(acc => {
         boxes.push(`<div class="osu-stat"><div class="osu-stat-value">${Math.round(data.pp[acc])}pp</div><div class="osu-stat-label">${acc}%</div></div>`);

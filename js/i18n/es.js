@@ -19,7 +19,7 @@ I18N.es = {
     skins_backup_hint: 'Solo para ti — hasta 30 skins, cada uno de menos de 4MB. "Restaurar en este dispositivo" lo añade de nuevo a la lista de arriba.',
     skins_backup_login_required: 'Inicia sesión con osu! para usar la copia de seguridad en la nube', skins_backup_too_large: 'Este skin supera los {limit}MB, así que solo puede quedarse en este dispositivo',
     skins_backup_done: 'Guardado en la nube', skins_backup_fail: 'Error al guardar en la nube, inténtalo más tarde', skins_backup_empty: 'Todavía no hay skins guardados en la nube',
-    skins_backup_restore: 'Restaurar en este dispositivo', skins_backup_restored: 'Restaurado en este dispositivo',
+    skins_backup_restore: 'Restaurar en este dispositivo', skins_backup_restored: 'Restaurado en este dispositivo', skins_by_author: 'por {author}',
     skins_empty: 'Aún no hay skins guardados', skins_download: 'Descargar', skins_delete: 'Eliminar', skins_delete_confirm: '¿Eliminar este archivo de skin?',
     skins_upload_done: '{n} archivo(s) añadido(s)', skins_upload_fail: 'Error al subir "{n}"', skins_load_fail: 'No se pudo cargar la lista de skins — comprueba que el navegador permite almacenamiento local',
 
@@ -59,6 +59,8 @@ I18N.es = {
     pp_calc_calculating: 'Calculando...', pp_calc_error: 'Error en el cálculo, inténtalo de nuevo más tarde', pp_calc_stars_label: 'Estrellas',
     pp_calc_strain_title: 'Curva de dificultad', pp_calc_strain_unsupported: 'No hay datos de dificultad disponibles para este mapa', pp_calc_acc_invalid: 'Introduce una precisión entre 0 y 100',
     pp_calc_hint: 'Elige una dificultad, marca mods, introduce una precisión y pulsa "Calcular" para recalcular estrellas y PP, y ver la curva de dificultad de este mapa abajo.',
+    pp_calc_combo_label: 'Combo', pp_calc_combo_placeholder: 'Combo completo', pp_calc_miss_label: 'Fallos',
+    pp_calc_combo_invalid: 'Introduce un combo / número de fallos válido', pp_calc_combo_full: 'Combo completo ({max}x)', pp_calc_combo_misses: ' · {n} fallo(s)',
 
     osu_share_link_btn: 'Compartir enlace de colección', osu_share_link_done: '¡Enlace copiado! Compártelo con amigos — al abrirlo podrán importar con un clic.',
     osu_share_link_fail: 'Error al generar el enlace para compartir', osu_share_link_empty: 'Tu colección está vacía — añade algunos beatmaps primero',

@@ -38,6 +38,12 @@ exports.handler = async (event) => {
         .slice(0, MAX_ACC_VALUES);
     if (accList.length === 0) accList.push(100);
 
+    // Both optional — omitted means "full combo" / "no misses" respectively,
+    // which is what rosu-pp-js itself defaults to when a Performance option
+    // is left unset, so there's no need to compute or send a real default.
+    const combo = /^\d+$/.test(qs.combo || '') ? parseInt(qs.combo, 10) : undefined;
+    const misses = /^\d+$/.test(qs.misses || '') ? Math.min(parseInt(qs.misses, 10), 5000) : undefined;
+
     try {
         const res = await fetch(`https://osu.ppy.sh/osu/${id}`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
@@ -53,7 +59,13 @@ exports.handler = async (event) => {
 
         const pp = {};
         for (const acc of accList) {
-            const perf = new rosu.Performance({ mods, accuracy: acc });
+            const perfOpts = { mods, accuracy: acc };
+            // Clamped to maxCombo rather than rejected — a visitor typing a
+            // combo higher than the map allows is a mistake, not something
+            // worth a 4xx round trip for.
+            if (combo !== undefined) perfOpts.combo = Math.min(combo, diffAttrs.maxCombo);
+            if (misses !== undefined) perfOpts.misses = misses;
+            const perf = new rosu.Performance(perfOpts);
             pp[acc] = perf.calculate(diffAttrs).pp;
         }
 

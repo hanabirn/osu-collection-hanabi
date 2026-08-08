@@ -129,6 +129,13 @@
     color: var(--text-secondary);
     margin-top: 2px;
 }
+.skin-item-ini-info {
+    font-size: 0.76rem;
+    color: var(--text-dim2);
+    margin-top: 2px;
+    font-style: italic;
+}
+.skin-item-ini-info:empty { display: none; }
 .skin-item-actions {
     display: flex;
     gap: 6px;
@@ -1761,6 +1768,13 @@
     font-family: inherit;
 }
 .pp-calc-acc-row .btn { margin-left: auto; padding: 9px 18px; font-size: 0.85rem; }
+.pp-calc-combo-row { flex-wrap: wrap; }
+.pp-calc-combo-label {
+    font-size: 0.78rem;
+    color: var(--text-pink);
+    margin-bottom: 8px;
+    text-align: center;
+}
 .pp-calc-result {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));

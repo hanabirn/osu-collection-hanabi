@@ -21,7 +21,7 @@ I18N.zh = {
     skins_backup_hint: '僅供你自己使用，最多 30 個、每個 4MB 以下。「還原到本機」會把它加回上面的清單。',
     skins_backup_login_required: '請先登入 osu! 才能使用雲端備份', skins_backup_too_large: '此皮膚超過 {limit}MB，僅能保存在本機',
     skins_backup_done: '已備份到雲端', skins_backup_fail: '雲端備份失敗，請稍後再試', skins_backup_empty: '雲端還沒有備份任何皮膚',
-    skins_backup_restore: '還原到本機', skins_backup_restored: '已還原到本機',
+    skins_backup_restore: '還原到本機', skins_backup_restored: '已還原到本機', skins_by_author: '作者：{author}',
 
     osu_title: '♫ 新增 Beatmap ♫', osu_placeholder: '輸入 ID 或貼上 osu! 網址', osu_add: '新增',
     osu_password: '🔒 設定密碼',
@@ -59,6 +59,8 @@ I18N.zh = {
     pp_calc_calculating: '計算中...', pp_calc_error: '計算失敗，請稍後再試', pp_calc_stars_label: '星數',
     pp_calc_strain_title: '難度曲線', pp_calc_strain_unsupported: '此譜面暫無難度曲線資料', pp_calc_acc_invalid: '請輸入 0～100 之間的準確率',
     pp_calc_hint: '選擇難度、勾選 Mods、輸入準確率後按「計算」，即可重新試算星數與 PP，並顯示這張圖的難度曲線。',
+    pp_calc_combo_label: 'Combo', pp_calc_combo_placeholder: '滿 Combo', pp_calc_miss_label: 'Miss 數',
+    pp_calc_combo_invalid: '請輸入有效的 Combo / Miss 數', pp_calc_combo_full: '滿 Combo（{max}x）', pp_calc_combo_misses: ' · {n} miss',
 
     osu_share_link_btn: '分享收藏連結', osu_share_link_done: '收藏連結已複製！分享給朋友，他們點開就能一鍵匯入。',
     osu_share_link_fail: '產生分享連結失敗', osu_share_link_empty: '收藏是空的，先新增幾張圖再分享吧',

@@ -19,7 +19,7 @@ I18N.ko = {
     skins_backup_hint: '본인만 사용할 수 있습니다. 최대 30개, 각 4MB 이하. "기기로 복원"을 누르면 위 목록에 다시 추가됩니다.',
     skins_backup_login_required: '클라우드 백업을 사용하려면 osu! 로그인이 필요합니다', skins_backup_too_large: '이 스킨은 {limit}MB를 초과하여 이 기기에만 저장할 수 있습니다',
     skins_backup_done: '클라우드에 백업했습니다', skins_backup_fail: '클라우드 백업 실패, 잠시 후 다시 시도해주세요', skins_backup_empty: '아직 클라우드에 백업된 스킨이 없습니다',
-    skins_backup_restore: '기기로 복원', skins_backup_restored: '이 기기로 복원했습니다',
+    skins_backup_restore: '기기로 복원', skins_backup_restored: '이 기기로 복원했습니다', skins_by_author: '제작자: {author}',
     skins_empty: '아직 저장된 스킨이 없습니다', skins_download: '다운로드', skins_delete: '삭제', skins_delete_confirm: '이 스킨 파일을 삭제하시겠습니까?',
     skins_upload_done: '{n}개 파일을 추가했습니다', skins_upload_fail: '"{n}" 업로드에 실패했습니다', skins_load_fail: '스킨 목록을 불러오지 못했습니다. 브라우저의 로컬 저장소 허용 여부를 확인해 주세요',
 
@@ -59,6 +59,8 @@ I18N.ko = {
     pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
     pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',
     pp_calc_hint: '난이도를 선택하고 Mods를 체크한 뒤 정확도를 입력하고 "계산"을 누르면 별점과 PP를 다시 계산하고, 아래에 난이도 곡선을 보여줍니다.',
+    pp_calc_combo_label: '콤보', pp_calc_combo_placeholder: '풀 콤보', pp_calc_miss_label: '미스 수',
+    pp_calc_combo_invalid: '유효한 콤보 / 미스 수를 입력해주세요', pp_calc_combo_full: '풀 콤보 ({max}x)', pp_calc_combo_misses: ' · 미스 {n}개',
 
     osu_share_link_btn: '컬렉션 링크 공유', osu_share_link_done: '링크가 복사되었습니다! 친구에게 공유하면 열기만 해도 한 번에 가져올 수 있어요.',
     osu_share_link_fail: '공유 링크 생성 실패', osu_share_link_empty: '컬렉션이 비어 있습니다. 먼저 비트맵을 추가해주세요',

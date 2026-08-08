@@ -19,7 +19,7 @@ I18N.fr = {
     skins_backup_hint: "Réservé à vous seul — jusqu'à 30 skins, chacun de moins de 4 Mo. « Restaurer sur cet appareil » le rajoute à la liste ci-dessus.",
     skins_backup_login_required: 'Connectez-vous avec osu! pour utiliser la sauvegarde cloud', skins_backup_too_large: 'Ce skin dépasse {limit} Mo, il ne peut donc rester que sur cet appareil',
     skins_backup_done: 'Sauvegardé dans le cloud', skins_backup_fail: 'Échec de la sauvegarde cloud, réessayez plus tard', skins_backup_empty: "Aucun skin sauvegardé dans le cloud pour l'instant",
-    skins_backup_restore: 'Restaurer sur cet appareil', skins_backup_restored: 'Restauré sur cet appareil',
+    skins_backup_restore: 'Restaurer sur cet appareil', skins_backup_restored: 'Restauré sur cet appareil', skins_by_author: 'par {author}',
     skins_empty: 'Aucun skin enregistré pour le moment', skins_download: 'Télécharger', skins_delete: 'Supprimer', skins_delete_confirm: 'Supprimer ce fichier de skin ?',
     skins_upload_done: '{n} fichier(s) ajouté(s)', skins_upload_fail: "Échec de l'envoi de « {n} »", skins_load_fail: "Échec du chargement de la liste des skins — vérifiez que le navigateur autorise le stockage local",
 
@@ -59,6 +59,8 @@ I18N.fr = {
     pp_calc_calculating: 'Calcul en cours...', pp_calc_error: 'Échec du calcul, veuillez réessayer plus tard', pp_calc_stars_label: 'Étoiles',
     pp_calc_strain_title: 'Courbe de difficulté', pp_calc_strain_unsupported: 'Aucune donnée de difficulté disponible pour cette carte', pp_calc_acc_invalid: 'Entrez une précision entre 0 et 100',
     pp_calc_hint: "Choisissez une difficulté, cochez des mods, entrez une précision puis cliquez sur « Calculer » pour recalculer les étoiles et les PP, et afficher la courbe de difficulté de cette carte ci-dessous.",
+    pp_calc_combo_label: 'Combo', pp_calc_combo_placeholder: 'Combo complet', pp_calc_miss_label: 'Miss',
+    pp_calc_combo_invalid: 'Veuillez entrer un combo / nombre de miss valide', pp_calc_combo_full: 'Combo complet ({max}x)', pp_calc_combo_misses: ' · {n} miss',
 
     osu_share_link_btn: 'Partager le lien de la collection', osu_share_link_done: "Lien copié ! Partagez-le avec vos amis — en l'ouvrant, ils pourront importer en un clic.",
     osu_share_link_fail: 'Échec de la génération du lien de partage', osu_share_link_empty: "Votre collection est vide — ajoutez d'abord des beatmaps",

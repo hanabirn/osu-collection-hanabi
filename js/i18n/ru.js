@@ -19,7 +19,7 @@ I18N.ru = {
     skins_backup_hint: 'Только для вас — до 30 скинов, каждый до 4МБ. «Восстановить на устройство» вернёт его в список выше.',
     skins_backup_login_required: 'Войдите через osu!, чтобы использовать облачное резервирование', skins_backup_too_large: 'Этот скин превышает {limit}МБ, поэтому может храниться только на этом устройстве',
     skins_backup_done: 'Сохранено в облако', skins_backup_fail: 'Не удалось сохранить в облако, попробуйте позже', skins_backup_empty: 'В облаке пока нет сохранённых скинов',
-    skins_backup_restore: 'Восстановить на устройство', skins_backup_restored: 'Восстановлено на этом устройстве',
+    skins_backup_restore: 'Восстановить на устройство', skins_backup_restored: 'Восстановлено на этом устройстве', skins_by_author: 'автор: {author}',
     skins_empty: 'Пока нет сохранённых скинов', skins_download: 'Скачать', skins_delete: 'Удалить', skins_delete_confirm: 'Удалить этот файл скина?',
     skins_upload_done: 'Добавлено файлов: {n}', skins_upload_fail: 'Не удалось загрузить «{n}»', skins_load_fail: 'Не удалось загрузить список скинов — проверьте, разрешено ли браузеру локальное хранилище',
 
@@ -59,6 +59,8 @@ I18N.ru = {
     pp_calc_calculating: 'Расчёт...', pp_calc_error: 'Не удалось выполнить расчёт, попробуйте позже', pp_calc_stars_label: 'Звёзды',
     pp_calc_strain_title: 'График сложности', pp_calc_strain_unsupported: 'Для этой карты нет данных о сложности во времени', pp_calc_acc_invalid: 'Введите точность от 0 до 100',
     pp_calc_hint: 'Выберите сложность, отметьте моды, введите точность и нажмите «Рассчитать» — звёзды и PP пересчитаются, а ниже появится график сложности этой карты.',
+    pp_calc_combo_label: 'Комбо', pp_calc_combo_placeholder: 'Полное комбо', pp_calc_miss_label: 'Помарки',
+    pp_calc_combo_invalid: 'Введите корректное значение комбо / помарок', pp_calc_combo_full: 'Полное комбо ({max}x)', pp_calc_combo_misses: ' · {n} помарок',
 
     osu_share_link_btn: 'Поделиться ссылкой на коллекцию', osu_share_link_done: 'Ссылка скопирована! Поделитесь с друзьями — открыв её, они смогут импортировать всё в один клик.',
     osu_share_link_fail: 'Не удалось создать ссылку', osu_share_link_empty: 'Коллекция пуста — сначала добавьте несколько битмапов',
