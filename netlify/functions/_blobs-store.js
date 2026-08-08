@@ -17,4 +17,12 @@ function getCollectionsStore() {
     });
 }
 
-module.exports = { getCollectionsStore };
+function getSkinBackupsStore() {
+    return getStore({
+        name: 'osu-skin-backups',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore };

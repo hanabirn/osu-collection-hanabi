@@ -166,10 +166,132 @@ async function renderSkinsList() {
                 <div class="skin-item-meta">${formatSkinSize(s.size)} &middot; ${new Date(s.addedAt).toLocaleDateString()}</div>
             </div>
             <div class="skin-item-actions">
+                <button class="skin-backup-btn" onclick="backupSkinToCloud(${s.id})" title="${t('skins_backup_btn')}">☁️</button>
                 <button class="skin-download-btn" onclick="downloadSkinFile(${s.id})">${t('skins_download')}</button>
                 <button class="skin-delete-btn" onclick="confirmDeleteSkin(${s.id})">${t('skins_delete')}</button>
             </div>
         </div>
     `).join('');
     loadSkinThumbnails(skins);
+}
+
+/* ===== Optional cloud backup =====
+   Strictly opt-in and size-capped — see netlify/functions/skins-upload.js
+   for exactly why (Netlify Functions' ~6MB request body ceiling vs. real
+   skins commonly running 10-200+ MB). Lives as its own list rather than a
+   per-item "synced" toggle on the local list above: a cloud backup is a
+   snapshot copy, not a live mirror, so keeping the two lists independent
+   avoids having to reconcile local-vs-cloud identity for files that have no
+   stable id of their own (only a name + size, both mutable). ===== */
+const SKIN_BACKUP_MAX_BYTES = 4 * 1024 * 1024;
+
+function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(String(reader.result).split(',')[1] || '');
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+async function backupSkinToCloud(localId) {
+    const token = getOsuAuthToken();
+    if (!token) { showShareToast(t('skins_backup_login_required')); return; }
+
+    const skins = await getAllSkins();
+    const skin = skins.find(s => s.id === localId);
+    if (!skin) return;
+    if (skin.size > SKIN_BACKUP_MAX_BYTES) {
+        showShareToast(t('skins_backup_too_large', { limit: SKIN_BACKUP_MAX_BYTES / 1024 / 1024 }));
+        return;
+    }
+
+    try {
+        const dataBase64 = await blobToBase64(skin.file);
+        const res = await fetch('/.netlify/functions/skins-upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ name: skin.name, dataBase64 }),
+        });
+        if (res.status === 401) { showShareToast(t('skins_backup_login_required')); return; }
+        if (!res.ok) throw new Error('upload failed');
+        showShareToast(t('skins_backup_done'));
+        renderCloudSkinsList();
+    } catch (e) {
+        console.error('Skin cloud backup failed:', e);
+        showShareToast(t('skins_backup_fail'));
+    }
+}
+
+async function renderCloudSkinsList() {
+    const section = document.getElementById('cloud-skins-section');
+    const container = document.getElementById('cloud-skins-list');
+    if (!section || !container) return;
+
+    const token = getOsuAuthToken();
+    if (!token) { section.style.display = 'none'; return; }
+    section.style.display = '';
+
+    try {
+        const res = await fetch('/.netlify/functions/skins-list', { headers: { Authorization: `Bearer ${token}` } });
+        if (res.status === 401) { section.style.display = 'none'; return; }
+        if (!res.ok) throw new Error('list failed');
+        const data = await res.json();
+        const items = data.items || [];
+
+        if (items.length === 0) {
+            container.innerHTML = `<p class="skins-empty">${t('skins_backup_empty')}</p>`;
+            return;
+        }
+        container.innerHTML = items.map(it => `
+            <div class="skin-item cloud-skin-item">
+                <div class="skin-item-thumb">☁️</div>
+                <div class="skin-item-info">
+                    <div class="skin-item-name">${escapeSkinName(it.name)}</div>
+                    <div class="skin-item-meta">${formatSkinSize(it.size)} &middot; ${new Date(it.uploadedAt).toLocaleDateString()}</div>
+                </div>
+                <div class="skin-item-actions">
+                    <button class="skin-download-btn" onclick="restoreCloudSkinToLocal('${it.id}', decodeURIComponent('${encodeURIComponent(it.name)}'))">${t('skins_backup_restore')}</button>
+                    <button class="skin-delete-btn" onclick="confirmDeleteCloudSkin('${it.id}')">${t('skins_delete')}</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Cloud skins list failed:', e);
+        container.innerHTML = `<p class="skins-empty">${t('skins_load_fail')}</p>`;
+    }
+}
+
+async function restoreCloudSkinToLocal(id, name) {
+    const token = getOsuAuthToken();
+    if (!token) { showShareToast(t('skins_backup_login_required')); return; }
+    try {
+        const res = await fetch(`/.netlify/functions/skins-download?id=${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error('download failed');
+        const blob = await res.blob();
+        await addSkinFile(new File([blob], name, { type: 'application/octet-stream' }));
+        showShareToast(t('skins_backup_restored'));
+        renderSkinsList();
+    } catch (e) {
+        console.error('Cloud skin restore failed:', e);
+        showShareToast(t('skins_backup_fail'));
+    }
+}
+
+async function confirmDeleteCloudSkin(id) {
+    if (!confirm(t('skins_delete_confirm'))) return;
+    const token = getOsuAuthToken();
+    if (!token) { showShareToast(t('skins_backup_login_required')); return; }
+    try {
+        const res = await fetch('/.netlify/functions/skins-delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ id }),
+        });
+        if (!res.ok) throw new Error('delete failed');
+        renderCloudSkinsList();
+    } catch (e) {
+        console.error('Cloud skin delete failed:', e);
+        showShareToast(t('skins_backup_fail'));
+    }
 }
