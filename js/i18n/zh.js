@@ -11,7 +11,7 @@ I18N.zh = {
     back_to_main: '返回 Hanabiの小天地',
     nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報', nav_tournaments: '賽事', nav_replay: 'Replay 錄影', nav_feedback: '建議&改進',
     updates_title: '✦ 更新情報 ✦', updates_loading: '載入更新資訊中...', updates_empty: '目前沒有更新資訊', updates_load_fail: '更新資訊載入失敗，稍後再試',
-    tournaments_title: '✦ 賽事 ✦', tournaments_hint: '來自官方論壇「Tournaments」版的社群賽事貼文，非官方主辦活動，報名前請自行確認主辦方規則。', tournaments_filter_hint: '遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。', osu_filter_all: '全部',
+    tournaments_title: '✦ 賽事 ✦', tournaments_hint: '整合官方論壇「Tournaments」版貼文與 wyBin 平台的社群賽事，非官方主辦活動，報名前請自行確認主辦方規則。', tournaments_filter_hint: '遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。', osu_filter_all: '全部', tournament_source_forum: '論壇',
     replay_title: '✦ Replay 錄影 ✦', replay_hint: '上傳 .osr replay 檔案，透過開源服務 o!rdr（ordr.issou.best）免費生成播放影片。生成時間依伺服器忙碌程度而定，通常 1～5 分鐘；影片存放在 o!rdr 的伺服器上，不是這個網站。', replay_upload_title: '上傳 Replay', replay_username_placeholder: '顯示名稱（選填）', replay_skin_placeholder: '搜尋皮膚名稱...', replay_submit: '產生影片', replay_history_title: '我的影片',
     replay_submitting: '上傳中...', replay_rendering: '已送出，開始生成影片...', replay_submit_fail: '送出失敗：{n}', replay_render_fail: '生成失敗（錯誤代碼 {n}）', replay_render_fail_short: '生成失敗', replay_render_done: '影片已完成！', replay_progress: '生成中：{n}', replay_skin_none: '找不到符合的皮膚', replay_history_empty: '還沒有生成過影片', replay_watch: '觀看影片', replay_history_pending: '生成中...',
     feedback_title: '✦ 建議&改進 ✦', feedback_hint: '覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。', feedback_placeholder: '寫下你的建議...', feedback_submit: '送出', feedback_success: '您的回覆訊息已傳送，感謝您的回饋！',

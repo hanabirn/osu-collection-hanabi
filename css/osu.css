@@ -82,10 +82,20 @@
 }
 .news-item-body { min-width: 0; flex: 1; }
 .news-item-header { display: flex; justify-content: space-between; gap: 8px; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 4px; }
-.news-item-stats { flex-shrink: 0; white-space: nowrap; }
+.news-item-meta { display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 3px; white-space: normal; overflow-wrap: anywhere; }
 .news-title { display: block; color: var(--text); font-size: 0.85rem; line-height: 1.4; }
 .news-loading, .news-empty { color: var(--text-secondary); font-size: 0.85rem; padding: 12px 0; }
 .tournaments-hint { text-align: center; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px; }
+.tournament-source-badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.68rem;
+    font-weight: bold;
+    padding: 1px 7px;
+    border-radius: 20px;
+}
+.tournament-source-forum { background: rgba(var(--accent-purple-rgb), 0.18); color: var(--accent-light-purple); }
+.tournament-source-wybin { background: rgba(255,140,66,0.18); color: #ff9d5c; }
 .skin-item {
     display: flex;
     align-items: center;
