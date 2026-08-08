@@ -1,6 +1,7 @@
 I18N.es = {
     title: 'osu! Colección', site_title: 'osu! Colección', site_tagline: '✦ Colección de beatmaps + búsqueda de PP ✦',
     pwa_install_btn_title: 'Añadir a la pantalla de inicio (funciona sin conexión)',
+    site_update_btn_title: 'Hay una actualización disponible, haz clic para actualizar', site_update_available: 'Hay una nueva versión del sitio disponible — haz clic en 🔄 arriba a la derecha para actualizar',
     track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',
     track_done: 'Añadido a tu lista de seguimiento — te avisaremos si cambia su PP', untrack_done: 'Eliminado de tu lista de seguimiento',
     tracked_players_title: '🔔 Jugadores seguidos', tracked_players_empty: 'Todavía no sigues a nadie — busca a un jugador y pulsa "Seguir" para recibir avisos de cambios de PP',

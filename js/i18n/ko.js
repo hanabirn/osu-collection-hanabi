@@ -1,6 +1,7 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 비트맵 컬렉션 + PP 조회 ✦',
     pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
+    site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 오른쪽 위 🔄 을 클릭해 업데이트하세요',
     track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',
     track_done: '추적 목록에 추가되었습니다. PP가 변하면 알려드릴게요', untrack_done: '추적을 해제했습니다',
     tracked_players_title: '🔔 추적 중인 플레이어', tracked_players_empty: '아직 추적 중인 플레이어가 없습니다. 검색 후 "추적"을 누르면 PP 변화를 알려드립니다',

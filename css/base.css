@@ -353,6 +353,20 @@ a:hover { text-decoration: underline; }
 }
 .theme-toggle-btn:active { transform: scale(0.92) rotate(15deg); }
 
+/* Gentle pulse so a waiting update doesn't just sit there unnoticed in a
+   row of otherwise-static icon buttons — same visual language as the
+   collection page's ▶ preview button (see .osu-card-play's playPulse). */
+.site-update-btn {
+    border-color: var(--accent-pink);
+    color: var(--accent-pink);
+    animation: siteUpdatePulse 1.6s ease-in-out infinite;
+}
+.site-update-btn:disabled { animation: none; opacity: 0.6; cursor: default; }
+@keyframes siteUpdatePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-pink-rgb), 0.45); }
+    50% { box-shadow: 0 0 0 7px rgba(var(--accent-pink-rgb), 0); }
+}
+
 .osu-login-btn {
     display: inline-flex;
     align-items: center;

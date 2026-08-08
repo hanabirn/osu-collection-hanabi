@@ -1,6 +1,7 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ ビートマップコレクション＋PP検索 ✦',
     pwa_install_btn_title: 'ホーム画面に追加（オフライン対応）',
+    site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。右上の 🔄 をクリックして更新してください',
     track_player_btn: '+ フォロー', untrack_player_btn: 'フォロー解除',
     track_done: 'ウォッチリストに追加しました。PP が変化したら通知します', untrack_done: 'フォローを解除しました',
     tracked_players_title: '🔔 フォロー中のプレイヤー', tracked_players_empty: 'まだ誰もフォローしていません。検索して「フォロー」を押すと、PP の変化を通知します',

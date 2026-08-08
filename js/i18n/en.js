@@ -1,6 +1,7 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Beatmap Collection + PP Lookup ✦',
     pwa_install_btn_title: 'Add to home screen (works offline)',
+    site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click 🔄 in the top right to update',
     track_player_btn: '+ Track', untrack_player_btn: 'Untrack',
     track_done: "Added to your watchlist — we'll notify you when their PP changes", untrack_done: 'Removed from your watchlist',
     tracked_players_title: '🔔 Tracked players', tracked_players_empty: "You're not tracking anyone yet — look someone up and hit \"Track\" to get notified when their PP changes",

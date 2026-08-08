@@ -1,6 +1,7 @@
 I18N.de = {
     title: 'osu! Sammlung', site_title: 'osu! Sammlung', site_tagline: '✦ Beatmap-Sammlung + PP-Suche ✦',
     pwa_install_btn_title: 'Zum Startbildschirm hinzufügen (funktioniert offline)',
+    site_update_btn_title: 'Ein Update ist verfügbar, zum Aktualisieren klicken', site_update_available: 'Eine neue Version der Seite ist verfügbar — klicke oben rechts auf 🔄, um zu aktualisieren',
     track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',
     track_done: 'Zur Beobachtungsliste hinzugefügt — wir benachrichtigen dich bei PP-Änderungen', untrack_done: 'Von der Beobachtungsliste entfernt',
     tracked_players_title: '🔔 Beobachtete Spieler', tracked_players_empty: 'Du beobachtest noch niemanden — suche einen Spieler und klicke auf "Verfolgen", um bei PP-Änderungen benachrichtigt zu werden',

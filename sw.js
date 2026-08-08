@@ -34,8 +34,17 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(SHELL_CACHE)
             .then(cache => cache.addAll(SHELL_ASSETS))
-            .then(() => self.skipWaiting())
     );
+    // No unconditional self.skipWaiting() here on purpose: a first-ever
+    // install has no old worker to wait behind anyway, and an *update*
+    // should stay parked in "waiting" until the visitor actually clicks the
+    // 更新網站 button (js/pwa.js), not swap the running page's code out from
+    // under it — see the message handler below for how that button's click
+    // reaches this worker.
+});
+
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
