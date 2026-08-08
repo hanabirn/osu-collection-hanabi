@@ -83,4 +83,26 @@ I18N.de = {
     gallery_liked_only: 'Nur von mir geliked', gallery_like_btn_title: 'Gefällt mir',
     gallery_like_login_required: 'Melde dich mit osu! an, um zu liken', gallery_like_fail: 'Liken fehlgeschlagen, bitte später erneut versuchen',
     gallery_no_results: 'Keine passenden Sammlungen — versuche ein anderes Stichwort oder Tag', gallery_tag_filter_clear_title: 'Tag-Filter entfernen',
+
+    pp_goal_tab: '🎯 PP-Ziel', pp_goal_hint: 'Aktuelles Gesamt-PP in {mode}: {current}pp. Ziel eingeben, um das minimal benötigte PP für einen neuen Play zu sehen.',
+    pp_goal_placeholder: 'Ziel-Gesamt-PP', pp_goal_btn: 'Berechnen', pp_goal_invalid: 'Bitte ein gültiges Ziel-PP eingeben',
+    pp_goal_achieved: '🎉 Bereits erreicht!', pp_goal_result_label: 'Neuer Play braucht mindestens',
+
+    collection_db_btn_title: 'Als osu! Collection exportieren', collection_db_title: '📦 Als osu! Collection exportieren',
+    collection_db_hint: 'Erstellt eine collection.db, die dein osu!-Client lesen kann, basierend auf deinen Kategorien (inkl. Favoriten) — herunterladen und in deinen osu!-Ordner kopieren. Das ersetzt deine vorhandene collection.db — willst du das Bestehende behalten, lade es unten hoch, um es zuerst zusammenzuführen (gleichnamige Sammlungen werden überschrieben, alles andere bleibt unberührt).',
+    collection_db_merge_label: 'Mit vorhandener collection.db zusammenführen (optional)', collection_db_export_btn: 'Exportieren',
+    collection_db_empty: 'Deine Sammlung ist leer — nichts zu exportieren', collection_db_fetching: 'Beatmap-Infos werden geladen... {done}/{total}',
+    collection_db_all_name: 'osu! Sammlung', collection_db_done: 'Export abgeschlossen! Kopiere collection.db in deinen osu!-Ordner',
+
+    stats_dashboard_btn_title: 'Sammlungs-Statistik-Dashboard', stats_dashboard_title: '📊 Sammlungs-Statistik-Dashboard',
+    stats_dashboard_empty: 'Deine Sammlung ist leer — noch nichts anzuzeigen', stats_dashboard_stars_title: 'Sterne-Verteilung',
+    stats_dashboard_modes_title: 'Modus-Verteilung', stats_dashboard_mappers_title: 'Top 10 Mapper',
+    stats_dashboard_growth_title: 'Sammlungswachstum', stats_dashboard_growth_baseline: 'Bereits vorhanden',
+
+    leaderboard_btn: '🏆 Bestenliste', leaderboard_title: '🏆 Bestenliste beobachteter Spieler',
+
+    tracked_mappers_title: '🎨 Beobachtete Mapper', tracked_mappers_hint: 'Gib den osu!-Benutzernamen eines Mappers ein — du wirst benachrichtigt, wenn er eine neue Map rankt.',
+    mapper_track_placeholder: 'Benutzername des Mappers...', mapper_track_btn: 'Verfolgen',
+    mapper_already_tracked: 'Du verfolgst diesen Mapper bereits', mapper_track_done: 'Zur Beobachtung hinzugefügt — du wirst über neue Maps benachrichtigt',
+    tracked_mappers_empty: 'Du beobachtest noch keine Mapper', notif_mapper_new_title: '{name} hat eine neue Map gerankt',
 };

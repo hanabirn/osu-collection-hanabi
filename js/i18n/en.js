@@ -83,4 +83,26 @@ I18N.en = {
     gallery_liked_only: 'Liked by me only', gallery_like_btn_title: 'Like',
     gallery_like_login_required: 'Log in with osu! to like collections', gallery_like_fail: 'Failed to like, please try again later',
     gallery_no_results: 'No collections match your search — try a different keyword or tag', gallery_tag_filter_clear_title: 'Clear tag filter',
+
+    pp_goal_tab: '🎯 PP Goal', pp_goal_hint: 'Current {mode} total PP: {current}pp. Enter a target to see the minimum PP a new play needs.',
+    pp_goal_placeholder: 'Target total PP', pp_goal_btn: 'Calculate', pp_goal_invalid: 'Please enter a valid target PP',
+    pp_goal_achieved: '🎉 Already there!', pp_goal_result_label: 'New play needs at least',
+
+    collection_db_btn_title: 'Export to osu! Collection', collection_db_title: '📦 Export to osu! Collection',
+    collection_db_hint: "Builds a collection.db your osu! client can read straight from your categories (including Favorites) — download it and drop it into your osu! folder. This replaces your existing collection.db, so if you want to keep what's already there, upload it below to merge first (same-named collections get overwritten, everything else stays untouched).",
+    collection_db_merge_label: 'Merge with existing collection.db (optional)', collection_db_export_btn: 'Export',
+    collection_db_empty: 'Your collection is empty — nothing to export', collection_db_fetching: 'Fetching beatmap info... {done}/{total}',
+    collection_db_all_name: 'osu! Collection', collection_db_done: 'Export complete! Copy collection.db into your osu! folder',
+
+    stats_dashboard_btn_title: 'Collection stats dashboard', stats_dashboard_title: '📊 Collection Stats Dashboard',
+    stats_dashboard_empty: 'Your collection is empty — nothing to show yet', stats_dashboard_stars_title: 'Star rating distribution',
+    stats_dashboard_modes_title: 'Mode split', stats_dashboard_mappers_title: 'Top 10 mappers',
+    stats_dashboard_growth_title: 'Collection growth', stats_dashboard_growth_baseline: 'Already had',
+
+    leaderboard_btn: '🏆 Leaderboard', leaderboard_title: '🏆 Tracked Players Leaderboard',
+
+    tracked_mappers_title: '🎨 Tracked Mappers', tracked_mappers_hint: "Enter a mapper's osu! username — you'll be notified when they rank a new map.",
+    mapper_track_placeholder: "Enter mapper's username...", mapper_track_btn: 'Track',
+    mapper_already_tracked: "You're already tracking this mapper", mapper_track_done: "Tracking added — you'll be notified about new maps",
+    tracked_mappers_empty: "You're not tracking any mappers yet", notif_mapper_new_title: '{name} ranked a new map',
 };

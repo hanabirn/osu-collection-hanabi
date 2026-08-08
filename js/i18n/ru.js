@@ -83,4 +83,26 @@ I18N.ru = {
     gallery_liked_only: 'Только понравившиеся мне', gallery_like_btn_title: 'Нравится',
     gallery_like_login_required: 'Войдите через osu!, чтобы ставить лайки', gallery_like_fail: 'Не удалось поставить лайк, попробуйте позже',
     gallery_no_results: 'Нет коллекций по вашему запросу — попробуйте другое слово или тег', gallery_tag_filter_clear_title: 'Сбросить фильтр по тегу',
+
+    pp_goal_tab: '🎯 Цель по PP', pp_goal_hint: 'Текущий общий PP в {mode}: {current}pp. Введите цель, чтобы узнать минимальный PP новой игры.',
+    pp_goal_placeholder: 'Целевой общий PP', pp_goal_btn: 'Рассчитать', pp_goal_invalid: 'Введите корректный целевой PP',
+    pp_goal_achieved: '🎉 Уже достигнуто!', pp_goal_result_label: 'Новой игре нужно минимум',
+
+    collection_db_btn_title: 'Экспорт в osu! Collection', collection_db_title: '📦 Экспорт в osu! Collection',
+    collection_db_hint: 'Создаёт collection.db, который понимает клиент osu!, на основе ваших категорий (включая избранное) — скачайте и скопируйте в папку osu!. Это заменит существующий collection.db — если хотите сохранить то, что уже есть, сначала загрузите его ниже для объединения (коллекции с тем же именем будут перезаписаны, остальные останутся нетронутыми).',
+    collection_db_merge_label: 'Объединить с существующим collection.db (необязательно)', collection_db_export_btn: 'Экспортировать',
+    collection_db_empty: 'Ваша коллекция пуста — нечего экспортировать', collection_db_fetching: 'Получение данных карт... {done}/{total}',
+    collection_db_all_name: 'osu! Коллекция', collection_db_done: 'Экспорт завершён! Скопируйте collection.db в папку osu!',
+
+    stats_dashboard_btn_title: 'Панель статистики коллекции', stats_dashboard_title: '📊 Панель статистики коллекции',
+    stats_dashboard_empty: 'Ваша коллекция пуста — пока нечего показать', stats_dashboard_stars_title: 'Распределение по звёздам',
+    stats_dashboard_modes_title: 'Распределение по режимам', stats_dashboard_mappers_title: 'Топ-10 мапперов',
+    stats_dashboard_growth_title: 'Рост коллекции', stats_dashboard_growth_baseline: 'Уже было',
+
+    leaderboard_btn: '🏆 Таблица лидеров', leaderboard_title: '🏆 Таблица лидеров отслеживаемых игроков',
+
+    tracked_mappers_title: '🎨 Отслеживаемые мапперы', tracked_mappers_hint: 'Введите ник маппера на osu! — вы получите уведомление, когда он зарангует новую карту.',
+    mapper_track_placeholder: 'Введите ник маппера...', mapper_track_btn: 'Отслеживать',
+    mapper_already_tracked: 'Вы уже отслеживаете этого маппера', mapper_track_done: 'Добавлено в отслеживаемые — сообщим о новых картах',
+    tracked_mappers_empty: 'Вы пока не отслеживаете ни одного маппера', notif_mapper_new_title: '{name} зарангал новую карту',
 };

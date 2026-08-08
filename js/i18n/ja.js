@@ -83,4 +83,26 @@ I18N.ja = {
     gallery_liked_only: 'いいねしたものだけ表示', gallery_like_btn_title: 'いいね',
     gallery_like_login_required: 'いいねするには osu! でログインしてください', gallery_like_fail: 'いいねに失敗しました。しばらくしてからお試しください',
     gallery_no_results: '条件に一致するコレクションがありません。別のキーワードやタグをお試しください', gallery_tag_filter_clear_title: 'タグ絞り込みを解除',
+
+    pp_goal_tab: '🎯 PP目標', pp_goal_hint: '現在の{mode}の合計PP：{current}pp。目標を入力すると、新しいプレイに最低限必要なPPがわかります。',
+    pp_goal_placeholder: '目標の合計PP', pp_goal_btn: '計算', pp_goal_invalid: '有効な目標PPを入力してください',
+    pp_goal_achieved: '🎉 すでに達成しています！', pp_goal_result_label: '新しいプレイに最低限必要なPP',
+
+    collection_db_btn_title: 'osu! Collectionとして書き出す', collection_db_title: '📦 osu! Collectionとして書き出す',
+    collection_db_hint: 'あなたの分類（「お気に入り」を含む）から、osu!クライアントが読み込める collection.db を作成します。ダウンロードして osu! フォルダにコピーしてください。これはあなたの端末にある既存の collection.db を置き換えます。既存のコレクションを残したい場合は、下で先にアップロードして統合してください（同名のコレクションは上書きされ、それ以外はそのまま残ります）。',
+    collection_db_merge_label: '既存の collection.db と統合（任意）', collection_db_export_btn: '書き出す',
+    collection_db_empty: 'コレクションが空です。書き出すものがありません', collection_db_fetching: '譜面情報を取得中... {done}/{total}',
+    collection_db_all_name: 'osu!コレクション', collection_db_done: '書き出し完了！collection.db を osu! フォルダにコピーしてください',
+
+    stats_dashboard_btn_title: 'コレクション統計ダッシュボード', stats_dashboard_title: '📊 コレクション統計ダッシュボード',
+    stats_dashboard_empty: 'コレクションが空です。まだ統計データがありません', stats_dashboard_stars_title: '☆数の分布',
+    stats_dashboard_modes_title: 'モード別割合', stats_dashboard_mappers_title: 'マッパー頻度 Top 10',
+    stats_dashboard_growth_title: 'コレクションの成長', stats_dashboard_growth_baseline: '既存分',
+
+    leaderboard_btn: '🏆 ランキング', leaderboard_title: '🏆 フォロー中プレイヤーのランキング',
+
+    tracked_mappers_title: '🎨 マッパーをフォロー', tracked_mappers_hint: 'マッパーの osu! ユーザー名を入力すると、新しい譜面が ranked になったときに通知します。',
+    mapper_track_placeholder: 'マッパーのユーザー名を入力...', mapper_track_btn: 'フォロー',
+    mapper_already_tracked: 'このマッパーはすでにフォロー中です', mapper_track_done: 'フォローに追加しました。新しい譜面が出たら通知します',
+    tracked_mappers_empty: 'まだ誰もフォローしていません', notif_mapper_new_title: '{name} が新しい譜面を公開しました',
 };

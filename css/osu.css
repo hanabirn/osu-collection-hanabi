@@ -1290,6 +1290,47 @@
 .pp-compare-side-b .pp-compare-side-pp { color: var(--accent-purple); }
 .pp-compare-side-pp { font-size: 0.95rem; font-weight: bold; }
 .pp-compare-vs { font-size: 0.8rem; font-weight: bold; color: var(--text-dim2); }
+
+/* ===== PP goal planner (3rd tab alongside 最近遊玩/最佳成績) ===== */
+.pp-goal-planner { padding: 4px 0; }
+.pp-goal-hint { font-size: 0.82rem; color: var(--text-secondary); text-align: center; margin-bottom: 12px; }
+.pp-goal-input-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.pp-goal-input-row input[type="number"] {
+    width: 140px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+.pp-goal-result { display: flex; justify-content: center; }
+.pp-goal-achieved { text-align: center; color: #34d399; font-weight: bold; }
+
+/* ===== Collection.db export modal ===== */
+.collection-db-upload-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 14px 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.collection-db-upload-row input[type="file"] { font-size: 0.82rem; color: var(--text); }
+
+/* ===== Stats dashboard modal ===== */
+.stats-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+.stats-dashboard-card {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    border-radius: 14px;
+    padding: 14px;
+}
+.stats-dashboard-card .trend-chart-wrap { height: 200px; }
 .visitor-result-header {
     display: flex;
     align-items: center;
@@ -1310,12 +1351,50 @@
    button has been used (see js/osu.js toggleTrackVisitorPlayer). ===== */
 .tracked-players-panel:empty { display: none; }
 .tracked-players-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     font-size: 0.85rem;
     font-weight: bold;
     color: var(--text-pink);
     margin-bottom: 10px;
     letter-spacing: 1px;
 }
+.tracked-leaderboard-btn {
+    font-size: 0.72rem;
+    font-weight: normal;
+    letter-spacing: normal;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(var(--accent-pink-rgb), 0.4);
+    background: rgba(var(--accent-pink-rgb), 0.1);
+    color: var(--text-pink);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.tracked-leaderboard-btn:hover { background: rgba(var(--accent-pink-rgb), 0.2); }
+.tracked-mapper-card { cursor: default; }
+.tracked-mapper-card:hover { transform: none; }
+
+/* ===== Leaderboard modal ===== */
+.leaderboard-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.leaderboard-row:hover { border-color: rgba(var(--accent-pink-rgb), 0.5); }
+.leaderboard-rank { font-weight: bold; color: var(--text-dim2); width: 32px; flex-shrink: 0; text-align: center; }
+.leaderboard-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.leaderboard-name { flex: 1; font-weight: bold; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leaderboard-pp { font-weight: bold; color: var(--accent-pink); }
 .tracked-players-empty {
     text-align: center;
     font-size: 0.82rem;

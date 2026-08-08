@@ -83,4 +83,26 @@ I18N.es = {
     gallery_liked_only: 'Solo las que me gustan', gallery_like_btn_title: 'Me gusta',
     gallery_like_login_required: 'Inicia sesión con osu! para dar me gusta', gallery_like_fail: 'Error al dar me gusta, inténtalo más tarde',
     gallery_no_results: 'Ninguna colección coincide — prueba otra palabra clave o etiqueta', gallery_tag_filter_clear_title: 'Quitar filtro de etiqueta',
+
+    pp_goal_tab: '🎯 Meta de PP', pp_goal_hint: 'PP total actual en {mode}: {current}pp. Introduce una meta para ver el PP mínimo que necesita una nueva partida.',
+    pp_goal_placeholder: 'PP total objetivo', pp_goal_btn: 'Calcular', pp_goal_invalid: 'Introduce un PP objetivo válido',
+    pp_goal_achieved: '🎉 ¡Ya lo has conseguido!', pp_goal_result_label: 'La nueva partida necesita al menos',
+
+    collection_db_btn_title: 'Exportar a osu! Collection', collection_db_title: '📦 Exportar a osu! Collection',
+    collection_db_hint: 'Crea un collection.db que tu cliente de osu! puede leer, a partir de tus categorías (incluyendo favoritos) — descárgalo y cópialo en tu carpeta de osu!. Esto reemplaza tu collection.db actual — si quieres conservar lo que ya tienes, súbelo abajo primero para fusionarlo (las colecciones con el mismo nombre se sobrescribirán, el resto no se tocará).',
+    collection_db_merge_label: 'Fusionar con el collection.db existente (opcional)', collection_db_export_btn: 'Exportar',
+    collection_db_empty: 'Tu colección está vacía — no hay nada que exportar', collection_db_fetching: 'Obteniendo información de beatmaps... {done}/{total}',
+    collection_db_all_name: 'osu! Colección', collection_db_done: '¡Exportación completa! Copia collection.db a tu carpeta de osu!',
+
+    stats_dashboard_btn_title: 'Panel de estadísticas de la colección', stats_dashboard_title: '📊 Panel de Estadísticas de la Colección',
+    stats_dashboard_empty: 'Tu colección está vacía — nada que mostrar todavía', stats_dashboard_stars_title: 'Distribución de estrellas',
+    stats_dashboard_modes_title: 'Distribución por modo', stats_dashboard_mappers_title: 'Top 10 de mappers',
+    stats_dashboard_growth_title: 'Crecimiento de la colección', stats_dashboard_growth_baseline: 'Ya tenías',
+
+    leaderboard_btn: '🏆 Clasificación', leaderboard_title: '🏆 Clasificación de Jugadores Seguidos',
+
+    tracked_mappers_title: '🎨 Mappers Seguidos', tracked_mappers_hint: 'Introduce el nombre de usuario osu! de un mapper — te avisaremos cuando clasifique un mapa nuevo.',
+    mapper_track_placeholder: 'Nombre de usuario del mapper...', mapper_track_btn: 'Seguir',
+    mapper_already_tracked: 'Ya estás siguiendo a este mapper', mapper_track_done: 'Añadido al seguimiento — te avisaremos de mapas nuevos',
+    tracked_mappers_empty: 'Todavía no sigues a ningún mapper', notif_mapper_new_title: '{name} ha clasificado un mapa nuevo',
 };

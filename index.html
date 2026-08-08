@@ -138,6 +138,8 @@
                 <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="分享收藏連結">🔗</button>
                 <button class="osu-refresh-all" onclick="downloadCollectionShareCard()" data-i18n-title="collection_card_btn" title="產生收藏卡">📸</button>
                 <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="🔒 設定密碼">🔒</button>
+                <button class="osu-refresh-all" onclick="openCollectionDbModal()" data-i18n-title="collection_db_btn_title" title="匯出成 osu! Collection">📦</button>
+                <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="收藏統計儀表板">📊</button>
             </div>
         </div>
 
@@ -239,8 +241,10 @@
                     <div class="osu-mode-tabs osu-plays-type-tabs">
                         <button class="osu-tab active" onclick="switchVisitorPlaysType('recent', this)" data-i18n="osu_recent_title">🎮 最近遊玩</button>
                         <button class="osu-tab" onclick="switchVisitorPlaysType('best', this)" data-i18n="osu_top_title">🏆 最佳成績</button>
+                        <button class="osu-tab" onclick="switchVisitorPlaysType('goal', this)" data-i18n="pp_goal_tab">🎯 PP 目標</button>
                     </div>
                     <div class="osu-recent-list" id="visitor-recent-list"></div>
+                    <div id="pp-goal-planner" class="pp-goal-planner" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -294,6 +298,17 @@
 
     <section id="page-updates" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="updates_title">✦ 更新情報 ✦</h2>
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="tracked_mappers_title">🎨 追蹤 Mapper</h3>
+            <p class="skins-hint" data-i18n="tracked_mappers_hint">輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。</p>
+            <div class="input-group">
+                <input type="text" id="mapper-track-input" data-i18n-placeholder="mapper_track_placeholder" placeholder="輸入 mapper 用戶名..." onkeydown="if(event.key==='Enter')trackMapperFromInput()">
+                <button onclick="trackMapperFromInput()" data-i18n="mapper_track_btn">追蹤</button>
+            </div>
+            <div id="tracked-mappers-panel" class="tracked-players-panel"></div>
+        </div>
         <div class="osu-add-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
@@ -417,6 +432,36 @@
             <button class="btn" onclick="addOsuCategoryFromModal()" data-i18n="osu_category_add_title">新增</button>
         </div>
         <div id="osu-category-manage-list"></div>
+    </div>
+</div>
+
+<div id="collection-db-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCollectionDbModal()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closeCollectionDbModal()">&#x2715;</button>
+        <h3 class="pp-calc-title" data-i18n="collection_db_title">📦 匯出成 osu! Collection</h3>
+        <p class="pp-calc-hint" data-i18n="collection_db_hint">會依照你的分類（含「最愛」）產生 osu! 遊戲讀得懂的 collection.db，下載後複製到你的 osu! 資料夾即可匯入。這會取代你電腦上原本的 collection.db——若想保留現有的收藏，可以先在下面上傳它一起合併（同名分類會被這裡的資料覆蓋，其他分類不受影響）。</p>
+        <div class="collection-db-upload-row">
+            <label data-i18n="collection_db_merge_label">合併現有 collection.db（可略過）</label>
+            <input type="file" id="collection-db-merge-input" accept=".db">
+        </div>
+        <div id="collection-db-status" class="status"></div>
+        <button class="btn" onclick="exportOsuCollectionDb()" data-i18n="collection_db_export_btn">匯出</button>
+    </div>
+</div>
+
+<div id="stats-dashboard-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeStatsDashboardModal()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closeStatsDashboardModal()">&#x2715;</button>
+        <h3 class="pp-calc-title" data-i18n="stats_dashboard_title">📊 收藏統計儀表板</h3>
+        <div id="stats-dashboard-body"></div>
+    </div>
+</div>
+
+<div id="leaderboard-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeTrackedLeaderboard()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closeTrackedLeaderboard()">&#x2715;</button>
+        <h3 class="pp-calc-title" data-i18n="leaderboard_title">🏆 追蹤玩家排行榜</h3>
+        <div id="leaderboard-list" class="leaderboard-list"></div>
     </div>
 </div>
 

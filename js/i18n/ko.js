@@ -83,4 +83,26 @@ I18N.ko = {
     gallery_liked_only: '좋아요한 것만 보기', gallery_like_btn_title: '좋아요',
     gallery_like_login_required: '좋아요를 누르려면 osu! 로그인이 필요합니다', gallery_like_fail: '좋아요 실패, 잠시 후 다시 시도해주세요',
     gallery_no_results: '조건에 맞는 컬렉션이 없습니다. 다른 키워드나 태그를 시도해보세요', gallery_tag_filter_clear_title: '태그 필터 해제',
+
+    pp_goal_tab: '🎯 PP 목표', pp_goal_hint: '현재 {mode} 총 PP: {current}pp. 목표를 입력하면 새 기록에 필요한 최소 PP를 계산합니다.',
+    pp_goal_placeholder: '목표 총 PP', pp_goal_btn: '계산', pp_goal_invalid: '유효한 목표 PP를 입력해주세요',
+    pp_goal_achieved: '🎉 이미 달성했습니다!', pp_goal_result_label: '새 기록에 최소 필요한 PP',
+
+    collection_db_btn_title: 'osu! 컬렉션으로 내보내기', collection_db_title: '📦 osu! 컬렉션으로 내보내기',
+    collection_db_hint: '분류(즐겨찾기 포함)를 기준으로 osu! 클라이언트가 읽을 수 있는 collection.db를 만듭니다. 다운로드 후 osu! 폴더에 복사하세요. 이 파일은 기존 collection.db를 대체합니다—기존 컬렉션을 유지하려면 아래에서 먼저 업로드해 병합하세요(같은 이름의 컬렉션은 덮어써지고, 나머지는 그대로 유지됩니다).',
+    collection_db_merge_label: '기존 collection.db와 병합 (선택)', collection_db_export_btn: '내보내기',
+    collection_db_empty: '컬렉션이 비어 있어 내보낼 것이 없습니다', collection_db_fetching: '비트맵 정보 불러오는 중... {done}/{total}',
+    collection_db_all_name: 'osu! 컬렉션', collection_db_done: '내보내기 완료! collection.db를 osu! 폴더에 복사하세요',
+
+    stats_dashboard_btn_title: '컬렉션 통계 대시보드', stats_dashboard_title: '📊 컬렉션 통계 대시보드',
+    stats_dashboard_empty: '컬렉션이 비어 있어 통계가 없습니다', stats_dashboard_stars_title: '별점 분포',
+    stats_dashboard_modes_title: '모드 비율', stats_dashboard_mappers_title: '매퍼 빈도 Top 10',
+    stats_dashboard_growth_title: '컬렉션 성장', stats_dashboard_growth_baseline: '기존 보유',
+
+    leaderboard_btn: '🏆 순위표', leaderboard_title: '🏆 추적 중인 플레이어 순위표',
+
+    tracked_mappers_title: '🎨 매퍼 추적', tracked_mappers_hint: '매퍼의 osu! 유저명을 입력하면 새 맵이 랭크될 때 알려드립니다.',
+    mapper_track_placeholder: '매퍼 유저명 입력...', mapper_track_btn: '추적',
+    mapper_already_tracked: '이미 이 매퍼를 추적 중입니다', mapper_track_done: '추적 목록에 추가되었습니다. 새 맵이 나오면 알려드릴게요',
+    tracked_mappers_empty: '아직 추적 중인 매퍼가 없습니다', notif_mapper_new_title: '{name} 님이 새 맵을 랭크했습니다',
 };

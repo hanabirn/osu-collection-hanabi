@@ -503,6 +503,171 @@ async function importOsuCollection(event) {
     }
 }
 
+/* ===== Export to osu!'s own collection.db =====
+   Binary format per ppy's "Legacy database file structure" docs (also used
+   by community tools like osu-db and osu!collection exporter): int32
+   version, int32 collection count, then per collection an osu!-string name
+   + int32 beatmap count + that many osu!-string MD5 hashes. The "osu!
+   string" encoding (0x00 for empty, else 0x0b + ULEB128 byte-length + UTF-8
+   bytes) is the same one used across osu!'s other binary formats (replays,
+   osu!.db), not something specific to collections.
+   The site's own collection only stores the trimmed API fields it actually
+   renders (js/osu.js addOsuBeatmap) — never the file MD5 collection.db
+   needs to identify a specific difficulty — so that has to be fetched
+   per-beatmap at export time via the same get_beatmaps proxy used
+   elsewhere, chunked to avoid firing hundreds of requests at once. */
+function writeUleb128(bytes, value) {
+    do {
+        let byte = value & 0x7f;
+        value >>>= 7;
+        if (value !== 0) byte |= 0x80;
+        bytes.push(byte);
+    } while (value !== 0);
+}
+
+function writeOsuDbString(bytes, str) {
+    if (!str) { bytes.push(0x00); return; }
+    const utf8 = Array.from(new TextEncoder().encode(str));
+    bytes.push(0x0b);
+    writeUleb128(bytes, utf8.length);
+    bytes.push(...utf8);
+}
+
+function writeInt32LE(bytes, value) {
+    bytes.push(value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff, (value >>> 24) & 0xff);
+}
+
+function buildCollectionDb(collectionsMap) {
+    const bytes = [];
+    writeInt32LE(bytes, 20220301); // just needs to look like a recent client version
+    writeInt32LE(bytes, collectionsMap.size);
+    for (const [name, hashSet] of collectionsMap) {
+        writeOsuDbString(bytes, name);
+        writeInt32LE(bytes, hashSet.size);
+        for (const md5 of hashSet) writeOsuDbString(bytes, md5);
+    }
+    return new Uint8Array(bytes);
+}
+
+function readUleb128(view, offset) {
+    let result = 0, shift = 0, pos = offset;
+    for (;;) {
+        const byte = view.getUint8(pos++);
+        result |= (byte & 0x7f) << shift;
+        if ((byte & 0x80) === 0) break;
+        shift += 7;
+    }
+    return { value: result, next: pos };
+}
+
+function readOsuDbString(view, offset) {
+    const marker = view.getUint8(offset);
+    if (marker === 0x00) return { value: '', next: offset + 1 };
+    const { value: len, next } = readUleb128(view, offset + 1);
+    const bytes = new Uint8Array(view.buffer, view.byteOffset + next, len);
+    return { value: new TextDecoder('utf-8').decode(bytes), next: next + len };
+}
+
+function parseCollectionDb(buffer) {
+    const view = new DataView(buffer);
+    let offset = 4; // skip version
+    const count = view.getInt32(offset, true); offset += 4;
+    const collections = new Map();
+    for (let i = 0; i < count; i++) {
+        const nameRes = readOsuDbString(view, offset); offset = nameRes.next;
+        const beatmapCount = view.getInt32(offset, true); offset += 4;
+        const hashes = new Set();
+        for (let j = 0; j < beatmapCount; j++) {
+            const hashRes = readOsuDbString(view, offset); offset = hashRes.next;
+            if (hashRes.value) hashes.add(hashRes.value);
+        }
+        collections.set(nameRes.value, hashes);
+    }
+    return collections;
+}
+
+function openCollectionDbModal() {
+    document.getElementById('collection-db-status').innerText = '';
+    document.getElementById('collection-db-merge-input').value = '';
+    document.getElementById('collection-db-modal').style.display = 'flex';
+}
+function closeCollectionDbModal() {
+    document.getElementById('collection-db-modal').style.display = 'none';
+}
+
+async function exportOsuCollectionDb() {
+    const status = document.getElementById('collection-db-status');
+    const col = getOsuCollection();
+    const allSets = OSU_MODES.flatMap(m => col[m]);
+    if (allSets.length === 0) {
+        status.innerText = t('collection_db_empty');
+        status.style.color = '#ff5252';
+        return;
+    }
+
+    const setById = new Map(allSets.map(s => [s.beatmapset_id, s]));
+    const allBeatmapIds = [...new Set(allSets.flatMap(s => s.beatmaps.map(b => b.beatmap_id)))];
+    const md5Map = {};
+    const CHUNK = 10;
+
+    status.style.color = '#c8a2e0';
+    for (let i = 0; i < allBeatmapIds.length; i += CHUNK) {
+        status.innerText = t('collection_db_fetching', { done: i, total: allBeatmapIds.length });
+        const chunk = allBeatmapIds.slice(i, i + CHUNK);
+        const results = await Promise.all(chunk.map(id => osuFetch(`b=${id}`).catch(() => null)));
+        results.forEach((r, idx) => {
+            const bm = r && r[0];
+            if (bm && bm.file_md5) md5Map[chunk[idx]] = bm.file_md5;
+        });
+    }
+
+    const generated = new Map();
+    const addToCollection = (name, beatmapsetIds) => {
+        if (!name) return;
+        if (!generated.has(name)) generated.set(name, new Set());
+        const bucket = generated.get(name);
+        beatmapsetIds.forEach(setId => {
+            const set = setById.get(setId);
+            if (!set) return;
+            set.beatmaps.forEach(b => { if (md5Map[b.beatmap_id]) bucket.add(md5Map[b.beatmap_id]); });
+        });
+    };
+
+    getOsuCategories().forEach(c => {
+        const members = getOsuCategoryMembers()[c.id] || [];
+        if (members.length) addToCollection(c.name, members);
+    });
+    const favorites = getOsuFavorites();
+    if (favorites.length) addToCollection(t('osu_fav'), favorites);
+    if (generated.size === 0) addToCollection(t('collection_db_all_name'), allSets.map(s => s.beatmapset_id));
+
+    let finalMap = generated;
+    const mergeFile = document.getElementById('collection-db-merge-input').files[0];
+    if (mergeFile) {
+        try {
+            const existing = parseCollectionDb(await mergeFile.arrayBuffer());
+            for (const [name, hashes] of generated) existing.set(name, hashes);
+            finalMap = existing;
+        } catch (e) {
+            console.error('Failed to parse uploaded collection.db, exporting without merge:', e);
+        }
+    }
+
+    const bytes = buildCollectionDb(finalMap);
+    const blob = new Blob([bytes], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'collection.db';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    status.innerText = t('collection_db_done');
+    status.style.color = '#34d399';
+}
+
 /* ===== Shareable collection link =====
    Encodes the collection as gzip+base64url into a URL hash fragment (never
    sent to any server, so there's no size limit imposed by a backend) —
@@ -677,6 +842,7 @@ async function addOsuBeatmap() {
             artist: beatmaps[0].artist,
             creator: beatmaps[0].creator,
             mode: modeNum,
+            addedAt: new Date().toISOString(),
             beatmaps: beatmaps.map(b => ({
                 beatmap_id: parseInt(b.beatmap_id),
                 version: b.version,
@@ -823,6 +989,148 @@ function renderOsuStats() {
             <div class="osu-stat-label">${t('osu_stats_max_rating')}</div>
         </div>
     `;
+}
+
+/* ===== Collection stats dashboard — richer charts than the flat tiles
+   above, all derived from data already in localStorage (no API calls).
+   The growth chart is the one exception worth a note: sets added before
+   `addedAt` existed (see addOsuBeatmap) have no timestamp, so they're
+   bucketed into a single "already had these" starting point rather than
+   guessing when they were actually added. ===== */
+let statsDashboardCharts = [];
+
+function openStatsDashboardModal() {
+    const col = getOsuCollection();
+    const seen = new Set();
+    const allSets = OSU_MODES.flatMap(m => col[m]).filter(s => {
+        if (seen.has(s.beatmapset_id)) return false;
+        seen.add(s.beatmapset_id);
+        return true;
+    });
+    const body = document.getElementById('stats-dashboard-body');
+    document.getElementById('stats-dashboard-modal').style.display = 'flex';
+
+    if (allSets.length === 0) {
+        body.innerHTML = `<p class="osu-empty">${t('stats_dashboard_empty')}</p>`;
+        return;
+    }
+
+    body.innerHTML = `
+        <div class="stats-dashboard-grid">
+            <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_stars_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-stars"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_modes_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-modes"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_mappers_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-mappers"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_growth_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-growth"></canvas></div>
+            </div>
+        </div>
+    `;
+    // Canvases need real layout dimensions before Chart.js measures them.
+    requestAnimationFrame(() => renderStatsDashboardCharts(col, allSets));
+}
+
+function closeStatsDashboardModal() {
+    document.getElementById('stats-dashboard-modal').style.display = 'none';
+    statsDashboardCharts.forEach(c => c.destroy());
+    statsDashboardCharts = [];
+}
+
+function renderStatsDashboardCharts(col, allSets) {
+    const colors = ppChartColors();
+    const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
+    statsDashboardCharts.forEach(c => c.destroy());
+    statsDashboardCharts = [];
+
+    const starBuckets = new Array(9).fill(0);
+    allSets.forEach(s => s.beatmaps.forEach(b => {
+        starBuckets[Math.min(8, Math.max(0, Math.floor(b.difficulty_rating || 0)))]++;
+    }));
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-stars'), {
+        type: 'bar',
+        data: {
+            labels: starBuckets.map((_, i) => i === 8 ? '8+' : `${i}-${i + 1}`),
+            datasets: [{ data: starBuckets, backgroundColor: colors.accent, borderRadius: 4 }],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: colors.label, font: { size: 10 } } },
+                y: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 10 }, precision: 0 } },
+            },
+        },
+    }));
+
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-modes'), {
+        type: 'doughnut',
+        data: {
+            labels: OSU_MODE_LABELS,
+            datasets: [{ data: OSU_MODES.map(m => col[m].length), backgroundColor: [colors.accent, purple, '#34d399', '#f59e0b'] }],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: colors.text, font: { size: 10 }, boxWidth: 10 } } },
+        },
+    }));
+
+    const mapperCounts = new Map();
+    allSets.forEach(s => { if (s.creator) mapperCounts.set(s.creator, (mapperCounts.get(s.creator) || 0) + 1); });
+    const topMappers = [...mapperCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-mappers'), {
+        type: 'bar',
+        data: { labels: topMappers.map(m => m[0]), datasets: [{ data: topMappers.map(m => m[1]), backgroundColor: purple, borderRadius: 4 }] },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 10 }, precision: 0 } },
+                y: { grid: { display: false }, ticks: { color: colors.label, font: { size: 10 } } },
+            },
+        },
+    }));
+
+    const dated = allSets.filter(s => s.addedAt).sort((a, b) => a.addedAt.localeCompare(b.addedAt));
+    const undatedCount = allSets.length - dated.length;
+    const growthLabels = [];
+    const growthData = [];
+    let running = undatedCount;
+    if (undatedCount > 0) { growthLabels.push(t('stats_dashboard_growth_baseline')); growthData.push(running); }
+    const byDay = new Map();
+    dated.forEach(s => { const day = s.addedAt.slice(0, 10); byDay.set(day, (byDay.get(day) || 0) + 1); });
+    [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([day, count]) => {
+        running += count;
+        growthLabels.push(formatPpChartDate(day));
+        growthData.push(running);
+    });
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-growth'), {
+        type: 'line',
+        data: {
+            labels: growthLabels,
+            datasets: [{
+                data: growthData, borderColor: colors.accent, backgroundColor: colors.accent + '2a',
+                pointRadius: 2.5, pointBackgroundColor: colors.accent, borderWidth: 2, tension: 0.25, fill: true,
+            }],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 } },
+                y: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 10 }, precision: 0 } },
+            },
+        },
+    }));
 }
 
 /* ===== Today's featured beatmap: a deterministic daily pick from the whole
@@ -1394,14 +1702,104 @@ function switchVisitorRecentMode(mode, el) {
     document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     visitorCurrentMode = mode;
-    if (visitorLookupUserId) renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
+    if (!visitorLookupUserId) return;
+    if (visitorPlaysType === 'goal') renderPpGoalPlannerUI();
+    else renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
 }
 
 function switchVisitorPlaysType(type, el) {
     visitorPlaysType = type;
     document.querySelectorAll('.osu-plays-type-tabs .osu-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
-    if (visitorLookupUserId) renderOsuPlaysList(visitorLookupUserId, visitorCurrentMode, type, 'visitor-recent-list', 'visitor-recent-plays');
+    const listEl = document.getElementById('visitor-recent-list');
+    const goalEl = document.getElementById('pp-goal-planner');
+    if (type === 'goal') {
+        listEl.style.display = 'none';
+        goalEl.style.display = '';
+        renderPpGoalPlannerUI();
+    } else {
+        listEl.style.display = '';
+        goalEl.style.display = 'none';
+        if (visitorLookupUserId) renderOsuPlaysList(visitorLookupUserId, visitorCurrentMode, type, 'visitor-recent-list', 'visitor-recent-plays');
+    }
+}
+
+/* ===== PP goal planner — "what pp does one new play need to reach a target
+   total on this mode?" Reuses the same get_user_best endpoint as the Top
+   Plays tab (fetched separately here at limit=100, osu!'s actual weighted-
+   scoring window, vs. the tab's lighter limit=10 for browsing). The weighted
+   formula (pp * 0.95^rank) is public (osu! wiki, "Performance points/
+   Weighting system"); "bonus pp" (score-count based, ~400pp max) isn't
+   reverse-engineered from its real formula — instead it's derived as
+   actualTotalPP - weightedTop100Sum using data already on screen, which is
+   exact rather than an approximation. */
+function weightedPpSum(sortedDescPp) {
+    return sortedDescPp.reduce((sum, pp, i) => sum + pp * Math.pow(0.95, i), 0);
+}
+
+function ppNeededForTarget(sortedDescPp, bonusPp, targetTotal) {
+    let lo = 0, hi = 2000;
+    for (let i = 0; i < 40; i++) {
+        const mid = (lo + hi) / 2;
+        const merged = [...sortedDescPp, mid].sort((a, b) => b - a).slice(0, 100);
+        if (weightedPpSum(merged) + bonusPp < targetTotal) lo = mid; else hi = mid;
+    }
+    return hi;
+}
+
+function renderPpGoalPlannerUI() {
+    const el = document.getElementById('pp-goal-planner');
+    if (!el) return;
+    const modeData = visitorModeData[visitorCurrentMode];
+    const currentPp = modeData && modeData.pp_raw != null ? Math.round(parseFloat(modeData.pp_raw)) : 0;
+    el.innerHTML = `
+        <p class="pp-goal-hint">${t('pp_goal_hint', { current: currentPp.toLocaleString(), mode: OSU_MODE_LABELS[visitorCurrentMode] })}</p>
+        <div class="pp-goal-input-row">
+            <input type="number" id="pp-goal-target" min="0" step="1" data-i18n-placeholder="pp_goal_placeholder" placeholder="目標總 PP">
+            <button class="btn" onclick="calculatePpGoal()">${t('pp_goal_btn')}</button>
+        </div>
+        <div id="pp-goal-status" class="status"></div>
+        <div id="pp-goal-result" class="pp-goal-result" style="display:none;"></div>
+    `;
+}
+
+async function calculatePpGoal() {
+    const target = parseFloat(document.getElementById('pp-goal-target').value);
+    const status = document.getElementById('pp-goal-status');
+    const resultEl = document.getElementById('pp-goal-result');
+    resultEl.style.display = 'none';
+
+    if (!Number.isFinite(target) || target <= 0) {
+        status.innerText = t('pp_goal_invalid');
+        status.style.color = '#ff5252';
+        return;
+    }
+
+    status.innerText = t('osu_searching');
+    status.style.color = '#f9a8d4';
+
+    try {
+        const top100 = await osuFetch(`best=${visitorLookupUserId}&limit=100&m=${visitorCurrentMode}`);
+        const ppList = (top100 || []).map(s => parseFloat(s.pp)).filter(n => Number.isFinite(n)).sort((a, b) => b - a);
+        const modeData = visitorModeData[visitorCurrentMode];
+        const actualTotal = modeData && modeData.pp_raw != null ? parseFloat(modeData.pp_raw) : 0;
+        const bonusPp = Math.max(0, actualTotal - weightedPpSum(ppList));
+
+        status.innerText = '';
+        if (actualTotal >= target) {
+            resultEl.innerHTML = `<p class="pp-goal-achieved">${t('pp_goal_achieved')}</p>`;
+        } else {
+            const needed = ppNeededForTarget(ppList, bonusPp, target);
+            resultEl.innerHTML = `
+                <div class="osu-stat"><div class="osu-stat-value">${Math.round(needed).toLocaleString()}pp</div><div class="osu-stat-label">${t('pp_goal_result_label')}</div></div>
+            `;
+        }
+        resultEl.style.display = 'block';
+    } catch (e) {
+        console.error('PP goal calc failed:', e);
+        status.innerText = `${t('pp_calc_error')}${e.message ? ' (' + e.message + ')' : ''}`;
+        status.style.color = '#ff5252';
+    }
 }
 
 async function loadVisitorProfileById(input, isUsername) {
@@ -1445,6 +1843,8 @@ async function loadVisitorProfileById(input, isUsername) {
         document.querySelector('#visitor-recent-mode-tabs .osu-mode-tab[data-mode="0"]').classList.add('active');
         visitorPlaysType = 'recent';
         document.querySelectorAll('.osu-plays-type-tabs .osu-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+        document.getElementById('visitor-recent-list').style.display = '';
+        document.getElementById('pp-goal-planner').style.display = 'none';
         renderOsuPlaysList(u.user_id, 0, 'recent', 'visitor-recent-list', 'visitor-recent-plays');
 
         if (totalPP > 0) {
@@ -1529,8 +1929,10 @@ function renderTrackedPlayersList() {
         panel.innerHTML = `<div class="tracked-players-empty">${t('tracked_players_empty')}</div>`;
         return;
     }
+    const leaderboardBtn = list.length >= 2
+        ? `<button class="tracked-leaderboard-btn" onclick="openTrackedLeaderboard()">${t('leaderboard_btn')}</button>` : '';
     panel.innerHTML = `
-        <div class="tracked-players-title">${t('tracked_players_title')}</div>
+        <div class="tracked-players-title">${t('tracked_players_title')}${leaderboardBtn}</div>
         <div class="tracked-players-list">${list.map(p => `
             <div class="tracked-player-card" onclick="loadVisitorProfileById('${p.id}', false)">
                 <img class="tracked-player-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
@@ -1539,6 +1941,40 @@ function renderTrackedPlayersList() {
                 <button class="tracked-player-remove" onclick="event.stopPropagation();untrackPlayerById('${p.id}')" title="${t('untrack_player_btn')}">✕</button>
             </div>`).join('')}
         </div>`;
+}
+
+/* ===== Tracked-players leaderboard — reuses fetchPlayerTotalPpAndHistory()
+   (built for the two-player compare chart) across every tracked player in
+   parallel rather than adding a separate fetch path. ===== */
+async function openTrackedLeaderboard() {
+    const players = getTrackedPlayers();
+    if (players.length === 0) return;
+    const listEl = document.getElementById('leaderboard-list');
+    listEl.innerHTML = `<p class="osu-empty">${t('osu_searching')}</p>`;
+    document.getElementById('leaderboard-modal').style.display = 'flex';
+
+    try {
+        const results = await Promise.all(players.map(p => fetchPlayerTotalPpAndHistory(String(p.id), false).catch(() => null)));
+        const ranked = results.filter(Boolean).sort((a, b) => b.totalPP - a.totalPP);
+        if (ranked.length === 0) {
+            listEl.innerHTML = `<p class="osu-empty">${t('pp_calc_error')}</p>`;
+            return;
+        }
+        listEl.innerHTML = ranked.map((p, i) => `
+            <div class="leaderboard-row" onclick="closeTrackedLeaderboard();loadVisitorProfileById('${p.id}', false)">
+                <span class="leaderboard-rank">#${i + 1}</span>
+                <img class="leaderboard-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
+                <span class="leaderboard-name">${escHtml(p.username)}</span>
+                <span class="leaderboard-pp">${Math.round(p.totalPP).toLocaleString()}pp</span>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Leaderboard load failed:', e);
+        listEl.innerHTML = `<p class="osu-empty">${t('pp_calc_error')}</p>`;
+    }
+}
+function closeTrackedLeaderboard() {
+    document.getElementById('leaderboard-modal').style.display = 'none';
 }
 
 /* ===== osu! OAuth login =====

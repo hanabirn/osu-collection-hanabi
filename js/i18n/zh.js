@@ -83,4 +83,26 @@ I18N.zh = {
     gallery_liked_only: '只看我按讚的', gallery_like_btn_title: '按讚',
     gallery_like_login_required: '請先登入 osu! 才能按讚', gallery_like_fail: '按讚失敗，請稍後再試',
     gallery_no_results: '沒有符合條件的收藏，換個關鍵字或標籤試試', gallery_tag_filter_clear_title: '清除標籤篩選',
+
+    pp_goal_tab: '🎯 PP 目標', pp_goal_hint: '{mode} 目前總 PP：{current}pp。輸入目標，看新增一張成績最少要打多少 PP。',
+    pp_goal_placeholder: '目標總 PP', pp_goal_btn: '計算', pp_goal_invalid: '請輸入有效的目標 PP',
+    pp_goal_achieved: '🎉 已經達標！', pp_goal_result_label: '新成績至少需要',
+
+    collection_db_btn_title: '匯出成 osu! Collection', collection_db_title: '📦 匯出成 osu! Collection',
+    collection_db_hint: '會依照你的分類（含「最愛」）產生 osu! 遊戲讀得懂的 collection.db，下載後複製到你的 osu! 資料夾即可匯入。這會取代你電腦上原本的 collection.db——若想保留現有的收藏，可以先在下面上傳它一起合併（同名分類會被這裡的資料覆蓋，其他分類不受影響）。',
+    collection_db_merge_label: '合併現有 collection.db（可略過）', collection_db_export_btn: '匯出',
+    collection_db_empty: '收藏是空的，沒有東西可以匯出', collection_db_fetching: '正在讀取譜面資訊... {done}/{total}',
+    collection_db_all_name: 'osu!收藏', collection_db_done: '匯出完成！請把 collection.db 複製到你的 osu! 資料夾',
+
+    stats_dashboard_btn_title: '收藏統計儀表板', stats_dashboard_title: '📊 收藏統計儀表板',
+    stats_dashboard_empty: '收藏是空的，還沒有統計資料', stats_dashboard_stars_title: '星數分布',
+    stats_dashboard_modes_title: '模式佔比', stats_dashboard_mappers_title: 'Mapper 頻率 Top 10',
+    stats_dashboard_growth_title: '收藏成長', stats_dashboard_growth_baseline: '已收藏',
+
+    leaderboard_btn: '🏆 排行榜', leaderboard_title: '🏆 追蹤玩家排行榜',
+
+    tracked_mappers_title: '🎨 追蹤 Mapper', tracked_mappers_hint: '輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。',
+    mapper_track_placeholder: '輸入 mapper 用戶名...', mapper_track_btn: '追蹤',
+    mapper_already_tracked: '已經在追蹤這位 mapper 了', mapper_track_done: '已加入追蹤，有新圖上架時會通知你',
+    tracked_mappers_empty: '尚未追蹤任何 mapper', notif_mapper_new_title: '{name} 上架新圖了',
 };
