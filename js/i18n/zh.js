@@ -1,5 +1,11 @@
 I18N.zh = {
     title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ Beatmap 收藏 + PP 查詢 ✦',
+    pwa_install_btn_title: '加到主畫面（離線可用）',
+    track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',
+    track_done: '已加入追蹤清單，PP 有變化時會通知你', untrack_done: '已取消追蹤',
+    tracked_players_title: '🔔 追蹤中的玩家', tracked_players_empty: '尚未追蹤任何玩家，查詢後點擊「追蹤」即可加入清單，PP 有變化時會通知你',
+    notif_bell_title: '通知', notif_clear_btn: '清除全部', notif_empty: '目前沒有通知',
+    notif_pp_changed_detail: '{sign}{delta}pp（目前 {pp}pp）', notif_tournament_new_title: '新賽事貼文',
     back_to_main: '← 返回 Hanabiの小天地',
     nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報', nav_tournaments: '賽事', nav_replay: 'Replay 錄影', nav_feedback: '建議&改進',
     updates_title: '✦ 更新情報 ✦', updates_loading: '載入更新資訊中...', updates_empty: '目前沒有更新資訊', updates_load_fail: '更新資訊載入失敗，稍後再試',
@@ -64,4 +70,8 @@ I18N.zh = {
     gallery_sort_recent: '最新發布', gallery_sort_sets: '收藏數量', gallery_sort_rating: '最高星數',
     gallery_import_confirm: '這是 {name} 的收藏，包含 {n} 個 Beatmap，要匯入到你的收藏嗎？（不會覆蓋現有收藏，只會加入你還沒有的）',
     gallery_download_btn_title: '匯入這個收藏', gallery_view_btn_title: '查看清單',
+    gallery_search_placeholder: '搜尋玩家名稱或標籤...', gallery_sort_likes: '❤ 最熱門',
+    gallery_liked_only: '只看我按讚的', gallery_like_btn_title: '按讚',
+    gallery_like_login_required: '請先登入 osu! 才能按讚', gallery_like_fail: '按讚失敗，請稍後再試',
+    gallery_no_results: '沒有符合條件的收藏，換個關鍵字或標籤試試', gallery_tag_filter_clear_title: '清除標籤篩選',
 };

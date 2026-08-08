@@ -1,5 +1,11 @@
 I18N.ru = {
     title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Коллекция битмапов + поиск PP ✦',
+    pwa_install_btn_title: 'Добавить на главный экран (работает офлайн)',
+    track_player_btn: '+ Отслеживать', untrack_player_btn: 'Не отслеживать',
+    track_done: 'Добавлено в список отслеживания — сообщим при изменении PP', untrack_done: 'Удалено из списка отслеживания',
+    tracked_players_title: '🔔 Отслеживаемые игроки', tracked_players_empty: 'Вы пока никого не отслеживаете — найдите игрока и нажмите «Отслеживать», чтобы получать уведомления об изменении PP',
+    notif_bell_title: 'Уведомления', notif_clear_btn: 'Очистить всё', notif_empty: 'Пока нет уведомлений',
+    notif_pp_changed_detail: '{sign}{delta}pp (сейчас {pp}pp)', notif_tournament_new_title: 'Новая тема турнира',
     back_to_main: '← Назад на Hanabiの小天地',
     nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_tournaments: 'Турниры', nav_replay: 'Реплей', nav_feedback: 'Предложения',
     updates_title: '✦ Новости ✦', updates_loading: 'Загрузка новостей...', updates_empty: 'Новостей пока нет', updates_load_fail: 'Не удалось загрузить новости, попробуйте позже',
@@ -64,4 +70,8 @@ I18N.ru = {
     gallery_sort_recent: 'Недавно опубликованные', gallery_sort_sets: 'Больше всего карт', gallery_sort_rating: 'Самый высокий рейтинг',
     gallery_import_confirm: 'Это коллекция {name} ({n} карт). Импортировать в вашу коллекцию? (Существующие записи не будут перезаписаны, добавятся только те, которых у вас нет)',
     gallery_download_btn_title: 'Импортировать эту коллекцию', gallery_view_btn_title: 'Посмотреть список карт',
+    gallery_search_placeholder: 'Поиск по имени игрока или тегу...', gallery_sort_likes: '❤ Популярные',
+    gallery_liked_only: 'Только понравившиеся мне', gallery_like_btn_title: 'Нравится',
+    gallery_like_login_required: 'Войдите через osu!, чтобы ставить лайки', gallery_like_fail: 'Не удалось поставить лайк, попробуйте позже',
+    gallery_no_results: 'Нет коллекций по вашему запросу — попробуйте другое слово или тег', gallery_tag_filter_clear_title: 'Сбросить фильтр по тегу',
 };

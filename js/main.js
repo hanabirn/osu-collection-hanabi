@@ -47,6 +47,9 @@ function refreshDynamicContent() {
     if (typeof renderReplayHistory === 'function') renderReplayHistory();
     if (typeof renderPublicCollectionsList === 'function') renderPublicCollectionsList();
     if (typeof updatePublishButtonLabel === 'function') updatePublishButtonLabel();
+    if (typeof renderTrackButtonState === 'function') renderTrackButtonState();
+    if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
+    if (typeof renderNotificationBell === 'function') renderNotificationBell();
 }
 
 /* ===== Init ===== */
@@ -55,4 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initOsuBgCarousel();
     checkImportFromHash();
     checkOsuLoginFromUrl();
+    if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
+    if (typeof initNotifications === 'function') initNotifications();
 });

@@ -1,0 +1,17 @@
+{
+    "name": "osu! 歌曲收藏 + PP 查詢",
+    "short_name": "osu!收藏",
+    "description": "osu! Beatmap 收藏管理、PP 查詢、皮膚收藏、賽事情報與 Replay 錄影生成",
+    "start_url": "/?pwa=1",
+    "id": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#1a0d2e",
+    "theme_color": "#a855f7",
+    "lang": "zh-TW",
+    "icons": [
+        { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ]
+}

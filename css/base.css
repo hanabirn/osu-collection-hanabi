@@ -26,9 +26,10 @@ a:hover { text-decoration: underline; }
     backdrop-filter: blur(var(--glass-blur));
 }
 /* The title-note float animation never needs to escape the header box, but
-   the language dropdown menu does — temporarily lift the clip while it's
-   open instead of removing overflow:hidden outright. */
-.site-header.lang-menu-open {
+   the language dropdown and notification bell menus do — temporarily lift
+   the clip while either is open instead of removing overflow:hidden outright. */
+.site-header.lang-menu-open,
+.site-header.notif-menu-open {
     overflow: visible;
 }
 
@@ -165,6 +166,125 @@ a:hover { text-decoration: underline; }
     font-weight: bold;
     box-shadow: 0 0 14px rgba(var(--accent-purple-rgb), 0.35);
 }
+
+.notif-bell {
+    position: relative;
+}
+.notif-bell-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--lang-pill-bg);
+    border: 1px solid var(--lang-pill-border);
+    color: var(--lang-pill-text);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+}
+.notif-bell-btn:hover,
+.notif-bell.open .notif-bell-btn {
+    background: rgba(var(--accent-pink-rgb), 0.14);
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+}
+.notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: var(--accent-pink);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: bold;
+    line-height: 16px;
+    text-align: center;
+    box-shadow: 0 0 0 2px var(--bg-body-1, transparent);
+}
+.notif-bell-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    max-width: 85vw;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    z-index: 210;
+}
+.notif-bell.open .notif-bell-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.notif-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-card);
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--text);
+}
+.notif-clear-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-dim2);
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+.notif-clear-btn:hover { color: var(--accent-pink); }
+.notif-menu-list {
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 6px;
+}
+.notif-empty {
+    padding: 20px 10px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-dim2);
+}
+.notif-item {
+    display: flex;
+    gap: 10px;
+    padding: 9px 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.notif-item:hover { background: var(--bg-stat); }
+.notif-item.unread { background: rgba(var(--accent-pink-rgb), 0.08); }
+.notif-item-icon { font-size: 1.1rem; flex: 0 0 auto; }
+.notif-item-body { min-width: 0; }
+.notif-item-title { font-size: 0.82rem; font-weight: bold; color: var(--text); }
+.notif-item-detail {
+    font-size: 0.78rem;
+    color: var(--text-dim2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.notif-item-time { font-size: 0.68rem; color: var(--text-dim2); opacity: 0.7; margin-top: 2px; }
 
 .lang-globe {
     position: relative;

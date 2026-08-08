@@ -1,5 +1,11 @@
 I18N.fr = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Collection de beatmaps + recherche PP ✦',
+    pwa_install_btn_title: "Ajouter à l'écran d'accueil (fonctionne hors ligne)",
+    track_player_btn: '+ Suivre', untrack_player_btn: 'Ne plus suivre',
+    track_done: 'Ajouté à votre liste de suivi — on vous préviendra en cas de changement de PP', untrack_done: 'Retiré de votre liste de suivi',
+    tracked_players_title: '🔔 Joueurs suivis', tracked_players_empty: "Vous ne suivez personne pour l'instant — recherchez un joueur et cliquez sur « Suivre » pour être averti d'un changement de PP",
+    notif_bell_title: 'Notifications', notif_clear_btn: 'Tout effacer', notif_empty: 'Aucune notification',
+    notif_pp_changed_detail: '{sign}{delta}pp (maintenant {pp}pp)', notif_tournament_new_title: 'Nouveau sujet de tournoi',
     back_to_main: '← Retour à Hanabiの小天地',
     nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_tournaments: 'Tournois', nav_replay: 'Replay', nav_feedback: 'Suggestions',
     updates_title: '✦ Actualités ✦', updates_loading: 'Chargement des actualités...', updates_empty: 'Aucune actualité pour le moment', updates_load_fail: 'Échec du chargement des actualités, réessayez plus tard',
@@ -64,4 +70,8 @@ I18N.fr = {
     gallery_sort_recent: 'Publiées récemment', gallery_sort_sets: 'Le plus de beatmaps', gallery_sort_rating: 'Note la plus élevée',
     gallery_import_confirm: "Voici la collection de {name} ({n} beatmaps). L'importer dans votre collection ? (N'écrase pas les entrées existantes, ajoute seulement celles que vous n'avez pas)",
     gallery_download_btn_title: 'Importer cette collection', gallery_view_btn_title: 'Voir la liste des beatmaps',
+    gallery_search_placeholder: 'Rechercher par joueur ou tag...', gallery_sort_likes: '❤ Plus aimées',
+    gallery_liked_only: "N'afficher que mes favoris", gallery_like_btn_title: "J'aime",
+    gallery_like_login_required: 'Connectez-vous avec osu! pour aimer une collection', gallery_like_fail: "Échec du j'aime, réessayez plus tard",
+    gallery_no_results: 'Aucune collection ne correspond — essayez un autre mot-clé ou tag', gallery_tag_filter_clear_title: 'Retirer le filtre de tag',
 };

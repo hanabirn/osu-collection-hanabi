@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>osu! 收藏</title>
 <meta name="theme-color" content="#a855f7">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="osu!收藏">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap">
@@ -66,6 +72,18 @@
                     <button class="osu-logout-btn" onclick="logoutOsuUser()" data-i18n-title="osu_logout_btn" title="登出">&#x2715;</button>
                 </div>
             </div>
+            <div class="notif-bell" id="notif-bell">
+                <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-haspopup="true" aria-expanded="false" data-i18n-title="notif_bell_title" title="通知">
+                    🔔<span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+                </button>
+                <div class="notif-bell-menu" id="notif-bell-menu">
+                    <div class="notif-menu-header">
+                        <span data-i18n="notif_bell_title">通知</span>
+                        <button class="notif-clear-btn" onclick="clearAllNotifications()" data-i18n="notif_clear_btn">清除全部</button>
+                    </div>
+                    <div class="notif-menu-list" id="notif-menu-list"></div>
+                </div>
+            </div>
             <div class="lang-globe" id="lang-globe">
                 <button class="lang-globe-btn" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language">&#127760;</button>
                 <div class="lang-globe-menu" id="lang-globe-menu">
@@ -80,12 +98,13 @@
                 </div>
             </div>
             <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+            <button id="pwa-install-btn" class="theme-toggle-btn" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面">⬇️</button>
         </div>
     </div>
     <nav class="site-nav">
         <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
         <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-i18n="nav_public_collections">🌐 收藏廣場</button>
-        <button class="site-nav-btn" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+        <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
         <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
@@ -162,11 +181,20 @@
         </div>
 
         <div class="osu-search-row">
+            <input type="text" id="gallery-search-input" data-i18n-placeholder="gallery_search_placeholder" placeholder="搜尋玩家名稱或標籤..." oninput="searchPublicCollections(this.value)">
             <select id="gallery-sort-select" onchange="switchPublicCollectionsSort(this.value)">
                 <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
+                <option value="likes" data-i18n="gallery_sort_likes">❤ 最熱門</option>
                 <option value="sets" data-i18n="gallery_sort_sets">收藏數量</option>
                 <option value="rating" data-i18n="gallery_sort_rating">最高星數</option>
             </select>
+        </div>
+        <div class="osu-search-row gallery-filter-row">
+            <label class="gallery-liked-only-label">
+                <input type="checkbox" id="gallery-liked-only-checkbox" onchange="toggleGalleryLikedOnly(this.checked)">
+                <span data-i18n="gallery_liked_only">只看我按讚的</span>
+            </label>
+            <div id="gallery-active-tag" class="gallery-active-tag" style="display:none;"></div>
         </div>
 
         <div id="public-collections-list" class="osu-collection"></div>
@@ -174,6 +202,7 @@
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
+        <div id="tracked-players-panel" class="tracked-players-panel"></div>
         <div class="visitor-lookup-card" id="visitor-lookup-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
@@ -190,6 +219,7 @@
                         <div class="visitor-result-name" id="visitor-result-name"></div>
                         <div class="visitor-result-country" id="visitor-result-country"></div>
                     </div>
+                    <button class="btn visitor-track-btn" id="visitor-track-btn" onclick="toggleTrackVisitorPlayer()" style="display:none;">+ 追蹤</button>
                 </div>
                 <div class="visitor-modes-grid" id="visitor-modes-grid"></div>
                 <div class="osu-total-pp" id="visitor-total-pp">
@@ -358,6 +388,7 @@
 
 <script src="js/theme.js"></script>
 <script src="js/particles.js"></script>
+<script src="js/pwa.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/i18n/zh.js"></script>
 <script src="js/i18n/en.js"></script>
@@ -375,6 +406,7 @@
 <script src="js/skins.js"></script>
 <script src="js/updates.js"></script>
 <script src="js/tournaments.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/replay.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/main.js"></script>

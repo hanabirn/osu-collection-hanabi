@@ -594,6 +594,38 @@
     #osu-sort-select { flex: 1; }
 }
 
+.gallery-filter-row { align-items: center; margin-top: -6px; flex-wrap: wrap; }
+.gallery-liked-only-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--text-dim2);
+    cursor: pointer;
+    user-select: none;
+}
+.gallery-liked-only-label input { accent-color: var(--accent-pink); cursor: pointer; }
+.gallery-active-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    padding: 4px 6px 4px 10px;
+    border-radius: 999px;
+    background: rgba(var(--accent-pink-rgb), 0.15);
+    border: 1px solid rgba(var(--accent-pink-rgb), 0.5);
+    color: var(--text-pink);
+}
+.gallery-active-tag-pill button {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1;
+    padding: 2px 4px;
+}
+
 .osu-collection {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1209,6 +1241,65 @@
     gap: 12px;
     margin-bottom: 1rem;
 }
+.visitor-track-btn { padding: 7px 14px; font-size: 0.8rem; }
+.visitor-track-btn.tracked {
+    background: rgba(var(--accent-pink-rgb), 0.15);
+    color: var(--text-pink);
+    box-shadow: none;
+}
+
+/* ===== Tracked players panel — sits above the lookup card so a returning
+   visitor sees their watchlist (and any PP drift on it) without having to
+   search anyone first. Empty until at least one lookup result's "追蹤"
+   button has been used (see js/osu.js toggleTrackVisitorPlayer). ===== */
+.tracked-players-panel:empty { display: none; }
+.tracked-players-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--text-pink);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+.tracked-players-empty {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-dim2);
+    margin-bottom: 1.2rem;
+}
+.tracked-players-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.tracked-player-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px 6px 6px;
+    border-radius: 999px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+}
+.tracked-player-card:hover { border-color: rgba(var(--accent-pink-rgb), 0.5); transform: translateY(-2px); }
+.tracked-player-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.tracked-player-name { font-size: 0.82rem; font-weight: bold; color: var(--text); }
+.tracked-player-pp { font-size: 0.78rem; color: var(--text-pink); font-weight: bold; }
+.tracked-player-remove {
+    border: none;
+    background: transparent;
+    color: var(--text-dim2);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 4px;
+    line-height: 1;
+}
+.tracked-player-remove:hover { color: var(--accent-pink); }
 .visitor-result-name {
     font-size: 1.1rem;
     font-weight: bold;
@@ -1299,6 +1390,43 @@
 .pcc-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,102,153,0.5); object-fit: cover; }
 .pcc-name { font-weight: bold; color: var(--text); font-size: 0.95rem; }
 .pcc-updated { font-size: 0.72rem; color: var(--text-dim2); }
+
+.pcc-like-btn {
+    margin-left: auto;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-stat);
+    color: var(--text-dim2);
+    font-size: 0.78rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pcc-like-btn:hover { border-color: rgba(var(--accent-pink-rgb), 0.5); color: var(--text-pink); }
+.pcc-like-btn.liked { border-color: rgba(var(--accent-pink-rgb), 0.6); background: rgba(var(--accent-pink-rgb), 0.12); color: var(--text-pink); }
+.pcc-like-icon { font-size: 0.95rem; }
+.pcc-like-btn:disabled { opacity: 0.6; cursor: default; }
+
+.pcc-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcc-tag {
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--bg-stat);
+    color: var(--text-dim2);
+    border: 1px solid var(--border-card);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.pcc-tag:hover { border-color: rgba(var(--accent-pink-rgb), 0.4); color: var(--text); }
+.pcc-tag.active { background: rgba(var(--accent-pink-rgb), 0.18); border-color: rgba(var(--accent-pink-rgb), 0.6); color: var(--text-pink); }
+
 .pcc-stats {
     display: flex;
     justify-content: space-between;

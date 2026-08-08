@@ -1,5 +1,11 @@
 I18N.es = {
     title: 'osu! Colección', site_title: 'osu! Colección', site_tagline: '✦ Colección de beatmaps + búsqueda de PP ✦',
+    pwa_install_btn_title: 'Añadir a la pantalla de inicio (funciona sin conexión)',
+    track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',
+    track_done: 'Añadido a tu lista de seguimiento — te avisaremos si cambia su PP', untrack_done: 'Eliminado de tu lista de seguimiento',
+    tracked_players_title: '🔔 Jugadores seguidos', tracked_players_empty: 'Todavía no sigues a nadie — busca a un jugador y pulsa "Seguir" para recibir avisos de cambios de PP',
+    notif_bell_title: 'Notificaciones', notif_clear_btn: 'Borrar todo', notif_empty: 'No hay notificaciones',
+    notif_pp_changed_detail: '{sign}{delta}pp (ahora {pp}pp)', notif_tournament_new_title: 'Nuevo tema de torneo',
     back_to_main: '← Volver a Hanabiの小天地',
     nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias', nav_tournaments: 'Torneos', nav_replay: 'Replay', nav_feedback: 'Sugerencias',
     updates_title: '✦ Noticias ✦', updates_loading: 'Cargando noticias...', updates_empty: 'No hay noticias por ahora', updates_load_fail: 'Error al cargar las noticias, inténtalo más tarde',
@@ -64,4 +70,8 @@ I18N.es = {
     gallery_sort_recent: 'Publicadas recientemente', gallery_sort_sets: 'Más beatmaps', gallery_sort_rating: 'Mayor puntuación',
     gallery_import_confirm: 'Esta es la colección de {name} ({n} beatmaps). ¿Importar a tu colección? (No sobrescribe las existentes, solo añade las que no tienes)',
     gallery_download_btn_title: 'Importar esta colección', gallery_view_btn_title: 'Ver lista de beatmaps',
+    gallery_search_placeholder: 'Buscar por jugador o etiqueta...', gallery_sort_likes: '❤ Más populares',
+    gallery_liked_only: 'Solo las que me gustan', gallery_like_btn_title: 'Me gusta',
+    gallery_like_login_required: 'Inicia sesión con osu! para dar me gusta', gallery_like_fail: 'Error al dar me gusta, inténtalo más tarde',
+    gallery_no_results: 'Ninguna colección coincide — prueba otra palabra clave o etiqueta', gallery_tag_filter_clear_title: 'Quitar filtro de etiqueta',
 };

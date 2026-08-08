@@ -1,5 +1,11 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ ビートマップコレクション＋PP検索 ✦',
+    pwa_install_btn_title: 'ホーム画面に追加（オフライン対応）',
+    track_player_btn: '+ フォロー', untrack_player_btn: 'フォロー解除',
+    track_done: 'ウォッチリストに追加しました。PP が変化したら通知します', untrack_done: 'フォローを解除しました',
+    tracked_players_title: '🔔 フォロー中のプレイヤー', tracked_players_empty: 'まだ誰もフォローしていません。検索して「フォロー」を押すと、PP の変化を通知します',
+    notif_bell_title: '通知', notif_clear_btn: 'すべて消去', notif_empty: '通知はありません',
+    notif_pp_changed_detail: '{sign}{delta}pp（現在 {pp}pp）', notif_tournament_new_title: '新しい大会スレッド',
     back_to_main: '← Hanabiの小天地に戻る',
     nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_tournaments: '大会', nav_replay: 'Replay動画', nav_feedback: 'ご意見&改善',
     updates_title: '✦ 更新情報 ✦', updates_loading: '更新情報を読み込み中...', updates_empty: '現在、更新情報はありません', updates_load_fail: '更新情報の読み込みに失敗しました',
@@ -64,4 +70,8 @@ I18N.ja = {
     gallery_sort_recent: '新着順', gallery_sort_sets: 'Beatmap 数', gallery_sort_rating: '最高星数',
     gallery_import_confirm: 'これは {name} さんのコレクション（{n} 個の Beatmap）です。あなたのコレクションに取り込みますか？（既存のものは上書きせず、持っていないものだけ追加されます）',
     gallery_download_btn_title: 'このコレクションを取り込む', gallery_view_btn_title: '曲目一覧を見る',
+    gallery_search_placeholder: 'プレイヤー名やタグで検索...', gallery_sort_likes: '❤ 人気順',
+    gallery_liked_only: 'いいねしたものだけ表示', gallery_like_btn_title: 'いいね',
+    gallery_like_login_required: 'いいねするには osu! でログインしてください', gallery_like_fail: 'いいねに失敗しました。しばらくしてからお試しください',
+    gallery_no_results: '条件に一致するコレクションがありません。別のキーワードやタグをお試しください', gallery_tag_filter_clear_title: 'タグ絞り込みを解除',
 };

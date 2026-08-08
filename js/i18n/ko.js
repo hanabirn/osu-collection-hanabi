@@ -1,5 +1,11 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 비트맵 컬렉션 + PP 조회 ✦',
+    pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
+    track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',
+    track_done: '추적 목록에 추가되었습니다. PP가 변하면 알려드릴게요', untrack_done: '추적을 해제했습니다',
+    tracked_players_title: '🔔 추적 중인 플레이어', tracked_players_empty: '아직 추적 중인 플레이어가 없습니다. 검색 후 "추적"을 누르면 PP 변화를 알려드립니다',
+    notif_bell_title: '알림', notif_clear_btn: '모두 지우기', notif_empty: '알림이 없습니다',
+    notif_pp_changed_detail: '{sign}{delta}pp (현재 {pp}pp)', notif_tournament_new_title: '새 대회 게시글',
     back_to_main: '← Hanabiの小天地로 돌아가기',
     nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_tournaments: '대회', nav_replay: 'Replay 영상', nav_feedback: '제안&개선',
     updates_title: '✦ 업데이트 소식 ✦', updates_loading: '업데이트 소식을 불러오는 중...', updates_empty: '현재 업데이트 소식이 없습니다', updates_load_fail: '업데이트 소식을 불러오지 못했습니다',
@@ -64,4 +70,8 @@ I18N.ko = {
     gallery_sort_recent: '최신 발행순', gallery_sort_sets: '비트맵 많은순', gallery_sort_rating: '최고 별점순',
     gallery_import_confirm: '{name}님의 컬렉션({n}개의 비트맵)입니다. 내 컬렉션으로 가져올까요? (기존 항목은 덮어쓰지 않고, 없는 것만 추가됩니다)',
     gallery_download_btn_title: '이 컬렉션 가져오기', gallery_view_btn_title: '목록 보기',
+    gallery_search_placeholder: '플레이어 이름이나 태그로 검색...', gallery_sort_likes: '❤ 인기순',
+    gallery_liked_only: '좋아요한 것만 보기', gallery_like_btn_title: '좋아요',
+    gallery_like_login_required: '좋아요를 누르려면 osu! 로그인이 필요합니다', gallery_like_fail: '좋아요 실패, 잠시 후 다시 시도해주세요',
+    gallery_no_results: '조건에 맞는 컬렉션이 없습니다. 다른 키워드나 태그를 시도해보세요', gallery_tag_filter_clear_title: '태그 필터 해제',
 };

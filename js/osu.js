@@ -1239,6 +1239,8 @@ function renderPpHistoryChart(historyOverride, key, panelId) {
 
 /* ===== Visitor Profile Lookup ===== */
 let visitorLookupUserId = null;
+let visitorLookupUsername = '';
+let visitorLookupTotalPp = 0;
 let visitorModeData = [];
 let visitorCurrentMode = 0;
 
@@ -1283,6 +1285,9 @@ async function loadVisitorProfileById(input, isUsername) {
         result.style.display = 'block';
 
         visitorLookupUserId = u.user_id;
+        visitorLookupUsername = u.username;
+        visitorLookupTotalPp = totalPP;
+        renderTrackButtonState();
         document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
         document.querySelector('#visitor-recent-mode-tabs .osu-mode-tab[data-mode="0"]').classList.add('active');
         renderOsuRecentPlays(u.user_id, 0, 'visitor-recent-list', 'visitor-recent-plays');
@@ -1306,6 +1311,79 @@ async function lookupVisitorProfile() {
     const input = document.getElementById('visitor-lookup-input').value.trim();
     if (!input) return;
     loadVisitorProfileById(input, !/^\d+$/.test(input));
+}
+
+/* ===== Tracked players — lightweight "watch this player's PP" list, purely
+   localStorage-backed (no login required, unlike the public-collections
+   like/publish flow). js/notifications.js periodically re-fetches each
+   tracked player's total PP and diffs it against the `lastPp` stored here
+   to decide whether to surface a notification; this file only owns the
+   list itself and the lookup-page UI for managing it. ===== */
+const TRACKED_PLAYERS_KEY = 'osu_tracked_players';
+
+function getTrackedPlayers() {
+    try { return JSON.parse(localStorage.getItem(TRACKED_PLAYERS_KEY)) || []; }
+    catch { return []; }
+}
+
+function saveTrackedPlayers(list) {
+    localStorage.setItem(TRACKED_PLAYERS_KEY, JSON.stringify(list));
+}
+
+function isPlayerTracked(id) {
+    return getTrackedPlayers().some(p => String(p.id) === String(id));
+}
+
+function toggleTrackVisitorPlayer() {
+    if (!visitorLookupUserId) return;
+    const list = getTrackedPlayers();
+    const idx = list.findIndex(p => String(p.id) === String(visitorLookupUserId));
+    if (idx >= 0) {
+        list.splice(idx, 1);
+        showShareToast(t('untrack_done'));
+    } else {
+        list.push({ id: visitorLookupUserId, username: visitorLookupUsername || `#${visitorLookupUserId}`, lastPp: visitorLookupTotalPp || 0 });
+        showShareToast(t('track_done'));
+    }
+    saveTrackedPlayers(list);
+    renderTrackButtonState();
+    renderTrackedPlayersList();
+}
+
+function untrackPlayerById(id) {
+    saveTrackedPlayers(getTrackedPlayers().filter(p => String(p.id) !== String(id)));
+    if (String(visitorLookupUserId) === String(id)) renderTrackButtonState();
+    renderTrackedPlayersList();
+}
+
+function renderTrackButtonState() {
+    const btn = document.getElementById('visitor-track-btn');
+    if (!btn) return;
+    if (!visitorLookupUserId) { btn.style.display = 'none'; return; }
+    btn.style.display = '';
+    const tracked = isPlayerTracked(visitorLookupUserId);
+    btn.textContent = tracked ? t('untrack_player_btn') : t('track_player_btn');
+    btn.classList.toggle('tracked', tracked);
+}
+
+function renderTrackedPlayersList() {
+    const panel = document.getElementById('tracked-players-panel');
+    if (!panel) return;
+    const list = getTrackedPlayers();
+    if (list.length === 0) {
+        panel.innerHTML = `<div class="tracked-players-empty">${t('tracked_players_empty')}</div>`;
+        return;
+    }
+    panel.innerHTML = `
+        <div class="tracked-players-title">${t('tracked_players_title')}</div>
+        <div class="tracked-players-list">${list.map(p => `
+            <div class="tracked-player-card" onclick="loadVisitorProfileById('${p.id}', false)">
+                <img class="tracked-player-avatar" src="${osuAvatarUrl(p.id)}" alt="" onerror="this.style.visibility='hidden';">
+                <span class="tracked-player-name">${escapeHtmlOsu(p.username || ('#' + p.id))}</span>
+                <span class="tracked-player-pp">${Math.round(p.lastPp || 0).toLocaleString()}pp</span>
+                <button class="tracked-player-remove" onclick="event.stopPropagation();untrackPlayerById('${p.id}')" title="${t('untrack_player_btn')}">✕</button>
+            </div>`).join('')}
+        </div>`;
 }
 
 /* ===== osu! OAuth login =====

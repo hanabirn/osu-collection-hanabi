@@ -1,5 +1,11 @@
 I18N.de = {
     title: 'osu! Sammlung', site_title: 'osu! Sammlung', site_tagline: '✦ Beatmap-Sammlung + PP-Suche ✦',
+    pwa_install_btn_title: 'Zum Startbildschirm hinzufügen (funktioniert offline)',
+    track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',
+    track_done: 'Zur Beobachtungsliste hinzugefügt — wir benachrichtigen dich bei PP-Änderungen', untrack_done: 'Von der Beobachtungsliste entfernt',
+    tracked_players_title: '🔔 Beobachtete Spieler', tracked_players_empty: 'Du beobachtest noch niemanden — suche einen Spieler und klicke auf "Verfolgen", um bei PP-Änderungen benachrichtigt zu werden',
+    notif_bell_title: 'Benachrichtigungen', notif_clear_btn: 'Alle löschen', notif_empty: 'Noch keine Benachrichtigungen',
+    notif_pp_changed_detail: '{sign}{delta}pp (jetzt {pp}pp)', notif_tournament_new_title: 'Neuer Turnier-Thread',
     back_to_main: '← Zurück zu Hanabiの小天地',
     nav_collection: 'Sammlung', nav_lookup: 'PP-Suche', nav_skins: 'Skins', nav_updates: 'Neuigkeiten', nav_tournaments: 'Turniere', nav_replay: 'Replay', nav_feedback: 'Vorschläge',
     updates_title: '✦ Neuigkeiten ✦', updates_loading: 'Neuigkeiten werden geladen...', updates_empty: 'Momentan keine Neuigkeiten', updates_load_fail: 'Neuigkeiten konnten nicht geladen werden, bitte später erneut versuchen',
@@ -64,4 +70,8 @@ I18N.de = {
     gallery_sort_recent: 'Kürzlich veröffentlicht', gallery_sort_sets: 'Meiste Beatmaps', gallery_sort_rating: 'Höchste Sternebewertung',
     gallery_import_confirm: 'Dies ist die Sammlung von {name} ({n} Beatmaps). In deine Sammlung importieren? (Vorhandene Einträge werden nicht überschrieben, nur fehlende werden hinzugefügt)',
     gallery_download_btn_title: 'Diese Sammlung importieren', gallery_view_btn_title: 'Beatmap-Liste ansehen',
+    gallery_search_placeholder: 'Nach Spielername oder Tag suchen...', gallery_sort_likes: '❤ Beliebteste',
+    gallery_liked_only: 'Nur von mir geliked', gallery_like_btn_title: 'Gefällt mir',
+    gallery_like_login_required: 'Melde dich mit osu! an, um zu liken', gallery_like_fail: 'Liken fehlgeschlagen, bitte später erneut versuchen',
+    gallery_no_results: 'Keine passenden Sammlungen — versuche ein anderes Stichwort oder Tag', gallery_tag_filter_clear_title: 'Tag-Filter entfernen',
 };

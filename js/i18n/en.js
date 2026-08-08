@@ -1,5 +1,11 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Beatmap Collection + PP Lookup ✦',
+    pwa_install_btn_title: 'Add to home screen (works offline)',
+    track_player_btn: '+ Track', untrack_player_btn: 'Untrack',
+    track_done: "Added to your watchlist — we'll notify you when their PP changes", untrack_done: 'Removed from your watchlist',
+    tracked_players_title: '🔔 Tracked players', tracked_players_empty: "You're not tracking anyone yet — look someone up and hit \"Track\" to get notified when their PP changes",
+    notif_bell_title: 'Notifications', notif_clear_btn: 'Clear all', notif_empty: 'No notifications yet',
+    notif_pp_changed_detail: '{sign}{delta}pp (now {pp}pp)', notif_tournament_new_title: 'New tournament post',
     back_to_main: '← Back to Hanabiの小天地',
     nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_tournaments: 'Tournaments', nav_replay: 'Replay', nav_feedback: 'Suggestions',
     updates_title: '✦ News ✦', updates_loading: 'Loading news...', updates_empty: 'No news right now', updates_load_fail: 'Failed to load news, please try again later',
@@ -64,4 +70,8 @@ I18N.en = {
     gallery_sort_recent: 'Recently published', gallery_sort_sets: 'Most beatmaps', gallery_sort_rating: 'Highest star rating',
     gallery_import_confirm: "This is {name}'s collection with {n} beatmaps. Import into your collection? (Won't overwrite existing entries, only adds ones you don't have)",
     gallery_download_btn_title: 'Import this collection', gallery_view_btn_title: 'View beatmap list',
+    gallery_search_placeholder: 'Search by player name or tag...', gallery_sort_likes: '❤ Most liked',
+    gallery_liked_only: 'Liked by me only', gallery_like_btn_title: 'Like',
+    gallery_like_login_required: 'Log in with osu! to like collections', gallery_like_fail: 'Failed to like, please try again later',
+    gallery_no_results: 'No collections match your search — try a different keyword or tag', gallery_tag_filter_clear_title: 'Clear tag filter',
 };
