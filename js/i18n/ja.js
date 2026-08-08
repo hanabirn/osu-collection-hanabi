@@ -90,7 +90,7 @@ I18N.ja = {
     farm_search_placeholder: '曲名やアーティストを検索...',
     farm_sort_pp_desc: 'PP 高い順', farm_sort_pp_asc: 'PP 低い順',
     farm_sort_star_desc: '星評価 高い順', farm_sort_star_asc: '星評価 低い順',
-    farm_sort_bpm_desc: 'BPM 高い順', farm_sort_length_desc: '長さ 長い順',
+    farm_sort_bpm_desc: 'BPM 高い順', farm_sort_length_desc: '長さ 長い順', farm_sort_new_desc: '新着順',
     farm_filter_length: '秒', farm_add_btn_title: 'コレクションに追加',
     farm_load_fail: 'Farm譜面の読み込みに失敗しました。しばらくしてから再試行してください', farm_empty: '条件に一致する譜面がありません。絞り込み条件を緩めてみてください',
     farm_coverage_pending: 'データベースを準備中です。しばらくしてからまた確認してください',
@@ -117,4 +117,6 @@ I18N.ja = {
     mapper_track_placeholder: 'マッパーのユーザー名を入力...', mapper_track_btn: 'フォロー',
     mapper_already_tracked: 'このマッパーはすでにフォロー中です', mapper_track_done: 'フォローに追加しました。新しい譜面が出たら通知します',
     tracked_mappers_empty: 'まだ誰もフォローしていません', notif_mapper_new_title: '{name} が新しい譜面を公開しました',
+    notif_achievement_new_title: '{n} が新しいメダルを獲得しました', notif_achievement_detail: '新しいメダル {count} 個 — クリックして確認',
+    notif_mapper_graveyard_title: '{name} に新しい Graveyard 譜面があります', notif_mapper_loved_title: '{name} の譜面が Loved になりました！',
 };

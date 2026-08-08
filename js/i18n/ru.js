@@ -90,7 +90,7 @@ I18N.ru = {
     farm_search_placeholder: 'Поиск по названию или автору...',
     farm_sort_pp_desc: 'PP: сначала больше', farm_sort_pp_asc: 'PP: сначала меньше',
     farm_sort_star_desc: 'Звёзды: сначала больше', farm_sort_star_asc: 'Звёзды: сначала меньше',
-    farm_sort_bpm_desc: 'BPM: сначала больше', farm_sort_length_desc: 'Длина: сначала длиннее',
+    farm_sort_bpm_desc: 'BPM: сначала больше', farm_sort_length_desc: 'Длина: сначала длиннее', farm_sort_new_desc: 'Недавно добавленные',
     farm_filter_length: 'сек', farm_add_btn_title: 'Добавить в коллекцию',
     farm_load_fail: 'Не удалось загрузить Farm-карты, попробуйте позже', farm_empty: 'Нет карт по этим фильтрам — попробуйте ослабить условия',
     farm_coverage_pending: 'База данных ещё формируется, загляните позже',
@@ -117,4 +117,6 @@ I18N.ru = {
     mapper_track_placeholder: 'Введите ник маппера...', mapper_track_btn: 'Отслеживать',
     mapper_already_tracked: 'Вы уже отслеживаете этого маппера', mapper_track_done: 'Добавлено в отслеживаемые — сообщим о новых картах',
     tracked_mappers_empty: 'Вы пока не отслеживаете ни одного маппера', notif_mapper_new_title: '{name} зарангал новую карту',
+    notif_achievement_new_title: '{n} получил новую медаль', notif_achievement_detail: 'Новых медалей: {count} — нажмите, чтобы посмотреть',
+    notif_mapper_graveyard_title: 'У {name} новая карта в graveyard', notif_mapper_loved_title: 'Карта {name} попала в Loved!',
 };

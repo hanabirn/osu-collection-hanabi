@@ -90,7 +90,7 @@ I18N.en = {
     farm_search_placeholder: 'Search title or artist...',
     farm_sort_pp_desc: 'PP: high to low', farm_sort_pp_asc: 'PP: low to high',
     farm_sort_star_desc: 'Stars: high to low', farm_sort_star_asc: 'Stars: low to high',
-    farm_sort_bpm_desc: 'BPM: high to low', farm_sort_length_desc: 'Length: long to short',
+    farm_sort_bpm_desc: 'BPM: high to low', farm_sort_length_desc: 'Length: long to short', farm_sort_new_desc: 'Newest added',
     farm_filter_length: 'sec', farm_add_btn_title: 'Add to collection',
     farm_load_fail: 'Failed to load Farm Maps, try again later', farm_empty: 'No maps match these filters — try loosening them',
     farm_coverage_pending: 'The dataset is still being built, check back soon',
@@ -117,4 +117,6 @@ I18N.en = {
     mapper_track_placeholder: "Enter mapper's username...", mapper_track_btn: 'Track',
     mapper_already_tracked: "You're already tracking this mapper", mapper_track_done: "Tracking added — you'll be notified about new maps",
     tracked_mappers_empty: "You're not tracking any mappers yet", notif_mapper_new_title: '{name} ranked a new map',
+    notif_achievement_new_title: '{n} earned a new medal', notif_achievement_detail: '{count} new medal(s) — click to view',
+    notif_mapper_graveyard_title: '{name} has a new graveyard map', notif_mapper_loved_title: "{name}'s map got Loved!",
 };

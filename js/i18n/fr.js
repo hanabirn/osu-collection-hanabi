@@ -90,7 +90,7 @@ I18N.fr = {
     farm_search_placeholder: 'Rechercher un titre ou un artiste...',
     farm_sort_pp_desc: 'PP : décroissant', farm_sort_pp_asc: 'PP : croissant',
     farm_sort_star_desc: 'Étoiles : décroissant', farm_sort_star_asc: 'Étoiles : croissant',
-    farm_sort_bpm_desc: 'BPM : décroissant', farm_sort_length_desc: 'Durée : longue à courte',
+    farm_sort_bpm_desc: 'BPM : décroissant', farm_sort_length_desc: 'Durée : longue à courte', farm_sort_new_desc: 'Ajoutés récemment',
     farm_filter_length: 'sec', farm_add_btn_title: 'Ajouter à ma collection',
     farm_load_fail: 'Échec du chargement des Farm Maps, réessayez plus tard', farm_empty: 'Aucune map ne correspond à ces filtres — essayez de les assouplir',
     farm_coverage_pending: 'La base de données est encore en préparation, revenez bientôt',
@@ -117,4 +117,6 @@ I18N.fr = {
     mapper_track_placeholder: 'Pseudo du mapper...', mapper_track_btn: 'Suivre',
     mapper_already_tracked: 'Vous suivez déjà ce mapper', mapper_track_done: 'Ajouté au suivi — vous serez averti des nouvelles cartes',
     tracked_mappers_empty: "Vous ne suivez aucun mapper pour l'instant", notif_mapper_new_title: '{name} a classé une nouvelle carte',
+    notif_achievement_new_title: '{n} a obtenu un nouveau médaillon', notif_achievement_detail: '{count} nouveau(x) médaillon(s) — cliquez pour voir',
+    notif_mapper_graveyard_title: '{name} a une nouvelle carte en graveyard', notif_mapper_loved_title: 'Une carte de {name} est passée en Loved !',
 };

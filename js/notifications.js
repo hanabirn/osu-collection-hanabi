@@ -47,12 +47,24 @@ function clearAllNotifications() {
     renderNotificationBell();
 }
 
-/* Re-fetches every tracked player's total PP and compares it to the `lastPp`
-   stashed on each entry by js/osu.js (set both at track-time and after every
-   check here), so only genuine changes since the last check produce a
-   notification — never a flood on the very first check, since lastPp is
-   always seeded from a real value at track-time. */
-async function checkTrackedPlayersPp() {
+/* Re-fetches every tracked player's total PP and achievement list in one
+   pass and compares each against what's stashed on the entry (`lastPp` /
+   `knownAchievementIds`, both set at track-time by toggleTrackVisitorPlayer()
+   in js/osu.js and kept current here), so only genuine changes since the
+   last check produce a notification — never a flood on the very first
+   check, since both are always seeded from real values at track-time (a
+   player tracked before knownAchievementIds existed instead baselines it
+   silently here on the first check that sees it, same idea as
+   checkTrackedMappers()' lastMaxApprovedDate === null below).
+
+   PP and achievements are checked together in a single read-modify-write of
+   getTrackedPlayers()/saveTrackedPlayers() rather than as two separate
+   functions — they used to be separate, but both independently reading the
+   list, mutating their own in-memory copy, and saving back meant whichever
+   finished last (unpredictable, since they're both awaited via the same
+   Promise.all in checkForNotifications()) silently clobbered the other's
+   update. One pass avoids the race instead of trying to schedule around it. */
+async function checkTrackedPlayers() {
     if (typeof getTrackedPlayers !== 'function') return;
     const players = getTrackedPlayers();
     if (players.length === 0) return;
@@ -88,6 +100,42 @@ async function checkTrackedPlayersPp() {
             anyUpdated = true;
         } catch (e) {
             console.error('Tracked player PP check failed:', player.id, e);
+        }
+
+        try {
+            const res = await fetch(`/.netlify/functions/osu-user-achievements?id=${player.id}`);
+            if (res.ok) {
+                const ids = (await res.json()).achievements || [];
+                if (!Array.isArray(player.knownAchievementIds)) {
+                    player.knownAchievementIds = ids;
+                    anyUpdated = true;
+                } else {
+                    const known = new Set(player.knownAchievementIds);
+                    const newIds = ids.filter(id => !known.has(id));
+                    if (newIds.length > 0) {
+                        addNotification({
+                            id: `achievement-${player.id}-${Date.now()}`,
+                            type: 'achievement',
+                            title: t('notif_achievement_new_title', { n: player.username || `#${player.id}` }),
+                            // Links out to the player's real osu! profile
+                            // rather than this site's own lookup view — this
+                            // site has no medal UI of its own (no
+                            // achievement id -> name/icon mapping, see
+                            // osu-user-achievements.js's header comment), so
+                            // that's the only place the new medal is
+                            // actually visible.
+                            detail: t('notif_achievement_detail', { count: newIds.length }),
+                            url: `https://osu.ppy.sh/users/${player.id}`,
+                            createdAt: Date.now(),
+                            read: false,
+                        });
+                        player.knownAchievementIds = ids;
+                        anyUpdated = true;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Tracked player achievement check failed:', player.id, e);
         }
     }
     if (anyUpdated) {
@@ -131,9 +179,17 @@ async function checkNewTournamentPosts() {
 /* Tracked mappers (js/updates.js) get the exact same "baseline on first
    check, then diff" treatment as checkNewTournamentPosts() below — a
    prolific mapper's whole back catalog would otherwise fire as "new" the
-   moment someone starts tracking them. Diffs by approved_date per
-   beatmapset rather than by id, since get_beatmaps' `u=` filter returns
-   every difficulty of every set the mapper has ever made. */
+   moment someone starts tracking them. New-ranked-map detection diffs by
+   approved_date per beatmapset rather than by id, since get_beatmaps' `u=`
+   filter returns every difficulty of every set the mapper has ever made.
+   Graveyard/loved detection (via osu-mapper-status.js, which resolves the
+   tracked username to a numeric id server-side every call — see that
+   file's header comment for why nothing is cached client-side) is folded
+   into this same pass rather than a separate function/Promise.all entry:
+   both read-modify-write the same getTrackedMappers()/saveTrackedMappers()
+   list, and doing that from two independently-awaited functions meant
+   whichever saved last could silently clobber the other's update (the same
+   race checkTrackedPlayers() above avoids the same way). */
 async function checkTrackedMappers() {
     if (typeof getTrackedMappers !== 'function') return;
     const mappers = getTrackedMappers();
@@ -143,38 +199,72 @@ async function checkTrackedMappers() {
     for (const mapper of mappers) {
         try {
             const beatmaps = await osuFetch(`mapper=${encodeURIComponent(mapper.name)}&mapper_type=string`);
-            if (!Array.isArray(beatmaps) || beatmaps.length === 0) continue;
-
-            const bySet = new Map();
-            beatmaps.forEach(b => {
-                if (!b.beatmapset_id || !b.approved_date) return;
-                const existing = bySet.get(b.beatmapset_id);
-                if (!existing || b.approved_date > existing.approved_date) bySet.set(b.beatmapset_id, b);
-            });
-            const sets = [...bySet.values()].sort((a, b) => b.approved_date.localeCompare(a.approved_date));
-            if (sets.length === 0) continue;
-
-            if (mapper.lastMaxApprovedDate === null) {
-                mapper.lastMaxApprovedDate = sets[0].approved_date;
-                anyUpdated = true;
-                continue;
-            }
-
-            const newSets = sets.filter(b => b.approved_date > mapper.lastMaxApprovedDate).slice(0, 5);
-            newSets.forEach(b => {
-                addNotification({
-                    id: `mapper-${b.beatmapset_id}`,
-                    type: 'mapper',
-                    title: t('notif_mapper_new_title', { name: mapper.name }),
-                    detail: `${b.artist} - ${b.title}`,
-                    url: `https://osu.ppy.sh/beatmapsets/${b.beatmapset_id}`,
-                    createdAt: Date.now(),
-                    read: false,
+            if (Array.isArray(beatmaps) && beatmaps.length > 0) {
+                const bySet = new Map();
+                beatmaps.forEach(b => {
+                    if (!b.beatmapset_id || !b.approved_date) return;
+                    const existing = bySet.get(b.beatmapset_id);
+                    if (!existing || b.approved_date > existing.approved_date) bySet.set(b.beatmapset_id, b);
                 });
-            });
-            if (newSets.length > 0) { mapper.lastMaxApprovedDate = sets[0].approved_date; anyUpdated = true; }
+                const sets = [...bySet.values()].sort((a, b) => b.approved_date.localeCompare(a.approved_date));
+
+                if (sets.length > 0) {
+                    if (mapper.lastMaxApprovedDate === null) {
+                        mapper.lastMaxApprovedDate = sets[0].approved_date;
+                        anyUpdated = true;
+                    } else {
+                        const newSets = sets.filter(b => b.approved_date > mapper.lastMaxApprovedDate).slice(0, 5);
+                        newSets.forEach(b => {
+                            addNotification({
+                                id: `mapper-${b.beatmapset_id}`,
+                                type: 'mapper',
+                                title: t('notif_mapper_new_title', { name: mapper.name }),
+                                detail: `${b.artist} - ${b.title}`,
+                                url: `https://osu.ppy.sh/beatmapsets/${b.beatmapset_id}`,
+                                createdAt: Date.now(),
+                                read: false,
+                            });
+                        });
+                        if (newSets.length > 0) { mapper.lastMaxApprovedDate = sets[0].approved_date; anyUpdated = true; }
+                    }
+                }
+            }
         } catch (e) {
             console.error('Tracked mapper check failed:', mapper.name, e);
+        }
+
+        try {
+            const res = await fetch(`/.netlify/functions/osu-mapper-status?username=${encodeURIComponent(mapper.name)}`);
+            if (res.ok) {
+                const data = await res.json();
+                [['graveyard', 'knownGraveyardIds', 'mapper-graveyard'], ['loved', 'knownLovedIds', 'mapper-loved']].forEach(([dataKey, storeKey, notifType]) => {
+                    const sets = data[dataKey] || [];
+                    const ids = sets.map(s => s.id);
+
+                    if (!Array.isArray(mapper[storeKey])) {
+                        mapper[storeKey] = ids;
+                        anyUpdated = true;
+                        return;
+                    }
+
+                    const known = new Set(mapper[storeKey]);
+                    const newSets = sets.filter(s => !known.has(s.id));
+                    newSets.forEach(s => {
+                        addNotification({
+                            id: `${notifType}-${s.id}`,
+                            type: notifType,
+                            title: t(dataKey === 'graveyard' ? 'notif_mapper_graveyard_title' : 'notif_mapper_loved_title', { name: mapper.name }),
+                            detail: `${s.artist} - ${s.title}`,
+                            url: `https://osu.ppy.sh/beatmapsets/${s.id}`,
+                            createdAt: Date.now(),
+                            read: false,
+                        });
+                    });
+                    if (newSets.length > 0) { mapper[storeKey] = ids; anyUpdated = true; }
+                });
+            }
+        } catch (e) {
+            console.error('Tracked mapper graveyard/loved check failed:', mapper.name, e);
         }
     }
     if (anyUpdated) {
@@ -188,7 +278,7 @@ async function checkForNotifications(force) {
     if (!force && Date.now() - last < NOTIF_CHECK_INTERVAL_MS) return;
     localStorage.setItem(NOTIF_LAST_CHECK_KEY, String(Date.now()));
 
-    await Promise.all([checkTrackedPlayersPp(), checkNewTournamentPosts(), checkTrackedMappers()]);
+    await Promise.all([checkTrackedPlayers(), checkNewTournamentPosts(), checkTrackedMappers()]);
     renderNotificationBell();
 }
 
@@ -210,7 +300,8 @@ function renderNotificationBell() {
 
     list.innerHTML = notifs.map(n => {
         const timeStr = new Date(n.createdAt).toLocaleString();
-        const iconName = n.type === 'pp' ? 'trendingUp' : n.type === 'mapper' ? 'palette' : 'trophy';
+        const ICON_BY_TYPE = { pp: 'trendingUp', mapper: 'palette', 'mapper-graveyard': 'palette', 'mapper-loved': 'heart', achievement: 'trophy' };
+        const iconName = ICON_BY_TYPE[n.type] || 'trophy';
         const body = `
             <span class="notif-item-icon">${icon(iconName)}</span>
             <div class="notif-item-body">
@@ -219,7 +310,7 @@ function renderNotificationBell() {
                 <div class="notif-item-time">${timeStr}</div>
             </div>`;
         const cls = `notif-item${n.read ? '' : ' unread'}`;
-        if ((n.type === 'tournament' || n.type === 'mapper') && n.url) {
+        if (['tournament', 'mapper', 'mapper-graveyard', 'mapper-loved', 'achievement'].includes(n.type) && n.url) {
             return `<a href="${n.url}" target="_blank" rel="noopener noreferrer" class="${cls}">${body}</a>`;
         }
         if (n.type === 'pp' && n.playerId) {

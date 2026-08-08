@@ -93,7 +93,7 @@ function trackMapperFromInput() {
         showShareToast(t('mapper_already_tracked'));
         return;
     }
-    list.push({ name, lastMaxApprovedDate: null });
+    list.push({ name, lastMaxApprovedDate: null, knownGraveyardIds: null, knownLovedIds: null });
     saveTrackedMappers(list);
     input.value = '';
     showShareToast(t('mapper_track_done'));

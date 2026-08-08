@@ -39,7 +39,7 @@ exports.handler = async (event) => {
     const lengthMin = num(qs.lengthMin), lengthMax = num(qs.lengthMax);
 
     const [sortField, sortDir] = (qs.sort || 'pp_desc').split('_');
-    const SORT_FIELDS = { pp: '__pp', star: '__star', bpm: 'bpm', length: 'total_length' };
+    const SORT_FIELDS = { pp: '__pp', star: '__star', bpm: 'bpm', length: 'total_length', new: 'firstSeenAt' };
     const sortKey = SORT_FIELDS[sortField] ? sortField : 'pp';
 
     try {

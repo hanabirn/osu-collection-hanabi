@@ -90,7 +90,7 @@ I18N.de = {
     farm_search_placeholder: 'Titel oder Künstler suchen...',
     farm_sort_pp_desc: 'PP: hoch zu niedrig', farm_sort_pp_asc: 'PP: niedrig zu hoch',
     farm_sort_star_desc: 'Sterne: hoch zu niedrig', farm_sort_star_asc: 'Sterne: niedrig zu hoch',
-    farm_sort_bpm_desc: 'BPM: hoch zu niedrig', farm_sort_length_desc: 'Länge: lang zu kurz',
+    farm_sort_bpm_desc: 'BPM: hoch zu niedrig', farm_sort_length_desc: 'Länge: lang zu kurz', farm_sort_new_desc: 'Neu hinzugefügt',
     farm_filter_length: 'Sek.', farm_add_btn_title: 'Zur Sammlung hinzufügen',
     farm_load_fail: 'Farm-Maps konnten nicht geladen werden, später erneut versuchen', farm_empty: 'Keine Maps entsprechen diesen Filtern — versuche es mit weniger strengen Filtern',
     farm_coverage_pending: 'Die Datenbank wird noch aufgebaut, schau bald wieder vorbei',
@@ -117,4 +117,6 @@ I18N.de = {
     mapper_track_placeholder: 'Benutzername des Mappers...', mapper_track_btn: 'Verfolgen',
     mapper_already_tracked: 'Du verfolgst diesen Mapper bereits', mapper_track_done: 'Zur Beobachtung hinzugefügt — du wirst über neue Maps benachrichtigt',
     tracked_mappers_empty: 'Du beobachtest noch keine Mapper', notif_mapper_new_title: '{name} hat eine neue Map gerankt',
+    notif_achievement_new_title: '{n} hat ein neues Abzeichen erhalten', notif_achievement_detail: '{count} neue(s) Abzeichen — hier klicken',
+    notif_mapper_graveyard_title: '{name} hat eine neue Graveyard-Map', notif_mapper_loved_title: 'Eine Map von {name} wurde zu Loved hinzugefügt!',
 };

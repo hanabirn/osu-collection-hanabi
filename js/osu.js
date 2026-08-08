@@ -1912,7 +1912,7 @@ function isPlayerTracked(id) {
     return getTrackedPlayers().some(p => String(p.id) === String(id));
 }
 
-function toggleTrackVisitorPlayer() {
+async function toggleTrackVisitorPlayer() {
     if (!visitorLookupUserId) return;
     const list = getTrackedPlayers();
     const idx = list.findIndex(p => String(p.id) === String(visitorLookupUserId));
@@ -1920,7 +1920,19 @@ function toggleTrackVisitorPlayer() {
         list.splice(idx, 1);
         showShareToast(t('untrack_done'));
     } else {
-        list.push({ id: visitorLookupUserId, username: visitorLookupUsername || `#${visitorLookupUserId}`, country: visitorLookupCountry, lastPp: visitorLookupTotalPp || 0 });
+        const entry = { id: visitorLookupUserId, username: visitorLookupUsername || `#${visitorLookupUserId}`, country: visitorLookupCountry, lastPp: visitorLookupTotalPp || 0 };
+        // Seed the achievement baseline the same way lastPp above is already
+        // seeded from a real value — otherwise the first periodic check
+        // (js/notifications.js's checkTrackedPlayers()) would
+        // have to establish it anyway, but silently, one check cycle later.
+        // Best-effort: if this fails, just leave the field unset so that
+        // later check still recognizes it needs to baseline first rather
+        // than treating "no field" as "zero achievements known".
+        try {
+            const res = await fetch(`/.netlify/functions/osu-user-achievements?id=${visitorLookupUserId}`);
+            if (res.ok) entry.knownAchievementIds = (await res.json()).achievements || [];
+        } catch (e) { /* left unset, notifications.js will baseline it later */ }
+        list.push(entry);
         showShareToast(t('track_done'));
     }
     saveTrackedPlayers(list);

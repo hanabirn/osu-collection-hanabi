@@ -90,7 +90,7 @@ I18N.ko = {
     farm_search_placeholder: '곡 제목 또는 아티스트 검색...',
     farm_sort_pp_desc: 'PP 높은순', farm_sort_pp_asc: 'PP 낮은순',
     farm_sort_star_desc: '별 높은순', farm_sort_star_asc: '별 낮은순',
-    farm_sort_bpm_desc: 'BPM 높은순', farm_sort_length_desc: '길이 긴순',
+    farm_sort_bpm_desc: 'BPM 높은순', farm_sort_length_desc: '길이 긴순', farm_sort_new_desc: '최신 수집순',
     farm_filter_length: '초', farm_add_btn_title: '내 컬렉션에 추가',
     farm_load_fail: '팜맵을 불러오지 못했습니다. 나중에 다시 시도해주세요', farm_empty: '조건에 맞는 맵이 없습니다. 필터를 완화해보세요',
     farm_coverage_pending: '데이터베이스를 아직 준비 중입니다. 잠시 후 다시 확인해주세요',
@@ -117,4 +117,6 @@ I18N.ko = {
     mapper_track_placeholder: '매퍼 유저명 입력...', mapper_track_btn: '추적',
     mapper_already_tracked: '이미 이 매퍼를 추적 중입니다', mapper_track_done: '추적 목록에 추가되었습니다. 새 맵이 나오면 알려드릴게요',
     tracked_mappers_empty: '아직 추적 중인 매퍼가 없습니다', notif_mapper_new_title: '{name} 님이 새 맵을 랭크했습니다',
+    notif_achievement_new_title: '{n} 님이 새 메달을 획득했습니다', notif_achievement_detail: '새 메달 {count}개 — 클릭해서 보기',
+    notif_mapper_graveyard_title: '{name} 님의 새 Graveyard 맵', notif_mapper_loved_title: '{name} 님의 맵이 Loved에 등록되었습니다!',
 };

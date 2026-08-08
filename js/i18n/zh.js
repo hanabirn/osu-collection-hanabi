@@ -90,7 +90,7 @@ I18N.zh = {
     farm_search_placeholder: '搜尋曲名或作者...',
     farm_sort_pp_desc: 'PP 高到低', farm_sort_pp_asc: 'PP 低到高',
     farm_sort_star_desc: '星等高到低', farm_sort_star_asc: '星等低到高',
-    farm_sort_bpm_desc: 'BPM 高到低', farm_sort_length_desc: '長度長到短',
+    farm_sort_bpm_desc: 'BPM 高到低', farm_sort_length_desc: '長度長到短', farm_sort_new_desc: '最新收錄',
     farm_filter_length: '秒', farm_add_btn_title: '加入收藏',
     farm_load_fail: '載入 Farm 圖失敗，稍後再試', farm_empty: '沒有符合條件的圖，換個篩選條件試試',
     farm_coverage_pending: '資料庫尚在準備中，稍後再回來看看',
@@ -117,4 +117,6 @@ I18N.zh = {
     mapper_track_placeholder: '輸入 mapper 用戶名...', mapper_track_btn: '追蹤',
     mapper_already_tracked: '已經在追蹤這位 mapper 了', mapper_track_done: '已加入追蹤，有新圖上架時會通知你',
     tracked_mappers_empty: '尚未追蹤任何 mapper', notif_mapper_new_title: '{name} 上架新圖了',
+    notif_achievement_new_title: '{n} 獲得新獎章', notif_achievement_detail: '新增了 {count} 個獎章，點此查看',
+    notif_mapper_graveyard_title: '{name} 有新的 Graveyard 圖', notif_mapper_loved_title: '{name} 的圖被加入 Loved！',
 };

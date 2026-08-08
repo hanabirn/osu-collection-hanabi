@@ -122,9 +122,13 @@ async function runCrawlBatch(mode, budgetMs) {
             const record = await computeOne(item);
             const existingIdx = index.get(record.beatmap_id);
             if (existingIdx === undefined) {
+                record.firstSeenAt = Date.now();
                 dataset.push(record);
                 index.set(record.beatmap_id, dataset.length - 1);
             } else {
+                // computeOne() never sets firstSeenAt itself — preserve the
+                // original value here or a recompute would wipe it out.
+                record.firstSeenAt = dataset[existingIdx].firstSeenAt;
                 dataset[existingIdx] = record;
             }
             state.computedCount++;
