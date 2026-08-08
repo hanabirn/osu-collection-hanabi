@@ -235,9 +235,32 @@
                 </div>
                 <button class="btn stats-card-btn" onclick="downloadVisitorStatsCard()">📸 <span data-i18n="stats_card_btn">產生戰績卡</span></button>
                 <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
-                    <div class="osu-recent-title" data-i18n="osu_recent_title">🎮 最近遊玩</div>
+                    <div class="osu-mode-tabs osu-plays-type-tabs">
+                        <button class="osu-tab active" onclick="switchVisitorPlaysType('recent', this)" data-i18n="osu_recent_title">🎮 最近遊玩</button>
+                        <button class="osu-tab" onclick="switchVisitorPlaysType('best', this)" data-i18n="osu_top_title">🏆 最佳成績</button>
+                    </div>
                     <div class="osu-recent-list" id="visitor-recent-list"></div>
                 </div>
+            </div>
+        </div>
+
+        <div class="visitor-lookup-card pp-compare-card" id="pp-compare-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="pp_compare_title">⚔ 雙人 PP 對比</h3>
+            <div class="pp-compare-input-row">
+                <input type="text" id="pp-compare-input-a" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input">
+                <input type="text" id="pp-compare-input-b" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input">
+                <button class="btn" onclick="comparePlayers()" data-i18n="pp_compare_btn">比較</button>
+            </div>
+            <div id="pp-compare-status" class="status"></div>
+            <div id="pp-compare-result" style="display:none;">
+                <div class="pp-compare-summary">
+                    <div class="pp-compare-side pp-compare-side-a" id="pp-compare-side-a"></div>
+                    <div class="pp-compare-vs">VS</div>
+                    <div class="pp-compare-side pp-compare-side-b" id="pp-compare-side-b"></div>
+                </div>
+                <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
             </div>
         </div>
     </section>
@@ -247,7 +270,7 @@
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="skins_title">&#127925; 我的皮膚 &#127925;</h3>
-            <p class="skins-hint" data-i18n="skins_hint">上傳你想收藏的 osu! 皮膚檔案（.osk），之後隨時可以下載回來。檔案只存在你目前這個瀏覽器裡，不會上傳到任何伺服器，換裝置或清除瀏覽器資料就會遺失，請自行備份重要檔案。</p>
+            <p class="skins-hint" data-i18n="skins_hint">上傳你想收藏的 osu! 皮膚檔案（.osk），之後隨時可以下載回來。檔案只存在你目前這個瀏覽器裡，不會上傳到任何伺服器，換裝置或清除瀏覽器資料就會遺失。登入 osu! 帳號後可以選擇性把 4MB 以下的皮膚備份到雲端。</p>
             <div class="skin-upload-row">
                 <input type="file" id="skin-file-input" accept=".osk" multiple onchange="handleSkinUpload(event)">
             </div>
@@ -258,6 +281,13 @@
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="skins_list_title">&#128190; 已收藏的皮膚</h3>
             <div id="skins-list" class="skins-list"></div>
+        </div>
+        <div class="osu-add-card" id="cloud-skins-section" style="display:none;">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="skins_backup_title">&#9729;&#65039; 雲端備份</h3>
+            <p class="skins-hint" data-i18n="skins_backup_hint">僅供你自己使用，最多 30 個、每個 4MB 以下。「還原到本機」會把它加回上面的清單。</p>
+            <div id="cloud-skins-list" class="skins-list"></div>
         </div>
     </section>
 

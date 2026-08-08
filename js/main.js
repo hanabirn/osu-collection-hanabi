@@ -5,6 +5,7 @@ function switchTab(tab, el) {
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
+    if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();

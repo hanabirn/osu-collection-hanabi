@@ -23,6 +23,16 @@ exports.handler = async (event) => {
             return { statusCode: 200, headers, body: JSON.stringify(data) };
         }
 
+        if (qs.best) {
+            params.set('u', qs.best);
+            params.set('type', qs.best_type === 'string' ? 'string' : 'id');
+            params.set('limit', qs.limit || '10');
+            if (qs.m !== undefined) params.set('m', qs.m);
+            const res = await fetch(`https://osu.ppy.sh/api/get_user_best?${params.toString()}`);
+            const data = await res.json();
+            return { statusCode: 200, headers, body: JSON.stringify(data) };
+        }
+
         if (qs.u) {
             params.set('u', qs.u);
             params.set('type', qs.type === 'string' ? 'string' : 'id');

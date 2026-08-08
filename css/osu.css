@@ -146,8 +146,19 @@
 }
 .skin-download-btn { border-color: var(--accent-pink); color: var(--accent-pink); }
 .skin-download-btn:hover { background: var(--accent-pink); color: #fff; }
-.skin-download-btn:active, .skin-delete-btn:active { transform: scale(0.95); }
+.skin-download-btn:active, .skin-delete-btn:active, .skin-backup-btn:active { transform: scale(0.95); }
 .skin-delete-btn:hover { border-color: #f87171; color: #f87171; }
+.skin-backup-btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    transition: all 0.2s;
+}
+.skin-backup-btn:hover { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(var(--accent-purple-rgb), 0.25); }
+.cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); }
 .skins-empty {
     text-align: center;
     color: var(--text-secondary);
@@ -1234,6 +1245,44 @@
     justify-content: center;
     margin-bottom: 12px;
 }
+
+/* ===== Two-player PP comparison card — sits below the single-player lookup
+   card on the same page, same .visitor-lookup-card shell. ===== */
+.pp-compare-card { margin-top: 20px; }
+.pp-compare-input-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.pp-compare-input-row .guestbook-input { flex: 1 1 160px; min-width: 0; }
+.pp-compare-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.pp-compare-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 18px;
+    border-radius: 14px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+}
+.pp-compare-side-a { border-color: rgba(var(--accent-pink-rgb), 0.4); }
+.pp-compare-side-b { border-color: rgba(var(--accent-purple-rgb), 0.4); }
+.pp-compare-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.pp-compare-side-name { font-size: 0.85rem; font-weight: bold; color: var(--text); }
+.pp-compare-side-a .pp-compare-side-pp { color: var(--accent-pink); }
+.pp-compare-side-b .pp-compare-side-pp { color: var(--accent-purple); }
+.pp-compare-side-pp { font-size: 0.95rem; font-weight: bold; }
+.pp-compare-vs { font-size: 0.8rem; font-weight: bold; color: var(--text-dim2); }
 .visitor-result-header {
     display: flex;
     align-items: center;

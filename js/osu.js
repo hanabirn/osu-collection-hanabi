@@ -1011,22 +1011,27 @@ function decodeOsuMods(bitmask) {
     return table.filter(([bit, name]) => name && (bitmask & bit)).map(([, name]) => name);
 }
 
-async function renderOsuRecentPlays(userId, mode, listId, wrapId) {
+/* Handles both "最近遊玩" (get_user_recent) and "最佳成績" (get_user_best) —
+   same response shape from the v1 API (score objects keyed by beatmap_id),
+   the only real difference is which endpoint/limit to use and that best-play
+   entries carry a `pp` field worth showing. See switchVisitorPlaysType(). */
+async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
     const container = document.getElementById(listId);
     const wrap = document.getElementById(wrapId);
     if (!container || !wrap) return;
     wrap.style.display = 'none';
     try {
-        const recent = await osuFetch(`recent=${userId}&limit=5&m=${mode}`);
-        if (!recent || recent.length === 0) return;
-        const beatmapIds = [...new Set(recent.map(r => r.beatmap_id))];
+        const query = type === 'best' ? `best=${userId}&limit=10&m=${mode}` : `recent=${userId}&limit=5&m=${mode}`;
+        const plays = await osuFetch(query);
+        if (!plays || plays.length === 0) return;
+        const beatmapIds = [...new Set(plays.map(r => r.beatmap_id))];
         const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`)));
         const beatmapMap = {};
         beatmapIds.forEach((id, i) => {
             const bm = beatmapResults[i] && beatmapResults[i][0];
             if (bm) beatmapMap[id] = bm;
         });
-        container.innerHTML = recent.map(r => {
+        container.innerHTML = plays.map(r => {
             const bm = beatmapMap[r.beatmap_id];
             const title = bm ? `${bm.title} [${bm.version}]` : `Beatmap #${r.beatmap_id}`;
             const coverUrl = bm ? `https://assets.ppy.sh/beatmaps/${bm.beatmapset_id}/covers/card.jpg` : '';
@@ -1036,19 +1041,20 @@ async function renderOsuRecentPlays(userId, mode, listId, wrapId) {
             const modsStr = mods.length > 0 ? ' · ' + mods.join(',') : '';
             const d = new Date(String(r.date).replace(' ', 'T') + 'Z');
             const dateStr = isNaN(d) ? '' : `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            const ppStr = type === 'best' && r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
             return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
                 <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
                 <div class="osu-recent-overlay"></div>
                 <span class="osu-recent-rank rank-${rankClass}">${r.rank || '—'}</span>
                 <div class="osu-recent-info">
                     <div class="osu-recent-song">${escHtml(title)}</div>
-                    <div class="osu-recent-meta">${acc}% · ${r.maxcombo}x${modsStr} · ${dateStr}</div>
+                    <div class="osu-recent-meta">${ppStr}${acc}% · ${r.maxcombo}x${modsStr} · ${dateStr}</div>
                 </div>
             </a>`;
         }).join('');
         wrap.style.display = 'block';
     } catch (e) {
-        console.error('Recent plays fetch failed:', e);
+        console.error('Plays list fetch failed:', e);
     }
 }
 
@@ -1226,6 +1232,144 @@ function renderPpHistoryChart(historyOverride, key, panelId) {
     });
 }
 
+/* ===== Two-player PP comparison — reuses the exact same history sources as
+   the single-player panel above (local daily snapshots + osu!Track via
+   osu-pp-history.js), just fetched for two ids and rendered as two Chart.js
+   datasets sharing a merged date axis instead of one. No new backend. ===== */
+async function fetchPlayerTotalPpAndHistory(input, isUsername) {
+    const param = isUsername ? `u=${encodeURIComponent(input)}&type=string` : `u=${input}`;
+    const results = await Promise.all([0, 1, 2, 3].map(m => osuFetch(`${param}&m=${m}`)));
+    const modeData = results.map(r => (r && r.length > 0) ? r[0] : null);
+    const u = modeData[0];
+    if (!u) return null;
+
+    const totalPP = modeData.reduce((sum, m) => sum + (m && m.pp_raw != null ? parseFloat(m.pp_raw) : 0), 0);
+    const key = ppHistoryKeyFor(u.user_id);
+    if (totalPP > 0) recordPpSnapshot(totalPP, key);
+    const remote = await fetchOsuTrackHistory(u.user_id);
+    const history = mergePpHistory(remote, getPpHistory(key));
+    return { id: u.user_id, username: u.username, totalPP, history };
+}
+
+function renderPpCompareSide(elId, player) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = `
+        <img class="osu-avatar pp-compare-avatar" src="${osuAvatarUrl(player.id)}" alt="" onerror="this.style.visibility='hidden';">
+        <div class="pp-compare-side-name">${escHtml(player.username)}</div>
+        <div class="pp-compare-side-pp">${Math.round(player.totalPP).toLocaleString()}pp</div>
+    `;
+}
+
+let ppCompareChart = null;
+let ppCompareChartArgs = null;
+
+function renderPpCompareChart(playerA, playerB, panelId) {
+    const el = document.getElementById(panelId);
+    if (!el) return;
+    if (ppCompareChart) { ppCompareChart.destroy(); ppCompareChart = null; }
+
+    const dates = [...new Set([...playerA.history.map(p => p.date), ...playerB.history.map(p => p.date)])].sort();
+    if (dates.length < 2) {
+        ppCompareChartArgs = null;
+        el.innerHTML = `
+            <div class="trend-chart-label">${t('pp_history_title')}</div>
+            <p class="osu-empty">${t('pp_history_empty')}</p>
+        `;
+        return;
+    }
+
+    ppCompareChartArgs = [playerA, playerB, panelId];
+    el.innerHTML = `
+        <div class="trend-chart-label">${t('pp_history_title')}</div>
+        <div class="trend-chart-wrap"><canvas></canvas></div>
+    `;
+    const canvas = el.querySelector('canvas');
+    const colors = ppChartColors();
+    const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
+    const seriesFor = (history) => {
+        const byDate = new Map(history.map(p => [p.date, p.pp]));
+        return dates.map(d => byDate.has(d) ? byDate.get(d) : null);
+    };
+
+    ppCompareChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: dates.map(formatPpChartDate),
+            datasets: [
+                {
+                    label: playerA.username, data: seriesFor(playerA.history),
+                    borderColor: colors.accent, backgroundColor: colors.accent + '2a',
+                    pointBackgroundColor: colors.accent, pointBorderColor: colors.accent,
+                    pointRadius: 2.5, pointHoverRadius: 5, borderWidth: 2, tension: 0.25, fill: false, spanGaps: true,
+                },
+                {
+                    label: playerB.username, data: seriesFor(playerB.history),
+                    borderColor: purple, backgroundColor: purple + '2a',
+                    pointBackgroundColor: purple, pointBorderColor: purple,
+                    pointRadius: 2.5, pointHoverRadius: 5, borderWidth: 2, tension: 0.25, fill: false, spanGaps: true,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { display: true, labels: { color: colors.text, font: { size: 11 }, boxWidth: 12 } },
+                tooltip: {
+                    backgroundColor: colors.tooltipBg,
+                    titleColor: colors.text,
+                    borderColor: colors.grid,
+                    borderWidth: 1,
+                    padding: 8,
+                    callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toLocaleString() : '—'}pp` },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.label, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 },
+                },
+                y: {
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.label, font: { size: 10 }, callback: v => v.toLocaleString() },
+                },
+            },
+        },
+    });
+}
+
+async function comparePlayers() {
+    const inputA = document.getElementById('pp-compare-input-a').value.trim();
+    const inputB = document.getElementById('pp-compare-input-b').value.trim();
+    const status = document.getElementById('pp-compare-status');
+    const result = document.getElementById('pp-compare-result');
+    if (!inputA || !inputB || !status || !result) return;
+
+    status.innerText = t('osu_searching') || 'Searching...';
+    status.style.color = '#f9a8d4';
+    result.style.display = 'none';
+
+    try {
+        const [a, b] = await Promise.all([
+            fetchPlayerTotalPpAndHistory(inputA, !/^\d+$/.test(inputA)),
+            fetchPlayerTotalPpAndHistory(inputB, !/^\d+$/.test(inputB)),
+        ]);
+        if (!a || !b) { status.innerText = t('osu_not_found') || 'Not found'; status.style.color = '#ff5252'; return; }
+
+        status.innerText = '';
+        renderPpCompareSide('pp-compare-side-a', a);
+        renderPpCompareSide('pp-compare-side-b', b);
+        renderPpCompareChart(a, b, 'pp-compare-chart-panel');
+        result.style.display = 'block';
+    } catch (e) {
+        console.error('PP compare failed:', e);
+        status.innerText = 'Error';
+        status.style.color = '#ff5252';
+    }
+}
+
 /* Re-render with fresh colors on theme toggle so the chart doesn't keep
    its old-theme palette baked into the canvas (unlike the previous SVG
    version, which resolved CSS var() live and needed no such hook). */
@@ -1234,6 +1378,7 @@ function renderPpHistoryChart(historyOverride, key, panelId) {
     if (!themeBtn) return;
     themeBtn.addEventListener('click', () => setTimeout(() => {
         if (ppHistoryChartArgs) renderPpHistoryChart(...ppHistoryChartArgs);
+        if (ppCompareChartArgs) renderPpCompareChart(...ppCompareChartArgs);
     }, 0));
 })();
 
@@ -1241,6 +1386,7 @@ function renderPpHistoryChart(historyOverride, key, panelId) {
 let visitorLookupUserId = null;
 let visitorLookupUsername = '';
 let visitorLookupTotalPp = 0;
+let visitorPlaysType = 'recent';
 let visitorModeData = [];
 let visitorCurrentMode = 0;
 
@@ -1248,7 +1394,14 @@ function switchVisitorRecentMode(mode, el) {
     document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     visitorCurrentMode = mode;
-    if (visitorLookupUserId) renderOsuRecentPlays(visitorLookupUserId, mode, 'visitor-recent-list', 'visitor-recent-plays');
+    if (visitorLookupUserId) renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
+}
+
+function switchVisitorPlaysType(type, el) {
+    visitorPlaysType = type;
+    document.querySelectorAll('.osu-plays-type-tabs .osu-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    if (visitorLookupUserId) renderOsuPlaysList(visitorLookupUserId, visitorCurrentMode, type, 'visitor-recent-list', 'visitor-recent-plays');
 }
 
 async function loadVisitorProfileById(input, isUsername) {
@@ -1290,7 +1443,9 @@ async function loadVisitorProfileById(input, isUsername) {
         renderTrackButtonState();
         document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
         document.querySelector('#visitor-recent-mode-tabs .osu-mode-tab[data-mode="0"]').classList.add('active');
-        renderOsuRecentPlays(u.user_id, 0, 'visitor-recent-list', 'visitor-recent-plays');
+        visitorPlaysType = 'recent';
+        document.querySelectorAll('.osu-plays-type-tabs .osu-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+        renderOsuPlaysList(u.user_id, 0, 'recent', 'visitor-recent-list', 'visitor-recent-plays');
 
         if (totalPP > 0) {
             const key = ppHistoryKeyFor(u.user_id);
@@ -1412,6 +1567,7 @@ function applyLoggedInOsuUser() {
 
     loginBtn.style.display = user ? 'none' : '';
     pill.style.display = user ? '' : 'none';
+    if (typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (!user) return;
 
     document.getElementById('osu-logged-in-name').textContent = user.username || `#${user.id}`;
