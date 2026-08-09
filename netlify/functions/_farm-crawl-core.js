@@ -58,8 +58,18 @@ async function discoverBatch(mode, state) {
     const sets = data.beatmapsets || [];
     if (typeof data.total === 'number') state.totalKnown = data.total;
 
+    const modeNum = MODE_NUM[mode];
     for (const set of sets) {
         for (const b of (set.beatmaps || [])) {
+            // beatmapsets/search?m={mode} filters by beatmapSET, not by
+            // individual difficulty — a set with both e.g. osu!std and taiko
+            // diffs matches the search either way, and `beatmaps` lists every
+            // difficulty in the set regardless of ruleset. Without this
+            // check, the "other" ruleset's diffs (mode_int !== modeNum) get
+            // crawled and PP-computed as if they were native to this mode,
+            // which is wrong — confirmed by finding actual osu!std beatmaps
+            // ranked #1 in the taiko dataset with implausibly high "taiko" pp.
+            if (b.mode_int !== modeNum) continue;
             if ((b.difficulty_rating || 0) < STAR_FLOOR) continue;
             state.pendingQueue.push({
                 beatmap_id: b.id,
