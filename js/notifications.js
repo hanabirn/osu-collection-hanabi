@@ -29,7 +29,9 @@ function saveNotifications(list) {
 function addNotification(notif) {
     const list = getNotifications();
     if (list.some(n => n.id === notif.id)) return;
-    list.unshift(notif);
+    if (notif.celebrate && typeof celebrateBurst === 'function') celebrateBurst();
+    const { celebrate, ...stored } = notif;
+    list.unshift(stored);
     saveNotifications(list);
 }
 
@@ -90,6 +92,7 @@ async function checkTrackedPlayers() {
                     playerId: player.id,
                     createdAt: Date.now(),
                     read: false,
+                    celebrate: delta > 0,
                 });
             }
             player.lastPp = totalPp;
@@ -128,6 +131,7 @@ async function checkTrackedPlayers() {
                             url: `https://osu.ppy.sh/users/${player.id}`,
                             createdAt: Date.now(),
                             read: false,
+                            celebrate: true,
                         });
                         player.knownAchievementIds = ids;
                         anyUpdated = true;

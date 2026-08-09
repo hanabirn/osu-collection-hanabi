@@ -126,14 +126,19 @@ function renderFarmMapsList() {
         return;
     }
 
+    // Computed once per render (not per card) so checking "already collected"
+    // stays O(items) instead of re-parsing localStorage per card.
+    const collectionSet = new Set((getOsuCollection()[farmMode] || []).map(s => s.beatmapset_id));
+
     listEl.innerHTML = farmItems.map(item => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${item.beatmapset_id}/covers/card.jpg`;
         const lengthStr = farmFormatLength(item.total_length);
+        const inCollection = collectionSet.has(item.beatmapset_id);
         return `
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${item.beatmapset_id}#${FARM_MODE_TO_API[farmMode]}/${item.beatmap_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
-            <button class="farm-add-btn" onclick="addFarmMapToCollection(${item.beatmapset_id}, event)" title="${t('farm_add_btn_title')}">${icon('plus')}</button>
+            <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addFarmMapToCollection(${item.beatmapset_id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${item.beatmapset_id}, event)" title="複製 ID">${icon('copy')}</button>
             <button class="osu-download-btn" onclick="downloadBeatmapset(${item.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${item.beatmapset_id}, event)" title="播放預覽">${icon('play', { filled: true })}</button>
@@ -179,7 +184,8 @@ function renderFarmCoverage() {
     el.textContent = t('farm_coverage', { n: (farmCoverage.computedCount || 0).toLocaleString(), t: updated });
 }
 
-function addFarmMapToCollection(beatmapsetId, event) {
+async function addFarmMapToCollection(beatmapsetId, event) {
     if (event) event.stopPropagation();
-    addOsuBeatmap(String(beatmapsetId));
+    await addOsuBeatmap(String(beatmapsetId));
+    renderFarmMapsList();
 }

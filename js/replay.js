@@ -145,6 +145,17 @@ function updateReplayHistoryEntry(renderID, patch) {
     renderReplayHistory();
 }
 
+/* Which renderIDs currently have their inline preview expanded — module-
+   scope only (not persisted), so it just resets on reload like the pending-
+   render polling already does. */
+const replayPreviewExpanded = new Set();
+
+function toggleReplayPreview(renderID) {
+    if (replayPreviewExpanded.has(renderID)) replayPreviewExpanded.delete(renderID);
+    else replayPreviewExpanded.add(renderID);
+    renderReplayHistory();
+}
+
 function renderReplayHistory() {
     const el = document.getElementById('replay-history-list');
     if (!el) return;
@@ -153,16 +164,25 @@ function renderReplayHistory() {
         el.innerHTML = `<p class="skins-empty">${t('replay_history_empty')}</p>`;
         return;
     }
-    el.innerHTML = history.map(r => `
-        <div class="replay-history-item">
-            <div class="replay-history-title">${escHtml(r.title || ('#' + r.renderID))}</div>
-            ${r.videoUrl
-                ? `<a class="btn replay-watch-btn" href="${r.videoUrl}" target="_blank" rel="noopener">${t('replay_watch')}</a>`
-                : r.failed
-                    ? `<span class="replay-history-status fail">${t('replay_render_fail_short')}</span>`
-                    : `<span class="replay-history-status">${t('replay_history_pending')}</span>`}
+    el.innerHTML = history.map(r => {
+        const expanded = r.videoUrl && replayPreviewExpanded.has(r.renderID);
+        return `
+        <div class="replay-history-item-wrap">
+            <div class="replay-history-item">
+                <div class="replay-history-title">${escHtml(r.title || ('#' + r.renderID))}</div>
+                ${r.videoUrl
+                    ? `<div class="replay-history-actions">
+                        <button class="btn replay-preview-btn" onclick="toggleReplayPreview(${r.renderID})">${expanded ? t('replay_preview_hide') : t('replay_preview_show')}</button>
+                        <a class="btn replay-watch-btn" href="${r.videoUrl}" target="_blank" rel="noopener">${t('replay_watch')}</a>
+                    </div>`
+                    : r.failed
+                        ? `<span class="replay-history-status fail">${t('replay_render_fail_short')}</span>`
+                        : `<span class="replay-history-status">${t('replay_history_pending')}</span>`}
+            </div>
+            ${expanded ? `<video class="replay-preview-video" src="${r.videoUrl}" controls preload="metadata"></video>` : ''}
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

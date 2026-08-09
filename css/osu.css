@@ -283,10 +283,33 @@
     white-space: nowrap;
 }
 .replay-history-status.fail { color: #f87171; }
-.replay-watch-btn {
+.replay-history-item-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.replay-history-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.replay-watch-btn, .replay-preview-btn {
     padding: 6px 14px;
     font-size: 0.8rem;
     white-space: nowrap;
+}
+.replay-preview-btn {
+    background: var(--bg-card-alt);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-card);
+    box-shadow: none;
+}
+.replay-preview-video {
+    width: 100%;
+    max-height: 360px;
+    border-radius: 10px;
+    border: 1px solid var(--border-card);
+    background: #000;
 }
 
 .feedback-card { max-width: 480px; margin: 0 auto; }
@@ -935,6 +958,15 @@
     background: rgba(52,211,153,0.5);
     transform: scale(1.1);
 }
+/* Already-collected state stays visible at all times (not hover-only, like
+   the plus button) since it's informational, not just an action trigger. */
+.farm-add-btn.in-collection {
+    opacity: 0.9;
+    color: #34d399;
+    background: rgba(52,211,153,0.18);
+    cursor: default;
+}
+.farm-add-btn.in-collection:hover { transform: none; }
 
 .farm-card-version {
     color: rgba(255,255,255,0.6);

@@ -122,7 +122,7 @@ a:hover { text-decoration: underline; }
 }
 .site-title-block h1 {
     font-size: 2.5rem;
-    font-weight: 800;
+    font-weight: 900;
     background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple), var(--accent-pink), var(--text-pink));
     background-size: 300% auto;
     -webkit-background-clip: text;
@@ -138,6 +138,30 @@ a:hover { text-decoration: underline; }
 @keyframes titleGlowPulse {
     0%, 100% { filter: drop-shadow(0 0 12px rgba(var(--accent-pink-rgb), 0.30)); }
     50% { filter: drop-shadow(0 0 20px rgba(var(--accent-pink-rgb), 0.5)) drop-shadow(0 0 32px rgba(var(--accent-purple-rgb), 0.25)); }
+}
+.site-page.page-fade-in {
+    animation: pageFadeIn 0.4s var(--ease-out);
+}
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .site-page.page-fade-in { animation: none; }
+}
+
+.site-title-block h1 .title-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.4em) scale(0.7);
+    animation: titleCharIn 0.55s var(--ease-spring) forwards;
+    animation-delay: calc(var(--char-index) * 35ms);
+}
+@keyframes titleCharIn {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .site-title-block h1 .title-char { animation: none; opacity: 1; transform: none; }
 }
 .site-tagline {
     font-size: 0.8rem;

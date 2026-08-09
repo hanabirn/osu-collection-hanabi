@@ -1,7 +1,13 @@
 /* ===== Tab switching ===== */
 function switchTab(tab, el) {
     document.querySelectorAll('.site-page').forEach(p => p.style.display = 'none');
-    document.getElementById('page-' + tab).style.display = 'block';
+    const page = document.getElementById('page-' + tab);
+    page.style.display = 'block';
+    // Force a reflow so removing+re-adding the class restarts the CSS
+    // animation even when switching back to a tab that already has it.
+    page.classList.remove('page-fade-in');
+    void page.offsetWidth;
+    page.classList.add('page-fade-in');
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
     if (el) {
         el.classList.add('active');
@@ -40,12 +46,39 @@ function onLangMenuEscape(e) {
     if (e.key === 'Escape') toggleLangMenu(false);
 }
 
+/* ===== Title entrance animation =====
+   Splits the h1 into one <span> per character so CSS can stagger a
+   fade+rise reveal per char (char-level, not word-level — safe for CJK
+   strings with no whitespace to split on, unlike most split-text libs).
+   Re-run from refreshDynamicContent() below on every language switch since
+   applyLang() replaces the h1's innerHTML with the new language's plain
+   text right before that fires — a library like shshaw/Splitting silently
+   no-ops on a re-split of the same element, so this is hand-rolled instead.
+   prefers-reduced-motion is handled purely in CSS (titleCharIn disabled),
+   so no branching needed here. */
+function playTitleEntrance() {
+    const h1 = document.querySelector('.site-title-block h1');
+    if (!h1) return;
+    const text = h1.textContent;
+    h1.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    [...text].forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'title-char';
+        span.style.setProperty('--char-index', i);
+        span.textContent = ch === ' ' ? ' ' : ch;
+        frag.appendChild(span);
+    });
+    h1.appendChild(frag);
+}
+
 /* ===== Re-render already-rendered dynamic content after a language switch =====
    The collection grid bakes t()-driven strings (mapped_by, empty-state text)
    into its innerHTML at render time, so a language switch needs a re-render
    to pick up the new strings — same reasoning as the main site's
    refreshDynamicContent() for quiz content. */
 function refreshDynamicContent() {
+    playTitleEntrance();
     renderOsuCollection();
     if (visitorLookupUserId) renderPpHistoryChart(null, ppHistoryKeyFor(visitorLookupUserId), 'visitor-pp-history-panel');
     if (typeof renderSkinsList === 'function') renderSkinsList();
