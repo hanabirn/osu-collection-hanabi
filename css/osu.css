@@ -1066,9 +1066,17 @@
     gap: 5px;
     margin-top: 3px;
 }
+.osu-card-diff-row .mode-diff-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
 .osu-card-diff-row .mode-icon-inline {
-    width: 19px;
-    height: 19px;
+    width: 17px;
+    height: 17px;
     margin-right: 0;
 }
 
