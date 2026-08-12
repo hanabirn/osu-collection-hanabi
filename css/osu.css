@@ -1031,8 +1031,8 @@
     position: absolute;
     bottom: 8px;
     right: 8px;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: rgba(0,0,0,0.55);
     display: flex;
@@ -1042,13 +1042,15 @@
     pointer-events: auto;
 }
 .osu-card-mode-badge .mode-icon-inline {
-    width: 22px;
-    height: 22px;
+    width: 25px;
+    height: 25px;
     margin-right: 0;
 }
 
 /* Star-rating-tinted mode icon: colour set inline per icon (see
-   starRatingColor() in js/osu.js), this just governs sizing/interaction. */
+   starRatingColor() in js/osu.js), this just governs sizing/interaction.
+   The exact SR only appears on hover (native title tooltip) — no numeric
+   text is shown alongside these by design. */
 .mode-diff-icon {
     display: inline-flex;
     cursor: default;
@@ -1061,20 +1063,13 @@
 .osu-card-diff-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 3px;
-    margin-top: 2px;
+    gap: 5px;
+    margin-top: 3px;
 }
 .osu-card-diff-row .mode-icon-inline {
-    width: 13px;
-    height: 13px;
+    width: 19px;
+    height: 19px;
     margin-right: 0;
-}
-
-.osu-card-stars {
-    color: var(--accent-yellow);
-    font-size: 0.8rem;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    margin-top: 1px;
 }
 
 .osu-card-artist {

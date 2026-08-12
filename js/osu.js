@@ -1282,7 +1282,6 @@ function renderOsuCollection() {
         const isFav = isOsuFavorited(set.beatmapset_id);
         const starsMin = Math.min(...set.beatmaps.map(b => b.difficulty_rating));
         const starsMax = Math.max(...set.beatmaps.map(b => b.difficulty_rating));
-        const starsText = (starsMin === 0 && starsMax === 0) ? '' : `<div class="osu-card-stars">${starsMin.toFixed(2)}⭐~${starsMax.toFixed(2)}⭐</div>`;
         const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(set.__mode, b.difficulty_rating, b.version)).join('')}</div>`;
         return `
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
@@ -1299,7 +1298,6 @@ function renderOsuCollection() {
             <div class="osu-card-info">
                 <div class="osu-card-title">${set.title}</div>
                 ${diffIconsRow}
-                ${starsText}
                 <div class="osu-card-artist">${set.artist}</div>
                 <div class="osu-card-mapper">${t('mapped_by', { n: set.creator })}</div>
             </div>
