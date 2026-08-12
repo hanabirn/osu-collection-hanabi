@@ -1250,9 +1250,17 @@ function renderOsuCollection() {
             return false;
         });
     } else {
+        // A set is stored under exactly one mode array (whichever the API
+        // reported for its first difficulty at add-time), but a crossover
+        // set can still have individual difficulties in *other* modes — so
+        // a mode tab must search every array for sets with a matching diff,
+        // not just the array the set happens to be filed under.
         const seen = new Set();
-        sets = col[osuCurrentTab].filter(s => {
+        const allSets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __homeMode: m })));
+        sets = allSets.filter(s => {
             if (seen.has(s.beatmapset_id)) return false;
+            const hasTabMode = s.beatmaps.some(b => (OSU_MODE_NAMES[b.mode_int] || s.__homeMode) === osuCurrentTab);
+            if (!hasTabMode) return false;
             seen.add(s.beatmapset_id);
             return true;
         }).map(s => ({ ...s, __mode: osuCurrentTab }));
@@ -1290,19 +1298,25 @@ function renderOsuCollection() {
     container.innerHTML = pageSets.map(set => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         const isFav = isOsuFavorited(set.beatmapset_id);
-        const starsMin = Math.min(...set.beatmaps.map(b => b.difficulty_rating));
-        const starsMax = Math.max(...set.beatmaps.map(b => b.difficulty_rating));
-        const hardestDiff = set.beatmaps.find(b => b.difficulty_rating === starsMax) || set.beatmaps[set.beatmaps.length - 1];
         // A beatmapset can mix rulesets (e.g. a taiko+mania crossover set) —
         // each difficulty may belong to a different mode than the set's own
         // collection category, so prefer each beatmap's own mode_int (added
         // via refresh) over set.__mode, falling back for un-refreshed data.
         const diffMode = (b) => OSU_MODE_NAMES[b.mode_int] || set.__mode;
+        // On a mode tab (Standard/Taiko/Catch/Mania), only show this set's
+        // difficulties that actually belong to that mode — a crossover set
+        // shows its mania diffs under Mania and its taiko diffs under Taiko,
+        // not all of them mixed together everywhere it's listed.
+        const tabBeatmaps = OSU_MODES.includes(osuCurrentTab) ? set.beatmaps.filter(b => diffMode(b) === osuCurrentTab) : set.beatmaps;
+        const diffBeatmaps = tabBeatmaps.length > 0 ? tabBeatmaps : set.beatmaps;
+        const starsMin = Math.min(...diffBeatmaps.map(b => b.difficulty_rating));
+        const starsMax = Math.max(...diffBeatmaps.map(b => b.difficulty_rating));
+        const hardestDiff = diffBeatmaps.find(b => b.difficulty_rating === starsMax) || diffBeatmaps[diffBeatmaps.length - 1];
         const diffUrl = (beatmapId, mode) => `https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}#${OSU_API_MODE[mode] || 'osu'}/${beatmapId}`;
         // Mania beatmapsets often mix key counts (4K/7K/etc, from CS) across
         // difficulties of the same set — surface that in the hover label.
         const diffLabel = (b) => (diffMode(b) === 'mania' && b.key_count) ? `${b.version} [${Math.round(b.key_count)}K]` : b.version;
-        const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(diffMode(b), b.difficulty_rating, diffLabel(b), diffUrl(b.beatmap_id, diffMode(b)))).join('')}</div>`;
+        const diffIconsRow = `<div class="osu-card-diff-row">${diffBeatmaps.map(b => modeDiffIcon(diffMode(b), b.difficulty_rating, diffLabel(b), diffUrl(b.beatmap_id, diffMode(b)))).join('')}</div>`;
         return `
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
