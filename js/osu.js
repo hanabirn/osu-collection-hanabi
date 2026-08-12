@@ -929,6 +929,7 @@ async function addOsuBeatmap(explicitId) {
         else if (typeof showShareToast === 'function') showShareToast(t('osu_added', { n: `${setInfo.artist} - ${setInfo.title}`, m: OSU_MODE_LABELS[modeNum], k: setInfo.beatmaps.length }));
 
         osuCurrentTab = modeKey;
+        osuPage = 0;
         clearAllOsuTabActive();
         const targetTab = document.querySelector(`#osu-collection-tabs [data-mode="${modeKey}"]`);
         if (targetTab) targetTab.classList.add('active');
