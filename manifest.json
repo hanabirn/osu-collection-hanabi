@@ -1,7 +1,7 @@
 {
     "name": "osu! 歌曲收藏 + PP 查詢",
     "short_name": "osu!收藏",
-    "description": "osu! Beatmap 收藏管理、PP 查詢、皮膚收藏、賽事情報與 Replay 錄影生成",
+    "description": "osu! Beatmap 收藏管理、PP 查詢、皮膚收藏與賽事情報",
     "start_url": "/?pwa=1",
     "id": "/",
     "scope": "/",

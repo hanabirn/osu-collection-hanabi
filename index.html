@@ -111,7 +111,6 @@
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
         <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
-        <button class="site-nav-btn" onclick="switchTab('replay', this)" data-i18n="nav_replay">Replay 錄影</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
@@ -384,41 +383,6 @@
         </div>
     </section>
 
-    <section id="page-replay" class="site-page" style="display:none;">
-        <h2 class="osu-page-title" data-i18n="replay_title">✦ Replay 錄影 ✦</h2>
-        <p class="tournaments-hint" data-i18n="replay_hint">上傳 .osr replay 檔案，透過開源服務 o!rdr（ordr.issou.best）免費生成播放影片。生成時間依伺服器忙碌程度而定，通常 1～5 分鐘；影片存放在 o!rdr 的伺服器上，不是這個網站。</p>
-        <div class="osu-add-card replay-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="replay_upload_title">上傳 Replay</h3>
-            <form class="replay-form" onsubmit="return handleReplaySubmit(event)">
-                <input type="file" id="replay-file-input" class="replay-file-input" accept=".osr" required>
-                <input type="text" id="replay-username-input" class="guestbook-input" data-i18n-placeholder="replay_username_placeholder" placeholder="顯示名稱（選填）">
-                <div class="replay-form-row">
-                    <select id="replay-resolution-select">
-                        <option value="1280x720" selected>720p</option>
-                        <option value="1920x1080">1080p</option>
-                        <option value="960x540">540p</option>
-                        <option value="640x480">480p (30fps)</option>
-                        <option value="3840x2160">4K (60fps)</option>
-                    </select>
-                    <div class="replay-skin-picker">
-                        <input type="text" id="replay-skin-input" class="guestbook-input" data-i18n-placeholder="replay_skin_placeholder" placeholder="搜尋皮膚名稱..." value="whitecatCK1.0" autocomplete="off" oninput="searchOrdrSkins(this.value)">
-                        <div id="replay-skin-results" class="replay-skin-results"></div>
-                    </div>
-                </div>
-                <button type="submit" class="btn replay-submit-btn" data-i18n="replay_submit">產生影片</button>
-            </form>
-            <div id="replay-status" class="status"></div>
-        </div>
-        <div class="osu-add-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="replay_history_title">我的影片</h3>
-            <div id="replay-history-list" class="replay-history-list"></div>
-        </div>
-    </section>
-
     <section id="page-feedback" class="site-page" style="display:none;">
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
@@ -544,7 +508,6 @@
 <script src="js/tournaments.js"></script>
 <script src="js/celebrate.js"></script>
 <script src="js/notifications.js"></script>
-<script src="js/replay.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
 </body>

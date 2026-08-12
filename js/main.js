@@ -55,7 +55,6 @@ function refreshDynamicContent() {
     renderOsuCollection();
     if (visitorLookupUserId) renderPpHistoryChart(null, ppHistoryKeyFor(visitorLookupUserId), 'visitor-pp-history-panel');
     if (typeof renderSkinsList === 'function') renderSkinsList();
-    if (typeof renderReplayHistory === 'function') renderReplayHistory();
     if (typeof renderPublicCollectionsList === 'function') renderPublicCollectionsList();
     if (typeof updatePublishButtonLabel === 'function') updatePublishButtonLabel();
     if (typeof renderTrackButtonState === 'function') renderTrackButtonState();
