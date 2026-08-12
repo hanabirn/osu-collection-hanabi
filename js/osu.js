@@ -902,7 +902,8 @@ async function addOsuBeatmap(explicitId) {
                 difficulty_rating: parseFloat(b.difficultyrating),
                 hit_length: parseInt(b.hit_length),
                 total_length: parseInt(b.total_length),
-                bpm: parseFloat(b.bpm)
+                bpm: parseFloat(b.bpm),
+                key_count: parseFloat(b.diff_size)
             })).sort((a, b) => a.difficulty_rating - b.difficulty_rating)
         };
 
@@ -981,7 +982,8 @@ async function refreshAllOsuSets() {
                             difficulty_rating: parseFloat(b.difficultyrating),
                             hit_length: parseInt(b.hit_length),
                             total_length: parseInt(b.total_length),
-                            bpm: parseFloat(b.bpm)
+                            bpm: parseFloat(b.bpm),
+                            key_count: parseFloat(b.diff_size)
                         })).sort((a, b) => a.difficulty_rating - b.difficulty_rating);
                         break;
                     }
@@ -1291,7 +1293,10 @@ function renderOsuCollection() {
         const apiMode = OSU_API_MODE[set.__mode] || 'osu';
         const diffUrl = (beatmapId) => `https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}#${apiMode}/${beatmapId}`;
         const hardestDiff = set.beatmaps.find(b => b.difficulty_rating === starsMax) || set.beatmaps[set.beatmaps.length - 1];
-        const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(set.__mode, b.difficulty_rating, b.version, diffUrl(b.beatmap_id))).join('')}</div>`;
+        // Mania beatmapsets often mix key counts (4K/7K/etc, from CS) across
+        // difficulties of the same set — surface that in the hover label.
+        const diffLabel = (b) => (set.__mode === 'mania' && b.key_count) ? `${b.version} [${Math.round(b.key_count)}K]` : b.version;
+        const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(set.__mode, b.difficulty_rating, diffLabel(b), diffUrl(b.beatmap_id))).join('')}</div>`;
         return `
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
@@ -1303,7 +1308,7 @@ function renderOsuCollection() {
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">${icon('heart', { filled: isFav })}</button>
             <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">${icon('x')}</button>
-            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml(starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`)}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id)}','_blank')" style="cursor:pointer">${modeIconSvg(set.__mode, starRatingColor(starsMax))}</span></div>
+            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`) + (set.__mode === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id)}','_blank')" style="cursor:pointer">${modeIconSvg(set.__mode, starRatingColor(starsMax))}</span></div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${set.title}</div>
                 ${diffIconsRow}
