@@ -1267,9 +1267,13 @@ function renderOsuCollection() {
         // reported for its first difficulty at add-time), but a crossover
         // set can still have individual difficulties in *other* modes — so
         // a mode tab must search every array for sets with a matching diff,
-        // not just the array the set happens to be filed under.
+        // not just the array the set happens to be filed under. The current
+        // tab's own array goes first so its natural newest-added-first order
+        // (unshift on add) isn't pushed down by other arrays' entries ahead
+        // of it — those only matter here as a fallback for crossover sets.
         const seen = new Set();
-        const allSets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __homeMode: m })));
+        const orderedModes = [osuCurrentTab, ...OSU_MODES.filter(m => m !== osuCurrentTab)];
+        const allSets = orderedModes.flatMap(m => col[m].map(s => ({ ...s, __homeMode: m })));
         sets = allSets.filter(s => {
             if (seen.has(s.beatmapset_id)) return false;
             const hasTabMode = s.beatmaps.some(b => (OSU_MODE_NAMES[b.mode_int] || s.__homeMode) === osuCurrentTab);
