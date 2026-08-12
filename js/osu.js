@@ -22,6 +22,9 @@ function showShareToast(msg) {
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const OSU_MODE_NAMES = { 0: 'standard', 1: 'taiko', 2: 'catch', 3: 'mania' };
 const OSU_MODE_LABELS = ['Standard', 'Taiko', 'Catch', 'Mania'];
+// This site's frontend mode keys differ from osu!'s own API/URL mode strings
+// (see also FARM_MODE_TO_API in js/farm-maps.js, same mapping).
+const OSU_API_MODE = { standard: 'osu', taiko: 'taiko', catch: 'fruits', mania: 'mania' };
 
 const MODE_ICON_PATHS = {
     standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
@@ -72,12 +75,15 @@ function rgbHex(rgb) {
 }
 
 /* Mode icon tinted by star rating, with a native hover tooltip showing the
-   exact SR (and optional difficulty name) — mirrors osu!'s own beatmap page. */
-function modeDiffIcon(mode, stars, label) {
+   exact SR (and optional difficulty name) — mirrors osu!'s own beatmap page.
+   Pass `url` to make the icon itself jump straight to that difficulty on
+   osu! (stopping the click from also bubbling to the card's own onclick). */
+function modeDiffIcon(mode, stars, label, url) {
     const color = starRatingColor(stars);
     const starsStr = (Number(stars) || 0).toFixed(2);
     const titleText = label ? `${label} ${starsStr}★` : `${starsStr}★`;
-    return `<span class="mode-diff-icon" title="${escHtml(titleText)}">${modeIconSvg(mode, color)}</span>`;
+    const clickAttr = url ? ` onclick="event.stopPropagation();window.open('${url}','_blank')" style="cursor:pointer"` : '';
+    return `<span class="mode-diff-icon" title="${escHtml(titleText)}"${clickAttr}>${modeIconSvg(mode, color)}</span>`;
 }
 let osuCurrentTab = 'standard';
 let osuCurrentAudio = null;
@@ -1282,7 +1288,10 @@ function renderOsuCollection() {
         const isFav = isOsuFavorited(set.beatmapset_id);
         const starsMin = Math.min(...set.beatmaps.map(b => b.difficulty_rating));
         const starsMax = Math.max(...set.beatmaps.map(b => b.difficulty_rating));
-        const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(set.__mode, b.difficulty_rating, b.version)).join('')}</div>`;
+        const apiMode = OSU_API_MODE[set.__mode] || 'osu';
+        const diffUrl = (beatmapId) => `https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}#${apiMode}/${beatmapId}`;
+        const hardestDiff = set.beatmaps.find(b => b.difficulty_rating === starsMax) || set.beatmaps[set.beatmaps.length - 1];
+        const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(set.__mode, b.difficulty_rating, b.version, diffUrl(b.beatmap_id))).join('')}</div>`;
         return `
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
@@ -1294,7 +1303,7 @@ function renderOsuCollection() {
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">${icon('heart', { filled: isFav })}</button>
             <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">${icon('x')}</button>
-            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml(starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`)}">${modeIconSvg(set.__mode, starRatingColor(starsMax))}</span></div>
+            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml(starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`)}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id)}','_blank')" style="cursor:pointer">${modeIconSvg(set.__mode, starRatingColor(starsMax))}</span></div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${set.title}</div>
                 ${diffIconsRow}
