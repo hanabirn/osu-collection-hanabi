@@ -46,46 +46,12 @@ function onLangMenuEscape(e) {
     if (e.key === 'Escape') toggleLangMenu(false);
 }
 
-/* ===== Title entrance animation =====
-   Splits the h1 into one <span> per character so CSS can stagger a
-   fade+rise reveal per char (char-level, not word-level — safe for CJK
-   strings with no whitespace to split on, unlike most split-text libs).
-   Re-run from refreshDynamicContent() below on every language switch since
-   applyLang() replaces the h1's innerHTML with the new language's plain
-   text right before that fires — a library like shshaw/Splitting silently
-   no-ops on a re-split of the same element, so this is hand-rolled instead.
-   prefers-reduced-motion is handled purely in CSS (titleCharIn disabled),
-   so no branching needed here. */
-function playTitleEntrance() {
-    const h1 = document.querySelector('.site-title-block h1');
-    if (!h1) return;
-    const text = h1.textContent;
-    h1.innerHTML = '';
-    const frag = document.createDocumentFragment();
-    [...text].forEach((ch, i) => {
-        const span = document.createElement('span');
-        span.className = 'title-char';
-        span.style.setProperty('--char-index', i);
-        span.textContent = ch === ' ' ? ' ' : ch;
-        // The entrance animation's transform+opacity promotes each char to
-        // its own composited layer; Chrome occasionally fails to re-clip
-        // the ancestor's gradient background-clip:text against that layer
-        // once the (fill-mode: forwards) animation settles, leaving the
-        // glyph painted as a solid block. Dropping the animation once it
-        // ends un-promotes the layer so the gradient text repaints normally.
-        span.addEventListener('animationend', () => { span.style.animation = 'none'; }, { once: true });
-        frag.appendChild(span);
-    });
-    h1.appendChild(frag);
-}
-
 /* ===== Re-render already-rendered dynamic content after a language switch =====
    The collection grid bakes t()-driven strings (mapped_by, empty-state text)
    into its innerHTML at render time, so a language switch needs a re-render
    to pick up the new strings — same reasoning as the main site's
    refreshDynamicContent() for quiz content. */
 function refreshDynamicContent() {
-    playTitleEntrance();
     renderOsuCollection();
     if (visitorLookupUserId) renderPpHistoryChart(null, ppHistoryKeyFor(visitorLookupUserId), 'visitor-pp-history-panel');
     if (typeof renderSkinsList === 'function') renderSkinsList();

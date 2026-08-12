@@ -149,20 +149,6 @@ a:hover { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) {
     .site-page.page-fade-in { animation: none; }
 }
-
-.site-title-block h1 .title-char {
-    display: inline-block;
-    opacity: 0;
-    transform: translateY(0.4em) scale(0.7);
-    animation: titleCharIn 0.55s var(--ease-spring) forwards;
-    animation-delay: calc(var(--char-index) * 35ms);
-}
-@keyframes titleCharIn {
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-    .site-title-block h1 .title-char { animation: none; opacity: 1; transform: none; }
-}
 .site-tagline {
     font-size: 0.8rem;
     font-weight: 500;
