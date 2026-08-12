@@ -1063,16 +1063,14 @@
 .osu-card-diff-row {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 5px;
     margin-top: 3px;
-}
-.osu-card-diff-row .mode-diff-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
+    padding: 4px 8px;
     background: rgba(0,0,0,0.5);
-    align-items: center;
-    justify-content: center;
+    border-radius: 999px;
+    width: fit-content;
+    max-width: 100%;
 }
 .osu-card-diff-row .mode-icon-inline {
     width: 17px;
