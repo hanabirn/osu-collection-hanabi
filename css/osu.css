@@ -1060,9 +1060,13 @@
     transform: scale(1.3);
 }
 
+/* nowrap + horizontal scroll (not flex-wrap) so a beatmapset with many
+   difficulties can't grow this row's height and squeeze the title above it —
+   it just scrolls sideways instead. Scrollbar hidden since the row is small
+   and decorative; every icon is still reachable via wheel/trackpad/drag. */
 .osu-card-diff-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 5px;
     margin-top: 3px;
@@ -1071,6 +1075,14 @@
     border-radius: 999px;
     width: fit-content;
     max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.osu-card-diff-row::-webkit-scrollbar {
+    display: none;
+}
+.osu-card-diff-row .mode-diff-icon {
+    flex-shrink: 0;
 }
 .osu-card-diff-row .mode-icon-inline {
     width: 17px;
