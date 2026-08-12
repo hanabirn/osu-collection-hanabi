@@ -67,6 +67,13 @@ function playTitleEntrance() {
         span.className = 'title-char';
         span.style.setProperty('--char-index', i);
         span.textContent = ch === ' ' ? ' ' : ch;
+        // The entrance animation's transform+opacity promotes each char to
+        // its own composited layer; Chrome occasionally fails to re-clip
+        // the ancestor's gradient background-clip:text against that layer
+        // once the (fill-mode: forwards) animation settles, leaving the
+        // glyph painted as a solid block. Dropping the animation once it
+        // ends un-promotes the layer so the gradient text repaints normally.
+        span.addEventListener('animationend', () => { span.style.animation = 'none'; }, { once: true });
         frag.appendChild(span);
     });
     h1.appendChild(frag);
