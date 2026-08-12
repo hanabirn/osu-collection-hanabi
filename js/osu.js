@@ -2,7 +2,7 @@
    two external dependencies there) — inlined here since this site doesn't
    load quiz.js. ===== */
 function escHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function showShareToast(msg) {
@@ -29,10 +29,55 @@ const MODE_ICON_PATHS = {
     catch: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/>',
     mania: '<circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/>'
 };
-function modeIconSvg(mode) {
+function modeIconSvg(mode, color) {
     const path = MODE_ICON_PATHS[mode];
     if (!path) return '';
-    return `<svg class="mode-icon-inline" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">${path}</svg>`;
+    const style = color ? ` style="color:${color}"` : '';
+    return `<svg class="mode-icon-inline"${style} viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">${path}</svg>`;
+}
+
+/* Star-rating colour scale matching osu!'s own beatmap pages (light blue for
+   low SR, shifting through green/yellow/red/purple up to near-black for very
+   high SR). Stops taken from osu-web's difficulty colour table. */
+const STAR_COLOR_STOPS = [
+    [0.1, [79, 192, 255]],
+    [1.25, [79, 192, 255]],
+    [2.0, [79, 255, 213]],
+    [2.5, [124, 255, 79]],
+    [3.3, [246, 240, 92]],
+    [4.2, [255, 128, 104]],
+    [4.9, [255, 78, 111]],
+    [5.8, [198, 69, 184]],
+    [6.7, [101, 99, 222]],
+    [7.7, [24, 21, 142]],
+    [9.0, [0, 0, 0]],
+];
+function starRatingColor(stars) {
+    stars = Number(stars) || 0;
+    const stops = STAR_COLOR_STOPS;
+    if (stars <= 0) return '#888';
+    if (stars <= stops[0][0]) return rgbHex(stops[0][1]);
+    for (let i = 1; i < stops.length; i++) {
+        if (stars <= stops[i][0]) {
+            const [s0, c0] = stops[i - 1];
+            const [s1, c1] = stops[i];
+            const t = (stars - s0) / (s1 - s0);
+            return rgbHex(c0.map((v, idx) => v + (c1[idx] - v) * t));
+        }
+    }
+    return rgbHex(stops[stops.length - 1][1]);
+}
+function rgbHex(rgb) {
+    return '#' + rgb.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+}
+
+/* Mode icon tinted by star rating, with a native hover tooltip showing the
+   exact SR (and optional difficulty name) — mirrors osu!'s own beatmap page. */
+function modeDiffIcon(mode, stars, label) {
+    const color = starRatingColor(stars);
+    const starsStr = (Number(stars) || 0).toFixed(2);
+    const titleText = label ? `${label} ${starsStr}★` : `${starsStr}★`;
+    return `<span class="mode-diff-icon" title="${escHtml(titleText)}">${modeIconSvg(mode, color)}</span>`;
 }
 let osuCurrentTab = 'standard';
 let osuCurrentAudio = null;
@@ -1238,6 +1283,7 @@ function renderOsuCollection() {
         const starsMin = Math.min(...set.beatmaps.map(b => b.difficulty_rating));
         const starsMax = Math.max(...set.beatmaps.map(b => b.difficulty_rating));
         const starsText = (starsMin === 0 && starsMax === 0) ? '' : `<div class="osu-card-stars">${starsMin.toFixed(2)}⭐~${starsMax.toFixed(2)}⭐</div>`;
+        const diffIconsRow = `<div class="osu-card-diff-row">${set.beatmaps.map(b => modeDiffIcon(set.__mode, b.difficulty_rating, b.version)).join('')}</div>`;
         return `
         <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
@@ -1249,9 +1295,10 @@ function renderOsuCollection() {
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">${icon('heart', { filled: isFav })}</button>
             <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">${icon('x')}</button>
-            <div class="osu-card-mode-badge">${modeIconSvg(set.__mode)}</div>
+            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml(starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`)}">${modeIconSvg(set.__mode, starRatingColor(starsMax))}</span></div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${set.title}</div>
+                ${diffIconsRow}
                 ${starsText}
                 <div class="osu-card-artist">${set.artist}</div>
                 <div class="osu-card-mapper">${t('mapped_by', { n: set.creator })}</div>

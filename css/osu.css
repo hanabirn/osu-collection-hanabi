@@ -1039,13 +1039,35 @@
     align-items: center;
     justify-content: center;
     z-index: 2;
-    pointer-events: none;
+    pointer-events: auto;
 }
 .osu-card-mode-badge .mode-icon-inline {
     width: 22px;
     height: 22px;
     margin-right: 0;
-    color: #fff;
+}
+
+/* Star-rating-tinted mode icon: colour set inline per icon (see
+   starRatingColor() in js/osu.js), this just governs sizing/interaction. */
+.mode-diff-icon {
+    display: inline-flex;
+    cursor: default;
+    transition: transform 0.15s ease;
+}
+.mode-diff-icon:hover {
+    transform: scale(1.3);
+}
+
+.osu-card-diff-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 2px;
+}
+.osu-card-diff-row .mode-icon-inline {
+    width: 13px;
+    height: 13px;
+    margin-right: 0;
 }
 
 .osu-card-stars {

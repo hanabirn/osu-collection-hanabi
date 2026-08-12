@@ -142,7 +142,7 @@ function renderFarmMapsList() {
             <button class="osu-copy-btn" onclick="copyBeatmapId(${item.beatmapset_id}, event)" title="複製 ID">${icon('copy')}</button>
             <button class="osu-download-btn" onclick="downloadBeatmapset(${item.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${item.beatmapset_id}, event)" title="播放預覽">${icon('play', { filled: true })}</button>
-            <div class="osu-card-mode-badge">${modeIconSvg(farmMode)}</div>
+            <div class="osu-card-mode-badge">${modeDiffIcon(farmMode, item.star, item.version)}</div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${escapeHtmlOsu(item.title || '')} <span class="farm-card-version">[${escapeHtmlOsu(item.version || '')}]</span></div>
                 <div class="farm-card-meta" title="${t('farm_filter_length')}: ${lengthStr}">
