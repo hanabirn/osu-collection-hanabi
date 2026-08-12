@@ -1,5 +1,5 @@
-/* ===== Tournaments tab: merges two community tournament sources, sorted
-   together by date =====
+/* ===== Tournaments tab: two community tournament sources, each in its own
+   date-sorted column (see .tournaments-columns in css/osu.css) =====
    1. Recent topics from the official osu! "Tournaments" subforum
       (osu.ppy.sh/community/forums/55), via the osu-tournaments Netlify
       function proxy — same OAuth API v2 situation as the News tab, see
@@ -9,9 +9,11 @@
       wybin-tournaments Netlify function proxy — see that file for why it's
       proxied and trimmed rather than called directly.
    Neither source is an official Kudosu-run event; both are just
-   community-organized tournaments announced/hosted in different places, so
-   they're normalized into one shape and merged into a single date-sorted
-   list rather than shown as two disconnected lists. ===== */
+   community-organized tournaments announced/hosted in different places.
+   They're normalized into the same shape (normalizeForumTopic /
+   normalizeWybinTournament) so both columns share one render function,
+   but rendered separately rather than merged into one interleaved list —
+   wyBin used to end up buried below dozens of forum posts. ===== */
 const OSU_TOURNAMENTS_FUNCTION_URL = '/.netlify/functions/osu-tournaments';
 const OSU_TOURNAMENTS_TOPIC_BASE = 'https://osu.ppy.sh/community/forums/topics/';
 const OSU_TOURNAMENTS_CACHE_KEY = 'osu_tournaments_cache';
@@ -97,8 +99,9 @@ function filterOsuTournamentsByMode(mode, btn) {
 
 async function loadOsuTournaments() {
     osuTournamentsLoaded = true;
-    const container = document.getElementById('osu-tournaments-list');
-    if (!container) return;
+    const wybinContainer = document.getElementById('osu-tournaments-list-wybin');
+    const forumContainer = document.getElementById('osu-tournaments-list-forum');
+    if (!wybinContainer || !forumContainer) return;
 
     const cachedForum = localStorage.getItem(OSU_TOURNAMENTS_CACHE_KEY);
     const cachedWybin = localStorage.getItem(WYBIN_TOURNAMENTS_CACHE_KEY);
@@ -107,7 +110,8 @@ async function loadOsuTournaments() {
         try { if (cachedWybin) osuWybinTournamentsCurrentItems = JSON.parse(cachedWybin); } catch (e) { /* refetch below repopulates it */ }
         renderOsuTournaments();
     } else {
-        container.innerHTML = `<div class="news-loading">${t('updates_loading')}</div>`;
+        wybinContainer.innerHTML = `<div class="news-loading">${t('updates_loading')}</div>`;
+        forumContainer.innerHTML = `<div class="news-loading">${t('updates_loading')}</div>`;
     }
 
     const [forumOk, wybinOk] = await Promise.all([
@@ -130,23 +134,29 @@ async function loadOsuTournaments() {
     ]);
 
     if (!forumOk && !cachedForum && !wybinOk && !cachedWybin) {
-        container.innerHTML = `<div class="news-empty">${t('updates_load_fail')}</div>`;
+        wybinContainer.innerHTML = `<div class="news-empty">${t('updates_load_fail')}</div>`;
+        forumContainer.innerHTML = `<div class="news-empty">${t('updates_load_fail')}</div>`;
         return;
     }
     renderOsuTournaments();
 }
 
+/* Each source gets its own column (see .tournaments-columns in css/osu.css)
+   instead of being interleaved into one merged/date-sorted list — wyBin no
+   longer ends up buried below a page of forum posts. */
 function renderOsuTournaments() {
-    const container = document.getElementById('osu-tournaments-list');
-    if (!container) return;
+    const wybinContainer = document.getElementById('osu-tournaments-list-wybin');
+    const forumContainer = document.getElementById('osu-tournaments-list-forum');
+    if (!wybinContainer || !forumContainer) return;
 
-    const merged = [
-        ...osuTournamentsCurrentItems.map(normalizeForumTopic),
-        ...osuWybinTournamentsCurrentItems.map(normalizeWybinTournament),
-    ];
+    renderTournamentColumn(wybinContainer, osuWybinTournamentsCurrentItems.map(normalizeWybinTournament));
+    renderTournamentColumn(forumContainer, osuTournamentsCurrentItems.map(normalizeForumTopic));
+}
+
+function renderTournamentColumn(container, sourceItems) {
     const filtered = osuTournamentsModeFilter === 'all'
-        ? merged
-        : merged.filter(item => item.mode === osuTournamentsModeFilter);
+        ? sourceItems
+        : sourceItems.filter(item => item.mode === osuTournamentsModeFilter);
     const items = filtered
         .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
         .slice(0, MERGED_TOURNAMENTS_LIMIT);
@@ -161,7 +171,6 @@ function renderOsuTournaments() {
             <div class="news-item-body">
                 <div class="news-item-header">
                     <span class="news-date">${item.date}</span>
-                    <span class="tournament-source-badge tournament-source-${item.source}">${item.source === 'wybin' ? 'wyBin' : t('tournament_source_forum')}</span>
                 </div>
                 <span class="news-title">${escapeHtmlOsu(item.title)}</span>
                 ${item.meta ? `<span class="news-item-meta">${item.meta}</span>` : ''}

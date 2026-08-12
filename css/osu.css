@@ -86,16 +86,32 @@
 .news-title { display: block; color: var(--text); font-size: 0.85rem; line-height: 1.4; }
 .news-loading, .news-empty { color: var(--text-secondary); font-size: 0.85rem; padding: 12px 0; }
 .tournaments-hint { text-align: center; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px; }
-.tournament-source-badge {
-    flex-shrink: 0;
-    white-space: nowrap;
-    font-size: 0.68rem;
-    font-weight: bold;
-    padding: 1px 7px;
-    border-radius: 20px;
+
+/* Two source-specific lists side by side instead of one merged/interleaved
+   list — wyBin entries no longer need scrolling past a wall of forum posts
+   to reach. Narrower than 760px there's no room for two columns, so it just
+   stacks (wyBin first). At/above that width the page breaks out of
+   .site-main's 640px cap (viewport-relative centering, not parent-relative)
+   so the two columns have enough room to stay readable. */
+.tournaments-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
-.tournament-source-forum { background: rgba(var(--accent-purple-rgb), 0.18); color: var(--accent-light-purple); }
-.tournament-source-wybin { background: rgba(255,140,66,0.18); color: #ff9d5c; }
+.tournaments-column-card { margin-bottom: 0; }
+@media (min-width: 760px) {
+    #page-tournaments {
+        width: 100vw;
+        max-width: 880px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .tournaments-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
 .skin-item {
     display: flex;
     align-items: center;
@@ -172,6 +188,7 @@
     cursor: pointer;
     border: 1px solid var(--border-card);
     background: var(--bg-card);
+    color: var(--accent-purple);
     transition: all 0.2s;
 }
 .skin-backup-btn:hover { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(var(--accent-purple-rgb), 0.25); }

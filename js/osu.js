@@ -55,20 +55,32 @@ const STAR_COLOR_STOPS = [
     [7.7, [24, 21, 142]],
     [9.0, [0, 0, 0]],
 ];
+/* osu!'s own colour table runs all the way to near-black at the high-SR end,
+   which reads fine on their white beatmap pages but disappears against this
+   site's dark card backgrounds. Lift any colour below a minimum luminance by
+   mixing it toward white by just enough to hit that floor exactly (mixing is
+   linear in each channel, so this ratio is exact, not approximate) — keeps
+   the hue direction (still reads as "the dark end") while staying visible. */
+function liftForContrast(rgb, minLum = 92) {
+    const lum = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+    if (lum >= minLum) return rgb;
+    const r = (minLum - lum) / (255 - lum);
+    return rgb.map(v => v + (255 - v) * r);
+}
 function starRatingColor(stars) {
     stars = Number(stars) || 0;
     const stops = STAR_COLOR_STOPS;
     if (stars <= 0) return '#888';
-    if (stars <= stops[0][0]) return rgbHex(stops[0][1]);
+    if (stars <= stops[0][0]) return rgbHex(liftForContrast(stops[0][1]));
     for (let i = 1; i < stops.length; i++) {
         if (stars <= stops[i][0]) {
             const [s0, c0] = stops[i - 1];
             const [s1, c1] = stops[i];
             const t = (stars - s0) / (s1 - s0);
-            return rgbHex(c0.map((v, idx) => v + (c1[idx] - v) * t));
+            return rgbHex(liftForContrast(c0.map((v, idx) => v + (c1[idx] - v) * t)));
         }
     }
-    return rgbHex(stops[stops.length - 1][1]);
+    return rgbHex(liftForContrast(stops[stops.length - 1][1]));
 }
 function rgbHex(rgb) {
     return '#' + rgb.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
