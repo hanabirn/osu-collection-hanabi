@@ -156,6 +156,17 @@ function toggleReplayPreview(renderID) {
     renderReplayHistory();
 }
 
+/* o!rdr only keeps rendered videos for a limited time, so an old history
+   entry's videoUrl commonly 404s by the time someone clicks preview — the
+   <video> element would otherwise just sit there black and stuck at 0:00
+   with no explanation. Swap it for an actionable message instead. */
+function handleReplayVideoError(video) {
+    const msg = document.createElement('p');
+    msg.className = 'replay-preview-expired';
+    msg.textContent = t('replay_preview_expired');
+    video.replaceWith(msg);
+}
+
 function renderReplayHistory() {
     const el = document.getElementById('replay-history-list');
     if (!el) return;
@@ -179,7 +190,7 @@ function renderReplayHistory() {
                         ? `<span class="replay-history-status fail">${t('replay_render_fail_short')}</span>`
                         : `<span class="replay-history-status">${t('replay_history_pending')}</span>`}
             </div>
-            ${expanded ? `<video class="replay-preview-video" src="${r.videoUrl}" controls preload="metadata"></video>` : ''}
+            ${expanded ? `<video class="replay-preview-video" src="${r.videoUrl}" controls preload="metadata" onerror="handleReplayVideoError(this)"></video>` : ''}
         </div>
     `;
     }).join('');

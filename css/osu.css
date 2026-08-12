@@ -311,6 +311,15 @@
     border: 1px solid var(--border-card);
     background: #000;
 }
+.replay-preview-expired {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px dashed var(--border-card);
+    background: var(--bg-stat);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    text-align: center;
+}
 
 .feedback-card { max-width: 480px; margin: 0 auto; }
 .feedback-hint {
