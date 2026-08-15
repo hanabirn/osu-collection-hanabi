@@ -93,6 +93,8 @@ I18N.ja = {
     farm_load_fail: 'Farm譜面の読み込みに失敗しました。しばらくしてから再試行してください', farm_empty: '条件に一致する譜面がありません。絞り込み条件を緩めてみてください',
     farm_coverage_pending: 'データベースを準備中です。しばらくしてからまた確認してください',
     farm_coverage: '{n} 件の譜面を収録・最終更新 {t}（データベースは構築中で、まだすべての ranked 譜面を網羅していません）',
+    farm_only_toggle: '🔥 農圖のみ表示',
+    farm_coverage_farm: '（農圖基準を満たす譜面：{n} 件 / 判定済み {c} 件）',
 
     pp_goal_tab: 'PP目標', pp_goal_hint: '現在の{mode}の合計PP：{current}pp。目標を入力すると、新しいプレイに最低限必要なPPがわかります。',
     pp_goal_placeholder: '目標の合計PP', pp_goal_btn: '計算', pp_goal_invalid: '有効な目標PPを入力してください',

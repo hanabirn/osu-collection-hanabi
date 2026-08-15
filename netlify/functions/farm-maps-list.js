@@ -31,6 +31,7 @@ exports.handler = async (event) => {
     const mods = MODS_SET.has(qs.mods) ? qs.mods : 'NM';
     const page = Math.max(0, parseInt(qs.page, 10) || 0);
     const q = (qs.q || '').trim().toLowerCase().slice(0, 100);
+    const farmOnly = qs.farmOnly === '1';
 
     const num = (v) => (v !== undefined && v !== '' && Number.isFinite(parseFloat(v)) ? parseFloat(v) : null);
     const ppMin = num(qs.ppMin), ppMax = num(qs.ppMax);
@@ -49,6 +50,10 @@ exports.handler = async (event) => {
 
         let items = dataset.map(r => ({ ...r, __pp: r.pp ? r.pp[mods] : undefined, __star: r.stars ? r.stars[mods] : undefined }))
             .filter(r => r.__pp !== undefined && r.__star !== undefined);
+
+        const farmClassifiedCount = items.filter(r => r.farmSignal).length;
+        const farmMapCount = items.filter(r => r.farmSignal && r.farmSignal.isFarm).length;
+        if (farmOnly) items = items.filter(r => r.farmSignal && r.farmSignal.isFarm);
 
         if (ppMin !== null) items = items.filter(r => r.__pp >= ppMin);
         if (ppMax !== null) items = items.filter(r => r.__pp <= ppMax);
@@ -85,6 +90,8 @@ exports.handler = async (event) => {
                     computedCount: crawlState.computedCount || 0,
                     totalKnown: crawlState.totalKnown || 0,
                     lastRunAt: crawlState.lastRunAt || null,
+                    farmClassifiedCount,
+                    farmMapCount,
                 },
             }),
         };

@@ -26,7 +26,10 @@
 const rosu = require('rosu-pp-js');
 const { getOsuToken } = require('./_osu-auth');
 const { getFarmMapsStore } = require('./_blobs-store');
-const { STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES } = require('./_farm-constants');
+const {
+    STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES,
+    FARM_DT_RATIO_THRESHOLD, FARM_PLAYCOUNT_THRESHOLD,
+} = require('./_farm-constants');
 
 function stateKey(mode) { return `crawl-state:${mode}`; }
 function datasetKey(mode) { return `dataset:${mode}`; }
@@ -92,7 +95,58 @@ async function discoverBatch(mode, state) {
     return sets.length;
 }
 
-async function computeOne(item) {
+/* "Genuine farm map" heuristic: what fraction of the beatmap's top-50
+   leaderboard was set with DT/NC (a cheap proxy for "the community is
+   abusing this map for pp, not just playing it at face value"), gated by
+   playcount so a handful of DT scores on a barely-played map doesn't count
+   as a real signal. Both thresholds are the site owner's judgment call,
+   not derived from anything (see FARM_DT_RATIO_THRESHOLD/FARM_PLAYCOUNT_
+   THRESHOLD in _farm-constants.js). This is deliberately *not* the same
+   thing osu-pps.com does (cross-referencing thousands of players' top-100
+   lists to see how many have this map in them) — that needs a standing
+   database continuously ingesting player score history, which doesn't fit
+   a time-boxed Netlify cron function. */
+async function fetchFarmSignal(beatmapId, mode, token) {
+    // mania has no score-multiplying mods the way std/taiko/catch do — DT in
+    // mania is purely a personal scroll-speed/readability preference, not a
+    // pp-farming signal, so a high DT ratio there means nothing. Skip the DT
+    // check entirely for mania and never classify a mania map as a farm map
+    // through this heuristic (playcount alone isn't a strong enough signal).
+    if (mode === 'mania') {
+        return { dtRatio: 0, sampleSize: 0, playcount: 0, isFarm: false, applicable: false, computedAt: Date.now() };
+    }
+
+    const [scoresRes, beatmapRes] = await Promise.all([
+        fetch(`https://osu.ppy.sh/api/v2/beatmaps/${beatmapId}/scores?mode=${mode}&limit=50`, {
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        }),
+        fetch(`https://osu.ppy.sh/api/v2/beatmaps/${beatmapId}`, {
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        }),
+    ]);
+
+    let dtRatio = 0, sampleSize = 0;
+    if (scoresRes.ok) {
+        const scoresData = await scoresRes.json();
+        const scores = scoresData.scores || [];
+        sampleSize = scores.length;
+        if (sampleSize > 0) {
+            const dtCount = scores.filter(s => (s.mods || []).some(m => m.acronym === 'DT' || m.acronym === 'NC')).length;
+            dtRatio = dtCount / sampleSize;
+        }
+    }
+
+    let playcount = 0;
+    if (beatmapRes.ok) {
+        const beatmapData = await beatmapRes.json();
+        playcount = beatmapData.playcount || 0;
+    }
+
+    const isFarm = dtRatio >= FARM_DT_RATIO_THRESHOLD && playcount >= FARM_PLAYCOUNT_THRESHOLD;
+    return { dtRatio, sampleSize, playcount, isFarm, applicable: true, computedAt: Date.now() };
+}
+
+async function computeOne(item, mode, existingRecord, token) {
     const res = await fetch(`https://osu.ppy.sh/osu/${item.beatmap_id}`, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
     });
@@ -109,7 +163,21 @@ async function computeOne(item) {
         pp[modKey(mods)] = perf.calculate(diffAttrs).pp;
     }
 
-    return { ...item, stars, pp };
+    // farmSignal only needs computing once per beatmap — a top-50 leaderboard's
+    // mod composition and playcount don't shift fast enough to be worth the
+    // extra 2 API calls on every recrawl the way pp/stars (recomputed from the
+    // .osu file every time) do. Leave it null on failure so the next recrawl
+    // retries rather than caching a false negative.
+    let farmSignal = existingRecord && existingRecord.farmSignal;
+    if (!farmSignal) {
+        try {
+            farmSignal = await fetchFarmSignal(item.beatmap_id, mode, token);
+        } catch (err) {
+            farmSignal = null;
+        }
+    }
+
+    return { ...item, stars, pp, farmSignal };
 }
 
 async function runCrawlBatch(mode, budgetMs) {
@@ -121,6 +189,7 @@ async function runCrawlBatch(mode, budgetMs) {
 
     let discovered = 0, computed = 0, error = null;
     try {
+        const token = await getOsuToken();
         while (Date.now() - start < budgetMs) {
             if (state.pendingQueue.length === 0) {
                 const got = await discoverBatch(mode, state);
@@ -129,8 +198,9 @@ async function runCrawlBatch(mode, budgetMs) {
                 continue;
             }
             const item = state.pendingQueue.shift();
-            const record = await computeOne(item);
-            const existingIdx = index.get(record.beatmap_id);
+            const existingIdx = index.get(item.beatmap_id);
+            const existingRecord = existingIdx !== undefined ? dataset[existingIdx] : null;
+            const record = await computeOne(item, mode, existingRecord, token);
             if (existingIdx === undefined) {
                 record.firstSeenAt = Date.now();
                 dataset.push(record);

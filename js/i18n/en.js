@@ -93,6 +93,8 @@ I18N.en = {
     farm_load_fail: 'Failed to load Farm Maps, try again later', farm_empty: 'No maps match these filters — try loosening them',
     farm_coverage_pending: 'The dataset is still being built, check back soon',
     farm_coverage: '{n} maps indexed · last updated {t} (dataset still growing, not yet covering every ranked map)',
+    farm_only_toggle: '🔥 Farm maps only',
+    farm_coverage_farm: '({n} classified as farm maps out of {c} scored so far)',
 
     pp_goal_tab: 'PP Goal', pp_goal_hint: 'Current {mode} total PP: {current}pp. Enter a target to see the minimum PP a new play needs.',
     pp_goal_placeholder: 'Target total PP', pp_goal_btn: 'Calculate', pp_goal_invalid: 'Please enter a valid target PP',

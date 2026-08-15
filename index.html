@@ -236,6 +236,10 @@
                 <option value="length_desc" data-i18n="farm_sort_length_desc">長度長到短</option>
                 <option value="new_desc" data-i18n="farm_sort_new_desc">最新收錄</option>
             </select>
+            <label class="gallery-liked-only-label" title="Top 50 中 DT/HDDT 佔比 ≥ 70%，且遊玩次數 ≥ 500 才算">
+                <input type="checkbox" id="farm-only-checkbox" onchange="toggleFarmOnly(this.checked)">
+                <span data-i18n="farm_only_toggle">🔥 只看農圖</span>
+            </label>
         </div>
 
         <div class="farm-range-row">

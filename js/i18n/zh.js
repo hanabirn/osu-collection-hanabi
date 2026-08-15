@@ -93,6 +93,8 @@ I18N.zh = {
     farm_load_fail: '載入 Farm 圖失敗，稍後再試', farm_empty: '沒有符合條件的圖，換個篩選條件試試',
     farm_coverage_pending: '資料庫尚在準備中，稍後再回來看看',
     farm_coverage: '已收錄 {n} 張圖・上次更新於 {t}（資料庫持續擴充中，尚未涵蓋全部 ranked 圖）',
+    farm_only_toggle: '🔥 只看農圖',
+    farm_coverage_farm: '（符合農圖標準：{n} 張，已分類 {c} 張）',
 
     pp_goal_tab: 'PP 目標', pp_goal_hint: '{mode} 目前總 PP：{current}pp。輸入目標，看新增一張成績最少要打多少 PP。',
     pp_goal_placeholder: '目標總 PP', pp_goal_btn: '計算', pp_goal_invalid: '請輸入有效的目標 PP',

@@ -93,6 +93,8 @@ I18N.es = {
     farm_load_fail: 'No se pudieron cargar los Mapas Farm, inténtalo más tarde', farm_empty: 'Ningún mapa coincide con estos filtros — prueba a relajarlos',
     farm_coverage_pending: 'La base de datos aún se está preparando, vuelve pronto',
     farm_coverage: '{n} mapas indexados · última actualización {t} (la base de datos sigue creciendo, aún no cubre todos los mapas ranked)',
+    farm_only_toggle: '🔥 Solo farm maps',
+    farm_coverage_farm: '({n} clasificados como farm map de {c} evaluados)',
 
     pp_goal_tab: 'Meta de PP', pp_goal_hint: 'PP total actual en {mode}: {current}pp. Introduce una meta para ver el PP mínimo que necesita una nueva partida.',
     pp_goal_placeholder: 'PP total objetivo', pp_goal_btn: 'Calcular', pp_goal_invalid: 'Introduce un PP objetivo válido',

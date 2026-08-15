@@ -93,6 +93,8 @@ I18N.fr = {
     farm_load_fail: 'Échec du chargement des Farm Maps, réessayez plus tard', farm_empty: 'Aucune map ne correspond à ces filtres — essayez de les assouplir',
     farm_coverage_pending: 'La base de données est encore en préparation, revenez bientôt',
     farm_coverage: '{n} maps indexées · mise à jour {t} (base encore en croissance, ne couvre pas encore toutes les maps ranked)',
+    farm_only_toggle: '🔥 Farm maps uniquement',
+    farm_coverage_farm: '({n} classées farm map sur {c} évaluées)',
 
     pp_goal_tab: 'Objectif PP', pp_goal_hint: 'PP total actuel en {mode} : {current}pp. Entrez un objectif pour voir le PP minimum requis pour un nouveau score.',
     pp_goal_placeholder: 'PP total visé', pp_goal_btn: 'Calculer', pp_goal_invalid: 'Veuillez entrer un objectif PP valide',

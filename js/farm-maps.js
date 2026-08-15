@@ -22,6 +22,7 @@ let farmMods = 'NM';
 let farmSort = 'pp_desc';
 let farmPage = 0;
 let farmQuery = '';
+let farmOnly = false;
 let farmItems = [];
 let farmTotal = 0;
 let farmCoverage = null;
@@ -36,6 +37,20 @@ function switchFarmMode(mode, btn) {
     farmMode = mode;
     document.querySelectorAll('#farm-mode-tabs .osu-tab').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
+
+    // mania has no farm-map classification (see fetchFarmSignal in
+    // _farm-crawl-core.js — DT isn't a pp-farming signal there), so the
+    // toggle would just always return zero results. Hide it and fall back
+    // to the unfiltered view rather than leave a checkbox that silently
+    // does nothing.
+    const farmOnlyLabel = document.getElementById('farm-only-checkbox')?.closest('label');
+    if (farmOnlyLabel) farmOnlyLabel.style.display = mode === 'mania' ? 'none' : '';
+    if (mode === 'mania' && farmOnly) {
+        farmOnly = false;
+        const checkbox = document.getElementById('farm-only-checkbox');
+        if (checkbox) checkbox.checked = false;
+    }
+
     loadFarmMapsPage(0);
 }
 
@@ -48,6 +63,11 @@ function switchFarmMods(mods, btn) {
 
 function switchFarmSort(value) {
     farmSort = value;
+    loadFarmMapsPage(0);
+}
+
+function toggleFarmOnly(checked) {
+    farmOnly = checked;
     loadFarmMapsPage(0);
 }
 
@@ -83,6 +103,7 @@ async function loadFarmMapsPage(page) {
             page: String(page),
         });
         if (farmQuery) params.set('q', farmQuery);
+        if (farmOnly) params.set('farmOnly', '1');
         // pp-min -> ppMin, star-max -> starMax, etc.
         const field = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
         [['pp-min', 'ppMin'], ['pp-max', 'ppMax'], ['star-min', 'starMin'], ['star-max', 'starMax'],
@@ -179,7 +200,14 @@ function renderFarmCoverage() {
         return;
     }
     const updated = new Date(farmCoverage.lastRunAt).toLocaleString();
-    el.textContent = t('farm_coverage', { n: (farmCoverage.computedCount || 0).toLocaleString(), t: updated });
+    let text = t('farm_coverage', { n: (farmCoverage.computedCount || 0).toLocaleString(), t: updated });
+    if (farmOnly) {
+        text += ' ' + t('farm_coverage_farm', {
+            n: (farmCoverage.farmMapCount || 0).toLocaleString(),
+            c: (farmCoverage.farmClassifiedCount || 0).toLocaleString(),
+        });
+    }
+    el.textContent = text;
 }
 
 async function addFarmMapToCollection(beatmapsetId, event) {

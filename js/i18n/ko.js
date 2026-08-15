@@ -93,6 +93,8 @@ I18N.ko = {
     farm_load_fail: '팜맵을 불러오지 못했습니다. 나중에 다시 시도해주세요', farm_empty: '조건에 맞는 맵이 없습니다. 필터를 완화해보세요',
     farm_coverage_pending: '데이터베이스를 아직 준비 중입니다. 잠시 후 다시 확인해주세요',
     farm_coverage: '{n}개 맵 수집됨 · 마지막 업데이트 {t} (데이터베이스가 계속 늘어나는 중이며 아직 모든 ranked 맵을 다루지 못합니다)',
+    farm_only_toggle: '🔥 파밍맵만 보기',
+    farm_coverage_farm: '(파밍맵 기준 충족: {n}개 / 분류 완료 {c}개)',
 
     pp_goal_tab: 'PP 목표', pp_goal_hint: '현재 {mode} 총 PP: {current}pp. 목표를 입력하면 새 기록에 필요한 최소 PP를 계산합니다.',
     pp_goal_placeholder: '목표 총 PP', pp_goal_btn: '계산', pp_goal_invalid: '유효한 목표 PP를 입력해주세요',
