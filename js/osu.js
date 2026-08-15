@@ -18,6 +18,32 @@ function showShareToast(msg) {
     toast._timer = setTimeout(function() { toast.className = 'share-toast'; }, 2500);
 }
 
+/* Builds the numbered-button portion of a pagination bar, collapsing long
+   runs into a "…" — used by this file, public-collections.js and
+   farm-maps.js, all of which can page into the hundreds/thousands and would
+   otherwise render one button per page. Keeps first/last page plus a small
+   window around the current page always reachable. onClickForPage(i) returns
+   the onclick JS for page i (each caller wires it to its own page-load fn). */
+function buildPaginationPageButtons(currentPage, totalPages, onClickForPage) {
+    const windowSize = 2;
+    const pageSet = new Set([0, totalPages - 1]);
+    for (let i = currentPage - windowSize; i <= currentPage + windowSize; i++) {
+        if (i >= 0 && i < totalPages) pageSet.add(i);
+    }
+    const sorted = [...pageSet].sort((a, b) => a - b);
+
+    let html = '';
+    let prev = null;
+    sorted.forEach(i => {
+        if (prev !== null && i - prev > 1) {
+            html += `<span class="osu-page-ellipsis">…</span>`;
+        }
+        html += `<button class="osu-page-btn ${i === currentPage ? 'active' : ''}" onclick="${onClickForPage(i)}">${i + 1}</button>`;
+        prev = i;
+    });
+    return html;
+}
+
 /* ===== osu! Collection ===== */
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const OSU_MODE_NAMES = { 0: 'standard', 1: 'taiko', 2: 'catch', 3: 'mania' };
@@ -1361,9 +1387,7 @@ function renderOsuCollection() {
         let pages = '';
         pages += `<button class="osu-page-btn" onclick="osuPage=0;renderOsuCollection()" ${osuPage===0?'disabled':''}>«</button>`;
         pages += `<button class="osu-page-btn" onclick="osuPage=Math.max(0,osuPage-1);renderOsuCollection()" ${osuPage===0?'disabled':''}>‹</button>`;
-        for (let i = 0; i < totalPages; i++) {
-            pages += `<button class="osu-page-btn ${i===osuPage?'active':''}" onclick="osuPage=${i};renderOsuCollection()">${i+1}</button>`;
-        }
+        pages += buildPaginationPageButtons(osuPage, totalPages, (i) => `osuPage=${i};renderOsuCollection()`);
         pages += `<button class="osu-page-btn" onclick="osuPage=Math.min(${totalPages-1},osuPage+1);renderOsuCollection()" ${osuPage>=totalPages-1?'disabled':''}>›</button>`;
         pages += `<button class="osu-page-btn" onclick="osuPage=${totalPages-1};renderOsuCollection()" ${osuPage>=totalPages-1?'disabled':''}>»</button>`;
         paginationEl.innerHTML = pages;

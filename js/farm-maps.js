@@ -165,9 +165,7 @@ function renderFarmMapsList() {
     let pages = '';
     pages += `<button class="osu-page-btn" onclick="loadFarmMapsPage(0)" ${farmPage === 0 ? 'disabled' : ''}>«</button>`;
     pages += `<button class="osu-page-btn" onclick="loadFarmMapsPage(Math.max(0,${farmPage}-1))" ${farmPage === 0 ? 'disabled' : ''}>‹</button>`;
-    for (let i = 0; i < totalPages; i++) {
-        pages += `<button class="osu-page-btn ${i === farmPage ? 'active' : ''}" onclick="loadFarmMapsPage(${i})">${i + 1}</button>`;
-    }
+    pages += buildPaginationPageButtons(farmPage, totalPages, (i) => `loadFarmMapsPage(${i})`);
     pages += `<button class="osu-page-btn" onclick="loadFarmMapsPage(Math.min(${totalPages - 1},${farmPage}+1))" ${farmPage >= totalPages - 1 ? 'disabled' : ''}>›</button>`;
     pages += `<button class="osu-page-btn" onclick="loadFarmMapsPage(${totalPages - 1})" ${farmPage >= totalPages - 1 ? 'disabled' : ''}>»</button>`;
     pageEl.innerHTML = pages;

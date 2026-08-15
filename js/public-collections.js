@@ -172,9 +172,7 @@ function renderPublicCollectionsList() {
     let pages = '';
     pages += `<button class="osu-page-btn" onclick="loadPublicCollectionsPage(0)" ${publicCollectionsPage === 0 ? 'disabled' : ''}>«</button>`;
     pages += `<button class="osu-page-btn" onclick="loadPublicCollectionsPage(Math.max(0,${publicCollectionsPage}-1))" ${publicCollectionsPage === 0 ? 'disabled' : ''}>‹</button>`;
-    for (let i = 0; i < totalPages; i++) {
-        pages += `<button class="osu-page-btn ${i === publicCollectionsPage ? 'active' : ''}" onclick="loadPublicCollectionsPage(${i})">${i + 1}</button>`;
-    }
+    pages += buildPaginationPageButtons(publicCollectionsPage, totalPages, (i) => `loadPublicCollectionsPage(${i})`);
     pages += `<button class="osu-page-btn" onclick="loadPublicCollectionsPage(Math.min(${totalPages - 1},${publicCollectionsPage}+1))" ${publicCollectionsPage >= totalPages - 1 ? 'disabled' : ''}>›</button>`;
     pages += `<button class="osu-page-btn" onclick="loadPublicCollectionsPage(${totalPages - 1})" ${publicCollectionsPage >= totalPages - 1 ? 'disabled' : ''}>»</button>`;
     pageEl.innerHTML = pages;

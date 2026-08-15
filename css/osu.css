@@ -1032,6 +1032,16 @@
     opacity: 0.3;
     cursor: default;
 }
+.osu-page-ellipsis {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-accent);
+    opacity: 0.5;
+    font-size: 0.85rem;
+}
 
 /* ===== osu! Profile stat tiles =====
    Ported verbatim from the main site's css/about.css lines 133-391. Shared by
