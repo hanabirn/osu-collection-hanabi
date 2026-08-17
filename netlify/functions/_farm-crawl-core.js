@@ -106,6 +106,19 @@ async function discoverBatch(mode, state) {
    lists to see how many have this map in them) — that needs a standing
    database continuously ingesting player score history, which doesn't fit
    a time-boxed Netlify cron function. */
+// Without an explicit x-api-version header, /beatmaps/{id}/scores serves
+// osu!'s legacy score shape where `mods` is an array of plain acronym
+// strings (e.g. ["HD","DT"]), not the newer `{acronym, settings}` objects —
+// this normalizes either shape down to an acronym string.
+function modAcronym(m) { return typeof m === 'string' ? m : m.acronym; }
+
+// Bumped whenever fetchFarmSignal's classification logic changes in a way
+// that invalidates previously-cached farmSignal values (see computeOne —
+// a stale-versioned signal is treated the same as a missing one and gets
+// recomputed on the map's next crawl pass, rather than being cached wrong
+// forever).
+const FARM_SIGNAL_VERSION = 2;
+
 async function fetchFarmSignal(beatmapId, mode, token) {
     // mania has no score-multiplying mods the way std/taiko/catch do — DT in
     // mania is purely a personal scroll-speed/readability preference, not a
@@ -113,7 +126,7 @@ async function fetchFarmSignal(beatmapId, mode, token) {
     // check entirely for mania and never classify a mania map as a farm map
     // through this heuristic (playcount alone isn't a strong enough signal).
     if (mode === 'mania') {
-        return { dtRatio: 0, sampleSize: 0, playcount: 0, isFarm: false, applicable: false, computedAt: Date.now() };
+        return { dtRatio: 0, sampleSize: 0, playcount: 0, isFarm: false, applicable: false, computedAt: Date.now(), signalVersion: FARM_SIGNAL_VERSION };
     }
 
     const [scoresRes, beatmapRes] = await Promise.all([
@@ -131,7 +144,7 @@ async function fetchFarmSignal(beatmapId, mode, token) {
         const scores = scoresData.scores || [];
         sampleSize = scores.length;
         if (sampleSize > 0) {
-            const dtCount = scores.filter(s => (s.mods || []).some(m => m.acronym === 'DT' || m.acronym === 'NC')).length;
+            const dtCount = scores.filter(s => (s.mods || []).some(m => modAcronym(m) === 'DT' || modAcronym(m) === 'NC')).length;
             dtRatio = dtCount / sampleSize;
         }
     }
@@ -143,7 +156,7 @@ async function fetchFarmSignal(beatmapId, mode, token) {
     }
 
     const isFarm = dtRatio >= FARM_DT_RATIO_THRESHOLD && playcount >= FARM_PLAYCOUNT_THRESHOLD;
-    return { dtRatio, sampleSize, playcount, isFarm, applicable: true, computedAt: Date.now() };
+    return { dtRatio, sampleSize, playcount, isFarm, applicable: true, computedAt: Date.now(), signalVersion: FARM_SIGNAL_VERSION };
 }
 
 async function computeOne(item, mode, existingRecord, token) {
@@ -167,9 +180,12 @@ async function computeOne(item, mode, existingRecord, token) {
     // mod composition and playcount don't shift fast enough to be worth the
     // extra 2 API calls on every recrawl the way pp/stars (recomputed from the
     // .osu file every time) do. Leave it null on failure so the next recrawl
-    // retries rather than caching a false negative.
+    // retries rather than caching a false negative. A signalVersion mismatch
+    // is treated the same as missing, so fixing a classification bug in
+    // fetchFarmSignal self-heals the existing dataset over subsequent crawls
+    // instead of leaving old wrong values cached forever.
     let farmSignal = existingRecord && existingRecord.farmSignal;
-    if (!farmSignal) {
+    if (!farmSignal || farmSignal.signalVersion !== FARM_SIGNAL_VERSION) {
         try {
             farmSignal = await fetchFarmSignal(item.beatmap_id, mode, token);
         } catch (err) {
