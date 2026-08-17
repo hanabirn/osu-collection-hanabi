@@ -1847,15 +1847,144 @@ function switchVisitorPlaysType(type, el) {
     el.classList.add('active');
     const listEl = document.getElementById('visitor-recent-list');
     const goalEl = document.getElementById('pp-goal-planner');
+    const medalsEl = document.getElementById('medals-gallery');
+    listEl.style.display = type === 'recent' || type === 'best' ? '' : 'none';
+    goalEl.style.display = type === 'goal' ? '' : 'none';
+    medalsEl.style.display = type === 'medals' ? '' : 'none';
     if (type === 'goal') {
-        listEl.style.display = 'none';
-        goalEl.style.display = '';
         renderPpGoalPlannerUI();
-    } else {
-        listEl.style.display = '';
-        goalEl.style.display = 'none';
-        if (visitorLookupUserId) renderOsuPlaysList(visitorLookupUserId, visitorCurrentMode, type, 'visitor-recent-list', 'visitor-recent-plays');
+    } else if (type === 'medals') {
+        ensureMedalsGalleryLoaded();
+    } else if (visitorLookupUserId) {
+        renderOsuPlaysList(visitorLookupUserId, visitorCurrentMode, type, 'visitor-recent-list', 'visitor-recent-plays');
     }
+}
+
+/* ===== Medal gallery — cross-references osekai.net's public medal database
+   (name/icon/description/rarity, keyed by the same achievement id osu!'s
+   own API uses) against the looked-up player's earned achievement ids, since
+   osu!'s API only ever exposes bare ids (see osu-user-achievements.js and
+   osekai-medals.js's header comments for why). The medal list itself is
+   the same for everyone and rarely changes, so it's fetched once per page
+   load and cached in osekaiMedalsPromise; only the "which ids does this
+   player have" half changes per lookup. */
+let osekaiMedalsPromise = null;
+let allOsekaiMedals = [];
+let visitorMedalIds = new Set();
+let medalsLoadedForUserId = null;
+let medalsFilterState = 'all';
+let medalsSearchQuery = '';
+
+function fetchOsekaiMedals() {
+    if (!osekaiMedalsPromise) {
+        osekaiMedalsPromise = fetch('/.netlify/functions/osekai-medals')
+            .then(res => { if (!res.ok) throw new Error('bad response'); return res.json(); })
+            .then(data => data.medals || [])
+            .catch(e => { osekaiMedalsPromise = null; throw e; });
+    }
+    return osekaiMedalsPromise;
+}
+
+async function ensureMedalsGalleryLoaded() {
+    const el = document.getElementById('medals-gallery');
+    if (!el) return;
+    if (!visitorLookupUserId) {
+        el.innerHTML = `<p class="osu-empty">${t('medals_need_lookup')}</p>`;
+        return;
+    }
+    if (medalsLoadedForUserId === visitorLookupUserId && allOsekaiMedals.length) {
+        renderMedalsGallery();
+        return;
+    }
+    el.innerHTML = `<p class="osu-empty">${t('medals_loading')}</p>`;
+    try {
+        const [medals, achRes] = await Promise.all([
+            fetchOsekaiMedals(),
+            fetch(`/.netlify/functions/osu-user-achievements?id=${visitorLookupUserId}`),
+        ]);
+        const achData = achRes.ok ? await achRes.json() : { achievements: [] };
+        allOsekaiMedals = medals;
+        visitorMedalIds = new Set(achData.achievements || []);
+        medalsLoadedForUserId = visitorLookupUserId;
+        renderMedalsGallery();
+    } catch (e) {
+        console.error('Medal gallery load failed:', e);
+        el.innerHTML = `<p class="osu-empty">${t('medals_load_fail')}</p>`;
+    }
+}
+
+function renderMedalsGallery() {
+    const el = document.getElementById('medals-gallery');
+    if (!el) return;
+    medalsFilterState = 'all';
+    medalsSearchQuery = '';
+    const earnedCount = allOsekaiMedals.filter(m => visitorMedalIds.has(m.id)).length;
+    el.innerHTML = `
+        <div class="medals-gallery-header">
+            <span class="medals-earned-count">${t('medals_earned_label', { n: earnedCount, total: allOsekaiMedals.length })}</span>
+            <input type="text" class="medals-search-input guestbook-input" data-i18n-placeholder="medals_search_placeholder" placeholder="${t('medals_search_placeholder')}" oninput="medalsSearchGallery(this.value)">
+        </div>
+        <div class="osu-mode-tabs medals-filter-tabs">
+            <button class="osu-tab active" onclick="medalsFilterGallery('all', this)">${t('medals_filter_all')}</button>
+            <button class="osu-tab" onclick="medalsFilterGallery('earned', this)">${t('medals_filter_earned')}</button>
+            <button class="osu-tab" onclick="medalsFilterGallery('missing', this)">${t('medals_filter_missing')}</button>
+        </div>
+        <div class="medals-grid" id="medals-grid"></div>
+    `;
+    renderMedalsList();
+}
+
+function medalsFilterGallery(filter, el) {
+    medalsFilterState = filter;
+    document.querySelectorAll('#medals-gallery .medals-filter-tabs .osu-tab').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    renderMedalsList();
+}
+
+function medalsSearchGallery(value) {
+    medalsSearchQuery = value.trim().toLowerCase();
+    renderMedalsList();
+}
+
+function renderMedalsList() {
+    const grid = document.getElementById('medals-grid');
+    if (!grid) return;
+
+    let list = allOsekaiMedals;
+    if (medalsFilterState === 'earned') list = list.filter(m => visitorMedalIds.has(m.id));
+    else if (medalsFilterState === 'missing') list = list.filter(m => !visitorMedalIds.has(m.id));
+    if (medalsSearchQuery) list = list.filter(m => (m.name || '').toLowerCase().includes(medalsSearchQuery));
+
+    if (list.length === 0) {
+        grid.innerHTML = `<p class="osu-empty">${t('medals_empty')}</p>`;
+        return;
+    }
+
+    // Grouped by osekai's own category field so related medals (e.g. all
+    // "Beatmap Spotlights") sit together instead of one flat alphabetical wall.
+    const groups = new Map();
+    for (const m of list) {
+        const g = m.grouping || '';
+        if (!groups.has(g)) groups.set(g, []);
+        groups.get(g).push(m);
+    }
+
+    grid.innerHTML = [...groups.entries()].map(([group, medals]) => `
+        <div class="medals-group">
+            ${group ? `<div class="medals-group-title">${escapeHtmlOsu(group)}</div>` : ''}
+            <div class="medals-group-grid">
+                ${medals.map(m => {
+                    const earned = visitorMedalIds.has(m.id);
+                    return `
+                    <div class="medal-item${earned ? ' earned' : ' missing'}" title="${escapeHtmlOsu(m.description || '')}">
+                        <img class="medal-icon" src="${m.icon}" alt="${escapeHtmlOsu(m.name || '')}" loading="lazy" onerror="this.style.visibility='hidden'">
+                        <div class="medal-name">${escapeHtmlOsu(m.name || '')}</div>
+                        ${m.rarity != null ? `<div class="medal-rarity">${t('medals_rarity', { p: m.rarity.toFixed(1) })}</div>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `).join('');
 }
 
 /* ===== PP goal planner — "what pp does one new play need to reach a target

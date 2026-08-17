@@ -14,3 +14,6 @@
 
 [functions."farm-crawl-run"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
+
+[functions."replay-analyze"]
+  included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]

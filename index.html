@@ -108,6 +108,7 @@
         <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
         <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
         <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+        <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
         <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
@@ -295,9 +296,11 @@
                         <button class="osu-tab active" onclick="switchVisitorPlaysType('recent', this)" data-icon="gamepad2" data-icon-gap><span data-i18n="osu_recent_title">最近遊玩</span></button>
                         <button class="osu-tab" onclick="switchVisitorPlaysType('best', this)" data-icon="trophy" data-icon-gap><span data-i18n="osu_top_title">最佳成績</span></button>
                         <button class="osu-tab" onclick="switchVisitorPlaysType('goal', this)" data-icon="target" data-icon-gap><span data-i18n="pp_goal_tab">PP 目標</span></button>
+                        <button class="osu-tab" onclick="switchVisitorPlaysType('medals', this)" data-icon="award" data-icon-gap><span data-i18n="nav_medals">獎章</span></button>
                     </div>
                     <div class="osu-recent-list" id="visitor-recent-list"></div>
                     <div id="pp-goal-planner" class="pp-goal-planner" style="display:none;"></div>
+                    <div id="medals-gallery" class="medals-gallery" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -320,6 +323,22 @@
                 </div>
                 <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
             </div>
+        </div>
+    </section>
+
+    <section id="page-replay-analyze" class="site-page" style="display:none;">
+        <div class="osu-add-card replay-analyze-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="replay_analyze_title">✦ Replay 分析 ✦</h3>
+            <p class="replay-analyze-hint" data-i18n="replay_analyze_hint">上傳 .osr 檔案，查看成績摘要與擊打時間分佈圖。純粹在伺服器端解析檔案本身，不會產生影片、也不依賴第三方轉檔服務。</p>
+            <div class="replay-upload-zone" id="replay-upload-zone" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleReplayDrop(event)">
+                <input type="file" id="replay-file-input" accept=".osr" style="display:none;" onchange="handleReplayFileSelected(this.files)">
+                <button class="btn" onclick="document.getElementById('replay-file-input').click()" data-icon="upload" data-icon-gap><span data-i18n="replay_upload_btn">選擇 .osr 檔案</span></button>
+                <p class="replay-upload-drag-hint" data-i18n="replay_upload_drag_hint">或把檔案拖曳到這裡</p>
+            </div>
+            <div id="replay-analyze-status" class="status"></div>
+            <div id="replay-analyze-result" style="display:none;"></div>
         </div>
     </section>
 
@@ -408,6 +427,39 @@
                 <button type="submit" class="btn feedback-submit" data-i18n="feedback_submit">送出</button>
             </form>
             <div id="feedback-success" class="feedback-success" style="display:none;" data-i18n="feedback_success">您的回覆訊息已傳送，感謝您的回饋！</div>
+        </div>
+
+        <div class="osu-add-card resources-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="resources_title">✦ 更多 osu! 資源 ✦</h3>
+            <p class="resources-hint" data-i18n="resources_hint">一些沒必要自己做、但很推薦認識的社群工具：</p>
+            <div class="resources-grid">
+                <a class="resource-link-card" href="https://osusearch.com" target="_blank" rel="noopener noreferrer">
+                    <div class="resource-link-title">osu!search <span data-icon="externalLink"></span></div>
+                    <div class="resource-link-desc" data-i18n="resource_osusearch_desc">進階圖譜搜尋引擎，可依星數、BPM、長度等條件篩選</div>
+                </a>
+                <a class="resource-link-card" href="https://osu-pps.com/#/osu/maps" target="_blank" rel="noopener noreferrer">
+                    <div class="resource-link-title">osu-pps <span data-icon="externalLink"></span></div>
+                    <div class="resource-link-desc" data-i18n="resource_osupps_desc">另一個 farm 圖追蹤網站，可以互相比較</div>
+                </a>
+                <a class="resource-link-card" href="https://github.com/Piotrekol/CollectionManager" target="_blank" rel="noopener noreferrer">
+                    <div class="resource-link-title">CollectionManager <span data-icon="externalLink"></span></div>
+                    <div class="resource-link-desc" data-i18n="resource_collectionmanager_desc">桌面版收藏編輯工具，可匯入本站匯出的收藏</div>
+                </a>
+                <a class="resource-link-card" href="https://osuskinner.com" target="_blank" rel="noopener noreferrer">
+                    <div class="resource-link-title">osuskinner <span data-icon="externalLink"></span></div>
+                    <div class="resource-link-desc" data-i18n="resource_osuskinner_desc">線上 skin 製作工具</div>
+                </a>
+                <a class="resource-link-card" href="https://mappersguild.com" target="_blank" rel="noopener noreferrer">
+                    <div class="resource-link-title">Mappers' Guild <span data-icon="externalLink"></span></div>
+                    <div class="resource-link-desc" data-i18n="resource_mappersguild_desc">公會制度，鼓勵大家一起製圖精選歌曲</div>
+                </a>
+                <a class="resource-link-card" href="http://osuskills.com" target="_blank" rel="noopener noreferrer">
+                    <div class="resource-link-title">osu!Skills <span data-icon="externalLink"></span></div>
+                    <div class="resource-link-desc" data-i18n="resource_osuskills_desc">非官方的玩家能力分項評分（aim / speed / acc）</div>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -514,6 +566,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="js/osu.js"></script>
+<script src="js/replay-analyze.js"></script>
 <script src="js/public-collections.js"></script>
 <script src="js/farm-maps.js"></script>
 <script src="js/skins.js"></script>

@@ -10,7 +10,7 @@
    cache — the fetch strategy below is network-first for the shell (so
    normal visits always get the latest code), so this mostly matters for
    forcing a clean slate rather than for staleness. */
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
 const FONT_CACHE = `osu-fonts-${CACHE_VERSION}`;
@@ -19,7 +19,7 @@ const KNOWN_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE, FONT_CACHE]);
 const SHELL_ASSETS = [
     '/', '/index.html', '/manifest.json',
     '/css/base.css', '/css/theme.css', '/css/particles.css', '/css/osu.css',
-    '/js/main.js', '/js/osu.js', '/js/public-collections.js', '/js/skins.js',
+    '/js/main.js', '/js/osu.js', '/js/replay-analyze.js', '/js/public-collections.js', '/js/skins.js',
     '/js/updates.js', '/js/tournaments.js', '/js/notifications.js', '/js/feedback.js', '/js/celebrate.js',
     '/js/icons.js', '/js/theme.js', '/js/particles.js', '/js/pwa.js', '/js/i18n.js',
     '/js/i18n/zh.js', '/js/i18n/en.js', '/js/i18n/ja.js', '/js/i18n/ko.js',
