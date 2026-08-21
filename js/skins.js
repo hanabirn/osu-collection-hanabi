@@ -342,12 +342,14 @@ async function restoreCloudSkinToLocal(id, name) {
      top and gets "caught", alternating a normal fruit with a hyperdash
      one (tinted with skin.ini's HyperDash color the same source-atop way).
    - mania: a 4K or 7K lane (toggle shown only in this tab) of notes
-     falling onto their keys, which light up briefly on "press" — mania
-     skins are configured per key-count via skin.ini [ManiaN] sections;
-     this always looks for the plain mania-note{N}/mania-key{N} fallback
-     names rather than parsing that, so a skin using only per-keycount-
-     prefixed art may fall back to the placeholder shapes instead of its
-     real images. */
+     falling onto their keys, which light up briefly on "press". Real
+     mania skins configure art per key-count via repeated [Mania] sections
+     in skin.ini, each disambiguated by its own `Keys: N` line and
+     NoteImage{i}/KeyImage{i}/KeyImage{i}D column overrides — see
+     getSkinIniSections()/parseSkinIniManiaAssets() below, which read
+     skin.ini in an extra unzip pass up front specifically to resolve
+     those before falling back to generic mania-note{i+1}/mania-key{i+1}
+     names for any column a skin doesn't customize. */
 const SKIN_PREVIEW_BASE_NAMES = [
     'cursor', 'cursormiddle', 'hitcircle', 'hitcircleoverlay', 'approachcircle',
     'sliderb0', 'sliderfollowcircle',
@@ -359,10 +361,16 @@ const SKIN_PREVIEW_BASE_NAMES = [
     ...Array.from({ length: 7 }, (_, i) => `mania-key${i + 1}`),
     ...Array.from({ length: 7 }, (_, i) => `mania-key${i + 1}d`),
 ];
-function skinPreviewFilterName(name) {
+// extraNames covers per-skin custom mania filenames discovered by reading
+// skin.ini first — see extractSkinPreviewAssets' two-pass unzip below.
+function skinPreviewFilterName(name, extraNames) {
     const lower = name.toLowerCase();
     if (lower === 'skin.ini') return true;
-    return SKIN_PREVIEW_BASE_NAMES.some(base => lower === `${base}.png` || lower === `${base}@2x.png`);
+    if (SKIN_PREVIEW_BASE_NAMES.some(base => lower === `${base}.png` || lower === `${base}@2x.png`)) return true;
+    return !!extraNames && extraNames.some(base => {
+        const b = base.toLowerCase();
+        return lower === `${b}.png` || lower === `${b}@2x.png`;
+    });
 }
 
 function parseSkinIniColours(text) {
@@ -393,54 +401,142 @@ function skinPreviewWithAlpha(rgbStr, alpha) {
     return m ? `rgba(${m[1]},${m[2]},${m[3]},${alpha})` : rgbStr;
 }
 
+/* skin.ini can repeat the *same* header — [Mania] appears once per key
+   count a skin customizes, each disambiguated by its own `Keys:` line
+   inside — so a single-section regex (like parseSkinIniColours' above)
+   can't isolate "the" [Mania] block. This splits the whole file into every
+   top-level [Header] block instead, in order, so callers can filter down
+   to the ones they actually want. */
+function getSkinIniSections(text) {
+    const headerRe = /^\[([^\]]+)\][ \t]*$/gim;
+    const matches = [...text.matchAll(headerRe)];
+    const sections = [];
+    for (let i = 0; i < matches.length; i++) {
+        const start = matches[i].index + matches[i][0].length;
+        const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+        sections.push({ name: matches[i][1].trim(), body: text.slice(start, end) });
+    }
+    return sections;
+}
+
+/* Finds the [Mania] section whose `Keys:` line matches keyCount and pulls
+   out its NoteImage{i}/KeyImage{i}/KeyImage{i}D overrides (0-indexed per
+   column) — real mania skins configure art this way rather than shipping
+   generically-named mania-note1.png/mania-key1.png files, so relying only
+   on those generic names (as the rest of this feature does) silently
+   fails to find a 4K- or 7K-specific skin's actual art. Returns null if
+   this skin has no [Mania] section for that key count at all, in which
+   case the caller falls back to the generic names. */
+function parseSkinIniManiaAssets(text, keyCount) {
+    const section = getSkinIniSections(text).find(s => {
+        if (s.name.toLowerCase() !== 'mania') return false;
+        const m = s.body.match(/^[ \t]*Keys[ \t]*:[ \t]*(\d+)/im);
+        return m && parseInt(m[1], 10) === keyCount;
+    });
+    if (!section) return null;
+    const grab = (key) => {
+        const m = section.body.match(new RegExp(`^[ \\t]*${key}[ \\t]*:[ \\t]*(.+?)[ \\t]*$`, 'im'));
+        return m ? m[1].trim().replace(/\.png$/i, '') : null;
+    };
+    const noteImages = [], keyImages = [], keyImagesPressed = [];
+    for (let i = 0; i < keyCount; i++) {
+        noteImages.push(grab(`NoteImage${i}`));
+        keyImages.push(grab(`KeyImage${i}`));
+        keyImagesPressed.push(grab(`KeyImage${i}D`));
+    }
+    return { noteImages, keyImages, keyImagesPressed };
+}
+
 // Keyed by skin id, caches the *promise* (not just the resolved value) so
 // concurrent preview-opens for the same skin id share one unzip pass
 // instead of racing two.
 const skinPreviewCache = new Map();
 
+// Column-index arrays for a resolved 4K/7K mania asset set — `override[i]`
+// (from skin.ini's NoteImage{i}/KeyImage{i}, when that skin actually
+// customizes this key count) wins over the generic mania-note{i+1}/
+// mania-key{i+1}[d] fallback name. `genericName(i)` supplies that fallback
+// so pressed vs unpressed keys can each use their own naming.
+function skinPreviewManiaPick(pick, override, genericName, keyCount) {
+    return Array.from({ length: keyCount }, (_, i) => pick((override && override[i]) || genericName(i)));
+}
+
 function extractSkinPreviewAssets(skinId, file) {
     if (skinPreviewCache.has(skinId)) return skinPreviewCache.get(skinId);
-    const promise = (typeof fflate === 'undefined' ? Promise.resolve(null) : file.arrayBuffer().then(buf => new Promise(resolve => {
-        try {
-            fflate.unzip(new Uint8Array(buf), { filter: entry => skinPreviewFilterName(entry.name) }, (err, unzipped) => {
-                if (err) { resolve(null); return; }
-                const pick = (base) => {
-                    const key2x = Object.keys(unzipped).find(k => k.toLowerCase() === `${base}@2x.png`);
-                    const key1x = Object.keys(unzipped).find(k => k.toLowerCase() === `${base}.png`);
-                    const key = key2x || key1x;
-                    return key ? URL.createObjectURL(new Blob([unzipped[key]], { type: 'image/png' })) : null;
-                };
-                let iniText = '';
-                const iniKey = Object.keys(unzipped).find(k => k.toLowerCase() === 'skin.ini');
-                if (iniKey) { try { iniText = new TextDecoder('utf-8').decode(unzipped[iniKey]); } catch { iniText = ''; } }
-                resolve({
-                    cursor: pick('cursor'),
-                    cursorMiddle: pick('cursormiddle'),
-                    hitcircle: pick('hitcircle'),
-                    hitcircleOverlay: pick('hitcircleoverlay'),
-                    approachCircle: pick('approachcircle'),
-                    sliderBall: pick('sliderb0'),
-                    sliderFollowCircle: pick('sliderfollowcircle'),
-                    numbers: Array.from({ length: 10 }, (_, i) => pick(`default-${i}`)),
-                    taikoHitcircle: pick('taikohitcircle'),
-                    taikoHitcircleOverlay: pick('taikohitcircleoverlay'),
-                    taikoBigCircle: pick('taikobigcircle'),
-                    taikoBigCircleOverlay: pick('taikobigcircleoverlay'),
-                    fruitCatcher: pick('fruit-catcher-idle'),
-                    fruit: pick('fruit-pear'),
-                    maniaNotes: Array.from({ length: 7 }, (_, i) => pick(`mania-note${i + 1}`)),
-                    maniaKeys: Array.from({ length: 7 }, (_, i) => pick(`mania-key${i + 1}`)),
-                    maniaKeysPressed: Array.from({ length: 7 }, (_, i) => pick(`mania-key${i + 1}d`)),
-                    cursorRotate: iniText ? parseSkinIniGeneralBool(iniText, 'CursorRotate', true) : true,
-                    cursorExpand: iniText ? parseSkinIniGeneralBool(iniText, 'CursorExpand', true) : true,
-                    colours: iniText ? parseSkinIniColours(iniText) : [],
-                    sliderBodyColor: iniText ? parseSkinIniRgb(iniText, 'Colours', 'SliderBody') : null,
-                    sliderBorderColor: iniText ? parseSkinIniRgb(iniText, 'Colours', 'SliderBorder') : null,
-                    hyperDashColor: iniText ? parseSkinIniRgb(iniText, 'CatchTheBeat', 'HyperDash') : null,
+    const promise = (typeof fflate === 'undefined' ? Promise.resolve(null) : file.arrayBuffer().then(async buf => {
+        const bytes = new Uint8Array(buf);
+
+        // Pass 1: skin.ini only. Mania's real per-keycount art is named
+        // via that file's [Mania] Keys:4/Keys:7 sections (see
+        // parseSkinIniManiaAssets), which has to be read before knowing
+        // which *other* filenames pass 2 needs to look for.
+        const iniText = await new Promise(resolve => {
+            try {
+                fflate.unzip(bytes, { filter: entry => entry.name.toLowerCase() === 'skin.ini' }, (err, unzipped) => {
+                    if (err) { resolve(''); return; }
+                    const key = Object.keys(unzipped)[0];
+                    if (!key) { resolve(''); return; }
+                    try { resolve(new TextDecoder('utf-8').decode(unzipped[key])); }
+                    catch { resolve(''); }
                 });
-            });
-        } catch { resolve(null); }
-    })).catch(() => null));
+            } catch { resolve(''); }
+        });
+
+        const mania4 = iniText ? parseSkinIniManiaAssets(iniText, 4) : null;
+        const mania7 = iniText ? parseSkinIniManiaAssets(iniText, 7) : null;
+        const customNames = [mania4, mania7]
+            .filter(Boolean)
+            .flatMap(m => [...m.noteImages, ...m.keyImages, ...m.keyImagesPressed])
+            .filter(Boolean);
+
+        return new Promise(resolve => {
+            try {
+                fflate.unzip(bytes, { filter: entry => skinPreviewFilterName(entry.name, customNames) }, (err, unzipped) => {
+                    if (err) { resolve(null); return; }
+                    const pick = (base) => {
+                        if (!base) return null;
+                        const lower = base.toLowerCase();
+                        const key2x = Object.keys(unzipped).find(k => k.toLowerCase() === `${lower}@2x.png`);
+                        const key1x = Object.keys(unzipped).find(k => k.toLowerCase() === `${lower}.png`);
+                        const key = key2x || key1x;
+                        return key ? URL.createObjectURL(new Blob([unzipped[key]], { type: 'image/png' })) : null;
+                    };
+                    resolve({
+                        cursor: pick('cursor'),
+                        cursorMiddle: pick('cursormiddle'),
+                        hitcircle: pick('hitcircle'),
+                        hitcircleOverlay: pick('hitcircleoverlay'),
+                        approachCircle: pick('approachcircle'),
+                        sliderBall: pick('sliderb0'),
+                        sliderFollowCircle: pick('sliderfollowcircle'),
+                        numbers: Array.from({ length: 10 }, (_, i) => pick(`default-${i}`)),
+                        taikoHitcircle: pick('taikohitcircle'),
+                        taikoHitcircleOverlay: pick('taikohitcircleoverlay'),
+                        taikoBigCircle: pick('taikobigcircle'),
+                        taikoBigCircleOverlay: pick('taikobigcircleoverlay'),
+                        fruitCatcher: pick('fruit-catcher-idle'),
+                        fruit: pick('fruit-pear'),
+                        mania4: {
+                            notes: skinPreviewManiaPick(pick, mania4 && mania4.noteImages, i => `mania-note${i + 1}`, 4),
+                            keys: skinPreviewManiaPick(pick, mania4 && mania4.keyImages, i => `mania-key${i + 1}`, 4),
+                            keysPressed: skinPreviewManiaPick(pick, mania4 && mania4.keyImagesPressed, i => `mania-key${i + 1}d`, 4),
+                        },
+                        mania7: {
+                            notes: skinPreviewManiaPick(pick, mania7 && mania7.noteImages, i => `mania-note${i + 1}`, 7),
+                            keys: skinPreviewManiaPick(pick, mania7 && mania7.keyImages, i => `mania-key${i + 1}`, 7),
+                            keysPressed: skinPreviewManiaPick(pick, mania7 && mania7.keyImagesPressed, i => `mania-key${i + 1}d`, 7),
+                        },
+                        cursorRotate: iniText ? parseSkinIniGeneralBool(iniText, 'CursorRotate', true) : true,
+                        cursorExpand: iniText ? parseSkinIniGeneralBool(iniText, 'CursorExpand', true) : true,
+                        colours: iniText ? parseSkinIniColours(iniText) : [],
+                        sliderBodyColor: iniText ? parseSkinIniRgb(iniText, 'Colours', 'SliderBody') : null,
+                        sliderBorderColor: iniText ? parseSkinIniRgb(iniText, 'Colours', 'SliderBorder') : null,
+                        hyperDashColor: iniText ? parseSkinIniRgb(iniText, 'CatchTheBeat', 'HyperDash') : null,
+                    });
+                });
+            } catch { resolve(null); }
+        });
+    }).catch(() => null));
     skinPreviewCache.set(skinId, promise);
     return promise;
 }
@@ -715,7 +811,7 @@ function drawSkinPreviewTaiko(ctx, w, h, images, elapsed) {
 }
 
 const SKIN_PREVIEW_CATCH_LOOP_MS = 1300;
-const CATCH_DEFAULT_HYPERDASH_COLOR = 'rgba(255,32,32,0.75)';
+const CATCH_DEFAULT_HYPERDASH_COLOR = 'rgba(255,32,32,0.92)';
 
 /* A fruit drops straight down while the catcher slides underneath to be in
    place exactly when it lands — real catch has the catcher tracking the
@@ -744,7 +840,17 @@ function drawSkinPreviewCatch(ctx, w, h, images, assets, elapsed) {
         ctx.save();
         ctx.globalAlpha = fruitAlpha;
         if (isHyper) {
-            const tint = assets.hyperDashColor ? skinPreviewWithAlpha(assets.hyperDashColor, 0.75) : CATCH_DEFAULT_HYPERDASH_COLOR;
+            const tint = assets.hyperDashColor ? skinPreviewWithAlpha(assets.hyperDashColor, 0.92) : CATCH_DEFAULT_HYPERDASH_COLOR;
+            // A glow ring behind the fruit itself, since real hyperdash's
+            // main visual cue is the bright trail/glow around it, not just
+            // a tinted fruit — makes the state readable even for skins
+            // whose fruit-pear.png is already so colorful the tint alone
+            // barely shows up against it.
+            ctx.save();
+            ctx.globalAlpha *= 0.5;
+            ctx.fillStyle = tint;
+            ctx.beginPath(); ctx.arc(dropX, fruitY, fruitR * 1.6, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
             drawSkinPreviewTinted(ctx, images.fruit, dropX - fruitR, fruitY - fruitR, fruitR * 2, fruitR * 2, tint, tint);
         } else if (images.fruit) {
             ctx.drawImage(images.fruit, dropX - fruitR, fruitY - fruitR, fruitR * 2, fruitR * 2);
@@ -785,6 +891,7 @@ const MANIA_FALLBACK_COLORS = ['#66d9ef', '#a6e22e', '#fd971f', '#f92672', '#ae8
 
 function drawSkinPreviewMania(ctx, w, h, images, elapsed) {
     const keyCount = skinPreviewManiaKeys;
+    const set = keyCount === 7 ? images.mania7 : images.mania4;
     const totalW = w * 0.9;
     const laneW = totalW / keyCount;
     const startX = (w - totalW) / 2;
@@ -809,7 +916,7 @@ function drawSkinPreviewMania(ctx, w, h, images, elapsed) {
         const noteX = laneX + (laneW - noteW) / 2;
 
         const pressed = p > 0.88 && p < 0.98;
-        const keyImg = pressed ? images.maniaKeysPressed[col] : images.maniaKeys[col];
+        const keyImg = pressed ? set.keysPressed[col] : set.keys[col];
         if (keyImg) {
             ctx.drawImage(keyImg, noteX, keyY, noteW, keyH);
         } else {
@@ -820,7 +927,7 @@ function drawSkinPreviewMania(ctx, w, h, images, elapsed) {
         if (p < 0.9) {
             const noteH = h * 0.08;
             const noteY = topY + (p / 0.9) * (keyY - noteH - topY);
-            const noteImg = images.maniaNotes[col];
+            const noteImg = set.notes[col];
             if (noteImg) {
                 ctx.drawImage(noteImg, noteX, noteY, noteW, noteH);
             } else {
@@ -929,9 +1036,16 @@ async function openSkinPreviewModal(skinId) {
     }));
     const loadUrlList = (list) => Promise.all(list.map(url => url ? loadImageQuiet(url) : Promise.resolve(null)));
     images.numbers = await loadUrlList(assets.numbers);
-    images.maniaNotes = await loadUrlList(assets.maniaNotes);
-    images.maniaKeys = await loadUrlList(assets.maniaKeys);
-    images.maniaKeysPressed = await loadUrlList(assets.maniaKeysPressed);
+    images.mania4 = {
+        notes: await loadUrlList(assets.mania4.notes),
+        keys: await loadUrlList(assets.mania4.keys),
+        keysPressed: await loadUrlList(assets.mania4.keysPressed),
+    };
+    images.mania7 = {
+        notes: await loadUrlList(assets.mania7.notes),
+        keys: await loadUrlList(assets.mania7.keys),
+        keysPressed: await loadUrlList(assets.mania7.keysPressed),
+    };
 
     if (document.getElementById('skin-preview-modal').style.display === 'none') return;
     status.textContent = '';
