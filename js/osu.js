@@ -1446,15 +1446,22 @@ function decodeOsuMods(bitmask) {
    same response shape from the v1 API (score objects keyed by beatmap_id),
    the only real difference is which endpoint/limit to use and that best-play
    entries carry a `pp` field worth showing. See switchVisitorPlaysType(). */
+/* Shimmering stand-ins for .osu-recent-item rows, shown in the list
+   container while its fetch is in flight (see renderOsuPlaysList below). */
+function playsListSkeletonHTML(count) {
+    return Array.from({ length: count }, () => '<div class="osu-recent-item skeleton" aria-hidden="true"></div>').join('');
+}
+
 async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
     const container = document.getElementById(listId);
     const wrap = document.getElementById(wrapId);
     if (!container || !wrap) return;
-    wrap.style.display = 'none';
+    container.innerHTML = playsListSkeletonHTML(type === 'best' ? 5 : 3);
+    wrap.style.display = 'block';
     try {
         const query = type === 'best' ? `best=${userId}&limit=10&m=${mode}` : `recent=${userId}&limit=5&m=${mode}`;
         const plays = await osuFetch(query);
-        if (!plays || plays.length === 0) return;
+        if (!plays || plays.length === 0) { wrap.style.display = 'none'; return; }
         const beatmapIds = [...new Set(plays.map(r => r.beatmap_id))];
         const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`)));
         const beatmapMap = {};
@@ -1486,6 +1493,7 @@ async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
         wrap.style.display = 'block';
     } catch (e) {
         console.error('Plays list fetch failed:', e);
+        wrap.style.display = 'none';
     }
 }
 
@@ -1786,8 +1794,10 @@ function renderPpCompareChart(playerA, playerB, panelId) {
 function clearPpCompareResult() {
     const status = document.getElementById('pp-compare-status');
     const result = document.getElementById('pp-compare-result');
+    const skeleton = document.getElementById('pp-compare-skeleton');
     if (status) status.innerText = '';
     if (result) result.style.display = 'none';
+    if (skeleton) skeleton.style.display = 'none';
 }
 
 function onPpCompareInputChange() {
@@ -1801,11 +1811,12 @@ async function comparePlayers() {
     const inputB = document.getElementById('pp-compare-input-b').value.trim();
     const status = document.getElementById('pp-compare-status');
     const result = document.getElementById('pp-compare-result');
+    const skeleton = document.getElementById('pp-compare-skeleton');
     if (!inputA || !inputB) { clearPpCompareResult(); return; }
     if (!status || !result) return;
 
-    status.innerText = t('osu_searching') || 'Searching...';
-    status.style.color = '#f9a8d4';
+    status.innerText = '';
+    if (skeleton) skeleton.style.display = '';
     result.style.display = 'none';
 
     try {
@@ -1813,6 +1824,7 @@ async function comparePlayers() {
             fetchPlayerTotalPpAndHistory(inputA, !/^\d+$/.test(inputA)),
             fetchPlayerTotalPpAndHistory(inputB, !/^\d+$/.test(inputB)),
         ]);
+        if (skeleton) skeleton.style.display = 'none';
         if (!a || !b) { status.innerText = t('osu_not_found') || 'Not found'; status.style.color = '#ff5252'; return; }
 
         status.innerText = '';
@@ -1822,6 +1834,7 @@ async function comparePlayers() {
         result.style.display = 'block';
     } catch (e) {
         console.error('PP compare failed:', e);
+        if (skeleton) skeleton.style.display = 'none';
         status.innerText = 'Error';
         status.style.color = '#ff5252';
     }
@@ -2084,14 +2097,16 @@ async function calculatePpGoal() {
 async function loadVisitorProfileById(input, isUsername) {
     const status = document.getElementById('visitor-lookup-status');
     const result = document.getElementById('visitor-lookup-result');
-    status.innerText = t('osu_searching') || 'Searching...';
-    status.style.color = '#f9a8d4';
+    const skeleton = document.getElementById('visitor-lookup-skeleton');
+    status.innerText = '';
+    if (skeleton) skeleton.style.display = '';
     result.style.display = 'none';
 
     const param = isUsername ? `u=${encodeURIComponent(input)}&type=string` : `u=${input}`;
 
     try {
         const results = await Promise.all([0,1,2,3].map(m => osuFetch(`${param}&m=${m}`)));
+        if (skeleton) skeleton.style.display = 'none';
         const modeData = results.map(r => (r && r.length > 0) ? r[0] : null);
         visitorModeData = modeData;
         visitorCurrentMode = 0;
@@ -2145,6 +2160,7 @@ async function loadVisitorProfileById(input, isUsername) {
         }
     } catch (e) {
         console.error('Visitor lookup failed:', e);
+        if (skeleton) skeleton.style.display = 'none';
         status.innerText = 'Error';
         status.style.color = '#ff5252';
     }
@@ -2161,8 +2177,10 @@ async function lookupVisitorProfile() {
 function clearVisitorLookupResult() {
     const status = document.getElementById('visitor-lookup-status');
     const result = document.getElementById('visitor-lookup-result');
+    const skeleton = document.getElementById('visitor-lookup-skeleton');
     if (status) { status.innerText = ''; }
     if (result) result.style.display = 'none';
+    if (skeleton) skeleton.style.display = 'none';
 }
 
 function onVisitorLookupInputChange() {

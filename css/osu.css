@@ -1398,6 +1398,70 @@
     margin-bottom: 12px;
 }
 
+/* ===== Skeleton loaders — shimmering placeholders shown while a lookup/
+   compare request is in flight, previewing the shape of what's about to
+   render instead of a plain "搜尋中..." status line. .skeleton is the
+   reusable shimmer surface; the blocks below arrange it into each result
+   panel's real layout so there's no visible jump when content arrives. ===== */
+@keyframes skeletonShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.skeleton {
+    background: linear-gradient(90deg,
+        var(--bg-stat) 25%,
+        rgba(var(--accent-pink-rgb), 0.22) 50%,
+        var(--bg-stat) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+    border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .skeleton { animation: none; }
+}
+.skeleton-line { height: 12px; }
+.skeleton-circle { border-radius: 50%; flex-shrink: 0; }
+
+.visitor-skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+.visitor-skeleton-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+.visitor-skeleton-modes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 0.8rem;
+}
+.visitor-skeleton-modes .skeleton { height: 46px; border-radius: 10px; }
+
+.pp-compare-skeleton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.pp-compare-skeleton-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    flex: 1 1 120px;
+    max-width: 160px;
+}
+
+.osu-recent-item.skeleton { pointer-events: none; }
+
 /* ===== Two-player PP comparison card — sits to the right of the single-player
    lookup card (see .lookup-page-row above), same .visitor-lookup-card shell. ===== */
 .pp-compare-input-row {
