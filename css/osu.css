@@ -194,57 +194,6 @@
 .skin-backup-btn:hover { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(var(--accent-purple-rgb), 0.25); }
 .cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); }
 
-.skin-preview-modal { max-width: 380px; text-align: center; }
-.skin-preview-mode-tabs { margin-bottom: 12px; }
-.skin-preview-mode-tabs .osu-tab { padding: 8px 4px; font-size: 0.8rem; }
-.skin-preview-mania-keys {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-.skin-preview-key-btn {
-    padding: 5px 16px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: bold;
-    cursor: pointer;
-    border: 1px solid var(--border-card);
-    background: var(--bg-card);
-    color: var(--text-accent);
-    transition: all 0.2s;
-}
-.skin-preview-key-btn:hover { border-color: var(--accent-purple); }
-.skin-preview-key-btn.active {
-    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-    color: #fff;
-    border-color: transparent;
-}
-.skin-preview-canvas {
-    display: block;
-    width: 100%;
-    max-width: 320px;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-    border-radius: 14px;
-    border: 1px solid var(--border-card);
-    box-shadow: var(--shadow-card-inset);
-}
-.skin-preview-colours {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-}
-.skin-preview-colours:empty { display: none; }
-.skin-preview-colour-dot {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.25);
-}
 .skins-empty {
     text-align: center;
     color: var(--text-secondary);

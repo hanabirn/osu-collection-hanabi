@@ -17,8 +17,6 @@ I18N.zh = {
     skins_empty: '還沒有收藏的皮膚', skins_download: '下載', skins_delete: '刪除', skins_delete_confirm: '確定要刪除這個皮膚檔案嗎？',
     skins_upload_done: '已新增 {n} 個檔案', skins_upload_fail: '「{n}」上傳失敗', skins_load_fail: '讀取皮膚清單失敗，請確認瀏覽器允許本機儲存空間',
     skins_backup_btn: '備份到雲端', skins_backup_title: '☁️ 雲端備份',
-    skins_preview_btn: '預覽皮膚', skins_preview_loading: '正在解析皮膚檔案...', skins_preview_fail: '無法預覽這個皮膚（可能不是有效的 .osk 檔）',
-    skins_preview_note: '預覽是用固定大小、假想動作示範這個皮膚在各模式下的樣式，不是實際遊戲畫面。',
     skins_backup_hint: '僅供你自己使用，最多 30 個、每個 4MB 以下。「還原到本機」會把它加回上面的清單。',
     skins_backup_login_required: '請先登入 osu! 才能使用雲端備份', skins_backup_too_large: '此皮膚超過 {limit}MB，僅能保存在本機',
     skins_backup_done: '已備份到雲端', skins_backup_fail: '雲端備份失敗，請稍後再試', skins_backup_empty: '雲端還沒有備份任何皮膚',
