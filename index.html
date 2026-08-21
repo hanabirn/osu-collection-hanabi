@@ -583,6 +583,10 @@
         <button class="pp-calc-close" onclick="closeSkinPreviewModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" id="skin-preview-title"></h3>
         <div id="skin-preview-mode-tabs" class="osu-mode-tabs skin-preview-mode-tabs"></div>
+        <div id="skin-preview-mania-keys" class="skin-preview-mania-keys" style="display:none;">
+            <button class="skin-preview-key-btn active" onclick="switchSkinPreviewManiaKeys(4, this)">4K</button>
+            <button class="skin-preview-key-btn" onclick="switchSkinPreviewManiaKeys(7, this)">7K</button>
+        </div>
         <canvas id="skin-preview-canvas" class="skin-preview-canvas" width="320" height="320"></canvas>
         <div id="skin-preview-status" class="status"></div>
         <div id="skin-preview-colours" class="skin-preview-colours"></div>

@@ -322,32 +322,42 @@ async function restoreCloudSkinToLocal(id, name) {
    sitting in IndexedDB (see the locker above), so this just unzips a few
    more root-level PNGs than the list thumbnail does (extractSkinAssets
    above only grabs one candidate image) plus skin.ini's [General] cursor
-   behavior flags and [Colours] combo palette, via the same fflate
-   filtered-unzip approach so large skins still unzip fast. Each mode's
-   animation is a fixed, made-up demo, not a recreation of real gameplay —
-   just enough motion to see the skin's shapes and colors in action:
-   - osu!: approach circle shrinking onto a hit circle that pops on "hit",
-     cursor swooping in to click it and swinging back out.
-   - taiko: a note scrolling in along the lane to the hit position (real
-     taiko has no per-skin don/katsu circle art — stable tints
-     taikohitcircle.png red/blue at fixed engine colors at runtime, which
-     this mirrors for the no-image fallback shape only, never on the
-     actual image, to avoid canvas tint-compositing edge cases).
-   - catch (fruits): the catcher sliding under a fruit that drops from
-     the top and gets "caught".
-   - mania: a single lane's note falling onto its key, which lights up
-     briefly on "press" — mania skins are configured per key-count via
-     skin.ini [ManiaN] sections; this always looks for the plain
-     mania-note1/mania-key1 fallback names rather than parsing that, so a
-     skin using only per-keycount-prefixed art may fall back to the
-     placeholder shapes instead of its real images. */
+   behavior flags, [Colours] combo/slider palette, and [CatchTheBeat]
+   HyperDash color, via the same fflate filtered-unzip approach so large
+   skins still unzip fast. Each mode's animation is a fixed, made-up demo,
+   not a recreation of real gameplay — just enough motion to see the
+   skin's shapes and colors in action:
+   - osu!: alternates a hit circle (approach circle shrinking on, cursor
+     swooping in to click and swinging back out) with a slider (body drawn
+     from skin.ini's SliderBody/SliderBorder colors, ball riding back and
+     forth along it, cursor following the ball).
+   - taiko: a note scrolls in along the (deliberately wide/short) lane to
+     the hit position, cycling through don/katsu/big-don/big-katsu. Stable
+     has no per-skin don/katsu circle art — it tints taikohitcircle.png
+     red/blue at fixed engine colors at runtime, which this reproduces via
+     a `source-atop` color fill over the drawn image (constrained to the
+     image's own alpha shape, so it can't bleed outside it) rather than
+     the riskier `multiply` approach.
+   - catch (fruits): the catcher sliding under a fruit that drops from the
+     top and gets "caught", alternating a normal fruit with a hyperdash
+     one (tinted with skin.ini's HyperDash color the same source-atop way).
+   - mania: a 4K or 7K lane (toggle shown only in this tab) of notes
+     falling onto their keys, which light up briefly on "press" — mania
+     skins are configured per key-count via skin.ini [ManiaN] sections;
+     this always looks for the plain mania-note{N}/mania-key{N} fallback
+     names rather than parsing that, so a skin using only per-keycount-
+     prefixed art may fall back to the placeholder shapes instead of its
+     real images. */
 const SKIN_PREVIEW_BASE_NAMES = [
     'cursor', 'cursormiddle', 'hitcircle', 'hitcircleoverlay', 'approachcircle',
+    'sliderb0', 'sliderfollowcircle',
     'default-0', 'default-1', 'default-2', 'default-3', 'default-4',
     'default-5', 'default-6', 'default-7', 'default-8', 'default-9',
-    'taikohitcircle', 'taikohitcircleoverlay',
+    'taikohitcircle', 'taikohitcircleoverlay', 'taikobigcircle', 'taikobigcircleoverlay',
     'fruit-catcher-idle', 'fruit-pear',
-    'mania-note1', 'mania-key1', 'mania-key1d',
+    ...Array.from({ length: 7 }, (_, i) => `mania-note${i + 1}`),
+    ...Array.from({ length: 7 }, (_, i) => `mania-key${i + 1}`),
+    ...Array.from({ length: 7 }, (_, i) => `mania-key${i + 1}d`),
 ];
 function skinPreviewFilterName(name) {
     const lower = name.toLowerCase();
@@ -367,6 +377,20 @@ function parseSkinIniColours(text) {
 function parseSkinIniGeneralBool(text, key, fallback) {
     const m = text.match(new RegExp(`^[ \\t]*${key}[ \\t]*:[ \\t]*(.+?)[ \\t]*$`, 'im'));
     return m ? m[1].trim() === '1' : fallback;
+}
+// Single "R,G,B" value nested under a given [Section] — used for
+// SliderBody/SliderBorder (under [Colours]) and HyperDash (under
+// [CatchTheBeat]), all three of which are one-off colors rather than the
+// numbered ComboN list parseSkinIniColours handles above.
+function parseSkinIniRgb(text, section, key) {
+    const sectionMatch = text.match(new RegExp(`\\[${section}\\]([\\s\\S]*?)(?:\\r?\\n\\[|$)`, 'i'));
+    if (!sectionMatch) return null;
+    const m = sectionMatch[1].match(new RegExp(`^[ \\t]*${key}[ \\t]*:[ \\t]*(\\d+)[ \\t]*,[ \\t]*(\\d+)[ \\t]*,[ \\t]*(\\d+)`, 'im'));
+    return m ? `rgb(${m[1]},${m[2]},${m[3]})` : null;
+}
+function skinPreviewWithAlpha(rgbStr, alpha) {
+    const m = rgbStr && rgbStr.match(/rgb\((\d+),(\d+),(\d+)\)/);
+    return m ? `rgba(${m[1]},${m[2]},${m[3]},${alpha})` : rgbStr;
 }
 
 // Keyed by skin id, caches the *promise* (not just the resolved value) so
@@ -395,17 +419,24 @@ function extractSkinPreviewAssets(skinId, file) {
                     hitcircle: pick('hitcircle'),
                     hitcircleOverlay: pick('hitcircleoverlay'),
                     approachCircle: pick('approachcircle'),
+                    sliderBall: pick('sliderb0'),
+                    sliderFollowCircle: pick('sliderfollowcircle'),
                     numbers: Array.from({ length: 10 }, (_, i) => pick(`default-${i}`)),
                     taikoHitcircle: pick('taikohitcircle'),
                     taikoHitcircleOverlay: pick('taikohitcircleoverlay'),
+                    taikoBigCircle: pick('taikobigcircle'),
+                    taikoBigCircleOverlay: pick('taikobigcircleoverlay'),
                     fruitCatcher: pick('fruit-catcher-idle'),
                     fruit: pick('fruit-pear'),
-                    maniaNote: pick('mania-note1'),
-                    maniaKey: pick('mania-key1'),
-                    maniaKeyPressed: pick('mania-key1d'),
+                    maniaNotes: Array.from({ length: 7 }, (_, i) => pick(`mania-note${i + 1}`)),
+                    maniaKeys: Array.from({ length: 7 }, (_, i) => pick(`mania-key${i + 1}`)),
+                    maniaKeysPressed: Array.from({ length: 7 }, (_, i) => pick(`mania-key${i + 1}d`)),
                     cursorRotate: iniText ? parseSkinIniGeneralBool(iniText, 'CursorRotate', true) : true,
                     cursorExpand: iniText ? parseSkinIniGeneralBool(iniText, 'CursorExpand', true) : true,
                     colours: iniText ? parseSkinIniColours(iniText) : [],
+                    sliderBodyColor: iniText ? parseSkinIniRgb(iniText, 'Colours', 'SliderBody') : null,
+                    sliderBorderColor: iniText ? parseSkinIniRgb(iniText, 'Colours', 'SliderBorder') : null,
+                    hyperDashColor: iniText ? parseSkinIniRgb(iniText, 'CatchTheBeat', 'HyperDash') : null,
                 });
             });
         } catch { resolve(null); }
@@ -414,9 +445,34 @@ function extractSkinPreviewAssets(skinId, file) {
     return promise;
 }
 
-const SKIN_PREVIEW_LOOP_MS = 1400;
+const SKIN_PREVIEW_CIRCLE_LOOP_MS = 1400;
 const SKIN_PREVIEW_HIT_MS = 1000; // when the hit-circle "pop" and cursor "click" happen
+const SKIN_PREVIEW_SLIDER_LOOP_MS = 2200;
+const SKIN_PREVIEW_STD_TOTAL_MS = SKIN_PREVIEW_CIRCLE_LOOP_MS + SKIN_PREVIEW_SLIDER_LOOP_MS;
+const SKIN_PREVIEW_SLIDER_APPROACH_MS = 500;
+const SKIN_PREVIEW_SLIDER_TRAVEL_MS = 1400;
+const SKIN_PREVIEW_SLIDER_FADE_MS = 200;
 function easeInOutSkinPreview(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+
+/* Fills `x,y,w,h` of `img` with `color` without disturbing its alpha shape
+   (source-atop only paints where the destination — the image just drawn —
+   already has coverage), then falls back to a plain filled circle when
+   there's no image at all. Used for taiko don/katsu/big-note tinting and
+   catch's hyperdash fruit, both of which need a runtime color the actual
+   skin image doesn't encode. */
+function drawSkinPreviewTinted(ctx, img, x, y, w, h, tintColor, fallbackColor) {
+    if (img) {
+        ctx.save();
+        ctx.drawImage(img, x, y, w, h);
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.fillStyle = tintColor;
+        ctx.fillRect(x, y, w, h);
+        ctx.restore();
+    } else {
+        ctx.fillStyle = fallbackColor;
+        ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2); ctx.fill();
+    }
+}
 
 /* Dispatches to the current mode's draw function — see openSkinPreviewModal
    for how skinPreviewMode gets set from the tab row. Shared background fill
@@ -429,13 +485,20 @@ function drawSkinPreviewFrame(ctx, canvas, images, assets, elapsed, mode) {
     ctx.fillRect(0, 0, w, h);
 
     if (mode === 'taiko') drawSkinPreviewTaiko(ctx, w, h, images, elapsed);
-    else if (mode === 'catch') drawSkinPreviewCatch(ctx, w, h, images, elapsed);
+    else if (mode === 'catch') drawSkinPreviewCatch(ctx, w, h, images, assets, elapsed);
     else if (mode === 'mania') drawSkinPreviewMania(ctx, w, h, images, elapsed);
     else drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed);
 }
 
+/* osu! standard alternates a hit circle and a slider each cycle — see the
+   two sub-functions below. */
 function drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed) {
-    const t = elapsed % SKIN_PREVIEW_LOOP_MS;
+    const cycleT = elapsed % SKIN_PREVIEW_STD_TOTAL_MS;
+    if (cycleT < SKIN_PREVIEW_CIRCLE_LOOP_MS) drawSkinPreviewStdCircle(ctx, w, h, images, assets, cycleT);
+    else drawSkinPreviewStdSlider(ctx, w, h, images, assets, cycleT - SKIN_PREVIEW_CIRCLE_LOOP_MS);
+}
+
+function drawSkinPreviewStdCircle(ctx, w, h, images, assets, t) {
     const cx = w / 2, cy = h / 2;
     const baseR = w * 0.16;
 
@@ -443,7 +506,7 @@ function drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed) {
     if (t < SKIN_PREVIEW_HIT_MS) {
         approachScale = 3 - (t / SKIN_PREVIEW_HIT_MS) * 2; // shrinks 3x -> 1x onto the circle
     } else {
-        const p = (t - SKIN_PREVIEW_HIT_MS) / (SKIN_PREVIEW_LOOP_MS - SKIN_PREVIEW_HIT_MS);
+        const p = (t - SKIN_PREVIEW_HIT_MS) / (SKIN_PREVIEW_CIRCLE_LOOP_MS - SKIN_PREVIEW_HIT_MS);
         circleScale = 1 + p * 0.4;
         circleAlpha = Math.max(0, 1 - p * 1.4);
     }
@@ -485,7 +548,7 @@ function drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed) {
         cyu = cy + Math.sin(angle) * r;
         if (t > SKIN_PREVIEW_HIT_MS - 120) clickPulse = 1 - (SKIN_PREVIEW_HIT_MS - t) / 120;
     } else {
-        const p = easeInOutSkinPreview((t - SKIN_PREVIEW_HIT_MS) / (SKIN_PREVIEW_LOOP_MS - SKIN_PREVIEW_HIT_MS));
+        const p = easeInOutSkinPreview((t - SKIN_PREVIEW_HIT_MS) / (SKIN_PREVIEW_CIRCLE_LOOP_MS - SKIN_PREVIEW_HIT_MS));
         angle = -Math.PI / 2 + 0.7 + p * (Math.PI * 2 - 0.7);
         const r = outerR * p;
         cxu = cx + Math.cos(angle) * r;
@@ -514,56 +577,158 @@ function drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed) {
     }
 }
 
+/* A straight-line slider (a real curved path would need bezier math this
+   demo doesn't need) drawn as a thick round-capped stroke — body visible
+   for the whole approach+travel+fade window, head circle+approach circle
+   during approach, then a ball riding back and forth along it (so it
+   reads as a slider with a repeat, not a one-way drag) with the cursor
+   tracking the ball 1:1 rather than its own swoop while it's moving. */
+function drawSkinPreviewStdSlider(ctx, w, h, images, assets, t) {
+    const startX = w * 0.28, startY = h * 0.32;
+    const endX = w * 0.72, endY = h * 0.68;
+    const baseR = w * 0.13;
+    const APPROACH = SKIN_PREVIEW_SLIDER_APPROACH_MS, TRAVEL = SKIN_PREVIEW_SLIDER_TRAVEL_MS, FADE = SKIN_PREVIEW_SLIDER_FADE_MS;
+
+    if (t < APPROACH + TRAVEL + FADE) {
+        const bodyAlpha = t > APPROACH + TRAVEL ? Math.max(0, 1 - (t - APPROACH - TRAVEL) / FADE) : 1;
+        ctx.save();
+        ctx.globalAlpha = bodyAlpha;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = assets.sliderBorderColor || '#ffffff';
+        ctx.lineWidth = baseR * 2;
+        ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke();
+        ctx.strokeStyle = assets.sliderBodyColor ? skinPreviewWithAlpha(assets.sliderBodyColor, 0.85) : 'rgba(20,20,30,0.75)';
+        ctx.lineWidth = baseR * 1.6;
+        ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke();
+        ctx.restore();
+    }
+
+    if (t < APPROACH) {
+        const p = t / APPROACH;
+        const r = baseR;
+        ctx.save();
+        if (images.hitcircle) ctx.drawImage(images.hitcircle, startX - r, startY - r, r * 2, r * 2);
+        else { ctx.fillStyle = '#f06292'; ctx.beginPath(); ctx.arc(startX, startY, r, 0, Math.PI * 2); ctx.fill(); }
+        if (images.hitcircleOverlay) ctx.drawImage(images.hitcircleOverlay, startX - r, startY - r, r * 2, r * 2);
+        ctx.restore();
+        const ar = baseR * (3 - p * 2);
+        ctx.save();
+        if (images.approachCircle) ctx.drawImage(images.approachCircle, startX - ar, startY - ar, ar * 2, ar * 2);
+        else { ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(startX, startY, ar, 0, Math.PI * 2); ctx.stroke(); }
+        ctx.restore();
+    }
+
+    let ballX = startX, ballY = startY, ballVisible = false;
+    if (t >= APPROACH && t < APPROACH + TRAVEL) {
+        const p = (t - APPROACH) / TRAVEL;
+        const back = p < 0.5 ? p * 2 : 2 - p * 2; // there and back = one repeat
+        ballX = startX + (endX - startX) * back;
+        ballY = startY + (endY - startY) * back;
+        ballVisible = true;
+        const br = baseR * 0.9;
+        ctx.save();
+        if (images.sliderFollowCircle) ctx.drawImage(images.sliderFollowCircle, ballX - br * 1.6, ballY - br * 1.6, br * 3.2, br * 3.2);
+        else { ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(ballX, ballY, br * 1.5, 0, Math.PI * 2); ctx.stroke(); }
+        if (images.sliderBall) ctx.drawImage(images.sliderBall, ballX - br, ballY - br, br * 2, br * 2);
+        else { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ballX, ballY, br * 0.6, 0, Math.PI * 2); ctx.fill(); }
+        ctx.restore();
+    }
+
+    const outerR = w * 0.375;
+    let cx, cy, angle = -Math.PI / 2 + 0.9;
+    if (t < APPROACH) {
+        const p = easeInOutSkinPreview(t / APPROACH);
+        cx = startX + Math.cos(angle) * outerR * (1 - p);
+        cy = startY + Math.sin(angle) * outerR * (1 - p);
+    } else if (ballVisible) {
+        cx = ballX; cy = ballY;
+    } else {
+        const p = easeInOutSkinPreview(Math.min(1, (t - APPROACH - TRAVEL) / FADE));
+        const outAngle = angle + 1.2;
+        cx = endX + Math.cos(outAngle) * outerR * p;
+        cy = endY + Math.sin(outAngle) * outerR * p;
+    }
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    const cursorSize = w * 0.11;
+    if (images.cursor) {
+        if (assets.cursorRotate) ctx.rotate(angle + Math.PI / 2);
+        ctx.drawImage(images.cursor, -cursorSize / 2, -cursorSize / 2, cursorSize, cursorSize);
+    } else {
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.moveTo(-2, -2); ctx.lineTo(14, 4); ctx.lineTo(2, 8); ctx.lineTo(-2, 16); ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+    if (images.cursorMiddle) {
+        const ms = cursorSize * 0.5;
+        ctx.drawImage(images.cursorMiddle, cx - ms / 2, cy - ms / 2, ms, ms);
+    }
+}
+
 const SKIN_PREVIEW_TAIKO_LOOP_MS = 1200;
 // Stable's actual fixed don/katsu tint colors — used only for the
 // no-image fallback circle (see the file-header comment above for why the
 // real taikohitcircle.png is never tinted here).
-const TAIKO_DON_COLOR = '#e0473f', TAIKO_KATSU_COLOR = '#4198d1';
+// Alpha kept well under 1 so drawSkinPreviewTinted's source-atop fill still
+// lets the real image's own shading/texture show through underneath it.
+const TAIKO_DON_COLOR = 'rgba(224,71,63,0.8)', TAIKO_KATSU_COLOR = 'rgba(65,152,209,0.8)';
 
-/* A note scrolls in from the right along the lane and pops on arrival at
-   the fixed hit position, alternating don/katsu each cycle — taiko has no
-   approach circle, so the scroll itself is what reads as "timing". */
+/* A note scrolls in from the right along the (wide, short — see
+   SKIN_PREVIEW_CANVAS_SIZES) lane and pops on arrival at the fixed hit
+   position, cycling through don/katsu/big-don/big-katsu each note — taiko
+   has no approach circle, so the scroll itself is what reads as "timing". */
 function drawSkinPreviewTaiko(ctx, w, h, images, elapsed) {
     const laneY = h / 2;
-    const hitX = w * 0.28;
-    const r = w * 0.13;
+    const hitX = w * 0.1;
+    const r = h * 0.3;
 
     ctx.strokeStyle = 'rgba(255,255,255,0.25)';
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, laneY + r * 1.4); ctx.lineTo(w, laneY + r * 1.4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, laneY + r * 1.6); ctx.lineTo(w, laneY + r * 1.6); ctx.stroke();
     ctx.beginPath(); ctx.arc(hitX, laneY, r * 1.15, 0, Math.PI * 2); ctx.stroke();
 
     const cycle = Math.floor(elapsed / SKIN_PREVIEW_TAIKO_LOOP_MS);
     const t = elapsed % SKIN_PREVIEW_TAIKO_LOOP_MS;
-    const isDon = cycle % 2 === 0;
+    const state = cycle % 4; // 0=don 1=katsu 2=big-don 3=big-katsu
+    const isDon = state === 0 || state === 2;
+    const isBig = state >= 2;
     const p = t / SKIN_PREVIEW_TAIKO_LOOP_MS;
-    const noteX = w * 1.1 - p * (w * 1.1 - hitX);
+    const startX = w * 1.05;
+    const noteX = startX - p * (startX - hitX);
     const atHit = p > 0.92;
     const alpha = atHit ? Math.max(0, 1 - (p - 0.92) / 0.08) : 1;
-    const scale = atHit ? 1 + (p - 0.92) / 0.08 * 0.3 : 1;
+    const scale = (isBig ? 1.5 : 1) * (atHit ? 1 + (p - 0.92) / 0.08 * 0.3 : 1);
+    const rr = r * scale;
+
+    const circleImg = isBig ? images.taikoBigCircle : images.taikoHitcircle;
+    const overlayImg = isBig ? images.taikoBigCircleOverlay : images.taikoHitcircleOverlay;
+    const tint = isDon ? TAIKO_DON_COLOR : TAIKO_KATSU_COLOR;
 
     ctx.save();
     ctx.globalAlpha = alpha;
-    const rr = r * scale;
-    if (images.taikoHitcircle) {
-        ctx.drawImage(images.taikoHitcircle, noteX - rr, laneY - rr, rr * 2, rr * 2);
-    } else {
-        ctx.fillStyle = isDon ? TAIKO_DON_COLOR : TAIKO_KATSU_COLOR;
-        ctx.beginPath(); ctx.arc(noteX, laneY, rr, 0, Math.PI * 2); ctx.fill();
-    }
-    if (images.taikoHitcircleOverlay) ctx.drawImage(images.taikoHitcircleOverlay, noteX - rr, laneY - rr, rr * 2, rr * 2);
+    drawSkinPreviewTinted(ctx, circleImg, noteX - rr, laneY - rr, rr * 2, rr * 2, tint, tint);
+    if (overlayImg) ctx.drawImage(overlayImg, noteX - rr, laneY - rr, rr * 2, rr * 2);
     ctx.restore();
 }
 
 const SKIN_PREVIEW_CATCH_LOOP_MS = 1300;
+const CATCH_DEFAULT_HYPERDASH_COLOR = 'rgba(255,32,32,0.75)';
 
 /* A fruit drops straight down while the catcher slides underneath to be in
    place exactly when it lands — real catch has the catcher tracking the
    fruit's actual (randomized) x position, simplified here to one fixed
-   drop column and a catcher that arrives just in time. */
-function drawSkinPreviewCatch(ctx, w, h, images, elapsed) {
+   drop column and a catcher that arrives just in time. Alternates a
+   normal fruit with a hyperdash one (tinted with skin.ini's HyperDash
+   color, or a default red, the same source-atop way taiko's don/katsu
+   tint works) every other drop. */
+function drawSkinPreviewCatch(ctx, w, h, images, assets, elapsed) {
     const dropX = w / 2;
     const floorY = h * 0.82;
+    const cycle = Math.floor(elapsed / SKIN_PREVIEW_CATCH_LOOP_MS);
+    const isHyper = cycle % 2 === 1;
     const t = elapsed % SKIN_PREVIEW_CATCH_LOOP_MS;
     const p = t / SKIN_PREVIEW_CATCH_LOOP_MS;
 
@@ -578,8 +743,14 @@ function drawSkinPreviewCatch(ctx, w, h, images, elapsed) {
     if (fruitAlpha > 0) {
         ctx.save();
         ctx.globalAlpha = fruitAlpha;
-        if (images.fruit) ctx.drawImage(images.fruit, dropX - fruitR, fruitY - fruitR, fruitR * 2, fruitR * 2);
-        else { ctx.fillStyle = '#ff8a3d'; ctx.beginPath(); ctx.arc(dropX, fruitY, fruitR, 0, Math.PI * 2); ctx.fill(); }
+        if (isHyper) {
+            const tint = assets.hyperDashColor ? skinPreviewWithAlpha(assets.hyperDashColor, 0.75) : CATCH_DEFAULT_HYPERDASH_COLOR;
+            drawSkinPreviewTinted(ctx, images.fruit, dropX - fruitR, fruitY - fruitR, fruitR * 2, fruitR * 2, tint, tint);
+        } else if (images.fruit) {
+            ctx.drawImage(images.fruit, dropX - fruitR, fruitY - fruitR, fruitR * 2, fruitR * 2);
+        } else {
+            ctx.fillStyle = '#ff8a3d'; ctx.beginPath(); ctx.arc(dropX, fruitY, fruitR, 0, Math.PI * 2); ctx.fill();
+        }
         ctx.restore();
     }
 
@@ -604,37 +775,58 @@ const SKIN_PREVIEW_MANIA_LOOP_MS = 1200;
 
 /* One lane's note falls to the key row and the key lights up (swaps to its
    pressed-state image, or a fallback color change) for a short window on
-   arrival — real mania has one lane per key with a stage/hint overlay,
-   simplified here to a single representative lane. */
+   arrival, staggered per column so notes cascade across the lane rather
+   than falling in lockstep — real mania has each key on its own
+   independent chart, this is just enough offset to read as N separate
+   lanes rather than one lane repeated. Column count (4K/7K) comes from
+   skinPreviewManiaKeys, set by the sub-tabs shown only in this mode (see
+   switchSkinPreviewManiaKeys). */
+const MANIA_FALLBACK_COLORS = ['#66d9ef', '#a6e22e', '#fd971f', '#f92672', '#ae81ff', '#e6db74', '#75715e'];
+
 function drawSkinPreviewMania(ctx, w, h, images, elapsed) {
-    const laneX = w / 2;
-    const laneW = w * 0.24;
+    const keyCount = skinPreviewManiaKeys;
+    const totalW = w * 0.9;
+    const laneW = totalW / keyCount;
+    const startX = (w - totalW) / 2;
+    const topY = h * 0.04;
     const keyY = h * 0.82;
-    const keyH = h * 0.12;
-    const t = elapsed % SKIN_PREVIEW_MANIA_LOOP_MS;
-    const p = t / SKIN_PREVIEW_MANIA_LOOP_MS;
+    const keyH = h * 0.1;
 
     ctx.strokeStyle = 'rgba(255,255,255,0.15)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(laneX - laneW / 2, h * 0.04, laneW, keyY - h * 0.04);
-
-    const pressed = p > 0.88 && p < 0.98;
-    const keyImg = pressed && images.maniaKeyPressed ? images.maniaKeyPressed : images.maniaKey;
-    if (keyImg) {
-        ctx.drawImage(keyImg, laneX - laneW / 2, keyY, laneW, keyH);
-    } else {
-        ctx.fillStyle = pressed ? 'rgba(244,114,182,0.9)' : 'rgba(255,255,255,0.15)';
-        ctx.fillRect(laneX - laneW / 2, keyY, laneW, keyH);
+    ctx.strokeRect(startX, topY, totalW, keyY - topY);
+    for (let i = 1; i < keyCount; i++) {
+        const x = startX + i * laneW;
+        ctx.beginPath(); ctx.moveTo(x, topY); ctx.lineTo(x, keyY); ctx.stroke();
     }
 
-    if (p < 0.9) {
-        const noteH = h * 0.09;
-        const noteY = h * 0.04 + (p / 0.9) * (keyY - noteH - h * 0.04);
-        if (images.maniaNote) {
-            ctx.drawImage(images.maniaNote, laneX - laneW / 2, noteY, laneW, noteH);
+    for (let col = 0; col < keyCount; col++) {
+        const offset = (col / keyCount) * SKIN_PREVIEW_MANIA_LOOP_MS;
+        const t = (elapsed + offset) % SKIN_PREVIEW_MANIA_LOOP_MS;
+        const p = t / SKIN_PREVIEW_MANIA_LOOP_MS;
+        const laneX = startX + col * laneW;
+        const noteW = laneW * 0.72;
+        const noteX = laneX + (laneW - noteW) / 2;
+
+        const pressed = p > 0.88 && p < 0.98;
+        const keyImg = pressed ? images.maniaKeysPressed[col] : images.maniaKeys[col];
+        if (keyImg) {
+            ctx.drawImage(keyImg, noteX, keyY, noteW, keyH);
         } else {
-            ctx.fillStyle = '#66d9ef';
-            ctx.fillRect(laneX - laneW / 2, noteY, laneW, noteH);
+            ctx.fillStyle = pressed ? 'rgba(244,114,182,0.9)' : 'rgba(255,255,255,0.15)';
+            ctx.fillRect(noteX, keyY, noteW, keyH);
+        }
+
+        if (p < 0.9) {
+            const noteH = h * 0.08;
+            const noteY = topY + (p / 0.9) * (keyY - noteH - topY);
+            const noteImg = images.maniaNotes[col];
+            if (noteImg) {
+                ctx.drawImage(noteImg, noteX, noteY, noteW, noteH);
+            } else {
+                ctx.fillStyle = MANIA_FALLBACK_COLORS[col % MANIA_FALLBACK_COLORS.length];
+                ctx.fillRect(noteX, noteY, noteW, noteH);
+            }
         }
     }
 }
@@ -642,6 +834,7 @@ function drawSkinPreviewMania(ctx, w, h, images, elapsed) {
 let skinPreviewRAF = null;
 let skinPreviewStartTime = 0;
 let skinPreviewMode = 'standard';
+let skinPreviewManiaKeys = 4;
 
 function stopSkinPreviewLoop() {
     if (skinPreviewRAF) { cancelAnimationFrame(skinPreviewRAF); skinPreviewRAF = null; }
@@ -664,6 +857,26 @@ function switchSkinPreviewMode(mode, el) {
     skinPreviewMode = mode;
     document.querySelectorAll('#skin-preview-mode-tabs .osu-tab').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
+    const keysRow = document.getElementById('skin-preview-mania-keys');
+    if (keysRow) keysRow.style.display = mode === 'mania' ? 'flex' : 'none';
+    resizeSkinPreviewCanvas();
+}
+function switchSkinPreviewManiaKeys(n, el) {
+    skinPreviewManiaKeys = n;
+    document.querySelectorAll('#skin-preview-mania-keys .skin-preview-key-btn').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
+
+// osu!/catch stay square; taiko goes wide-and-short so its lane has real
+// room to scroll across instead of being squeezed into a square box.
+const SKIN_PREVIEW_CANVAS_SIZES = { standard: [320, 320], taiko: [320, 130], catch: [320, 320], mania: [320, 320] };
+function resizeSkinPreviewCanvas() {
+    const canvas = document.getElementById('skin-preview-canvas');
+    if (!canvas) return;
+    const [w, h] = SKIN_PREVIEW_CANVAS_SIZES[skinPreviewMode] || [320, 320];
+    canvas.width = w;
+    canvas.height = h;
+    canvas.style.aspectRatio = `${w} / ${h}`;
 }
 
 async function openSkinPreviewModal(skinId) {
@@ -675,7 +888,14 @@ async function openSkinPreviewModal(skinId) {
 
     stopSkinPreviewLoop();
     skinPreviewMode = 'standard';
+    skinPreviewManiaKeys = 4;
     renderSkinPreviewModeTabs();
+    resizeSkinPreviewCanvas();
+    const keysRow = document.getElementById('skin-preview-mania-keys');
+    if (keysRow) {
+        keysRow.style.display = 'none';
+        keysRow.querySelectorAll('.skin-preview-key-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+    }
     modal.style.display = 'flex';
     document.getElementById('skin-preview-title').textContent = '';
     status.textContent = t('skins_preview_loading');
@@ -700,13 +920,18 @@ async function openSkinPreviewModal(skinId) {
     const images = {};
     const imageKeys = [
         'cursor', 'cursorMiddle', 'hitcircle', 'hitcircleOverlay', 'approachCircle',
-        'taikoHitcircle', 'taikoHitcircleOverlay', 'fruitCatcher', 'fruit',
-        'maniaNote', 'maniaKey', 'maniaKeyPressed',
+        'sliderBall', 'sliderFollowCircle',
+        'taikoHitcircle', 'taikoHitcircleOverlay', 'taikoBigCircle', 'taikoBigCircleOverlay',
+        'fruitCatcher', 'fruit',
     ];
     await Promise.all(imageKeys.map(async key => {
         if (assets[key]) images[key] = await loadImageQuiet(assets[key]);
     }));
-    images.numbers = await Promise.all(assets.numbers.map(url => url ? loadImageQuiet(url) : Promise.resolve(null)));
+    const loadUrlList = (list) => Promise.all(list.map(url => url ? loadImageQuiet(url) : Promise.resolve(null)));
+    images.numbers = await loadUrlList(assets.numbers);
+    images.maniaNotes = await loadUrlList(assets.maniaNotes);
+    images.maniaKeys = await loadUrlList(assets.maniaKeys);
+    images.maniaKeysPressed = await loadUrlList(assets.maniaKeysPressed);
 
     if (document.getElementById('skin-preview-modal').style.display === 'none') return;
     status.textContent = '';

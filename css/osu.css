@@ -197,6 +197,29 @@
 .skin-preview-modal { max-width: 380px; text-align: center; }
 .skin-preview-mode-tabs { margin-bottom: 12px; }
 .skin-preview-mode-tabs .osu-tab { padding: 8px 4px; font-size: 0.8rem; }
+.skin-preview-mania-keys {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.skin-preview-key-btn {
+    padding: 5px 16px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    color: var(--text-accent);
+    transition: all 0.2s;
+}
+.skin-preview-key-btn:hover { border-color: var(--accent-purple); }
+.skin-preview-key-btn.active {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    color: #fff;
+    border-color: transparent;
+}
 .skin-preview-canvas {
     display: block;
     width: 100%;
