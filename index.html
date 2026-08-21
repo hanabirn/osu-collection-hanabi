@@ -257,12 +257,13 @@
 
     <section id="page-lookup" class="site-page" style="display:none;">
         <div id="tracked-players-panel" class="tracked-players-panel"></div>
+        <div class="lookup-page-row">
         <div class="visitor-lookup-card" id="visitor-lookup-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="visitor_lookup_title">✦ 查詢你的 osu! PP ✦</h3>
             <div class="visitor-lookup-input-row">
-                <input type="text" id="visitor-lookup-input" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input">
+                <input type="text" id="visitor-lookup-input" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input" oninput="onVisitorLookupInputChange()">
                 <button class="btn" onclick="lookupVisitorProfile()" data-i18n="visitor_lookup_btn">查詢</button>
             </div>
             <div id="visitor-lookup-status" class="status"></div>
@@ -323,6 +324,7 @@
                 </div>
                 <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
             </div>
+        </div>
         </div>
     </section>
 

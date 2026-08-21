@@ -2136,8 +2136,21 @@ async function loadVisitorProfileById(input, isUsername) {
 
 async function lookupVisitorProfile() {
     const input = document.getElementById('visitor-lookup-input').value.trim();
-    if (!input) return;
+    if (!input) { clearVisitorLookupResult(); return; }
     loadVisitorProfileById(input, !/^\d+$/.test(input));
+}
+
+/* Hides any previously-shown lookup result and status message so a blank
+   search box never displays stale player data. */
+function clearVisitorLookupResult() {
+    const status = document.getElementById('visitor-lookup-status');
+    const result = document.getElementById('visitor-lookup-result');
+    if (status) { status.innerText = ''; }
+    if (result) result.style.display = 'none';
+}
+
+function onVisitorLookupInputChange() {
+    if (!document.getElementById('visitor-lookup-input').value.trim()) clearVisitorLookupResult();
 }
 
 /* ===== Tracked players — lightweight "watch this player's PP" list, purely

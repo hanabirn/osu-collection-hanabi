@@ -1343,6 +1343,35 @@
 }
 
 /* ===== Visitor Lookup ===== */
+/* Lays the single-player lookup card and the two-player compare card side by
+   side (lookup on the left, compare on the right). Below 760px there's no
+   room for two 520px-ish cards, so it just stacks. At/above that width the
+   page breaks out of .site-main's 640px cap (viewport-relative centering,
+   not parent-relative) so the two columns have enough room to stay readable
+   — same pattern as #page-tournaments' two-column breakout above. */
+.lookup-page-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+@media (min-width: 760px) {
+    #page-lookup {
+        width: 100vw;
+        max-width: 880px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .lookup-page-row {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .lookup-page-row .visitor-lookup-card {
+        flex: 1 1 0;
+        min-width: 0;
+        margin: 0;
+    }
+}
 .visitor-lookup-card {
     position: relative;
     max-width: 520px;
@@ -1369,9 +1398,8 @@
     margin-bottom: 12px;
 }
 
-/* ===== Two-player PP comparison card — sits below the single-player lookup
-   card on the same page, same .visitor-lookup-card shell. ===== */
-.pp-compare-card { margin-top: 20px; }
+/* ===== Two-player PP comparison card — sits to the right of the single-player
+   lookup card (see .lookup-page-row above), same .visitor-lookup-card shell. ===== */
 .pp-compare-input-row {
     display: flex;
     flex-wrap: wrap;
