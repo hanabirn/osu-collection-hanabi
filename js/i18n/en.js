@@ -16,7 +16,7 @@ I18N.en = {
     skins_title: '🎵 My Skins 🎵', skins_hint: "Upload osu! skin files (.osk) you want to keep, and download them again anytime. Files are stored only in this browser, never uploaded to any server by default — switching devices or clearing browser data will lose them. Log in with osu! to optionally back up skins under 4MB to the cloud.", skins_list_title: '💾 Saved Skins',
     skins_backup_btn: 'Back up to cloud', skins_backup_title: '☁️ Cloud Backup',
     skins_preview_btn: 'Preview skin', skins_preview_loading: 'Parsing skin file...', skins_preview_fail: "Couldn't preview this skin (it may not be a valid .osk file)",
-    skins_preview_note: "The preview uses a fixed size and made-up motion to demo this skin's cursor and hit-circle style — it's not the actual in-game view.",
+    skins_preview_note: "The preview uses a fixed size and made-up motion to demo this skin's style across each mode — it's not the actual in-game view.",
     skins_backup_hint: 'Just for you — up to 30 skins, each under 4MB. "Restore to device" adds it back to the list above.',
     skins_backup_login_required: 'Log in with osu! to use cloud backup', skins_backup_too_large: 'This skin exceeds {limit}MB, so it can only stay on this device',
     skins_backup_done: 'Backed up to the cloud', skins_backup_fail: 'Cloud backup failed, please try again later', skins_backup_empty: 'No skins backed up to the cloud yet',

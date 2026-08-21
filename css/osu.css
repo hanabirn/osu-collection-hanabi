@@ -195,6 +195,8 @@
 .cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); }
 
 .skin-preview-modal { max-width: 380px; text-align: center; }
+.skin-preview-mode-tabs { margin-bottom: 12px; }
+.skin-preview-mode-tabs .osu-tab { padding: 8px 4px; font-size: 0.8rem; }
 .skin-preview-canvas {
     display: block;
     width: 100%;

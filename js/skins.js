@@ -317,21 +317,37 @@ async function restoreCloudSkinToLocal(id, name) {
 }
 
 /* ===== Skin online preview =====
-   A canvas animation loop showing off a skin's cursor + hit-circle set
-   without ever downloading it in-game — the .osk is already sitting in
-   IndexedDB (see the locker above), so this just unzips a few more root-
-   level PNGs than the list thumbnail does (extractSkinAssets above only
-   grabs one candidate image) plus skin.ini's [General] cursor behavior
-   flags and [Colours] combo palette, via the same fflate filtered-unzip
-   approach so large skins still unzip fast. The animation itself is a
-   fixed, made-up demo (approach circle shrinking onto a hit circle that
-   pops on "hit", cursor swooping in to click it and swinging back out) —
-   not a recreation of real gameplay, just enough motion to see the skin's
-   shapes, colors, and cursor rotate/expand behavior in action. */
+   A canvas animation loop showing off a skin's element set for all four
+   rulesets without ever downloading it in-game — the .osk is already
+   sitting in IndexedDB (see the locker above), so this just unzips a few
+   more root-level PNGs than the list thumbnail does (extractSkinAssets
+   above only grabs one candidate image) plus skin.ini's [General] cursor
+   behavior flags and [Colours] combo palette, via the same fflate
+   filtered-unzip approach so large skins still unzip fast. Each mode's
+   animation is a fixed, made-up demo, not a recreation of real gameplay —
+   just enough motion to see the skin's shapes and colors in action:
+   - osu!: approach circle shrinking onto a hit circle that pops on "hit",
+     cursor swooping in to click it and swinging back out.
+   - taiko: a note scrolling in along the lane to the hit position (real
+     taiko has no per-skin don/katsu circle art — stable tints
+     taikohitcircle.png red/blue at fixed engine colors at runtime, which
+     this mirrors for the no-image fallback shape only, never on the
+     actual image, to avoid canvas tint-compositing edge cases).
+   - catch (fruits): the catcher sliding under a fruit that drops from
+     the top and gets "caught".
+   - mania: a single lane's note falling onto its key, which lights up
+     briefly on "press" — mania skins are configured per key-count via
+     skin.ini [ManiaN] sections; this always looks for the plain
+     mania-note1/mania-key1 fallback names rather than parsing that, so a
+     skin using only per-keycount-prefixed art may fall back to the
+     placeholder shapes instead of its real images. */
 const SKIN_PREVIEW_BASE_NAMES = [
     'cursor', 'cursormiddle', 'hitcircle', 'hitcircleoverlay', 'approachcircle',
     'default-0', 'default-1', 'default-2', 'default-3', 'default-4',
     'default-5', 'default-6', 'default-7', 'default-8', 'default-9',
+    'taikohitcircle', 'taikohitcircleoverlay',
+    'fruit-catcher-idle', 'fruit-pear',
+    'mania-note1', 'mania-key1', 'mania-key1d',
 ];
 function skinPreviewFilterName(name) {
     const lower = name.toLowerCase();
@@ -380,6 +396,13 @@ function extractSkinPreviewAssets(skinId, file) {
                     hitcircleOverlay: pick('hitcircleoverlay'),
                     approachCircle: pick('approachcircle'),
                     numbers: Array.from({ length: 10 }, (_, i) => pick(`default-${i}`)),
+                    taikoHitcircle: pick('taikohitcircle'),
+                    taikoHitcircleOverlay: pick('taikohitcircleoverlay'),
+                    fruitCatcher: pick('fruit-catcher-idle'),
+                    fruit: pick('fruit-pear'),
+                    maniaNote: pick('mania-note1'),
+                    maniaKey: pick('mania-key1'),
+                    maniaKeyPressed: pick('mania-key1d'),
                     cursorRotate: iniText ? parseSkinIniGeneralBool(iniText, 'CursorRotate', true) : true,
                     cursorExpand: iniText ? parseSkinIniGeneralBool(iniText, 'CursorExpand', true) : true,
                     colours: iniText ? parseSkinIniColours(iniText) : [],
@@ -395,12 +418,23 @@ const SKIN_PREVIEW_LOOP_MS = 1400;
 const SKIN_PREVIEW_HIT_MS = 1000; // when the hit-circle "pop" and cursor "click" happen
 function easeInOutSkinPreview(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
 
-function drawSkinPreviewFrame(ctx, canvas, images, assets, elapsed) {
+/* Dispatches to the current mode's draw function — see openSkinPreviewModal
+   for how skinPreviewMode gets set from the tab row. Shared background fill
+   lives here so every mode's draw function only has to worry about its own
+   shapes. */
+function drawSkinPreviewFrame(ctx, canvas, images, assets, elapsed, mode) {
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = '#150c22';
     ctx.fillRect(0, 0, w, h);
 
+    if (mode === 'taiko') drawSkinPreviewTaiko(ctx, w, h, images, elapsed);
+    else if (mode === 'catch') drawSkinPreviewCatch(ctx, w, h, images, elapsed);
+    else if (mode === 'mania') drawSkinPreviewMania(ctx, w, h, images, elapsed);
+    else drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed);
+}
+
+function drawSkinPreviewStandard(ctx, w, h, images, assets, elapsed) {
     const t = elapsed % SKIN_PREVIEW_LOOP_MS;
     const cx = w / 2, cy = h / 2;
     const baseR = w * 0.16;
@@ -480,11 +514,156 @@ function drawSkinPreviewFrame(ctx, canvas, images, assets, elapsed) {
     }
 }
 
+const SKIN_PREVIEW_TAIKO_LOOP_MS = 1200;
+// Stable's actual fixed don/katsu tint colors — used only for the
+// no-image fallback circle (see the file-header comment above for why the
+// real taikohitcircle.png is never tinted here).
+const TAIKO_DON_COLOR = '#e0473f', TAIKO_KATSU_COLOR = '#4198d1';
+
+/* A note scrolls in from the right along the lane and pops on arrival at
+   the fixed hit position, alternating don/katsu each cycle — taiko has no
+   approach circle, so the scroll itself is what reads as "timing". */
+function drawSkinPreviewTaiko(ctx, w, h, images, elapsed) {
+    const laneY = h / 2;
+    const hitX = w * 0.28;
+    const r = w * 0.13;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, laneY + r * 1.4); ctx.lineTo(w, laneY + r * 1.4); ctx.stroke();
+    ctx.beginPath(); ctx.arc(hitX, laneY, r * 1.15, 0, Math.PI * 2); ctx.stroke();
+
+    const cycle = Math.floor(elapsed / SKIN_PREVIEW_TAIKO_LOOP_MS);
+    const t = elapsed % SKIN_PREVIEW_TAIKO_LOOP_MS;
+    const isDon = cycle % 2 === 0;
+    const p = t / SKIN_PREVIEW_TAIKO_LOOP_MS;
+    const noteX = w * 1.1 - p * (w * 1.1 - hitX);
+    const atHit = p > 0.92;
+    const alpha = atHit ? Math.max(0, 1 - (p - 0.92) / 0.08) : 1;
+    const scale = atHit ? 1 + (p - 0.92) / 0.08 * 0.3 : 1;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const rr = r * scale;
+    if (images.taikoHitcircle) {
+        ctx.drawImage(images.taikoHitcircle, noteX - rr, laneY - rr, rr * 2, rr * 2);
+    } else {
+        ctx.fillStyle = isDon ? TAIKO_DON_COLOR : TAIKO_KATSU_COLOR;
+        ctx.beginPath(); ctx.arc(noteX, laneY, rr, 0, Math.PI * 2); ctx.fill();
+    }
+    if (images.taikoHitcircleOverlay) ctx.drawImage(images.taikoHitcircleOverlay, noteX - rr, laneY - rr, rr * 2, rr * 2);
+    ctx.restore();
+}
+
+const SKIN_PREVIEW_CATCH_LOOP_MS = 1300;
+
+/* A fruit drops straight down while the catcher slides underneath to be in
+   place exactly when it lands — real catch has the catcher tracking the
+   fruit's actual (randomized) x position, simplified here to one fixed
+   drop column and a catcher that arrives just in time. */
+function drawSkinPreviewCatch(ctx, w, h, images, elapsed) {
+    const dropX = w / 2;
+    const floorY = h * 0.82;
+    const t = elapsed % SKIN_PREVIEW_CATCH_LOOP_MS;
+    const p = t / SKIN_PREVIEW_CATCH_LOOP_MS;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, floorY + h * 0.06); ctx.lineTo(w, floorY + h * 0.06); ctx.stroke();
+
+    const caught = p > 0.85;
+    const fruitY = caught ? floorY : h * 0.08 + p / 0.85 * (floorY - h * 0.08);
+    const fruitAlpha = caught ? Math.max(0, 1 - (p - 0.85) / 0.15) : 1;
+    const fruitR = w * 0.07;
+    if (fruitAlpha > 0) {
+        ctx.save();
+        ctx.globalAlpha = fruitAlpha;
+        if (images.fruit) ctx.drawImage(images.fruit, dropX - fruitR, fruitY - fruitR, fruitR * 2, fruitR * 2);
+        else { ctx.fillStyle = '#ff8a3d'; ctx.beginPath(); ctx.arc(dropX, fruitY, fruitR, 0, Math.PI * 2); ctx.fill(); }
+        ctx.restore();
+    }
+
+    const catcherW = w * 0.26;
+    const catcherSquash = caught ? 1 - Math.min(1, (p - 0.85) / 0.15 * 4) * 0.15 : 1;
+    ctx.save();
+    ctx.translate(dropX, floorY);
+    ctx.scale(1, catcherSquash);
+    if (images.fruitCatcher) {
+        ctx.drawImage(images.fruitCatcher, -catcherW / 2, -catcherW * 0.35, catcherW, catcherW * 0.7);
+    } else {
+        ctx.fillStyle = '#e0d0ff';
+        ctx.beginPath();
+        ctx.moveTo(-catcherW / 2, catcherW * 0.35); ctx.lineTo(catcherW / 2, catcherW * 0.35);
+        ctx.lineTo(catcherW * 0.32, -catcherW * 0.35); ctx.lineTo(-catcherW * 0.32, -catcherW * 0.35);
+        ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+}
+
+const SKIN_PREVIEW_MANIA_LOOP_MS = 1200;
+
+/* One lane's note falls to the key row and the key lights up (swaps to its
+   pressed-state image, or a fallback color change) for a short window on
+   arrival — real mania has one lane per key with a stage/hint overlay,
+   simplified here to a single representative lane. */
+function drawSkinPreviewMania(ctx, w, h, images, elapsed) {
+    const laneX = w / 2;
+    const laneW = w * 0.24;
+    const keyY = h * 0.82;
+    const keyH = h * 0.12;
+    const t = elapsed % SKIN_PREVIEW_MANIA_LOOP_MS;
+    const p = t / SKIN_PREVIEW_MANIA_LOOP_MS;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(laneX - laneW / 2, h * 0.04, laneW, keyY - h * 0.04);
+
+    const pressed = p > 0.88 && p < 0.98;
+    const keyImg = pressed && images.maniaKeyPressed ? images.maniaKeyPressed : images.maniaKey;
+    if (keyImg) {
+        ctx.drawImage(keyImg, laneX - laneW / 2, keyY, laneW, keyH);
+    } else {
+        ctx.fillStyle = pressed ? 'rgba(244,114,182,0.9)' : 'rgba(255,255,255,0.15)';
+        ctx.fillRect(laneX - laneW / 2, keyY, laneW, keyH);
+    }
+
+    if (p < 0.9) {
+        const noteH = h * 0.09;
+        const noteY = h * 0.04 + (p / 0.9) * (keyY - noteH - h * 0.04);
+        if (images.maniaNote) {
+            ctx.drawImage(images.maniaNote, laneX - laneW / 2, noteY, laneW, noteH);
+        } else {
+            ctx.fillStyle = '#66d9ef';
+            ctx.fillRect(laneX - laneW / 2, noteY, laneW, noteH);
+        }
+    }
+}
+
 let skinPreviewRAF = null;
 let skinPreviewStartTime = 0;
+let skinPreviewMode = 'standard';
 
 function stopSkinPreviewLoop() {
     if (skinPreviewRAF) { cancelAnimationFrame(skinPreviewRAF); skinPreviewRAF = null; }
+}
+
+/* One tab per ruleset, same osu-mode-tabs/osu-tab styling and mode icons
+   (modeIconSvg, from js/osu.js) used everywhere else on the site a mode
+   needs picking. Switching tabs is a pure state flip — drawSkinPreviewFrame
+   reads skinPreviewMode fresh every animation frame, so there's no need to
+   re-unzip or restart the loop. */
+function renderSkinPreviewModeTabs() {
+    const el = document.getElementById('skin-preview-mode-tabs');
+    if (!el) return;
+    el.innerHTML = OSU_MODES.map(mode => `
+        <button class="osu-tab ${mode === skinPreviewMode ? 'active' : ''}" onclick="switchSkinPreviewMode('${mode}', this)">
+            ${modeIconSvg(mode)} ${OSU_MODE_LABELS[OSU_MODES.indexOf(mode)]}
+        </button>`).join('');
+}
+function switchSkinPreviewMode(mode, el) {
+    skinPreviewMode = mode;
+    document.querySelectorAll('#skin-preview-mode-tabs .osu-tab').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
 }
 
 async function openSkinPreviewModal(skinId) {
@@ -495,6 +674,8 @@ async function openSkinPreviewModal(skinId) {
     if (!modal || !canvas) return;
 
     stopSkinPreviewLoop();
+    skinPreviewMode = 'standard';
+    renderSkinPreviewModeTabs();
     modal.style.display = 'flex';
     document.getElementById('skin-preview-title').textContent = '';
     status.textContent = t('skins_preview_loading');
@@ -517,7 +698,12 @@ async function openSkinPreviewModal(skinId) {
     }
 
     const images = {};
-    await Promise.all(['cursor', 'cursorMiddle', 'hitcircle', 'hitcircleOverlay', 'approachCircle'].map(async key => {
+    const imageKeys = [
+        'cursor', 'cursorMiddle', 'hitcircle', 'hitcircleOverlay', 'approachCircle',
+        'taikoHitcircle', 'taikoHitcircleOverlay', 'fruitCatcher', 'fruit',
+        'maniaNote', 'maniaKey', 'maniaKeyPressed',
+    ];
+    await Promise.all(imageKeys.map(async key => {
         if (assets[key]) images[key] = await loadImageQuiet(assets[key]);
     }));
     images.numbers = await Promise.all(assets.numbers.map(url => url ? loadImageQuiet(url) : Promise.resolve(null)));
@@ -530,7 +716,7 @@ async function openSkinPreviewModal(skinId) {
 
     skinPreviewStartTime = performance.now();
     const loop = (now) => {
-        drawSkinPreviewFrame(ctx, canvas, images, assets, now - skinPreviewStartTime);
+        drawSkinPreviewFrame(ctx, canvas, images, assets, now - skinPreviewStartTime, skinPreviewMode);
         skinPreviewRAF = requestAnimationFrame(loop);
     };
     skinPreviewRAF = requestAnimationFrame(loop);
