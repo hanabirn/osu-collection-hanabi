@@ -2657,6 +2657,7 @@ function openPpCalcModal(setId, event) {
     document.getElementById('pp-calc-status').innerText = '';
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-radar-wrap').style.display = 'none';
     document.getElementById('pp-calc-combo-label').style.display = 'none';
     renderPpCalcMods();
 
@@ -2673,6 +2674,7 @@ function selectPpCalcDiff(beatmapIdStr) {
     document.getElementById('pp-calc-status').innerText = '';
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-radar-wrap').style.display = 'none';
     document.getElementById('pp-calc-combo-label').style.display = 'none';
 }
 
@@ -2688,6 +2690,7 @@ function togglePpCalcMod(mod) {
     renderPpCalcMods();
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-radar-wrap').style.display = 'none';
     document.getElementById('pp-calc-combo-label').style.display = 'none';
 }
 
@@ -2725,6 +2728,7 @@ async function runPpCalc() {
     const status = document.getElementById('pp-calc-status');
     document.getElementById('pp-calc-result').style.display = 'none';
     document.getElementById('pp-calc-graph-wrap').style.display = 'none';
+    document.getElementById('pp-calc-radar-wrap').style.display = 'none';
     document.getElementById('pp-calc-combo-label').style.display = 'none';
 
     if (!Number.isFinite(acc) || acc < 0 || acc > 100) {
@@ -2785,6 +2789,53 @@ function strainChartSvg(values, sectionLengthMs) {
     </svg>`;
 }
 
+/* Five-axis radar/spider chart (AR/OD/CS/HP + ★) — same hand-rolled-SVG
+   approach as strainChartSvg/hitErrorChartSvg above rather than pulling in
+   a charting library for one shape. AR/OD/CS/HP are normalized against 11
+   (the practical ceiling once HR/mod stacking pushes a stat past its
+   nominal 0-10 range) and ★ against 10 (a generous top-difficulty
+   reference) — an axis maxing out at the outer ring just means "at or
+   past that reference", which is expected and fine for a handful of
+   extreme maps rather than something the chart needs to accommodate
+   exactly. */
+function difficultyRadarSvg(attrs, stars) {
+    const width = 260, height = 250;
+    const cx = width / 2, cy = height / 2 - 4;
+    const R = 82;
+    const axes = [
+        { label: 'AR', value: attrs.ar, max: 11 },
+        { label: 'OD', value: attrs.od, max: 11 },
+        { label: 'CS', value: attrs.cs, max: 11 },
+        { label: 'HP', value: attrs.hp, max: 11 },
+        { label: '★', value: stars, max: 10 },
+    ];
+    const n = axes.length;
+    const angleFor = i => -Math.PI / 2 + (i / n) * Math.PI * 2;
+    const pointFor = (i, frac) => [
+        (cx + Math.cos(angleFor(i)) * R * frac).toFixed(2),
+        (cy + Math.sin(angleFor(i)) * R * frac).toFixed(2),
+    ];
+
+    const rings = [0.25, 0.5, 0.75, 1].map(frac =>
+        `<polygon points="${axes.map((_, i) => pointFor(i, frac).join(',')).join(' ')}" class="radar-ring" />`
+    ).join('');
+    const axisLines = axes.map((_, i) => {
+        const [x, y] = pointFor(i, 1);
+        return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" class="radar-axis-line" />`;
+    }).join('');
+    const valuePts = axes.map((ax, i) => pointFor(i, Math.max(0, Math.min(1, ax.value / ax.max))).join(',')).join(' ');
+    const labels = axes.map((ax, i) => {
+        const [x, y] = pointFor(i, 1.24);
+        return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" class="radar-axis-label">${ax.label} ${ax.value.toFixed(1)}</text>`;
+    }).join('');
+
+    return `<svg viewBox="0 0 ${width} ${height}" class="difficulty-radar-svg">
+        ${rings}${axisLines}
+        <polygon points="${valuePts}" class="radar-value-fill" />
+        ${labels}
+    </svg>`;
+}
+
 function renderPpCalcResult(data, combo, misses) {
     const resultEl = document.getElementById('pp-calc-result');
     const comboLabel = document.getElementById('pp-calc-combo-label');
@@ -2810,6 +2861,13 @@ function renderPpCalcResult(data, combo, misses) {
         graphWrap.innerHTML = `<p class="osu-empty">${t('pp_calc_strain_unsupported')}</p>`;
     }
     graphWrap.style.display = 'block';
+
+    const radarWrap = document.getElementById('pp-calc-radar-wrap');
+    if (radarWrap && data.attrs) {
+        radarWrap.innerHTML = `<div class="pp-calc-section-label">${t('pp_calc_radar_title')}</div>
+            <div class="difficulty-radar-wrap">${difficultyRadarSvg(data.attrs, data.stars)}</div>`;
+        radarWrap.style.display = 'block';
+    }
 }
 
 /* ===== Shareable PNG cards =====

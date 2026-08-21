@@ -520,6 +520,7 @@
         <div id="pp-calc-status" class="status"></div>
         <div id="pp-calc-combo-label" class="pp-calc-combo-label" style="display:none;"></div>
         <div id="pp-calc-result" class="pp-calc-result" style="display:none;"></div>
+        <div id="pp-calc-radar-wrap" class="pp-calc-graph-wrap" style="display:none;"></div>
         <div id="pp-calc-graph-wrap" class="pp-calc-graph-wrap" style="display:none;"></div>
     </div>
 </div>
@@ -574,6 +575,17 @@
         <h3 class="pp-calc-title" data-i18n="leaderboard_title">🏆 追蹤玩家排行榜</h3>
         <div id="leaderboard-list" class="leaderboard-list"></div>
         <div id="tracked-leaderboard-chart" class="pp-history-panel"></div>
+    </div>
+</div>
+
+<div id="skin-preview-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeSkinPreviewModal()">
+    <div class="pp-calc-modal skin-preview-modal">
+        <button class="pp-calc-close" onclick="closeSkinPreviewModal()" data-icon="x"></button>
+        <h3 class="pp-calc-title" id="skin-preview-title"></h3>
+        <canvas id="skin-preview-canvas" class="skin-preview-canvas" width="320" height="320"></canvas>
+        <div id="skin-preview-status" class="status"></div>
+        <div id="skin-preview-colours" class="skin-preview-colours"></div>
+        <p class="replay-approx-note" data-i18n="skins_preview_note">預覽是用固定大小、假想動作示範這個皮膚的游標與圓圈樣式，不是實際遊戲畫面。</p>
     </div>
 </div>
 

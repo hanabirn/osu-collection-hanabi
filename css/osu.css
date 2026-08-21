@@ -193,6 +193,33 @@
 }
 .skin-backup-btn:hover { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(var(--accent-purple-rgb), 0.25); }
 .cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); }
+
+.skin-preview-modal { max-width: 380px; text-align: center; }
+.skin-preview-canvas {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: 14px;
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card-inset);
+}
+.skin-preview-colours {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+.skin-preview-colours:empty { display: none; }
+.skin-preview-colour-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+}
 .skins-empty {
     text-align: center;
     color: var(--text-secondary);
@@ -2217,6 +2244,13 @@
 .strain-chart-fill { fill: rgba(192,132,252,0.18); stroke: none; }
 .strain-chart-line { fill: none; stroke: var(--accent-light-purple); stroke-width: 1.5; }
 
+.difficulty-radar-wrap { display: flex; justify-content: center; }
+.difficulty-radar-svg { width: 100%; max-width: 280px; height: auto; display: block; }
+.radar-ring { fill: none; stroke: var(--border-light); stroke-width: 1; }
+.radar-axis-line { stroke: var(--border-light); stroke-width: 1; }
+.radar-value-fill { fill: rgba(var(--accent-pink-rgb), 0.28); stroke: var(--accent-pink); stroke-width: 1.5; stroke-linejoin: round; }
+.radar-axis-label { fill: var(--text-label); font-size: 11px; }
+
 /* ===== Replay Analyzer ===== */
 .replay-analyze-card { max-width: 560px; margin: 0 auto; }
 .replay-analyze-hint {
@@ -2262,6 +2296,16 @@
 .hit-error-chart-svg { width: 100%; height: auto; display: block; }
 .hit-error-bar { fill: var(--accent-light-purple); opacity: 0.75; }
 .hit-error-zero-line { stroke: var(--text-pink); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.6; }
+
+.replay-heatmap-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card-inset);
+}
 
 /* ===== Stats card download button ===== */
 .stats-card-btn {

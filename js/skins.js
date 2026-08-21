@@ -202,6 +202,7 @@ async function renderSkinsList() {
                 <div class="skin-item-ini-info" id="skin-ini-info-${s.id}">${cached && cached.info ? formatSkinIniInfo(cached.info) : ''}</div>
             </div>
             <div class="skin-item-actions">
+                <button class="skin-backup-btn" onclick="openSkinPreviewModal(${s.id})" title="${t('skins_preview_btn')}">${icon('palette')}</button>
                 <button class="skin-backup-btn" onclick="backupSkinToCloud(${s.id})" title="${t('skins_backup_btn')}">${icon('cloudUpload')}</button>
                 <button class="skin-download-btn" onclick="downloadSkinFile(${s.id})">${icon('download', { extraClass: 'icon-label-gap' })}${t('skins_download')}</button>
                 <button class="skin-delete-btn" onclick="confirmDeleteSkin(${s.id})">${icon('trash2', { extraClass: 'icon-label-gap' })}${t('skins_delete')}</button>
@@ -313,6 +314,232 @@ async function restoreCloudSkinToLocal(id, name) {
         console.error('Cloud skin restore failed:', e);
         showShareToast(t('skins_backup_fail'));
     }
+}
+
+/* ===== Skin online preview =====
+   A canvas animation loop showing off a skin's cursor + hit-circle set
+   without ever downloading it in-game — the .osk is already sitting in
+   IndexedDB (see the locker above), so this just unzips a few more root-
+   level PNGs than the list thumbnail does (extractSkinAssets above only
+   grabs one candidate image) plus skin.ini's [General] cursor behavior
+   flags and [Colours] combo palette, via the same fflate filtered-unzip
+   approach so large skins still unzip fast. The animation itself is a
+   fixed, made-up demo (approach circle shrinking onto a hit circle that
+   pops on "hit", cursor swooping in to click it and swinging back out) —
+   not a recreation of real gameplay, just enough motion to see the skin's
+   shapes, colors, and cursor rotate/expand behavior in action. */
+const SKIN_PREVIEW_BASE_NAMES = [
+    'cursor', 'cursormiddle', 'hitcircle', 'hitcircleoverlay', 'approachcircle',
+    'default-0', 'default-1', 'default-2', 'default-3', 'default-4',
+    'default-5', 'default-6', 'default-7', 'default-8', 'default-9',
+];
+function skinPreviewFilterName(name) {
+    const lower = name.toLowerCase();
+    if (lower === 'skin.ini') return true;
+    return SKIN_PREVIEW_BASE_NAMES.some(base => lower === `${base}.png` || lower === `${base}@2x.png`);
+}
+
+function parseSkinIniColours(text) {
+    const section = text.match(/\[Colours\]([\s\S]*?)(?:\r?\n\[|$)/i);
+    if (!section) return [];
+    const colours = [];
+    const re = /^[ \t]*Combo\d+[ \t]*:[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)/gim;
+    let m;
+    while ((m = re.exec(section[1]))) colours.push(`rgb(${m[1]},${m[2]},${m[3]})`);
+    return colours;
+}
+function parseSkinIniGeneralBool(text, key, fallback) {
+    const m = text.match(new RegExp(`^[ \\t]*${key}[ \\t]*:[ \\t]*(.+?)[ \\t]*$`, 'im'));
+    return m ? m[1].trim() === '1' : fallback;
+}
+
+// Keyed by skin id, caches the *promise* (not just the resolved value) so
+// concurrent preview-opens for the same skin id share one unzip pass
+// instead of racing two.
+const skinPreviewCache = new Map();
+
+function extractSkinPreviewAssets(skinId, file) {
+    if (skinPreviewCache.has(skinId)) return skinPreviewCache.get(skinId);
+    const promise = (typeof fflate === 'undefined' ? Promise.resolve(null) : file.arrayBuffer().then(buf => new Promise(resolve => {
+        try {
+            fflate.unzip(new Uint8Array(buf), { filter: entry => skinPreviewFilterName(entry.name) }, (err, unzipped) => {
+                if (err) { resolve(null); return; }
+                const pick = (base) => {
+                    const key2x = Object.keys(unzipped).find(k => k.toLowerCase() === `${base}@2x.png`);
+                    const key1x = Object.keys(unzipped).find(k => k.toLowerCase() === `${base}.png`);
+                    const key = key2x || key1x;
+                    return key ? URL.createObjectURL(new Blob([unzipped[key]], { type: 'image/png' })) : null;
+                };
+                let iniText = '';
+                const iniKey = Object.keys(unzipped).find(k => k.toLowerCase() === 'skin.ini');
+                if (iniKey) { try { iniText = new TextDecoder('utf-8').decode(unzipped[iniKey]); } catch { iniText = ''; } }
+                resolve({
+                    cursor: pick('cursor'),
+                    cursorMiddle: pick('cursormiddle'),
+                    hitcircle: pick('hitcircle'),
+                    hitcircleOverlay: pick('hitcircleoverlay'),
+                    approachCircle: pick('approachcircle'),
+                    numbers: Array.from({ length: 10 }, (_, i) => pick(`default-${i}`)),
+                    cursorRotate: iniText ? parseSkinIniGeneralBool(iniText, 'CursorRotate', true) : true,
+                    cursorExpand: iniText ? parseSkinIniGeneralBool(iniText, 'CursorExpand', true) : true,
+                    colours: iniText ? parseSkinIniColours(iniText) : [],
+                });
+            });
+        } catch { resolve(null); }
+    })).catch(() => null));
+    skinPreviewCache.set(skinId, promise);
+    return promise;
+}
+
+const SKIN_PREVIEW_LOOP_MS = 1400;
+const SKIN_PREVIEW_HIT_MS = 1000; // when the hit-circle "pop" and cursor "click" happen
+function easeInOutSkinPreview(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+
+function drawSkinPreviewFrame(ctx, canvas, images, assets, elapsed) {
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#150c22';
+    ctx.fillRect(0, 0, w, h);
+
+    const t = elapsed % SKIN_PREVIEW_LOOP_MS;
+    const cx = w / 2, cy = h / 2;
+    const baseR = w * 0.16;
+
+    let circleScale = 1, circleAlpha = 1, approachScale = null;
+    if (t < SKIN_PREVIEW_HIT_MS) {
+        approachScale = 3 - (t / SKIN_PREVIEW_HIT_MS) * 2; // shrinks 3x -> 1x onto the circle
+    } else {
+        const p = (t - SKIN_PREVIEW_HIT_MS) / (SKIN_PREVIEW_LOOP_MS - SKIN_PREVIEW_HIT_MS);
+        circleScale = 1 + p * 0.4;
+        circleAlpha = Math.max(0, 1 - p * 1.4);
+    }
+
+    if (circleAlpha > 0) {
+        ctx.save();
+        ctx.globalAlpha = circleAlpha;
+        const r = baseR * circleScale;
+        if (images.hitcircle) ctx.drawImage(images.hitcircle, cx - r, cy - r, r * 2, r * 2);
+        else { ctx.fillStyle = '#f06292'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); }
+        if (images.hitcircleOverlay) ctx.drawImage(images.hitcircleOverlay, cx - r, cy - r, r * 2, r * 2);
+        const numImg = images.numbers && images.numbers[1];
+        if (numImg) {
+            const nw = r * 0.5, nh = nw * (numImg.height / numImg.width);
+            ctx.drawImage(numImg, cx - nw / 2, cy - nh / 2, nw, nh);
+        }
+        ctx.restore();
+    }
+    if (approachScale !== null) {
+        const ar = baseR * approachScale;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, (SKIN_PREVIEW_HIT_MS - t) / 200 + 0.3);
+        if (images.approachCircle) ctx.drawImage(images.approachCircle, cx - ar, cy - ar, ar * 2, ar * 2);
+        else { ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, ar, 0, Math.PI * 2); ctx.stroke(); }
+        ctx.restore();
+    }
+
+    // Cursor swoops in to "click" the circle at the hit moment, then swings
+    // back out along a different angle to set up the next loop's approach —
+    // continuous motion rather than resetting instantly, so it reads as one
+    // gesture repeating rather than a cursor teleporting each loop.
+    const outerR = w * 0.375;
+    let cxu, cyu, angle, clickPulse = 0;
+    if (t <= SKIN_PREVIEW_HIT_MS) {
+        const p = easeInOutSkinPreview(t / SKIN_PREVIEW_HIT_MS);
+        angle = -Math.PI / 2 + p * 0.7;
+        const r = outerR * (1 - p);
+        cxu = cx + Math.cos(angle) * r;
+        cyu = cy + Math.sin(angle) * r;
+        if (t > SKIN_PREVIEW_HIT_MS - 120) clickPulse = 1 - (SKIN_PREVIEW_HIT_MS - t) / 120;
+    } else {
+        const p = easeInOutSkinPreview((t - SKIN_PREVIEW_HIT_MS) / (SKIN_PREVIEW_LOOP_MS - SKIN_PREVIEW_HIT_MS));
+        angle = -Math.PI / 2 + 0.7 + p * (Math.PI * 2 - 0.7);
+        const r = outerR * p;
+        cxu = cx + Math.cos(angle) * r;
+        cyu = cy + Math.sin(angle) * r;
+        if (p < 0.15) clickPulse = 1 - p / 0.15;
+    }
+
+    const cursorScale = assets.cursorExpand ? 1 + clickPulse * 0.3 : 1;
+    const cursorSize = w * 0.11 * cursorScale;
+    ctx.save();
+    ctx.translate(cxu, cyu);
+    if (images.cursor) {
+        if (assets.cursorRotate) ctx.rotate(angle + Math.PI / 2);
+        ctx.drawImage(images.cursor, -cursorSize / 2, -cursorSize / 2, cursorSize, cursorSize);
+    } else {
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.moveTo(-2, -2); ctx.lineTo(14, 4); ctx.lineTo(2, 8); ctx.lineTo(-2, 16); ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+    // cursormiddle intentionally drawn unrotated on top, same as real osu!.
+    if (images.cursorMiddle) {
+        const ms = cursorSize * 0.5;
+        ctx.drawImage(images.cursorMiddle, cxu - ms / 2, cyu - ms / 2, ms, ms);
+    }
+}
+
+let skinPreviewRAF = null;
+let skinPreviewStartTime = 0;
+
+function stopSkinPreviewLoop() {
+    if (skinPreviewRAF) { cancelAnimationFrame(skinPreviewRAF); skinPreviewRAF = null; }
+}
+
+async function openSkinPreviewModal(skinId) {
+    const modal = document.getElementById('skin-preview-modal');
+    const status = document.getElementById('skin-preview-status');
+    const coloursEl = document.getElementById('skin-preview-colours');
+    const canvas = document.getElementById('skin-preview-canvas');
+    if (!modal || !canvas) return;
+
+    stopSkinPreviewLoop();
+    modal.style.display = 'flex';
+    document.getElementById('skin-preview-title').textContent = '';
+    status.textContent = t('skins_preview_loading');
+    coloursEl.innerHTML = '';
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const skins = await getAllSkins();
+    const skin = skins.find(s => s.id === skinId);
+    if (!skin) { status.textContent = t('skins_preview_fail'); return; }
+    document.getElementById('skin-preview-title').textContent = skin.name;
+
+    const assets = await extractSkinPreviewAssets(skinId, skin.file);
+    // The modal may have been closed (or reopened for a different skin)
+    // while the unzip above was in flight — bail rather than animate into
+    // a canvas nobody's looking at, or the wrong skin's canvas.
+    if (!assets || document.getElementById('skin-preview-modal').style.display === 'none') {
+        if (assets === null) status.textContent = t('skins_preview_fail');
+        return;
+    }
+
+    const images = {};
+    await Promise.all(['cursor', 'cursorMiddle', 'hitcircle', 'hitcircleOverlay', 'approachCircle'].map(async key => {
+        if (assets[key]) images[key] = await loadImageQuiet(assets[key]);
+    }));
+    images.numbers = await Promise.all(assets.numbers.map(url => url ? loadImageQuiet(url) : Promise.resolve(null)));
+
+    if (document.getElementById('skin-preview-modal').style.display === 'none') return;
+    status.textContent = '';
+    if (assets.colours.length) {
+        coloursEl.innerHTML = assets.colours.map(c => `<span class="skin-preview-colour-dot" style="background:${c}"></span>`).join('');
+    }
+
+    skinPreviewStartTime = performance.now();
+    const loop = (now) => {
+        drawSkinPreviewFrame(ctx, canvas, images, assets, now - skinPreviewStartTime);
+        skinPreviewRAF = requestAnimationFrame(loop);
+    };
+    skinPreviewRAF = requestAnimationFrame(loop);
+}
+
+function closeSkinPreviewModal() {
+    const modal = document.getElementById('skin-preview-modal');
+    if (modal) modal.style.display = 'none';
+    stopSkinPreviewLoop();
 }
 
 async function confirmDeleteCloudSkin(id) {

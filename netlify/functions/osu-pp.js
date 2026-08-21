@@ -56,6 +56,10 @@ exports.handler = async (event) => {
         const map = new rosu.Beatmap(text);
         const difficulty = new rosu.Difficulty({ mods });
         const diffAttrs = difficulty.calculate(map);
+        // Mod-adjusted AR/OD/CS/HP (e.g. HR raising CS, DT's clock rate
+        // shrinking AR's effective hit window) for the difficulty radar
+        // chart — separate from diffAttrs above, which doesn't expose ar/cs.
+        const beatmapAttrs = new rosu.BeatmapAttributesBuilder({ map, mods }).build();
 
         const pp = {};
         for (const acc of accList) {
@@ -77,6 +81,7 @@ exports.handler = async (event) => {
             maxCombo: diffAttrs.maxCombo,
             pp,
             strains: { sectionLength: strainsRaw.sectionLength, values: strainValues },
+            attrs: { ar: beatmapAttrs.ar, od: beatmapAttrs.od, cs: beatmapAttrs.cs, hp: beatmapAttrs.hp },
         });
         return { statusCode: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' }, body };
     } catch (err) {
