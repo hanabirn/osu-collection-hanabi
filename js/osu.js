@@ -1781,12 +1781,28 @@ function renderPpCompareChart(playerA, playerB, panelId) {
     });
 }
 
+/* Hides any previously-shown compare result so a blank player field never
+   leaves stale comparison data on screen (mirrors clearVisitorLookupResult). */
+function clearPpCompareResult() {
+    const status = document.getElementById('pp-compare-status');
+    const result = document.getElementById('pp-compare-result');
+    if (status) status.innerText = '';
+    if (result) result.style.display = 'none';
+}
+
+function onPpCompareInputChange() {
+    const inputA = document.getElementById('pp-compare-input-a').value.trim();
+    const inputB = document.getElementById('pp-compare-input-b').value.trim();
+    if (!inputA || !inputB) clearPpCompareResult();
+}
+
 async function comparePlayers() {
     const inputA = document.getElementById('pp-compare-input-a').value.trim();
     const inputB = document.getElementById('pp-compare-input-b').value.trim();
     const status = document.getElementById('pp-compare-status');
     const result = document.getElementById('pp-compare-result');
-    if (!inputA || !inputB || !status || !result) return;
+    if (!inputA || !inputB) { clearPpCompareResult(); return; }
+    if (!status || !result) return;
 
     status.innerText = t('osu_searching') || 'Searching...';
     status.style.color = '#f9a8d4';

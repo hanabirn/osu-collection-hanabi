@@ -311,8 +311,8 @@
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="pp_compare_title">⚔ 雙人 PP 對比</h3>
             <div class="pp-compare-input-row">
-                <input type="text" id="pp-compare-input-a" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input">
-                <input type="text" id="pp-compare-input-b" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input">
+                <input type="text" id="pp-compare-input-a" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()">
+                <input type="text" id="pp-compare-input-b" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()">
                 <button class="btn" onclick="comparePlayers()" data-i18n="pp_compare_btn">比較</button>
             </div>
             <div id="pp-compare-status" class="status"></div>
