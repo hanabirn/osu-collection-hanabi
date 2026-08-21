@@ -977,6 +977,40 @@
     margin-right: 0;
 }
 
+/* Played-status badge (checkCollectionPlayedStatus()) — bottom-left corner,
+   mirroring .osu-card-mode-badge's bottom-right star-rating badge. Reuses
+   the same rank-ss/s/a/b/c/d/f palette as .osu-recent-rank so a card's
+   "you got an S here" reads the same everywhere on the site. Hidden until
+   a check has actually run for this card (see renderOsuCollection()). */
+.osu-play-status {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    font-weight: bold;
+    font-size: 0.68rem;
+    color: #fff;
+    background: rgba(0,0,0,0.55);
+}
+.osu-play-status.unplayed { color: rgba(255,255,255,0.5); }
+.osu-play-status.rank-ss { background: linear-gradient(135deg, #f4d03f, #f7ecb5); color: #6b5900; }
+.osu-play-status.rank-s { background: linear-gradient(135deg, #f4c542, #e8a628); color: #5c3d00; }
+.osu-play-status.rank-a { background: #6ee7b7; color: #064e3b; }
+.osu-play-status.rank-b { background: #60a5fa; color: #1e3a8a; }
+.osu-play-status.rank-c { background: #c084fc; color: #3b0764; }
+.osu-play-status.rank-d { background: #f87171; color: #7f1d1d; }
+.osu-play-status.rank-f { background: #94a3b8; color: #1e293b; }
+.osu-card.has-play-status .osu-card-info { padding-left: 44px; }
+
+#osu-check-played-btn.checking .icon-svg { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* Star-rating-tinted mode icon: colour set inline per icon (see
    starRatingColor() in js/osu.js), this just governs sizing/interaction.
    The exact SR only appears on hover (native title tooltip) — no numeric
@@ -1340,6 +1374,64 @@
     color: rgba(255,255,255,0.8);
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 2px;
+}
+.fc-sim-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 4px;
+    padding: 2px 7px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.45);
+    color: rgba(255,255,255,0.85);
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.fc-sim-btn:hover { background: rgba(var(--accent-pink-rgb), 0.55); color: #fff; }
+.fc-sim-btn .icon-svg { width: 0.85em; height: 0.85em; }
+
+/* Body-level singleton popover for the FC-if-simulated PP result, same
+   position:fixed + getBoundingClientRect() placement pattern as
+   .osu-category-picker above — see toggleFcSim() in js/osu.js. */
+.fc-sim-popover {
+    position: fixed;
+    min-width: 150px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    z-index: 220;
+}
+.fc-sim-popover.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.fc-sim-title {
+    font-size: 0.72rem;
+    font-weight: bold;
+    color: var(--text-label);
+    margin-bottom: 4px;
+}
+.fc-sim-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    font-size: 0.82rem;
+    color: var(--text);
+    padding: 2px 0;
+}
+.fc-sim-row b { color: var(--accent-pink); }
+.fc-sim-loading, .fc-sim-error {
+    font-size: 0.8rem;
+    color: var(--text-label);
 }
 
 /* ===== Visitor Lookup ===== */

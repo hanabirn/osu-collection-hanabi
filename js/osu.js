@@ -130,6 +130,11 @@ let osuPage = 0;
 let osuSortMode = 'default';
 let osuSearchQuery = '';
 const OSU_PAGE_SIZE = 8;
+// Populated by renderOsuCollection() on every render — the current page's
+// sets, one representative (hardest-visible-difficulty) beatmap id + mode
+// each, for checkCollectionPlayedStatus() to check against. See its own
+// comment at the assignment site for why it's per-set, not per-difficulty.
+let osuPageCheckTargets = [];
 
 function osuAvatarUrl(userId) {
     return `/.netlify/functions/osu-avatar?id=${userId}`;
@@ -1338,6 +1343,13 @@ function renderOsuCollection() {
     if (osuPage < 0) osuPage = 0;
     const pageSets = sets.slice(osuPage * OSU_PAGE_SIZE, (osuPage + 1) * OSU_PAGE_SIZE);
 
+    // Repopulated on every render so "checkCollectionPlayedStatus()" (the
+    // 已遊玩 button) always checks exactly the sets currently on screen —
+    // representative of each set by its hardest visible difficulty, so the
+    // check stays bounded to one API call per card instead of one per
+    // difficulty (a set can have a dozen).
+    osuPageCheckTargets = [];
+
     container.innerHTML = pageSets.map(set => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         const isFav = isOsuFavorited(set.beatmapset_id);
@@ -1360,8 +1372,9 @@ function renderOsuCollection() {
         // difficulties of the same set — surface that in the hover label.
         const diffLabel = (b) => (diffMode(b) === 'mania' && b.key_count) ? `${b.version} [${Math.round(b.key_count)}K]` : b.version;
         const diffIconsRow = `<div class="osu-card-diff-row">${diffBeatmaps.map(b => modeDiffIcon(diffMode(b), b.difficulty_rating, diffLabel(b), diffUrl(b.beatmap_id, diffMode(b)))).join('')}</div>`;
+        osuPageCheckTargets.push({ setId: set.beatmapset_id, beatmapId: hardestDiff.beatmap_id, mode: OSU_MODES.indexOf(diffMode(hardestDiff)) });
         return `
-        <div class="osu-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
+        <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="複製 ID">${icon('copy')}</button>
@@ -1372,6 +1385,7 @@ function renderOsuCollection() {
             <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">${icon('x')}</button>
             <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
+            <div class="osu-play-status" id="play-status-${set.beatmapset_id}" style="display:none;"></div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${set.title}</div>
                 ${diffIconsRow}
@@ -1391,6 +1405,53 @@ function renderOsuCollection() {
         pages += `<button class="osu-page-btn" onclick="osuPage=Math.min(${totalPages-1},osuPage+1);renderOsuCollection()" ${osuPage>=totalPages-1?'disabled':''}>›</button>`;
         pages += `<button class="osu-page-btn" onclick="osuPage=${totalPages-1};renderOsuCollection()" ${osuPage>=totalPages-1?'disabled':''}>»</button>`;
         paginationEl.innerHTML = pages;
+    }
+}
+
+/* ===== 收藏 vs 已遊玩比對 — cross-references the current page's collected
+   sets against the logged-in osu! account's actual scores, via get_scores'
+   own `u` filter (added as netlify/functions/osu.js's `scoreBeatmap`
+   branch). Bounded to one score lookup per *set* (its hardest visible
+   difficulty, from osuPageCheckTargets — see renderOsuCollection()) rather
+   than per difficulty, and only for the visible page, rather than the
+   whole collection, so a click here stays a handful of parallel requests
+   instead of potentially hundreds. ===== */
+async function checkCollectionPlayedStatus() {
+    const user = getLoggedInOsuUser();
+    const btn = document.getElementById('osu-check-played-btn');
+    if (!user || osuPageCheckTargets.length === 0) return;
+
+    if (btn) { btn.disabled = true; btn.classList.add('checking'); }
+    try {
+        await Promise.all(osuPageCheckTargets.map(async ({ setId, beatmapId, mode }) => {
+            const el = document.getElementById(`play-status-${setId}`);
+            if (!el || mode < 0) return;
+            try {
+                const scores = await osuFetch(`scoreBeatmap=${beatmapId}&scoreUser=${user.id}&m=${mode}`);
+                const score = Array.isArray(scores) ? scores[0] : null;
+                if (!score) {
+                    el.className = 'osu-play-status unplayed';
+                    el.title = t('play_status_unplayed_title');
+                    el.textContent = '–';
+                } else {
+                    const rankClass = OSU_RANK_CLASS[score.rank] || 'f';
+                    const isFc = (parseInt(score.countmiss) || 0) === 0;
+                    el.className = `osu-play-status rank-${rankClass}`;
+                    el.title = t(isFc ? 'play_status_fc_title' : 'play_status_played_title', { rank: score.rank || '?' });
+                    el.textContent = score.rank || '?';
+                }
+                el.style.display = 'flex';
+                // Reserves room in .osu-card-info's left padding so the badge
+                // doesn't sit on top of the title/artist text below it — only
+                // applied once a card is actually checked, so cards nobody's
+                // checked yet keep their original (un-padded) layout.
+                el.closest('.osu-card')?.classList.add('has-play-status');
+            } catch (e) {
+                console.error('Played-status check failed for beatmap', beatmapId, e);
+            }
+        }));
+    } finally {
+        if (btn) { btn.disabled = false; btn.classList.remove('checking'); }
     }
 }
 
@@ -1480,6 +1541,11 @@ async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
             const d = new Date(String(r.date).replace(' ', 'T') + 'Z');
             const dateStr = isNaN(d) ? '' : `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             const ppStr = type === 'best' && r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
+            // rosu-pp-js (the FC-simulation backend) doesn't factor NF/SO
+            // into difficulty/pp at all, so they're dropped from the mods
+            // string sent to it — same convention netlify/functions/
+            // replay-analyze.js already uses.
+            const fcMods = mods.filter(m => m !== 'NF' && m !== 'SO').join('');
             return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
                 <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
                 <div class="osu-recent-overlay"></div>
@@ -1487,6 +1553,7 @@ async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
                 <div class="osu-recent-info">
                     <div class="osu-recent-song">${escHtml(title)}</div>
                     <div class="osu-recent-meta">${ppStr}${acc}% · ${r.maxcombo}x${modsStr} · ${dateStr}</div>
+                    <button class="fc-sim-btn" onclick="toggleFcSim(event, ${r.beatmap_id}, '${fcMods}')" title="${escHtml(t('fc_sim_btn_title'))}">${icon('trendingUp')}<span>${t('fc_sim_btn')}</span></button>
                 </div>
             </a>`;
         }).join('');
@@ -1495,6 +1562,78 @@ async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
         console.error('Plays list fetch failed:', e);
         wrap.style.display = 'none';
     }
+}
+
+/* ===== "PP if FC" simulator — a single document.body-level popover (same
+   lazy-singleton pattern as #osu-category-picker above: .osu-recent-item
+   has overflow:hidden for its aspect-ratio background image, which would
+   clip an inline result panel, and the list's innerHTML gets replaced
+   wholesale on every re-render). Lazy-loaded per click rather than for
+   every row up front, since each calculation downloads the raw .osu file
+   server-side; results are cached in memory per beatmap+mods pair since
+   the same map can appear more than once across the recent/best lists. ===== */
+function ensureFcSimPopoverEl() {
+    let el = document.getElementById('fc-sim-popover');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'fc-sim-popover';
+        el.className = 'fc-sim-popover';
+        document.body.appendChild(el);
+    }
+    return el;
+}
+
+let fcSimPopoverKey = null;
+const fcSimCache = {};
+
+async function toggleFcSim(event, beatmapId, mods) {
+    // The row itself is an <a> to the beatmap page — without these, this
+    // click would both open the popover AND navigate away.
+    event.preventDefault();
+    event.stopPropagation();
+    const key = `${beatmapId}:${mods}`;
+    const el = ensureFcSimPopoverEl();
+    if (fcSimPopoverKey === key && el.classList.contains('open')) {
+        closeFcSimPopover();
+        return;
+    }
+    fcSimPopoverKey = key;
+    const r = event.currentTarget.getBoundingClientRect();
+    el.style.top = `${r.bottom + 6}px`;
+    el.style.left = `${Math.min(r.left, window.innerWidth - 200)}px`;
+    el.classList.add('open');
+    document.addEventListener('click', onFcSimPopoverOutsideClick);
+    document.addEventListener('keydown', onFcSimPopoverEscape);
+
+    if (fcSimCache[key]) { el.innerHTML = fcSimCache[key]; return; }
+    el.innerHTML = `<div class="fc-sim-loading">${t('fc_sim_loading')}</div>`;
+    try {
+        const res = await fetch(`/.netlify/functions/osu-pp?id=${beatmapId}&mods=${encodeURIComponent(mods)}`);
+        const data = await res.json();
+        if (!res.ok || data.error || !data.pp) throw new Error(data.error || 'bad response');
+        const html = `<div class="fc-sim-title">${t('fc_sim_popover_title')}</div>` + Object.entries(data.pp)
+            .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
+            .map(([acc, pp]) => `<div class="fc-sim-row"><span>${parseFloat(acc)}%</span><b>${Math.round(pp).toLocaleString()}pp</b></div>`)
+            .join('');
+        fcSimCache[key] = html;
+        if (fcSimPopoverKey === key) el.innerHTML = html;
+    } catch (e) {
+        console.error('FC simulation failed:', e);
+        if (fcSimPopoverKey === key) el.innerHTML = `<div class="fc-sim-error">${t('fc_sim_error')}</div>`;
+    }
+}
+function closeFcSimPopover() {
+    const el = document.getElementById('fc-sim-popover');
+    if (el) el.classList.remove('open');
+    fcSimPopoverKey = null;
+    document.removeEventListener('click', onFcSimPopoverOutsideClick);
+    document.removeEventListener('keydown', onFcSimPopoverEscape);
+}
+function onFcSimPopoverOutsideClick(e) {
+    if (!e.target.closest('#fc-sim-popover') && !e.target.closest('.fc-sim-btn')) closeFcSimPopover();
+}
+function onFcSimPopoverEscape(e) {
+    if (e.key === 'Escape') closeFcSimPopover();
 }
 
 /* ===== PP growth trend: daily localStorage snapshots of total PP, rendered
@@ -1789,6 +1928,93 @@ function renderPpCompareChart(playerA, playerB, panelId) {
     });
 }
 
+/* ===== Tracked-players "PP race" chart — same merged-date-axis approach as
+   renderPpCompareChart() above, generalized from 2 fixed sides to however
+   many players openTrackedLeaderboard() fetched. Colors cycle through a
+   fixed palette (covers the pink/purple accents used everywhere else on
+   the site first) and fall back to evenly-spaced HSL hues past that, so an
+   arbitrarily long tracked-players list still gets visually distinct
+   lines instead of repeating or clashing colors. ===== */
+let ppRaceChart = null;
+let ppRaceChartArgs = null;
+
+function ppRaceColor(i, accent, purple) {
+    const palette = [accent, purple, '#34d399', '#fbbf24', '#60a5fa', '#f87171', '#f472b6', '#94a3b8'];
+    if (i < palette.length) return palette[i];
+    return `hsl(${(i * 47) % 360}, 70%, 60%)`;
+}
+
+function renderPpRaceChart(players, panelId) {
+    const el = document.getElementById(panelId);
+    if (!el) return;
+    if (ppRaceChart) { ppRaceChart.destroy(); ppRaceChart = null; }
+
+    const dates = [...new Set(players.flatMap(p => p.history.map(h => h.date)))].sort();
+    if (dates.length < 2) {
+        ppRaceChartArgs = null;
+        el.innerHTML = `
+            <div class="trend-chart-label">${t('pp_race_title')}</div>
+            <p class="osu-empty">${t('pp_history_empty')}</p>
+        `;
+        return;
+    }
+
+    ppRaceChartArgs = [players, panelId];
+    el.innerHTML = `
+        <div class="trend-chart-label">${t('pp_race_title')}</div>
+        <div class="trend-chart-wrap"><canvas></canvas></div>
+    `;
+    const canvas = el.querySelector('canvas');
+    const colors = ppChartColors();
+    const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
+    const seriesFor = (history) => {
+        const byDate = new Map(history.map(p => [p.date, p.pp]));
+        return dates.map(d => byDate.has(d) ? byDate.get(d) : null);
+    };
+
+    ppRaceChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: dates.map(formatPpChartDate),
+            datasets: players.map((p, i) => {
+                const c = ppRaceColor(i, colors.accent, purple);
+                return {
+                    label: p.username, data: seriesFor(p.history),
+                    borderColor: c, backgroundColor: c + '2a',
+                    pointBackgroundColor: c, pointBorderColor: c,
+                    pointRadius: 2, pointHoverRadius: 4, borderWidth: 2, tension: 0.25, fill: false, spanGaps: true,
+                };
+            }),
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { display: true, labels: { color: colors.text, font: { size: 11 }, boxWidth: 12 } },
+                tooltip: {
+                    backgroundColor: colors.tooltipBg,
+                    titleColor: colors.text,
+                    borderColor: colors.grid,
+                    borderWidth: 1,
+                    padding: 8,
+                    callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toLocaleString() : '—'}pp` },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.label, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 },
+                },
+                y: {
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.label, font: { size: 10 }, callback: v => v.toLocaleString() },
+                },
+            },
+        },
+    });
+}
+
 /* Hides any previously-shown compare result so a blank player field never
    leaves stale comparison data on screen (mirrors clearVisitorLookupResult). */
 function clearPpCompareResult() {
@@ -1849,6 +2075,7 @@ async function comparePlayers() {
     themeBtn.addEventListener('click', () => setTimeout(() => {
         if (ppHistoryChartArgs) renderPpHistoryChart(...ppHistoryChartArgs);
         if (ppCompareChartArgs) renderPpCompareChart(...ppCompareChartArgs);
+        if (ppRaceChartArgs) renderPpRaceChart(...ppRaceChartArgs);
     }, 0));
 })();
 
@@ -2305,6 +2532,7 @@ async function openTrackedLeaderboard() {
                 <span class="leaderboard-pp">${Math.round(p.totalPP).toLocaleString()}pp</span>
             </div>
         `).join('');
+        renderPpRaceChart(ranked, 'tracked-leaderboard-chart');
     } catch (e) {
         console.error('Leaderboard load failed:', e);
         listEl.innerHTML = `<p class="osu-empty">${t('pp_calc_error')}</p>`;
@@ -2340,6 +2568,8 @@ function applyLoggedInOsuUser() {
 
     loginBtn.style.display = user ? 'none' : '';
     pill.style.display = user ? '' : 'none';
+    const checkPlayedBtn = document.getElementById('osu-check-played-btn');
+    if (checkPlayedBtn) checkPlayedBtn.style.display = user ? '' : 'none';
     if (typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (!user) return;
 

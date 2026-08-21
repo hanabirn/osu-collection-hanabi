@@ -139,4 +139,12 @@ I18N.en = {
     replay_stat_accuracy: 'Accuracy', replay_stat_combo: 'Max Combo', replay_stat_misses: 'Misses',
     replay_stat_mods: 'Mods', replay_stat_rank: 'Rank', replay_stat_player: 'Player',
     replay_approx_note: "Hit timing is estimated by matching key presses to nearby beatmap notes — it's not a full judgement replay, just a reference.",
+
+    fc_sim_btn: 'FC sim', fc_sim_btn_title: 'Estimate PP if this map were FC\'d',
+    fc_sim_popover_title: 'PP if FC', fc_sim_loading: 'Calculating...', fc_sim_error: 'Calculation failed, please try again later',
+
+    check_played_btn_title: 'Check played status (this page)', play_status_unplayed_title: "You haven't played this map yet (hardest difficulty)",
+    play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
+
+    pp_race_title: 'PP Race',
 };

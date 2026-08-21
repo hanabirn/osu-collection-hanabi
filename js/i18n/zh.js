@@ -139,4 +139,12 @@ I18N.zh = {
     replay_stat_accuracy: '準確率', replay_stat_combo: '最大 Combo', replay_stat_misses: 'Miss 數',
     replay_stat_mods: 'Mods', replay_stat_rank: '評級', replay_stat_player: '玩家',
     replay_approx_note: '時間誤差是用按鍵時間比對譜面音符估算出來的，不是完整的判定重現，僅供參考',
+
+    fc_sim_btn: 'FC 模擬', fc_sim_btn_title: '模擬這張圖 FC 後大概多少 PP',
+    fc_sim_popover_title: 'FC 預估 PP', fc_sim_loading: '計算中...', fc_sim_error: '計算失敗，請稍後再試',
+
+    check_played_btn_title: '檢查本頁已遊玩', play_status_unplayed_title: '你還沒玩過這張圖（最高難度）',
+    play_status_played_title: '你打過這張圖，評級 {rank}', play_status_fc_title: '你 FC 過這張圖，評級 {rank}',
+
+    pp_race_title: 'PP 賽跑',
 };

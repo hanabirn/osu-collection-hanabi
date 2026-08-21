@@ -55,6 +55,22 @@ exports.handler = async (event) => {
             return { statusCode: 200, headers, body: JSON.stringify(data) };
         }
 
+        if (qs.scoreBeatmap) {
+            // get_scores' own `u` filters to just that player's score(s) on
+            // this one beatmap — exactly "did this user play this map, and
+            // with what rank/miss count" (see checkCollectionPlayedStatus()).
+            params.set('b', qs.scoreBeatmap);
+            if (qs.scoreUser) {
+                params.set('u', qs.scoreUser);
+                params.set('type', qs.scoreUserType === 'string' ? 'string' : 'id');
+            }
+            if (qs.m !== undefined) params.set('m', qs.m);
+            params.set('limit', '1');
+            const res = await fetch(`https://osu.ppy.sh/api/get_scores?${params.toString()}`);
+            const data = await res.json();
+            return { statusCode: 200, headers, body: JSON.stringify(data) };
+        }
+
         if (qs.b) params.set('b', qs.b);
         if (qs.s) params.set('s', qs.s);
 
