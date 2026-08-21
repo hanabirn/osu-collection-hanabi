@@ -149,4 +149,22 @@ I18N.en = {
     play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
 
     pp_race_title: 'PP Race',
+
+    nav_skin_screenshots: 'Skin Plaza',
+    ssc_page_title: '✦ Skin Screenshot Plaza ✦',
+    ssc_page_hint: "Share real in-game screenshots of skins for others to browse — only the screenshot itself is stored here, not the skin file; download it via whatever link the poster included.",
+    ssc_upload_title: '✦ Share My Skin Screenshot ✦',
+    ssc_upload_name_placeholder: 'Skin name', ssc_upload_author_placeholder: 'Author (optional)', ssc_upload_url_placeholder: 'Download link (optional)',
+    ssc_upload_btn: 'Publish Screenshot',
+    ssc_search_placeholder: 'Search by skin name or author...',
+    ssc_filter_all: 'All',
+    ssc_mine_only: 'Only mine',
+    ssc_login_required: 'Please log in with osu! first',
+    ssc_name_required: 'Enter a skin name', ssc_image_required: 'Choose a screenshot', ssc_url_invalid: 'Download link must start with http:// or https://',
+    ssc_uploading: 'Uploading...', ssc_upload_done: 'Screenshot published!', ssc_upload_fail: 'Upload failed',
+    ssc_loading: 'Loading screenshot plaza...', ssc_load_fail: 'Failed to load screenshot plaza, please try again later',
+    ssc_no_results: 'No screenshots match', ssc_empty: 'No one has shared a skin screenshot yet — be the first!',
+    ssc_by_author: 'by {author}',
+    ssc_download_link_title: 'Get skin', ssc_no_link: 'No download link provided',
+    ssc_delete_btn_title: 'Delete this screenshot', ssc_delete_confirm: 'Delete this screenshot?', ssc_delete_done: 'Deleted', ssc_delete_fail: 'Delete failed',
 };

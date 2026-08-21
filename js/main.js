@@ -19,6 +19,7 @@ function switchTab(tab, el) {
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'farm-maps') ensureFarmMapsLoaded();
+    if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
 }
 
 /* ===== 🌐 Language Dropdown ===== */

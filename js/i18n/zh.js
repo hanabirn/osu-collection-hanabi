@@ -149,4 +149,22 @@ I18N.zh = {
     play_status_played_title: '你打過這張圖，評級 {rank}', play_status_fc_title: '你 FC 過這張圖，評級 {rank}',
 
     pp_race_title: 'PP 賽跑',
+
+    nav_skin_screenshots: '皮膚廣場',
+    ssc_page_title: '✦ 皮膚截圖廣場 ✦',
+    ssc_page_hint: '分享你實際遊玩時的皮膚截圖給其他人參考——這裡只存截圖本身，不代管皮膚檔案，想下載請透過作者附上的連結。',
+    ssc_upload_title: '✦ 分享我的皮膚截圖 ✦',
+    ssc_upload_name_placeholder: '皮膚名稱', ssc_upload_author_placeholder: '作者（選填）', ssc_upload_url_placeholder: '下載連結（選填）',
+    ssc_upload_btn: '發布截圖',
+    ssc_search_placeholder: '搜尋皮膚名稱或作者...',
+    ssc_filter_all: '全部',
+    ssc_mine_only: '只看我上傳的',
+    ssc_login_required: '請先登入 osu! 帳號',
+    ssc_name_required: '請輸入皮膚名稱', ssc_image_required: '請選擇一張截圖', ssc_url_invalid: '下載連結需以 http:// 或 https:// 開頭',
+    ssc_uploading: '上傳中...', ssc_upload_done: '截圖已發布！', ssc_upload_fail: '上傳失敗',
+    ssc_loading: '載入截圖廣場中...', ssc_load_fail: '載入截圖廣場失敗，稍後再試',
+    ssc_no_results: '沒有符合條件的截圖', ssc_empty: '還沒有人分享皮膚截圖，來當第一個吧！',
+    ssc_by_author: 'by {author}',
+    ssc_download_link_title: '前往下載', ssc_no_link: '作者未附下載連結',
+    ssc_delete_btn_title: '刪除這張截圖', ssc_delete_confirm: '確定要刪除這張截圖嗎？', ssc_delete_done: '已刪除', ssc_delete_fail: '刪除失敗',
 };

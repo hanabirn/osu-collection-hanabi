@@ -33,4 +33,12 @@ function getFarmMapsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore };
+function getSkinScreenshotsStore() {
+    return getStore({
+        name: 'osu-skin-screenshots',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore };

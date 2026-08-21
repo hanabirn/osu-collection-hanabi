@@ -110,6 +110,7 @@
         <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
         <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
+        <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_skin_screenshots">皮膚廣場</span></button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
         <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
@@ -400,6 +401,55 @@
         </div>
     </section>
 
+    <section id="page-skin-screenshots" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="ssc_page_title">✦ 皮膚截圖廣場 ✦</h2>
+        <p class="tournaments-hint" data-i18n="ssc_page_hint">分享你實際遊玩時的皮膚截圖給其他人參考——這裡只存截圖本身，不代管皮膚檔案，想下載請透過作者附上的連結。</p>
+
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <h3 data-i18n="ssc_upload_title">✦ 分享我的皮膚截圖 ✦</h3>
+            <div class="input-group">
+                <input type="text" id="ssc-upload-name" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
+            </div>
+            <div class="input-group">
+                <input type="text" id="ssc-upload-author" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
+            </div>
+            <div class="input-group">
+                <input type="text" id="ssc-upload-url" data-i18n-placeholder="ssc_upload_url_placeholder" placeholder="下載連結（選填）" maxlength="300">
+            </div>
+            <div class="osu-mode-tabs" id="ssc-upload-mode-tabs"></div>
+            <div class="skin-upload-row">
+                <input type="file" id="ssc-upload-file" accept="image/*" onchange="previewSkinScreenshotFile(this)">
+            </div>
+            <div id="ssc-upload-preview" class="ssc-upload-preview"></div>
+            <button class="btn" onclick="uploadSkinScreenshot()" data-i18n="ssc_upload_btn">發布截圖</button>
+            <p id="ssc-upload-status" class="status"></p>
+        </div>
+
+        <div class="osu-search-row">
+            <input type="text" id="ssc-search-input" data-i18n-placeholder="ssc_search_placeholder" placeholder="搜尋皮膚名稱或作者..." oninput="searchSkinScreenshots(this.value)">
+            <select id="ssc-sort-select" onchange="switchSkinScreenshotsSort(this.value)">
+                <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
+                <option value="likes" data-i18n="gallery_sort_likes">❤ 最熱門</option>
+            </select>
+        </div>
+        <div class="osu-mode-tabs" id="skin-screenshots-mode-filter"></div>
+        <div class="osu-search-row gallery-filter-row">
+            <label class="gallery-liked-only-label">
+                <input type="checkbox" id="ssc-liked-only-checkbox" onchange="toggleSkinScreenshotsLikedOnly(this.checked)">
+                <span data-i18n="gallery_liked_only">只看我按讚的</span>
+            </label>
+            <label class="gallery-liked-only-label">
+                <input type="checkbox" id="ssc-mine-only-checkbox" onchange="toggleSkinScreenshotsMineOnly(this.checked)">
+                <span data-i18n="ssc_mine_only">只看我上傳的</span>
+            </label>
+        </div>
+
+        <div id="skin-screenshots-list" class="osu-collection"></div>
+        <div id="skin-screenshots-pagination" class="osu-pagination"></div>
+    </section>
+
     <section id="page-updates" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="updates_title">✦ 更新情報 ✦</h2>
         <div class="osu-add-card">
@@ -604,6 +654,7 @@
 <script src="js/public-collections.js"></script>
 <script src="js/farm-maps.js"></script>
 <script src="js/skins.js"></script>
+<script src="js/skin-screenshots.js"></script>
 <script src="js/updates.js"></script>
 <script src="js/tournaments.js"></script>
 <script src="js/celebrate.js"></script>
