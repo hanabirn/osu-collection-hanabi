@@ -403,28 +403,35 @@
 
     <section id="page-skin-screenshots" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="ssc_page_title">✦ 皮膚截圖廣場 ✦</h2>
-        <p class="tournaments-hint" data-i18n="ssc_page_hint">分享你實際遊玩時的皮膚截圖給其他人參考——這裡只存截圖本身，不代管皮膚檔案，想下載請透過作者附上的連結。</p>
+        <p class="tournaments-hint" data-i18n="ssc_page_hint">分享你實際遊玩時的皮膚截圖給其他人參考——下載連結或 .osk 檔案至少擇一，這樣別人才能下載到這個皮膚。</p>
 
         <div class="osu-add-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="ssc_upload_title">✦ 分享我的皮膚截圖 ✦</h3>
-            <div class="input-group">
-                <input type="text" id="ssc-upload-name" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
+            <div class="ssc-upload-form">
+                <div class="input-group">
+                    <input type="text" id="ssc-upload-name" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="ssc-upload-author" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="ssc-upload-url" data-i18n-placeholder="ssc_upload_url_placeholder" placeholder="下載連結" maxlength="300">
+                </div>
+                <p class="ssc-upload-hint" data-i18n="ssc_upload_link_or_file_hint">下載連結、或直接上傳 .osk 檔案，兩者至少擇一，這樣別人才能下載到這個皮膚（.osk 檔案上限 2.5MB，太大的皮膚建議改附連結）。</p>
+                <div class="skin-upload-row">
+                    <input type="file" id="ssc-upload-osk-file" accept=".osk" onchange="previewSkinScreenshotOskFile(this)">
+                </div>
+                <div id="ssc-upload-osk-name" class="ssc-upload-osk-name"></div>
+                <div class="osu-mode-tabs" id="ssc-upload-mode-tabs"></div>
+                <div class="skin-upload-row">
+                    <input type="file" id="ssc-upload-file" accept="image/*" onchange="previewSkinScreenshotFile(this)">
+                </div>
+                <div id="ssc-upload-preview" class="ssc-upload-preview"></div>
+                <button class="btn" onclick="uploadSkinScreenshot()" data-i18n="ssc_upload_btn">發布截圖</button>
+                <p id="ssc-upload-status" class="status"></p>
             </div>
-            <div class="input-group">
-                <input type="text" id="ssc-upload-author" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
-            </div>
-            <div class="input-group">
-                <input type="text" id="ssc-upload-url" data-i18n-placeholder="ssc_upload_url_placeholder" placeholder="下載連結（選填）" maxlength="300">
-            </div>
-            <div class="osu-mode-tabs" id="ssc-upload-mode-tabs"></div>
-            <div class="skin-upload-row">
-                <input type="file" id="ssc-upload-file" accept="image/*" onchange="previewSkinScreenshotFile(this)">
-            </div>
-            <div id="ssc-upload-preview" class="ssc-upload-preview"></div>
-            <button class="btn" onclick="uploadSkinScreenshot()" data-i18n="ssc_upload_btn">發布截圖</button>
-            <p id="ssc-upload-status" class="status"></p>
         </div>
 
         <div class="osu-search-row">

@@ -7,24 +7,30 @@
    traceable to a real osu! account (rather than fully anonymous) is the
    only abuse deterrent in place.
 
-   Only the screenshot image is ever stored here — the actual .osk skin
-   file itself is never uploaded or hosted (see downloadUrl, an external
-   link the publisher provides), so this carries none of the
-   redistribution/copyright exposure hosting other people's skin files
-   would. The client is expected to downscale/re-encode the image to a
-   reasonable size before sending (see js/skin-screenshots.js's canvas
-   resize step) — this just re-enforces a hard ceiling server-side since
-   the client can't be trusted. */
+   A screenshot must come with a way to actually get the skin — either an
+   external downloadUrl the publisher provides, or the .osk file itself
+   uploaded straight to this store (see skin-screenshots-download.js).
+   Hosting the file ourselves does carry redistribution/copyright exposure
+   an external link doesn't (this is publishing whatever the uploader
+   handed us, not just linking to where they got it), which is why it's
+   capped hard at MAX_OSK_BYTES rather than sized for real skins (which
+   commonly run 10-200+ MB, same caveat as skins-upload.js) — a skin that
+   doesn't fit is expected to use a downloadUrl instead. Both the
+   screenshot image and the .osk (when present) travel in the same
+   request, so their two size caps are kept low enough that even both at
+   once, base64-inflated, stay under Netlify Functions' ~6MB body ceiling. */
 const crypto = require('crypto');
 const { getSkinScreenshotsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
-const MAX_BODY_BYTES = 2.5 * 1024 * 1024;
+const MAX_OSK_BYTES = 2.5 * 1024 * 1024;
+const MAX_BODY_BYTES = 5.5 * 1024 * 1024;
 const MAX_SCREENSHOTS_PER_USER = 20;
 const MAX_NAME_LEN = 100;
 const MAX_URL_LEN = 300;
+const MAX_FILENAME_LEN = 150;
 
 exports.handler = async (event) => {
     const headers = {
@@ -64,9 +70,14 @@ exports.handler = async (event) => {
     const dataBase64 = typeof body.dataBase64 === 'string' ? body.dataBase64 : '';
     const width = Number.isFinite(body.width) && body.width > 0 ? Math.round(body.width) : null;
     const height = Number.isFinite(body.height) && body.height > 0 ? Math.round(body.height) : null;
+    const oskDataBase64 = typeof body.oskDataBase64 === 'string' ? body.oskDataBase64 : '';
+    const oskFilename = typeof body.oskFilename === 'string' ? body.oskFilename.trim().slice(0, MAX_FILENAME_LEN) : '';
 
     if (!skinName || !dataBase64) {
         return { statusCode: 422, headers, body: JSON.stringify({ error: 'Missing skin name or screenshot data' }) };
+    }
+    if (!downloadUrl && !oskDataBase64) {
+        return { statusCode: 422, headers, body: JSON.stringify({ error: 'Provide a download link or upload the .osk file' }) };
     }
     if (downloadUrl && !/^https?:\/\//i.test(downloadUrl)) {
         return { statusCode: 422, headers, body: JSON.stringify({ error: 'Download link must start with http:// or https://' }) };
@@ -89,6 +100,27 @@ exports.handler = async (event) => {
         return { statusCode: 422, headers, body: JSON.stringify({ error: 'Screenshot must be a JPEG image' }) };
     }
 
+    let oskBuffer = null;
+    if (oskDataBase64) {
+        if (!oskFilename) {
+            return { statusCode: 422, headers, body: JSON.stringify({ error: 'Missing .osk filename' }) };
+        }
+        try {
+            oskBuffer = Buffer.from(oskDataBase64, 'base64');
+        } catch {
+            return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid .osk file data' }) };
+        }
+        if (oskBuffer.length === 0 || oskBuffer.length > MAX_OSK_BYTES) {
+            return { statusCode: 413, headers, body: JSON.stringify({ error: `.osk file exceeds the ${MAX_OSK_BYTES / 1024 / 1024}MB limit — use a download link instead for larger skins` }) };
+        }
+        // .osk is a plain zip archive — "PK" is the local-file-header magic
+        // every zip (empty or not) starts with, same cheap-sanity-check
+        // philosophy as the JPEG check above.
+        if (oskBuffer[0] !== 0x50 || oskBuffer[1] !== 0x4b) {
+            return { statusCode: 422, headers, body: JSON.stringify({ error: 'File must be a valid .osk (zip) skin file' }) };
+        }
+    }
+
     try {
         const store = getSkinScreenshotsStore();
         const owned = (await store.get(`owner:${user.id}`, { type: 'json' })) || [];
@@ -99,11 +131,13 @@ exports.handler = async (event) => {
         const id = crypto.randomUUID();
         const uploadedAt = new Date().toISOString();
         await store.set(`image:${id}`, buffer);
+        if (oskBuffer) await store.set(`osk:${id}`, oskBuffer);
 
         const entry = {
             id, skinName, author, downloadUrl, mode,
             userId: user.id, username: user.username,
             uploadedAt, likeCount: 0, width, height,
+            oskFilename: oskBuffer ? oskFilename : null,
         };
 
         const index = (await store.get('index', { type: 'json' })) || [];

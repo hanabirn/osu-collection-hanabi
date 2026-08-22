@@ -50,6 +50,7 @@ exports.handler = async (event) => {
         }
 
         await store.delete(`image:${id}`);
+        await store.delete(`osk:${id}`);
         await store.delete(`likers:${id}`);
         await store.setJSON(`owner:${user.id}`, owned.filter(v => v !== id));
 

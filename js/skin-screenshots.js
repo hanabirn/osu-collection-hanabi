@@ -1,14 +1,14 @@
 /* ===== Public skin screenshot plaza =====
    Browse/publish real screenshots of osu! skins in action — see
-   netlify/functions/skin-screenshots-{upload,list,image,like,delete}.js.
-   Unlike the public collections gallery (one entry per user, overwritten on
-   republish), a user can publish many screenshots here, so this is a flat
-   paginated list filtered by mode/search/liked/mine rather than a per-owner
-   drill-down. Only the screenshot image + a skinName/author/downloadUrl the
-   publisher types in ever gets stored — never the actual .osk file itself
-   (see the AskUserQuestion decision this feature was built from: screenshots
-   + an external link only, no hosting/redistributing other people's skin
-   files). Publishing/liking/deleting all require a verified osu! login
+   netlify/functions/skin-screenshots-{upload,list,image,download,like,
+   delete}.js. Unlike the public collections gallery (one entry per user,
+   overwritten on republish), a user can publish many screenshots here, so
+   this is a flat paginated list filtered by mode/search/liked/mine rather
+   than a per-owner drill-down. Every screenshot needs a way to actually get
+   the skin — either an external downloadUrl the publisher types in, or the
+   .osk file itself uploaded alongside the screenshot (small ones only, see
+   skin-screenshots-upload.js's size cap; at least one of the two is
+   required). Publishing/liking/deleting all require a verified osu! login
    (getOsuAuthToken(), js/osu.js) since the server trusts nothing else about
    who's asking — and, since this site has no moderation/admin panel, that
    login is the only real deterrent against abuse (see
@@ -157,9 +157,15 @@ function renderSkinScreenshotsList() {
                 <span class="ssc-like-icon">${icon('heart', { filled: item.likedByMe })}</span><span class="ssc-like-count">${(item.likeCount || 0).toLocaleString()}</span>
                </button>`;
         const aspectStyle = (item.width && item.height) ? ` style="aspect-ratio:${item.width}/${item.height};"` : '';
-        const linkHtml = item.downloadUrl
+        // A screenshot always has at least one of these two (enforced by
+        // skin-screenshots-upload.js) — both render when a publisher gave
+        // both an external link and a hosted .osk.
+        const linkBtnHtml = item.downloadUrl
             ? `<a class="btn ssc-link-btn" href="${escapeHtmlOsu(item.downloadUrl)}" target="_blank" rel="noopener noreferrer">${icon('externalLink', { extraClass: 'icon-label-gap' })}${t('ssc_download_link_title')}</a>`
-            : `<span class="ssc-no-link">${t('ssc_no_link')}</span>`;
+            : '';
+        const fileBtnHtml = item.oskFilename
+            ? `<a class="btn ssc-link-btn" href="/.netlify/functions/skin-screenshots-download?id=${item.id}">${icon('download', { extraClass: 'icon-label-gap' })}${t('ssc_download_file_title')}</a>`
+            : '';
         const authorLine = item.author ? t('ssc_by_author', { author: escapeHtmlOsu(item.author) }) : escapeHtmlOsu(item.username || '');
 
         return `
@@ -176,7 +182,7 @@ function renderSkinScreenshotsList() {
                     </div>
                     ${actionBtnHtml}
                 </div>
-                ${linkHtml}
+                <div class="ssc-links-row">${linkBtnHtml}${fileBtnHtml}</div>
             </div>
         </div>`;
     }).join('');
@@ -277,6 +283,8 @@ function resizeImageToJpeg(file, maxDim, quality) {
     });
 }
 
+const SKIN_SCREENSHOT_MAX_OSK_BYTES = 2.5 * 1024 * 1024;
+
 function previewSkinScreenshotFile(input) {
     const preview = document.getElementById('ssc-upload-preview');
     if (!preview) return;
@@ -284,6 +292,25 @@ function previewSkinScreenshotFile(input) {
     if (!file) { preview.innerHTML = ''; return; }
     const url = URL.createObjectURL(file);
     preview.innerHTML = `<img src="${url}" alt="">`;
+}
+
+/* Just names the chosen .osk (and flags an oversized one immediately,
+   before the user even hits publish) — the file itself is read fresh from
+   the input at submit time in uploadSkinScreenshot(), same as the
+   screenshot file input. */
+function previewSkinScreenshotOskFile(input) {
+    const nameEl = document.getElementById('ssc-upload-osk-name');
+    if (!nameEl) return;
+    const file = input.files && input.files[0];
+    if (!file) { nameEl.textContent = ''; return; }
+    if (file.size > SKIN_SCREENSHOT_MAX_OSK_BYTES) {
+        nameEl.textContent = t('ssc_osk_too_large', { limit: (SKIN_SCREENSHOT_MAX_OSK_BYTES / 1024 / 1024).toFixed(1) });
+        nameEl.style.color = '#ff5252';
+        input.value = '';
+        return;
+    }
+    nameEl.style.color = '';
+    nameEl.textContent = t('ssc_osk_selected', { name: file.name });
 }
 
 async function uploadSkinScreenshot() {
@@ -294,15 +321,23 @@ async function uploadSkinScreenshot() {
     const authorInput = document.getElementById('ssc-upload-author');
     const urlInput = document.getElementById('ssc-upload-url');
     const fileInput = document.getElementById('ssc-upload-file');
+    const oskFileInput = document.getElementById('ssc-upload-osk-file');
     const status = document.getElementById('ssc-upload-status');
     const skinName = nameInput.value.trim();
     const author = authorInput.value.trim();
     const downloadUrl = urlInput.value.trim();
     const file = fileInput.files && fileInput.files[0];
+    const oskFile = oskFileInput.files && oskFileInput.files[0];
 
     if (!skinName) { status.textContent = t('ssc_name_required'); status.style.color = '#ff5252'; return; }
     if (!file) { status.textContent = t('ssc_image_required'); status.style.color = '#ff5252'; return; }
+    if (!downloadUrl && !oskFile) { status.textContent = t('ssc_link_or_file_required'); status.style.color = '#ff5252'; return; }
     if (downloadUrl && !/^https?:\/\//i.test(downloadUrl)) { status.textContent = t('ssc_url_invalid'); status.style.color = '#ff5252'; return; }
+    if (oskFile && oskFile.size > SKIN_SCREENSHOT_MAX_OSK_BYTES) {
+        status.textContent = t('ssc_osk_too_large', { limit: (SKIN_SCREENSHOT_MAX_OSK_BYTES / 1024 / 1024).toFixed(1) });
+        status.style.color = '#ff5252';
+        return;
+    }
 
     status.textContent = t('ssc_uploading');
     status.style.color = '#c8a2e0';
@@ -310,10 +345,15 @@ async function uploadSkinScreenshot() {
     try {
         const { blob, width, height } = await resizeImageToJpeg(file, SKIN_SCREENSHOT_MAX_DIM, SKIN_SCREENSHOT_JPEG_QUALITY);
         const dataBase64 = await blobToBase64(blob);
+        const payload = { skinName, author, downloadUrl, mode: sscUploadMode, dataBase64, width, height };
+        if (oskFile) {
+            payload.oskDataBase64 = await blobToBase64(oskFile);
+            payload.oskFilename = oskFile.name;
+        }
         const res = await fetch('/.netlify/functions/skin-screenshots-upload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ skinName, author, downloadUrl, mode: sscUploadMode, dataBase64, width, height }),
+            body: JSON.stringify(payload),
         });
         if (res.status === 401) { status.textContent = t('ssc_login_required'); status.style.color = '#ff5252'; return; }
         const data = await res.json().catch(() => null);
@@ -325,8 +365,11 @@ async function uploadSkinScreenshot() {
         authorInput.value = '';
         urlInput.value = '';
         fileInput.value = '';
+        oskFileInput.value = '';
         const preview = document.getElementById('ssc-upload-preview');
         if (preview) preview.innerHTML = '';
+        const oskNameEl = document.getElementById('ssc-upload-osk-name');
+        if (oskNameEl) oskNameEl.textContent = '';
         if (skinScreenshotsLoaded) loadSkinScreenshotsPage(0);
     } catch (e) {
         console.error('Skin screenshot upload failed:', e);

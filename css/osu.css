@@ -1994,10 +1994,36 @@
 .ssc-like-btn.liked { border-color: rgba(var(--accent-pink-rgb), 0.6); background: rgba(var(--accent-pink-rgb), 0.12); color: var(--text-pink); }
 .ssc-like-btn:disabled { opacity: 0.6; cursor: default; }
 .ssc-delete-btn:hover { border-color: #f87171; color: #f87171; }
-.ssc-link-btn { display: flex; width: 100%; justify-content: center; margin-top: 10px; padding: 8px; font-size: 0.85rem; }
-.ssc-no-link { display: block; margin-top: 10px; text-align: center; font-size: 0.78rem; color: var(--text-dim2); }
+.ssc-links-row { display: flex; gap: 8px; margin-top: 10px; }
+.ssc-link-btn { display: flex; flex: 1; justify-content: center; padding: 8px; font-size: 0.85rem; }
 
-.ssc-upload-preview { margin: 10px 0; }
+/* Every direct child (input-group, hint text, file row, mode tabs, preview,
+   button, status) gets one consistent gap from the flex column itself —
+   simpler and more even than each element carrying its own margin, and
+   easy to retune in one place if the spacing ever feels off again. */
+.ssc-upload-form { display: flex; flex-direction: column; gap: 14px; }
+.ssc-upload-form > * { margin: 0; }
+.ssc-upload-form .osu-mode-tabs { margin: 0; }
+
+.ssc-upload-hint { font-size: 0.78rem; color: var(--text-dim2); line-height: 1.5; text-align: center; }
+
+/* Mode icons read a little small at .mode-icon-inline's sitewide 15px
+   default (used everywhere from diff-icon rows to card badges) — sized up
+   specifically for this page's two mode-tab rows rather than globally. */
+#ssc-upload-mode-tabs .mode-icon-inline,
+#skin-screenshots-mode-filter .mode-icon-inline {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+
+.ssc-upload-osk-name {
+    font-size: 0.82rem;
+    color: var(--text-pink);
+    text-align: center;
+}
+.ssc-upload-osk-name:empty { display: none; }
+
 .ssc-upload-preview:empty { display: none; }
 .ssc-upload-preview img {
     display: block;
