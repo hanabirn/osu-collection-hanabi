@@ -1,5 +1,5 @@
 I18N.en = {
-    title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Beatmap Collection + PP Lookup ✦',
+    title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Build your very own song collection! ✦',
     pwa_install_btn_title: 'Add to home screen (works offline)',
     site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click 🔄 in the top right to update',
     page_refresh_btn_title: 'Refresh page',
@@ -7,6 +7,7 @@ I18N.en = {
     track_done: "Added to your watchlist — we'll notify you when their PP changes", untrack_done: 'Removed from your watchlist',
     tracked_players_title: '🔔 Tracked players', tracked_players_empty: "You're not tracking anyone yet — look someone up and hit \"Track\" to get notified when their PP changes",
     notif_bell_title: 'Notifications', notif_clear_btn: 'Clear all', notif_empty: 'No notifications yet',
+    contact_info_title: 'Contact info',
     notif_pp_changed_detail: '{sign}{delta}pp (now {pp}pp)', notif_tournament_new_title: 'New tournament post',
     back_to_main: 'Back to Hanabiの小天地',
     nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_tournaments: 'Tournaments', nav_feedback: 'Suggestions',

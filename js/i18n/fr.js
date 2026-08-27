@@ -1,5 +1,5 @@
 I18N.fr = {
-    title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Collection de beatmaps + recherche PP ✦',
+    title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Constitue ta propre collection de morceaux ! ✦',
     pwa_install_btn_title: "Ajouter à l'écran d'accueil (fonctionne hors ligne)",
     site_update_btn_title: 'Une mise à jour est disponible, cliquez pour mettre à jour', site_update_available: 'Une nouvelle version du site est disponible — cliquez sur 🔄 en haut à droite pour mettre à jour',
     page_refresh_btn_title: 'Actualiser la page',
@@ -7,6 +7,7 @@ I18N.fr = {
     track_done: 'Ajouté à votre liste de suivi — on vous préviendra en cas de changement de PP', untrack_done: 'Retiré de votre liste de suivi',
     tracked_players_title: '🔔 Joueurs suivis', tracked_players_empty: "Vous ne suivez personne pour l'instant — recherchez un joueur et cliquez sur « Suivre » pour être averti d'un changement de PP",
     notif_bell_title: 'Notifications', notif_clear_btn: 'Tout effacer', notif_empty: 'Aucune notification',
+    contact_info_title: 'Coordonnées',
     notif_pp_changed_detail: '{sign}{delta}pp (maintenant {pp}pp)', notif_tournament_new_title: 'Nouveau sujet de tournoi',
     back_to_main: 'Retour à Hanabiの小天地',
     nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_tournaments: 'Tournois', nav_feedback: 'Suggestions',

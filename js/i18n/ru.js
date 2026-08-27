@@ -1,5 +1,5 @@
 I18N.ru = {
-    title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Коллекция битмапов + поиск PP ✦',
+    title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Собери свою собственную коллекцию песен! ✦',
     pwa_install_btn_title: 'Добавить на главный экран (работает офлайн)',
     site_update_btn_title: 'Доступно обновление, нажмите для обновления', site_update_available: 'Доступна новая версия сайта — нажмите 🔄 в правом верхнем углу, чтобы обновить',
     page_refresh_btn_title: 'Обновить страницу',
@@ -7,6 +7,7 @@ I18N.ru = {
     track_done: 'Добавлено в список отслеживания — сообщим при изменении PP', untrack_done: 'Удалено из списка отслеживания',
     tracked_players_title: '🔔 Отслеживаемые игроки', tracked_players_empty: 'Вы пока никого не отслеживаете — найдите игрока и нажмите «Отслеживать», чтобы получать уведомления об изменении PP',
     notif_bell_title: 'Уведомления', notif_clear_btn: 'Очистить всё', notif_empty: 'Пока нет уведомлений',
+    contact_info_title: 'Контактная информация',
     notif_pp_changed_detail: '{sign}{delta}pp (сейчас {pp}pp)', notif_tournament_new_title: 'Новая тема турнира',
     back_to_main: 'Назад на Hanabiの小天地',
     nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_tournaments: 'Турниры', nav_feedback: 'Предложения',

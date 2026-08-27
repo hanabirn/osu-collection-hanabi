@@ -27,6 +27,7 @@
     <div class="bg-glow glow-1"></div>
     <div class="bg-glow glow-2"></div>
     <div class="bg-glow glow-3"></div>
+    <div class="world-grid" aria-hidden="true"></div>
     <div class="hit-circles">
         <div class="hit-circle hc-1"></div>
         <div class="hit-circle hc-2"></div>
@@ -58,18 +59,43 @@
                     <span class="title-note tn-6">&#9835;</span>
                 </span>
             </div>
-            <p class="site-tagline" data-i18n="site_tagline">✦ Beatmap 收藏 + PP 查詢 ✦</p>
+            <p class="site-tagline" data-i18n="site_tagline">✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦</p>
         </div>
     </div>
     <div class="header-bottom-row">
-        <a class="back-to-main" href="https://hanabirn.github.io/" data-icon="arrowLeft" data-icon-gap><span data-i18n="back_to_main">返回 Hanabiの小天地</span></a>
         <div class="header-icons">
-            <div class="osu-login-widget" id="osu-login-widget">
-                <a id="osu-login-btn" class="osu-login-btn" href="/.netlify/functions/osu-login" data-icon="key" data-icon-gap><span data-i18n="osu_login_btn">osu! 登入</span></a>
-                <div id="osu-logged-in-pill" class="osu-logged-in-pill" style="display:none;">
-                    <img id="osu-logged-in-avatar" class="osu-logged-in-avatar" alt="">
-                    <span id="osu-logged-in-name" class="osu-logged-in-name"></span>
-                    <button class="osu-logout-btn" onclick="logoutOsuUser()" data-i18n-title="osu_logout_btn" title="登出" data-icon="x"></button>
+            <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()"></button>
+            <button id="pwa-install-btn" class="theme-toggle-btn" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
+            <button id="site-update-btn" class="theme-toggle-btn site-update-btn" onclick="applySiteUpdate()" style="display:none;" data-i18n-title="site_update_btn_title" title="網站有更新，點擊更新" data-icon="refreshCw"></button>
+            <button id="page-refresh-btn" class="theme-toggle-btn" onclick="location.reload()" data-i18n-title="page_refresh_btn_title" title="重新整理頁面" data-icon="rotateCw"></button>
+            <div class="contact-info" id="contact-info">
+                <button class="contact-info-btn" id="contact-info-btn" onclick="toggleContactMenu()" aria-haspopup="true" aria-expanded="false" data-i18n-title="contact_info_title" title="聯絡資訊" data-icon="mail"></button>
+                <div class="contact-info-menu" id="contact-info-menu">
+                    <a class="contact-info-item" href="mailto:azusawakohane12@gmail.com" data-icon="mail" data-icon-gap>
+                        <span class="contact-info-label">Gmail</span><span class="contact-info-value">azusawakohane12@gmail.com</span>
+                    </a>
+                    <div class="contact-info-item contact-info-item-static" data-icon="messageCircle" data-icon-gap>
+                        <span class="contact-info-label">Discord</span><span class="contact-info-value">hanabihanabi</span>
+                    </div>
+                    <a class="contact-info-item" href="https://instagram.com/hanabi_rn436" target="_blank" rel="noopener noreferrer" data-icon="instagram" data-icon-gap>
+                        <span class="contact-info-label">Instagram</span><span class="contact-info-value">hanabi_rn436</span>
+                    </a>
+                    <div class="contact-info-item contact-info-item-static" data-icon="facebook" data-icon-gap>
+                        <span class="contact-info-label">Facebook</span><span class="contact-info-value">Shi-Heng Chen</span>
+                    </div>
+                </div>
+            </div>
+            <div class="lang-globe" id="lang-globe">
+                <button class="lang-globe-btn" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language" data-icon="globe" data-icon-gap><span id="lang-globe-current">中文</span></button>
+                <div class="lang-globe-menu" id="lang-globe-menu">
+                    <button class="lang-pill active" data-lang="zh" onclick="applyLang('zh'); toggleLangMenu(false)">中文</button>
+                    <button class="lang-pill" data-lang="en" onclick="applyLang('en'); toggleLangMenu(false)">EN</button>
+                    <button class="lang-pill" data-lang="ja" onclick="applyLang('ja'); toggleLangMenu(false)">日本語</button>
+                    <button class="lang-pill" data-lang="ko" onclick="applyLang('ko'); toggleLangMenu(false)">한국어</button>
+                    <button class="lang-pill" data-lang="ru" onclick="applyLang('ru'); toggleLangMenu(false)">Русский</button>
+                    <button class="lang-pill" data-lang="fr" onclick="applyLang('fr'); toggleLangMenu(false)">Français</button>
+                    <button class="lang-pill" data-lang="es" onclick="applyLang('es'); toggleLangMenu(false)">Español</button>
+                    <button class="lang-pill" data-lang="de" onclick="applyLang('de'); toggleLangMenu(false)">Deutsch</button>
                 </div>
             </div>
             <div class="notif-bell" id="notif-bell">
@@ -84,23 +110,14 @@
                     <div class="notif-menu-list" id="notif-menu-list"></div>
                 </div>
             </div>
-            <div class="lang-globe" id="lang-globe">
-                <button class="lang-globe-btn" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language" data-icon="globe"></button>
-                <div class="lang-globe-menu" id="lang-globe-menu">
-                    <button class="lang-pill active" data-lang="zh" onclick="applyLang('zh'); toggleLangMenu(false)">中文</button>
-                    <button class="lang-pill" data-lang="en" onclick="applyLang('en'); toggleLangMenu(false)">EN</button>
-                    <button class="lang-pill" data-lang="ja" onclick="applyLang('ja'); toggleLangMenu(false)">日本語</button>
-                    <button class="lang-pill" data-lang="ko" onclick="applyLang('ko'); toggleLangMenu(false)">한국어</button>
-                    <button class="lang-pill" data-lang="ru" onclick="applyLang('ru'); toggleLangMenu(false)">Русский</button>
-                    <button class="lang-pill" data-lang="fr" onclick="applyLang('fr'); toggleLangMenu(false)">Français</button>
-                    <button class="lang-pill" data-lang="es" onclick="applyLang('es'); toggleLangMenu(false)">Español</button>
-                    <button class="lang-pill" data-lang="de" onclick="applyLang('de'); toggleLangMenu(false)">Deutsch</button>
+            <div class="osu-login-widget osu-login-widget-large" id="osu-login-widget">
+                <a id="osu-login-btn" class="osu-login-btn osu-login-btn-large" href="/.netlify/functions/osu-login" data-icon="key" data-icon-gap><span data-i18n="osu_login_btn">osu! 登入</span></a>
+                <div id="osu-logged-in-pill" class="osu-logged-in-pill osu-logged-in-pill-large" style="display:none;">
+                    <img id="osu-logged-in-avatar" class="osu-logged-in-avatar" alt="">
+                    <span id="osu-logged-in-name" class="osu-logged-in-name"></span>
+                    <button class="osu-logout-btn" onclick="logoutOsuUser()" data-i18n-title="osu_logout_btn" title="登出" data-icon="x"></button>
                 </div>
             </div>
-            <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()"></button>
-            <button id="pwa-install-btn" class="theme-toggle-btn" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
-            <button id="site-update-btn" class="theme-toggle-btn site-update-btn" onclick="applySiteUpdate()" style="display:none;" data-i18n-title="site_update_btn_title" title="網站有更新，點擊更新" data-icon="refreshCw"></button>
-            <button id="page-refresh-btn" class="theme-toggle-btn" onclick="location.reload()" data-i18n-title="page_refresh_btn_title" title="重新整理頁面" data-icon="rotateCw"></button>
         </div>
     </div>
     <nav class="site-nav">

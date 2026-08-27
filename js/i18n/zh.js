@@ -1,5 +1,5 @@
 I18N.zh = {
-    title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ Beatmap 收藏 + PP 查詢 ✦',
+    title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦',
     pwa_install_btn_title: '加到主畫面（離線可用）',
     site_update_btn_title: '網站有更新，點擊更新', site_update_available: '網站有新版本可用，點擊右上角 🔄 完成更新',
     page_refresh_btn_title: '重新整理頁面',
@@ -7,6 +7,7 @@ I18N.zh = {
     track_done: '已加入追蹤清單，PP 有變化時會通知你', untrack_done: '已取消追蹤',
     tracked_players_title: '🔔 追蹤中的玩家', tracked_players_empty: '尚未追蹤任何玩家，查詢後點擊「追蹤」即可加入清單，PP 有變化時會通知你',
     notif_bell_title: '通知', notif_clear_btn: '清除全部', notif_empty: '目前沒有通知',
+    contact_info_title: '聯絡資訊',
     notif_pp_changed_detail: '{sign}{delta}pp（目前 {pp}pp）', notif_tournament_new_title: '新賽事貼文',
     back_to_main: '返回 Hanabiの小天地',
     nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報', nav_tournaments: '賽事', nav_feedback: '建議&改進',

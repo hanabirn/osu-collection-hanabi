@@ -35,7 +35,8 @@ a:hover { text-decoration: underline; }
    the language dropdown and notification bell menus do — temporarily lift
    the clip while either is open instead of removing overflow:hidden outright. */
 .site-header.lang-menu-open,
-.site-header.notif-menu-open {
+.site-header.notif-menu-open,
+.site-header.contact-menu-open {
     overflow: visible;
 }
 
@@ -72,7 +73,9 @@ a:hover { text-decoration: underline; }
     .tn-3, .tn-4 { font-size: 1.6rem; }
     .header-logo { gap: 4px; }
     .title-notes { gap: 2px; }
-    .lang-globe-btn { width: 32px; height: 32px; font-size: 1rem; }
+    .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: 1rem; padding: 0 8px; }
+    .site-title-block h1 { font-size: 2.1rem; }
+    .logo-icon svg { width: 46px; height: 46px; }
 }
 
 .site-header-top {
@@ -96,7 +99,7 @@ a:hover { text-decoration: underline; }
     filter: drop-shadow(0 0 8px rgba(var(--accent-pink-rgb), 0.55));
     animation: logoBeatHit 1.6s cubic-bezier(.36,.07,.19,.97) infinite;
 }
-.logo-icon svg { width: 56px; height: 56px; display: block; }
+.logo-icon svg { width: 68px; height: 68px; display: block; }
 .logo-icon::after {
     content: '';
     position: absolute;
@@ -121,7 +124,7 @@ a:hover { text-decoration: underline; }
     100% { opacity: 0;   transform: scale(1.6); }
 }
 .site-title-block h1 {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
     font-weight: 900;
     background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple), var(--accent-pink), var(--text-pink));
     background-size: 300% auto;
@@ -302,28 +305,102 @@ a:hover { text-decoration: underline; }
 }
 .notif-item-time { font-size: 0.68rem; color: var(--text-dim2); opacity: 0.7; margin-top: 2px; }
 
-.lang-globe {
+.contact-info {
     position: relative;
 }
-.lang-globe-btn {
+.contact-info-btn {
     width: 36px;
     height: 36px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
     border: 1px solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
 }
-.lang-globe-btn:hover,
-.lang-globe.open .lang-globe-btn {
+.contact-info-btn:hover,
+.contact-info.open .contact-info-btn {
     background: rgba(var(--accent-pink-rgb), 0.14);
     border-color: var(--accent-pink);
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+}
+.contact-info-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 240px;
+    padding: 8px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    z-index: 210;
+}
+.contact-info.open .contact-info-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.contact-info-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.85rem;
+    transition: background 0.15s;
+}
+a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
+.contact-info-item-static { cursor: default; }
+.contact-info-label { font-weight: bold; flex-shrink: 0; }
+.contact-info-value {
+    color: var(--text-dim2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: auto;
+    padding-left: 10px;
+}
+
+.lang-globe {
+    position: relative;
+}
+.lang-globe-btn {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 18px;
+    /* Stronger than the plain .lang-pill-bg/-border used elsewhere in the
+       header — this button now carries a language name as text, not just
+       an icon, so it needs to read clearly as a control on its own rather
+       than blend into the row. */
+    background: rgba(var(--accent-purple-rgb), 0.16);
+    border: 1px solid rgba(var(--accent-purple-rgb), 0.45);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+}
+.lang-globe-btn:hover,
+.lang-globe.open .lang-globe-btn {
+    background: rgba(var(--accent-pink-rgb), 0.2);
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.35);
+    transform: translateY(-1px);
 }
 .lang-globe-menu {
     position: absolute;
@@ -351,6 +428,7 @@ a:hover { text-decoration: underline; }
 }
 
 .theme-toggle-btn {
+    position: relative;
     background: var(--theme-toggle-bg);
     border: 1px solid var(--theme-toggle-border);
     border-radius: 50%;
@@ -368,6 +446,69 @@ a:hover { text-decoration: underline; }
     box-shadow: 0 0 12px rgba(var(--accent-purple-rgb), 0.35);
 }
 .theme-toggle-btn:active { transform: scale(0.92) rotate(15deg); }
+
+/* ===== #theme-toggle's transient "you're now in ___ mode" flourish =====
+   See themeToggleDecoHTML() in js/theme.js — these elements are fresh DOM
+   nodes on every theme switch, so the animations below just autoplay once
+   on insertion and settle at opacity:0 (their `forwards` fill-mode), no JS
+   cleanup needed before the next switch replaces them again. */
+.tt-deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    color: var(--accent-yellow);
+}
+.tt-deco-sun {
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.7));
+    animation: ttSunPop 1.3s var(--ease-out) forwards;
+}
+.tt-deco-cloud { color: #fff; opacity: 0.9; }
+.tt-deco-cloud-a { top: 2px; left: -10px; animation: ttCloudDrift 1.3s var(--ease-out) forwards; }
+.tt-deco-cloud-b { bottom: 0px; right: -9px; animation: ttCloudDrift 1.3s var(--ease-out) 0.15s forwards; }
+.tt-deco-moon {
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #e2e8f0;
+    filter: drop-shadow(0 0 4px rgba(226, 232, 240, 0.6));
+    animation: ttMoonPop 1.3s var(--ease-out) forwards;
+}
+.tt-deco-star { color: #fef08a; }
+.tt-deco-star-a { top: -4px; left: -8px; animation: ttStarTwinkle 1.3s ease-out forwards; }
+.tt-deco-star-b { top: -4px; right: -8px; animation: ttStarTwinkle 1.3s ease-out 0.2s forwards; }
+.tt-deco-star-c { bottom: -2px; left: 50%; transform: translateX(-50%); animation: ttStarTwinkle 1.3s ease-out 0.4s forwards; }
+@keyframes ttSunPop {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.3); }
+    20%  { opacity: 1; transform: translateX(-50%) scale(1.15); }
+    35%  { transform: translateX(-50%) scale(1); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.85); }
+}
+@keyframes ttMoonPop {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-20deg); }
+    20%  { opacity: 1; transform: translateX(-50%) scale(1.1) rotate(0deg); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.9); }
+}
+@keyframes ttCloudDrift {
+    0%   { opacity: 0; transform: translateX(-4px); }
+    25%  { opacity: 0.9; transform: translateX(0); }
+    75%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translateX(6px); }
+}
+@keyframes ttStarTwinkle {
+    0%   { opacity: 0; transform: scale(0.4); }
+    20%  { opacity: 1; transform: scale(1.2); }
+    35%  { opacity: 0.6; transform: scale(0.8); }
+    50%  { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(0.7); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .tt-deco { display: none; }
+}
 
 /* Gentle pulse so a waiting update doesn't just sit there unnoticed in a
    row of otherwise-static icon buttons — same visual language as the
@@ -440,6 +581,33 @@ a:hover { text-decoration: underline; }
 }
 .osu-logout-btn:hover { color: var(--accent-pink); }
 
+/* Larger, higher-contrast osu! login control — this is the header's primary
+   call-to-action (everything else up here is a utility icon), so it gets
+   its own size bump on top of the shared .osu-login-btn/.osu-logged-in-pill
+   base styling rather than just inheriting the same 34px-tall look. */
+.osu-login-btn-large {
+    height: 42px;
+    padding: 0 20px;
+    border-radius: 21px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(var(--accent-pink-rgb), 0.3);
+}
+.osu-login-btn-large:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(var(--accent-pink-rgb), 0.4);
+}
+.osu-logged-in-pill-large {
+    height: 42px;
+    padding: 0 10px 0 6px;
+    border-radius: 21px;
+}
+.osu-logged-in-pill-large .osu-logged-in-avatar { width: 30px; height: 30px; }
+.osu-logged-in-pill-large .osu-logged-in-name { font-size: 0.9rem; max-width: 140px; }
+
 .header-bottom-row {
     display: flex;
     align-items: center;
@@ -452,10 +620,6 @@ a:hover { text-decoration: underline; }
     display: flex;
     align-items: center;
     gap: 8px;
-}
-.back-to-main {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
 }
 
 .site-nav {
@@ -515,6 +679,36 @@ a:hover { text-decoration: underline; }
     max-width: 640px;
     margin: 0 auto;
     padding: 24px 16px 60px;
+}
+
+/* ===== Per-tab flowing gradient border =====
+   Every .site-page section gets the same framed-panel treatment: a
+   transparent border painted from a second, larger background layer whose
+   position keeps shifting — the classic two-background-layer border trick
+   (padding-box for the panel fill, border-box for the gradient), same
+   technique .site-nav-btn::after already uses for its underline shimmer,
+   just applied to the whole tab instead of one small underline. */
+.site-page {
+    position: relative;
+    border-radius: 20px;
+    border: 1.5px solid transparent;
+    padding: 20px 16px 28px;
+    background:
+        linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+        linear-gradient(120deg, var(--accent-pink), var(--accent-purple), var(--accent-light-purple), var(--accent-pink)) border-box;
+    background-size: 100% 100%, 300% 300%;
+    box-shadow: var(--shadow-card);
+    animation: sitePageBorderFlow 10s linear infinite;
+}
+@keyframes sitePageBorderFlow {
+    0%   { background-position: 0 0, 0% 50%; }
+    100% { background-position: 0 0, 300% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .site-page { animation: none; }
+}
+@media (max-width: 600px) {
+    .site-page { padding: 16px 10px 22px; border-radius: 16px; }
 }
 
 .site-footer {

@@ -1,5 +1,5 @@
 I18N.ja = {
-    title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ ビートマップコレクション＋PP検索 ✦',
+    title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ あなただけの楽曲コレクションを作ろう！ ✦',
     pwa_install_btn_title: 'ホーム画面に追加（オフライン対応）',
     site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。右上の 🔄 をクリックして更新してください',
     page_refresh_btn_title: 'ページを再読み込み',
@@ -7,6 +7,7 @@ I18N.ja = {
     track_done: 'ウォッチリストに追加しました。PP が変化したら通知します', untrack_done: 'フォローを解除しました',
     tracked_players_title: '🔔 フォロー中のプレイヤー', tracked_players_empty: 'まだ誰もフォローしていません。検索して「フォロー」を押すと、PP の変化を通知します',
     notif_bell_title: '通知', notif_clear_btn: 'すべて消去', notif_empty: '通知はありません',
+    contact_info_title: '連絡先',
     notif_pp_changed_detail: '{sign}{delta}pp（現在 {pp}pp）', notif_tournament_new_title: '新しい大会スレッド',
     back_to_main: 'Hanabiの小天地に戻る',
     nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_tournaments: '大会', nav_feedback: 'ご意見&改善',

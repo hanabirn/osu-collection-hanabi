@@ -47,6 +47,32 @@ function onLangMenuEscape(e) {
     if (e.key === 'Escape') toggleLangMenu(false);
 }
 
+/* ===== ✉️ Contact info dropdown ===== (same open/outside-click/Escape
+   pattern as the language dropdown above) */
+function toggleContactMenu(forceOpen) {
+    const wrap = document.getElementById('contact-info');
+    const btn = document.getElementById('contact-info-btn');
+    const header = document.querySelector('.site-header');
+    if (!wrap || !btn) return;
+    const open = typeof forceOpen === 'boolean' ? forceOpen : !wrap.classList.contains('open');
+    wrap.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    if (header) header.classList.toggle('contact-menu-open', open);
+    if (open) {
+        document.addEventListener('click', onContactMenuOutsideClick);
+        document.addEventListener('keydown', onContactMenuEscape);
+    } else {
+        document.removeEventListener('click', onContactMenuOutsideClick);
+        document.removeEventListener('keydown', onContactMenuEscape);
+    }
+}
+function onContactMenuOutsideClick(e) {
+    if (!e.target.closest('#contact-info')) toggleContactMenu(false);
+}
+function onContactMenuEscape(e) {
+    if (e.key === 'Escape') toggleContactMenu(false);
+}
+
 /* ===== Re-render already-rendered dynamic content after a language switch =====
    The collection grid bakes t()-driven strings (mapped_by, empty-state text)
    into its innerHTML at render time, so a language switch needs a re-render

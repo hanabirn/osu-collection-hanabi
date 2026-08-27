@@ -1,5 +1,5 @@
 I18N.ko = {
-    title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 비트맵 컬렉션 + PP 조회 ✦',
+    title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 나만의 곡 컬렉션을 만들어보세요! ✦',
     pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
     site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 오른쪽 위 🔄 을 클릭해 업데이트하세요',
     page_refresh_btn_title: '페이지 새로고침',
@@ -7,6 +7,7 @@ I18N.ko = {
     track_done: '추적 목록에 추가되었습니다. PP가 변하면 알려드릴게요', untrack_done: '추적을 해제했습니다',
     tracked_players_title: '🔔 추적 중인 플레이어', tracked_players_empty: '아직 추적 중인 플레이어가 없습니다. 검색 후 "추적"을 누르면 PP 변화를 알려드립니다',
     notif_bell_title: '알림', notif_clear_btn: '모두 지우기', notif_empty: '알림이 없습니다',
+    contact_info_title: '연락처',
     notif_pp_changed_detail: '{sign}{delta}pp (현재 {pp}pp)', notif_tournament_new_title: '새 대회 게시글',
     back_to_main: 'Hanabiの小天地로 돌아가기',
     nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_tournaments: '대회', nav_feedback: '제안&개선',

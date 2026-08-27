@@ -38,6 +38,12 @@ function applyLang(lang) {
     document.querySelectorAll('.lang-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
+    // Each language names itself (not translated content), so this just
+    // copies whichever .lang-pill already carries that name rather than
+    // duplicating the eight labels into a separate lookup table.
+    const currentPill = document.querySelector(`.lang-pill[data-lang="${lang}"]`);
+    const currentLabel = document.getElementById('lang-globe-current');
+    if (currentPill && currentLabel) currentLabel.textContent = currentPill.textContent;
     if (t.title) document.title = t.title;
     if (typeof refreshDynamicContent === 'function') refreshDynamicContent();
 }
