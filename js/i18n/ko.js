@@ -52,6 +52,7 @@ I18N.ko = {
     featured_beatmap_label: '✦ 오늘의 추천 ✦',
     osu_export: '컬렉션 내보내기', osu_import: '컬렉션 가져오기',
     osu_export_done: '내보내기 완료!', osu_import_done: '가져오기 완료!', osu_import_fail: '가져오기 실패. 파일 형식을 확인하세요',
+    osu_import_fail_json: '가져오기 실패: 유효한 JSON 파일이 아닙니다', osu_import_fail_format: '가져오기 실패: 파일에 컬렉션 데이터(collection 필드)가 없습니다',
 
     osu_download_btn_title: '직접 다운로드 (로그인 불필요 미러)',
     pp_calc_btn_title: 'PP 계산 & 난이도 곡선', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '정확도', pp_calc_run: '계산',

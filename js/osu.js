@@ -279,9 +279,13 @@ async function toggleOsuFavorite(setId, event) {
 
 /* ===== Custom collection categories =====
    Generalizes the single "Favorites" tag into user-defined named tags,
-   many-to-many with beatmaps. Local-only — deliberately not included in
-   shareOsuCollectionLink()/checkImportFromHash() or the public gallery
-   publish, same reach as favorites today. */
+   many-to-many with beatmaps. Carried along by the JSON export/import
+   (exportOsuCollection/importOsuCollection) and by shareOsuCollectionLink/
+   checkImportFromHash (see mergeIncomingCategories) so a category survives
+   a move to another device either way — but still deliberately excluded
+   from the public gallery publish (js/public-collections.js), since a
+   category is personal organization, not something worth exposing as
+   public metadata about a published collection. */
 /* Locale-aware sort so categories display in a sensible order regardless
    of what script their names happen to be in: 'ja' collation gives real
    alphabetical order for Latin names, gojuon (あいうえお) order for kana,
@@ -553,8 +557,15 @@ function runOsuBgSlideCarousel(intervalMs) {
     }, intervalMs);
 }
 
+// Bumped whenever the exported shape changes in a way that matters for
+// import-time compatibility decisions — not enforced as a hard gate (older
+// exports with no schemaVersion at all are still accepted, see importOsuCollection),
+// just carried along so a future incompatible format has something to check.
+const OSU_EXPORT_SCHEMA_VERSION = 1;
+
 function exportOsuCollection() {
     const data = {
+        schemaVersion: OSU_EXPORT_SCHEMA_VERSION,
         collection: getOsuCollection(),
         favorites: getOsuFavorites(),
         categories: getOsuCategories(),
@@ -571,26 +582,68 @@ function exportOsuCollection() {
     showShareToast(t('osu_export_done'));
 }
 
+/* Drops any categoryMembers entries that reference a category id not present
+   in `categories`, or a beatmapset id not present in `collection` — an
+   import built by hand, from an older export, or from a partially-edited
+   file could otherwise leave orphaned references that the category picker/
+   tabs would silently choke on. De-dupes category ids too, keeping the
+   first occurrence (a hand-edited file is the realistic way to end up with
+   duplicates; a normal export never does). */
+function sanitizeImportedCategoryData(collection, categories, categoryMembers) {
+    const validSetIds = new Set(OSU_MODES.flatMap(m => (collection[m] || []).map(s => s.beatmapset_id)));
+    const seenIds = new Set();
+    const cleanCategories = categories.filter(c => {
+        if (!c || typeof c.id !== 'string' || typeof c.name !== 'string') return false;
+        if (seenIds.has(c.id)) return false;
+        seenIds.add(c.id);
+        return true;
+    });
+    const cleanMembers = {};
+    for (const catId of seenIds) {
+        const ids = Array.isArray(categoryMembers[catId]) ? categoryMembers[catId] : [];
+        const filtered = ids.filter(id => validSetIds.has(id));
+        if (filtered.length) cleanMembers[catId] = filtered;
+    }
+    return { categories: cleanCategories, categoryMembers: cleanMembers };
+}
+
 async function importOsuCollection(event) {
     const file = event.target.files[0];
     if (!file) return;
     if (!await verifyOsuPassword()) { event.target.value = ''; return; }
+
+    let data;
     try {
         const text = await file.text();
-        const data = JSON.parse(text);
-        if (!data.collection || !OSU_MODES.every(m => Array.isArray(data.collection[m]))) {
-            throw new Error('invalid format');
-        }
+        data = JSON.parse(text);
+    } catch (e) {
+        console.error('Import failed (not valid JSON):', e);
+        alert(t('osu_import_fail_json'));
+        event.target.value = '';
+        return;
+    }
+    if (!data || typeof data !== 'object' || !data.collection || !OSU_MODES.every(m => Array.isArray(data.collection[m]))) {
+        console.error('Import failed (missing/invalid collection field)');
+        alert(t('osu_import_fail_format'));
+        event.target.value = '';
+        return;
+    }
+
+    try {
         saveOsuCollection(data.collection);
         if (Array.isArray(data.favorites)) saveOsuFavorites(data.favorites);
-        if (Array.isArray(data.categories)) saveOsuCategories(data.categories);
-        if (data.categoryMembers && typeof data.categoryMembers === 'object' && !Array.isArray(data.categoryMembers)) {
-            saveOsuCategoryMembers(data.categoryMembers);
-        }
+
+        const rawCategories = Array.isArray(data.categories) ? data.categories : [];
+        const rawMembers = (data.categoryMembers && typeof data.categoryMembers === 'object' && !Array.isArray(data.categoryMembers))
+            ? data.categoryMembers : {};
+        const { categories, categoryMembers } = sanitizeImportedCategoryData(data.collection, rawCategories, rawMembers);
+        saveOsuCategories(categories);
+        saveOsuCategoryMembers(categoryMembers);
+
         renderOsuCollection();
         showShareToast(t('osu_import_done'));
     } catch (e) {
-        console.error('Import failed:', e);
+        console.error('Import failed while applying data:', e);
         alert(t('osu_import_fail'));
     } finally {
         event.target.value = '';
@@ -802,7 +855,16 @@ async function shareOsuCollectionLink() {
         return;
     }
     try {
-        const encoded = await compressToBase64Url({ collection: col });
+        // Categories/categoryMembers ride along too now (previously
+        // share-link-only synced the raw collection, so a beatmap crossing
+        // devices this way would silently lose which category/tab it was
+        // filed under — the JSON file export/import already carried these,
+        // this just brings the share-link path to parity with it).
+        const encoded = await compressToBase64Url({
+            collection: col,
+            categories: getOsuCategories(),
+            categoryMembers: getOsuCategoryMembers(),
+        });
         const url = `${location.origin}${location.pathname}#import=${encoded}`;
         await navigator.clipboard.writeText(url);
         showShareToast(t('osu_share_link_done'));
@@ -832,6 +894,45 @@ function mergeIncomingCollection(incoming) {
     return added;
 }
 
+/* Merges incoming categories into the visitor's own, matching by name
+   (category ids are per-device crypto.randomUUID()s — see
+   addOsuCategoryFromModal — so two devices' categories never share an id
+   even when they're "the same" category by the user's own reckoning,
+   making name the only sensible merge key). A name match reuses the local
+   id and unions its members; an unmatched incoming category is created
+   locally with a fresh id. Members are filtered to beatmapset ids that
+   actually exist in the (already-merged) local collection, same defensive
+   reasoning as sanitizeImportedCategoryData for the file-import path. */
+function mergeIncomingCategories(incomingCategories, incomingCategoryMembers) {
+    if (!Array.isArray(incomingCategories) || incomingCategories.length === 0) return 0;
+    const col = getOsuCollection();
+    const validSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
+
+    const localCategories = getOsuCategories();
+    const localMembers = getOsuCategoryMembers();
+    const nameToLocalId = new Map(localCategories.map(c => [c.name, c.id]));
+    let touched = 0;
+
+    for (const inCat of incomingCategories) {
+        if (!inCat || typeof inCat.id !== 'string' || typeof inCat.name !== 'string') continue;
+        let localId = nameToLocalId.get(inCat.name);
+        if (!localId) {
+            localId = crypto.randomUUID();
+            localCategories.push({ id: localId, name: inCat.name });
+            nameToLocalId.set(inCat.name, localId);
+        }
+        const incomingIds = (incomingCategoryMembers && Array.isArray(incomingCategoryMembers[inCat.id]))
+            ? incomingCategoryMembers[inCat.id] : [];
+        const merged = new Set(localMembers[localId] || []);
+        for (const id of incomingIds) if (validSetIds.has(id)) merged.add(id);
+        if (merged.size) { localMembers[localId] = [...merged]; touched++; }
+    }
+
+    saveOsuCategories(localCategories);
+    saveOsuCategoryMembers(localMembers);
+    return touched;
+}
+
 async function checkImportFromHash() {
     const hash = location.hash;
     if (!hash.startsWith('#import=')) return;
@@ -846,6 +947,10 @@ async function checkImportFromHash() {
         if (!confirm(t('osu_share_link_import_confirm', { n: incomingCount }))) return;
 
         const added = mergeIncomingCollection(data.collection);
+        // Older share links (generated before categories were included)
+        // simply won't have this field — mergeIncomingCategories no-ops on
+        // an empty/missing array, so this stays backward compatible.
+        mergeIncomingCategories(data.categories, data.categoryMembers);
         renderOsuCollection();
         showShareToast(t('osu_share_link_imported', { n: added }));
     } catch (e) {

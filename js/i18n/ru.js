@@ -52,6 +52,7 @@ I18N.ru = {
     featured_beatmap_label: '✦ Рекомендация дня ✦',
     osu_export: 'Экспорт коллекции', osu_import: 'Импорт коллекции',
     osu_export_done: 'Коллекция экспортирована!', osu_import_done: 'Коллекция импортирована!', osu_import_fail: 'Ошибка импорта. Проверьте формат файла',
+    osu_import_fail_json: 'Ошибка импорта: файл не является корректным JSON', osu_import_fail_format: 'Ошибка импорта: в файле отсутствуют данные коллекции (поле collection)',
 
     osu_download_btn_title: 'Прямая загрузка (зеркало без входа)',
     pp_calc_btn_title: 'Калькулятор PP и график сложности', pp_calc_mods_label: 'Моды', pp_calc_acc_label: 'Точность', pp_calc_run: 'Рассчитать',

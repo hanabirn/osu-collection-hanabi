@@ -52,6 +52,7 @@ I18N.fr = {
     featured_beatmap_label: '✦ Sélection du jour ✦',
     osu_export: 'Exporter la collection', osu_import: 'Importer la collection',
     osu_export_done: 'Collection exportée !', osu_import_done: 'Collection importée !', osu_import_fail: "Échec de l'import. Vérifiez le format du fichier",
+    osu_import_fail_json: "Échec de l'import : ce fichier n'est pas un JSON valide", osu_import_fail_format: "Échec de l'import : le fichier ne contient pas de données de collection (champ « collection »)",
 
     osu_download_btn_title: 'Téléchargement direct (miroir sans connexion)',
     pp_calc_btn_title: 'Calculateur de PP et courbe de difficulté', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Précision', pp_calc_run: 'Calculer',

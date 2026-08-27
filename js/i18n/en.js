@@ -52,6 +52,7 @@ I18N.en = {
     featured_beatmap_label: '✦ Featured Today ✦',
     osu_export: 'Export Collection', osu_import: 'Import Collection',
     osu_export_done: 'Collection exported!', osu_import_done: 'Collection imported!', osu_import_fail: 'Import failed. Please check the file format.',
+    osu_import_fail_json: 'Import failed: this file is not valid JSON.', osu_import_fail_format: 'Import failed: the file is missing collection data (the "collection" field).',
 
     osu_download_btn_title: 'Direct download (no-login mirror)',
     pp_calc_btn_title: 'PP Calculator & Strain Graph', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Accuracy', pp_calc_run: 'Calculate',

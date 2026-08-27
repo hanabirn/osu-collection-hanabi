@@ -52,6 +52,7 @@ I18N.zh = {
     featured_beatmap_label: '✦ 今日推薦 ✦',
     osu_export: '匯出收藏', osu_import: '匯入收藏',
     osu_export_done: '已匯出收藏！', osu_import_done: '已匯入收藏！', osu_import_fail: '匯入失敗，請確認檔案格式正確',
+    osu_import_fail_json: '匯入失敗，這個檔案不是有效的 JSON', osu_import_fail_format: '匯入失敗，檔案內缺少收藏資料（collection 欄位）',
 
     osu_download_btn_title: '直接下載（免登入鏡像站）',
     pp_calc_btn_title: 'PP 試算與難度曲線', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '準確率', pp_calc_run: '計算',

@@ -52,6 +52,7 @@ I18N.de = {
     featured_beatmap_label: '✦ Heute empfohlen ✦',
     osu_export: 'Sammlung exportieren', osu_import: 'Sammlung importieren',
     osu_export_done: 'Sammlung exportiert!', osu_import_done: 'Sammlung importiert!', osu_import_fail: 'Import fehlgeschlagen. Bitte Dateiformat prüfen',
+    osu_import_fail_json: 'Import fehlgeschlagen: Diese Datei ist kein gültiges JSON', osu_import_fail_format: 'Import fehlgeschlagen: Der Datei fehlen die Sammlungsdaten (Feld "collection")',
 
     osu_download_btn_title: 'Direkter Download (Mirror ohne Login)',
     pp_calc_btn_title: 'PP-Rechner & Schwierigkeitskurve', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Genauigkeit', pp_calc_run: 'Berechnen',

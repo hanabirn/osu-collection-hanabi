@@ -52,6 +52,7 @@ I18N.ja = {
     featured_beatmap_label: '✦ 本日のおすすめ ✦',
     osu_export: 'コレクションをエクスポート', osu_import: 'コレクションをインポート',
     osu_export_done: 'エクスポートしました！', osu_import_done: 'インポートしました！', osu_import_fail: 'インポート失敗。ファイル形式を確認してください',
+    osu_import_fail_json: 'インポート失敗：このファイルは有効な JSON ではありません', osu_import_fail_format: 'インポート失敗：ファイルにコレクションデータ（collection フィールド）がありません',
 
     osu_download_btn_title: '直接ダウンロード（ログイン不要ミラー）',
     pp_calc_btn_title: 'PP試算・難易度カーブ', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '正確率', pp_calc_run: '計算',
