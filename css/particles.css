@@ -213,14 +213,21 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
-    opacity: 0.7;
-    animation: floatingCardDrift 8s ease-in-out infinite;
+    opacity: 0;
+    /* Entrance only — the ambient drift lives on .floating-cover-bg
+       instead (see below) so the two animations don't fight over
+       `transform` on the same element. A plain none -> block display
+       switch (the media query + .has-cover-cards flipping on) always
+       (re)starts an animation defined on the base rule, so this just
+       fires naturally on load/resize without any JS trigger. */
+    animation: floatingCardEnter 0.7s var(--ease-out) forwards;
 }
 .floating-cover-bg {
     position: absolute;
     inset: 0;
     background-size: cover;
     background-position: center 25%;
+    animation: floatingCardDrift 8s ease-in-out infinite;
 }
 .floating-cover-card::after {
     content: '';
@@ -232,11 +239,22 @@
 /* .bg-layer (their positioning parent) is viewport-fixed, so these `top`
    values are measured from the viewport top, not the page — pushed below
    .site-header's own bottom edge (~287px at rest) so the header's own
-   opaque/blurred background doesn't paint over the top pair. */
+   opaque/blurred background doesn't paint over the top pair. The
+   animation-delay staggers the entrance reveal left-to-right/top-to-
+   bottom; the nested .floating-cover-bg delay staggers the ambient
+   drift instead, so the four don't rise in lockstep once settled. */
 .fc-left-1  { left: calc((100vw - 1080px) / 2 - 414px); top: 320px; animation-delay: 0s; }
-.fc-left-2  { left: calc((100vw - 1080px) / 2 - 490px); top: 560px; animation-delay: -3s; }
-.fc-right-1 { right: calc((100vw - 1080px) / 2 - 414px); top: 310px; animation-delay: -5s; }
-.fc-right-2 { right: calc((100vw - 1080px) / 2 - 490px); top: 530px; animation-delay: -1.5s; }
+.fc-left-1  .floating-cover-bg { animation-delay: 0s; }
+.fc-left-2  { left: calc((100vw - 1080px) / 2 - 490px); top: 560px; animation-delay: 0.15s; }
+.fc-left-2  .floating-cover-bg { animation-delay: -3s; }
+.fc-right-1 { right: calc((100vw - 1080px) / 2 - 414px); top: 310px; animation-delay: 0.3s; }
+.fc-right-1 .floating-cover-bg { animation-delay: -5s; }
+.fc-right-2 { right: calc((100vw - 1080px) / 2 - 490px); top: 530px; animation-delay: 0.45s; }
+.fc-right-2 .floating-cover-bg { animation-delay: -1.5s; }
+@keyframes floatingCardEnter {
+    from { opacity: 0; transform: translateY(28px) scale(0.94); }
+    to   { opacity: 0.7; transform: translateY(0) scale(1); }
+}
 @keyframes floatingCardDrift {
     0%, 100% { transform: translateY(0) scale(1); }
     50%      { transform: translateY(-12px) scale(1.03); }
@@ -249,7 +267,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .bg-glow, .hit-circle, .world-globe-spin, .globe-dot, .floating-cover-card { animation: none; }
+    .bg-glow, .hit-circle, .world-globe-spin, .globe-dot, .floating-cover-card, .floating-cover-bg { animation: none; }
+    /* .floating-cover-card's own animation is its entrance (opacity 0 ->
+       0.7) — killing it without this would leave the cards stuck
+       invisible at opacity:0 instead of just skipping the motion. */
+    .floating-cover-card { opacity: 0.7; }
     /* The orbiting dots use SMIL <animateMotion>, which CSS `animation: none`
        can't stop — hiding them outright is the simplest way to honor
        reduced-motion here (the static orbit rings/sphere stay visible). */
