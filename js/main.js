@@ -15,7 +15,8 @@ function switchTab(tab, el) {
     }
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
-    if (tab === 'updates') { ensureUpdatesLoaded(); if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList(); }
+    if (tab === 'updates') ensureUpdatesLoaded();
+    if (tab === 'mapper-tracking' && typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'farm-maps') ensureFarmMapsLoaded();

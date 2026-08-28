@@ -155,6 +155,7 @@
         <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
         <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
+        <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
         <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
@@ -509,6 +510,14 @@
         <div class="osu-add-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div id="osu-news-list" class="news-list"></div>
+        </div>
+    </section>
+
+    <section id="page-mapper-tracking" class="site-page" style="display:none;">
+        <div class="osu-add-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="tracked_mappers_title">🎨 追蹤 Mapper</h3>
             <p class="skins-hint" data-i18n="tracked_mappers_hint">輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。</p>
             <div class="input-group">
@@ -516,11 +525,6 @@
                 <button onclick="trackMapperFromInput()" data-i18n="mapper_track_btn">追蹤</button>
             </div>
             <div id="tracked-mappers-panel" class="tracked-players-panel"></div>
-        </div>
-        <div class="osu-add-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <div id="osu-news-list" class="news-list"></div>
         </div>
     </section>
 

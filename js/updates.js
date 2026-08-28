@@ -51,6 +51,8 @@ function renderOsuNews(items) {
         const dateStr = (n.published_at || '').slice(0, 10);
         const linkUrl = OSU_NEWS_PAGE_BASE + n.slug;
         const imageUrl = n.first_image ? (n.first_image.startsWith('http') ? n.first_image : 'https://osu.ppy.sh' + n.first_image) : '';
+        // API v2's news listing already includes a short excerpt per post
+        // (`preview`) — no extra fetch needed to show more than the title.
         return `<a class="news-item" href="${linkUrl}" target="_blank" rel="noopener">
             ${imageUrl ? `<img class="news-thumb" src="${imageUrl}" alt="" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none'">` : ''}
             <div class="news-item-body">
@@ -58,6 +60,7 @@ function renderOsuNews(items) {
                     <span class="news-date">${dateStr}</span>
                 </div>
                 <span class="news-title">${escapeHtmlOsu(n.title || '')}</span>
+                ${n.preview ? `<span class="news-summary">${escapeHtmlOsu(n.preview)}</span>` : ''}
             </div>
         </a>`;
     }).join('');

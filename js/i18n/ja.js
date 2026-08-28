@@ -10,7 +10,7 @@ I18N.ja = {
     contact_info_title: '連絡先',
     notif_pp_changed_detail: '{sign}{delta}pp（現在 {pp}pp）', notif_tournament_new_title: '新しい大会スレッド',
     back_to_main: 'Hanabiの小天地に戻る',
-    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_tournaments: '大会', nav_feedback: 'ご意見&改善',
+    nav_collection: 'コレクション', nav_lookup: 'PP検索', nav_skins: 'スキン', nav_updates: '更新情報', nav_mapper_tracking: 'マッパーをフォロー', nav_tournaments: '大会', nav_feedback: 'ご意見&改善',
     updates_title: '✦ 更新情報 ✦', updates_loading: '更新情報を読み込み中...', updates_empty: '現在、更新情報はありません', updates_load_fail: '更新情報の読み込みに失敗しました',
     tournaments_title: '✦ 大会 ✦', tournaments_hint: '公式フォーラム「Tournaments」板と wyBin のコミュニティ大会をまとめて表示しています。公式主催ではないため、参加前に主催者のルールをご確認ください。', tournaments_filter_hint: 'ゲームモードはタイトルのキーワードから推測しています。判別できないタイトルは「すべて」にのみ表示されます。', osu_filter_all: 'すべて', tournament_source_forum: 'フォーラム',
     feedback_title: '✦ ご意見&改善 ✦', feedback_hint: 'サイトで改善できそうな点があれば教えてください。あなたのメッセージは私だけが見ることができ、他の訪問者には表示されません。', feedback_placeholder: 'ご意見を書いてください...', feedback_submit: '送信', feedback_success: 'メッセージを送信しました。フィードバックありがとうございます！',

@@ -10,7 +10,7 @@ I18N.de = {
     contact_info_title: 'Kontaktinformationen',
     notif_pp_changed_detail: '{sign}{delta}pp (jetzt {pp}pp)', notif_tournament_new_title: 'Neuer Turnier-Thread',
     back_to_main: 'Zurück zu Hanabiの小天地',
-    nav_collection: 'Sammlung', nav_lookup: 'PP-Suche', nav_skins: 'Skins', nav_updates: 'Neuigkeiten', nav_tournaments: 'Turniere', nav_feedback: 'Vorschläge',
+    nav_collection: 'Sammlung', nav_lookup: 'PP-Suche', nav_skins: 'Skins', nav_updates: 'Neuigkeiten', nav_mapper_tracking: 'Beobachtete Mapper', nav_tournaments: 'Turniere', nav_feedback: 'Vorschläge',
     updates_title: '✦ Neuigkeiten ✦', updates_loading: 'Neuigkeiten werden geladen...', updates_empty: 'Momentan keine Neuigkeiten', updates_load_fail: 'Neuigkeiten konnten nicht geladen werden, bitte später erneut versuchen',
     tournaments_title: '✦ Turniere ✦', tournaments_hint: 'Community-Turniere aus dem offiziellen Unterforum „Tournaments" und der wyBin-Plattform — das sind keine offiziellen Events, prüfe vor der Anmeldung die Regeln des Veranstalters.', tournaments_filter_hint: 'Der Spielmodus wird anhand des Titels geraten — nicht erkannte Titel erscheinen nur unter „Alle".', osu_filter_all: 'Alle', tournament_source_forum: 'Forum',
     feedback_title: '✦ Vorschläge & Verbesserungen ✦', feedback_hint: 'Denkst du, an der Seite könnte etwas verbessert werden? Sag es mir hier — nur ich kann deine Nachricht sehen, andere Besucher nicht.', feedback_placeholder: 'Schreib deinen Vorschlag...', feedback_submit: 'Senden', feedback_success: 'Deine Nachricht wurde gesendet, danke für dein Feedback!',

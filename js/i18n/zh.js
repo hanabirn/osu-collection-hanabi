@@ -10,7 +10,7 @@ I18N.zh = {
     contact_info_title: '聯絡資訊',
     notif_pp_changed_detail: '{sign}{delta}pp（目前 {pp}pp）', notif_tournament_new_title: '新賽事貼文',
     back_to_main: '返回 Hanabiの小天地',
-    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報', nav_tournaments: '賽事', nav_feedback: '建議&改進',
+    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報', nav_mapper_tracking: '追蹤 Mapper', nav_tournaments: '賽事', nav_feedback: '建議&改進',
     updates_title: '✦ 更新情報 ✦', updates_loading: '載入更新資訊中...', updates_empty: '目前沒有更新資訊', updates_load_fail: '更新資訊載入失敗，稍後再試',
     tournaments_title: '✦ 賽事 ✦', tournaments_hint: '整合官方論壇「Tournaments」版貼文與 wyBin 平台的社群賽事，非官方主辦活動，報名前請自行確認主辦方規則。', tournaments_filter_hint: '遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。', osu_filter_all: '全部', tournament_source_forum: '論壇',
     feedback_title: '✦ 建議&改進 ✦', feedback_hint: '覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。', feedback_placeholder: '寫下你的建議...', feedback_submit: '送出', feedback_success: '您的回覆訊息已傳送，感謝您的回饋！',
