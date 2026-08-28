@@ -185,20 +185,22 @@
 }
 
 /* ── Floating collection banners ──
-   4 small frosted-glass cards flanking .site-main's own centered 1080px
-   column (css/base.css), each showing a different, randomly-picked
-   banner from the visitor's own collection (renderFloatingCoverBanners()
-   in js/osu.js, reshuffled independently of the header's own hero
-   carousel every time the collection re-renders). Positioned with
-   calc() off .site-main's actual max-width rather than plain vw units so
-   the gutter math stays correct at any viewport size, not just the one
-   the numbers were tuned at. Purely ambient — inherits pointer-events:
-   none from .bg-layer, and stays out of the lower-right quadrant so it
-   doesn't collide with .world-globe there. Gated to wide viewports
-   (.site-main's gutters aren't wide enough below that to fit one without
-   overlapping real content) and to visitors who actually have a
-   collection (.bg-layer.has-cover-cards, set once there's a real cover
-   to show — no empty glass frames for a first-time visitor). */
+   4 bare beatmap covers (no card chrome — no border/shadow/glass
+   background, just the image itself, softened only by rounded corners)
+   flanking .site-main's own centered 1080px column (css/base.css), each
+   showing a different, randomly-picked banner from the visitor's own
+   collection (renderFloatingCoverBanners() in js/osu.js, reshuffled
+   independently of the header's own hero carousel every time the
+   collection re-renders). Positioned with calc() off .site-main's actual
+   max-width rather than plain vw units so the gutter math stays correct
+   at any viewport size, not just the one the numbers were tuned at.
+   Purely ambient — inherits pointer-events: none from .bg-layer, and
+   stays out of the lower-right quadrant so it doesn't collide with
+   .world-globe there. Gated to wide viewports (.site-main's gutters
+   aren't wide enough below that to fit one without overlapping real
+   content) and to visitors who actually have a collection
+   (.bg-layer.has-cover-cards, set once there's a real cover to show —
+   nothing floats for a first-time visitor). */
 .floating-cover-card {
     display: none;
     position: absolute;
@@ -208,32 +210,28 @@
        read as beatmap banners, not mini collection cards. */
     aspect-ratio: 4 / 1.6;
     border-radius: 12px;
-    /* Clips the background image AND the ::after gradient overlay to the
-       card's own rounded rect — nothing inside ever pokes out past the
-       border once this box starts fading. */
+    /* Clips the background image to the rounded rect — nothing pokes out
+       past the corners once this box starts fading. */
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
     /* Hidden resting state. opacity/transform live ONLY here and on
        .fc-visible below — one property, one mechanism (a transition),
-       applied to this outer box so the border/shadow/blur/background/
-       image/gradient-overlay all composite and fade as a single unit.
-       (Previously entrance used a `forwards`-filled animation on this
-       same element while a separate transition also targeted opacity —
-       CSS animations outrank plain transitions in the cascade, so the
-       animation's held end value kept fighting the transition and the
-       card would pop back to full opacity instead of smoothly fading.
-       Using one mechanism for both entrance and the periodic reshuffle
-       (js/osu.js's renderFloatingCoverBanners/scheduleFloatingCoverRefresh
-       toggle .fc-visible) avoids that fight entirely.) */
+       applied to this outer box so the image fades as a single unit
+       rather than opacity being set on some inner layer while this box
+       stays put. (Previously entrance used a `forwards`-filled animation
+       on this same element while a separate transition also targeted
+       opacity — CSS animations outrank plain transitions in the cascade,
+       so the animation's held end value kept fighting the transition and
+       the card would pop back to full opacity instead of smoothly
+       fading. Using one mechanism for both entrance and the periodic
+       reshuffle (js/osu.js's renderFloatingCoverBanners/
+       scheduleFloatingCoverRefresh toggle .fc-visible) avoids that fight
+       entirely.) */
     opacity: 0;
     transform: translateY(16px) scale(0.95);
     transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
 }
 .floating-cover-card.fc-visible {
-    opacity: 0.7;
+    opacity: 0.85;
     transform: translateY(0) scale(1);
 }
 .floating-cover-bg {
@@ -245,13 +243,6 @@
        never competes with the outer's own opacity/transform transition
        for control of `transform` on the same box. */
     animation: floatingCardDrift 8s ease-in-out infinite;
-}
-.floating-cover-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 40%),
-                linear-gradient(to top, rgba(10, 6, 24, 0.45), transparent 55%);
 }
 /* .bg-layer (their positioning parent) is viewport-fixed, so these `top`
    values are measured from the viewport top, not the page — pushed below
