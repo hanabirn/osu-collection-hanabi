@@ -70,7 +70,11 @@ function normalizeForumTopic(topic) {
         title: topic.title || '',
         url: OSU_TOURNAMENTS_TOPIC_BASE + topic.id,
         meta: `&#128172; ${topic.post_count} &#183; &#128065; ${topic.views}`,
-        thumb: null,
+        // Best-effort first image out of the opening post's body, fetched
+        // server-side (see netlify/functions/osu-tournaments.js) — a topic
+        // whose first post has no image just keeps this null, same as
+        // wyBin tournaments with no header image already render cleanly.
+        thumb: topic.thumb || null,
     };
 }
 
