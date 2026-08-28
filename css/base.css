@@ -39,10 +39,68 @@ a:hover { text-decoration: underline; }
     position: relative;
     z-index: 5;
     overflow: hidden;
-    padding: 20px 24px 0;
+    padding: 40px 24px 28px;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-card);
     backdrop-filter: blur(var(--glass-blur));
+}
+@media (max-width: 600px) {
+    .site-header { padding: 32px 20px 22px; min-height: 200px; }
+}
+/* ===== Beatmap-cover hero banner, behind the header's own content =====
+   #bg-carousel (its slides populated by js/osu.js's renderOsuBgCarousel,
+   same personalized "whatever's in the visitor's collection" carousel as
+   before) sits absolutely behind everything else in the header; the "0
+   height until populated" collapse this used to do doesn't apply here —
+   .site-header's own min-height/content already gives it a home. Sits
+   below .site-header-overlay (the readability wash) and every actual
+   header control, which all need z-index > 1 to stay above both. */
+#bg-carousel {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+/* Dark enough up top/at the very bottom for the title and nav pills to
+   stay readable over any cover art; lighter through the middle band so
+   the art's own subject (the whole point of showing it) doesn't just
+   disappear under a flat scrim. Bottom stop lands on --bg-body-1 itself
+   (not just "dark") so the header's lower edge dissolves straight into
+   the page background instead of a visible seam at the border. */
+.site-header-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+        rgba(10, 6, 24, 0.55) 0%,
+        rgba(10, 6, 24, 0.32) 40%,
+        rgba(10, 6, 24, 0.4) 70%,
+        var(--bg-body-1) 100%);
+}
+/* Every text/pill color in the header (.site-tagline, .site-nav-btn,
+   .lang-globe-btn, ...) reads var(--text-secondary)/var(--lang-pill-bg)/etc,
+   which assume the usual page-colored background and flip dark in light
+   theme — wrong once a cover photo is actually filling the header (added
+   by js/osu.js's renderOsuBgCarousel, only once there's an image to show).
+   Redefining those custom properties here — rather than overriding each
+   individual rule — forces every descendant that reads them back to the
+   light-on-dark values regardless of site theme, since the header's visual
+   background is dark either way once a cover is showing. */
+.site-header.has-cover-banner {
+    --text: #fff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-dim2: rgba(200, 162, 224, 0.6);
+    --lang-pill-bg: rgba(255, 255, 255, 0.08);
+    --lang-pill-border: rgba(255, 255, 255, 0.15);
+    --lang-pill-text: rgba(255, 255, 255, 0.6);
+    --theme-toggle-bg: rgba(255, 255, 255, 0.08);
+    --theme-toggle-border: rgba(255, 255, 255, 0.15);
 }
 /* The title-note float animation never needs to escape the header box, but
    the language dropdown and notification bell menus do — temporarily lift
@@ -115,6 +173,8 @@ a:hover { text-decoration: underline; }
 }
 
 .site-header-top {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -704,6 +764,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .osu-logged-in-pill-large .osu-logged-in-name { font-size: 0.9rem; max-width: 140px; }
 
 .header-bottom-row {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -717,13 +779,46 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     gap: 8px;
 }
 
+/* width:fit-content (not a plain full-width block) so the pill background
+   below hugs just the tab buttons themselves — centered via margin:auto —
+   rather than stretching into a full-width bar; max-width:100% is what
+   lets overflow-x still kick in and scroll once the buttons collectively
+   don't fit a narrow viewport. */
 .site-nav {
+    position: relative;
+    z-index: 2;
     display: flex;
     justify-content: center;
     gap: 6px;
-    margin-top: 16px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 16px auto 0;
     overflow-x: auto;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
 }
+/* Fixed dark pill rather than the theme-adaptive one above, matching
+   .has-cover-banner's forced light nav-button text (see its rule below) —
+   same reasoning: the tab bar sits on a photo either way once a cover is
+   showing, not on the page's own light/dark background. */
+.site-header.has-cover-banner .site-nav {
+    background: rgba(10, 6, 24, 0.45);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+/* Deliberately plain at rest — the pill-shaped .site-nav container around
+   this whole row already gives the tab bar its own frosted surface and
+   edge, so individual buttons don't need their own competing border/glow
+   on top of it (an earlier version gave every tab its own animated
+   conic-gradient ring here, which combined with the new outer pill read as
+   "too much going on"; restraint reads better than every element having
+   its own effect). Active state is the one thing that gets a strong,
+   static treatment — a solid gradient-filled pill, same visual language
+   .osu-tab.active already uses for mode tabs elsewhere on the site — so
+   there's exactly one clear focal point in the bar, not twelve. */
 .site-nav-btn {
     position: relative;
     background: transparent;
@@ -734,75 +829,19 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-size: 0.95rem;
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
-}
-/* Same masked-conic-gradient-ring trick as .site-page::before (see its
-   comment for the mechanics), but a full, ungapped loop rather than a
-   sparse comet — this one's meant to read as a continuously flowing
-   gradient outline around each pill-shaped tab, not a chasing highlight
-   on a big card. Sits under every tab all the time at low opacity so the
-   nav row doesn't turn into 12 shouting buttons; hover/active turn it up. */
-.site-nav-btn::before {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    border-radius: inherit;
-    padding: 1.2px;
-    pointer-events: none;
-    background: conic-gradient(from var(--nav-flow-angle, 0deg),
-        var(--accent-pink), var(--accent-purple), var(--accent-light-purple), #fff, var(--accent-pink));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0.4;
-    animation: navBtnBorderFlow 5s linear infinite;
-}
-.site-nav-btn:hover::before,
-.site-nav-btn.active::before {
-    opacity: 0.9;
-}
-@property --nav-flow-angle {
-    syntax: '<angle>';
-    inherits: false;
-    initial-value: 0deg;
-}
-@keyframes navBtnBorderFlow {
-    to { --nav-flow-angle: 360deg; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .site-nav-btn::before { animation: none; }
-}
-.site-nav-btn::after {
-    content: '';
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 0;
-    height: 3px;
-    border-radius: 2px 2px 0 0;
-    background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), var(--accent-pink));
-    background-size: 200% auto;
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.35s var(--ease-spring);
+    transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out),
+        transform 0.2s var(--ease-out), box-shadow 0.25s var(--ease-out);
 }
 .site-nav-btn:hover {
     color: var(--text-pink);
-    transform: translateY(-1px);
+    background: rgba(var(--accent-pink-rgb), 0.12);
 }
-.site-nav-btn:active { transform: translateY(0) scale(0.96); }
+.site-nav-btn:active { transform: scale(0.96); }
 .site-nav-btn.active {
-    color: var(--text-pink);
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    color: #fff;
     font-weight: bold;
-    filter: drop-shadow(0 2px 8px rgba(var(--accent-pink-rgb), 0.3));
-}
-.site-nav-btn.active::after {
-    transform: scaleX(1);
-    animation: navShimmer 3s linear infinite;
-}
-@keyframes navShimmer {
-    0% { background-position: 0% center; }
-    100% { background-position: 200% center; }
+    box-shadow: 0 4px 14px rgba(var(--accent-pink-rgb), 0.35);
 }
 
 /* 1080px matches what #page-collection (js/osu.js's two-column layout)
@@ -841,6 +880,16 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border: 1.5px solid var(--border-card);
     padding: 20px 16px 28px;
     background: var(--bg-card);
+    /* Frosted-glass so the ambient background layer (.bg-layer's glows/
+       particles/world-globe, css/particles.css) still shows through as
+       soft blurred color/light behind the card instead of being fully
+       blocked by its own solid background — same treatment .osu-add-card
+       already gets, just applied one level up so it reaches every tab's
+       outer shell. (#bg-carousel, the beatmap-cover hero banner, sits in
+       normal flow above this card entirely now, so it's not what this is
+       blurring through — see its own comment in css/particles.css.) */
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     box-shadow: var(--shadow-card);
 }
 .site-page::before {

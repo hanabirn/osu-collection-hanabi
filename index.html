@@ -21,7 +21,6 @@
 </head>
 <body>
 
-<div id="bg-carousel" aria-hidden="true"></div>
 <div class="bg-layer" aria-hidden="true">
     <canvas id="particles-canvas"></canvas>
     <div class="bg-glow glow-1"></div>
@@ -62,6 +61,8 @@
 </div>
 
 <header class="site-header">
+    <div id="bg-carousel" aria-hidden="true"></div>
+    <div class="site-header-overlay" aria-hidden="true"></div>
     <div class="header-corner-actions">
         <div class="notif-bell" id="notif-bell">
             <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-haspopup="true" aria-expanded="false" data-i18n-title="notif_bell_title" title="通知" data-icon="bell">
@@ -161,6 +162,8 @@
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
+
+<div id="bg-carousel" aria-hidden="true"></div>
 
 <div id="maintenance-banner" class="maintenance-banner" style="display:none;">
     <span data-icon="settings" data-icon-gap></span>

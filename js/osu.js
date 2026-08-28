@@ -542,6 +542,15 @@ function renderOsuBgCarousel(urls) {
     const container = document.getElementById('bg-carousel');
     if (!container || !urls.length) return;
     container.innerHTML = urls.map(u => `<div class="bg-slide" style="background-image:url('${u}')"></div>`).join('');
+    // Header text/pill colors are theme-adaptive (dark text in light theme,
+    // assuming the usual light page background) — but with a cover photo
+    // filling the header they need to stay light-on-dark regardless of site
+    // theme, or light-theme visitors get near-invisible text (see
+    // .site-header.has-cover-banner in css/base.css). Only added once
+    // there's actually an image, so a visitor with no collection yet still
+    // gets the normal theme-correct header.
+    const header = document.querySelector('.site-header');
+    if (header) header.classList.add('has-cover-banner');
     runOsuBgSlideCarousel(7000);
 }
 

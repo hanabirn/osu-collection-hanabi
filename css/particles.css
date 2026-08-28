@@ -6,38 +6,36 @@
    using this site's own pink/purple/cyan accent variables rather than
    Bolt's hardcoded hex values. */
 
-/* ── Background carousel of the visitor's own collected beatmap covers ──
+/* ── Hero banner of the visitor's own collected beatmap covers ──
    osu! has no official mascot cast like the pjsekai/wuwa sibling sites, so
-   instead of character art this cross-fades through one centered cover at
-   a time, pulled from whatever beatmaps are actually in the visitor's own
-   collection — personalized, and needs no hand-picked art. Sits behind
-   .bg-layer (z-index 0) so the glow/particles/hit-circles render as a
-   translucent layer on top of it. */
-#bg-carousel {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
+   instead of character art this cross-fades through one cover at a time,
+   pulled from whatever beatmaps are actually in the visitor's own
+   collection — personalized, and needs no hand-picked art.
+   Lives inside .site-header now (see css/base.css's #bg-carousel/
+   .site-header-overlay rules for the container + readability-wash side of
+   this) — went through two earlier layouts first: a position:fixed
+   full-viewport layer sitting behind every .site-page card (the card's
+   centered position exactly matched the art's own centered focal point,
+   so the one part actually worth seeing was permanently hidden), then a
+   free-floating band between the header and page content (visible, but
+   disconnected from the rest of the header). This one keeps it visible
+   *and* anchored to the header it's actually themed around. */
 .bg-slide {
     position: absolute;
     inset: 0;
     background-repeat: no-repeat;
-    /* cover.jpg/@2x is a wide ~3.6:1 banner crop — background-size:cover
-       forces it to fill the (much taller) viewport height, which blows the
-       image up until only a thin, heavily-zoomed vertical sliver of the
-       middle is visible. Sizing to 100% width instead keeps the banner's
-       own proportions intact; whatever's left top/bottom just shows the
-       page's own gradient background, which reads better than an
-       unrecognisable close-up crop. */
-    background-size: 100% auto;
-    background-position: center center;
+    background-size: cover;
+    /* 30% rather than dead-center: cover art's subject (a character, a
+       logo mark) skews toward the upper half more often than not, and the
+       header's overlay (css/base.css) is also darkest right at the very
+       top for title contrast — centering the crop a bit higher keeps the
+       subject out of that darkest band. */
+    background-position: center 30%;
     opacity: 0;
     transition: opacity 2.5s ease;
     animation: bgSlideDrift 12s ease-in-out infinite;
 }
-.bg-slide.active { opacity: 0.4; }
+.bg-slide.active { opacity: 1; }
 @keyframes bgSlideDrift {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.06); }
