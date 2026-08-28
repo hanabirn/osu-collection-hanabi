@@ -564,16 +564,32 @@ function renderOsuBgCarousel(urls) {
 // always read as different beatmaps from the one up top. Kicks off
 // scheduleFloatingCoverRefresh() so they keep cycling afterward instead
 // of staying frozen on their initial pick for the rest of the session.
+//
+// Reveal and periodic reshuffle both go through the same .fc-visible
+// class toggle (see css/particles.css) rather than one being a CSS
+// `animation` and the other a `transition` on the same element/property —
+// mixing those meant the finished-but-still-`forwards`-filling entrance
+// animation kept outranking the transition in the cascade, so the card's
+// opacity would pop back instead of smoothly fading during a reshuffle.
 function renderFloatingCoverBanners(urls) {
     const layer = document.querySelector('.bg-layer');
-    const cards = document.querySelectorAll('.floating-cover-card .floating-cover-bg');
+    const cards = document.querySelectorAll('.floating-cover-card');
     if (!layer || !cards.length || !urls.length) return;
     const pool = urls.length > 1 ? urls.slice(1) : urls;
     const picks = pool.slice().sort(() => Math.random() - 0.5);
-    cards.forEach((bg, i) => {
-        bg.style.backgroundImage = `url('${picks[i % picks.length]}')`;
+    cards.forEach((card, i) => {
+        card.querySelector('.floating-cover-bg').style.backgroundImage = `url('${picks[i % picks.length]}')`;
     });
     layer.classList.add('has-cover-cards');
+    // Staggered reveal. The class add has to land a frame after
+    // has-cover-cards flips display:none -> block (media query in
+    // css/particles.css) — adding it in the same tick as the display
+    // change gives the browser nothing to transition *from*, so the
+    // card would just appear instantly instead of fading in.
+    cards.forEach((card, i) => {
+        card.classList.remove('fc-visible');
+        setTimeout(() => requestAnimationFrame(() => card.classList.add('fc-visible')), i * 150);
+    });
     scheduleFloatingCoverRefresh(urls);
 }
 
@@ -595,13 +611,13 @@ function scheduleFloatingCoverRefresh(urls) {
     floatingCoverRefreshTimer = setInterval(() => {
         const card = cards[Math.floor(Math.random() * cards.length)];
         const bg = card.querySelector('.floating-cover-bg');
-        card.style.opacity = '0';
+        card.classList.remove('fc-visible');
         setTimeout(() => {
             const headerSlide = document.querySelector('#bg-carousel .bg-slide.active');
             const headerUrl = headerSlide && headerSlide.style.backgroundImage.slice(5, -2);
             const pool = urls.filter(u => u !== headerUrl && `url("${u}")` !== bg.style.backgroundImage);
             if (pool.length) bg.style.backgroundImage = `url('${pool[Math.floor(Math.random() * pool.length)]}')`;
-            card.style.opacity = '0.7';
+            requestAnimationFrame(() => card.classList.add('fc-visible'));
         }, 500);
     }, 6000);
 }
