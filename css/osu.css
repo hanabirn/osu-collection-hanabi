@@ -11,6 +11,46 @@
     letter-spacing: 2px;
 }
 
+/* ===== Collection page two-column layout =====
+   Left column is the control panel (add-beatmap form, today's pick,
+   search/sort) — things you set once and glance at; right column is the
+   actual collection grid, which needs the most width since .osu-collection
+   is a fixed 2-column card grid (see below). Stacks to a single column
+   below 900px, same breakout-past-.site-main's-640px-cap pattern
+   #page-lookup already uses for its two-card row (css/osu.css's
+   .lookup-page-row), since two real columns need more room than the
+   640px reading-width cap gives a single-column page. */
+.collection-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.collection-layout-left {
+    min-width: 0;
+}
+.collection-layout-right {
+    min-width: 0;
+}
+@media (min-width: 900px) {
+    #page-collection {
+        width: 100vw;
+        max-width: 1080px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .collection-layout {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .collection-layout-left {
+        flex: 0 0 340px;
+    }
+    .collection-layout-right {
+        flex: 1 1 0;
+    }
+}
+
 .osu-add-card {
     position: relative;
     background: var(--bg-card);
@@ -850,7 +890,8 @@
     z-index: 3;
     opacity: 0;
 }
-.osu-card:hover .osu-play-btn { opacity: 1; }
+.osu-card:hover .osu-play-btn,
+.gallery-detail-item:hover .osu-play-btn { opacity: 1; }
 .osu-play-btn:hover {
     color: #fff;
     background: rgba(244,114,182,0.6);
@@ -2045,24 +2086,26 @@
 #gallery-detail-modal .pp-calc-modal { max-width: 900px; }
 .gallery-detail-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 }
 @media (max-width: 900px) {
-    .gallery-detail-grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 640px) {
     .gallery-detail-grid { grid-template-columns: repeat(2, 1fr); }
 }
-/* Square-ish thumbnail cards — same cover+overlay+text-on-top visual
-   language as .osu-recent-item, just resized to fit a 4-column grid
-   instead of a single-column banner list. Uses a real <img loading="lazy">
-   (rather than an inline background-image div) since a published
-   collection can run into the hundreds of entries. */
+@media (max-width: 480px) {
+    .gallery-detail-grid { grid-template-columns: 1fr; }
+}
+/* Rectangular banner cards — matches the main collection grid's own
+   .osu-card aspect ratio instead of the small square thumbnails this used
+   to be, so a beatmap looks the same shape whether it's in your own
+   collection or someone else's published one. Same cover+overlay+
+   text-on-top visual language as .osu-recent-item either way. Uses a real
+   <img loading="lazy"> (rather than an inline background-image div) since
+   a published collection can run into the hundreds of entries. */
 .gallery-detail-item {
     position: relative;
     display: block;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 1.6;
     border-radius: 10px;
     overflow: hidden;
     cursor: pointer;

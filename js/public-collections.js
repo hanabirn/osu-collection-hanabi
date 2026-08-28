@@ -423,9 +423,18 @@ function renderGalleryDetailGrid() {
     const cards = sets.map(set => {
         const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
+        // A category can mix modes, so the badge reads each set's own mode
+        // rather than assuming galleryDetailMode — same OSU_MODE_NAMES
+        // lookup renderOsuCollection() uses for its own .osu-card-mode-badge.
+        const modeKey = OSU_MODE_NAMES[set.mode];
+        const modeBadge = modeKey
+            ? `<div class="osu-card-mode-badge" title="${escapeHtmlOsu(maxDiff.toFixed(2) + '★')}">${modeIconSvg(modeKey, starRatingColor(maxDiff))}</div>`
+            : '';
         return `<a class="gallery-detail-item" href="https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}" target="_blank" rel="noopener noreferrer">
             <img class="gallery-detail-item-bg" src="${coverUrl}" alt="" loading="lazy" onerror="this.style.visibility='hidden';">
             <div class="gallery-detail-item-overlay"></div>
+            ${modeBadge}
+            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event); event.preventDefault();" title="播放預覽">${icon('play', { filled: true })}</button>
             <div class="gallery-detail-item-info">
                 <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
                 <span class="gallery-detail-item-stars">${maxDiff.toFixed(2)}⭐</span>

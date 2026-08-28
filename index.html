@@ -163,59 +163,63 @@
 <main class="site-main">
 
     <section id="page-collection" class="site-page">
-        <h2 class="osu-page-title" data-i18n="osu_page_title">✦ osu!歌曲收藏+查詢個人總PP ✦</h2>
+        <div class="collection-layout">
+            <div class="collection-layout-left">
+                <div class="osu-add-card">
+                    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+                    <div class="card-corner bl"></div><div class="card-corner br"></div>
+                    <h3 data-i18n="osu_title">♫ 新增 Beatmap ♫</h3>
+                    <div class="input-group">
+                        <input type="text" id="osuInput" data-i18n-placeholder="osu_placeholder" placeholder="輸入 ID 或貼上 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
+                        <button onclick="addOsuBeatmap()" data-i18n="osu_add">新增</button>
+                    </div>
+                    <p id="osu-status" class="status"></p>
+                    <div class="osu-volume">
+                        <span data-icon="volume2"></span>
+                        <input type="range" id="osu-volume" min="0" max="1" step="0.05" value="0.4" oninput="osuSetVolume(this.value)">
+                        <button class="osu-refresh-all" onclick="refreshAllOsuSets()" title="更新Beatmap" data-icon="refreshCw"></button>
+                        <button class="osu-refresh-all" onclick="exportOsuCollection()" data-i18n-title="osu_export" title="匯出收藏" data-icon="upload"></button>
+                        <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="匯入收藏" data-icon="download"></button>
+                        <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
+                        <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="分享收藏連結" data-icon="link2"></button>
+                        <button class="osu-refresh-all" onclick="downloadCollectionShareCard()" data-i18n-title="collection_card_btn" title="產生收藏卡" data-icon="camera"></button>
+                        <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="設定密碼" data-icon="lock"></button>
+                        <button class="osu-refresh-all" onclick="openCollectionDbModal()" data-i18n-title="collection_db_btn_title" title="匯出成 osu! Collection" data-icon="package"></button>
+                        <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="收藏統計儀表板" data-icon="barChart3"></button>
+                        <button class="osu-refresh-all" id="osu-check-played-btn" onclick="checkCollectionPlayedStatus()" data-i18n-title="check_played_btn_title" title="檢查本頁已遊玩" data-icon="target" style="display:none;"></button>
+                    </div>
+                </div>
 
-        <div class="osu-add-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="osu_title">♫ 新增 Beatmap ♫</h3>
-            <div class="input-group">
-                <input type="text" id="osuInput" data-i18n-placeholder="osu_placeholder" placeholder="輸入 ID 或貼上 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
-                <button onclick="addOsuBeatmap()" data-i18n="osu_add">新增</button>
+                <div class="featured-beatmap-banner" id="featured-beatmap-banner" style="display:none;"></div>
+
+                <div class="osu-search-row">
+                    <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
+                    <select id="osu-sort-select" onchange="switchOsuSort(this.value)">
+                        <option value="default" data-i18n="osu_sort_default">預設排序</option>
+                        <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>
+                        <option value="rating-asc" data-i18n="osu_sort_rating_asc">星數（低到高）</option>
+                    </select>
+                </div>
             </div>
-            <p id="osu-status" class="status"></p>
-            <div class="osu-volume">
-                <span data-icon="volume2"></span>
-                <input type="range" id="osu-volume" min="0" max="1" step="0.05" value="0.4" oninput="osuSetVolume(this.value)">
-                <button class="osu-refresh-all" onclick="refreshAllOsuSets()" title="更新Beatmap" data-icon="refreshCw"></button>
-                <button class="osu-refresh-all" onclick="exportOsuCollection()" data-i18n-title="osu_export" title="匯出收藏" data-icon="upload"></button>
-                <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="匯入收藏" data-icon="download"></button>
-                <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
-                <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="分享收藏連結" data-icon="link2"></button>
-                <button class="osu-refresh-all" onclick="downloadCollectionShareCard()" data-i18n-title="collection_card_btn" title="產生收藏卡" data-icon="camera"></button>
-                <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="設定密碼" data-icon="lock"></button>
-                <button class="osu-refresh-all" onclick="openCollectionDbModal()" data-i18n-title="collection_db_btn_title" title="匯出成 osu! Collection" data-icon="package"></button>
-                <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="收藏統計儀表板" data-icon="barChart3"></button>
-                <button class="osu-refresh-all" id="osu-check-played-btn" onclick="checkCollectionPlayedStatus()" data-i18n-title="check_played_btn_title" title="檢查本頁已遊玩" data-icon="target" style="display:none;"></button>
+
+            <div class="collection-layout-right">
+                <div class="osu-stats-panel" id="osu-stats-panel" style="display:none;"></div>
+
+                <div class="osu-mode-tabs" id="osu-collection-tabs">
+                    <button class="osu-tab" data-mode="favorites" onclick="switchOsuTab('favorites', this)" data-icon="heart" data-icon-gap><span data-i18n="osu_fav">最愛</span></button>
+                    <button class="osu-tab active" data-mode="standard" onclick="switchOsuTab('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+                    <button class="osu-tab" data-mode="taiko" onclick="switchOsuTab('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+                    <button class="osu-tab" data-mode="catch" onclick="switchOsuTab('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+                    <button class="osu-tab" data-mode="mania" onclick="switchOsuTab('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+                    <button class="osu-tab osu-category-manage-btn" onclick="openCategoryManageModal()" title="管理分類" data-i18n-title="osu_category_manage_title" data-icon="settings"></button>
+                </div>
+
+                <div class="osu-category-tabs-row" id="osu-category-tabs-row"></div>
+
+                <div id="osu-collection" class="osu-collection"></div>
+                <div id="osu-pagination" class="osu-pagination"></div>
             </div>
         </div>
-
-        <div class="featured-beatmap-banner" id="featured-beatmap-banner" style="display:none;"></div>
-
-        <div class="osu-stats-panel" id="osu-stats-panel" style="display:none;"></div>
-
-        <div class="osu-mode-tabs" id="osu-collection-tabs">
-            <button class="osu-tab" data-mode="favorites" onclick="switchOsuTab('favorites', this)" data-icon="heart" data-icon-gap><span data-i18n="osu_fav">最愛</span></button>
-            <button class="osu-tab active" data-mode="standard" onclick="switchOsuTab('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
-            <button class="osu-tab" data-mode="taiko" onclick="switchOsuTab('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
-            <button class="osu-tab" data-mode="catch" onclick="switchOsuTab('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
-            <button class="osu-tab" data-mode="mania" onclick="switchOsuTab('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
-            <button class="osu-tab osu-category-manage-btn" onclick="openCategoryManageModal()" title="管理分類" data-i18n-title="osu_category_manage_title" data-icon="settings"></button>
-        </div>
-
-        <div class="osu-category-tabs-row" id="osu-category-tabs-row"></div>
-
-        <div class="osu-search-row">
-            <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
-            <select id="osu-sort-select" onchange="switchOsuSort(this.value)">
-                <option value="default" data-i18n="osu_sort_default">預設排序</option>
-                <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>
-                <option value="rating-asc" data-i18n="osu_sort_rating_asc">星數（低到高）</option>
-            </select>
-        </div>
-
-        <div id="osu-collection" class="osu-collection"></div>
-        <div id="osu-pagination" class="osu-pagination"></div>
     </section>
 
     <section id="page-public-collections" class="site-page" style="display:none;">
