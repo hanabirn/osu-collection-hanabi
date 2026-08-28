@@ -21,6 +21,19 @@ a:hover { text-decoration: underline; }
    keeps it from getting squashed inside flex button layouts. */
 .icon-svg { vertical-align: -0.15em; flex-shrink: 0; }
 .icon-label-gap { margin-right: 0.4em; }
+/* See icons.js renderStaticIcons()'s data-icon-badge handling — a colored
+   circle badge around a forced-white icon, e.g. the Discord "app icon"
+   look, rather than a bare flat brand-colored glyph. */
+.icon-badge {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: 50%;
+    vertical-align: -0.5em;
+}
 
 .site-header {
     position: relative;
@@ -38,6 +51,29 @@ a:hover { text-decoration: underline; }
 .site-header.notif-menu-open,
 .site-header.contact-menu-open {
     overflow: visible;
+}
+
+/* ===== Corner-pinned osu! login (+ notif bell to its left) =====
+   The header's own primary call-to-action, pinned to the actual top-right
+   corner rather than sitting inline with the rest of the utility icon row
+   (.header-icons below) — same idea as the login control on osu!'s own
+   site header. Needs .site-header's own `position: relative` (set above)
+   as its containing block. */
+.header-corner-actions {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+@media (max-width: 600px) {
+    .header-corner-actions {
+        position: static;
+        justify-content: center;
+        margin-top: 10px;
+    }
 }
 
 .title-notes {
@@ -209,6 +245,21 @@ a:hover { text-decoration: underline; }
     background: rgba(var(--accent-pink-rgb), 0.14);
     border-color: var(--accent-pink);
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+}
+/* Sized to match the enlarged osu! login pill it now sits beside in the
+   corner-pinned unit (see .header-corner-actions / .osu-login-btn-large). */
+.header-corner-actions .notif-bell-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+}
+.header-corner-actions .notif-badge {
+    top: -3px;
+    right: -3px;
+    min-width: 19px;
+    height: 19px;
+    font-size: 0.72rem;
+    line-height: 19px;
 }
 .notif-badge {
     position: absolute;
@@ -402,6 +453,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.35);
     transform: translateY(-1px);
 }
+/* Sized to match the enlarged osu! login pill/notif bell it now sits
+   beside in the corner-pinned unit (see .header-corner-actions). */
+.header-corner-actions .lang-globe-btn {
+    height: 42px;
+    padding: 0 14px;
+    font-size: 0.9rem;
+}
 .lang-globe-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -447,67 +505,104 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .theme-toggle-btn:active { transform: scale(0.92) rotate(15deg); }
 
-/* ===== #theme-toggle's transient "you're now in ___ mode" flourish =====
-   See themeToggleDecoHTML() in js/theme.js — these elements are fresh DOM
-   nodes on every theme switch, so the animations below just autoplay once
-   on insertion and settle at opacity:0 (their `forwards` fill-mode), no JS
-   cleanup needed before the next switch replaces them again. */
-.tt-deco {
+/* ===== #theme-toggle — a real sliding switch, not just an icon button =====
+   Track depicts the theme itself (night sky w/ moon+twinkling stars, or day
+   sky w/ sun+drifting clouds) and the knob physically slides from one end
+   to the other. Built once by js/theme.js (themeSwitchHTML()) with BOTH
+   icon groups always in the DOM — everything below is driven purely by the
+   [data-theme] attribute on <html> (same mechanism css/theme.css's color
+   tokens already use), so toggling is just that attribute flipping; no
+   innerHTML rebuild needed on every click. */
+.theme-switch {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px var(--theme-toggle-border), 0 2px 8px rgba(0,0,0,0.25);
+    transition: box-shadow 0.25s var(--ease-out);
+}
+.theme-switch:hover { box-shadow: 0 0 0 1px var(--accent-purple), 0 0 12px rgba(var(--accent-purple-rgb), 0.35); }
+.theme-switch:active .theme-switch-thumb { width: 27px; }
+.theme-switch-track {
     position: absolute;
-    pointer-events: none;
+    inset: 0;
+    background: linear-gradient(160deg, #10173a 0%, #1c2b5e 60%, #2a3f7a 100%);
+    transition: background 0.5s var(--ease-out);
+}
+[data-theme="light"] .theme-switch-track {
+    background: linear-gradient(160deg, #7ec8f2 0%, #bfe4fb 60%, #eef8ff 100%);
+}
+/* Base scale(0.4) + the per-group opacity:0 below is the "hidden" resting
+   state; the active side's rule (.theme-switch-moon-group, and light's
+   override of -sun-group) bumps opacity to 1 and scale back to 1 — since
+   both live on the same transitioned properties, flipping [data-theme]
+   plays as a pop-in "emerge" for the side switching on and a shrink-away
+   for the side switching off, not just a plain crossfade. */
+.theme-switch-icon-group {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(0.4);
+    display: flex;
+    align-items: center;
     opacity: 0;
-    color: var(--accent-yellow);
+    transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-spring);
 }
-.tt-deco-sun {
-    top: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.7));
-    animation: ttSunPop 1.3s var(--ease-out) forwards;
+.theme-switch-moon-group {
+    left: 7px;
+    color: #fde68a;
+    filter: drop-shadow(0 0 3px rgba(253, 230, 138, 0.7));
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
 }
-.tt-deco-cloud { color: #fff; opacity: 0.9; }
-.tt-deco-cloud-a { top: 2px; left: -10px; animation: ttCloudDrift 1.3s var(--ease-out) forwards; }
-.tt-deco-cloud-b { bottom: 0px; right: -9px; animation: ttCloudDrift 1.3s var(--ease-out) 0.15s forwards; }
-.tt-deco-moon {
-    top: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #e2e8f0;
-    filter: drop-shadow(0 0 4px rgba(226, 232, 240, 0.6));
-    animation: ttMoonPop 1.3s var(--ease-out) forwards;
+[data-theme="light"] .theme-switch-moon-group { opacity: 0; transform: translateY(-50%) scale(0.4); }
+.theme-switch-star { position: absolute; color: #fef9c3; animation: switchStarTwinkle 2.4s ease-in-out infinite; }
+.theme-switch-star-a { top: -7px; left: 13px; animation-delay: 0s; }
+.theme-switch-star-b { top: 6px; left: 19px; animation-delay: 1.1s; }
+@keyframes switchStarTwinkle {
+    0%, 100% { opacity: 0.35; transform: scale(0.8); }
+    50%      { opacity: 1; transform: scale(1.15); }
 }
-.tt-deco-star { color: #fef08a; }
-.tt-deco-star-a { top: -4px; left: -8px; animation: ttStarTwinkle 1.3s ease-out forwards; }
-.tt-deco-star-b { top: -4px; right: -8px; animation: ttStarTwinkle 1.3s ease-out 0.2s forwards; }
-.tt-deco-star-c { bottom: -2px; left: 50%; transform: translateX(-50%); animation: ttStarTwinkle 1.3s ease-out 0.4s forwards; }
-@keyframes ttSunPop {
-    0%   { opacity: 0; transform: translateX(-50%) scale(0.3); }
-    20%  { opacity: 1; transform: translateX(-50%) scale(1.15); }
-    35%  { transform: translateX(-50%) scale(1); }
-    75%  { opacity: 1; }
-    100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.85); }
+.theme-switch-sun-group {
+    right: 7px;
+    color: #fbbf24;
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.8));
+    opacity: 0;
 }
-@keyframes ttMoonPop {
-    0%   { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-20deg); }
-    20%  { opacity: 1; transform: translateX(-50%) scale(1.1) rotate(0deg); }
-    75%  { opacity: 1; }
-    100% { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.9); }
+[data-theme="light"] .theme-switch-sun-group { opacity: 1; transform: translateY(-50%) scale(1); }
+.theme-switch-cloud { position: absolute; color: #fff; animation: switchCloudDrift 5s ease-in-out infinite; }
+.theme-switch-cloud-a { top: -6px; right: 10px; animation-delay: 0s; }
+.theme-switch-cloud-b { bottom: -5px; right: 2px; animation-delay: -2.5s; }
+@keyframes switchCloudDrift {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(-2px); }
 }
-@keyframes ttCloudDrift {
-    0%   { opacity: 0; transform: translateX(-4px); }
-    25%  { opacity: 0.9; transform: translateX(0); }
-    75%  { opacity: 0.7; }
-    100% { opacity: 0; transform: translateX(6px); }
+.theme-switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #fff, #d8dce6);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    /* Dark (default): thumb sits on the right, opposite the moon+stars at
+       the left. Light flips it to the left, opposite the sun+clouds at the
+       right — icon positions themselves never move, only which one is
+       visible (see the opacity toggle above) and which side the thumb is on. */
+    transform: translateX(26px);
+    transition: transform 0.4s var(--ease-spring), width 0.15s var(--ease-out);
 }
-@keyframes ttStarTwinkle {
-    0%   { opacity: 0; transform: scale(0.4); }
-    20%  { opacity: 1; transform: scale(1.2); }
-    35%  { opacity: 0.6; transform: scale(0.8); }
-    50%  { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0; transform: scale(0.7); }
+[data-theme="light"] .theme-switch-thumb {
+    transform: translateX(0);
+    background: linear-gradient(160deg, #fffdf5, #ffe8a3);
 }
 @media (prefers-reduced-motion: reduce) {
-    .tt-deco { display: none; }
+    .theme-switch-thumb, .theme-switch-track, .theme-switch-icon-group { transition: none; }
+    .theme-switch-star, .theme-switch-cloud { animation: none; }
 }
 
 /* Gentle pulse so a waiting update doesn't just sit there unnoticed in a
@@ -682,30 +777,67 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 
 /* ===== Per-tab flowing gradient border =====
-   Every .site-page section gets the same framed-panel treatment: a
-   transparent border painted from a second, larger background layer whose
-   position keeps shifting — the classic two-background-layer border trick
-   (padding-box for the panel fill, border-box for the gradient), same
-   technique .site-nav-btn::after already uses for its underline shimmer,
-   just applied to the whole tab instead of one small underline. */
+   Every .site-page section gets a static subtle outline (this rule's own
+   `border`) plus a bright "comet" of light that continuously chases around
+   that outline's path — a masked conic-gradient ring on ::before, rotated
+   via an animated custom property so the gradient's angle interpolates
+   smoothly frame to frame (a plain custom-property animation would just
+   jump between values without @property's typed <angle> syntax).
+   The mask pair + mask-composite:exclude is the standard "gradient border"
+   trick: the pseudo-element covers the whole box, `padding` reserves the
+   ring's thickness, and XOR-ing a content-box mask against a full-box mask
+   punches out everything except that ring, so only the border itself
+   catches the conic-gradient sweep — the page content underneath is
+   untouched (and unclickable-through, via pointer-events: none). */
 .site-page {
     position: relative;
     border-radius: 20px;
-    border: 1.5px solid transparent;
+    border: 1.5px solid var(--border-card);
     padding: 20px 16px 28px;
-    background:
-        linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
-        linear-gradient(120deg, var(--accent-pink), var(--accent-purple), var(--accent-light-purple), var(--accent-pink)) border-box;
-    background-size: 100% 100%, 300% 300%;
+    background: var(--bg-card);
     box-shadow: var(--shadow-card);
-    animation: sitePageBorderFlow 10s linear infinite;
+}
+.site-page::before {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    padding: 1.5px;
+    pointer-events: none;
+    /* Three comets, evenly spaced 120deg apart, rather than one lone light
+       chasing all the way around a big card before it's seen again. */
+    background: conic-gradient(from var(--flow-angle, 0deg),
+        transparent 0deg,
+        transparent 80deg,
+        var(--accent-light-purple) 95deg,
+        #fff 105deg,
+        var(--accent-pink) 115deg,
+        transparent 120deg,
+        transparent 200deg,
+        var(--accent-light-purple) 215deg,
+        #fff 225deg,
+        var(--accent-pink) 235deg,
+        transparent 240deg,
+        transparent 320deg,
+        var(--accent-light-purple) 335deg,
+        #fff 345deg,
+        var(--accent-pink) 355deg,
+        transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: sitePageBorderFlow 3.5s linear infinite;
+}
+@property --flow-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
 }
 @keyframes sitePageBorderFlow {
-    0%   { background-position: 0 0, 0% 50%; }
-    100% { background-position: 0 0, 300% 50%; }
+    to { --flow-angle: 360deg; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .site-page { animation: none; }
+    .site-page::before { animation: none; opacity: 0; }
 }
 @media (max-width: 600px) {
     .site-page { padding: 16px 10px 22px; border-radius: 16px; }

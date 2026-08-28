@@ -3,35 +3,37 @@ function getTheme() {
     return localStorage.getItem('theme') || 'dark';
 }
 
-/* Decorative flourish for #theme-toggle, layered next to the static sun/
-   moon icon that shows which theme clicking the button would switch TO
-   (see applyTheme below). This instead depicts the theme that was just
-   entered — a sun+clouds pop-in when switching to light, a moon+stars
-   twinkle when switching to dark — so it reads as a brief "you're now in
-   ___ mode" confirmation rather than duplicating the static click target.
-   Built fresh every applyTheme() call (innerHTML replaced wholesale), so
-   the CSS keyframes just play once on insertion — no animationend/replay
-   bookkeeping needed. */
-function themeToggleDecoHTML(theme) {
+/* Builds #theme-toggle's sliding-switch content: a moon+twinkling-stars
+   group and a sun+drifting-clouds group, both always present — which one
+   shows and which side the thumb sits on is entirely CSS, keyed off the
+   [data-theme] attribute this file already sets on <html> (see
+   .theme-switch-track etc. in css/base.css). Built once (applyTheme below
+   only calls this if the button is still empty) since there's nothing left
+   to regenerate on a theme switch — no innerHTML replace, no animation
+   restart bookkeeping. */
+function themeSwitchHTML() {
     if (typeof icon !== 'function') return '';
-    if (theme === 'light') {
-        return `<span class="tt-deco tt-deco-sun" aria-hidden="true">${icon('sun', { size: '0.62em' })}</span>
-            <span class="tt-deco tt-deco-cloud tt-deco-cloud-a" aria-hidden="true">${icon('cloud', { size: '0.5em', filled: true })}</span>
-            <span class="tt-deco tt-deco-cloud tt-deco-cloud-b" aria-hidden="true">${icon('cloud', { size: '0.4em', filled: true })}</span>`;
-    }
-    return `<span class="tt-deco tt-deco-moon" aria-hidden="true">${icon('moon', { size: '0.6em', filled: true })}</span>
-        <span class="tt-deco tt-deco-star tt-deco-star-a" aria-hidden="true">${icon('star', { size: '0.32em', filled: true })}</span>
-        <span class="tt-deco tt-deco-star tt-deco-star-b" aria-hidden="true">${icon('star', { size: '0.26em', filled: true })}</span>
-        <span class="tt-deco tt-deco-star tt-deco-star-c" aria-hidden="true">${icon('star', { size: '0.22em', filled: true })}</span>`;
+    return `<span class="theme-switch-track" aria-hidden="true">
+        <span class="theme-switch-icon-group theme-switch-moon-group">
+            ${icon('moon', { size: '0.95em', filled: true })}
+            <span class="theme-switch-star theme-switch-star-a">${icon('star', { size: '0.4em', filled: true })}</span>
+            <span class="theme-switch-star theme-switch-star-b">${icon('star', { size: '0.3em', filled: true })}</span>
+        </span>
+        <span class="theme-switch-icon-group theme-switch-sun-group">
+            ${icon('sun', { size: '1em', filled: true })}
+            <span class="theme-switch-cloud theme-switch-cloud-a">${icon('cloud', { size: '0.55em', filled: true })}</span>
+            <span class="theme-switch-cloud theme-switch-cloud-b">${icon('cloud', { size: '0.42em', filled: true })}</span>
+        </span>
+    </span>
+    <span class="theme-switch-thumb"></span>`;
 }
 
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const btn = document.getElementById('theme-toggle');
-    // Icon reflects the theme you'd switch TO, same as the old emoji did —
-    // set directly via icon() rather than the data-icon/renderStaticIcons
-    // path, since this one swaps on every toggle, not just once on load.
-    if (btn && typeof icon === 'function') btn.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon') + themeToggleDecoHTML(theme);
+    if (btn && !btn.querySelector('.theme-switch-track') && typeof icon === 'function') {
+        btn.innerHTML = themeSwitchHTML();
+    }
     localStorage.setItem('theme', theme);
 }
 
