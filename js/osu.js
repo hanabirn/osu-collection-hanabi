@@ -551,10 +551,28 @@ function renderOsuBgCarousel(urls) {
     // gets the normal theme-correct header.
     const header = document.querySelector('.site-header');
     if (header) header.classList.add('has-cover-banner');
-    runOsuBgSlideCarousel(7000);
+    runOsuBgSlideCarousel(urls, 7000);
+    renderFloatingCoverBanners(urls);
 }
 
-function runOsuBgSlideCarousel(intervalMs) {
+// Four small glass cards flanking the page's centered content column
+// (only shown on wide viewports — see .floating-cover-card in
+// css/particles.css), each showing a different, randomly-picked banner
+// from the visitor's own collection — reshuffled independently of the
+// header's own hero carousel every time this renders (collection load,
+// import, a beatmap add/remove), not kept in sync with it.
+function renderFloatingCoverBanners(urls) {
+    const layer = document.querySelector('.bg-layer');
+    const cards = document.querySelectorAll('.floating-cover-card .floating-cover-bg');
+    if (!layer || !cards.length || !urls.length) return;
+    const picks = urls.slice().sort(() => Math.random() - 0.5);
+    cards.forEach((bg, i) => {
+        bg.style.backgroundImage = `url('${picks[i % picks.length]}')`;
+    });
+    layer.classList.add('has-cover-cards');
+}
+
+function runOsuBgSlideCarousel(urls, intervalMs) {
     const slides = document.querySelectorAll('#bg-carousel .bg-slide');
     if (!slides.length) return;
     let idx = 0;
@@ -563,7 +581,18 @@ function runOsuBgSlideCarousel(intervalMs) {
         slides[idx].classList.remove('active');
         idx = (idx + 1) % slides.length;
         slides[idx].classList.add('active');
+        syncFloatingCoverShards(urls[idx]);
     }, intervalMs);
+}
+
+// Echoes the header's current hero slide onto the two floating cards
+// closest to it (fc-left-1/fc-right-1), so they visually track the header
+// carousel instead of just coincidentally matching. The lower pair
+// (fc-left-2/fc-right-2) is left alone — it stays on the independent
+// shuffle from renderFloatingCoverBanners().
+function syncFloatingCoverShards(url) {
+    document.querySelectorAll('.fc-left-1 .floating-cover-bg, .fc-right-1 .floating-cover-bg')
+        .forEach(bg => { bg.style.backgroundImage = `url('${url}')`; });
 }
 
 // Bumped whenever the exported shape changes in a way that matters for

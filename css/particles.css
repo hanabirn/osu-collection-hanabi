@@ -184,8 +184,62 @@
     50%      { opacity: 0.7; transform: scale(1.05); }
 }
 
+/* ── Floating collection banners ──
+   4 small frosted-glass cards flanking .site-main's own centered 1080px
+   column (css/base.css), each showing a different, randomly-picked
+   banner from the visitor's own collection (renderFloatingCoverBanners()
+   in js/osu.js, reshuffled independently of the header's own hero
+   carousel every time the collection re-renders). Positioned with
+   calc() off .site-main's actual max-width rather than plain vw units so
+   the gutter math stays correct at any viewport size, not just the one
+   the numbers were tuned at. Purely ambient — inherits pointer-events:
+   none from .bg-layer, and stays out of the lower-right quadrant so it
+   doesn't collide with .world-globe there. Gated to wide viewports
+   (.site-main's gutters aren't wide enough below that to fit one without
+   overlapping real content) and to visitors who actually have a
+   collection (.bg-layer.has-cover-cards, set once there's a real cover
+   to show — no empty glass frames for a first-time visitor). */
+.floating-cover-card {
+    display: none;
+    position: absolute;
+    width: 160px;
+    aspect-ratio: 3 / 4;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+    opacity: 0.7;
+    animation: floatingCardDrift 8s ease-in-out infinite;
+}
+.floating-cover-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 25%;
+}
+.floating-cover-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 40%),
+                linear-gradient(to top, rgba(10, 6, 24, 0.45), transparent 55%);
+}
+.fc-left-1  { left: calc((100vw - 1080px) / 2 - 184px); top: 260px; animation-delay: 0s; }
+.fc-left-2  { left: calc((100vw - 1080px) / 2 - 260px); top: 490px; animation-delay: -3s; }
+.fc-right-1 { right: calc((100vw - 1080px) / 2 - 184px); top: 250px; animation-delay: -5s; }
+.fc-right-2 { right: calc((100vw - 1080px) / 2 - 260px); top: 420px; animation-delay: -1.5s; }
+@keyframes floatingCardDrift {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-12px) scale(1.03); }
+}
+@media (min-width: 1600px) {
+    .bg-layer.has-cover-cards .floating-cover-card { display: block; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .bg-glow, .hit-circle, .world-globe-spin, .globe-dot { animation: none; }
+    .bg-glow, .hit-circle, .world-globe-spin, .globe-dot, .floating-cover-card { animation: none; }
     /* The orbiting dots use SMIL <animateMotion>, which CSS `animation: none`
        can't stop — hiding them outright is the simplest way to honor
        reduced-motion here (the static orbit rings/sphere stay visible). */
