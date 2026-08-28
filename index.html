@@ -157,6 +157,7 @@
         <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
         <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
         <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
+        <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources">資源</button>
         <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
     </nav>
 </header>
@@ -568,38 +569,15 @@
             </form>
             <div id="feedback-success" class="feedback-success" style="display:none;" data-i18n="feedback_success">您的回覆訊息已傳送，感謝您的回饋！</div>
         </div>
+    </section>
 
+    <section id="page-resources" class="site-page" style="display:none;">
         <div class="osu-add-card resources-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="resources_title">✦ 更多 osu! 資源 ✦</h3>
             <p class="resources-hint" data-i18n="resources_hint">一些沒必要自己做、但很推薦認識的社群工具：</p>
-            <div class="resources-grid">
-                <a class="resource-link-card" href="https://osusearch.com" target="_blank" rel="noopener noreferrer">
-                    <div class="resource-link-title">osu!search <span data-icon="externalLink"></span></div>
-                    <div class="resource-link-desc" data-i18n="resource_osusearch_desc">進階圖譜搜尋引擎，可依星數、BPM、長度等條件篩選</div>
-                </a>
-                <a class="resource-link-card" href="https://osu-pps.com/#/osu/maps" target="_blank" rel="noopener noreferrer">
-                    <div class="resource-link-title">osu-pps <span data-icon="externalLink"></span></div>
-                    <div class="resource-link-desc" data-i18n="resource_osupps_desc">另一個 farm 圖追蹤網站，可以互相比較</div>
-                </a>
-                <a class="resource-link-card" href="https://github.com/Piotrekol/CollectionManager" target="_blank" rel="noopener noreferrer">
-                    <div class="resource-link-title">CollectionManager <span data-icon="externalLink"></span></div>
-                    <div class="resource-link-desc" data-i18n="resource_collectionmanager_desc">桌面版收藏編輯工具，可匯入本站匯出的收藏</div>
-                </a>
-                <a class="resource-link-card" href="https://osuskinner.com" target="_blank" rel="noopener noreferrer">
-                    <div class="resource-link-title">osuskinner <span data-icon="externalLink"></span></div>
-                    <div class="resource-link-desc" data-i18n="resource_osuskinner_desc">線上 skin 製作工具</div>
-                </a>
-                <a class="resource-link-card" href="https://mappersguild.com" target="_blank" rel="noopener noreferrer">
-                    <div class="resource-link-title">Mappers' Guild <span data-icon="externalLink"></span></div>
-                    <div class="resource-link-desc" data-i18n="resource_mappersguild_desc">公會制度，鼓勵大家一起製圖精選歌曲</div>
-                </a>
-                <a class="resource-link-card" href="http://osuskills.com" target="_blank" rel="noopener noreferrer">
-                    <div class="resource-link-title">osu!Skills <span data-icon="externalLink"></span></div>
-                    <div class="resource-link-desc" data-i18n="resource_osuskills_desc">非官方的玩家能力分項評分（aim / speed / acc）</div>
-                </a>
-            </div>
+            <div class="resources-grid" id="resources-list"></div>
         </div>
     </section>
 
@@ -714,6 +692,7 @@
 <script src="js/skins.js"></script>
 <script src="js/skin-screenshots.js"></script>
 <script src="js/updates.js"></script>
+<script src="js/resources-data.js"></script>
 <script src="js/tournaments.js"></script>
 <script src="js/celebrate.js"></script>
 <script src="js/notifications.js"></script>

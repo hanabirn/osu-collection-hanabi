@@ -10,7 +10,7 @@ I18N.es = {
     contact_info_title: 'Información de contacto',
     notif_pp_changed_detail: '{sign}{delta}pp (ahora {pp}pp)', notif_tournament_new_title: 'Nuevo tema de torneo',
     back_to_main: 'Volver a Hanabiの小天地',
-    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias', nav_mapper_tracking: 'Mappers seguidos', nav_tournaments: 'Torneos', nav_feedback: 'Sugerencias',
+    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias', nav_mapper_tracking: 'Mappers seguidos', nav_tournaments: 'Torneos', nav_resources: 'Recursos', nav_feedback: 'Sugerencias',
     updates_title: '✦ Noticias ✦', updates_loading: 'Cargando noticias...', updates_empty: 'No hay noticias por ahora', updates_load_fail: 'Error al cargar las noticias, inténtalo más tarde',
     tournaments_title: '✦ Torneos ✦', tournaments_hint: 'Torneos comunitarios del subforo oficial «Tournaments» y de la plataforma wyBin — no son eventos oficiales, confirma las reglas del organizador antes de inscribirte.', tournaments_filter_hint: 'El modo de juego se adivina a partir del título — los hilos no reconocidos solo aparecen en "Todos".', osu_filter_all: 'Todos', tournament_source_forum: 'Foro',
     feedback_title: '✦ Sugerencias y mejoras ✦', feedback_hint: '¿Crees que algo en el sitio podría mejorar? Cuéntamelo aquí — solo yo puedo ver tu mensaje, otros visitantes no lo verán.', feedback_placeholder: 'Escribe tu sugerencia...', feedback_submit: 'Enviar', feedback_success: '¡Tu mensaje ha sido enviado, gracias por tu opinión!',

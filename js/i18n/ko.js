@@ -10,7 +10,7 @@ I18N.ko = {
     contact_info_title: '연락처',
     notif_pp_changed_detail: '{sign}{delta}pp (현재 {pp}pp)', notif_tournament_new_title: '새 대회 게시글',
     back_to_main: 'Hanabiの小天地로 돌아가기',
-    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_mapper_tracking: '매퍼 추적', nav_tournaments: '대회', nav_feedback: '제안&개선',
+    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_mapper_tracking: '매퍼 추적', nav_tournaments: '대회', nav_resources: '리소스', nav_feedback: '제안&개선',
     updates_title: '✦ 업데이트 소식 ✦', updates_loading: '업데이트 소식을 불러오는 중...', updates_empty: '현재 업데이트 소식이 없습니다', updates_load_fail: '업데이트 소식을 불러오지 못했습니다',
     tournaments_title: '✦ 대회 ✦', tournaments_hint: '공식 포럼 「Tournaments」 게시판과 wyBin 플랫폼의 커뮤니티 대회를 함께 모아 보여줍니다. 공식 주최가 아니므로 참가 전 주최자의 규칙을 직접 확인해 주세요.', tournaments_filter_hint: '게임 모드는 제목의 키워드로 추측합니다. 인식되지 않는 제목은 "전체"에만 표시됩니다.', osu_filter_all: '전체', tournament_source_forum: '포럼',
     feedback_title: '✦ 제안&개선 ✦', feedback_hint: '사이트에서 개선이 필요한 부분이 있나요? 여기에 알려주세요. 이 메시지는 저만 볼 수 있고 다른 방문자는 볼 수 없습니다.', feedback_placeholder: '제안 사항을 적어주세요...', feedback_submit: '보내기', feedback_success: '메시지가 전송되었습니다. 소중한 의견 감사합니다!',

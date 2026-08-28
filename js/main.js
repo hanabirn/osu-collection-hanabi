@@ -88,6 +88,7 @@ function refreshDynamicContent() {
     if (typeof renderTrackButtonState === 'function') renderTrackButtonState();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
+    if (typeof renderResourcesList === 'function') renderResourcesList();
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
     if (typeof renderFarmMapsList === 'function') renderFarmMapsList();
 }
