@@ -1,7 +1,8 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ あなただけの楽曲コレクションを作ろう！ ✦',
     pwa_install_btn_title: 'ホーム画面に追加（オフライン対応）',
-    site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。右上の 🔄 をクリックして更新してください',
+    site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。クリックして再読み込みし、最新版を取得してください',
+    maintenance_banner_text: '現在このサイトは修正中です。ご質問やバグがあればご連絡ください！',
     page_refresh_btn_title: 'ページを再読み込み',
     track_player_btn: '+ フォロー', untrack_player_btn: 'フォロー解除',
     track_done: 'ウォッチリストに追加しました。PP が変化したら通知します', untrack_done: 'フォローを解除しました',

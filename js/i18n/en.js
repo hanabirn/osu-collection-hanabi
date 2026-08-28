@@ -1,7 +1,8 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Build your very own song collection! ✦',
     pwa_install_btn_title: 'Add to home screen (works offline)',
-    site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click 🔄 in the top right to update',
+    site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click to reload and get the latest version',
+    maintenance_banner_text: 'This site is currently being updated — if you run into any questions or bugs, please get in touch!',
     page_refresh_btn_title: 'Refresh page',
     track_player_btn: '+ Track', untrack_player_btn: 'Untrack',
     track_done: "Added to your watchlist — we'll notify you when their PP changes", untrack_done: 'Removed from your watchlist',

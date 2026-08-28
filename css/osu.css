@@ -16,10 +16,8 @@
    search/sort) — things you set once and glance at; right column is the
    actual collection grid, which needs the most width since .osu-collection
    is a fixed 2-column card grid (see below). Stacks to a single column
-   below 900px, same breakout-past-.site-main's-640px-cap pattern
-   #page-lookup already uses for its two-card row (css/osu.css's
-   .lookup-page-row), since two real columns need more room than the
-   640px reading-width cap gives a single-column page. */
+   below 900px (the outer width itself comes from .site-main's shared
+   max-width — see css/base.css — this only switches the internal layout). */
 .collection-layout {
     display: flex;
     flex-direction: column;
@@ -32,13 +30,6 @@
     min-width: 0;
 }
 @media (min-width: 900px) {
-    #page-collection {
-        width: 100vw;
-        max-width: 1080px;
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-    }
     .collection-layout {
         flex-direction: row;
         align-items: flex-start;
@@ -163,9 +154,9 @@
 /* Two source-specific lists side by side instead of one merged/interleaved
    list — wyBin entries no longer need scrolling past a wall of forum posts
    to reach. Narrower than 760px there's no room for two columns, so it just
-   stacks (wyBin first). At/above that width the page breaks out of
-   .site-main's 640px cap (viewport-relative centering, not parent-relative)
-   so the two columns have enough room to stay readable. */
+   stacks (wyBin first); at/above that it switches to the grid below (the
+   outer width itself comes from .site-main's shared max-width — see
+   css/base.css). */
 .tournaments-columns {
     display: flex;
     flex-direction: column;
@@ -173,13 +164,6 @@
 }
 .tournaments-column-card { margin-bottom: 0; }
 @media (min-width: 760px) {
-    #page-tournaments {
-        width: 100vw;
-        max-width: 880px;
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-    }
     .tournaments-columns {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1512,23 +1496,15 @@
 /* ===== Visitor Lookup ===== */
 /* Lays the single-player lookup card and the two-player compare card side by
    side (lookup on the left, compare on the right). Below 760px there's no
-   room for two 520px-ish cards, so it just stacks. At/above that width the
-   page breaks out of .site-main's 640px cap (viewport-relative centering,
-   not parent-relative) so the two columns have enough room to stay readable
-   — same pattern as #page-tournaments' two-column breakout above. */
+   room for two 520px-ish cards, so it just stacks; at/above that it goes
+   side by side (the outer width itself comes from .site-main's shared
+   max-width — see css/base.css). */
 .lookup-page-row {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 @media (min-width: 760px) {
-    #page-lookup {
-        width: 100vw;
-        max-width: 880px;
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-    }
     .lookup-page-row {
         flex-direction: row;
         align-items: flex-start;

@@ -1,7 +1,8 @@
 I18N.de = {
     title: 'osu! Sammlung', site_title: 'osu! Sammlung', site_tagline: '✦ Bau dir deine eigene Songsammlung auf! ✦',
     pwa_install_btn_title: 'Zum Startbildschirm hinzufügen (funktioniert offline)',
-    site_update_btn_title: 'Ein Update ist verfügbar, zum Aktualisieren klicken', site_update_available: 'Eine neue Version der Seite ist verfügbar — klicke oben rechts auf 🔄, um zu aktualisieren',
+    site_update_btn_title: 'Ein Update ist verfügbar, zum Aktualisieren klicken', site_update_available: 'Eine neue Version der Seite ist verfügbar — klicke, um neu zu laden und die neueste Version zu erhalten',
+    maintenance_banner_text: 'Diese Website wird gerade überarbeitet — bei Fragen oder Bugs meld dich gerne bei mir!',
     page_refresh_btn_title: 'Seite neu laden',
     track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',
     track_done: 'Zur Beobachtungsliste hinzugefügt — wir benachrichtigen dich bei PP-Änderungen', untrack_done: 'Von der Beobachtungsliste entfernt',

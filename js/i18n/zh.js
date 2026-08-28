@@ -1,7 +1,8 @@
 I18N.zh = {
     title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦',
     pwa_install_btn_title: '加到主畫面（離線可用）',
-    site_update_btn_title: '網站有更新，點擊更新', site_update_available: '網站有新版本可用，點擊右上角 🔄 完成更新',
+    site_update_btn_title: '網站有更新，點擊更新', site_update_available: '目前網站有更新，請點擊重新載入以獲取最新版本',
+    maintenance_banner_text: '目前該網頁正在修改中，如果有任何疑問或 bug 的話請聯絡我！',
     page_refresh_btn_title: '重新整理頁面',
     track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',
     track_done: '已加入追蹤清單，PP 有變化時會通知你', untrack_done: '已取消追蹤',

@@ -1,3 +1,27 @@
+/* ===== Maintenance banner =====
+   Manual on/off switch for a site-wide "we're mid-change" notice — flip
+   MAINTENANCE_BANNER_ENABLED to true and redeploy to show it, flip back to
+   false when done. A visitor who closes it won't see it again (tracked in
+   localStorage, not sessionStorage — the point is not re-nagging them on
+   their next visit, not just for the rest of this tab). The key has a
+   version suffix so a *new* maintenance notice later can reset everyone's
+   dismissal just by bumping it, without needing new code elsewhere. */
+const MAINTENANCE_BANNER_ENABLED = false;
+const MAINTENANCE_BANNER_DISMISSED_KEY = 'maintenance_banner_dismissed_v1';
+
+function initMaintenanceBanner() {
+    if (!MAINTENANCE_BANNER_ENABLED) return;
+    if (localStorage.getItem(MAINTENANCE_BANNER_DISMISSED_KEY) === '1') return;
+    const banner = document.getElementById('maintenance-banner');
+    if (banner) banner.style.display = 'flex';
+}
+
+function dismissMaintenanceBanner() {
+    localStorage.setItem(MAINTENANCE_BANNER_DISMISSED_KEY, '1');
+    const banner = document.getElementById('maintenance-banner');
+    if (banner) banner.style.display = 'none';
+}
+
 /* ===== Tab switching ===== */
 function switchTab(tab, el) {
     document.querySelectorAll('.site-page').forEach(p => p.style.display = 'none');
@@ -97,6 +121,7 @@ function refreshDynamicContent() {
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof renderStaticIcons === 'function') renderStaticIcons();
     applyLang(siteLang);
+    initMaintenanceBanner();
     initOsuBgCarousel();
     checkImportFromHash();
     checkOsuLoginFromUrl();

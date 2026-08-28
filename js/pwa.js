@@ -48,13 +48,27 @@ if ('serviceWorker' in navigator) {
 function notifySiteUpdateAvailable(registration) {
     const btn = document.getElementById('site-update-btn');
     if (btn) btn.style.display = '';
-    if (typeof showShareToast === 'function' && typeof t === 'function') showShareToast(t('site_update_available'));
+    // #site-update-toast (index.html) is its own element, deliberately not
+    // routed through showShareToast()/#share-toast: that one is shared by
+    // every "已加入最愛"-style fire-and-forget confirmation across the
+    // site and always carries its own auto-hide timer, so reusing it here
+    // would let an unrelated toast clobber the update notice, or have it
+    // vanish on a timer before the visitor even notices it. This one only
+    // goes away when applySiteUpdate() actually runs (see its onclick in
+    // index.html) — the visitor decides when, not a timeout.
+    const toast = document.getElementById('site-update-toast');
+    if (toast && typeof t === 'function') {
+        toast.textContent = t('site_update_available');
+        toast.classList.add('show');
+    }
 }
 
 function applySiteUpdate() {
     if (!swRegistration || !swRegistration.waiting) return;
     const btn = document.getElementById('site-update-btn');
     if (btn) btn.disabled = true;
+    const toast = document.getElementById('site-update-toast');
+    if (toast) { toast.classList.remove('show'); toast.onclick = null; }
     swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
 }
 

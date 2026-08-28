@@ -728,12 +728,49 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     position: relative;
     background: transparent;
     border: none;
+    border-radius: 999px;
     color: var(--text-secondary);
     padding: 10px 16px;
     font-size: 0.95rem;
     cursor: pointer;
     white-space: nowrap;
     transition: color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
+}
+/* Same masked-conic-gradient-ring trick as .site-page::before (see its
+   comment for the mechanics), but a full, ungapped loop rather than a
+   sparse comet — this one's meant to read as a continuously flowing
+   gradient outline around each pill-shaped tab, not a chasing highlight
+   on a big card. Sits under every tab all the time at low opacity so the
+   nav row doesn't turn into 12 shouting buttons; hover/active turn it up. */
+.site-nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: inherit;
+    padding: 1.2px;
+    pointer-events: none;
+    background: conic-gradient(from var(--nav-flow-angle, 0deg),
+        var(--accent-pink), var(--accent-purple), var(--accent-light-purple), #fff, var(--accent-pink));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.4;
+    animation: navBtnBorderFlow 5s linear infinite;
+}
+.site-nav-btn:hover::before,
+.site-nav-btn.active::before {
+    opacity: 0.9;
+}
+@property --nav-flow-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+@keyframes navBtnBorderFlow {
+    to { --nav-flow-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .site-nav-btn::before { animation: none; }
 }
 .site-nav-btn::after {
     content: '';
@@ -768,10 +805,19 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     100% { background-position: 200% center; }
 }
 
+/* 1080px matches what #page-collection (js/osu.js's two-column layout)
+   needs — every other tab used to just sit inside a plain 640px cap here,
+   which made the whole page visibly narrow and re-center itself on every
+   tab switch. Unifying the cap here means every .site-page shares the
+   exact same outer width at every viewport size; #page-collection/
+   #page-lookup/#page-tournaments no longer need their own width-escaping
+   breakout rules (see css/osu.css) since there's nothing left to escape —
+   only their internal single-column/multi-column layout switch at their
+   own breakpoints stays. */
 .site-main {
     position: relative;
     z-index: 1;
-    max-width: 640px;
+    max-width: 1080px;
     margin: 0 auto;
     padding: 24px 16px 60px;
 }
@@ -958,6 +1004,59 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+/* An actionable, click-to-act toast — pointer-events is off by default
+   above since every plain showShareToast() call is a fire-and-forget
+   confirmation, not something to click. Also drops the nowrap/fixed-width
+   look for a message long enough to need wrapping (a full sentence, vs.
+   the short "已匯出收藏！" style confirmations showShareToast sends). Used
+   by #site-update-toast below — a distinct element/id from #share-toast on
+   purpose, so an unrelated confirmation toast (copy an ID, add a favorite,
+   ...) firing while the update notice is up can't clobber it, and so it
+   has no auto-hide timer: it needs to actually stay up until clicked,
+   which a shared single-instance toast with its own timer can't promise. */
+.share-toast-clickable {
+    pointer-events: auto;
+    cursor: pointer;
+    white-space: normal;
+    max-width: min(90vw, 420px);
+    text-align: center;
+}
+.share-toast-clickable:hover { filter: brightness(1.1); }
+
+/* Sits above #share-toast's own position so the two can coexist without
+   overlapping if a plain confirmation toast fires while this is up. */
+#site-update-toast { bottom: 88px; }
+
+/* ===== Maintenance banner (see initMaintenanceBanner in js/main.js) ===== */
+.maintenance-banner {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 40px 10px 16px;
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.1));
+    border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+    color: var(--accent-yellow);
+    font-size: 0.85rem;
+    text-align: center;
+}
+.maintenance-banner-close {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: inherit;
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+}
+.maintenance-banner-close:hover { opacity: 1; }
 
 @media (max-width: 600px) {
     .site-header-top { flex-direction: column; }

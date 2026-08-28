@@ -1,7 +1,8 @@
 I18N.es = {
     title: 'osu! Colección', site_title: 'osu! Colección', site_tagline: '✦ ¡Crea tu propia colección de canciones! ✦',
     pwa_install_btn_title: 'Añadir a la pantalla de inicio (funciona sin conexión)',
-    site_update_btn_title: 'Hay una actualización disponible, haz clic para actualizar', site_update_available: 'Hay una nueva versión del sitio disponible — haz clic en 🔄 arriba a la derecha para actualizar',
+    site_update_btn_title: 'Hay una actualización disponible, haz clic para actualizar', site_update_available: 'Hay una nueva versión del sitio disponible — haz clic para recargar y obtener la última versión',
+    maintenance_banner_text: 'Este sitio está actualmente en proceso de modificación — si tienes alguna duda o encuentras un error, ¡contáctame!',
     page_refresh_btn_title: 'Actualizar página',
     track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',
     track_done: 'Añadido a tu lista de seguimiento — te avisaremos si cambia su PP', untrack_done: 'Eliminado de tu lista de seguimiento',

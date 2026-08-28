@@ -162,6 +162,12 @@
     </nav>
 </header>
 
+<div id="maintenance-banner" class="maintenance-banner" style="display:none;">
+    <span data-icon="settings" data-icon-gap></span>
+    <span data-i18n="maintenance_banner_text">目前該網頁正在修改中，如果有任何疑問或 bug 的話請聯絡我！</span>
+    <button class="maintenance-banner-close" onclick="dismissMaintenanceBanner()" aria-label="Close" data-icon="x"></button>
+</div>
+
 <main class="site-main">
 
     <section id="page-collection" class="site-page">
@@ -680,6 +686,8 @@
 <footer class="site-footer">
     <p>osu! 收藏 ✦ osu! is a trademark of ppy Pty Ltd</p>
 </footer>
+
+<div id="site-update-toast" class="share-toast share-toast-clickable" onclick="applySiteUpdate()"></div>
 
 <script src="js/icons.js"></script>
 <script src="js/theme.js"></script>

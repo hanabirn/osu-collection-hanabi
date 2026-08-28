@@ -1,7 +1,8 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 나만의 곡 컬렉션을 만들어보세요! ✦',
     pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
-    site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 오른쪽 위 🔄 을 클릭해 업데이트하세요',
+    site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 클릭하면 새로고침하여 최신 버전을 받습니다',
+    maintenance_banner_text: '현재 이 사이트는 수정 중입니다. 궁금한 점이나 버그가 있으면 연락해 주세요!',
     page_refresh_btn_title: '페이지 새로고침',
     track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',
     track_done: '추적 목록에 추가되었습니다. PP가 변하면 알려드릴게요', untrack_done: '추적을 해제했습니다',
