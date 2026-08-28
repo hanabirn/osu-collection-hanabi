@@ -45,7 +45,7 @@ I18N.en = {
     osu_page_title: '✦ osu! Song Collection + Total PP Lookup ✦', visitor_lookup_title: '✦ Look Up Your osu! PP ✦', visitor_lookup_placeholder: 'Enter osu! username or ID', visitor_lookup_btn: 'Search', osu_login_btn: 'Login with osu!', osu_logout_btn: 'Log out', osu_login_fail: 'osu! login failed, please try again',
     osu_stat_global: 'Global Rank', osu_stat_accuracy: 'Accuracy', osu_stat_playcount: 'Play Count', osu_total_pp: 'Total PP (All Modes)',
     osu_recent_title: 'Recent Plays', osu_top_title: 'Top Plays',
-    pp_compare_title: '⚔ Compare Two Players', pp_compare_placeholder_a: 'Player A: username or ID', pp_compare_placeholder_b: 'Player B: username or ID', pp_compare_btn: 'Compare',
+    pp_compare_title: '⚔ Compare Two Players', pp_compare_placeholder_a: 'Player A: username or ID', pp_compare_placeholder_b: 'Player B: username or ID', pp_compare_btn: 'Compare', pp_compare_topplays_title: '⚔ Top Play Comparison', pp_compare_topplays_empty: 'No scores in this mode',
     osu_search_placeholder: 'Search by title or artist...', osu_search_empty: 'No matching beatmaps found',
     osu_sort_default: 'Default Order', osu_sort_rating_desc: 'Star Rating (High to Low)', osu_sort_rating_asc: 'Star Rating (Low to High)',
     pp_history_title: 'PP Growth', pp_history_empty: 'Not enough history yet — visit again later to build up the trend.',

@@ -45,7 +45,7 @@ I18N.zh = {
     osu_page_title: '✦ osu!歌曲收藏+查詢個人總PP ✦', visitor_lookup_title: '✦ 查詢你的 osu! PP ✦', visitor_lookup_placeholder: '輸入 osu! 用戶名或 ID', visitor_lookup_btn: '查詢', osu_login_btn: 'osu! 登入', osu_logout_btn: '登出', osu_login_fail: 'osu! 登入失敗，請再試一次',
     osu_stat_global: '全球排名', osu_stat_accuracy: '準確率', osu_stat_playcount: '遊戲數', osu_total_pp: '全模式 PP',
     osu_recent_title: '最近遊玩', osu_top_title: '最佳成績',
-    pp_compare_title: '⚔ 雙人 PP 對比', pp_compare_placeholder_a: '玩家 A：用戶名或 ID', pp_compare_placeholder_b: '玩家 B：用戶名或 ID', pp_compare_btn: '比較',
+    pp_compare_title: '⚔ 雙人 PP 對比', pp_compare_placeholder_a: '玩家 A：用戶名或 ID', pp_compare_placeholder_b: '玩家 B：用戶名或 ID', pp_compare_btn: '比較', pp_compare_topplays_title: '⚔ Top Play 對比', pp_compare_topplays_empty: '這個模式沒有成績',
     osu_search_placeholder: '搜尋曲名或作者...', osu_search_empty: '找不到符合的 Beatmap',
     osu_sort_default: '預設排序', osu_sort_rating_desc: '星數（高到低）', osu_sort_rating_asc: '星數（低到高）',
     pp_history_title: 'PP 成長趨勢', pp_history_empty: '還沒有足夠的紀錄，多來看看就會累積趨勢圖！',

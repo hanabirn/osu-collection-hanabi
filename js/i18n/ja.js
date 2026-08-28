@@ -45,7 +45,7 @@ I18N.ja = {
     osu_page_title: '✦ osu!譜面コレクション＋合計PP検索 ✦', visitor_lookup_title: '✦ osu! PPを照会 ✦', visitor_lookup_placeholder: 'osu! ユーザー名またはID', visitor_lookup_btn: '検索', osu_login_btn: 'osu!でログイン', osu_logout_btn: 'ログアウト', osu_login_fail: 'osu!ログインに失敗しました。もう一度お試しください',
     osu_stat_global: '世界ランク', osu_stat_accuracy: '精度', osu_stat_playcount: 'プレイ数', osu_total_pp: '全モード合計PP',
     osu_recent_title: '最近のプレイ', osu_top_title: 'ベストプレイ',
-    pp_compare_title: '⚔ 2人のPP比較', pp_compare_placeholder_a: 'プレイヤーA：ユーザー名またはID', pp_compare_placeholder_b: 'プレイヤーB：ユーザー名またはID', pp_compare_btn: '比較する',
+    pp_compare_title: '⚔ 2人のPP比較', pp_compare_placeholder_a: 'プレイヤーA：ユーザー名またはID', pp_compare_placeholder_b: 'プレイヤーB：ユーザー名またはID', pp_compare_btn: '比較する', pp_compare_topplays_title: '⚔ Top Play 比較', pp_compare_topplays_empty: 'このモードには記録がありません',
     osu_search_placeholder: '曲名またはアーティストで検索...', osu_search_empty: '該当するビートマップが見つかりません',
     osu_sort_default: 'デフォルト順', osu_sort_rating_desc: '星評価（高い順）', osu_sort_rating_asc: '星評価（低い順）',
     pp_history_title: 'PP成長推移', pp_history_empty: 'まだ記録が少ないです。また訪れると推移グラフが増えていきます。',

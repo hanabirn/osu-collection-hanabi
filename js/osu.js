@@ -1618,16 +1618,47 @@ function playsListSkeletonHTML(count) {
     return Array.from({ length: count }, () => '<div class="osu-recent-item skeleton" aria-hidden="true"></div>').join('');
 }
 
-async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
-    const container = document.getElementById(listId);
-    const wrap = document.getElementById(wrapId);
-    if (!container || !wrap) return;
-    container.innerHTML = playsListSkeletonHTML(type === 'best' ? 5 : 3);
-    wrap.style.display = 'block';
+/* One .osu-recent-item card's markup — pulled out of renderOsuPlaysList so
+   the two-player Top Play comparison (loadPpCompareTopPlays below) can
+   build the exact same card for each side without duplicating this. */
+function osuPlayItemHtml(r, mode, bm, type) {
+    const title = bm ? `${bm.title} [${bm.version}]` : `Beatmap #${r.beatmap_id}`;
+    const coverUrl = bm ? `https://assets.ppy.sh/beatmaps/${bm.beatmapset_id}/covers/card.jpg` : '';
+    const acc = calcOsuAccuracy(r, mode);
+    const rankClass = OSU_RANK_CLASS[r.rank] || 'f';
+    const mods = decodeOsuMods(r.enabled_mods);
+    const modsStr = mods.length > 0 ? ' · ' + mods.join(',') : '';
+    const d = new Date(String(r.date).replace(' ', 'T') + 'Z');
+    const dateStr = isNaN(d) ? '' : `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const ppStr = type === 'best' && r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
+    // rosu-pp-js (the FC-simulation backend) doesn't factor NF/SO
+    // into difficulty/pp at all, so they're dropped from the mods
+    // string sent to it — same convention netlify/functions/
+    // replay-analyze.js already uses.
+    const fcMods = mods.filter(m => m !== 'NF' && m !== 'SO').join('');
+    return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
+        <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="osu-recent-overlay"></div>
+        <span class="osu-recent-rank rank-${rankClass}">${r.rank || '—'}</span>
+        <div class="osu-recent-info">
+            <div class="osu-recent-song">${escHtml(title)}</div>
+            <div class="osu-recent-meta">${ppStr}${acc}% · ${r.maxcombo}x${modsStr} · ${dateStr}</div>
+            <button class="fc-sim-btn" onclick="toggleFcSim(event, ${r.beatmap_id}, '${fcMods}')" title="${escHtml(t('fc_sim_btn_title'))}">${icon('trendingUp')}<span>${t('fc_sim_btn')}</span></button>
+        </div>
+    </a>`;
+}
+
+/* Shared by renderOsuPlaysList (single-player recent/best list) and
+   loadPpCompareTopPlays (two-player Top10 comparison, see comparePlayers
+   below): fetch `best`/`recent` scores for one user+mode, batch-fetch the
+   beatmap details each score references, and return the rendered card
+   list HTML — '' on no scores or any failure, never throws, so a caller
+   comparing two players never has one side's failure take down the other. */
+async function fetchOsuPlaysHtml(userId, mode, type, limit) {
     try {
-        const query = type === 'best' ? `best=${userId}&limit=10&m=${mode}` : `recent=${userId}&limit=5&m=${mode}`;
+        const query = type === 'best' ? `best=${userId}&limit=${limit}&m=${mode}` : `recent=${userId}&limit=${limit}&m=${mode}`;
         const plays = await osuFetch(query);
-        if (!plays || plays.length === 0) { wrap.style.display = 'none'; return; }
+        if (!plays || plays.length === 0) return '';
         const beatmapIds = [...new Set(plays.map(r => r.beatmap_id))];
         const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`)));
         const beatmapMap = {};
@@ -1635,38 +1666,23 @@ async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
             const bm = beatmapResults[i] && beatmapResults[i][0];
             if (bm) beatmapMap[id] = bm;
         });
-        container.innerHTML = plays.map(r => {
-            const bm = beatmapMap[r.beatmap_id];
-            const title = bm ? `${bm.title} [${bm.version}]` : `Beatmap #${r.beatmap_id}`;
-            const coverUrl = bm ? `https://assets.ppy.sh/beatmaps/${bm.beatmapset_id}/covers/card.jpg` : '';
-            const acc = calcOsuAccuracy(r, mode);
-            const rankClass = OSU_RANK_CLASS[r.rank] || 'f';
-            const mods = decodeOsuMods(r.enabled_mods);
-            const modsStr = mods.length > 0 ? ' · ' + mods.join(',') : '';
-            const d = new Date(String(r.date).replace(' ', 'T') + 'Z');
-            const dateStr = isNaN(d) ? '' : `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-            const ppStr = type === 'best' && r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
-            // rosu-pp-js (the FC-simulation backend) doesn't factor NF/SO
-            // into difficulty/pp at all, so they're dropped from the mods
-            // string sent to it — same convention netlify/functions/
-            // replay-analyze.js already uses.
-            const fcMods = mods.filter(m => m !== 'NF' && m !== 'SO').join('');
-            return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
-                <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
-                <div class="osu-recent-overlay"></div>
-                <span class="osu-recent-rank rank-${rankClass}">${r.rank || '—'}</span>
-                <div class="osu-recent-info">
-                    <div class="osu-recent-song">${escHtml(title)}</div>
-                    <div class="osu-recent-meta">${ppStr}${acc}% · ${r.maxcombo}x${modsStr} · ${dateStr}</div>
-                    <button class="fc-sim-btn" onclick="toggleFcSim(event, ${r.beatmap_id}, '${fcMods}')" title="${escHtml(t('fc_sim_btn_title'))}">${icon('trendingUp')}<span>${t('fc_sim_btn')}</span></button>
-                </div>
-            </a>`;
-        }).join('');
-        wrap.style.display = 'block';
+        return plays.map(r => osuPlayItemHtml(r, mode, beatmapMap[r.beatmap_id], type)).join('');
     } catch (e) {
         console.error('Plays list fetch failed:', e);
-        wrap.style.display = 'none';
+        return '';
     }
+}
+
+async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
+    const container = document.getElementById(listId);
+    const wrap = document.getElementById(wrapId);
+    if (!container || !wrap) return;
+    container.innerHTML = playsListSkeletonHTML(type === 'best' ? 5 : 3);
+    wrap.style.display = 'block';
+    const html = await fetchOsuPlaysHtml(userId, mode, type, type === 'best' ? 10 : 5);
+    if (!html) { wrap.style.display = 'none'; return; }
+    container.innerHTML = html;
+    wrap.style.display = 'block';
 }
 
 /* ===== "PP if FC" simulator — a single document.body-level popover (same
@@ -2129,6 +2145,9 @@ function clearPpCompareResult() {
     if (status) status.innerText = '';
     if (result) result.style.display = 'none';
     if (skeleton) skeleton.style.display = 'none';
+    ppCompareTopPlaysData = null;
+    const topplaysWrap = document.getElementById('pp-compare-topplays');
+    if (topplaysWrap) topplaysWrap.style.display = 'none';
 }
 
 function onPpCompareInputChange() {
@@ -2163,12 +2182,72 @@ async function comparePlayers() {
         renderPpCompareSide('pp-compare-side-b', b);
         renderPpCompareChart(a, b, 'pp-compare-chart-panel');
         result.style.display = 'block';
+        loadPpCompareTopPlays(a.id, b.id);
     } catch (e) {
         console.error('PP compare failed:', e);
         if (skeleton) skeleton.style.display = 'none';
         status.innerText = 'Error';
         status.style.color = '#ff5252';
     }
+}
+
+/* ===== Two-player Top Play comparison =====
+   All 4 modes × both players (8 osuFetch('best=...') calls, each with its
+   own beatmap-detail batch — see fetchOsuPlaysHtml) are fetched together
+   up front rather than per-tab-click, so switching modes afterward is
+   instant and a slow mode for one player doesn't block the others from
+   appearing. Keyed by mode name (not the numeric index fetchOsuPlaysHtml
+   itself needs) so switchPpCompareTopPlaysMode can just look results up by
+   the same 'standard'/'taiko'/'catch'/'mania' ids the mode tabs use. */
+let ppCompareTopPlaysData = null;
+let ppCompareTopPlaysMode = 'standard';
+let ppCompareTopPlaysRequestKey = null;
+
+async function loadPpCompareTopPlays(idA, idB) {
+    const wrap = document.getElementById('pp-compare-topplays');
+    const listA = document.getElementById('pp-compare-topplays-a');
+    const listB = document.getElementById('pp-compare-topplays-b');
+    if (!wrap || !listA || !listB) return;
+
+    ppCompareTopPlaysData = null;
+    ppCompareTopPlaysMode = 'standard';
+    document.querySelectorAll('#pp-compare-topplays-tabs .osu-mode-tab').forEach((btn, i) => btn.classList.toggle('active', i === 0));
+    wrap.style.display = 'block';
+    listA.innerHTML = playsListSkeletonHTML(5);
+    listB.innerHTML = playsListSkeletonHTML(5);
+
+    // Snapshot which pair this fetch is for — if the visitor re-compares a
+    // different pair before this resolves, the stale response just gets
+    // dropped instead of clobbering the newer one's list.
+    const requestKey = `${idA}:${idB}`;
+    ppCompareTopPlaysRequestKey = requestKey;
+
+    const perMode = await Promise.all(OSU_MODES.map((mode, i) => Promise.all([
+        fetchOsuPlaysHtml(idA, i, 'best', 10),
+        fetchOsuPlaysHtml(idB, i, 'best', 10),
+    ])));
+    if (ppCompareTopPlaysRequestKey !== requestKey) return;
+
+    ppCompareTopPlaysData = {};
+    OSU_MODES.forEach((mode, i) => { ppCompareTopPlaysData[mode] = { a: perMode[i][0], b: perMode[i][1] }; });
+    renderPpCompareTopPlays();
+}
+
+function switchPpCompareTopPlaysMode(mode, el) {
+    ppCompareTopPlaysMode = mode;
+    document.querySelectorAll('#pp-compare-topplays-tabs .osu-mode-tab').forEach(btn => btn.classList.remove('active'));
+    if (el) el.classList.add('active');
+    renderPpCompareTopPlays();
+}
+
+function renderPpCompareTopPlays() {
+    if (!ppCompareTopPlaysData) return;
+    const data = ppCompareTopPlaysData[ppCompareTopPlaysMode];
+    const listA = document.getElementById('pp-compare-topplays-a');
+    const listB = document.getElementById('pp-compare-topplays-b');
+    const emptyHtml = `<div class="osu-empty">${t('pp_compare_topplays_empty')}</div>`;
+    if (listA) listA.innerHTML = data.a || emptyHtml;
+    if (listB) listB.innerHTML = data.b || emptyHtml;
 }
 
 /* Re-render with fresh colors on theme toggle so the chart doesn't keep

@@ -45,7 +45,7 @@ I18N.ko = {
     osu_page_title: '✦ osu! 비트맵 컬렉션 + 총 PP 조회 ✦', visitor_lookup_title: '✦ osu! PP 조회 ✦', visitor_lookup_placeholder: 'osu! 사용자 이름 또는 ID', visitor_lookup_btn: '검색', osu_login_btn: 'osu!로 로그인', osu_logout_btn: '로그아웃', osu_login_fail: 'osu! 로그인에 실패했습니다. 다시 시도해 주세요',
     osu_stat_global: '글로벌 랭크', osu_stat_accuracy: '정확도', osu_stat_playcount: '플레이 수', osu_total_pp: '전 모드 PP 합계',
     osu_recent_title: '최근 플레이', osu_top_title: '베스트 플레이',
-    pp_compare_title: '⚔ 두 플레이어 PP 비교', pp_compare_placeholder_a: '플레이어 A: 유저명 또는 ID', pp_compare_placeholder_b: '플레이어 B: 유저명 또는 ID', pp_compare_btn: '비교',
+    pp_compare_title: '⚔ 두 플레이어 PP 비교', pp_compare_placeholder_a: '플레이어 A: 유저명 또는 ID', pp_compare_placeholder_b: '플레이어 B: 유저명 또는 ID', pp_compare_btn: '비교', pp_compare_topplays_title: '⚔ Top Play 비교', pp_compare_topplays_empty: '이 모드에는 기록이 없습니다',
     osu_search_placeholder: '곡명 또는 아티스트로 검색...', osu_search_empty: '일치하는 비트맵을 찾을 수 없습니다',
     osu_sort_default: '기본 정렬', osu_sort_rating_desc: '난이도 (높은순)', osu_sort_rating_asc: '난이도 (낮은순)',
     pp_history_title: 'PP 성장 추이', pp_history_empty: '아직 기록이 부족합니다. 다시 방문하면 추이가 쌓입니다.',

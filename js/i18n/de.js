@@ -45,7 +45,7 @@ I18N.de = {
     osu_page_title: '✦ osu! Beatmap-Sammlung + Gesamt-PP-Suche ✦', visitor_lookup_title: '✦ Deinen osu! PP prüfen ✦', visitor_lookup_placeholder: 'osu! Benutzername oder ID', visitor_lookup_btn: 'Suchen', osu_login_btn: 'Mit osu! anmelden', osu_logout_btn: 'Abmelden', osu_login_fail: 'osu!-Anmeldung fehlgeschlagen, bitte erneut versuchen',
     osu_stat_global: 'Weltrang', osu_stat_accuracy: 'Genauigkeit', osu_stat_playcount: 'Spiele', osu_total_pp: 'PP gesamt (alle Modi)',
     osu_recent_title: 'Letzte Spiele', osu_top_title: 'Beste Spiele',
-    pp_compare_title: '⚔ Zwei Spieler vergleichen', pp_compare_placeholder_a: 'Spieler A: Name oder ID', pp_compare_placeholder_b: 'Spieler B: Name oder ID', pp_compare_btn: 'Vergleichen',
+    pp_compare_title: '⚔ Zwei Spieler vergleichen', pp_compare_placeholder_a: 'Spieler A: Name oder ID', pp_compare_placeholder_b: 'Spieler B: Name oder ID', pp_compare_btn: 'Vergleichen', pp_compare_topplays_title: '⚔ Top-Play-Vergleich', pp_compare_topplays_empty: 'Keine Ergebnisse in diesem Modus',
     osu_search_placeholder: 'Nach Titel oder Künstler suchen...', osu_search_empty: 'Keine passenden Beatmaps gefunden',
     osu_sort_default: 'Standardreihenfolge', osu_sort_rating_desc: 'Sterne (absteigend)', osu_sort_rating_asc: 'Sterne (aufsteigend)',
     pp_history_title: 'PP-Entwicklung', pp_history_empty: 'Noch nicht genug Verlauf — komm später wieder, um den Trend aufzubauen.',

@@ -1666,6 +1666,25 @@
 .pp-compare-side-pp { font-size: 0.95rem; font-weight: bold; }
 .pp-compare-vs { font-size: 0.8rem; font-weight: bold; color: var(--text-dim2); }
 
+/* ===== Two-player Top Play comparison (loadPpCompareTopPlays) =====
+   auto-fit/minmax rather than a fixed 2-column grid: .pp-compare-card can
+   end up quite narrow (it shares a row with the single-player lookup card
+   above 760px — see .lookup-page-row), so this self-stacks to one column
+   there and only goes side-by-side once there's actually ~480px+ to split,
+   same width each .osu-recent-item already needs to read comfortably. */
+.pp-compare-topplays-title {
+    margin: 1rem 0 10px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--text-accent);
+}
+.pp-compare-topplays-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+.pp-compare-topplays-col { display: flex; flex-direction: column; gap: 6px; }
+
 /* ===== PP goal planner (3rd tab alongside 最近遊玩/最佳成績) ===== */
 .pp-goal-planner { padding: 4px 0; }
 .pp-goal-hint { font-size: 0.82rem; color: var(--text-secondary); text-align: center; margin-bottom: 12px; }

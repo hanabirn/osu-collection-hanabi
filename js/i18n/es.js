@@ -45,7 +45,7 @@ I18N.es = {
     osu_page_title: '✦ Colección de beatmaps osu! + PP total ✦', visitor_lookup_title: '✦ Consultar tu osu! PP ✦', visitor_lookup_placeholder: 'Nombre de usuario o ID', visitor_lookup_btn: 'Buscar', osu_login_btn: 'Iniciar sesión con osu!', osu_logout_btn: 'Cerrar sesión', osu_login_fail: 'Error al iniciar sesión con osu!, inténtalo de nuevo',
     osu_stat_global: 'Ranking global', osu_stat_accuracy: 'Precisión', osu_stat_playcount: 'Partidas', osu_total_pp: 'PP total (todos los modos)',
     osu_recent_title: 'Partidas recientes', osu_top_title: 'Mejores partidas',
-    pp_compare_title: '⚔ Comparar dos jugadores', pp_compare_placeholder_a: 'Jugador A: nombre o ID', pp_compare_placeholder_b: 'Jugador B: nombre o ID', pp_compare_btn: 'Comparar',
+    pp_compare_title: '⚔ Comparar dos jugadores', pp_compare_placeholder_a: 'Jugador A: nombre o ID', pp_compare_placeholder_b: 'Jugador B: nombre o ID', pp_compare_btn: 'Comparar', pp_compare_topplays_title: '⚔ Comparación de mejores puntuaciones', pp_compare_topplays_empty: 'Sin puntuaciones en este modo',
     osu_search_placeholder: 'Buscar por título o artista...', osu_search_empty: 'No se encontraron beatmaps',
     osu_sort_default: 'Orden predeterminado', osu_sort_rating_desc: 'Estrellas (mayor a menor)', osu_sort_rating_asc: 'Estrellas (menor a mayor)',
     pp_history_title: 'Evolución del PP', pp_history_empty: 'Aún no hay suficiente historial — vuelve más tarde para ver la tendencia.',

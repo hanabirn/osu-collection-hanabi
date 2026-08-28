@@ -404,6 +404,19 @@
                 </div>
                 <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
             </div>
+            <div id="pp-compare-topplays" style="display:none;">
+                <h4 class="pp-compare-topplays-title" data-i18n="pp_compare_topplays_title">⚔ Top Play 對比</h4>
+                <div class="osu-mode-tabs" id="pp-compare-topplays-tabs">
+                    <button class="osu-mode-tab active" data-mode="standard" onclick="switchPpCompareTopPlaysMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+                    <button class="osu-mode-tab" data-mode="taiko" onclick="switchPpCompareTopPlaysMode('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+                    <button class="osu-mode-tab" data-mode="catch" onclick="switchPpCompareTopPlaysMode('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+                    <button class="osu-mode-tab" data-mode="mania" onclick="switchPpCompareTopPlaysMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+                </div>
+                <div class="pp-compare-topplays-columns">
+                    <div class="osu-recent-list pp-compare-topplays-col" id="pp-compare-topplays-a"></div>
+                    <div class="osu-recent-list pp-compare-topplays-col" id="pp-compare-topplays-b"></div>
+                </div>
+            </div>
         </div>
         </div>
     </section>
