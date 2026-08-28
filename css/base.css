@@ -765,7 +765,10 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 
 .header-bottom-row {
     position: relative;
-    z-index: 2;
+    /* Above .site-nav (also z-index:2, but later in the DOM so it would
+       otherwise win ties) — .contact-info-menu lives in here and needs to
+       stay above the nav pill's own background when it drops down over it. */
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
