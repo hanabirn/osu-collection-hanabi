@@ -221,6 +221,11 @@
        (re)starts an animation defined on the base rule, so this just
        fires naturally on load/resize without any JS trigger. */
     animation: floatingCardEnter 0.7s var(--ease-out) forwards;
+    /* Doesn't apply to the entrance animation above (CSS animations don't
+       trigger transitions) — this is purely for scheduleFloatingCoverRefresh()
+       in js/osu.js toggling opacity via inline style to fade-swap covers
+       periodically after the initial reveal. */
+    transition: opacity 0.5s ease-in-out;
 }
 .floating-cover-bg {
     position: absolute;

@@ -561,10 +561,9 @@ function renderOsuBgCarousel(urls) {
 // from the visitor's own collection. Excludes whatever the header's
 // hero carousel is currently showing (urls[0] — see runOsuBgSlideCarousel,
 // which activates slides[0] before this runs) so the floating banners
-// always read as different beatmaps from the one up top, and stays that
-// way for the rest of the session — reshuffled only when this re-renders
-// (collection load, import, a beatmap add/remove), not kept in sync with
-// the header's own rotation.
+// always read as different beatmaps from the one up top. Kicks off
+// scheduleFloatingCoverRefresh() so they keep cycling afterward instead
+// of staying frozen on their initial pick for the rest of the session.
 function renderFloatingCoverBanners(urls) {
     const layer = document.querySelector('.bg-layer');
     const cards = document.querySelectorAll('.floating-cover-card .floating-cover-bg');
@@ -575,6 +574,36 @@ function renderFloatingCoverBanners(urls) {
         bg.style.backgroundImage = `url('${picks[i % picks.length]}')`;
     });
     layer.classList.add('has-cover-cards');
+    scheduleFloatingCoverRefresh(urls);
+}
+
+// Cleared and restarted by every renderFloatingCoverBanners() call (a
+// collection load, import, or add/remove) so re-renders never stack a
+// second ticking interval on top of the first.
+let floatingCoverRefreshTimer = null;
+
+// Every few seconds, fades one random floating banner out, swaps in a
+// different cover from the collection, and fades it back in — one at a
+// time rather than all four together, so there's always something subtly
+// changing instead of a single jarring flip. Re-excludes whatever the
+// header carousel is showing *right now* (not just at initial render),
+// since the header keeps rotating on its own timer independently of this.
+function scheduleFloatingCoverRefresh(urls) {
+    if (floatingCoverRefreshTimer) clearInterval(floatingCoverRefreshTimer);
+    if (urls.length < 2) return;
+    const cards = [...document.querySelectorAll('.floating-cover-card')];
+    floatingCoverRefreshTimer = setInterval(() => {
+        const card = cards[Math.floor(Math.random() * cards.length)];
+        const bg = card.querySelector('.floating-cover-bg');
+        card.style.opacity = '0';
+        setTimeout(() => {
+            const headerSlide = document.querySelector('#bg-carousel .bg-slide.active');
+            const headerUrl = headerSlide && headerSlide.style.backgroundImage.slice(5, -2);
+            const pool = urls.filter(u => u !== headerUrl && `url("${u}")` !== bg.style.backgroundImage);
+            if (pool.length) bg.style.backgroundImage = `url('${pool[Math.floor(Math.random() * pool.length)]}')`;
+            card.style.opacity = '0.7';
+        }, 500);
+    }, 6000);
 }
 
 function runOsuBgSlideCarousel(intervalMs) {
