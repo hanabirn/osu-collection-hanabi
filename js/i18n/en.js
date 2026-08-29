@@ -11,7 +11,7 @@ I18N.en = {
     contact_info_title: 'Contact info',
     notif_pp_changed_detail: '{sign}{delta}pp (now {pp}pp)', notif_tournament_new_title: 'New tournament post',
     back_to_main: 'Back to Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_mapper_tracking: 'Tracked Mappers', nav_tournaments: 'Tournaments', nav_resources: 'Resources', nav_feedback: 'Suggestions',
+    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_mapper_tracking: 'Tracked Mappers', nav_tournaments: 'Tournaments', nav_resources: 'Resources', nav_feedback: 'Suggestions', nav_menu_open: 'Open menu', nav_menu_title: 'Menu', nav_group_core: 'Core', nav_group_tools: 'Tools', nav_group_resources: 'Resources',
     updates_title: '✦ News ✦', updates_loading: 'Loading news...', updates_empty: 'No news right now', updates_load_fail: 'Failed to load news, please try again later',
     tournaments_title: '✦ Tournaments ✦', tournaments_hint: "Community tournaments from the official \"Tournaments\" subforum and the wyBin platform — these aren't official events, so check each organizer's rules before signing up.", tournaments_filter_hint: 'Gamemode is guessed from the title — threads that don\'t match a mode only show under "All".', osu_filter_all: 'All', tournament_source_forum: 'Forum',
     feedback_title: '✦ Suggestions & Improvements ✦', feedback_hint: "Think something on this site could be better? Let me know here — only I can see your message, other visitors can't.", feedback_placeholder: 'Write your suggestion...', feedback_submit: 'Send', feedback_success: 'Your message has been sent — thank you for the feedback!',

@@ -58,16 +58,35 @@
         <div class="hit-circle hc-4"></div>
         <div class="hit-circle hc-5"></div>
     </div>
-    <div class="floating-cover-card fc-left-1" aria-hidden="true"><div class="floating-cover-bg"></div></div>
-    <div class="floating-cover-card fc-left-2" aria-hidden="true"><div class="floating-cover-bg"></div></div>
-    <div class="floating-cover-card fc-right-1" aria-hidden="true"><div class="floating-cover-bg"></div></div>
-    <div class="floating-cover-card fc-right-2" aria-hidden="true"><div class="floating-cover-bg"></div></div>
 </div>
 
 <header class="site-header">
     <div id="bg-carousel" aria-hidden="true"></div>
     <div class="site-header-overlay" aria-hidden="true"></div>
+    <div class="header-corner-left">
+        <button id="theme-toggle" class="theme-switch" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+        <button id="pwa-install-btn" class="theme-toggle-btn" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
+        <button id="site-update-btn" class="theme-toggle-btn site-update-btn" onclick="applySiteUpdate()" style="display:none;" data-i18n-title="site_update_btn_title" title="網站有更新，點擊更新" data-icon="refreshCw"></button>
+    </div>
     <div class="header-corner-actions">
+        <div class="header-corner-row">
+        <div class="contact-info" id="contact-info">
+            <button class="contact-info-btn" id="contact-info-btn" onclick="toggleContactMenu()" aria-haspopup="true" aria-expanded="false" data-i18n-title="contact_info_title" title="聯絡資訊" data-icon="mail"></button>
+            <div class="contact-info-menu" id="contact-info-menu">
+                <a class="contact-info-item" href="mailto:azusawakohane12@gmail.com" data-icon="gmail" data-icon-brand data-icon-color="#EA4335" data-icon-gap>
+                    <span class="contact-info-label">Gmail</span><span class="contact-info-value">azusawakohane12@gmail.com</span>
+                </a>
+                <div class="contact-info-item contact-info-item-static" data-icon="discord" data-icon-brand data-icon-badge="#5865F2" data-icon-gap>
+                    <span class="contact-info-label">Discord</span><span class="contact-info-value">hanabihanabi</span>
+                </div>
+                <a class="contact-info-item" href="https://instagram.com/hanabi_rn436" target="_blank" rel="noopener noreferrer" data-icon="instagram" data-icon-brand data-icon-color="#E4405F" data-icon-gap>
+                    <span class="contact-info-label">Instagram</span><span class="contact-info-value">hanabi_rn436</span>
+                </a>
+                <a class="contact-info-item" href="https://www.facebook.com/chen.shi.hen.2025" target="_blank" rel="noopener noreferrer" data-icon="facebook" data-icon-brand data-icon-color="#1877F2" data-icon-gap>
+                    <span class="contact-info-label">Facebook</span><span class="contact-info-value">Shi-Heng Chen</span>
+                </a>
+            </div>
+        </div>
         <div class="notif-bell" id="notif-bell">
             <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-haspopup="true" aria-expanded="false" data-i18n-title="notif_bell_title" title="通知" data-icon="bell">
                 <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
@@ -101,6 +120,8 @@
                 <button class="lang-pill" data-lang="de" onclick="applyLang('de'); toggleLangMenu(false)">Deutsch</button>
             </div>
         </div>
+        </div>
+        <button class="nav-menu-btn" id="nav-menu-btn" onclick="openNavDrawer()" aria-haspopup="true" aria-expanded="false" aria-controls="nav-drawer" data-i18n-title="nav_menu_open" title="開啟選單" data-icon="menu"></button>
     </div>
     <div class="site-header-top">
         <div class="site-title-block">
@@ -126,46 +147,39 @@
             <p class="site-tagline" data-i18n="site_tagline">✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦</p>
         </div>
     </div>
-    <div class="header-bottom-row">
-        <div class="header-icons">
-            <button id="theme-toggle" class="theme-switch" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
-            <button id="pwa-install-btn" class="theme-toggle-btn" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
-            <button id="site-update-btn" class="theme-toggle-btn site-update-btn" onclick="applySiteUpdate()" style="display:none;" data-i18n-title="site_update_btn_title" title="網站有更新，點擊更新" data-icon="refreshCw"></button>
-            <button id="page-refresh-btn" class="theme-toggle-btn" onclick="location.reload()" data-i18n-title="page_refresh_btn_title" title="重新整理頁面" data-icon="rotateCw"></button>
-            <div class="contact-info" id="contact-info">
-                <button class="contact-info-btn" id="contact-info-btn" onclick="toggleContactMenu()" aria-haspopup="true" aria-expanded="false" data-i18n-title="contact_info_title" title="聯絡資訊" data-icon="mail"></button>
-                <div class="contact-info-menu" id="contact-info-menu">
-                    <a class="contact-info-item" href="mailto:azusawakohane12@gmail.com" data-icon="gmail" data-icon-brand data-icon-color="#EA4335" data-icon-gap>
-                        <span class="contact-info-label">Gmail</span><span class="contact-info-value">azusawakohane12@gmail.com</span>
-                    </a>
-                    <div class="contact-info-item contact-info-item-static" data-icon="discord" data-icon-brand data-icon-badge="#5865F2" data-icon-gap>
-                        <span class="contact-info-label">Discord</span><span class="contact-info-value">hanabihanabi</span>
-                    </div>
-                    <a class="contact-info-item" href="https://instagram.com/hanabi_rn436" target="_blank" rel="noopener noreferrer" data-icon="instagram" data-icon-brand data-icon-color="#E4405F" data-icon-gap>
-                        <span class="contact-info-label">Instagram</span><span class="contact-info-value">hanabi_rn436</span>
-                    </a>
-                    <a class="contact-info-item" href="https://www.facebook.com/chen.shi.hen.2025" target="_blank" rel="noopener noreferrer" data-icon="facebook" data-icon-brand data-icon-color="#1877F2" data-icon-gap>
-                        <span class="contact-info-label">Facebook</span><span class="contact-info-value">Shi-Heng Chen</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <nav class="site-nav">
-        <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
-        <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
-        <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_skin_screenshots">皮膚廣場</span></button>
-        <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
-        <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
-        <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
-        <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
-        <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
-        <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
-        <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
-        <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources">資源</button>
-        <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
-    </nav>
 </header>
+
+<div class="nav-drawer-scrim" id="nav-drawer-scrim" onclick="closeNavDrawer()" hidden></div>
+<aside class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-labelledby="nav-drawer-title" hidden>
+    <div class="nav-drawer-head">
+        <span id="nav-drawer-title" data-i18n="nav_menu_title">選單</span>
+        <button class="nav-drawer-close" onclick="closeNavDrawer()" aria-label="Close" data-icon="x"></button>
+    </div>
+    <nav class="nav-drawer-body">
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_group_core">核心功能</p>
+            <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
+            <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
+            <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_skin_screenshots">皮膚廣場</span></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
+            <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
+            <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+            <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
+            <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_group_resources">資源區</p>
+            <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
+            <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
+            <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
+            <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources">資源</button>
+            <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
+        </div>
+    </nav>
+</aside>
+<button class="page-refresh-fab" id="page-refresh-fab" onclick="location.reload()" data-i18n-title="page_refresh_btn_title" title="重新整理頁面" data-icon="rotateCw"></button>
 
 <div id="maintenance-banner" class="maintenance-banner" style="display:none;">
     <span data-icon="settings" data-icon-gap></span>

@@ -11,7 +11,7 @@ I18N.ru = {
     contact_info_title: 'Контактная информация',
     notif_pp_changed_detail: '{sign}{delta}pp (сейчас {pp}pp)', notif_tournament_new_title: 'Новая тема турнира',
     back_to_main: 'Назад на Hanabiの小天地',
-    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_mapper_tracking: 'Отслеживаемые мапперы', nav_tournaments: 'Турниры', nav_resources: 'Ресурсы', nav_feedback: 'Предложения',
+    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_mapper_tracking: 'Отслеживаемые мапперы', nav_tournaments: 'Турниры', nav_resources: 'Ресурсы', nav_feedback: 'Предложения', nav_menu_open: 'Открыть меню', nav_menu_title: 'Меню', nav_group_core: 'Основное', nav_group_tools: 'Инструменты', nav_group_resources: 'Ресурсы',
     updates_title: '✦ Новости ✦', updates_loading: 'Загрузка новостей...', updates_empty: 'Новостей пока нет', updates_load_fail: 'Не удалось загрузить новости, попробуйте позже',
     tournaments_title: '✦ Турниры ✦', tournaments_hint: 'Турниры сообщества с официального подфорума «Tournaments» и платформы wyBin — это не официальные мероприятия, уточняйте правила у организаторов перед регистрацией.', tournaments_filter_hint: 'Игровой режим определяется по ключевым словам в заголовке — темы без совпадений показываются только во вкладке «Все».', osu_filter_all: 'Все', tournament_source_forum: 'Форум',
     feedback_title: '✦ Предложения и улучшения ✦', feedback_hint: 'Думаете, что-то на сайте можно улучшить? Напишите здесь — ваше сообщение увижу только я, другие посетители его не увидят.', feedback_placeholder: 'Напишите ваше предложение...', feedback_submit: 'Отправить', feedback_success: 'Ваше сообщение отправлено, спасибо за отзыв!',

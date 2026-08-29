@@ -45,6 +45,62 @@ function switchTab(tab, el) {
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'farm-maps') ensureFarmMapsLoaded();
     if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
+    // Tab buttons now live in the slide-in drawer — picking one should also
+    // dismiss it.
+    if (typeof closeNavDrawer === 'function') closeNavDrawer();
+}
+
+/* ===== ☰ Navigation drawer =====
+   The 12 tab buttons moved out of the old horizontal .site-nav bar into a
+   right-side slide-in drawer (#nav-drawer + #nav-drawer-scrim in
+   index.html, styling in css/base.css). Open/close mirror the language
+   dropdown's outside-click / Escape pattern below; the panel starts
+   [hidden] (display:none) and the .open class drives the CSS transform
+   transition, so the class add has to land a frame after `hidden` is
+   cleared or there's nothing to animate from. On close we wait for the
+   slide-out transition before re-hiding (with a timeout backstop for
+   prefers-reduced-motion, where the transition is suppressed and
+   `transitionend` never fires). */
+function openNavDrawer() {
+    const drawer = document.getElementById('nav-drawer');
+    const scrim = document.getElementById('nav-drawer-scrim');
+    const btn = document.getElementById('nav-menu-btn');
+    if (!drawer || !scrim) return;
+    drawer.hidden = false;
+    scrim.hidden = false;
+    requestAnimationFrame(() => {
+        drawer.classList.add('open');
+        scrim.classList.add('open');
+    });
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onNavDrawerEscape);
+    drawer.querySelector('.site-nav-btn')?.focus();
+}
+function closeNavDrawer() {
+    const drawer = document.getElementById('nav-drawer');
+    const scrim = document.getElementById('nav-drawer-scrim');
+    const btn = document.getElementById('nav-menu-btn');
+    if (!drawer || !scrim || drawer.hidden) return;
+    drawer.classList.remove('open');
+    scrim.classList.remove('open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', onNavDrawerEscape);
+    let done = false;
+    const hide = () => {
+        if (done) return;
+        done = true;
+        drawer.hidden = true;
+        scrim.hidden = true;
+        drawer.removeEventListener('transitionend', hide);
+    };
+    drawer.addEventListener('transitionend', hide);
+    setTimeout(hide, 400);
+    if (btn) btn.focus();
+}
+function onNavDrawerEscape(e) {
+    if (e.key === 'Escape') closeNavDrawer();
 }
 
 /* ===== 🌐 Language Dropdown ===== */
