@@ -158,19 +158,21 @@ a:hover { text-decoration: underline; }
     gap: 8px;
 }
 
-/* Hamburger that opens #nav-drawer — same 36px frosted-pill language as
-   .lang-globe-btn / .notif-bell-btn so .site-header.has-cover-banner's
-   custom-property overrides keep it readable over the cover art. */
+/* Hamburger that opens #nav-drawer — same frosted-pill language as
+   .lang-globe-btn / .notif-bell-btn (so .site-header.has-cover-banner's
+   custom-property overrides keep it readable over the cover art), and the
+   same 42px corner-control size as the notif bell / login / language row. */
 .nav-menu-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
     border: 1px solid var(--lang-pill-border);
     color: var(--lang-pill-text);
+    font-size: 1.2rem;
     cursor: pointer;
     transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out),
         color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
@@ -505,6 +507,13 @@ a:hover { text-decoration: underline; }
     border-color: var(--accent-pink);
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
 }
+/* Match the 42px notif bell / login / language sizing now that contact
+   sits in that same top-right row (see .header-corner-actions). */
+.header-corner-actions .contact-info-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+}
 .contact-info-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -616,10 +625,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: var(--theme-toggle-bg);
     border: 1px solid var(--theme-toggle-border);
     border-radius: 50%;
-    width: 34px;
-    height: 34px;
+    /* 42px to match the notif bell / login / language corner controls. */
+    width: 42px;
+    height: 42px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.15rem;
     color: var(--text);
     transition: transform 0.35s var(--ease-spring), border-color 0.25s var(--ease-out),
         box-shadow 0.25s var(--ease-out), background 0.25s var(--ease-out);
@@ -653,6 +663,17 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .theme-switch:hover { box-shadow: 0 0 0 1px var(--accent-purple), 0 0 12px rgba(var(--accent-purple-rgb), 0.35); }
 .theme-switch:active .theme-switch-thumb { width: 27px; }
+/* In the top-left header cluster, scale the whole switch up so its 30px
+   height reads as the same 42px as the notif bell / login / language
+   controls on the other side. Scaling the component (rather than resizing
+   its ~10 internal magic-number offsets) keeps the moon/stars/thumb
+   geometry intact. Origin left so the extra width spills right into the
+   margin, not off the header's left edge. */
+.header-corner-left .theme-switch {
+    transform: scale(1.4);
+    transform-origin: left center;
+    margin-right: 22px;
+}
 .theme-switch-track {
     position: absolute;
     inset: 0;
