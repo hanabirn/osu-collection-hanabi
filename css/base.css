@@ -112,6 +112,42 @@ a:hover { text-decoration: underline; }
     --theme-toggle-bg: rgba(255, 255, 255, 0.08);
     --theme-toggle-border: rgba(255, 255, 255, 0.15);
 }
+/* ===== Title / tagline outline over the cover art =====
+   The pink gradient-clipped title and the small tagline both lose contrast
+   on a busy cover photo, and there's no dark scrim behind them anymore. So
+   when a cover is showing (.has-cover-banner) give both a crisp outline:
+   -webkit-text-stroke draws the keyline and `paint-order: stroke fill`
+   paints it *behind* the glyphs so they aren't thinned; a layered
+   text-shadow is the cross-browser floor (it renders here because the fill
+   is a solid colour now, not the transparent gradient-clip). All of
+   -webkit-text-stroke + paint-order + text-shadow work in Chrome, Edge and
+   Safari. titleShimmer only animates background-position, which is a no-op
+   without the clipped gradient, so only the glow pulse is kept here. */
+.site-header.has-cover-banner .site-title-block h1 {
+    /* Dark cover: pink letters, white keyline. */
+    background: none;
+    -webkit-text-fill-color: var(--text-pink);
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9);
+    paint-order: stroke fill;
+    text-shadow: 0 2px 10px rgba(10, 4, 20, 0.55);
+    animation: titleGlowPulse 4s ease-in-out infinite;
+}
+.site-header.has-cover-banner .site-tagline {
+    color: #fff;
+    opacity: 1;
+    text-shadow:
+        -1px -1px 0 rgba(16, 6, 26, 0.6),
+         1px -1px 0 rgba(16, 6, 26, 0.6),
+        -1px  1px 0 rgba(16, 6, 26, 0.6),
+         1px  1px 0 rgba(16, 6, 26, 0.6),
+         0    0   8px rgba(16, 6, 26, 0.55);
+}
+[data-theme="light"] .site-header.has-cover-banner .site-title-block h1 {
+    /* Light cover: white letters, dark keyline (per the brief). */
+    -webkit-text-fill-color: #fff;
+    -webkit-text-stroke: 2px rgba(22, 9, 34, 0.82);
+    text-shadow: 0 2px 12px rgba(22, 9, 34, 0.5);
+}
 /* The title-note float animation never needs to escape the header box, but
    the language dropdown and notification bell menus do — temporarily lift
    the clip while either is open instead of removing overflow:hidden outright. */
@@ -206,20 +242,28 @@ a:hover { text-decoration: underline; }
 .title-note {
     display: block;
     line-height: 1;
-    animation: titleNoteFloat 3.2s ease-in-out infinite;
+    /* Longer cycle to carry the bigger travel without looking hurried. */
+    animation: titleNoteFloat 4s ease-in-out infinite;
 }
-/* Tapered so the notes closest to the title are largest, trailing off smaller outward. */
-.tn-1, .tn-6 { font-size: 1.1rem; }
-.tn-2, .tn-5 { font-size: 1.6rem; }
-.tn-3, .tn-4 { font-size: 2.2rem; }
+/* Tapered so the notes closest to the title are largest, trailing off
+   smaller outward — sizes bumped ~1.4x. */
+.tn-1, .tn-6 { font-size: 1.5rem; }
+.tn-2, .tn-5 { font-size: 2.2rem; }
+.tn-3, .tn-4 { font-size: 3rem; }
 
-.tn-1, .tn-4 { color: var(--accent-pink); filter: drop-shadow(0 0 10px rgba(var(--accent-pink-rgb), 0.5)); animation-delay: 0s; }
-.tn-2, .tn-5 { color: var(--accent-light-purple); filter: drop-shadow(0 0 10px var(--accent-light-purple)); animation-delay: 0.6s; }
-.tn-3, .tn-6 { color: var(--accent-purple); filter: drop-shadow(0 0 10px rgba(var(--accent-purple-rgb), 0.5)); animation-delay: 1.2s; }
+.tn-1, .tn-4 { color: var(--accent-pink); filter: drop-shadow(0 0 16px rgba(var(--accent-pink-rgb), 0.7)) drop-shadow(0 0 5px rgba(var(--accent-pink-rgb), 0.9)); animation-delay: 0s; }
+.tn-2, .tn-5 { color: var(--accent-light-purple); filter: drop-shadow(0 0 16px var(--accent-light-purple)) drop-shadow(0 0 5px var(--accent-light-purple)); animation-delay: 0.6s; }
+.tn-3, .tn-6 { color: var(--accent-purple); filter: drop-shadow(0 0 16px rgba(var(--accent-purple-rgb), 0.7)) drop-shadow(0 0 5px rgba(var(--accent-purple-rgb), 0.9)); animation-delay: 1.2s; }
 
+/* Bigger rise (up to -26px vs -10), a left/right sway (±8px, was none),
+   a little scale breathing, and an opacity pulse (0.5 -> 1) so the notes
+   visibly fade in and out as they drift instead of holding flat. */
 @keyframes titleNoteFloat {
-    0%, 100% { transform: translateY(0) rotate(-6deg); }
-    50%      { transform: translateY(-10px) rotate(6deg); }
+    0%   { transform: translate(0, 0) rotate(-10deg) scale(0.9); opacity: 0.5; }
+    25%  { transform: translate(-6px, -13px) rotate(7deg) scale(1.06); opacity: 1; }
+    50%  { transform: translate(5px, -26px) rotate(13deg) scale(1); opacity: 0.8; }
+    75%  { transform: translate(8px, -12px) rotate(-4deg) scale(1.05); opacity: 1; }
+    100% { transform: translate(0, 0) rotate(-10deg) scale(0.9); opacity: 0.5; }
 }
 @media (prefers-reduced-motion: reduce) {
     .title-note { animation: none; }
@@ -227,8 +271,8 @@ a:hover { text-decoration: underline; }
 }
 @media (max-width: 600px) {
     .tn-1, .tn-6 { display: none; }
-    .tn-2, .tn-5 { font-size: 1.1rem; }
-    .tn-3, .tn-4 { font-size: 1.6rem; }
+    .tn-2, .tn-5 { font-size: 1.4rem; }
+    .tn-3, .tn-4 { font-size: 2rem; }
     .header-logo { gap: 4px; }
     .title-notes { gap: 2px; }
     .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: 1rem; padding: 0 8px; }
@@ -256,8 +300,11 @@ a:hover { text-decoration: underline; }
     display: flex;
     position: relative;
     color: var(--accent-pink);
-    filter: drop-shadow(0 0 8px rgba(var(--accent-pink-rgb), 0.55));
-    animation: logoBeatHit 1.6s cubic-bezier(.36,.07,.19,.97) infinite;
+    filter: drop-shadow(0 0 13px rgba(var(--accent-pink-rgb), 0.65));
+    /* Bigger, springier beat — the spring bezier makes each keyframe step
+       overshoot and settle, so the pulse rings down elastically instead of
+       easing flatly. */
+    animation: logoBeatHit 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }
 .logo-icon svg { width: 68px; height: 68px; display: block; }
 .logo-icon::after {
@@ -265,23 +312,27 @@ a:hover { text-decoration: underline; }
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 2px solid var(--accent-pink);
+    border: 2.5px solid var(--accent-pink);
     opacity: 0;
-    animation: logoHitRing 1.6s cubic-bezier(.36,.07,.19,.97) infinite;
+    filter: drop-shadow(0 0 6px rgba(var(--accent-pink-rgb), 0.7));
+    animation: logoHitRing 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }
+/* Amplitude roughly doubled (0.8–1.3 vs the old 0.86–1.14) and more
+   ring-down steps for an elastic, on-the-beat feel. */
 @keyframes logoBeatHit {
-    0%        { transform: scale(1); }
-    10%       { transform: scale(0.86); }
-    28%       { transform: scale(1.14); }
-    45%       { transform: scale(0.97); }
-    62%       { transform: scale(1.04); }
-    80%, 100% { transform: scale(1); }
+    0%   { transform: scale(1); }
+    12%  { transform: scale(0.8); }
+    30%  { transform: scale(1.3); }
+    48%  { transform: scale(0.92); }
+    64%  { transform: scale(1.12); }
+    80%  { transform: scale(0.98); }
+    100% { transform: scale(1); }
 }
 @keyframes logoHitRing {
-    0%   { opacity: 0;   transform: scale(0.8); }
-    10%  { opacity: 0.7; transform: scale(0.9); }
-    45%  { opacity: 0;   transform: scale(1.6); }
-    100% { opacity: 0;   transform: scale(1.6); }
+    0%   { opacity: 0;    transform: scale(0.72); }
+    12%  { opacity: 0.9;  transform: scale(0.9); }
+    55%  { opacity: 0;    transform: scale(2); }
+    100% { opacity: 0;    transform: scale(2); }
 }
 .site-title-block h1 {
     /* Enlarged ~1.5x in the header rework so the title is the page's clear
