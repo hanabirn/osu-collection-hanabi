@@ -99,7 +99,7 @@ I18N.fr = {
     gallery_empty: "Personne n'a encore publié de collection — soyez le premier !",
     gallery_sort_recent: 'Publiées récemment', gallery_sort_sets: 'Le plus de beatmaps', gallery_sort_rating: 'Note la plus élevée',
     gallery_import_confirm: "Voici la collection de {name} ({n} beatmaps). L'importer dans votre collection ? (N'écrase pas les entrées existantes, ajoute seulement celles que vous n'avez pas)",
-    gallery_download_btn_title: 'Importer cette collection', gallery_view_btn_title: 'Voir la liste des beatmaps',
+    gallery_download_btn_title: 'Importer cette collection', gallery_share_btn: 'Partager le lien', gallery_share_copied: 'Lien de partage copié !', gallery_view_btn_title: 'Voir la liste des beatmaps',
     gallery_search_placeholder: 'Rechercher par joueur ou tag...', gallery_sort_likes: '❤ Plus aimées',
     gallery_liked_only: "N'afficher que mes favoris", gallery_like_btn_title: "J'aime",
     gallery_like_login_required: 'Connectez-vous avec osu! pour aimer une collection', gallery_like_fail: "Échec du j'aime, réessayez plus tard",

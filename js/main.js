@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => { if (typeof backfillOsuLanguages === 'function') backfillOsuLanguages(); }, 3000);
     checkImportFromHash();
     checkOsuLoginFromUrl();
+    if (typeof checkGalleryDeepLink === 'function') checkGalleryDeepLink();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof initNotifications === 'function') initNotifications();
 });

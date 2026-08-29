@@ -17,3 +17,11 @@
 
 [functions."replay-analyze"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
+
+# Shareable pretty URL for a published gallery collection — rewrite (200) so
+# /c/<id> stays in the address bar while collection-share-page.js serves the
+# OpenGraph meta (and bounces real browsers to /?c=<id>).
+[[redirects]]
+  from = "/c/:id"
+  to = "/.netlify/functions/collection-share-page?id=:id"
+  status = 200

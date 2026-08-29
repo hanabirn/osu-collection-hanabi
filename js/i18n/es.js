@@ -99,7 +99,7 @@ I18N.es = {
     gallery_empty: 'Nadie ha publicado una colección todavía — ¡sé el primero!',
     gallery_sort_recent: 'Publicadas recientemente', gallery_sort_sets: 'Más beatmaps', gallery_sort_rating: 'Mayor puntuación',
     gallery_import_confirm: 'Esta es la colección de {name} ({n} beatmaps). ¿Importar a tu colección? (No sobrescribe las existentes, solo añade las que no tienes)',
-    gallery_download_btn_title: 'Importar esta colección', gallery_view_btn_title: 'Ver lista de beatmaps',
+    gallery_download_btn_title: 'Importar esta colección', gallery_share_btn: 'Compartir enlace', gallery_share_copied: '¡Enlace de compartir copiado!', gallery_view_btn_title: 'Ver lista de beatmaps',
     gallery_search_placeholder: 'Buscar por jugador o etiqueta...', gallery_sort_likes: '❤ Más populares',
     gallery_liked_only: 'Solo las que me gustan', gallery_like_btn_title: 'Me gusta',
     gallery_like_login_required: 'Inicia sesión con osu! para dar me gusta', gallery_like_fail: 'Error al dar me gusta, inténtalo más tarde',

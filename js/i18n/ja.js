@@ -99,7 +99,7 @@ I18N.ja = {
     gallery_empty: 'まだ誰もコレクションを公開していません。最初の一人になりましょう！',
     gallery_sort_recent: '新着順', gallery_sort_sets: 'Beatmap 数', gallery_sort_rating: '最高星数',
     gallery_import_confirm: 'これは {name} さんのコレクション（{n} 個の Beatmap）です。あなたのコレクションに取り込みますか？（既存のものは上書きせず、持っていないものだけ追加されます）',
-    gallery_download_btn_title: 'このコレクションを取り込む', gallery_view_btn_title: '曲目一覧を見る',
+    gallery_download_btn_title: 'このコレクションを取り込む', gallery_share_btn: 'リンクを共有', gallery_share_copied: '共有リンクをコピーしました！', gallery_view_btn_title: '曲目一覧を見る',
     gallery_search_placeholder: 'プレイヤー名やタグで検索...', gallery_sort_likes: '❤ 人気順',
     gallery_liked_only: 'いいねしたものだけ表示', gallery_like_btn_title: 'いいね',
     gallery_like_login_required: 'いいねするには osu! でログインしてください', gallery_like_fail: 'いいねに失敗しました。しばらくしてからお試しください',

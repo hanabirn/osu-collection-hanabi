@@ -2340,7 +2340,10 @@
     text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 #gallery-detail-mode-tabs { margin: 10px 0 14px; }
-.gallery-detail-download-btn { width: 100%; margin-top: 16px; }
+.gallery-detail-actions { display: flex; gap: 10px; margin-top: 16px; }
+.gallery-detail-actions .btn { flex: 1; }
+.gallery-detail-download-btn { margin-top: 0; }
+@media (max-width: 480px) { .gallery-detail-actions { flex-direction: column; } }
 
 /* ===== Today's featured beatmap banner ===== */
 .featured-beatmap-banner {

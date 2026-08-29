@@ -100,7 +100,7 @@ I18N.en = {
     gallery_empty: 'No one has published a collection yet — be the first!',
     gallery_sort_recent: 'Recently published', gallery_sort_sets: 'Most beatmaps', gallery_sort_rating: 'Highest star rating',
     gallery_import_confirm: "This is {name}'s collection with {n} beatmaps. Import into your collection? (Won't overwrite existing entries, only adds ones you don't have)",
-    gallery_download_btn_title: 'Import this collection', gallery_view_btn_title: 'View beatmap list',
+    gallery_download_btn_title: 'Import this collection', gallery_share_btn: 'Share link', gallery_share_copied: 'Share link copied!', gallery_view_btn_title: 'View beatmap list',
     gallery_search_placeholder: 'Search by player name or tag...', gallery_sort_likes: '❤ Most liked',
     gallery_liked_only: 'Liked by me only', gallery_like_btn_title: 'Like',
     gallery_like_login_required: 'Log in with osu! to like collections', gallery_like_fail: 'Failed to like, please try again later',

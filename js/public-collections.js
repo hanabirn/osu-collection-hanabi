@@ -352,6 +352,8 @@ async function openGalleryDetailModal(id) {
     tabsEl.innerHTML = '';
     bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     downloadBtn.style.display = 'none';
+    const shareBtn = document.getElementById('gallery-detail-share-btn');
+    if (shareBtn) shareBtn.style.display = 'none';
     modal.style.display = 'flex';
 
     try {
@@ -390,10 +392,38 @@ async function openGalleryDetailModal(id) {
 
         renderGalleryDetailGrid();
         downloadBtn.style.display = '';
+        if (shareBtn) shareBtn.style.display = '';
     } catch (e) {
         console.error('Gallery detail load failed:', e);
         bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_load_fail')}</p>`;
     }
+}
+
+/* Copy a crawler-friendly /c/<id> link for this collection (see
+   netlify/functions/collection-share-page.js). Native share sheet on mobile,
+   clipboard elsewhere. */
+function shareGalleryDetailLink() {
+    if (!galleryDetailData) return;
+    const url = `${location.origin}/c/${galleryDetailData.id}`;
+    if (navigator.share) { navigator.share({ url }).catch(() => {}); return; }
+    const done = () => { if (typeof showShareToast === 'function') showShareToast(t('gallery_share_copied')); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
+    else done();
+}
+
+/* Deep link: /c/<id> rewrites to the share page which bounces here as
+   /?c=<id>; open that collection's detail modal on load. */
+function checkGalleryDeepLink() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('c') || params.get('gallery');
+    if (!id || !/^\d+$/.test(id)) return;
+    params.delete('c');
+    params.delete('gallery');
+    const qs = params.toString();
+    history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+    const navBtn = document.querySelector('.site-nav-btn[onclick*="public-collections"]');
+    if (typeof switchTab === 'function') switchTab('public-collections', navBtn || undefined);
+    openGalleryDetailModal(id);
 }
 
 function switchGalleryDetailMode(mode) {
