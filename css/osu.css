@@ -618,7 +618,8 @@
     border-color: var(--accent-light-purple);
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
-#osu-sort-select {
+#osu-sort-select,
+#osu-lang-filter {
     padding: 11px 12px;
     border-radius: 10px;
     border: 1px solid var(--border-input);
@@ -626,11 +627,37 @@
     color: var(--text);
     font-size: 0.85rem;
     font-family: inherit;
+    max-width: 40%;
 }
 @media (max-width: 480px) {
     .osu-search-row { flex-wrap: wrap; }
     #osu-search-input { flex: 1 1 100%; }
-    #osu-sort-select { flex: 1; }
+    #osu-sort-select,
+    #osu-lang-filter { flex: 1; max-width: none; }
+}
+
+/* Small frosted pill at the top of a card's info block — the beatmapset's
+   language (osu! API v2), flag + localized name. */
+.osu-lang-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    align-self: flex-start;
+    max-width: 100%;
+    font-size: 0.66rem;
+    font-weight: 600;
+    line-height: 1.4;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ===== Farm Maps filter row + coverage note ===== */

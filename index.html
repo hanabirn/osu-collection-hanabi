@@ -221,6 +221,9 @@
 
                 <div class="osu-search-row">
                     <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
+                    <select id="osu-lang-filter" onchange="switchOsuLangFilter(this.value)">
+                        <option value="all" data-i18n="osu_lang_filter_all">全部語言</option>
+                    </select>
                     <select id="osu-sort-select" onchange="switchOsuSort(this.value)">
                         <option value="default" data-i18n="osu_sort_default">預設排序</option>
                         <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>

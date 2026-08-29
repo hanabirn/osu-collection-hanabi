@@ -179,6 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
     applyLang(siteLang);
     initMaintenanceBanner();
     initOsuBgCarousel();
+    // Top up language/genre for collection sets saved before that feature —
+    // capped + paced inside; delayed so it yields to first paint.
+    setTimeout(() => { if (typeof backfillOsuLanguages === 'function') backfillOsuLanguages(); }, 3000);
     checkImportFromHash();
     checkOsuLoginFromUrl();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();

@@ -52,6 +52,34 @@ const OSU_MODE_LABELS = ['Standard', 'Taiko', 'Catch', 'Mania'];
 // (see also FARM_MODE_TO_API in js/farm-maps.js, same mapping).
 const OSU_API_MODE = { standard: 'osu', taiko: 'taiko', catch: 'fruits', mania: 'mania' };
 
+// osu! API v2 LanguageEnum id -> flag emoji + i18n key (see
+// netlify/functions/osu-beatmapset.js). Names resolve through t() so the
+// card badge follows the site UI language; the API's own English name is
+// the fallback when a locale is missing the key.
+const OSU_LANGUAGES = {
+    1:  { flag: '🌐', key: 'lang_unspecified' },
+    2:  { flag: '🇬🇧', key: 'lang_english' },
+    3:  { flag: '🇯🇵', key: 'lang_japanese' },
+    4:  { flag: '🇨🇳', key: 'lang_chinese' },
+    5:  { flag: '🎵', key: 'lang_instrumental' },
+    6:  { flag: '🇰🇷', key: 'lang_korean' },
+    7:  { flag: '🇫🇷', key: 'lang_french' },
+    8:  { flag: '🇩🇪', key: 'lang_german' },
+    9:  { flag: '🇸🇪', key: 'lang_swedish' },
+    10: { flag: '🇪🇸', key: 'lang_spanish' },
+    11: { flag: '🇮🇹', key: 'lang_italian' },
+    12: { flag: '🇷🇺', key: 'lang_russian' },
+    13: { flag: '🇵🇱', key: 'lang_polish' },
+    14: { flag: '🏳️', key: 'lang_other' },
+};
+function osuLangEntry(set) { return set && set.language ? OSU_LANGUAGES[set.language.id] : null; }
+function osuLangFlag(set) { const e = osuLangEntry(set); return e ? e.flag : '🌐'; }
+function osuLangName(set) {
+    const e = osuLangEntry(set);
+    if (e) return t(e.key);
+    return (set && set.language && set.language.name) || '';
+}
+
 const MODE_ICON_PATHS = {
     standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
     taiko: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/>',
@@ -129,6 +157,7 @@ let osuVolume = 0.4;
 let osuPage = 0;
 let osuSortMode = 'default';
 let osuSearchQuery = '';
+let osuLangFilter = 'all';   // 'all' | 'unknown' | '<language id>'
 const OSU_PAGE_SIZE = 8;
 // Populated by renderOsuCollection() on every render — the current page's
 // sets, one representative (hardest-visible-difficulty) beatmap id + mode
@@ -150,6 +179,105 @@ function switchOsuSort(mode) {
     osuSortMode = mode;
     osuPage = 0;
     renderOsuCollection();
+}
+
+function switchOsuLangFilter(v) {
+    osuLangFilter = v;
+    osuPage = 0;
+    renderOsuCollection();
+}
+
+/* Rebuilds #osu-lang-filter's options from the languages present in `sets`
+   (+ "all", + "unlabeled" if any set has no language yet), keeping the
+   current selection. Called from renderOsuCollection() so it also
+   re-localizes on a language switch (refreshDynamicContent -> renderOsuCollection). */
+function renderOsuLangFilterOptions(sets) {
+    const sel = document.getElementById('osu-lang-filter');
+    if (!sel) return;
+    const ids = new Set();
+    let hasUnknown = false;
+    for (const s of sets) {
+        if (s.language && s.language.id) ids.add(s.language.id);
+        else hasUnknown = true;
+    }
+    const ordered = [...ids].sort((a, b) => a - b);
+    let html = `<option value="all">${t('osu_lang_filter_all')}</option>`;
+    for (const id of ordered) {
+        const e = OSU_LANGUAGES[id];
+        const name = e ? t(e.key) : String(id);
+        const flag = e ? e.flag : '🌐';
+        html += `<option value="${id}">${flag} ${escHtml(name)}</option>`;
+    }
+    if (hasUnknown) html += `<option value="unknown">🌐 ${t('lang_unknown')}</option>`;
+    if (osuLangFilter !== 'all' && osuLangFilter !== 'unknown' && !ids.has(Number(osuLangFilter))) {
+        osuLangFilter = 'all';   // selected language no longer present (tab switch / removal)
+    }
+    sel.innerHTML = html;
+    sel.value = osuLangFilter;
+}
+
+/* Pulls a set's language + genre from API v2 (see
+   netlify/functions/osu-beatmapset.js). Never throws — a null result just
+   means the fields stay unset and the next backfill pass retries. */
+async function fetchOsuSetMeta(setId) {
+    try {
+        const r = await fetch(`/.netlify/functions/osu-beatmapset?id=${setId}`);
+        if (!r.ok) return null;
+        const d = await r.json();
+        return { language: d.language || null, genre: d.genre || null };
+    } catch {
+        return null;
+    }
+}
+
+// Guards backfillOsuLanguages() against overlapping itself or a manual
+// refreshAllOsuSets().
+let osuMetaBackfillRunning = false;
+
+/* Fills in `language`/`genre` for collection sets saved before this feature
+   existed. Runs a capped, gently-paced batch on page load (see js/main.js
+   init) so a large collection tops up over a few visits rather than firing
+   hundreds of API calls at once. New adds and "Refresh all" fetch the meta
+   inline, so this only ever has old data to catch up on. */
+async function backfillOsuLanguages() {
+    if (osuMetaBackfillRunning) return;
+    const col = getOsuCollection();
+    const seen = new Set();
+    const pending = [];
+    for (const mode of OSU_MODES) {
+        for (const s of col[mode]) {
+            if (s.language || seen.has(s.beatmapset_id)) continue;
+            seen.add(s.beatmapset_id);
+            pending.push(s.beatmapset_id);
+        }
+    }
+    if (pending.length === 0) return;
+
+    osuMetaBackfillRunning = true;
+    const MAX_PER_VISIT = 24, CHUNK = 4, PAUSE_MS = 800;
+    const batch = pending.slice(0, MAX_PER_VISIT);
+    try {
+        for (let i = 0; i < batch.length; i += CHUNK) {
+            const ids = batch.slice(i, i + CHUNK);
+            const metas = await Promise.all(ids.map(id =>
+                fetchOsuSetMeta(id).then(m => ({ id, m }))
+            ));
+            const fresh = getOsuCollection();
+            let changed = false;
+            for (const { id, m } of metas) {
+                if (!m) continue;
+                for (const mode of OSU_MODES) {
+                    const set = fresh[mode].find(s => s.beatmapset_id === id);
+                    if (set) { set.language = m.language; set.genre = m.genre; changed = true; }
+                }
+            }
+            if (changed) saveOsuCollection(fresh);
+            if (i + CHUNK < batch.length) await new Promise(res => setTimeout(res, PAUSE_MS));
+        }
+        renderOsuCollection();
+    } finally {
+        osuMetaBackfillRunning = false;
+    }
 }
 
 function osuSetMaxRating(set) {
@@ -570,7 +698,9 @@ function runOsuBgSlideCarousel(intervalMs) {
 // import-time compatibility decisions — not enforced as a hard gate (older
 // exports with no schemaVersion at all are still accepted, see importOsuCollection),
 // just carried along so a future incompatible format has something to check.
-const OSU_EXPORT_SCHEMA_VERSION = 1;
+// v2: sets carry optional `language`/`genre` (osu! API v2). Purely additive —
+// v1 exports import fine and get backfilled on later visits.
+const OSU_EXPORT_SCHEMA_VERSION = 2;
 
 function exportOsuCollection() {
     const data = {
@@ -1065,6 +1195,12 @@ async function addOsuBeatmap(explicitId) {
             })).sort((a, b) => a.difficulty_rating - b.difficulty_rating)
         };
 
+        // Language/genre come from API v2 (the v1 fetch above only has a
+        // coarse language_id) — non-blocking-ish: one extra ~300ms call,
+        // and the add still succeeds if it fails (backfill will retry).
+        const meta = await fetchOsuSetMeta(setInfo.beatmapset_id);
+        if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; }
+
         col[modeKey].unshift(setInfo);
         saveOsuCollection(col);
 
@@ -1121,20 +1257,22 @@ async function refreshAllOsuSets() {
     const col = getOsuCollection();
     const allIds = [...new Set(OSU_MODES.flatMap(mode => col[mode].map(s => s.beatmapset_id)))];
     const REFRESH_CONCURRENCY = 6;
+    osuMetaBackfillRunning = true;   // keep the page-load backfill out of the way
 
     try {
         for (let i = 0; i < allIds.length; i += REFRESH_CONCURRENCY) {
             const batch = allIds.slice(i, i + REFRESH_CONCURRENCY);
             const results = await Promise.all(batch.map(setId =>
-                osuFetch(`s=${setId}`)
-                    .then(beatmaps => ({ setId, beatmaps }))
-                    .catch(() => ({ setId, beatmaps: [] }))
+                Promise.all([
+                    osuFetch(`s=${setId}`).catch(() => []),
+                    fetchOsuSetMeta(setId),
+                ]).then(([beatmaps, meta]) => ({ setId, beatmaps, meta }))
             ));
-            for (const { setId, beatmaps } of results) {
-                if (beatmaps.length === 0) continue;
+            for (const { setId, beatmaps, meta } of results) {
                 for (const mode of OSU_MODES) {
                     const idx = col[mode].findIndex(s => s.beatmapset_id === setId);
-                    if (idx >= 0) {
+                    if (idx < 0) continue;
+                    if (beatmaps.length > 0) {
                         col[mode][idx].beatmaps = beatmaps.map(b => ({
                             beatmap_id: parseInt(b.beatmap_id),
                             version: b.version,
@@ -1145,8 +1283,9 @@ async function refreshAllOsuSets() {
                             key_count: parseFloat(b.diff_size),
                             mode_int: parseInt(b.mode)
                         })).sort((a, b) => a.difficulty_rating - b.difficulty_rating);
-                        break;
                     }
+                    if (meta) { col[mode][idx].language = meta.language; col[mode][idx].genre = meta.genre; }
+                    break;
                 }
             }
         }
@@ -1160,6 +1299,7 @@ async function refreshAllOsuSets() {
         status.style.color = '#ff5252';
     } finally {
         btn.classList.remove('spinning');
+        osuMetaBackfillRunning = false;
     }
 }
 
@@ -1246,6 +1386,10 @@ function openStatsDashboardModal() {
                 <div class="trend-chart-wrap"><canvas id="stats-chart-mappers"></canvas></div>
             </div>
             <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_langs_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-langs"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
                 <div class="pp-calc-section-label">${t('stats_dashboard_growth_title')}</div>
                 <div class="trend-chart-wrap"><canvas id="stats-chart-growth"></canvas></div>
             </div>
@@ -1292,6 +1436,28 @@ function renderStatsDashboardCharts(col, allSets) {
         data: {
             labels: OSU_MODE_LABELS,
             datasets: [{ data: OSU_MODES.map(m => col[m].length), backgroundColor: [colors.accent, purple, '#34d399', '#f59e0b'] }],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: colors.text, font: { size: 10 }, boxWidth: 10 } } },
+        },
+    }));
+
+    // Language mix — tally by v2 language id, missing -> "unlabeled" bucket.
+    const langTally = new Map();
+    allSets.forEach(s => {
+        const key = s.language && s.language.id ? s.language.id : 'unknown';
+        langTally.set(key, (langTally.get(key) || 0) + 1);
+    });
+    const langEntries = [...langTally.entries()].sort((a, b) => b[1] - a[1]);
+    const langPalette = ['#f472b6', '#a855f7', '#c084fc', '#22d3ee', '#34d399', '#f59e0b', '#60a5fa', '#f87171', '#818cf8', '#fbbf24', '#4ade80', '#e879f9', '#2dd4bf', '#fb7185'];
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-langs'), {
+        type: 'doughnut',
+        data: {
+            labels: langEntries.map(([k]) => k === 'unknown'
+                ? t('lang_unknown')
+                : (OSU_LANGUAGES[k] ? `${OSU_LANGUAGES[k].flag} ${t(OSU_LANGUAGES[k].key)}` : String(k))),
+            datasets: [{ data: langEntries.map(([, n]) => n), backgroundColor: langEntries.map((_, i) => langPalette[i % langPalette.length]) }],
         },
         options: {
             responsive: true, maintainAspectRatio: false,
@@ -1437,6 +1603,16 @@ function renderOsuCollection() {
         );
     }
 
+    // Language filter options track whatever's actually in this tab's sets;
+    // do it before the language filter narrows `sets` so the dropdown still
+    // lists every option.
+    renderOsuLangFilterOptions(sets);
+    if (osuLangFilter === 'unknown') {
+        sets = sets.filter(s => !s.language);
+    } else if (osuLangFilter !== 'all') {
+        sets = sets.filter(s => s.language && String(s.language.id) === osuLangFilter);
+    }
+
     sets = sortOsuSets(sets);
 
     if (sets.length === 0) {
@@ -1487,6 +1663,10 @@ function renderOsuCollection() {
         const diffLabel = (b) => (diffMode(b) === 'mania' && b.key_count) ? `${b.version} [${Math.round(b.key_count)}K]` : b.version;
         const diffIconsRow = `<div class="osu-card-diff-row">${diffBeatmaps.map(b => modeDiffIcon(diffMode(b), b.difficulty_rating, diffLabel(b), diffUrl(b.beatmap_id, diffMode(b)))).join('')}</div>`;
         osuPageCheckTargets.push({ setId: set.beatmapset_id, beatmapId: hardestDiff.beatmap_id, mode: OSU_MODES.indexOf(diffMode(hardestDiff)) });
+        // Language badge (API v2, via backfill / add / refresh). A set that
+        // hasn't been backfilled yet shows 🌐 未標記 until it fills in.
+        const langLabel = osuLangName(set) || t('lang_unknown');
+        const langBadge = `<span class="osu-lang-badge" data-tip="${escHtml(langLabel)}">${set.language ? osuLangFlag(set) : '🌐'} ${escHtml(langLabel)}</span>`;
         return `
         <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
@@ -1501,6 +1681,7 @@ function renderOsuCollection() {
             <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
             <div class="osu-play-status" id="play-status-${set.beatmapset_id}" style="display:none;"></div>
             <div class="osu-card-info">
+                ${langBadge}
                 <div class="osu-card-title">${set.title}</div>
                 ${diffIconsRow}
                 <div class="osu-card-artist">${set.artist}</div>
