@@ -1192,69 +1192,9 @@ async function importOsuGameCollection(event) {
             });
         }
 
-        // Fetch + add every set we don't already have.
-        const col = getOsuCollection();
-        const haveSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
-        const wantedSetIds = [...new Set(named.flatMap(c => c.entries.map(e => e.setId)))].filter(id => !haveSetIds.has(id));
-
-        let addedSets = 0;
-        const SCHUNK = 6;
-        for (let i = 0; i < wantedSetIds.length; i += SCHUNK) {
-            setStatus(t('collection_io_importing', { done: i, total: wantedSetIds.length }));
-            const chunk = wantedSetIds.slice(i, i + SCHUNK);
-            const results = await Promise.all(chunk.map(id => osuFetch(`s=${id}`).catch(() => null)));
-            for (const beatmaps of results) {
-                if (!beatmaps || beatmaps.length === 0) { unresolved++; continue; }
-                const modeNum = parseInt(beatmaps[0].mode);
-                const modeKey = OSU_MODE_NAMES[modeNum];
-                const setId = parseInt(beatmaps[0].beatmapset_id);
-                if (!modeKey || haveSetIds.has(setId)) continue;
-                const setInfo = {
-                    beatmapset_id: setId,
-                    title: beatmaps[0].title,
-                    artist: beatmaps[0].artist,
-                    creator: beatmaps[0].creator,
-                    mode: modeNum,
-                    addedAt: new Date().toISOString(),
-                    beatmaps: beatmaps.map(b => ({
-                        beatmap_id: parseInt(b.beatmap_id),
-                        version: b.version,
-                        difficulty_rating: parseFloat(b.difficultyrating),
-                        hit_length: parseInt(b.hit_length),
-                        total_length: parseInt(b.total_length),
-                        bpm: parseFloat(b.bpm),
-                        key_count: parseFloat(b.diff_size),
-                        mode_int: parseInt(b.mode),
-                    })).sort((a, b) => a.difficulty_rating - b.difficulty_rating),
-                };
-                const meta = await fetchOsuSetMeta(setId).catch(() => null);
-                if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; }
-                col[modeKey].push(setInfo);
-                haveSetIds.add(setId);
-                addedSets++;
-            }
-            saveOsuCollection(col);
-        }
-
-        // One category per imported collection, merged (never destructive).
-        const cats = getOsuCategories();
-        const catMembers = getOsuCategoryMembers();
-        const validSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
-        let touchedCats = 0;
-        for (const c of named) {
-            const name = (c.name || '').trim();
-            const ids = [...new Set(c.entries.map(e => e.setId))].filter(id => validSetIds.has(id));
-            if (!name || ids.length === 0) continue;
-            let cat = cats.find(x => x.name === name);
-            if (!cat) { cat = { id: crypto.randomUUID(), name }; cats.push(cat); }
-            catMembers[cat.id] = [...new Set([...(catMembers[cat.id] || []), ...ids])];
-            touchedCats++;
-        }
-        saveOsuCategories(cats);
-        saveOsuCategoryMembers(catMembers);
-
-        renderOsuCollection();
-        const doneMsg = t('collection_io_import_done', { sets: addedSets, cats: touchedCats, missed: unresolved });
+        const report = await applyImportedCollections(named, msg => setStatus(msg));
+        report.unresolved += unresolved;
+        const doneMsg = t('collection_io_import_done', { sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved });
         setStatus(doneMsg, '#34d399');
         if (typeof showShareToast === 'function') showShareToast(doneMsg);
     } catch (e) {
@@ -1263,6 +1203,124 @@ async function importOsuGameCollection(event) {
     } finally {
         fileInput.value = '';
     }
+}
+
+/* Shared tail of every "bring a list of collections in" flow (game file
+   import, osu! profile import): given [{ name, entries: [{ setId }] }], fetch
+   each set the collection doesn't already have (via the v1 s= proxy, chunked)
+   into the standard setInfo shape, then merge each source list into a
+   same-named category — creating it if missing, never overwriting. Returns
+   { addedSets, touchedCats, unresolved }. onProgress(msg) is optional. */
+async function applyImportedCollections(named, onProgress) {
+    const report = { addedSets: 0, touchedCats: 0, unresolved: 0 };
+    const col = getOsuCollection();
+    const haveSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
+    const wantedSetIds = [...new Set(named.flatMap(c => c.entries.map(e => e.setId)))].filter(id => !haveSetIds.has(id));
+
+    const SCHUNK = 6;
+    for (let i = 0; i < wantedSetIds.length; i += SCHUNK) {
+        if (onProgress) onProgress(t('collection_io_importing', { done: i, total: wantedSetIds.length }));
+        const chunk = wantedSetIds.slice(i, i + SCHUNK);
+        const results = await Promise.all(chunk.map(id => osuFetch(`s=${id}`).catch(() => null)));
+        for (const beatmaps of results) {
+            if (!beatmaps || beatmaps.length === 0) { report.unresolved++; continue; }
+            const modeNum = parseInt(beatmaps[0].mode);
+            const modeKey = OSU_MODE_NAMES[modeNum];
+            const setId = parseInt(beatmaps[0].beatmapset_id);
+            if (!modeKey || haveSetIds.has(setId)) continue;
+            const setInfo = {
+                beatmapset_id: setId,
+                title: beatmaps[0].title,
+                artist: beatmaps[0].artist,
+                creator: beatmaps[0].creator,
+                mode: modeNum,
+                addedAt: new Date().toISOString(),
+                beatmaps: beatmaps.map(b => ({
+                    beatmap_id: parseInt(b.beatmap_id),
+                    version: b.version,
+                    difficulty_rating: parseFloat(b.difficultyrating),
+                    hit_length: parseInt(b.hit_length),
+                    total_length: parseInt(b.total_length),
+                    bpm: parseFloat(b.bpm),
+                    key_count: parseFloat(b.diff_size),
+                    mode_int: parseInt(b.mode),
+                })).sort((a, b) => a.difficulty_rating - b.difficulty_rating),
+            };
+            const meta = await fetchOsuSetMeta(setId).catch(() => null);
+            if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; }
+            col[modeKey].push(setInfo);
+            haveSetIds.add(setId);
+            report.addedSets++;
+        }
+        saveOsuCollection(col);
+    }
+
+    const cats = getOsuCategories();
+    const catMembers = getOsuCategoryMembers();
+    const validSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
+    for (const c of named) {
+        const name = (c.name || '').trim();
+        const ids = [...new Set(c.entries.map(e => e.setId))].filter(id => validSetIds.has(id));
+        if (!name || ids.length === 0) continue;
+        let cat = cats.find(x => x.name === name);
+        if (!cat) { cat = { id: crypto.randomUUID(), name }; cats.push(cat); }
+        catMembers[cat.id] = [...new Set([...(catMembers[cat.id] || []), ...ids])];
+        report.touchedCats++;
+    }
+    saveOsuCategories(cats);
+    saveOsuCategoryMembers(catMembers);
+
+    renderOsuCollection();
+    return report;
+}
+
+/* Page through a logged-in visitor's osu! profile beatmapsets (favourite or
+   most_played) via the v2 proxy, newest/most-played first, capped. */
+async function fetchOsuProfileBeatmapsets(userId, type, cap) {
+    const out = [];
+    const PAGE = Math.min(100, cap);
+    for (let offset = 0; out.length < cap; offset += PAGE) {
+        let batch;
+        try {
+            const r = await fetch(`/.netlify/functions/osu-user-beatmapsets?id=${userId}&type=${type}&limit=${PAGE}&offset=${offset}`);
+            if (!r.ok) break;
+            batch = await r.json();
+        } catch { break; }
+        if (!Array.isArray(batch) || batch.length === 0) break;
+        for (const x of batch) { if (x && x.beatmapset_id) out.push(parseInt(x.beatmapset_id)); }
+        if (batch.length < PAGE) break;
+    }
+    return [...new Set(out)].slice(0, cap);
+}
+
+/* Seed the collection from the logged-in visitor's osu! profile — all their
+   favourite beatmapsets + their top 50 most-played — into "Favourites" and
+   "Most played" categories. Offered once on first login when the collection
+   is empty (checkOsuLoginFromUrl), and available any time from the toolbar
+   button. Non-destructive, same as every other import. */
+async function importFromOsuProfile() {
+    if (!await verifyOsuPassword()) return;
+    const user = getLoggedInOsuUser();
+    if (!user || !user.id) { showShareToast(t('osu_profile_need_login')); return; }
+
+    showShareToast(t('osu_profile_importing', { done: 0, total: '…' }));
+    let favIds, mpIds;
+    try {
+        favIds = await fetchOsuProfileBeatmapsets(user.id, 'favourite', 300);
+        mpIds = await fetchOsuProfileBeatmapsets(user.id, 'most_played', 50);
+    } catch (e) {
+        console.error('osu! profile beatmapset fetch failed:', e);
+        showShareToast(t('osu_profile_import_fail'));
+        return;
+    }
+
+    const named = [];
+    if (favIds.length) named.push({ name: t('osu_profile_cat_favourites'), entries: favIds.map(id => ({ setId: id })) });
+    if (mpIds.length) named.push({ name: t('osu_profile_cat_mostplayed'), entries: mpIds.map(id => ({ setId: id })) });
+    if (named.length === 0) { showShareToast(t('osu_profile_import_empty')); return; }
+
+    const report = await applyImportedCollections(named, msg => showShareToast(msg));
+    showShareToast(t('collection_io_import_done', { sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved }));
 }
 
 /* ===== Shareable collection link =====
@@ -3255,6 +3313,8 @@ function applyLoggedInOsuUser() {
     pill.style.display = user ? '' : 'none';
     const checkPlayedBtn = document.getElementById('osu-check-played-btn');
     if (checkPlayedBtn) checkPlayedBtn.style.display = user ? '' : 'none';
+    const profileImportBtn = document.getElementById('osu-import-profile-btn');
+    if (profileImportBtn) profileImportBtn.style.display = user ? '' : 'none';
     if (typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (!user) return;
 
@@ -3289,6 +3349,17 @@ function checkOsuLoginFromUrl() {
     }
 
     applyLoggedInOsuUser();
+
+    // First successful login on this device: if the collection is still empty,
+    // offer to seed it from the visitor's own osu! profile (favourites +
+    // most-played). Asked once — the toolbar button covers it after that.
+    if (id && !localStorage.getItem('osu_profile_import_prompted')) {
+        localStorage.setItem('osu_profile_import_prompted', '1');
+        const col = getOsuCollection();
+        if (OSU_MODES.every(m => col[m].length === 0)) {
+            setTimeout(() => { if (confirm(t('osu_profile_import_confirm'))) importFromOsuProfile(); }, 500);
+        }
+    }
 }
 
 /* Signed proof of identity for the currently logged-in osu! user (see
