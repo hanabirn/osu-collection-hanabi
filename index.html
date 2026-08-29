@@ -210,6 +210,18 @@
 <main class="site-main">
 
     <section id="page-collection" class="site-page">
+        <div id="collection-hero" class="collection-hero" hidden>
+            <p class="collection-hero-pitch" data-i18n="hero_pitch">一站整理你的 osu! 收藏：從遊戲匯入、依成績自動生成分類、一鍵匯出回遊戲。</p>
+            <div class="collection-hero-feats">
+                <span class="collection-hero-feat" data-icon="package" data-icon-gap><span data-i18n="hero_feat_import">匯入遊戲的 collection.db / .osdb</span></span>
+                <span class="collection-hero-feat" data-icon="sparkles" data-icon-gap><span data-i18n="hero_feat_generate">從 osu! 帳號生成分類</span></span>
+                <span class="collection-hero-feat" data-icon="share2" data-icon-gap><span data-i18n="hero_feat_share">分享收藏（含預覽卡片）</span></span>
+            </div>
+            <div class="collection-hero-foot">
+                <span class="collection-hero-stats" id="collection-hero-stats"></span>
+                <a class="collection-hero-cta" id="collection-hero-cta" href="/.netlify/functions/osu-login" hidden data-i18n="hero_login_cta">用 osu! 登入，自動帶入你的最愛</a>
+            </div>
+        </div>
         <div class="collection-layout">
             <div class="collection-layout-left">
                 <div class="osu-add-card">

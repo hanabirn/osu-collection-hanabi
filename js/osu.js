@@ -2106,10 +2106,46 @@ function renderFeaturedBeatmap() {
     `;
 }
 
+/* ===== Landing hero (empty-collection state) =====
+   A first-time visitor with nothing collected lands on an empty grid — this
+   panel above it pitches what the site does and shows a couple of live
+   numbers. Hidden the moment the collection has anything in it. */
+let collectionHeroInit = false;
+
+function updateCollectionHeroVisibility() {
+    const hero = document.getElementById('collection-hero');
+    if (!hero) return;
+    const col = getOsuCollection();
+    const empty = OSU_MODES.every(m => col[m].length === 0);
+    hero.hidden = !empty;
+    if (empty && !collectionHeroInit) initCollectionHero();
+}
+
+function initCollectionHero() {
+    collectionHeroInit = true;
+    const cta = document.getElementById('collection-hero-cta');
+    if (cta) cta.hidden = !!getLoggedInOsuUser();
+
+    const statsEl = document.getElementById('collection-hero-stats');
+    if (!statsEl) return;
+    Promise.allSettled([
+        fetch('/.netlify/functions/collections-list?page=0').then(r => (r.ok ? r.json() : null)),
+        fetch('/.netlify/functions/site-likes').then(r => (r.ok ? r.json() : null)),
+    ]).then(([a, b]) => {
+        const total = a.status === 'fulfilled' && a.value && typeof a.value.total === 'number' ? a.value.total : null;
+        const likes = b.status === 'fulfilled' && b.value && typeof b.value.likes === 'number' ? b.value.likes : null;
+        const parts = [];
+        if (total != null) parts.push(t('hero_stat_collections', { n: total.toLocaleString() }));
+        if (likes != null) parts.push(t('hero_stat_likes', { n: likes.toLocaleString() }));
+        statsEl.textContent = parts.join('   ·   ');
+    });
+}
+
 function renderOsuCollection() {
     const container = document.getElementById('osu-collection');
     const paginationEl = document.getElementById('osu-pagination');
     if (!container || !paginationEl) return;
+    updateCollectionHeroVisibility();
     renderOsuStats();
     renderFeaturedBeatmap();
     renderOsuCategoryTabsRow();
@@ -3500,6 +3536,8 @@ function applyLoggedInOsuUser() {
     if (checkPlayedBtn) checkPlayedBtn.style.display = user ? '' : 'none';
     const profileImportBtn = document.getElementById('osu-import-profile-btn');
     if (profileImportBtn) profileImportBtn.style.display = user ? '' : 'none';
+    const heroCta = document.getElementById('collection-hero-cta');
+    if (heroCta) heroCta.hidden = !!user;
     if (typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (!user) return;
 

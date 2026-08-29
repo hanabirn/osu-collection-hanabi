@@ -23,6 +23,67 @@
     flex-direction: column;
     gap: 20px;
 }
+
+/* Landing pitch shown above the grid while the collection is empty (js/osu.js
+   updateCollectionHeroVisibility). */
+.collection-hero {
+    max-width: 760px;
+    margin: 0 auto 20px;
+    padding: 18px 22px;
+    border-radius: 16px;
+    background: var(--overlap-panel-bg, rgba(30, 22, 46, 0.55));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    backdrop-filter: blur(10px) saturate(1.2);
+    text-align: center;
+}
+.collection-hero-pitch {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--text);
+}
+.collection-hero-feats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+}
+.collection-hero-feat {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.collection-hero-feat .icon-svg { color: var(--accent-pink); }
+.collection-hero-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 16px;
+}
+.collection-hero-stats {
+    font-size: 0.8rem;
+    color: var(--text-dim2);
+    font-variant-numeric: tabular-nums;
+}
+.collection-hero-cta {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 3px 14px rgba(var(--accent-pink-rgb), 0.35);
+    transition: transform 0.2s var(--ease-out);
+}
+.collection-hero-cta:hover { transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .collection-hero-cta { transition: none; } .collection-hero-cta:hover { transform: none; } }
 .collection-layout-left {
     min-width: 0;
 }
