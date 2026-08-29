@@ -39,7 +39,13 @@ a:hover { text-decoration: underline; }
     position: relative;
     z-index: 5;
     overflow: hidden;
-    padding: 40px 24px 28px;
+    /* Top padding trimmed (was 40px) so more real content clears the fold;
+       the tall bottom padding is deliberate — it's the landing strip the
+       overlapping .site-main slides up into (see its negative margin-top),
+       and because aspect-ratio fixes the total height, the extra bottom
+       padding just floats the centred title/controls up out of that zone
+       rather than adding height. */
+    padding: 22px 24px 88px;
     /* Match the aspect ratio of osu!'s own cover@2x.jpg (1800x500 = 3.6:1),
        the image renderOsuBgCarousel feeds #bg-carousel — so background-size:
        cover ends up showing the whole cover with no crop, instead of the
@@ -48,8 +54,8 @@ a:hover { text-decoration: underline; }
        viewports where 3.6:1 would be shorter than the header's own content;
        max-height keeps it from eating a short/wide window whole. */
     aspect-ratio: 3.6 / 1;
-    min-height: 240px;
-    max-height: 72vh;
+    min-height: 230px;
+    max-height: 62vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -58,7 +64,7 @@ a:hover { text-decoration: underline; }
     backdrop-filter: blur(var(--glass-blur));
 }
 @media (max-width: 600px) {
-    .site-header { padding: 32px 20px 22px; min-height: 200px; }
+    .site-header { padding: 18px 20px 56px; min-height: 188px; }
 }
 /* ===== Beatmap-cover hero banner, behind the header's own content =====
    #bg-carousel (its slides populated by js/osu.js's renderOsuBgCarousel,
@@ -300,18 +306,29 @@ a:hover { text-decoration: underline; }
 .title-note {
     display: block;
     line-height: 1;
+    position: relative;
+    z-index: 1;
+    /* Readability on busy / light cover art: a white keyline drawn *behind*
+       the glyph (paint-order) so it isn't thinned, a dark drop-shadow for
+       depth, and a neon bloom in the note's own colour. Works in Chrome,
+       Edge and Safari. */
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.92);
+    paint-order: stroke fill;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 13px currentColor);
     /* Longer cycle to carry the bigger travel without looking hurried. */
     animation: titleNoteFloat 4s ease-in-out infinite;
 }
 /* Tapered so the notes closest to the title are largest, trailing off
-   smaller outward — sizes bumped ~1.4x. */
-.tn-1, .tn-6 { font-size: 1.5rem; }
-.tn-2, .tn-5 { font-size: 2.2rem; }
-.tn-3, .tn-4 { font-size: 3rem; }
+   smaller outward. Vivid fixed hues (not the theme accents) so they stay
+   punchy on both light and dark backgrounds now that a white keyline
+   guarantees the edge. */
+.tn-1, .tn-6 { font-size: 1.7rem; }
+.tn-2, .tn-5 { font-size: 2.4rem; }
+.tn-3, .tn-4 { font-size: 3.2rem; }
 
-.tn-1, .tn-4 { color: var(--accent-pink); filter: drop-shadow(0 0 16px rgba(var(--accent-pink-rgb), 0.7)) drop-shadow(0 0 5px rgba(var(--accent-pink-rgb), 0.9)); animation-delay: 0s; }
-.tn-2, .tn-5 { color: var(--accent-light-purple); filter: drop-shadow(0 0 16px var(--accent-light-purple)) drop-shadow(0 0 5px var(--accent-light-purple)); animation-delay: 0.6s; }
-.tn-3, .tn-6 { color: var(--accent-purple); filter: drop-shadow(0 0 16px rgba(var(--accent-purple-rgb), 0.7)) drop-shadow(0 0 5px rgba(var(--accent-purple-rgb), 0.9)); animation-delay: 1.2s; }
+.tn-1, .tn-4 { color: #ff5cae; animation-delay: 0s; }
+.tn-2, .tn-5 { color: #c98bff; animation-delay: 0.6s; }
+.tn-3, .tn-6 { color: #a855f7; animation-delay: 1.2s; }
 
 /* Bigger rise (up to -26px vs -10), a left/right sway (±8px, was none),
    a little scale breathing, and an opacity pulse (0.5 -> 1) so the notes
@@ -329,18 +346,20 @@ a:hover { text-decoration: underline; }
 }
 @media (max-width: 600px) {
     .tn-1, .tn-6 { display: none; }
-    .tn-2, .tn-5 { font-size: 1.4rem; }
-    .tn-3, .tn-4 { font-size: 2rem; }
+    .tn-2, .tn-5 { font-size: 1.5rem; }
+    .tn-3, .tn-4 { font-size: 2.1rem; }
     .header-logo { gap: 4px; }
     .title-notes { gap: 2px; }
     .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: 1rem; padding: 0 8px; }
     .site-title-block h1 { font-size: 3rem; }
-    .logo-icon svg { width: 46px; height: 46px; }
+    .logo-icon svg { width: 54px; height: 54px; }
 }
 
 .site-header-top {
     position: relative;
-    z-index: 2;
+    /* Above the header's cover + overlay (0/1) so the title, logo ring and
+       floating notes are never dimmed or clipped by them. */
+    z-index: 4;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -357,14 +376,24 @@ a:hover { text-decoration: underline; }
 .logo-icon {
     display: flex;
     position: relative;
-    color: var(--accent-pink);
-    filter: drop-shadow(0 0 13px rgba(var(--accent-pink-rgb), 0.65));
+    z-index: 1;
+    /* Vivid hot pink (fixed, both themes) with a 4-way white outline, a
+       dark depth shadow and a neon bloom — the thin SVG ring vanished on
+       light/complex covers with just a soft glow. */
+    color: #ff4fa8;
+    filter:
+        drop-shadow(1.5px 0 0 rgba(255, 255, 255, 0.95))
+        drop-shadow(-1.5px 0 0 rgba(255, 255, 255, 0.95))
+        drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.95))
+        drop-shadow(0 -1.5px 0 rgba(255, 255, 255, 0.95))
+        drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6))
+        drop-shadow(0 0 16px rgba(255, 79, 168, 0.7));
     /* Bigger, springier beat — the spring bezier makes each keyframe step
        overshoot and settle, so the pulse rings down elastically instead of
        easing flatly. */
     animation: logoBeatHit 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }
-.logo-icon svg { width: 68px; height: 68px; display: block; }
+.logo-icon svg { width: 80px; height: 80px; display: block; }
 .logo-icon::after {
     content: '';
     position: absolute;
@@ -1137,10 +1166,34 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    own breakpoints stays. */
 .site-main {
     position: relative;
-    z-index: 1;
+    /* Above the header's cover image + overlay (0/1) so the panel visibly
+       sits on top of the artwork — but the header's own title (z 2 inside
+       its z:5 context) and corner controls (z 50) still read above it,
+       because the tall header padding-bottom keeps them clear of the
+       overlap zone, they never actually intersect. */
+    z-index: 6;
     max-width: 1080px;
     margin: 0 auto;
-    padding: 24px 16px 60px;
+    /* Pull the content column up so it overlaps the header's lower edge —
+       responsive so a short header on a phone isn't swallowed. */
+    margin-top: -96px;
+    padding: 14px 16px 60px;
+    /* Frosted "tray" the .site-page card sits on: a translucent glass base
+       so the header illustration bleeds faintly through where they overlap,
+       a blur, a rounded top, a hairline top keyline, and a lift shadow that
+       reads as the panel floating above the cover. */
+    background: var(--overlap-panel-bg);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    backdrop-filter: blur(12px) saturate(1.3);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -16px 44px rgba(0, 0, 0, 0.34);
+}
+@media (max-width: 900px) {
+    .site-main { margin-top: -60px; }
+}
+@media (max-width: 600px) {
+    .site-main { margin-top: -34px; border-radius: 22px 22px 0 0; }
 }
 
 /* ===== Per-tab flowing gradient border =====
@@ -1161,18 +1214,20 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border-radius: 20px;
     border: 1.5px solid var(--border-card);
     padding: 20px 16px 28px;
-    background: var(--bg-card);
+    /* A touch more translucent than the shared --bg-card (~0.88): this card
+       now overlaps the header cover, so letting the blurred illustration
+       tint faintly through its top sells the glass/depth. Only the outer
+       tab shell is affected, not the inner .osu-card etc. */
+    background: var(--site-page-bg);
     /* Frosted-glass so the ambient background layer (.bg-layer's glows/
-       particles/world-globe, css/particles.css) still shows through as
-       soft blurred color/light behind the card instead of being fully
-       blocked by its own solid background — same treatment .osu-add-card
-       already gets, just applied one level up so it reaches every tab's
-       outer shell. (#bg-carousel, the beatmap-cover hero banner, sits in
-       normal flow above this card entirely now, so it's not what this is
-       blurring through — see its own comment in css/particles.css.) */
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    box-shadow: var(--shadow-card);
+       particles/world-globe, css/particles.css) and, where they overlap,
+       the header cover image still show through as soft blurred color/light
+       behind the card instead of being fully blocked by its own background. */
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    /* Upward "floating above the header" shadow first, then the card's
+       normal ambient shadow. */
+    box-shadow: 0 -18px 46px rgba(0, 0, 0, 0.32), var(--shadow-card);
 }
 .site-page::before {
     content: '';
