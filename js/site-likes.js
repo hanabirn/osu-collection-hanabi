@@ -1,31 +1,40 @@
 /* ===== "Like / share this site" — the small row under the header tagline.
 
    The like count is cumulative and server-backed
-   (netlify/functions/site-likes.js -> Netlify Blobs). A visitor can add one
-   like; it's remembered in localStorage so the button stays in its "liked"
-   state on return visits and never re-POSTs. Sharing uses the native Web
-   Share sheet where available (mobile) and falls back to copying the URL
-   (desktop).
+   (netlify/functions/site-likes.js -> Netlify Blobs). A visitor can like or
+   un-like; the current choice is remembered in localStorage so the button
+   keeps its state on return visits, and toggling off decrements the total.
+   Sharing uses the native Web Share sheet where available (mobile) and
+   falls back to copying the URL (desktop).
 
    Everything degrades quietly: if the function is unreachable — e.g. a plain
    static server with no Netlify backend, or the Blobs env vars aren't set —
-   the count just shows "–" and the like button becomes a no-op. ===== */
+   the count just shows "–" and toggling only flips the local button state. */
 (function () {
     'use strict';
 
     var LIKED_KEY = 'site_liked_v1';
     var ENDPOINT = '/.netlify/functions/site-likes';
     var countEl, likeBtn;
+    var currentCount = null;   // last known server total, or null if unknown
 
     function hasLiked() {
         try { return localStorage.getItem(LIKED_KEY) === '1'; } catch (e) { return false; }
     }
-    function rememberLiked() {
-        try { localStorage.setItem(LIKED_KEY, '1'); } catch (e) { /* private mode — fine */ }
+    function rememberLiked(liked) {
+        try {
+            if (liked) localStorage.setItem(LIKED_KEY, '1');
+            else localStorage.removeItem(LIKED_KEY);
+        } catch (e) { /* private mode — fine */ }
     }
 
     function renderCount(n) {
-        if (countEl) countEl.textContent = (typeof n === 'number' && isFinite(n)) ? n.toLocaleString() : '–';
+        if (typeof n === 'number' && isFinite(n)) {
+            currentCount = Math.max(0, Math.round(n));
+            if (countEl) countEl.textContent = currentCount.toLocaleString();
+        } else if (countEl) {
+            countEl.textContent = '–';
+        }
     }
     // Re-trigger the CSS bump animation on the count.
     function bump() {
@@ -47,16 +56,21 @@
             .catch(function () { /* offline / no backend */ });
     }
 
-    function likeSite() {
-        if (hasLiked()) return;
-        // Optimistic + remembered up front so a slow POST can't be double-fired.
-        rememberLiked();
-        setLikedState(true);
+    function toggleLike() {
+        var nextLiked = !hasLiked();
+        rememberLiked(nextLiked);
+        setLikedState(nextLiked);
+        // Optimistic count nudge (only when we actually have a number to nudge).
+        if (currentCount != null) renderCount(currentCount + (nextLiked ? 1 : -1));
         bump();
-        fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+        fetch(ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ liked: nextLiked })
+        })
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (d) { if (d && typeof d.likes === 'number') { renderCount(d.likes); bump(); } })
-            .catch(function () { /* keep the local liked state anyway */ });
+            .catch(function () { /* keep the local toggle state anyway */ });
     }
 
     function shareSite() {
@@ -79,7 +93,7 @@
     }
 
     // Called from the inline onclick= handlers in index.html.
-    window.likeSite = likeSite;
+    window.toggleSiteLike = toggleLike;
     window.shareSite = shareSite;
 
     function init() {

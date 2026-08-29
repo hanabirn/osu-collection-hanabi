@@ -1,22 +1,21 @@
 /* Site-wide "like this site" counter for anonymous visitors — no osu! login,
-   unlike collections-like.js. State is one blob-backed integer at key
-   `count`, plus a per-day list of hashed client IPs (`seen:<yyyy-mm-dd>`) so
-   a refresh-spam or double-tap from one address only counts once per day.
-   This is a vanity number, not an audited metric: the client's localStorage
-   guard does most of the de-duping and this is just a light server backstop.
+   unlike collections-like.js. Source of truth is one blob-backed array at
+   key `likers` holding hashed client IPs; the like total is just its
+   length. Keeping the set (rather than a bare integer) is what lets a like
+   be undone later — including on a different day — without the count
+   drifting. This is a vanity number, not an audited metric: visitors behind
+   the same NAT share a hash and count once, and the client's localStorage
+   guard does most of the de-duping. This is only a light server backstop.
 
      GET  -> { likes }
-     POST -> { likes, counted }   counted:false when this IP already liked
-                                  today (still returns the current total)
+     POST { liked: true }  -> add this IP's like    -> { likes, liked: true }
+     POST { liked: false } -> remove this IP's like -> { likes, liked: false }
+     (POST with no body is treated as liked:true, matching the old behaviour.)
 */
 const crypto = require('crypto');
 const { getSiteStatsStore } = require('./_blobs-store');
 
-const COUNT_KEY = 'count';
-
-function todayKey() {
-    return 'seen:' + new Date().toISOString().slice(0, 10);
-}
+const LIKERS_KEY = 'likers';
 
 function clientIpHash(event) {
     const h = event.headers || {};
@@ -24,10 +23,6 @@ function clientIpHash(event) {
         || (h['x-forwarded-for'] || '').split(',')[0].trim()
         || 'unknown';
     return crypto.createHash('sha256').update(ip + '|osu-site-like').digest('hex').slice(0, 16);
-}
-
-async function readCount(store) {
-    return Number(await store.get(COUNT_KEY, { type: 'text' })) || 0;
 }
 
 exports.handler = async (event) => {
@@ -48,25 +43,32 @@ exports.handler = async (event) => {
     }
 
     try {
+        const likers = (await store.get(LIKERS_KEY, { type: 'json' })) || [];
+
         if (event.httpMethod === 'GET') {
-            return { statusCode: 200, headers, body: JSON.stringify({ likes: await readCount(store) }) };
+            return { statusCode: 200, headers, body: JSON.stringify({ likes: likers.length }) };
         }
 
         if (event.httpMethod === 'POST') {
-            const count = await readCount(store);
-            const dayK = todayKey();
-            const seen = (await store.get(dayK, { type: 'json' })) || [];
-            const hash = clientIpHash(event);
+            let wantLiked = true;
+            try {
+                const body = JSON.parse(event.body || '{}');
+                if (body && body.liked === false) wantLiked = false;
+            } catch { /* no/!json body -> treat as a like */ }
 
-            if (seen.includes(hash)) {
-                return { statusCode: 200, headers, body: JSON.stringify({ likes: count, counted: false }) };
+            const hash = clientIpHash(event);
+            const has = likers.includes(hash);
+
+            if (wantLiked && !has) {
+                likers.push(hash);
+                await store.setJSON(LIKERS_KEY, likers);
+            } else if (!wantLiked && has) {
+                const next = likers.filter(x => x !== hash);
+                await store.setJSON(LIKERS_KEY, next);
+                return { statusCode: 200, headers, body: JSON.stringify({ likes: next.length, liked: false }) };
             }
 
-            const next = count + 1;
-            await store.set(COUNT_KEY, String(next));
-            seen.push(hash);
-            await store.setJSON(dayK, seen);
-            return { statusCode: 200, headers, body: JSON.stringify({ likes: next, counted: true }) };
+            return { statusCode: 200, headers, body: JSON.stringify({ likes: likers.length, liked: wantLiked }) };
         }
 
         return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
