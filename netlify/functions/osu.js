@@ -73,6 +73,10 @@ exports.handler = async (event) => {
 
         if (qs.b) params.set('b', qs.b);
         if (qs.s) params.set('s', qs.s);
+        // h=<md5>: look a beatmap up by its file hash — used when importing an
+        // in-game collection.db (js/osu.js importOsuGameCollection), whose
+        // entries are MD5 hashes rather than ids.
+        if (qs.h) params.set('h', qs.h);
 
         const res = await fetch(`https://osu.ppy.sh/api/get_beatmaps?${params.toString()}`);
         const data = await res.json();

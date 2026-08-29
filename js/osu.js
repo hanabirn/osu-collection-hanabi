@@ -874,8 +874,11 @@ function parseCollectionDb(buffer) {
 }
 
 function openCollectionDbModal() {
-    document.getElementById('collection-db-status').innerText = '';
+    const status = document.getElementById('collection-db-status');
+    status.innerText = '';
+    status.style.color = '';
     document.getElementById('collection-db-merge-input').value = '';
+    document.getElementById('collection-io-import-input').value = '';
     document.getElementById('collection-db-modal').style.display = 'flex';
 }
 function closeCollectionDbModal() {
@@ -953,6 +956,313 @@ async function exportOsuCollectionDb() {
 
     status.innerText = t('collection_db_done');
     status.style.color = '#34d399';
+}
+
+/* ===== .osdb (Collection Manager / osu!Stats format) =====
+   Piotrekol's Collection Manager format. Unlike collection.db it stores the
+   beatmap + beatmapset ids (plus metadata), so Collection Manager can match
+   it in-game *without* the per-difficulty MD5 that collection.db needs — and
+   it's the usual way whole collections get shared. Field order below is from
+   Collection Manager's OsdbCollectionHandler, "o!dm8" (full) variant.
+
+   NOTE: .osdb strings are plain .NET BinaryWriter strings — a 7-bit
+   (ULEB128) byte length then UTF-8, 0x00 for an empty string — NOT the
+   0x0b-prefixed "osu! string" writeOsuDbString() uses. From o!dm7 on,
+   everything after the leading version string is gzipped (fflate). */
+const OSDB_VERSIONS = { 'o!dm': 1, 'o!dm2': 2, 'o!dm3': 3, 'o!dm4': 4, 'o!dm5': 5, 'o!dm6': 6, 'o!dm7': 7, 'o!dm8': 8, 'o!dm7min': 1007, 'o!dm8min': 1008 };
+const OSDB_WRITE_VERSION = 'o!dm8';
+
+function writeNetString(bytes, str) {
+    const utf8 = str ? new TextEncoder().encode(str) : new Uint8Array(0);
+    writeUleb128(bytes, utf8.length);
+    for (let i = 0; i < utf8.length; i++) bytes.push(utf8[i]);
+}
+function readNetString(view, offset) {
+    const { value: len, next } = readUleb128(view, offset);
+    const bytes = new Uint8Array(view.buffer, view.byteOffset + next, len);
+    return { value: new TextDecoder('utf-8').decode(bytes), next: next + len };
+}
+function writeFloat64LE(bytes, value) {
+    const u8 = new Uint8Array(8);
+    new DataView(u8.buffer).setFloat64(0, value, true);
+    for (let i = 0; i < 8; i++) bytes.push(u8[i]);
+}
+function triggerBytesDownload(bytes, filename) {
+    const blob = new Blob([bytes], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* collections: [{ name, onlineId?, beatmaps: [{ mapId, mapSetId, artist, title, diff, md5, mode, stars }] }] */
+function buildOsdb(collections, editor) {
+    const p = [];
+    writeNetString(p, OSDB_WRITE_VERSION);
+    writeFloat64LE(p, Date.now() / 86400000 + 25569); // OLE Automation date (days since 1899-12-30)
+    writeNetString(p, editor || 'osu! collection');
+    writeInt32LE(p, collections.length);
+    for (const c of collections) {
+        writeNetString(p, c.name || '');
+        writeInt32LE(p, Number.isInteger(c.onlineId) ? c.onlineId : -1);
+        const maps = c.beatmaps || [];
+        writeInt32LE(p, maps.length);
+        for (const m of maps) {
+            writeInt32LE(p, m.mapId || 0);
+            writeInt32LE(p, m.mapSetId || 0);
+            writeNetString(p, m.artist || '');
+            writeNetString(p, m.title || '');
+            writeNetString(p, m.diff || '');
+            writeNetString(p, m.md5 || '');
+            writeNetString(p, '');               // user comment
+            p.push((m.mode || 0) & 0xff);        // play mode
+            writeFloat64LE(p, m.stars || 0);     // star rating
+        }
+        writeInt32LE(p, 0);                      // hash-only beatmap count
+    }
+    writeNetString(p, 'By Piotrekol');
+
+    const gz = fflate.gzipSync(new Uint8Array(p));
+    const head = [];
+    writeNetString(head, OSDB_WRITE_VERSION);    // uncompressed leading version string
+    const out = new Uint8Array(head.length + gz.length);
+    out.set(head, 0);
+    out.set(gz, head.length);
+    return out;
+}
+
+/* -> [{ name, beatmaps: [{ mapId, mapSetId, mode }] }] (metadata/md5 are read past but dropped) */
+function parseOsdb(buffer) {
+    let view = new DataView(buffer);
+    const head = readNetString(view, 0);
+    const versionString = head.value;
+    const fileVersion = OSDB_VERSIONS[versionString];
+    if (!fileVersion) throw new Error('OSDB_BAD_VERSION:' + versionString);
+
+    let cur;
+    if (fileVersion >= 7) {
+        const inflated = fflate.gunzipSync(new Uint8Array(buffer, head.next));
+        view = new DataView(inflated.buffer, inflated.byteOffset, inflated.byteLength);
+        cur = readNetString(view, 0).next;      // skip inner version string
+    } else {
+        cur = head.next;
+    }
+
+    const isMin = versionString.endsWith('min');
+    const isFull = !isMin;
+    cur += 8;                                    // save date (f64)
+    cur = readNetString(view, cur).next;         // editor
+    const count = view.getInt32(cur, true); cur += 4;
+
+    const collections = [];
+    for (let i = 0; i < count; i++) {
+        const nameRes = readNetString(view, cur); cur = nameRes.next;
+        if (fileVersion >= 7) cur += 4;          // online id
+        const nBeatmaps = view.getInt32(cur, true); cur += 4;
+        const beatmaps = [];
+        for (let j = 0; j < nBeatmaps; j++) {
+            const mapId = view.getInt32(cur, true); cur += 4;
+            let mapSetId = 0;
+            if (fileVersion >= 2) { mapSetId = view.getInt32(cur, true); cur += 4; }
+            if (!isMin) {
+                cur = readNetString(view, cur).next; // artist
+                cur = readNetString(view, cur).next; // title
+                cur = readNetString(view, cur).next; // diff
+            }
+            cur = readNetString(view, cur).next;     // md5
+            if (fileVersion >= 4) cur = readNetString(view, cur).next; // user comment
+            let mode = 0;
+            if (fileVersion >= 8 || (fileVersion >= 5 && isFull)) { mode = view.getUint8(cur); cur += 1; }
+            if (fileVersion >= 8 || (fileVersion >= 6 && isFull)) cur += 8; // star rating (f64)
+            beatmaps.push({ mapId, mapSetId, mode });
+        }
+        if (fileVersion >= 3) {
+            const nHashes = view.getInt32(cur, true); cur += 4;
+            for (let j = 0; j < nHashes; j++) cur = readNetString(view, cur).next;
+        }
+        collections.push({ name: nameRes.value, beatmaps });
+    }
+    return collections;
+}
+
+/* Export the collection as an .osdb (Collection Manager / osu!Stats). Unlike
+   the collection.db export this needs no network calls — .osdb carries the
+   ids the site already has. One .osdb collection per category (+ Favorites),
+   or a single "osu!收藏" collection if there are no categories. */
+function exportOsuOsdb() {
+    const status = document.getElementById('collection-db-status');
+    const col = getOsuCollection();
+    const allSets = OSU_MODES.flatMap(m => col[m]);
+    if (allSets.length === 0) {
+        if (status) { status.innerText = t('collection_db_empty'); status.style.color = '#ff5252'; }
+        return;
+    }
+    const setById = new Map(allSets.map(s => [s.beatmapset_id, s]));
+
+    const osdbCollections = [];
+    const addColl = (name, setIds) => {
+        const beatmaps = [];
+        setIds.forEach(id => {
+            const set = setById.get(id);
+            if (!set) return;
+            (set.beatmaps || []).forEach(b => beatmaps.push({
+                mapId: b.beatmap_id || 0,
+                mapSetId: set.beatmapset_id,
+                artist: set.artist || '',
+                title: set.title || '',
+                diff: b.version || '',
+                md5: '',
+                mode: Number.isInteger(b.mode_int) ? b.mode_int : (set.mode || 0),
+                stars: b.difficulty_rating || 0,
+            }));
+        });
+        if (beatmaps.length) osdbCollections.push({ name, beatmaps });
+    };
+
+    const members = getOsuCategoryMembers();
+    getOsuCategories().forEach(c => { if ((members[c.id] || []).length) addColl(c.name, members[c.id]); });
+    const favorites = getOsuFavorites();
+    if (favorites.length) addColl(t('osu_fav'), favorites);
+    if (osdbCollections.length === 0) addColl(t('collection_db_all_name'), allSets.map(s => s.beatmapset_id));
+
+    const editor = (getLoggedInOsuUser && getLoggedInOsuUser() && getLoggedInOsuUser().username) || 'osu! collection';
+    triggerBytesDownload(buildOsdb(osdbCollections, editor), 'osu!collection.osdb');
+    if (status) { status.innerText = t('collection_io_osdb_done'); status.style.color = '#34d399'; }
+}
+
+/* Import an in-game collection.db OR a shared/osu!Stats .osdb onto the site.
+   Never destructive — only adds sets you don't already have, and merges into
+   a same-named category (creating it if missing). collection.db entries are
+   MD5 hashes so they need a lookup pass (h=<md5> via the osu proxy); .osdb
+   carries beatmapset ids directly and skips straight to the set fetch. */
+async function importOsuGameCollection(event) {
+    const fileInput = event.target;
+    const file = fileInput.files[0];
+    if (!file) return;
+    if (!await verifyOsuPassword()) { fileInput.value = ''; return; }
+
+    const status = document.getElementById('collection-db-status');
+    const setStatus = (msg, color) => { if (status) { status.innerText = msg; status.style.color = color || '#c8a2e0'; } };
+
+    try {
+        const buffer = await file.arrayBuffer();
+        const magic = new TextDecoder().decode(new Uint8Array(buffer, 0, Math.min(6, buffer.byteLength)));
+        const isOsdb = magic.startsWith('o!dm') || file.name.toLowerCase().endsWith('.osdb');
+
+        let named = [];      // [{ name, entries: [{ setId, mode }] }]
+        let unresolved = 0;
+
+        if (isOsdb) {
+            let parsed;
+            try {
+                parsed = parseOsdb(buffer);
+            } catch (e) {
+                if (String(e.message).startsWith('OSDB_BAD_VERSION')) { setStatus(t('collection_io_osdb_unsupported'), '#ff5252'); fileInput.value = ''; return; }
+                throw e;
+            }
+            named = parsed.map(c => ({
+                name: c.name,
+                entries: c.beatmaps.filter(b => b.mapSetId > 0).map(b => ({ setId: b.mapSetId, mode: b.mode })),
+            }));
+        } else {
+            let dbMap;
+            try { dbMap = parseCollectionDb(buffer); }
+            catch (e) { setStatus(t('collection_io_bad_file'), '#ff5252'); fileInput.value = ''; return; }
+
+            const allHashes = [...new Set([...dbMap.values()].flatMap(s => [...s]))];
+            const hashToSet = {};
+            const HCHUNK = 10;
+            for (let i = 0; i < allHashes.length; i += HCHUNK) {
+                setStatus(t('collection_db_fetching', { done: i, total: allHashes.length }));
+                const chunk = allHashes.slice(i, i + HCHUNK);
+                const results = await Promise.all(chunk.map(h => osuFetch(`h=${h}`).catch(() => null)));
+                results.forEach((r, idx) => {
+                    const bm = r && r[0];
+                    if (bm && bm.beatmapset_id) hashToSet[chunk[idx]] = { setId: parseInt(bm.beatmapset_id), mode: parseInt(bm.mode) };
+                });
+            }
+            named = [...dbMap.entries()].map(([name, hashes]) => {
+                const entries = [];
+                hashes.forEach(h => { if (hashToSet[h]) entries.push(hashToSet[h]); else unresolved++; });
+                return { name, entries };
+            });
+        }
+
+        // Fetch + add every set we don't already have.
+        const col = getOsuCollection();
+        const haveSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
+        const wantedSetIds = [...new Set(named.flatMap(c => c.entries.map(e => e.setId)))].filter(id => !haveSetIds.has(id));
+
+        let addedSets = 0;
+        const SCHUNK = 6;
+        for (let i = 0; i < wantedSetIds.length; i += SCHUNK) {
+            setStatus(t('collection_io_importing', { done: i, total: wantedSetIds.length }));
+            const chunk = wantedSetIds.slice(i, i + SCHUNK);
+            const results = await Promise.all(chunk.map(id => osuFetch(`s=${id}`).catch(() => null)));
+            for (const beatmaps of results) {
+                if (!beatmaps || beatmaps.length === 0) { unresolved++; continue; }
+                const modeNum = parseInt(beatmaps[0].mode);
+                const modeKey = OSU_MODE_NAMES[modeNum];
+                const setId = parseInt(beatmaps[0].beatmapset_id);
+                if (!modeKey || haveSetIds.has(setId)) continue;
+                const setInfo = {
+                    beatmapset_id: setId,
+                    title: beatmaps[0].title,
+                    artist: beatmaps[0].artist,
+                    creator: beatmaps[0].creator,
+                    mode: modeNum,
+                    addedAt: new Date().toISOString(),
+                    beatmaps: beatmaps.map(b => ({
+                        beatmap_id: parseInt(b.beatmap_id),
+                        version: b.version,
+                        difficulty_rating: parseFloat(b.difficultyrating),
+                        hit_length: parseInt(b.hit_length),
+                        total_length: parseInt(b.total_length),
+                        bpm: parseFloat(b.bpm),
+                        key_count: parseFloat(b.diff_size),
+                        mode_int: parseInt(b.mode),
+                    })).sort((a, b) => a.difficulty_rating - b.difficulty_rating),
+                };
+                const meta = await fetchOsuSetMeta(setId).catch(() => null);
+                if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; }
+                col[modeKey].push(setInfo);
+                haveSetIds.add(setId);
+                addedSets++;
+            }
+            saveOsuCollection(col);
+        }
+
+        // One category per imported collection, merged (never destructive).
+        const cats = getOsuCategories();
+        const catMembers = getOsuCategoryMembers();
+        const validSetIds = new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
+        let touchedCats = 0;
+        for (const c of named) {
+            const name = (c.name || '').trim();
+            const ids = [...new Set(c.entries.map(e => e.setId))].filter(id => validSetIds.has(id));
+            if (!name || ids.length === 0) continue;
+            let cat = cats.find(x => x.name === name);
+            if (!cat) { cat = { id: crypto.randomUUID(), name }; cats.push(cat); }
+            catMembers[cat.id] = [...new Set([...(catMembers[cat.id] || []), ...ids])];
+            touchedCats++;
+        }
+        saveOsuCategories(cats);
+        saveOsuCategoryMembers(catMembers);
+
+        renderOsuCollection();
+        const doneMsg = t('collection_io_import_done', { sets: addedSets, cats: touchedCats, missed: unresolved });
+        setStatus(doneMsg, '#34d399');
+        if (typeof showShareToast === 'function') showShareToast(doneMsg);
+    } catch (e) {
+        console.error('Game collection import failed:', e);
+        setStatus(t('collection_io_bad_file'), '#ff5252');
+    } finally {
+        fileInput.value = '';
+    }
 }
 
 /* ===== Shareable collection link =====

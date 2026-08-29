@@ -686,14 +686,26 @@
 <div id="collection-db-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCollectionDbModal()">
     <div class="pp-calc-modal">
         <button class="pp-calc-close" onclick="closeCollectionDbModal()" data-icon="x"></button>
-        <h3 class="pp-calc-title" data-i18n="collection_db_title">📦 匯出成 osu! Collection</h3>
-        <p class="pp-calc-hint" data-i18n="collection_db_hint">會依照你的分類（含「最愛」）產生 osu! 遊戲讀得懂的 collection.db，下載後複製到你的 osu! 資料夾即可匯入。這會取代你電腦上原本的 collection.db——若想保留現有的收藏，可以先在下面上傳它一起合併（同名分類會被這裡的資料覆蓋，其他分類不受影響）。</p>
+        <h3 class="pp-calc-title" data-i18n="collection_io_title">📦 osu! 遊戲收藏（匯入 / 匯出）</h3>
+
+        <p class="pp-calc-hint" data-i18n="collection_io_import_hint">從遊戲的 collection.db（在你的 osu! 資料夾裡）或別人分享的 .osdb 匯入。只會把你還沒有的圖加進來，並依原本的收藏名稱建立分類，不會覆蓋你現有的資料。</p>
+        <div class="collection-db-upload-row">
+            <input type="file" id="collection-io-import-input" accept=".db,.osdb" style="display:none" onchange="importOsuGameCollection(event)">
+            <button class="btn" onclick="document.getElementById('collection-io-import-input').click()" data-i18n="collection_io_import_btn">選擇 .db / .osdb 檔匯入</button>
+        </div>
+
+        <hr class="collection-io-sep">
+
+        <p class="pp-calc-hint" data-i18n="collection_db_hint">會依照你的分類（含「最愛」）產生 osu! 遊戲讀得懂的 collection.db，下載後複製到你的 osu! 資料夾即可匯入。這會取代你電腦上原本的 collection.db——若想保留現有的收藏，可以先在下面上傳它一起合併（同名分類會被這裡的資料覆蓋，其他分類不受影響）。.osdb 則帶有 beatmap ID，用 Collection Manager／osu!Stats 匯入遊戲，不需要每張圖的雜湊。</p>
         <div class="collection-db-upload-row">
             <label data-i18n="collection_db_merge_label">合併現有 collection.db（可略過）</label>
             <input type="file" id="collection-db-merge-input" accept=".db">
         </div>
+        <div class="collection-io-export-btns">
+            <button class="btn" onclick="exportOsuCollectionDb()" data-i18n="collection_db_export_btn">匯出 collection.db</button>
+            <button class="btn" onclick="exportOsuOsdb()" data-i18n="collection_io_osdb_btn">匯出 .osdb</button>
+        </div>
         <div id="collection-db-status" class="status"></div>
-        <button class="btn" onclick="exportOsuCollectionDb()" data-i18n="collection_db_export_btn">匯出</button>
     </div>
 </div>
 

@@ -1844,6 +1844,18 @@
     color: var(--text-secondary);
 }
 .collection-db-upload-row input[type="file"] { font-size: 0.82rem; color: var(--text); }
+.collection-io-sep {
+    border: none;
+    border-top: 1px solid var(--border-input);
+    margin: 18px 0 14px;
+}
+.collection-io-export-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.collection-io-export-btns .btn { flex: 1 1 auto; }
 
 /* ===== Stats dashboard modal ===== */
 .stats-dashboard-grid {
