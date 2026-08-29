@@ -167,7 +167,10 @@ a:hover { text-decoration: underline; }
     position: absolute;
     top: 18px;
     right: 24px;
-    z-index: 6;
+    /* Well clear of the cover carousel (0) and the readability overlay (1),
+       and above the rest of the header's own content — but below the nav
+       drawer + its scrim (80/81) so an open drawer still covers it. */
+    z-index: 50;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -189,7 +192,7 @@ a:hover { text-decoration: underline; }
     position: absolute;
     top: 18px;
     left: 24px;
-    z-index: 6;
+    z-index: 50;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -218,8 +221,57 @@ a:hover { text-decoration: underline; }
     border-color: var(--accent-pink);
     color: var(--text-pink);
     box-shadow: 0 0 12px rgba(var(--accent-pink-rgb), 0.3);
+    transform: scale(1.05);
 }
 .nav-menu-btn:active { transform: scale(0.92); }
+
+/* ===== Glass-chip treatment for corner controls over cover art =====
+   Problem: with a cover photo behind the header (.has-cover-banner) the
+   plain theme pills — rgba(255,255,255,0.08) fill on rgba(255,255,255,0.6)
+   icons — disappear on a light illustration.
+   Fix: every corner control (contact, notification, hamburger, language,
+   and the hidden PWA / update buttons — all tagged .header-ctl in the
+   markup) gets one shared frosted chip that doesn't depend on what's
+   behind it: a dark, semi-opaque fill so white icons on it always clear
+   WCAG AA whatever the art is, a hairline light keyline, a 10px blur, and
+   a lift shadow. The per-button rules keep owning size/shape only. */
+.site-header.has-cover-banner .header-ctl {
+    background: rgba(18, 12, 30, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #fff;
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+/* Hover / open — gentle grow, pink wash, and a glow that lifts the chip
+   off any busy background. Same treatment for the "menu is open" states so
+   the control stays lit while its dropdown is showing. */
+.site-header.has-cover-banner .header-ctl:hover,
+.site-header.has-cover-banner .contact-info.open .header-ctl,
+.site-header.has-cover-banner .notif-bell.open .header-ctl,
+.site-header.has-cover-banner .lang-globe.open .header-ctl {
+    background: rgba(var(--accent-pink-rgb), 0.30);
+    border-color: rgba(255, 255, 255, 0.42);
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--accent-pink-rgb), 0.5);
+}
+.site-header.has-cover-banner .header-ctl:active { transform: scale(0.95); }
+
+/* The theme switch already carries its own opaque track, but its light-theme
+   sky gradient can go soft on a pale cover — a white keyline + deeper drop
+   shadow pins its edge on any background. */
+.site-header.has-cover-banner .theme-switch {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+/* The osu! login button / avatar pill is a solid gradient CTA — already
+   high-contrast anywhere, it just gets a matching lift shadow so it reads
+   as part of the same floating control set. */
+.site-header.has-cover-banner .osu-login-btn-large,
+.site-header.has-cover-banner .osu-logged-in-pill-large {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 12px rgba(var(--accent-pink-rgb), 0.4);
+}
+.osu-login-btn-large:hover { transform: scale(1.04); }
 
 @media (max-width: 600px) {
     .header-corner-actions {
@@ -231,6 +283,12 @@ a:hover { text-decoration: underline; }
         position: static;
         justify-content: center;
         margin-top: 10px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .header-ctl, .contact-info-btn, .notif-bell-btn, .nav-menu-btn,
+    .lang-globe-btn, .theme-toggle-btn, .osu-login-btn-large {
+        transition: none;
     }
 }
 
@@ -425,6 +483,7 @@ a:hover { text-decoration: underline; }
     background: rgba(var(--accent-pink-rgb), 0.14);
     border-color: var(--accent-pink);
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+    transform: scale(1.05);
 }
 /* Sized to match the enlarged osu! login pill it now sits beside in the
    corner-pinned unit (see .header-corner-actions / .osu-login-btn-large). */
@@ -558,6 +617,7 @@ a:hover { text-decoration: underline; }
     background: rgba(var(--accent-pink-rgb), 0.14);
     border-color: var(--accent-pink);
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+    transform: scale(1.05);
 }
 /* Match the 42px notif bell / login / language sizing now that contact
    sits in that same top-right row (see .header-corner-actions). */
@@ -638,7 +698,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: rgba(var(--accent-pink-rgb), 0.2);
     border-color: var(--accent-pink);
     box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.35);
-    transform: translateY(-1px);
+    transform: scale(1.05);
 }
 /* Sized to match the enlarged osu! login pill/notif bell it now sits
    beside in the corner-pinned unit (see .header-corner-actions). */
