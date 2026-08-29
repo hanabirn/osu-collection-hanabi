@@ -10,8 +10,17 @@ const esc = (s) => String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+/* The /c/:id rewrite (netlify.toml, status 200) does NOT surface the id in
+   event.queryStringParameters, so fall back to the original path / URL. */
+function getId(event) {
+    const q = (event.queryStringParameters || {}).id;
+    if (q && /^\d+$/.test(q)) return q;
+    const m = String(event.rawUrl || event.path || '').match(/\/c\/(\d+)/);
+    return m ? m[1] : null;
+}
+
 exports.handler = async (event) => {
-    const id = (event.queryStringParameters || {}).id;
+    const id = getId(event);
     const proto = event.headers['x-forwarded-proto'] || 'https';
     const host = event.headers.host || '';
     const origin = `${proto}://${host}`;
