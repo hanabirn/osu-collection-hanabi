@@ -1323,6 +1323,191 @@ async function importFromOsuProfile() {
     showShareToast(t('collection_io_import_done', { sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved }));
 }
 
+/* ===== Collection tools modal — generate categories from your osu! account,
+   and a health check for the collection ===== */
+function openCollectionToolsModal() {
+    const gs = document.getElementById('ctools-gen-status');
+    gs.innerText = ''; gs.style.color = '';
+    document.getElementById('ctools-health-results').innerHTML = '';
+    document.getElementById('ctools-mapper-input').value = '';
+    document.getElementById('collection-tools-modal').style.display = 'flex';
+}
+function closeCollectionToolsModal() {
+    document.getElementById('collection-tools-modal').style.display = 'none';
+}
+
+/* type: 'favourite' | 'most_played' | 'best' | 'recent' — turns a slice of
+   the logged-in visitor's osu! account into one merged category, reusing
+   applyImportedCollections (so nothing already collected is touched). */
+async function generateCollectionFor(type) {
+    if (!await verifyOsuPassword()) return;
+    const user = getLoggedInOsuUser();
+    const status = document.getElementById('ctools-gen-status');
+    const setS = (m, c) => { status.innerText = m; status.style.color = c || '#c8a2e0'; };
+    if (!user || !user.id) { setS(t('osu_profile_need_login'), '#ff5252'); return; }
+
+    setS(t('osu_profile_importing', { done: 0, total: '…' }));
+    let setIds = [];
+    let name = '';
+    try {
+        if (type === 'favourite') {
+            setIds = await fetchOsuProfileBeatmapsets(user.id, 'favourite', 300);
+            name = t('osu_profile_cat_favourites');
+        } else if (type === 'most_played') {
+            setIds = await fetchOsuProfileBeatmapsets(user.id, 'most_played', 50);
+            name = t('osu_profile_cat_mostplayed');
+        } else if (type === 'best' || type === 'recent') {
+            const plays = await osuFetch(`${type}=${user.id}&limit=${type === 'best' ? 100 : 50}`);
+            const bmIds = [...new Set((plays || []).map(p => p.beatmap_id).filter(Boolean))];
+            const sids = new Set();
+            const CH = 10;
+            for (let i = 0; i < bmIds.length; i += CH) {
+                setS(t('osu_profile_importing', { done: i, total: bmIds.length }));
+                const chunk = bmIds.slice(i, i + CH);
+                const rs = await Promise.all(chunk.map(id => osuFetch(`b=${id}`).catch(() => null)));
+                rs.forEach(r => { const b = r && r[0]; if (b && b.beatmapset_id) sids.add(parseInt(b.beatmapset_id)); });
+            }
+            setIds = [...sids];
+            name = type === 'best' ? t('ctools_cat_best') : t('ctools_cat_recent');
+        }
+    } catch (e) {
+        console.error('generateCollectionFor failed:', e);
+        setS(t('osu_profile_import_fail'), '#ff5252');
+        return;
+    }
+    if (!setIds.length) { setS(t('osu_profile_import_empty'), '#f59e0b'); return; }
+
+    const report = await applyImportedCollections([{ name, entries: setIds.map(id => ({ setId: id })) }], m => setS(m));
+    setS(t('collection_io_import_done', { sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved }), '#34d399');
+}
+
+/* All of a mapper's ranked/approved/loved sets (graveyard/pending skipped),
+   capped, into a "Mapper: <name>" category. */
+async function generateCollectionFromMapper() {
+    if (!await verifyOsuPassword()) return;
+    const status = document.getElementById('ctools-gen-status');
+    const setS = (m, c) => { status.innerText = m; status.style.color = c || '#c8a2e0'; };
+    const raw = document.getElementById('ctools-mapper-input').value.trim();
+    if (!raw) return;
+
+    setS(t('osu_profile_importing', { done: 0, total: '…' }));
+    let rows;
+    try {
+        const isId = /^\d+$/.test(raw);
+        rows = await osuFetch(`mapper=${encodeURIComponent(raw)}${isId ? '' : '&mapper_type=string'}`);
+    } catch (e) {
+        console.error('mapper lookup failed:', e);
+        setS(t('osu_profile_import_fail'), '#ff5252');
+        return;
+    }
+    if (!Array.isArray(rows) || rows.length === 0) { setS(t('ctools_mapper_none'), '#f59e0b'); return; }
+
+    const RANKED = new Set(['1', '2', '4']); // ranked / approved / loved
+    const setIds = [...new Set(rows.filter(r => RANKED.has(String(r.approved))).map(r => parseInt(r.beatmapset_id)))].slice(0, 80);
+    if (!setIds.length) { setS(t('ctools_mapper_none'), '#f59e0b'); return; }
+
+    const creator = rows[0].creator || raw;
+    const report = await applyImportedCollections(
+        [{ name: t('ctools_cat_mapper', { name: creator }), entries: setIds.map(id => ({ setId: id })) }],
+        m => setS(m),
+    );
+    setS(t('collection_io_import_done', { sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved }), '#34d399');
+}
+
+/* Remove several sets at once, cleaning their category memberships too
+   (removeOsuSet only touches the mode arrays). */
+async function removeOsuSetsByIds(ids) {
+    if (!ids.length || !await verifyOsuPassword()) return;
+    const drop = new Set(ids);
+    const col = getOsuCollection();
+    OSU_MODES.forEach(m => { col[m] = col[m].filter(s => !drop.has(s.beatmapset_id)); });
+    saveOsuCollection(col);
+    const members = getOsuCategoryMembers();
+    for (const k of Object.keys(members)) members[k] = (members[k] || []).filter(id => !drop.has(id));
+    saveOsuCategoryMembers(members);
+    saveOsuFavorites(getOsuFavorites().filter(id => !drop.has(id)));
+    renderOsuCollection();
+}
+
+/* Keep the first occurrence of each beatmapset_id (scanning standard→mania),
+   drop the rest. */
+async function dedupeOsuCollection() {
+    if (!await verifyOsuPassword()) return;
+    const col = getOsuCollection();
+    const seen = new Set();
+    let removed = 0;
+    for (const m of OSU_MODES) {
+        col[m] = col[m].filter(s => {
+            if (seen.has(s.beatmapset_id)) { removed++; return false; }
+            seen.add(s.beatmapset_id);
+            return true;
+        });
+    }
+    saveOsuCollection(col);
+    renderOsuCollection();
+    const status = document.getElementById('ctools-gen-status');
+    if (status) { status.innerText = t('ctools_dedupe_done', { n: removed }); status.style.color = '#34d399'; }
+    runCollectionHealthCheck();
+}
+
+/* Scans the collection: duplicate set ids (client-side), then a bounded
+   re-fetch pass flagging sets that no longer exist on osu!, are no longer
+   ranked/approved/loved, or whose difficulty count has changed. */
+async function runCollectionHealthCheck() {
+    if (!await verifyOsuPassword()) return;
+    const out = document.getElementById('ctools-health-results');
+    const col = getOsuCollection();
+    const allSets = OSU_MODES.flatMap(m => col[m]);
+    if (!allSets.length) { out.innerHTML = `<p class="status">${escHtml(t('collection_db_empty'))}</p>`; return; }
+
+    const seen = new Set();
+    const dupIds = new Set();
+    for (const s of allSets) {
+        if (seen.has(s.beatmapset_id)) dupIds.add(s.beatmapset_id);
+        else seen.add(s.beatmapset_id);
+    }
+    const storedById = new Map(allSets.map(s => [s.beatmapset_id, s]));
+    const ids = [...seen];
+
+    out.innerHTML = `<p class="status" style="color:#c8a2e0" id="ctools-health-progress"></p>`;
+    const prog = document.getElementById('ctools-health-progress');
+    const dead = [], nonRanked = [], diffChanged = [];
+    const CH = 6;
+    for (let i = 0; i < ids.length; i += CH) {
+        if (prog) prog.textContent = t('ctools_health_scanning', { done: i, total: ids.length });
+        const chunk = ids.slice(i, i + CH);
+        const rs = await Promise.all(chunk.map(id => osuFetch(`s=${id}`).catch(() => null)));
+        rs.forEach((r, k) => {
+            const id = chunk[k];
+            const stored = storedById.get(id);
+            if (!r || r.length === 0) { dead.push(id); return; }
+            if (!['1', '2', '4'].includes(String(r[0].approved))) nonRanked.push(id);
+            if (stored && stored.beatmaps && r.length !== stored.beatmaps.length) diffChanged.push(id);
+        });
+    }
+
+    const dupArr = [...dupIds];
+    const rows = [];
+    const line = (labelKey, arr, action) => {
+        if (!arr.length) return;
+        rows.push(`<div class="ctools-health-row">
+            <span>${escHtml(t(labelKey, { n: arr.length }))}</span>
+            ${action || ''}
+        </div>`);
+    };
+    line('ctools_health_dupes', dupArr,
+        dupArr.length ? `<button class="btn btn-sm" onclick="dedupeOsuCollection()">${escHtml(t('ctools_health_dedupe_btn'))}</button>` : '');
+    line('ctools_health_dead', dead,
+        dead.length ? `<button class="btn btn-sm" onclick="removeOsuSetsByIds([${dead.join(',')}]).then(runCollectionHealthCheck)">${escHtml(t('ctools_health_remove_btn'))}</button>` : '');
+    line('ctools_health_diffchanged', diffChanged,
+        diffChanged.length ? `<button class="btn btn-sm" onclick="refreshAllOsuSets().then(runCollectionHealthCheck)">${escHtml(t('ctools_health_refresh_btn'))}</button>` : '');
+    line('ctools_health_nonranked', nonRanked, '');
+
+    out.innerHTML = rows.length
+        ? rows.join('')
+        : `<p class="status" style="color:#34d399">${escHtml(t('ctools_health_ok'))}</p>`;
+}
+
 /* ===== Shareable collection link =====
    Encodes the collection as gzip+base64url into a URL hash fragment (never
    sent to any server, so there's no size limit imposed by a backend) —

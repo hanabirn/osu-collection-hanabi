@@ -1857,6 +1857,47 @@
 }
 .collection-io-export-btns .btn { flex: 1 1 auto; }
 
+/* ===== Collection tools modal ===== */
+.ctools-btn-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+}
+.ctools-mapper-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.ctools-mapper-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+.ctools-health-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-input);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+.ctools-health-row:last-child { border-bottom: none; }
+.btn.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+}
+#ctools-health-results { margin-top: 10px; }
+
 /* ===== Stats dashboard modal ===== */
 .stats-dashboard-grid {
     display: grid;

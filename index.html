@@ -222,6 +222,7 @@
                         <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="設定密碼" data-icon="lock"></button>
                         <button class="osu-refresh-all" onclick="openCollectionDbModal()" data-i18n-title="collection_db_btn_title" title="匯出成 osu! Collection" data-icon="package"></button>
                         <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="收藏統計儀表板" data-icon="barChart3"></button>
+                        <button class="osu-refresh-all" onclick="openCollectionToolsModal()" data-i18n-title="ctools_btn_title" title="收藏整理（從 osu! 帳號生成 / 健康檢查）" data-icon="sparkles"></button>
                         <button class="osu-refresh-all" id="osu-check-played-btn" onclick="checkCollectionPlayedStatus()" data-i18n-title="check_played_btn_title" title="檢查本頁已遊玩" data-icon="target" style="display:none;"></button>
                         <button class="osu-refresh-all" id="osu-import-profile-btn" onclick="importFromOsuProfile()" data-i18n-title="osu_profile_import_btn_title" title="從 osu! 個人檔案匯入最愛 / 常玩" data-icon="star" style="display:none;"></button>
                     </div>
@@ -707,6 +708,32 @@
             <button class="btn" onclick="exportOsuOsdb()" data-i18n="collection_io_osdb_btn">匯出 .osdb</button>
         </div>
         <div id="collection-db-status" class="status"></div>
+    </div>
+</div>
+
+<div id="collection-tools-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCollectionToolsModal()">
+    <div class="pp-calc-modal">
+        <button class="pp-calc-close" onclick="closeCollectionToolsModal()" data-icon="x"></button>
+        <h3 class="pp-calc-title" data-i18n="ctools_title">✨ 收藏整理</h3>
+
+        <p class="pp-calc-hint" data-i18n="ctools_gen_hint">從你的 osu! 帳號生成收藏分類（需登入）。全部合併、不覆蓋現有資料。</p>
+        <div class="ctools-btn-grid">
+            <button class="btn" onclick="generateCollectionFor('favourite')" data-i18n="ctools_gen_fav">最愛</button>
+            <button class="btn" onclick="generateCollectionFor('most_played')" data-i18n="ctools_gen_mostplayed">常玩 50</button>
+            <button class="btn" onclick="generateCollectionFor('best')" data-i18n="ctools_gen_best">最佳成績 100</button>
+            <button class="btn" onclick="generateCollectionFor('recent')" data-i18n="ctools_gen_recent">最近遊玩</button>
+        </div>
+        <div class="ctools-mapper-row">
+            <input type="text" id="ctools-mapper-input" data-i18n-placeholder="ctools_mapper_ph" placeholder="mapper 名稱或 ID">
+            <button class="btn" onclick="generateCollectionFromMapper()" data-i18n="ctools_gen_mapper">生成</button>
+        </div>
+        <div id="ctools-gen-status" class="status"></div>
+
+        <hr class="collection-io-sep">
+
+        <p class="pp-calc-hint" data-i18n="ctools_health_hint">掃描收藏，找出重複、已被刪除、非 ranked、難度數量有變的圖。</p>
+        <button class="btn" onclick="runCollectionHealthCheck()" data-i18n="ctools_health_scan">掃描收藏</button>
+        <div id="ctools-health-results"></div>
     </div>
 </div>
 
