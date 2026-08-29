@@ -158,6 +158,7 @@ function renderPublicCollectionsList() {
             </div>
             <div class="pcc-btn-row">
                 <button class="btn pcc-view-btn" onclick="event.stopPropagation();openGalleryDetailModal(${item.id})" title="${t('gallery_view_btn_title')}">${icon('search')}</button>
+                <button class="btn pcc-share-btn" onclick="shareCollectionLink(${item.id}, event)" title="${t('gallery_share_btn')}">${icon('share2')}</button>
                 <button class="btn pcc-download-btn" onclick="event.stopPropagation();downloadPublicCollection(${item.id})" title="${t('gallery_download_btn_title')}">${icon('download', { extraClass: 'icon-label-gap' })}${t('gallery_download_btn_title')}</button>
             </div>
         </div>`;
@@ -399,16 +400,20 @@ async function openGalleryDetailModal(id) {
     }
 }
 
-/* Copy a crawler-friendly /c/<id> link for this collection (see
-   netlify/functions/collection-share-page.js). Native share sheet on mobile,
-   clipboard elsewhere. */
-function shareGalleryDetailLink() {
-    if (!galleryDetailData) return;
-    const url = `${location.origin}/c/${galleryDetailData.id}`;
+/* Copy a crawler-friendly /c/<id> link for a published collection (see
+   netlify/functions/collection-share-page.js) — unfurls into an OpenGraph
+   card. Native share sheet on mobile, clipboard elsewhere. */
+function shareCollectionLink(id, event) {
+    if (event) event.stopPropagation();
+    if (id == null) return;
+    const url = `${location.origin}/c/${id}`;
     if (navigator.share) { navigator.share({ url }).catch(() => {}); return; }
     const done = () => { if (typeof showShareToast === 'function') showShareToast(t('gallery_share_copied')); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
     else done();
+}
+function shareGalleryDetailLink() {
+    if (galleryDetailData) shareCollectionLink(galleryDetailData.id);
 }
 
 /* Deep link: /c/<id> rewrites to the share page which bounces here as

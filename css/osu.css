@@ -2150,7 +2150,8 @@
     font-weight: bold;
 }
 .pcc-btn-row { display: flex; gap: 8px; }
-.pcc-view-btn { flex: 0 0 auto; padding: 8px 12px; font-size: 0.85rem; }
+.pcc-view-btn,
+.pcc-share-btn { flex: 0 0 auto; padding: 8px 12px; font-size: 0.85rem; }
 .pcc-download-btn { flex: 1; padding: 8px; font-size: 0.85rem; }
 
 /* ===== Skin screenshot plaza — an image-first card (unlike the collection
