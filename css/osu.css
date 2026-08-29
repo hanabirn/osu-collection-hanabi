@@ -662,7 +662,9 @@
     -webkit-backdrop-filter: blur(8px) saturate(140%);
     backdrop-filter: blur(8px) saturate(140%);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    margin-bottom: 8px;
+    /* Small gap to the title below — kept tight so the badge sits low on the
+       card, close to the rest of the info block rather than floating up. */
+    margin-bottom: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1042,7 +1044,7 @@
 #farm-maps-list .osu-lang-badge {
     font-size: 0.64rem;
     padding: 2px 8px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 }
 #farm-maps-list .osu-card-title {
     font-size: 0.85rem;
