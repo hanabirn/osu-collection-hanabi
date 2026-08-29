@@ -75,21 +75,22 @@ a:hover { text-decoration: underline; }
     overflow: hidden;
     pointer-events: none;
 }
-/* Dark enough up top/at the very bottom for the title and nav pills to
-   stay readable over any cover art; lighter through the middle band so
-   the art's own subject (the whole point of showing it) doesn't just
-   disappear under a flat scrim. Bottom stop lands on --bg-body-1 itself
-   (not just "dark") so the header's lower edge dissolves straight into
-   the page background instead of a visible seam at the border. */
+/* Pure bottom-only dissolve into the page background — no dark scrim.
+   Fully transparent across the top ~80% so the cover art shows clean with
+   no haze (the old version washed the whole header in rgba(10,6,24,...),
+   which read as a grey/black murk over the art, badly so in light theme).
+   The only stop with colour is --bg-body-1 itself at the very bottom, so
+   the header's lower edge melts into the page instead of ending on a hard
+   seam — and it's the theme's own background colour (light: #fdf3fa),
+   never black or grey. */
 .site-header-overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
     background: linear-gradient(to bottom,
-        rgba(10, 6, 24, 0.55) 0%,
-        rgba(10, 6, 24, 0.32) 40%,
-        rgba(10, 6, 24, 0.4) 70%,
+        transparent 0%,
+        transparent 80%,
         var(--bg-body-1) 100%);
 }
 /* Every text/pill color in the header (.site-tagline, .site-nav-btn,
