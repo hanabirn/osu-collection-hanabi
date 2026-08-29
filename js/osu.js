@@ -147,7 +147,8 @@ function rgbHex(rgb) {
 function modeDiffIcon(mode, stars, label, url) {
     const color = starRatingColor(stars);
     const starsStr = (Number(stars) || 0).toFixed(2);
-    const titleText = label ? `${label} ${starsStr}★` : `${starsStr}★`;
+    // nbsp between the value and the star so "5.23 ⭐" never wraps apart.
+    const titleText = label ? `${label} ${starsStr} ⭐` : `${starsStr} ⭐`;
     const clickAttr = url ? ` onclick="event.stopPropagation();window.open('${url}','_blank')" style="cursor:pointer"` : '';
     return `<span class="mode-diff-icon" title="${escHtml(titleText)}"${clickAttr}>${modeIconSvg(mode, color)}</span>`;
 }
@@ -1622,7 +1623,7 @@ function renderOsuCollection() {
                 ? `${t('osu_empty_fav')}<br><span>${t('osu_empty_fav_hint')}</span>`
                 : !OSU_MODES.includes(osuCurrentTab)
                     ? t('osu_empty_category')
-                    : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span>`;
+                    : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span><br><span class="osu-empty-sub">${t('osu_empty_banner_hint')}</span>`;
         container.innerHTML = `<div class="osu-empty">${msg}</div>`;
         paginationEl.innerHTML = '';
         return;
@@ -1678,7 +1679,7 @@ function renderOsuCollection() {
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? '取消最愛' : '加入最愛'}">${icon('heart', { filled: isFav })}</button>
             <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
             <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="移除">${icon('x')}</button>
-            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)}★` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)}★`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
+            <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)} ⭐` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)} ⭐`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
             <div class="osu-play-status" id="play-status-${set.beatmapset_id}" style="display:none;"></div>
             <div class="osu-card-info">
                 ${langBadge}

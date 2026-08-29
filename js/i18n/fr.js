@@ -1,5 +1,6 @@
 I18N.fr = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Constitue ta propre collection de morceaux ! ✦',
+    site_like_label: 'J’aime', site_like_title: 'Ce site vous plaît ? Mettez un like !', site_share_label: 'Partager', site_share_title: 'Partager ce site avec des amis', site_share_copied: 'Lien du site copié !', site_share_text: 'Constitue ta propre collection de musiques osu !',
     pwa_install_btn_title: "Ajouter à l'écran d'accueil (fonctionne hors ligne)",
     site_update_btn_title: 'Une mise à jour est disponible, cliquez pour mettre à jour', site_update_available: 'Une nouvelle version du site est disponible — cliquez pour recharger et obtenir la dernière version',
     maintenance_banner_text: "Ce site est actuellement en cours de modification — si vous avez des questions ou rencontrez un bug, n'hésitez pas à me contacter !",
@@ -27,7 +28,7 @@ I18N.fr = {
 
     osu_title: '♫ Ajouter Beatmap ♫', osu_placeholder: 'Entrez ID ou URL', osu_add: 'Ajouter',
     osu_password: 'Mot de passe',
-    osu_fav: 'Favoris', osu_empty_collection: 'Pas encore de beatmaps', osu_empty_hint: 'Entrez un ID ci-dessus!',
+    osu_fav: 'Favoris', osu_empty_collection: 'Pas encore de beatmaps', osu_empty_hint: 'Entrez un ID ci-dessus!', osu_empty_banner_hint: 'Une fois que vous en ajoutez, la bannière et le fond de page affichent vos covers.',
     osu_empty_fav: 'Pas encore de favoris', osu_empty_fav_hint: 'Cliquez ♥ pour ajouter!',
     osu_category_add_prompt: 'Entrez le nom de la nouvelle catégorie :', osu_category_rename_prompt: 'Renommer la catégorie :',
     osu_category_delete_confirm: "Supprimer cette catégorie ? (Les beatmaps restent dans votre collection — seule l'étiquette est retirée.)",

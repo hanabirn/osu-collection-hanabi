@@ -1,5 +1,6 @@
 I18N.ja = {
     title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ あなただけの楽曲コレクションを作ろう！ ✦',
+    site_like_label: 'いいね', site_like_title: 'このサイトが気に入ったら、いいねしてね！', site_share_label: 'シェア', site_share_title: 'このサイトを友達にシェア', site_share_copied: 'サイトのリンクをコピーしました！', site_share_text: 'あなただけの osu! 楽曲コレクションを作ろう！',
     pwa_install_btn_title: 'ホーム画面に追加（オフライン対応）',
     site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。クリックして再読み込みし、最新版を取得してください',
     maintenance_banner_text: '現在このサイトは修正中です。ご質問やバグがあればご連絡ください！',
@@ -27,7 +28,7 @@ I18N.ja = {
 
     osu_title: '♫ ビートマップ追加 ♫', osu_placeholder: 'IDまたはURLを入力', osu_add: '追加',
     osu_password: 'パスワード設定',
-    osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！',
+    osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
     osu_empty_fav: 'お気に入りはまだありません', osu_empty_fav_hint: '♥をクリックしてお気に入りに追加！',
     osu_category_add_prompt: '新しいカテゴリ名を入力：', osu_category_rename_prompt: 'カテゴリ名を変更：',
     osu_category_delete_confirm: 'このカテゴリを削除しますか？（収蔵したビートマップは削除されません。タグだけが外れます）',

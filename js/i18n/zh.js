@@ -1,5 +1,6 @@
 I18N.zh = {
     title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦',
+    site_like_label: '讚', site_like_title: '喜歡這個網站的話，幫我按個讚吧！', site_share_label: '分享', site_share_title: '把這個網站分享給朋友', site_share_copied: '網站連結已複製！', site_share_text: '一起來收藏你專屬的 osu! 歌曲收藏庫吧！',
     pwa_install_btn_title: '加到主畫面（離線可用）',
     site_update_btn_title: '網站有更新，點擊更新', site_update_available: '目前網站有更新，請點擊重新載入以獲取最新版本',
     maintenance_banner_text: '目前該網頁正在修改中，如果有任何疑問或 bug 的話請聯絡我！',
@@ -27,7 +28,7 @@ I18N.zh = {
 
     osu_title: '♫ 新增 Beatmap ♫', osu_placeholder: '輸入 ID 或貼上 osu! 網址', osu_add: '新增',
     osu_password: '設定密碼',
-    osu_fav: '最愛', osu_empty_collection: '還沒有收藏的 Beatmap', osu_empty_hint: '在上方輸入 Beatmap ID 開始收藏！',
+    osu_fav: '最愛', osu_empty_collection: '還沒有收藏的 Beatmap', osu_empty_hint: '在上方輸入 Beatmap ID 開始收藏！', osu_empty_banner_hint: '收藏圖譜後，頁首橫幅與整頁背景會換成你收藏的封面圖 🎆',
     osu_empty_fav: '還沒有最愛的歌曲', osu_empty_fav_hint: '在其他分類中點擊 ♥ 加入最愛！',
     osu_category_add_prompt: '輸入新分類名稱：', osu_category_rename_prompt: '重新命名分類：',
     osu_category_delete_confirm: '確定要刪除這個分類嗎？（不會刪除收藏的圖譜，只移除分類標籤）',

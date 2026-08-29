@@ -1,5 +1,6 @@
 I18N.en = {
     title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Build your very own song collection! ✦',
+    site_like_label: 'Like', site_like_title: 'Like this site if you enjoy it!', site_share_label: 'Share', site_share_title: 'Share this site with friends', site_share_copied: 'Site link copied!', site_share_text: 'Build your very own osu! song collection!',
     pwa_install_btn_title: 'Add to home screen (works offline)',
     site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click to reload and get the latest version',
     maintenance_banner_text: 'This site is currently being updated — if you run into any questions or bugs, please get in touch!',
@@ -27,7 +28,7 @@ I18N.en = {
 
     osu_title: '♫ Add Beatmap ♫', osu_placeholder: 'Enter ID or paste osu! URL', osu_add: 'Add',
     osu_password: 'Set Password',
-    osu_fav: 'Favorites', osu_empty_collection: 'No beatmaps yet', osu_empty_hint: 'Enter a Beatmap ID above to start!',
+    osu_fav: 'Favorites', osu_empty_collection: 'No beatmaps yet', osu_empty_hint: 'Enter a Beatmap ID above to start!', osu_empty_banner_hint: 'Once you collect some, the header banner and page background turn into your beatmap covers.',
     osu_empty_fav: 'No favorites yet', osu_empty_fav_hint: 'Click ♥ on beatmaps to add favorites!',
     osu_category_add_prompt: 'Enter new category name:', osu_category_rename_prompt: 'Rename category:',
     osu_category_delete_confirm: 'Delete this category? (Beatmaps stay in your collection — only the tag is removed.)',

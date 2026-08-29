@@ -1,5 +1,6 @@
 I18N.de = {
     title: 'osu! Sammlung', site_title: 'osu! Sammlung', site_tagline: '✦ Bau dir deine eigene Songsammlung auf! ✦',
+    site_like_label: 'Gefällt mir', site_like_title: 'Gefällt dir die Seite? Gib ein Like!', site_share_label: 'Teilen', site_share_title: 'Diese Seite mit Freunden teilen', site_share_copied: 'Seitenlink kopiert!', site_share_text: 'Bau dir deine eigene osu!-Songsammlung auf!',
     pwa_install_btn_title: 'Zum Startbildschirm hinzufügen (funktioniert offline)',
     site_update_btn_title: 'Ein Update ist verfügbar, zum Aktualisieren klicken', site_update_available: 'Eine neue Version der Seite ist verfügbar — klicke, um neu zu laden und die neueste Version zu erhalten',
     maintenance_banner_text: 'Diese Website wird gerade überarbeitet — bei Fragen oder Bugs meld dich gerne bei mir!',
@@ -27,7 +28,7 @@ I18N.de = {
 
     osu_title: '♫ Beatmap hinzufügen ♫', osu_placeholder: 'ID oder URL eingeben', osu_add: 'Hinzufügen',
     osu_password: 'Passwort',
-    osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!',
+    osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!', osu_empty_banner_hint: 'Sobald du welche sammelst, zeigen Banner und Seitenhintergrund deine Beatmap-Cover.',
     osu_empty_fav: 'Noch keine Favoriten', osu_empty_fav_hint: 'Klicken Sie ♥ um hinzuzufügen!',
     osu_category_add_prompt: 'Name der neuen Kategorie eingeben:', osu_category_rename_prompt: 'Kategorie umbenennen:',
     osu_category_delete_confirm: 'Diese Kategorie löschen? (Beatmaps bleiben in deiner Sammlung — nur das Tag wird entfernt.)',

@@ -145,6 +145,15 @@
                 </span>
             </div>
             <p class="site-tagline" data-i18n="site_tagline">✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦</p>
+            <div class="site-social">
+                <button class="site-social-btn site-like-btn" id="site-like-btn" type="button" onclick="likeSite()" aria-pressed="false" data-icon="heart" data-i18n-title="site_like_title" title="喜歡這個網站的話，幫我按個讚吧！">
+                    <span data-i18n="site_like_label">讚</span>
+                    <span class="site-like-count" id="site-like-count" aria-hidden="true">–</span>
+                </button>
+                <button class="site-social-btn site-share-btn" id="site-share-btn" type="button" onclick="shareSite()" data-icon="share2" data-i18n-title="site_share_title" title="把這個網站分享給朋友">
+                    <span data-i18n="site_share_label">分享</span>
+                </button>
+            </div>
         </div>
     </div>
 </header>
@@ -741,6 +750,7 @@
 <script src="js/notifications.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
+<script src="js/site-likes.js"></script>
 <script src="js/tooltip.js"></script>
 </body>
 </html>

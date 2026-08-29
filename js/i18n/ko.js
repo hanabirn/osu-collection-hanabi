@@ -1,5 +1,6 @@
 I18N.ko = {
     title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 나만의 곡 컬렉션을 만들어보세요! ✦',
+    site_like_label: '좋아요', site_like_title: '이 사이트가 마음에 들면 좋아요를 눌러주세요!', site_share_label: '공유', site_share_title: '이 사이트를 친구에게 공유하기', site_share_copied: '사이트 링크를 복사했습니다!', site_share_text: '나만의 osu! 곡 컬렉션을 만들어 보세요!',
     pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
     site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 클릭하면 새로고침하여 최신 버전을 받습니다',
     maintenance_banner_text: '현재 이 사이트는 수정 중입니다. 궁금한 점이나 버그가 있으면 연락해 주세요!',
@@ -27,7 +28,7 @@ I18N.ko = {
 
     osu_title: '♫ 비트맵 추가 ♫', osu_placeholder: 'ID 또는 URL 입력', osu_add: '추가',
     osu_password: '비밀번호 설정',
-    osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!',
+    osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
     osu_empty_fav: '즐겨찾기가 없습니다', osu_empty_fav_hint: '♥를 눌러 즐겨찾기에 추가!',
     osu_category_add_prompt: '새 카테고리 이름 입력:', osu_category_rename_prompt: '카테고리 이름 변경:',
     osu_category_delete_confirm: '이 카테고리를 삭제할까요? (수집한 비트맵은 삭제되지 않고 태그만 제거됩니다)',

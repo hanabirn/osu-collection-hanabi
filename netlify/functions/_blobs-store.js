@@ -41,4 +41,14 @@ function getSkinScreenshotsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore };
+// Small key/value bucket for site-wide counters (currently just the "like
+// this site" total — see site-likes.js).
+function getSiteStatsStore() {
+    return getStore({
+        name: 'osu-site-stats',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore };

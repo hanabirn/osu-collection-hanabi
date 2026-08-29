@@ -484,6 +484,80 @@ a:hover { text-decoration: underline; }
     text-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.35), 0 0 20px rgba(var(--accent-purple-rgb), 0.2);
 }
 
+/* "Like / share this site" row under the tagline. Self-contained dark glass
+   chips (not the theme pills) so they hold their contrast on a plain header
+   and on a bright cover photo alike — same reasoning as .osu-lang-badge /
+   .header-ctl elsewhere, so no separate .has-cover-banner override needed. */
+.site-social {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+.site-social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(18, 12, 30, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    cursor: pointer;
+    transition: transform 0.2s var(--ease-out), background 0.2s var(--ease-out),
+        border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.site-social-btn .icon-svg {
+    width: 1.05em;
+    height: 1.05em;
+}
+.site-social-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    background: rgba(var(--accent-pink-rgb), 0.28);
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 16px rgba(var(--accent-pink-rgb), 0.3);
+}
+.site-social-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+.site-like-count {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    opacity: 0.9;
+}
+/* Liked state — solid pink heart, chip stays lit. Toggled by js/site-likes.js. */
+.site-like-btn.liked {
+    background: rgba(var(--accent-pink-rgb), 0.32);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+.site-like-btn.liked .icon-svg {
+    fill: var(--text-pink);
+    stroke: var(--text-pink);
+}
+.site-like-count.bump {
+    animation: siteLikeBump 0.4s var(--ease-out);
+}
+@keyframes siteLikeBump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); color: var(--text-pink); }
+    100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .site-social-btn, .site-social-btn:hover, .site-social-btn:active { transition: none; transform: none; }
+    .site-like-count.bump { animation: none; }
+}
+@media (max-width: 480px) {
+    .site-social { margin-top: 10px; }
+    .site-social-btn { font-size: 0.78rem; padding: 6px 12px; }
+}
+
 .lang-pill {
     background: var(--lang-pill-bg);
     border: 1px solid var(--lang-pill-border);
@@ -1485,6 +1559,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     top: 0;
     left: 0;
     z-index: 3000;
+    display: flex;
+    align-items: center;      /* keep emoji (⭐) + text visually centred on one line */
     max-width: 260px;
     padding: 7px 11px;
     border-radius: 8px;

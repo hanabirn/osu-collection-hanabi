@@ -1,5 +1,6 @@
 I18N.ru = {
     title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Собери свою собственную коллекцию песен! ✦',
+    site_like_label: 'Нравится', site_like_title: 'Понравился сайт? Поставьте лайк!', site_share_label: 'Поделиться', site_share_title: 'Поделиться сайтом с друзьями', site_share_copied: 'Ссылка на сайт скопирована!', site_share_text: 'Собери свою собственную коллекцию любимых карт osu!',
     pwa_install_btn_title: 'Добавить на главный экран (работает офлайн)',
     site_update_btn_title: 'Доступно обновление, нажмите для обновления', site_update_available: 'Доступна новая версия сайта — нажмите, чтобы перезагрузить и получить последнюю версию',
     maintenance_banner_text: 'Сайт сейчас находится в процессе доработки — если у вас есть вопросы или вы нашли баг, пожалуйста, свяжитесь со мной!',
@@ -27,7 +28,7 @@ I18N.ru = {
 
     osu_title: '♫ Добавить битмап ♫', osu_placeholder: 'Введите ID или URL', osu_add: 'Добавить',
     osu_password: 'Пароль',
-    osu_fav: 'Избранное', osu_empty_collection: 'Битмапов пока нет', osu_empty_hint: 'Введите ID выше!',
+    osu_fav: 'Избранное', osu_empty_collection: 'Битмапов пока нет', osu_empty_hint: 'Введите ID выше!', osu_empty_banner_hint: 'Когда добавите несколько, баннер и фон страницы покажут обложки ваших карт.',
     osu_empty_fav: 'Избранных пока нет', osu_empty_fav_hint: 'Нажмите ♥ чтобы добавить!',
     osu_category_add_prompt: 'Введите название новой категории:', osu_category_rename_prompt: 'Переименовать категорию:',
     osu_category_delete_confirm: 'Удалить эту категорию? (Битмапы останутся в коллекции — удалится только тег.)',

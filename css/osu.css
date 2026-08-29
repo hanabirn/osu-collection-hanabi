@@ -637,24 +637,32 @@
 }
 
 /* Small frosted pill at the top of a card's info block — the beatmapset's
-   language (osu! API v2), flag + localized name. */
+   language (osu! API v2), flag + localized name. It sits directly above the
+   card title over cover art that can be very bright (blue sky, white
+   illustration), so the container carries its own contrast instead of
+   leaning on the image: a near-opaque dark-plum fill keeps the white text
+   well past WCAG AA on any cover, with blur + a hairline keyline + a lift
+   shadow to separate it from busy art. */
 .osu-lang-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     align-self: flex-start;
     max-width: 100%;
-    font-size: 0.66rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     line-height: 1.4;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(15, 12, 25, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     color: #fff;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    margin-bottom: 5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    backdrop-filter: blur(8px) saturate(140%);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    margin-bottom: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -746,6 +754,15 @@
 .osu-empty span {
     font-size: 0.85rem;
     color: var(--text-dim2);
+}
+/* Second, quieter line under the main "enter an ID" hint — explains that a
+   collection is also what lights up the header banner + page background, so
+   a first-time visitor with an empty collection knows why theirs is plain. */
+.osu-empty .osu-empty-sub {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    opacity: 0.75;
 }
 
 .osu-card {
@@ -1019,6 +1036,13 @@
 }
 #farm-maps-list .osu-card-info {
     padding: 8px 40px 6px 10px;
+}
+/* Denser farm cards (aspect 4/1.3) — shrink the language pill a touch so it
+   doesn't crowd the tighter title/meta stack below it. */
+#farm-maps-list .osu-lang-badge {
+    font-size: 0.64rem;
+    padding: 2px 8px;
+    margin-bottom: 6px;
 }
 #farm-maps-list .osu-card-title {
     font-size: 0.85rem;
