@@ -55,6 +55,13 @@ a:hover { text-decoration: underline; }
        viewports where 3.6:1 would be shorter than the header's own content;
        max-height (lowered to 50vh) keeps a big screen's header from eating
        the fold. */
+    /* width must be pinned: with aspect-ratio set, once max-height clamps
+       the height the browser will otherwise shrink the *width* to keep the
+       3.6:1 ratio (e.g. 569px tall -> only 2048px wide), leaving a bare
+       strip down the side of the viewport. Pinning width to 100% makes
+       height the only flexible dimension, so max-height just crops the
+       cover vertically as intended. */
+    width: 100%;
     aspect-ratio: 3.6 / 1;
     min-height: 220px;
     max-height: 50vh;
