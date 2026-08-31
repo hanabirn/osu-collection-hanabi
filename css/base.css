@@ -1587,6 +1587,14 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .app-tooltip[data-placement="bottom"] { transform: translateY(-4px); }
 .app-tooltip.visible { opacity: 1; transform: translateY(0); }
+.app-tooltip-body { display: flex; flex-direction: column; min-width: 0; }
+.app-tooltip-desc {
+    margin-top: 3px;
+    font-size: 0.92em;
+    font-weight: 500;
+    line-height: 1.4;
+    opacity: 0.72;
+}
 
 /* Rotated square sharing the bubble's fill + the two accent edges that
    face outward; sits a hair behind the bubble body so its inner half is

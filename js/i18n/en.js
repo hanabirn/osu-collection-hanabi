@@ -27,7 +27,7 @@ I18N.en = {
     skins_upload_done: 'Added {n} file(s)', skins_upload_fail: 'Failed to upload "{n}"', skins_load_fail: 'Failed to load the skins list — check that your browser allows local storage',
 
     osu_title: '♫ Add Beatmap ♫', osu_placeholder: 'Enter ID or paste osu! URL', osu_add: 'Add',
-    osu_password: 'Set a password to protect publish / edit actions',
+    osu_password: 'Set a collection password\nPublishing to the gallery and importing / exporting will then ask for it',
     osu_refresh_all_title: 'Re-fetch the latest data for every map (star rating, status)',
     tools_group_io: 'Import / export', tools_group_tools: 'Tools & settings',
     howto_summary: 'How does this work?',
@@ -56,7 +56,7 @@ I18N.en = {
     osu_copied: 'Copied!', mapped_by: 'mapped by {n}',
     osu_page_title: '✦ osu! Song Collection + Total PP Lookup ✦', visitor_lookup_title: '✦ Look Up Your osu! PP ✦', visitor_lookup_placeholder: 'Enter osu! username or ID', visitor_lookup_btn: 'Search', osu_login_btn: 'Login with osu!', osu_logout_btn: 'Log out', osu_login_fail: 'osu! login failed, please try again',
     osu_profile_import_confirm: 'Found your osu! account. Import your favourite beatmaps plus your 50 most-played into your collection? (Nothing existing is overwritten.)',
-    osu_profile_import_btn_title: 'Pull your osu! favourites / most-played in one click (login)',
+    osu_profile_import_btn_title: 'Pull favourites / most-played from your osu! account\nNeeds login; only adds maps you don’t have, never overwrites',
     osu_profile_importing: 'Importing from your osu! profile... {done}/{total}',
     osu_profile_import_fail: "Couldn't read your osu! profile, please try again later",
     osu_profile_import_empty: 'Your osu! profile has no favourites or most-played sets to import',
@@ -107,7 +107,7 @@ I18N.en = {
     pp_history_title: 'PP Growth', pp_history_empty: 'Not enough history yet — visit again later to build up the trend.',
     osu_stats_total: 'Total Collected', osu_stats_avg_rating: 'Avg Rating', osu_stats_max_rating: 'Max Rating',
     featured_beatmap_label: '✦ Featured Today ✦',
-    osu_export: 'Download your collection as a JSON backup', osu_import: 'Restore a collection from a JSON file you exported',
+    osu_export: 'Download your collection as a JSON backup', osu_import: 'Restore a collection from a JSON backup\nPick a .json you downloaded earlier with Export — adds its maps and categories',
     osu_export_done: 'Collection exported!', osu_import_done: 'Collection imported!', osu_import_fail: 'Import failed. Please check the file format.',
     osu_import_fail_json: 'Import failed: this file is not valid JSON.', osu_import_fail_format: 'Import failed: the file is missing collection data (the "collection" field).',
 
@@ -211,7 +211,7 @@ I18N.en = {
     fc_sim_btn: 'FC sim', fc_sim_btn_title: 'Estimate PP if this map were FC\'d',
     fc_sim_popover_title: 'PP if FC', fc_sim_loading: 'Calculating...', fc_sim_error: 'Calculation failed, please try again later',
 
-    check_played_btn_title: "Mark which maps on this page you've played (login)", play_status_unplayed_title: "You haven't played this map yet (hardest difficulty)",
+    check_played_btn_title: "Mark which maps on this page you've played\nNeeds osu! login; checks your best score on each map", play_status_unplayed_title: "You haven't played this map yet (hardest difficulty)",
     play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
 
     pp_race_title: 'PP Race',

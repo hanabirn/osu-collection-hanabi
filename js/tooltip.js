@@ -16,7 +16,7 @@
 (function () {
     'use strict';
 
-    var tipEl, textNode, arrowEl;
+    var tipEl, titleEl, descEl, arrowEl;
     var currentTarget = null;   // tooltip is showing for this element
     var pendingTarget = null;   // hover timer is counting down for this one
     var showTimer;
@@ -28,9 +28,18 @@
         tipEl.setAttribute('role', 'tooltip');
         arrowEl = document.createElement('span');
         arrowEl.className = 'app-tooltip-arrow';
-        textNode = document.createTextNode('');
+        var body = document.createElement('span');
+        body.className = 'app-tooltip-body';
+        titleEl = document.createElement('span');
+        titleEl.className = 'app-tooltip-title';
+        // Second line: prerequisite / detail for the deeper buttons. Fed by
+        // a newline in the data-tip (title) text; hidden when there isn't one.
+        descEl = document.createElement('span');
+        descEl.className = 'app-tooltip-desc';
+        body.appendChild(titleEl);
+        body.appendChild(descEl);
         tipEl.appendChild(arrowEl);
-        tipEl.appendChild(textNode);
+        tipEl.appendChild(body);
         document.body.appendChild(tipEl);
         // Paint the resting (opacity:0) state once so the first show still
         // transitions rather than snapping.
@@ -87,7 +96,16 @@
         build();
         pendingTarget = null;
         currentTarget = target;
-        textNode.nodeValue = text;
+        var nl = text.indexOf('\n');
+        if (nl === -1) {
+            titleEl.textContent = text;
+            descEl.textContent = '';
+            descEl.style.display = 'none';
+        } else {
+            titleEl.textContent = text.slice(0, nl);
+            descEl.textContent = text.slice(nl + 1).replace(/\n/g, ' ').trim();
+            descEl.style.display = descEl.textContent ? '' : 'none';
+        }
         place(target);
         tipEl.classList.add('visible');
     }

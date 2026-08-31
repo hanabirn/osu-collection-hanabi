@@ -27,7 +27,7 @@ I18N.zh = {
     skins_backup_restore: '還原到本機', skins_backup_restored: '已還原到本機', skins_by_author: '作者：{author}',
 
     osu_title: '♫ 新增 Beatmap ♫', osu_placeholder: '輸入 ID 或貼上 osu! 網址', osu_add: '新增',
-    osu_password: '設定密碼，保護發佈 / 編輯等操作',
+    osu_password: '設定收藏密碼\n之後發佈到 gallery、匯入 / 匯出等操作會要求輸入這組密碼',
     osu_refresh_all_title: '重新抓取所有圖的最新資料（星數、狀態）',
     tools_group_io: '收藏進出', tools_group_tools: '工具・設定',
     howto_summary: '怎麼用？',
@@ -56,7 +56,7 @@ I18N.zh = {
     osu_copied: '已複製！', mapped_by: 'mapped by {n}',
     osu_page_title: '✦ osu!歌曲收藏+查詢個人總PP ✦', visitor_lookup_title: '✦ 查詢你的 osu! PP ✦', visitor_lookup_placeholder: '輸入 osu! 用戶名或 ID', visitor_lookup_btn: '查詢', osu_login_btn: 'osu! 登入', osu_logout_btn: '登出', osu_login_fail: 'osu! 登入失敗，請再試一次',
     osu_profile_import_confirm: '偵測到你的 osu! 帳號。要把你在 osu! 的最愛，以及最常玩的前 50 張圖，匯入收藏嗎？（不會覆蓋現有資料）',
-    osu_profile_import_btn_title: '一鍵帶入你 osu! 帳號的最愛 / 常玩（需登入）',
+    osu_profile_import_btn_title: '從 osu! 帳號帶入最愛 / 常玩\n需要先登入；不會覆蓋現有收藏，只補你還沒有的圖',
     osu_profile_importing: '正在從 osu! 個人檔案匯入... {done}/{total}',
     osu_profile_import_fail: '讀取 osu! 個人檔案失敗，請稍後再試',
     osu_profile_import_empty: '你的 osu! 個人檔案沒有可匯入的最愛或常玩圖譜',
@@ -107,7 +107,7 @@ I18N.zh = {
     pp_history_title: 'PP 成長趨勢', pp_history_empty: '還沒有足夠的紀錄，多來看看就會累積趨勢圖！',
     osu_stats_total: '收藏總數', osu_stats_avg_rating: '平均星數', osu_stats_max_rating: '最高星數',
     featured_beatmap_label: '✦ 今日推薦 ✦',
-    osu_export: '下載收藏成 JSON 備份檔', osu_import: '從先前匯出的 JSON 檔還原收藏',
+    osu_export: '下載收藏成 JSON 備份檔', osu_import: '從 JSON 備份還原收藏\n選一個你先前用「匯出」下載的 .json 檔，把圖和分類補回來',
     osu_export_done: '已匯出收藏！', osu_import_done: '已匯入收藏！', osu_import_fail: '匯入失敗，請確認檔案格式正確',
     osu_import_fail_json: '匯入失敗，這個檔案不是有效的 JSON', osu_import_fail_format: '匯入失敗，檔案內缺少收藏資料（collection 欄位）',
 
@@ -211,7 +211,7 @@ I18N.zh = {
     fc_sim_btn: 'FC 模擬', fc_sim_btn_title: '模擬這張圖 FC 後大概多少 PP',
     fc_sim_popover_title: 'FC 預估 PP', fc_sim_loading: '計算中...', fc_sim_error: '計算失敗，請稍後再試',
 
-    check_played_btn_title: '標出這頁哪些圖你已經打過（需登入）', play_status_unplayed_title: '你還沒玩過這張圖（最高難度）',
+    check_played_btn_title: '標出這頁已遊玩的圖\n需要先用 osu! 登入；會逐張查你在該圖的最佳成績', play_status_unplayed_title: '你還沒玩過這張圖（最高難度）',
     play_status_played_title: '你打過這張圖，評級 {rank}', play_status_fc_title: '你 FC 過這張圖，評級 {rank}',
 
     pp_race_title: 'PP 賽跑',
