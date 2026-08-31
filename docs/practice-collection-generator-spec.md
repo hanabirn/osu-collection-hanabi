@@ -260,9 +260,14 @@ async function generatePracticeCollection(kind, opts = {}) {
 ## 9. 風險 / 取捨
 
 - **farm dataset 不完整**：`farm-maps-list` 是漸進式爬蟲產物，不是完整 ranked pool。
-  **決策：覆蓋不足時擋下產出**（不做「照樣產出並標示」）。擋下條件（任一成立）：
-  - 帶好 pp/star/mods filter 的查詢 `total < N_MIN`（連一個最小練習收藏都湊不滿）；
-  - `coverage.computedCount / max(coverage.totalKnown, 1) < 0.15`。
+  **決策：覆蓋不足時擋下產出**（不做「照樣產出並標示」）。擋下條件：
+  帶好 pp/star/mods filter 的查詢 `total < N_MIN`（連一個最小練習收藏都湊不滿）。
+
+  > 實測修正（2026-08-30）：原本規劃帶 `farmOnly=1`，但那個 flag 只留爬蟲判定為
+  > DT farm 的 ~700 張，任何 pp/star 帶都湊不到 40。改成**不帶 `farmOnly`**，用整個
+  > 已算 pp 的 5.5★+ 資料集（~7 萬張）——「突破分」本來就只需要「你 pp 帶內、還沒
+  > 打過的 ranked 圖」。`coverage.totalKnown` 是被 cap 在 10000 的髒欄位，原本的
+  > 比例門檻沒意義，已移除，只留 `total < N_MIN`。
 
   擋下時 status 顯示：「farm 資料庫在這個難度 / pp 區間的覆蓋還不夠，無法產生可靠的
   練習收藏，晚點再試」。之後可擴 crawler，或補用 osu! API v2 `/beatmaps` 搜尋

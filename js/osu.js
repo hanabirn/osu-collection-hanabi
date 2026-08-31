@@ -1432,7 +1432,6 @@ const PRACTICE_N_MIN = 40;
 const PRACTICE_N_MAX = 60;
 const PRACTICE_MODE = 0;                 // MVP: standard only
 const PRACTICE_MODE_NAME = 'osu';        // farm-maps-list `mode` param
-const PRACTICE_COVERAGE_MIN_RATIO = 0.15;
 const PRACTICE_GOOD_ACC = 95;            // a top-100 play at >= this acc counts as "already done"
 
 function practiceMedian(nums) {
@@ -1491,7 +1490,11 @@ async function practiceCollectFarmBand(band, want, onProgress) {
     const qs = new URLSearchParams({
         mode: PRACTICE_MODE_NAME,
         mods: band.mods,
-        farmOnly: '1',
+        // No farmOnly: that flag keeps only the ~700 maps the crawler tags as
+        // active DT-abuse farm, which is far too narrow to fill a pp/star
+        // band. "Break into your top 100" just needs any ranked 5.5*+ map in
+        // range you haven't done — the whole computed dataset (~70k) is fair
+        // game. (A "prefer farm maps" toggle could come back later.)
         ppMin: band.ppMin.toFixed(1),
         ppMax: band.ppMax.toFixed(1),
         starMin: band.starMin.toFixed(2),
@@ -1514,10 +1517,12 @@ async function practiceCollectFarmBand(band, want, onProgress) {
     return { items, total, coverage };
 }
 
-function practiceCoverageBlocked(total, coverage) {
-    if (total < PRACTICE_N_MIN) return true;
-    const known = Math.max(1, coverage.totalKnown || 0);
-    return (coverage.computedCount || 0) / known < PRACTICE_COVERAGE_MIN_RATIO;
+/* Gate: not enough maps in this pp/star band to build a real collection.
+   `coverage.totalKnown` turned out to be a stale/capped field so the old
+   ratio check was meaningless — the honest signal is just how many rows the
+   band actually matched. */
+function practiceCoverageBlocked(total) {
+    return total < PRACTICE_N_MIN;
 }
 
 function practiceExistingSetIds() {
@@ -1598,7 +1603,7 @@ async function generatePracticeCollection(kind) {
         setS(t('osu_profile_import_fail'), '#ff5252');
         return;
     }
-    if (practiceCoverageBlocked(farm.total, farm.coverage)) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
+    if (practiceCoverageBlocked(farm.total)) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
 
     const have = practiceExistingSetIds();
     const seenSet = new Set();
