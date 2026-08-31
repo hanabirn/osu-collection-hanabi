@@ -102,7 +102,10 @@
    - recent 裡 pass 且 acc < 96% 的。
 3. 去重、映射到 `beatmapset_id`（recent/best 回傳有 `beatmap_id`；用現有的
    `b=<id>` chunk 查 set，pattern 見 `generateCollectionFor('best')`）。
-4. 套共同排除規則裡的「已在收藏」（這裡**不**套「已有好成績」，因為重點就是回去重打）。
+4. **不套任何共同排除規則**。實測修正（2026-08-30）：原本要套「已在收藏」，
+   但會整理收藏的人，弱項圖幾乎全都已經在收藏裡了 → 產出永遠是空。這個類型的價值
+   是「重練清單」這個聚焦分類本身，不是新增圖；`applyImportedCollections()` 本來
+   就會把已存在的 set 也歸進新分類名下。也不套「已有好成績」——重點就是回去重打。
 
 **輸出**：`name = t('practice_cat_acc')`。
 

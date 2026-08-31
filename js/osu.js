@@ -1535,12 +1535,16 @@ async function practiceCandidatesLowAcc(uid, mode, top, onProgress) {
     low.sort((a, b) => a[1] - b[1]); // worst acc first
 
     await practiceResolveMissingDetails(low.map(([bid]) => bid), top.detailByBeatmap, onProgress);
-    const have = practiceExistingSetIds();
+    // Unlike push/goal/taste this does NOT drop maps already in the
+    // collection — a curator's weak plays are almost all already collected,
+    // and the value here is the focused re-grind category, not new adds.
+    // applyImportedCollections() still files an existing set under the new
+    // category name.
     const seen = new Set();
     const entries = [];
     for (const [bid] of low) {
         const d = top.detailByBeatmap.get(bid);
-        if (!d || !d.setId || have.has(d.setId) || seen.has(d.setId)) continue;
+        if (!d || !d.setId || seen.has(d.setId)) continue;
         seen.add(d.setId);
         entries.push({ setId: d.setId });
         if (entries.length >= PRACTICE_N_MAX) break;
