@@ -1485,6 +1485,8 @@ async function practiceResolveMissingDetails(beatmapIds, detailByBeatmap, onProg
                 creator: b.creator || null,
                 bpm: parseFloat(b.bpm) || null,
                 length: parseInt(b.total_length) || null,
+                ar: b.diff_approach != null ? parseFloat(b.diff_approach) : null,
+                cs: b.diff_size != null ? parseFloat(b.diff_size) : null,
             });
         });
     }
@@ -1500,6 +1502,12 @@ const PRACTICE_WEAK_BUCKETS = [
     { dim: 'bpm_low',   band: { bpmMax: 160 },                hit: d => d.bpm != null && d.bpm < 160 },
     { dim: 'bpm_mid',   band: { bpmMin: 160, bpmMax: 200 },   hit: d => d.bpm != null && d.bpm >= 160 && d.bpm <= 200 },
     { dim: 'bpm_high',  band: { bpmMin: 200 },                hit: d => d.bpm != null && d.bpm > 200 },
+    { dim: 'ar_low',    band: { arMax: 8.3 },                 hit: d => d.ar != null && d.ar < 8.3 },
+    { dim: 'ar_mid',    band: { arMin: 8.3, arMax: 9.3 },     hit: d => d.ar != null && d.ar >= 8.3 && d.ar <= 9.3 },
+    { dim: 'ar_high',   band: { arMin: 9.3 },                 hit: d => d.ar != null && d.ar > 9.3 },
+    { dim: 'cs_low',    band: { csMax: 3.7 },                 hit: d => d.cs != null && d.cs < 3.7 },
+    { dim: 'cs_mid',    band: { csMin: 3.7, csMax: 4.3 },     hit: d => d.cs != null && d.cs >= 3.7 && d.cs <= 4.3 },
+    { dim: 'cs_high',   band: { csMin: 4.3 },                 hit: d => d.cs != null && d.cs > 4.3 },
 ];
 
 function practicePickWeakestBucket(top) {
@@ -1652,10 +1660,10 @@ async function practiceCollectFarmBand(band, want, onProgress) {
         starMax: band.starMax.toFixed(2),
         sort: band.sort,
     });
-    // pp band: push/goal set it, 弱項 doesn't (it filters on bpm/length)
+    // pp band: push/goal set it, 弱項 doesn't (it filters on bpm/length/ar/cs)
     if (band.ppMin != null) qs.set('ppMin', band.ppMin.toFixed(1));
     if (band.ppMax != null) qs.set('ppMax', band.ppMax.toFixed(1));
-    for (const k of ['bpmMin', 'bpmMax', 'lengthMin', 'lengthMax']) {
+    for (const k of ['bpmMin', 'bpmMax', 'lengthMin', 'lengthMax', 'arMin', 'arMax', 'csMin', 'csMax']) {
         if (band[k] != null) qs.set(k, String(band[k]));
     }
     const get = (page) => fetch(`/.netlify/functions/farm-maps-list?${qs}&page=${page}`).then(r => r.json());

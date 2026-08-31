@@ -70,6 +70,8 @@ I18N.zh = {
     practice_cat_lowacc: '🎯 低準度重練', practice_cat_taste: '🎯 相似圖', practice_cat_weak: '🎯 弱項：{dim}',
     practice_dim_len_short: '短圖（<90秒）', practice_dim_len_mid: '中等長度（90–150秒）', practice_dim_len_long: '長圖（>150秒）',
     practice_dim_bpm_low: '低 BPM（<160）', practice_dim_bpm_mid: '中 BPM（160–200）', practice_dim_bpm_high: '高 BPM（>200）',
+    practice_dim_ar_low: '低 AR（<8.3）', practice_dim_ar_mid: '中 AR（8.3–9.3）', practice_dim_ar_high: '高 AR（>9.3）',
+    practice_dim_cs_low: '低 CS（<3.7）', practice_dim_cs_mid: '中 CS（3.7–4.3）', practice_dim_cs_high: '高 CS（>4.3）',
     practice_weak_none: '你的 top plays 在各長度／BPM 都很平均，沒有明顯弱項',
     practice_progress_title: '練習進度',
     practice_progress_loading: '讀取練習進度…',

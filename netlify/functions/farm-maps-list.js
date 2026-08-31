@@ -38,6 +38,8 @@ exports.handler = async (event) => {
     const starMin = num(qs.starMin), starMax = num(qs.starMax);
     const bpmMin = num(qs.bpmMin), bpmMax = num(qs.bpmMax);
     const lengthMin = num(qs.lengthMin), lengthMax = num(qs.lengthMax);
+    const arMin = num(qs.arMin), arMax = num(qs.arMax);
+    const csMin = num(qs.csMin), csMax = num(qs.csMax);
 
     const [sortField, sortDir] = (qs.sort || 'pp_desc').split('_');
     const SORT_FIELDS = { pp: '__pp', star: '__star', bpm: 'bpm', length: 'total_length', new: 'firstSeenAt' };
@@ -63,6 +65,10 @@ exports.handler = async (event) => {
         if (bpmMax !== null) items = items.filter(r => (r.bpm || 0) <= bpmMax);
         if (lengthMin !== null) items = items.filter(r => (r.total_length || 0) >= lengthMin);
         if (lengthMax !== null) items = items.filter(r => (r.total_length || 0) <= lengthMax);
+        if (arMin !== null) items = items.filter(r => r.ar != null && r.ar >= arMin);
+        if (arMax !== null) items = items.filter(r => r.ar != null && r.ar <= arMax);
+        if (csMin !== null) items = items.filter(r => r.cs != null && r.cs >= csMin);
+        if (csMax !== null) items = items.filter(r => r.cs != null && r.cs <= csMax);
         if (q) {
             items = items.filter(r =>
                 (r.title || '').toLowerCase().includes(q) ||
