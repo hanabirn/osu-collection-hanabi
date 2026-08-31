@@ -1510,11 +1510,13 @@ const PRACTICE_WEAK_BUCKETS = [
     { dim: 'cs_high',   band: { csMin: 4.3 },                 hit: d => d.cs != null && d.cs > 4.3 },
     // stream/jump — needsRatio: only considered when the top plays have
     // been enriched with a speedRatio (via osu-pp, behind the 精算
-    // checkbox). Farm query uses a BPM proxy plus srMin/srMax; srRange also
-    // refines the candidates client-side where they carry a speedRatio.
-    { dim: 'sr_jump',   needsRatio: true, srRange: [0, 0.42],    band: { srMax: 0.42, bpmMax: 190 },  hit: d => d.speedRatio != null && d.speedRatio < 0.42 },
-    { dim: 'sr_bal',    needsRatio: true, srRange: [0.42, 0.55], band: { srMin: 0.42, srMax: 0.55 },  hit: d => d.speedRatio != null && d.speedRatio >= 0.42 && d.speedRatio <= 0.55 },
-    { dim: 'sr_stream', needsRatio: true, srRange: [0.55, 1],    band: { srMin: 0.55, bpmMin: 170 },  hit: d => d.speedRatio != null && d.speedRatio > 0.55 },
+    // checkbox). The farm query uses only a BPM proxy — srMin/srMax would
+    // hard-drop every map the crawler hasn't recomputed with aim/speed yet
+    // (currently ~all of them). srRange refines the candidates client-side
+    // for the ones that do carry a speedRatio, sharpening as recrawls land.
+    { dim: 'sr_jump',   needsRatio: true, srRange: [0, 0.42],    band: { bpmMax: 190 }, hit: d => d.speedRatio != null && d.speedRatio < 0.42 },
+    { dim: 'sr_bal',    needsRatio: true, srRange: [0.42, 0.55], band: {},              hit: d => d.speedRatio != null && d.speedRatio >= 0.42 && d.speedRatio <= 0.55 },
+    { dim: 'sr_stream', needsRatio: true, srRange: [0.55, 1],    band: { bpmMin: 170 }, hit: d => d.speedRatio != null && d.speedRatio > 0.55 },
 ];
 
 /* Pick the weak spot: the bucket with the lowest share *within its own
