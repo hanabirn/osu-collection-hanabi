@@ -87,6 +87,7 @@ I18N.ko = {
     practice_progress_loading: '연습 진행 상황 불러오는 중…',
     practice_progress_dpp: '총 pp {d}',
     practice_progress_hits: '{n}/{total}개가 top 100에 진입',
+    practice_precise_label: 'pp 정밀 계산 (느림)', practice_precise_pp: 'pp 정밀 계산 중… ({done}/{total})',
     ctools_health_hint: '컬렉션에서 중복, 삭제된 맵, 비 ranked, 난이도 수 변경을 검사합니다.', ctools_health_scan: '컬렉션 검사',
     ctools_health_scanning: '검사 중... {done}/{total}',
     ctools_health_dupes: '중복 세트: {n}', ctools_health_dead: 'osu!에서 삭제됨: {n}', ctools_health_diffchanged: '난이도 수 변경: {n}', ctools_health_nonranked: '비 ranked (graveyard/pending 등): {n}',

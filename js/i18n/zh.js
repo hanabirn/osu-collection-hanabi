@@ -77,6 +77,7 @@ I18N.zh = {
     practice_progress_loading: '讀取練習進度…',
     practice_progress_dpp: '總 PP {d}',
     practice_progress_hits: '{n}/{total} 張進了你的 top 100',
+    practice_precise_label: '精算 pp（較慢）', practice_precise_pp: '精算 pp 中…（{done}/{total}）',
     practice_reading_top: '讀取你的 top plays…（{done}/{total}）',
     practice_reading_recent: '讀取最近成績…',
     practice_scanning_farm: '掃描 farm 圖池…（{done}/{total}）',

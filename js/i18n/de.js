@@ -87,6 +87,7 @@ I18N.de = {
     practice_progress_loading: 'Lade Übungs-Fortschritt…',
     practice_progress_dpp: 'Gesamt-pp {d}',
     practice_progress_hits: '{n}/{total} jetzt in deinen Top 100',
+    practice_precise_label: 'Genaues pp (langsamer)', practice_precise_pp: 'pp wird berechnet… ({done}/{total})',
     ctools_health_hint: 'Die Sammlung auf Duplikate, gelöschte Maps, nicht-ranked Sets und geänderte Schwierigkeitsanzahl prüfen.', ctools_health_scan: 'Sammlung prüfen',
     ctools_health_scanning: 'Prüfe... {done}/{total}',
     ctools_health_dupes: 'Doppelte Sets: {n}', ctools_health_dead: 'Aus osu! entfernt: {n}', ctools_health_diffchanged: 'Schwierigkeitsanzahl geändert: {n}', ctools_health_nonranked: 'Nicht ranked (Graveyard/Pending usw.): {n}',

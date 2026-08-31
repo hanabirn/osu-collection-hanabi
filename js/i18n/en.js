@@ -77,6 +77,7 @@ I18N.en = {
     practice_progress_loading: 'Loading practice progress…',
     practice_progress_dpp: 'total pp {d}',
     practice_progress_hits: '{n}/{total} now in your top 100',
+    practice_precise_label: 'Accurate pp (slower)', practice_precise_pp: 'Computing pp… ({done}/{total})',
     practice_reading_top: 'Reading your top plays… ({done}/{total})',
     practice_reading_recent: 'Reading recent plays…',
     practice_scanning_farm: 'Scanning the farm pool… ({done}/{total})',

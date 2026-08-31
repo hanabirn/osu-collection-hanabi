@@ -87,6 +87,7 @@ I18N.ja = {
     practice_progress_loading: '練習の進捗を読み込み中…',
     practice_progress_dpp: '合計 PP {d}',
     practice_progress_hits: '{n}/{total} 件が top 100 入り',
+    practice_precise_label: 'pp を精密計算（低速）', practice_precise_pp: 'pp を精密計算中…（{done}/{total}）',
     ctools_health_hint: 'コレクションをスキャンして、重複・削除済み・非 ranked・難易度数の変化を検出します。', ctools_health_scan: 'スキャン',
     ctools_health_scanning: 'スキャン中... {done}/{total}',
     ctools_health_dupes: '重複した譜面: {n}', ctools_health_dead: 'osu! から削除済み: {n}', ctools_health_diffchanged: '難易度数が変化: {n}', ctools_health_nonranked: '非 ranked（graveyard/pending など）: {n}',

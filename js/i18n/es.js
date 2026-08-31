@@ -87,6 +87,7 @@ I18N.es = {
     practice_progress_loading: 'Cargando el progreso de práctica…',
     practice_progress_dpp: 'pp total {d}',
     practice_progress_hits: '{n}/{total} ahora en tu top 100',
+    practice_precise_label: 'pp preciso (más lento)', practice_precise_pp: 'Calculando pp… ({done}/{total})',
     ctools_health_hint: 'Escanea la colección en busca de duplicados, mapas eliminados, sets no ranked y cambios en el número de dificultades.', ctools_health_scan: 'Escanear colección',
     ctools_health_scanning: 'Escaneando... {done}/{total}',
     ctools_health_dupes: 'Sets duplicados: {n}', ctools_health_dead: 'Eliminados de osu!: {n}', ctools_health_diffchanged: 'Nº de dificultades cambió: {n}', ctools_health_nonranked: 'No ranked (graveyard/pending/etc.): {n}',

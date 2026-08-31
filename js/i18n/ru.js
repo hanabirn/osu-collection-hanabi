@@ -87,6 +87,7 @@ I18N.ru = {
     practice_progress_loading: 'Загрузка прогресса тренировок…',
     practice_progress_dpp: 'общий pp {d}',
     practice_progress_hits: '{n}/{total} теперь в вашем топ-100',
+    practice_precise_label: 'Точный расчёт pp (медленно)', practice_precise_pp: 'Точный расчёт pp… ({done}/{total})',
     ctools_health_hint: 'Проверить коллекцию на дубликаты, удалённые карты, не-ranked и изменение числа сложностей.', ctools_health_scan: 'Проверить коллекцию',
     ctools_health_scanning: 'Проверка... {done}/{total}',
     ctools_health_dupes: 'Дубликаты наборов: {n}', ctools_health_dead: 'Удалено из osu!: {n}', ctools_health_diffchanged: 'Изменилось число сложностей: {n}', ctools_health_nonranked: 'Не ranked (graveyard/pending и т. п.): {n}',

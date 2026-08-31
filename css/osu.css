@@ -1942,6 +1942,16 @@
     margin: 12px 0 6px;
 }
 .ctools-practice-row .btn { flex: 1; }
+.ctools-practice-precise {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: -2px 0 8px;
+    cursor: pointer;
+}
+.ctools-practice-precise input { cursor: pointer; }
 .ctools-practice-mods {
     padding: 9px 10px;
     border-radius: 8px;

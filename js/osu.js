@@ -1756,7 +1756,8 @@ async function generatePracticeCollection(kind) {
         return practiceApplyAndReport(kind, recOpts, entries, setS);
     }
 
-    let band, weakDim = null;
+    const precise = !!(document.getElementById('ctools-practice-precise') || {}).checked;
+    let band, weakDim = null, needed = null;
     if (kind === 'push') {
         band = {
             mods,
@@ -1787,7 +1788,7 @@ async function generatePracticeCollection(kind) {
         const actualTotal = currentTotalPp || 0;
         if (actualTotal && actualTotal >= target) { setS(t('practice_goal_reached'), '#34d399'); return; }
         const bonusPp = Math.max(0, actualTotal - weightedPpSum(top.ppList));
-        const needed = ppNeededForTarget(top.ppList, bonusPp, target);
+        needed = ppNeededForTarget(top.ppList, bonusPp, target);
         const starMax = top.star90 + 0.3;
         band = {
             mods,
@@ -1812,18 +1813,55 @@ async function generatePracticeCollection(kind) {
 
     const have = practiceExistingSetIds();
     const seenSet = new Set();
-    const entries = [];
+    const candidates = [];
     for (const r of farm.items) {
         const sid = parseInt(r.beatmapset_id);
         if (!sid || have.has(sid) || seenSet.has(sid)) continue;
         if (top.goodScoreBeatmapIds.has(parseInt(r.beatmap_id))) continue;
         seenSet.add(sid);
-        entries.push({ setId: sid, beatmapId: parseInt(r.beatmap_id) || null });
-        if (entries.length >= PRACTICE_N_MAX) break;
+        candidates.push({ setId: sid, beatmapId: parseInt(r.beatmap_id) || null, farmPp: parseFloat(r.pp) || 0 });
+        if (candidates.length >= PRACTICE_N_MAX * 2) break;
     }
+    if (candidates.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
+
+    let ranked = candidates;
+    if (precise && (kind === 'push' || kind === 'goal')) {
+        const reranked = await practicePrecisePpRerank(kind, candidates, { mods, p100: top.p100, needed }, setS);
+        if (reranked.length >= PRACTICE_N_MIN) ranked = reranked; // else keep the farm-pp order
+    }
+    const entries = ranked.slice(0, PRACTICE_N_MAX).map(c => ({ setId: c.setId, beatmapId: c.beatmapId }));
     if (entries.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
 
     return practiceApplyAndReport(kind, { ...recOpts, target, dim: weakDim }, entries, setS);
+}
+
+/* Optional accurate pass for push/goal: re-score up to 2×N_MAX candidates
+   with rosu-pp (the osu-pp function, FC/100% pp) instead of trusting the
+   farm dataset's precomputed pp, then re-rank —
+   push by the biggest jump, goal by closeness to the pp still needed.
+   One function call per candidate, so it's behind a checkbox. */
+async function practicePrecisePpRerank(kind, candidates, ctx, setS) {
+    const pool = candidates.slice(0, PRACTICE_N_MAX * 2);
+    const CH = 6;
+    for (let i = 0; i < pool.length; i += CH) {
+        setS(t('practice_precise_pp', { done: i, total: pool.length }));
+        await Promise.all(pool.slice(i, i + CH).map(async c => {
+            if (!c.beatmapId) return;
+            try {
+                const qs = new URLSearchParams({ id: String(c.beatmapId), acc: '100' });
+                if (ctx.mods && ctx.mods !== 'NM') qs.set('mods', ctx.mods);
+                const r = await fetch(`/.netlify/functions/osu-pp?${qs}`).then(x => x.json());
+                if (r && r.pp && r.pp['100'] != null) c.accPp = r.pp['100'];
+            } catch { /* leave c.accPp unset → dropped below */ }
+        }));
+    }
+    const scored = pool.filter(c => c.accPp != null);
+    if (scored.length < PRACTICE_N_MIN) return [];
+    if (kind === 'push') {
+        return scored.filter(c => c.accPp > ctx.p100).sort((a, b) => b.accPp - a.accPp);
+    }
+    return scored.filter(c => c.accPp >= (ctx.needed || 0) * 0.9)
+                 .sort((a, b) => Math.abs(a.accPp - ctx.needed) - Math.abs(b.accPp - ctx.needed));
 }
 
 /* Shared tail: hand the picked set ids to the normal import pipeline (set

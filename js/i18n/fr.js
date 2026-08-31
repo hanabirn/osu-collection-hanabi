@@ -87,6 +87,7 @@ I18N.fr = {
     practice_progress_loading: 'Chargement de la progression…',
     practice_progress_dpp: 'pp total {d}',
     practice_progress_hits: '{n}/{total} désormais dans ton top 100',
+    practice_precise_label: 'pp précis (plus lent)', practice_precise_pp: 'Calcul du pp… ({done}/{total})',
     ctools_health_hint: 'Analyser la collection : doublons, maps supprimées, sets non ranked, changement du nombre de difficultés.', ctools_health_scan: 'Analyser la collection',
     ctools_health_scanning: 'Analyse... {done}/{total}',
     ctools_health_dupes: 'Sets en double : {n}', ctools_health_dead: 'Supprimés d\'osu! : {n}', ctools_health_diffchanged: 'Nombre de difficultés modifié : {n}', ctools_health_nonranked: 'Non ranked (graveyard/pending/etc.) : {n}',
