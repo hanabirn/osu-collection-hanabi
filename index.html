@@ -31,10 +31,14 @@
 <!-- The Google Fonts stylesheet is an external-origin round trip and the
      single most expensive thing on the critical path: load it as
      media="print", then flip to "all" once it arrives, so FCP no longer
-     waits on it (Noto swaps in afterwards via font-display=swap).
+     waits on it. display=optional (not swap): a first visit that can't
+     fetch the multi-MB CJK woff2 within the ~100ms window keeps the system
+     CJK fallback for that pageview with NO late swap — that swap was the
+     main driver of the CLS regression. Repeat visits get the font from
+     FONT_CACHE (sw.js) instantly, so it renders in Noto from then on.
      particles.css stays blocking on purpose — it carries .bg-layer's
      position:fixed, and deferring it flashes that layer into document flow. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=optional" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/particles.css">
@@ -223,7 +227,13 @@
 <main class="site-main">
 
     <section id="page-collection" class="site-page">
-        <div id="collection-hero" class="collection-hero" hidden>
+        <!-- Visible by default: this is the empty-collection landing state a
+             first-time visitor (and Lighthouse) sees, and #page-collection
+             paints at FCP. updateCollectionHeroVisibility() sets .hidden on
+             it for a non-empty collection instead — that path is a returning
+             visitor, who takes one small collapse rather than the fresh
+             visitor taking a ~150px expansion after paint (CLS). -->
+        <div id="collection-hero" class="collection-hero">
             <p class="collection-hero-pitch" data-i18n="hero_pitch">一站整理你的 osu! 收藏：從遊戲匯入、依成績自動生成分類、一鍵匯出回遊戲。</p>
             <div class="collection-hero-feats">
                 <span class="collection-hero-feat" data-icon="package" data-icon-gap><span data-i18n="hero_feat_import">匯入遊戲的 collection.db / .osdb</span></span>
@@ -799,12 +809,16 @@
 
 <div id="site-update-toast" class="share-toast share-toast-clickable" onclick="applySiteUpdate()"></div>
 
-<!-- All deferred: nothing here needs to run before the document is parsed
-     (the theme bootstrap in <head> handles the one exception). defer keeps
-     execution in document order, so the global-dependency chain
-     (icons → theme, i18n.js → i18n/*, osu.js → main.js, …) still holds,
-     while ~600 KB of JS no longer blocks parsing or first paint. -->
-<script defer src="js/icons.js"></script>
+<!-- icons.js is the one exception to defer: renderStaticIcons() swaps every
+     [data-icon] slot for an <svg>, and if that runs after first paint every
+     header/hero icon shoves its neighbours (CLS). Run it inline, before
+     FCP, so the icons are already there. It's 16 KB and just defines
+     ICON_PATHS + two functions — cheap to parse synchronously here.
+     Everything else stays deferred; defer keeps document-order execution so
+     the global-dependency chain (i18n.js → i18n/*, osu.js → main.js, …)
+     still holds while ~580 KB of JS is off the critical path. -->
+<script src="js/icons.js"></script>
+<script>renderStaticIcons();</script>
 <script defer src="js/theme.js"></script>
 <script defer src="js/particles.js"></script>
 <script defer src="js/pwa.js"></script>

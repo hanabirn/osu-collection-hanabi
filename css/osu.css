@@ -64,6 +64,12 @@
     align-items: center;
     justify-content: center;
     gap: 10px 16px;
+    /* Reserve the CTA-button row height up front: #collection-hero-cta starts
+       [hidden] and #collection-hero-stats starts empty (both filled later by
+       initCollectionHero, one after an async fetch), so without this the row
+       is ~0px at first paint and then jumps to button height — a layout
+       shift right in the hero. */
+    min-height: 35px;
 }
 .collection-hero-stats {
     font-size: 0.8rem;
