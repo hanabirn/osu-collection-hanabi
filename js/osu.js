@@ -912,20 +912,28 @@ async function exportOsuCollectionDb() {
     }
 
     const generated = new Map();
-    const addToCollection = (name, beatmapsetIds) => {
+    const addToCollection = (name, beatmapsetIds, catId) => {
         if (!name) return;
         if (!generated.has(name)) generated.set(name, new Set());
         const bucket = generated.get(name);
+        const diffFilter = practiceDiffFilter(catId);
         beatmapsetIds.forEach(setId => {
             const set = setById.get(setId);
             if (!set) return;
-            set.beatmaps.forEach(b => { if (md5Map[b.beatmap_id]) bucket.add(md5Map[b.beatmap_id]); });
+            // Restrict to the practice-picked diffs only if this set actually
+            // has one of them cached — otherwise fall back to all diffs so a
+            // stale cache can't silently drop the whole set.
+            const restrict = diffFilter && set.beatmaps.some(b => diffFilter.has(b.beatmap_id)) ? diffFilter : null;
+            set.beatmaps.forEach(b => {
+                if (restrict && !restrict.has(b.beatmap_id)) return;
+                if (md5Map[b.beatmap_id]) bucket.add(md5Map[b.beatmap_id]);
+            });
         });
     };
 
     getOsuCategories().forEach(c => {
         const members = getOsuCategoryMembers()[c.id] || [];
-        if (members.length) addToCollection(c.name, members);
+        if (members.length) addToCollection(c.name, members, c.id);
     });
     const favorites = getOsuFavorites();
     if (favorites.length) addToCollection(t('osu_fav'), favorites);
@@ -1104,27 +1112,33 @@ function exportOsuOsdb() {
     const setById = new Map(allSets.map(s => [s.beatmapset_id, s]));
 
     const osdbCollections = [];
-    const addColl = (name, setIds) => {
+    const addColl = (name, setIds, catId) => {
         const beatmaps = [];
+        const diffFilter = practiceDiffFilter(catId);
         setIds.forEach(id => {
             const set = setById.get(id);
             if (!set) return;
-            (set.beatmaps || []).forEach(b => beatmaps.push({
-                mapId: b.beatmap_id || 0,
-                mapSetId: set.beatmapset_id,
-                artist: set.artist || '',
-                title: set.title || '',
-                diff: b.version || '',
-                md5: '',
-                mode: Number.isInteger(b.mode_int) ? b.mode_int : (set.mode || 0),
-                stars: b.difficulty_rating || 0,
-            }));
+            const all = set.beatmaps || [];
+            const restrict = diffFilter && all.some(b => diffFilter.has(b.beatmap_id)) ? diffFilter : null;
+            all.forEach(b => {
+                if (restrict && !restrict.has(b.beatmap_id)) return;
+                beatmaps.push({
+                    mapId: b.beatmap_id || 0,
+                    mapSetId: set.beatmapset_id,
+                    artist: set.artist || '',
+                    title: set.title || '',
+                    diff: b.version || '',
+                    md5: '',
+                    mode: Number.isInteger(b.mode_int) ? b.mode_int : (set.mode || 0),
+                    stars: b.difficulty_rating || 0,
+                });
+            });
         });
         if (beatmaps.length) osdbCollections.push({ name, beatmaps });
     };
 
     const members = getOsuCategoryMembers();
-    getOsuCategories().forEach(c => { if ((members[c.id] || []).length) addColl(c.name, members[c.id]); });
+    getOsuCategories().forEach(c => { if ((members[c.id] || []).length) addColl(c.name, members[c.id], c.id); });
     const favorites = getOsuFavorites();
     if (favorites.length) addColl(t('osu_fav'), favorites);
     if (osdbCollections.length === 0) addColl(t('collection_db_all_name'), allSets.map(s => s.beatmapset_id));
@@ -1436,6 +1450,7 @@ const PRACTICE_N_MAX = 60;
 const PRACTICE_MODE = 0;                 // MVP: standard only
 const PRACTICE_MODE_NAME = 'osu';        // farm-maps-list `mode` param
 const PRACTICE_GOOD_ACC = 95;            // a top-100 play at >= this acc counts as "already done"
+const PRACTICE_WEAK_LENGTH_CAP = 400;    // s — keep 弱項 targets to normal-length maps, no marathons
 
 function practiceMedian(nums) {
     if (!nums.length) return 0;
@@ -1579,7 +1594,7 @@ async function practiceCandidatesLowAcc(uid, mode, top, onProgress) {
         const d = top.detailByBeatmap.get(bid);
         if (!d || !d.setId || seen.has(d.setId)) continue;
         seen.add(d.setId);
-        entries.push({ setId: d.setId });
+        entries.push({ setId: d.setId, beatmapId: bid });
         if (entries.length >= PRACTICE_N_MAX) break;
     }
     return entries;
@@ -1614,11 +1629,11 @@ async function practiceCandidatesTaste(uid, mode, top, onProgress) {
             const bid = parseInt(r.beatmap_id), sid = parseInt(r.beatmapset_id);
             if (!sid || top.playedBeatmapIds.has(bid) || have.has(sid) || seen.has(sid)) continue;
             seen.add(sid);
-            scored.push({ setId: sid, dist: Math.abs(st - top.starMedian) });
+            scored.push({ setId: sid, beatmapId: bid, dist: Math.abs(st - top.starMedian) });
         }
     }
     scored.sort((a, b) => a.dist - b.dist);
-    return scored.slice(0, PRACTICE_N_MAX).map(x => ({ setId: x.setId }));
+    return scored.slice(0, PRACTICE_N_MAX).map(x => ({ setId: x.setId, beatmapId: x.beatmapId }));
 }
 
 /* Page farm-maps-list within a pp/star band, collecting up to `want` rows.
@@ -1750,6 +1765,9 @@ async function generatePracticeCollection(kind) {
         band = {
             mods,
             ...bucket.band,   // bpmMin/Max or lengthMin/Max
+            // Cap length so a high-BPM bucket doesn't fill up with 10-minute
+            // marathon compilations — not a practice target.
+            lengthMax: Math.min(bucket.band.lengthMax || Infinity, PRACTICE_WEAK_LENGTH_CAP),
             starMin: Math.max(0, top.starMedian - 0.7),
             starMax: top.starMedian + 0.7,
             sort: 'pp_desc',
@@ -1792,7 +1810,7 @@ async function generatePracticeCollection(kind) {
         if (!sid || have.has(sid) || seenSet.has(sid)) continue;
         if (top.goodScoreBeatmapIds.has(parseInt(r.beatmap_id))) continue;
         seenSet.add(sid);
-        entries.push({ setId: sid });
+        entries.push({ setId: sid, beatmapId: parseInt(r.beatmap_id) || null });
         if (entries.length >= PRACTICE_N_MAX) break;
     }
     if (entries.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
@@ -1818,6 +1836,10 @@ async function practiceApplyAndReport(kind, opts, entries, setS) {
             ppAtCreation: opts.ppAtCreation != null ? opts.ppAtCreation : null,
             userId: opts.userId || null,
             memberSetIds: entries.map(e => e.setId),
+            // the one difficulty per set this kind actually picked — used to
+            // narrow the .db / .osdb export so a 60-set practice collection
+            // stays 60 maps in-game instead of ~300.
+            memberBeatmapIds: entries.map(e => e.beatmapId).filter(Boolean),
         };
         savePracticeSets(store);
     }
@@ -1839,6 +1861,15 @@ function getPracticeSets() {
 }
 function savePracticeSets(m) {
     localStorage.setItem(PRACTICE_SETS_KEY, JSON.stringify(m));
+}
+
+/* If `catId` is a tracked practice category, the Set of beatmap_ids it
+   should export (its picked difficulties); null for any normal category
+   (= export every difficulty, the default). */
+function practiceDiffFilter(catId) {
+    const rec = getPracticeSets()[String(catId)];
+    if (!rec || !Array.isArray(rec.memberBeatmapIds) || !rec.memberBeatmapIds.length) return null;
+    return new Set(rec.memberBeatmapIds.map(Number));
 }
 
 async function renderPracticeProgress() {
