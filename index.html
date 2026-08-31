@@ -319,6 +319,42 @@
                 <div id="osu-pagination" class="osu-pagination"></div>
             </div>
         </div>
+
+        <section class="explore-row" aria-labelledby="explore-title">
+            <h3 id="explore-title" data-i18n="explore_title">探索更多</h3>
+            <div class="explore-grid">
+                <button class="explore-card" onclick="switchTab('lookup')">
+                    <span class="explore-card-icon" data-icon="trendingUp"></span>
+                    <span class="explore-card-t" data-i18n="nav_lookup">PP 查詢</span>
+                    <span class="explore-card-d" data-i18n="explore_lookup_d">查你的總 PP、每日進步曲線、和朋友比較</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('farm-maps')">
+                    <span class="explore-card-icon" data-icon="target"></span>
+                    <span class="explore-card-t" data-i18n="nav_farm_maps">Farm 圖</span>
+                    <span class="explore-card-d" data-i18n="explore_farm_d">依你分段整理的高 pp farm 圖清單</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('public-collections')">
+                    <span class="explore-card-icon" data-icon="globe"></span>
+                    <span class="explore-card-t" data-i18n="nav_public_collections">收藏廣場</span>
+                    <span class="explore-card-d" data-i18n="explore_gallery_d">看別人公開的收藏，一鍵匯入你的</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('mapper-tracking')">
+                    <span class="explore-card-icon" data-icon="palette"></span>
+                    <span class="explore-card-t" data-i18n="nav_mapper_tracking">追蹤 Mapper</span>
+                    <span class="explore-card-d" data-i18n="explore_mapper_d">喜歡的 mapper 出新圖時通知你</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('replay-analyze')">
+                    <span class="explore-card-icon" data-icon="barChart3"></span>
+                    <span class="explore-card-t" data-i18n="nav_replay_analyze">Replay 分析</span>
+                    <span class="explore-card-d" data-i18n="explore_replay_d">上傳 replay，看 UR、分段表現、pp</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('tournaments')">
+                    <span class="explore-card-icon" data-icon="trophy"></span>
+                    <span class="explore-card-t" data-i18n="nav_tournaments">賽事</span>
+                    <span class="explore-card-d" data-i18n="explore_tourney_d">官方論壇 + wyBin 的社群賽事情報</span>
+                </button>
+            </div>
+        </section>
     </section>
 
     <section id="page-public-collections" class="site-page" style="display:none;">

@@ -24,6 +24,49 @@
     gap: 20px;
 }
 
+/* "探索更多" — feature doorways at the bottom of the collection page so a
+   first-time visitor discovers this is a companion app, not a one-shot
+   converter (the 12 tabs otherwise live only behind the ☰ drawer). */
+.explore-row {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-input);
+}
+.explore-row h3 {
+    margin: 0 0 14px;
+    text-align: center;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+}
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+.explore-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s var(--ease-out), border-color 0.15s, background 0.15s;
+}
+.explore-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-purple);
+    background: rgba(168, 85, 247, 0.08);
+}
+.explore-card-icon .icon-svg { width: 20px; height: 20px; color: var(--accent-pink); }
+.explore-card-t { font-weight: 700; font-size: 0.92rem; margin-top: 2px; }
+.explore-card-d { font-size: 0.78rem; color: var(--text-dim2); line-height: 1.45; }
+
 /* "為你更新" digest strip (js/osu.js renderCollectionDigest) — empty unless
    there's something to report, so it collapses to nothing most visits. */
 #collection-digest:empty { display: none; }
