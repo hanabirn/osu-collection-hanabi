@@ -7,6 +7,7 @@ I18N.zh = {
     page_refresh_btn_title: '重新整理頁面',
     track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',
     track_done: '已加入追蹤清單，PP 有變化時會通知你', untrack_done: '已取消追蹤',
+    push_enable: '開啟推播通知', push_disable: '關閉推播通知', push_on: '已開啟推播，追蹤玩家 PP 有變化時會通知你（即使沒開著網頁）', push_off: '已關閉推播通知', push_blocked: '瀏覽器已封鎖通知權限，請到瀏覽器設定開啟', push_fail: '推播訂閱失敗，請稍後再試',
     tracked_players_title: '🔔 追蹤中的玩家', tracked_players_empty: '尚未追蹤任何玩家，查詢後點擊「追蹤」即可加入清單，PP 有變化時會通知你',
     notif_bell_title: '通知', notif_clear_btn: '清除全部', notif_empty: '目前沒有通知',
     contact_info_title: '聯絡資訊',

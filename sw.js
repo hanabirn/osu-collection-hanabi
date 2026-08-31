@@ -10,7 +10,7 @@
    cache — the fetch strategy below is network-first for the shell (so
    normal visits always get the latest code), so this mostly matters for
    forcing a clean slate rather than for staleness. */
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
 const FONT_CACHE = `osu-fonts-${CACHE_VERSION}`;
@@ -48,6 +48,38 @@ self.addEventListener('install', event => {
 
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+/* ===== Web Push =====
+   push-cron sends { title, body, url } — see netlify/functions/push-cron.js.
+   Clicking the notification focuses an existing tab (navigating it to the
+   payload url) or opens a new one. */
+self.addEventListener('push', event => {
+    let data = {};
+    try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data && event.data.text() }; }
+    const title = data.title || 'osu! Collection';
+    event.waitUntil(self.registration.showNotification(title, {
+        body: data.body || '',
+        icon: '/assets/icons/icon-192.png',
+        badge: '/assets/icons/icon-192.png',
+        tag: data.tag || 'osu-pp',
+        data: { url: data.url || '/' },
+    }));
+});
+
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+    const url = (event.notification.data && event.notification.data.url) || '/';
+    event.waitUntil((async () => {
+        const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const c of clients) {
+            if ('focus' in c) {
+                try { await c.navigate(url); } catch { /* cross-origin/opaque — just focus */ }
+                return c.focus();
+            }
+        }
+        return self.clients.openWindow(url);
+    })());
 });
 
 self.addEventListener('activate', event => {

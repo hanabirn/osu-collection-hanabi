@@ -7,6 +7,7 @@ I18N.fr = {
     page_refresh_btn_title: 'Actualiser la page',
     track_player_btn: '+ Suivre', untrack_player_btn: 'Ne plus suivre',
     track_done: 'Ajouté à votre liste de suivi — on vous préviendra en cas de changement de PP', untrack_done: 'Retiré de votre liste de suivi',
+    push_enable: 'Activer les notifications push', push_disable: 'Désactiver les notifications push', push_on: "Push activé — on vous préviendra quand le PP d'un joueur suivi change, même site fermé", push_off: 'Notifications push désactivées', push_blocked: 'Votre navigateur a bloqué les notifications — activez-les dans ses paramètres', push_fail: "Impossible de s'abonner aux notifications push — réessayez plus tard",
     tracked_players_title: '🔔 Joueurs suivis', tracked_players_empty: "Vous ne suivez personne pour l'instant — recherchez un joueur et cliquez sur « Suivre » pour être averti d'un changement de PP",
     notif_bell_title: 'Notifications', notif_clear_btn: 'Tout effacer', notif_empty: 'Aucune notification',
     contact_info_title: 'Coordonnées',

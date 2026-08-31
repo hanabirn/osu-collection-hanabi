@@ -7,6 +7,7 @@ I18N.ja = {
     page_refresh_btn_title: 'ページを再読み込み',
     track_player_btn: '+ フォロー', untrack_player_btn: 'フォロー解除',
     track_done: 'ウォッチリストに追加しました。PP が変化したら通知します', untrack_done: 'フォローを解除しました',
+    push_enable: 'プッシュ通知をオンにする', push_disable: 'プッシュ通知をオフにする', push_on: 'プッシュ通知をオンにしました。サイトを閉じていても、追跡中のプレイヤーの PP が変化したら通知します', push_off: 'プッシュ通知をオフにしました', push_blocked: 'ブラウザで通知がブロックされています。ブラウザの設定で許可してください', push_fail: 'プッシュ通知の登録に失敗しました。後でもう一度お試しください',
     tracked_players_title: '🔔 フォロー中のプレイヤー', tracked_players_empty: 'まだ誰もフォローしていません。検索して「フォロー」を押すと、PP の変化を通知します',
     notif_bell_title: '通知', notif_clear_btn: 'すべて消去', notif_empty: '通知はありません',
     contact_info_title: '連絡先',

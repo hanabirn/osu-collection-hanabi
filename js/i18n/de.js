@@ -7,6 +7,7 @@ I18N.de = {
     page_refresh_btn_title: 'Seite neu laden',
     track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',
     track_done: 'Zur Beobachtungsliste hinzugefügt — wir benachrichtigen dich bei PP-Änderungen', untrack_done: 'Von der Beobachtungsliste entfernt',
+    push_enable: 'Push-Benachrichtigungen aktivieren', push_disable: 'Push-Benachrichtigungen deaktivieren', push_on: 'Push aktiviert — wir benachrichtigen dich bei PP-Änderungen eines beobachteten Spielers, auch bei geschlossener Seite', push_off: 'Push-Benachrichtigungen deaktiviert', push_blocked: 'Dein Browser blockiert Benachrichtigungen — aktiviere sie in den Browsereinstellungen', push_fail: 'Push-Abo fehlgeschlagen — bitte später erneut versuchen',
     tracked_players_title: '🔔 Beobachtete Spieler', tracked_players_empty: 'Du beobachtest noch niemanden — suche einen Spieler und klicke auf "Verfolgen", um bei PP-Änderungen benachrichtigt zu werden',
     notif_bell_title: 'Benachrichtigungen', notif_clear_btn: 'Alle löschen', notif_empty: 'Noch keine Benachrichtigungen',
     contact_info_title: 'Kontaktinformationen',

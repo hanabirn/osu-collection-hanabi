@@ -687,6 +687,26 @@ a:hover { text-decoration: underline; }
     padding: 2px 4px;
 }
 .notif-clear-btn:hover { color: var(--accent-pink); }
+/* Opt-in Web Push toggle — only unhidden by js/pwa.js when the site owner
+   has set the VAPID env vars AND the visitor is logged in. */
+.notif-push-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    border-bottom: 1px solid var(--border-card);
+    background: transparent;
+    color: var(--text-dim2);
+    font: inherit;
+    font-size: 0.78rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.notif-push-row:hover { background: var(--bg-stat); color: var(--text); }
+.notif-push-row.on { color: var(--accent-pink); }
 .notif-menu-list {
     max-height: 340px;
     overflow-y: auto;

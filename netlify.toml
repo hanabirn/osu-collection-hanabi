@@ -12,6 +12,11 @@
   schedule = "*/10 * * * *"
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
 
+# Web Push: re-check every subscriber's tracked players every 30 min and
+# send a push when PP moved. Inert until the VAPID_* env vars are set.
+[functions."push-cron"]
+  schedule = "*/30 * * * *"
+
 [functions."farm-crawl-run"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
 

@@ -7,6 +7,7 @@ I18N.es = {
     page_refresh_btn_title: 'Actualizar página',
     track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',
     track_done: 'Añadido a tu lista de seguimiento — te avisaremos si cambia su PP', untrack_done: 'Eliminado de tu lista de seguimiento',
+    push_enable: 'Activar notificaciones push', push_disable: 'Desactivar notificaciones push', push_on: 'Push activado — te avisaremos cuando cambie el PP de un jugador seguido, aunque el sitio esté cerrado', push_off: 'Notificaciones push desactivadas', push_blocked: 'Tu navegador ha bloqueado las notificaciones — actívalas en su configuración', push_fail: 'No se pudo suscribir a las notificaciones push — inténtalo más tarde',
     tracked_players_title: '🔔 Jugadores seguidos', tracked_players_empty: 'Todavía no sigues a nadie — busca a un jugador y pulsa "Seguir" para recibir avisos de cambios de PP',
     notif_bell_title: 'Notificaciones', notif_clear_btn: 'Borrar todo', notif_empty: 'No hay notificaciones',
     contact_info_title: 'Información de contacto',

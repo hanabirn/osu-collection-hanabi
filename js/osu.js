@@ -4240,6 +4240,7 @@ async function toggleTrackVisitorPlayer() {
     saveTrackedPlayers(list);
     renderTrackButtonState();
     renderTrackedPlayersList();
+    if (typeof syncPushPlayers === 'function') syncPushPlayers();
 }
 
 /* Add a player to the tracked list without going through the lookup panel
@@ -4256,6 +4257,7 @@ async function trackPlayerById(id, username, country, pp) {
     list.push(entry);
     saveTrackedPlayers(list);
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
+    if (typeof syncPushPlayers === 'function') syncPushPlayers();
     return true;
 }
 
@@ -4286,6 +4288,7 @@ function untrackPlayerById(id) {
     saveTrackedPlayers(getTrackedPlayers().filter(p => String(p.id) !== String(id)));
     if (String(visitorLookupUserId) === String(id)) renderTrackButtonState();
     renderTrackedPlayersList();
+    if (typeof syncPushPlayers === 'function') syncPushPlayers();
 }
 
 function renderTrackButtonState() {

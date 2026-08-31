@@ -7,6 +7,7 @@ I18N.ko = {
     page_refresh_btn_title: '페이지 새로고침',
     track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',
     track_done: '추적 목록에 추가되었습니다. PP가 변하면 알려드릴게요', untrack_done: '추적을 해제했습니다',
+    push_enable: '푸시 알림 켜기', push_disable: '푸시 알림 끄기', push_on: '푸시 알림을 켰습니다. 사이트를 닫아도 추적 중인 플레이어의 PP가 변하면 알려드릴게요', push_off: '푸시 알림을 껐습니다', push_blocked: '브라우저에서 알림이 차단되어 있습니다. 브라우저 설정에서 허용해 주세요', push_fail: '푸시 알림 구독에 실패했습니다. 나중에 다시 시도해 주세요',
     tracked_players_title: '🔔 추적 중인 플레이어', tracked_players_empty: '아직 추적 중인 플레이어가 없습니다. 검색 후 "추적"을 누르면 PP 변화를 알려드립니다',
     notif_bell_title: '알림', notif_clear_btn: '모두 지우기', notif_empty: '알림이 없습니다',
     contact_info_title: '연락처',

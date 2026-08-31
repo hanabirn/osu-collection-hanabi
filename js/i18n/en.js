@@ -7,6 +7,7 @@ I18N.en = {
     page_refresh_btn_title: 'Refresh page',
     track_player_btn: '+ Track', untrack_player_btn: 'Untrack',
     track_done: "Added to your watchlist — we'll notify you when their PP changes", untrack_done: 'Removed from your watchlist',
+    push_enable: 'Enable push notifications', push_disable: 'Disable push notifications', push_on: "Push on — we'll notify you when a tracked player's PP changes, even with the site closed", push_off: 'Push notifications turned off', push_blocked: 'Your browser has blocked notifications — enable them in its settings', push_fail: 'Could not subscribe to push — try again later',
     tracked_players_title: '🔔 Tracked players', tracked_players_empty: "You're not tracking anyone yet — look someone up and hit \"Track\" to get notified when their PP changes",
     notif_bell_title: 'Notifications', notif_clear_btn: 'Clear all', notif_empty: 'No notifications yet',
     contact_info_title: 'Contact info',

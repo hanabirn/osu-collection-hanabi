@@ -28,6 +28,7 @@ if ('serviceWorker' in navigator) {
                     }
                 });
             });
+            if (typeof initPushNotifications === 'function') initPushNotifications();
         }).catch(e => console.error('SW registration failed:', e));
 
         // Re-check on return to the tab rather than only on page load, since
@@ -96,4 +97,118 @@ async function promptPwaInstall() {
     // Chrome won't refire beforeinstallprompt until the next eligible visit.
     pwaDeferredInstallPrompt = null;
     if (btn) btn.style.display = 'none';
+}
+
+/* ===== Web Push (opt-in) =====
+   A toggle in the notification dropdown. Server side:
+   netlify/functions/push-subscribe.js (store), push-cron.js (30-min check
+   of every subscriber's tracked players' PP), _push-store.js, push-config.js
+   (serves the VAPID public key from env). Inert until the site owner sets
+   VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT — push-config then
+   returns an empty key and the toggle stays hidden. */
+let pushVapidKey = null;
+
+function urlBase64ToUint8Array(base64) {
+    const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+    const raw = atob((base64 + padding).replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+function pushSupported() {
+    return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+}
+
+async function initPushNotifications() {
+    const row = document.getElementById('notif-push-row');
+    if (!row || !pushSupported()) return;
+    try {
+        const cfg = await fetch('/.netlify/functions/push-config').then(r => r.json());
+        pushVapidKey = cfg && cfg.vapidPublicKey;
+    } catch { pushVapidKey = null; }
+    // Only offer it to logged-in visitors — there's nothing to check pushes
+    // against otherwise (tracked players hang off the osu! account).
+    const loggedIn = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
+    if (!pushVapidKey || !loggedIn) { row.hidden = true; return; }
+    row.hidden = false;
+    await refreshPushToggleLabel();
+}
+
+async function currentPushSubscription() {
+    const reg = await navigator.serviceWorker.ready;
+    return reg.pushManager.getSubscription();
+}
+
+async function refreshPushToggleLabel() {
+    const label = document.getElementById('notif-push-label');
+    if (!label) return;
+    const sub = await currentPushSubscription().catch(() => null);
+    const on = !!sub && Notification.permission === 'granted';
+    const key = on ? 'push_disable' : 'push_enable';
+    label.setAttribute('data-i18n', key);   // so a later applyLang() keeps it right
+    label.textContent = t(key);
+    document.getElementById('notif-push-row')?.classList.toggle('on', on);
+}
+
+/* The players payload the server checks — kept in sync from here and from
+   js/osu.js's track / untrack paths (they call syncPushPlayers). */
+function pushPlayersPayload() {
+    if (typeof getTrackedPlayers !== 'function') return [];
+    return getTrackedPlayers().map(p => ({ id: String(p.id), username: p.username || null }));
+}
+
+async function togglePushNotifications() {
+    if (!pushVapidKey) return;
+    const existing = await currentPushSubscription().catch(() => null);
+    if (existing && Notification.permission === 'granted') {
+        try {
+            await fetch('/.netlify/functions/push-subscribe', {
+                method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ endpoint: existing.endpoint }),
+            });
+        } catch { /* server prune will catch it eventually */ }
+        try { await existing.unsubscribe(); } catch {}
+        if (typeof showShareToast === 'function') showShareToast(t('push_off'));
+        await refreshPushToggleLabel();
+        return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+        if (typeof showShareToast === 'function') showShareToast(t('push_blocked'));
+        return;
+    }
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = existing || await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(pushVapidKey),
+        });
+        const user = getLoggedInOsuUser();
+        const res = await fetch('/.netlify/functions/push-subscribe', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscription: sub, osuUserId: user && user.id, players: pushPlayersPayload() }),
+        });
+        if (!res.ok) throw new Error('subscribe failed');
+        if (typeof showShareToast === 'function') showShareToast(t('push_on'));
+    } catch (e) {
+        console.error('push subscribe failed:', e);
+        if (typeof showShareToast === 'function') showShareToast(t('push_fail'));
+    }
+    await refreshPushToggleLabel();
+}
+
+/* Called from js/osu.js after the tracked-players list changes, so the
+   server's copy stays current without the visitor re-toggling. No-op if
+   push isn't on. */
+async function syncPushPlayers() {
+    if (!pushSupported()) return;
+    const sub = await currentPushSubscription().catch(() => null);
+    if (!sub || Notification.permission !== 'granted') return;
+    const user = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
+    if (!user) return;
+    try {
+        await fetch('/.netlify/functions/push-subscribe', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscription: sub, osuUserId: user.id, players: pushPlayersPayload() }),
+        });
+    } catch { /* next toggle / cron self-heals */ }
 }

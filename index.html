@@ -123,6 +123,10 @@
                     <span data-i18n="notif_bell_title">通知</span>
                     <button class="notif-clear-btn" onclick="clearAllNotifications()" data-i18n="notif_clear_btn">清除全部</button>
                 </div>
+                <button class="notif-push-row" id="notif-push-row" onclick="togglePushNotifications()" hidden>
+                    <span data-icon="bell" data-icon-gap></span>
+                    <span id="notif-push-label" data-i18n="push_enable">開啟推播通知</span>
+                </button>
                 <div class="notif-menu-list" id="notif-menu-list"></div>
             </div>
         </div>
