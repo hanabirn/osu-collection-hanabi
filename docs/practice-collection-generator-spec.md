@@ -258,7 +258,7 @@ async function generatePracticeCollection(kind, opts = {}) {
 | v1.2 | 類型 4 弱項、回饋閉環 | ✅ 上線（`5179983`, `c1b4a61`） |
 | Phase 2 | per-diff 匯出、弱項長度上限（`5d32e82`）、AR/CS 弱項維度（`ea244a7`） | ✅ 上線 |
 | Phase 2+ | 其餘 6 語系翻譯（`b078bf1`）、`osu-pp` 精算重排序 checkbox（`8ace163`） | ✅ 上線 |
-| 之後 | 串圖/跳圖弱項維度（需擴 farm 爬蟲存 aim/speed + ~100 次 osu-pp 分類 top plays，較大） | 待做 |
+| Phase 3 | 串圖/跳圖弱項維度（`2f210af`, `b8d697b`）——`osu-pp` 回傳 aim/speed、爬蟲存、`farm-maps-list` 算 speedRatio、精算時 ~100 次 osu-pp 分類 top plays。farm 覆蓋回填中，暫用 BPM 近似 | ✅ 上線 |
 
 ---
 
