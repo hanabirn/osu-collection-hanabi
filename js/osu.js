@@ -1447,9 +1447,10 @@ function practicePercentile(nums, p) {
 }
 
 /* Chunked get_beatmap (b=) fill: for every beatmap_id not already in
-   `detailByBeatmap`, fetch its details and store { setId, stars, creator }.
-   Mutates the map; used by practiceFetchTopPlays and by the low-acc kind
-   for recent plays outside the top 100. */
+   `detailByBeatmap`, fetch its details and store
+   { setId, stars, creator, bpm, length }. Mutates the map; used by
+   practiceFetchTopPlays and by the low-acc kind for recent plays outside
+   the top 100. */
 async function practiceResolveMissingDetails(beatmapIds, detailByBeatmap, onProgress, label) {
     const need = [...new Set(beatmapIds)].filter(id => id && !detailByBeatmap.has(id));
     const CH = 10;
@@ -1464,9 +1465,38 @@ async function practiceResolveMissingDetails(beatmapIds, detailByBeatmap, onProg
                 setId: parseInt(b.beatmapset_id) || null,
                 stars: parseFloat(b.difficultyrating),
                 creator: b.creator || null,
+                bpm: parseFloat(b.bpm) || null,
+                length: parseInt(b.total_length) || null,
             });
         });
     }
+}
+
+/* 弱項: bucket the top plays by length and by BPM, return the single bucket
+   with the fewest of them (ties → lowest average pp). The farm-maps-list
+   query params for that bucket ride along in `band`. */
+const PRACTICE_WEAK_BUCKETS = [
+    { dim: 'len_short', band: { lengthMax: 90 },              hit: d => d.length != null && d.length < 90 },
+    { dim: 'len_mid',   band: { lengthMin: 90, lengthMax: 150 }, hit: d => d.length != null && d.length >= 90 && d.length <= 150 },
+    { dim: 'len_long',  band: { lengthMin: 150 },             hit: d => d.length != null && d.length > 150 },
+    { dim: 'bpm_low',   band: { bpmMax: 160 },                hit: d => d.bpm != null && d.bpm < 160 },
+    { dim: 'bpm_mid',   band: { bpmMin: 160, bpmMax: 200 },   hit: d => d.bpm != null && d.bpm >= 160 && d.bpm <= 200 },
+    { dim: 'bpm_high',  band: { bpmMin: 200 },                hit: d => d.bpm != null && d.bpm > 200 },
+];
+
+function practicePickWeakestBucket(top) {
+    const stats = PRACTICE_WEAK_BUCKETS.map(b => {
+        let count = 0, ppSum = 0;
+        top.scores.forEach((s, i) => {
+            const d = top.detailByBeatmap.get(parseInt(s.beatmap_id));
+            if (d && b.hit(d)) { count++; ppSum += top.ppList[i] || parseFloat(s.pp) || 0; }
+        });
+        return { ...b, count, avgPp: count ? ppSum / count : 0 };
+    });
+    // need at least *some* bucketable data
+    if (!stats.some(s => s.count > 0)) return null;
+    stats.sort((a, b) => a.count - b.count || a.avgPp - b.avgPp);
+    return stats[0];
 }
 
 /* get_user_best has pp but no star rating, set id or mapper, so this joins
@@ -1600,12 +1630,16 @@ async function practiceCollectFarmBand(band, want, onProgress) {
         // band. "Break into your top 100" just needs any ranked 5.5*+ map in
         // range you haven't done — the whole computed dataset (~70k) is fair
         // game. (A "prefer farm maps" toggle could come back later.)
-        ppMin: band.ppMin.toFixed(1),
-        ppMax: band.ppMax.toFixed(1),
         starMin: band.starMin.toFixed(2),
         starMax: band.starMax.toFixed(2),
         sort: band.sort,
     });
+    // pp band: push/goal set it, 弱項 doesn't (it filters on bpm/length)
+    if (band.ppMin != null) qs.set('ppMin', band.ppMin.toFixed(1));
+    if (band.ppMax != null) qs.set('ppMax', band.ppMax.toFixed(1));
+    for (const k of ['bpmMin', 'bpmMax', 'lengthMin', 'lengthMax']) {
+        if (band[k] != null) qs.set(k, String(band[k]));
+    }
     const get = (page) => fetch(`/.netlify/functions/farm-maps-list?${qs}&page=${page}`).then(r => r.json());
 
     const first = await get(0);
@@ -1639,6 +1673,7 @@ function practiceCatName(kind, opts = {}) {
     if (kind === 'goal') return t('practice_cat_goal', { target: Math.round(opts.target).toLocaleString() });
     if (kind === 'lowacc') return t('practice_cat_lowacc');
     if (kind === 'taste') return t('practice_cat_taste');
+    if (kind === 'weak') return t('practice_cat_weak', { dim: t('practice_dim_' + opts.dim) });
     return t('practice_cat_push');
 }
 
@@ -1686,7 +1721,7 @@ async function generatePracticeCollection(kind) {
         return practiceApplyAndReport(kind, {}, entries, setS);
     }
 
-    let band;
+    let band, weakDim = null;
     if (kind === 'push') {
         band = {
             mods,
@@ -1696,9 +1731,21 @@ async function generatePracticeCollection(kind) {
             starMax: top.starMedian + 0.7,
             sort: 'pp_desc',
         };
+    } else if (kind === 'weak') {
+        const bucket = practicePickWeakestBucket(top);
+        if (!bucket) { setS(t('practice_weak_none'), '#34d399'); return; }
+        weakDim = bucket.dim;
+        band = {
+            mods,
+            ...bucket.band,   // bpmMin/Max or lengthMin/Max
+            starMin: Math.max(0, top.starMedian - 0.7),
+            starMax: top.starMedian + 0.7,
+            sort: 'pp_desc',
+        };
     } else {
-        // Recompute `needed` against the LOGGED-IN user's own top 100 (the PP
-        // panel's own calc runs against whatever profile was last looked up).
+        // goal — recompute `needed` against the LOGGED-IN user's own top 100
+        // (the PP panel's own calc runs against whatever profile was last
+        // looked up).
         let actualTotal = 0;
         try {
             const me = await osuFetch(`u=${user.id}&m=${PRACTICE_MODE}`);
@@ -1742,7 +1789,7 @@ async function generatePracticeCollection(kind) {
     }
     if (entries.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
 
-    return practiceApplyAndReport(kind, { target }, entries, setS);
+    return practiceApplyAndReport(kind, { target, dim: weakDim }, entries, setS);
 }
 
 /* Shared tail: hand the picked set ids to the normal import pipeline (set
