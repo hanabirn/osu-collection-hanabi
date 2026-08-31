@@ -10,7 +10,7 @@
    cache — the fetch strategy below is network-first for the shell (so
    normal visits always get the latest code), so this mostly matters for
    forcing a clean slate rather than for staleness. */
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
 const FONT_CACHE = `osu-fonts-${CACHE_VERSION}`;
@@ -48,16 +48,27 @@ self.addEventListener('message', event => {
 });
 
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys()
-            .then(keys => Promise.all(keys.filter(k => !KNOWN_CACHES.has(k)).map(k => caches.delete(k))))
-            .then(() => self.clients.claim())
-    );
+    event.waitUntil((async () => {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter(k => !KNOWN_CACHES.has(k)).map(k => caches.delete(k)));
+        // Navigation preload: let Chrome fire the network request for a
+        // navigation in parallel with this worker booting, instead of the
+        // page waiting out SW startup before networkFirstShell() even calls
+        // fetch(). That startup wait is what Lighthouse was charging as a
+        // ~1s "redirect" on cold loads.
+        if (self.registration.navigationPreload) {
+            await self.registration.navigationPreload.enable();
+        }
+        await self.clients.claim();
+    })());
 });
 
-async function networkFirstShell(request) {
+async function networkFirstShell(request, preloadResponsePromise) {
     try {
-        const res = await fetch(request);
+        // For navigations this is the response Chrome already started
+        // fetching while the worker booted (see navigationPreload above);
+        // for everything else it's undefined and we fetch() as normal.
+        const res = (preloadResponsePromise && await preloadResponsePromise) || await fetch(request);
         if (res.ok) {
             const cache = await caches.open(SHELL_CACHE);
             cache.put(request, res.clone());
@@ -115,6 +126,6 @@ self.addEventListener('fetch', event => {
 
     if (url.origin === self.location.origin &&
         (request.mode === 'navigate' || ['script', 'style'].includes(request.destination) || SHELL_ASSETS.includes(url.pathname))) {
-        event.respondWith(networkFirstShell(request));
+        event.respondWith(networkFirstShell(request, event.preloadResponse));
     }
 });
