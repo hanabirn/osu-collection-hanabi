@@ -1936,6 +1936,21 @@
     gap: 8px;
     margin-bottom: 6px;
 }
+.ctools-practice-row {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 6px;
+}
+.ctools-practice-row .btn { flex: 1; }
+.ctools-practice-mods {
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+}
 .ctools-mapper-row input {
     flex: 1;
     min-width: 0;

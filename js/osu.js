@@ -1414,6 +1414,214 @@ async function generateCollectionFromMapper() {
     setS(t('collection_io_import_done', { sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved }), '#34d399');
 }
 
+/* ===== 🎯 Practice-collection generators =====
+   Turn the visitor's own osu! results into a collection they can play
+   against — the wedge this site has over osu!Collector / CollectionManager,
+   which have no notion of your scores. See
+   docs/practice-collection-generator-spec.md.
+
+   MVP = two farm-dataset-backed kinds, standard mode only:
+   - 'push' 突破分  : farm maps whose FC pp would break into your top 100
+   - 'goal' 目標圖池 : farm maps each worth >= the single-score pp you still
+                       need for the target total typed in the PP panel
+   Both are 5.5*+ only (the farm crawler's STAR_FLOOR); lower brackets get
+   blocked with an honest message and are the job of the score-driven kinds
+   (低準度 / 相似圖 / 弱項) planned for later. */
+
+const PRACTICE_N_MIN = 40;
+const PRACTICE_N_MAX = 60;
+const PRACTICE_MODE = 0;                 // MVP: standard only
+const PRACTICE_MODE_NAME = 'osu';        // farm-maps-list `mode` param
+const PRACTICE_COVERAGE_MIN_RATIO = 0.15;
+const PRACTICE_GOOD_ACC = 95;            // a top-100 play at >= this acc counts as "already done"
+
+function practiceMedian(nums) {
+    if (!nums.length) return 0;
+    const s = [...nums].sort((a, b) => a - b);
+    const m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+function practicePercentile(nums, p) {
+    if (!nums.length) return 0;
+    const s = [...nums].sort((a, b) => a - b);
+    return s[Math.min(s.length - 1, Math.max(0, Math.round((p / 100) * (s.length - 1))))];
+}
+
+/* get_user_best has pp but no star rating and no set id, so this batches
+   get_beatmap (b=) in chunks the same way generateCollectionFor('best')
+   does. Returns the pp/star summary both kinds need, plus the beatmap_ids
+   the user has already scored well on (so we don't recommend those back). */
+async function practiceFetchTopPlays(uid, mode, onProgress) {
+    const scores = await osuFetch(`best=${uid}&limit=100&m=${mode}`) || [];
+    if (!scores.length) return null;
+    const ppList = scores.map(s => parseFloat(s.pp)).filter(Number.isFinite).sort((a, b) => b - a);
+
+    const starByBeatmap = new Map();
+    const bmIds = [...new Set(scores.map(s => s.beatmap_id).filter(Boolean))];
+    const CH = 10;
+    for (let i = 0; i < bmIds.length; i += CH) {
+        if (onProgress) onProgress(t('practice_reading_top', { done: i, total: bmIds.length }));
+        const chunk = bmIds.slice(i, i + CH);
+        const rs = await Promise.all(chunk.map(id => osuFetch(`b=${id}`).catch(() => null)));
+        rs.forEach((r, j) => {
+            const b = r && r[0];
+            if (b) starByBeatmap.set(chunk[j], parseFloat(b.difficultyrating));
+        });
+    }
+    const stars = [...starByBeatmap.values()].filter(Number.isFinite);
+
+    const goodScoreBeatmapIds = new Set(
+        scores.filter(s => parseFloat(calcOsuAccuracy(s, mode)) >= PRACTICE_GOOD_ACC)
+              .map(s => parseInt(s.beatmap_id)),
+    );
+
+    return {
+        ppList,
+        p100: ppList.length ? ppList[Math.min(99, ppList.length - 1)] : 0,
+        starMedian: practiceMedian(stars),
+        star90: practicePercentile(stars, 90),
+        goodScoreBeatmapIds,
+    };
+}
+
+/* Page farm-maps-list within a pp/star band, collecting up to `want` rows.
+   `total` and `coverage` come from page 0 so the caller can run the
+   coverage gate before committing to the rest of the pages. */
+async function practiceCollectFarmBand(band, want, onProgress) {
+    const qs = new URLSearchParams({
+        mode: PRACTICE_MODE_NAME,
+        mods: band.mods,
+        farmOnly: '1',
+        ppMin: band.ppMin.toFixed(1),
+        ppMax: band.ppMax.toFixed(1),
+        starMin: band.starMin.toFixed(2),
+        starMax: band.starMax.toFixed(2),
+        sort: band.sort,
+    });
+    const get = (page) => fetch(`/.netlify/functions/farm-maps-list?${qs}&page=${page}`).then(r => r.json());
+
+    const first = await get(0);
+    const total = first.total || 0;
+    const coverage = first.coverage || {};
+    const items = [...(first.items || [])];
+    const pageSize = first.pageSize || 20;
+    const pages = Math.ceil(total / pageSize);
+    for (let p = 1; p < pages && items.length < want; p++) {
+        if (onProgress) onProgress(t('practice_scanning_farm', { done: items.length, total: Math.min(total, want) }));
+        const res = await get(p);
+        items.push(...(res.items || []));
+    }
+    return { items, total, coverage };
+}
+
+function practiceCoverageBlocked(total, coverage) {
+    if (total < PRACTICE_N_MIN) return true;
+    const known = Math.max(1, coverage.totalKnown || 0);
+    return (coverage.computedCount || 0) / known < PRACTICE_COVERAGE_MIN_RATIO;
+}
+
+function practiceExistingSetIds() {
+    const col = getOsuCollection();
+    return new Set(OSU_MODES.flatMap(m => col[m].map(s => s.beatmapset_id)));
+}
+
+function practiceCatName(kind, opts = {}) {
+    if (kind === 'goal') return t('practice_cat_goal', { target: Math.round(opts.target).toLocaleString() });
+    return t('practice_cat_push');
+}
+
+async function generatePracticeCollection(kind) {
+    if (!await verifyOsuPassword()) return;
+    const status = document.getElementById('ctools-practice-status');
+    const setS = (m, c) => { status.innerText = m; status.style.color = c || '#c8a2e0'; };
+    const user = getLoggedInOsuUser();
+    if (!user || !user.id) { setS(t('osu_profile_need_login'), '#ff5252'); return; }
+
+    const mods = (document.getElementById('ctools-practice-mods') || {}).value || 'NM';
+
+    // 目標圖池 needs the target from the PP panel before any fetching
+    let target = null;
+    if (kind === 'goal') {
+        target = parseFloat((document.getElementById('pp-goal-target') || {}).value);
+        if (!Number.isFinite(target) || target <= 0) { setS(t('practice_goal_need_target'), '#f59e0b'); return; }
+    }
+
+    setS(t('practice_reading_top', { done: 0, total: '…' }));
+    let top;
+    try {
+        top = await practiceFetchTopPlays(user.id, PRACTICE_MODE, setS);
+    } catch (e) {
+        console.error('practice: top plays fetch failed:', e);
+        setS(t('osu_profile_import_fail'), '#ff5252');
+        return;
+    }
+    if (!top || top.ppList.length < 10) { setS(t('practice_need_more_plays'), '#f59e0b'); return; }
+
+    let band;
+    if (kind === 'push') {
+        band = {
+            mods,
+            ppMin: top.p100,
+            ppMax: top.p100 * 1.3,
+            starMin: Math.max(0, top.starMedian - 0.7),
+            starMax: top.starMedian + 0.7,
+            sort: 'pp_desc',
+        };
+    } else {
+        // Recompute `needed` against the LOGGED-IN user's own top 100 (the PP
+        // panel's own calc runs against whatever profile was last looked up).
+        let actualTotal = 0;
+        try {
+            const me = await osuFetch(`u=${user.id}&m=${PRACTICE_MODE}`);
+            if (me && me[0] && me[0].pp_raw != null) actualTotal = parseFloat(me[0].pp_raw);
+        } catch { /* fall through with 0 → needed is just larger */ }
+        if (actualTotal && actualTotal >= target) { setS(t('practice_goal_reached'), '#34d399'); return; }
+        const bonusPp = Math.max(0, actualTotal - weightedPpSum(top.ppList));
+        const needed = ppNeededForTarget(top.ppList, bonusPp, target);
+        const starMax = top.star90 + 0.3;
+        band = {
+            mods,
+            ppMin: needed * 0.9,
+            ppMax: needed * 1.6,
+            starMin: Math.max(0, starMax - 1.5),
+            starMax,
+            sort: 'star_asc',
+        };
+    }
+
+    setS(t('practice_scanning_farm', { done: 0, total: PRACTICE_N_MAX }));
+    let farm;
+    try {
+        farm = await practiceCollectFarmBand(band, PRACTICE_N_MAX * 3, setS);
+    } catch (e) {
+        console.error('practice: farm-maps-list failed:', e);
+        setS(t('osu_profile_import_fail'), '#ff5252');
+        return;
+    }
+    if (practiceCoverageBlocked(farm.total, farm.coverage)) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
+
+    const have = practiceExistingSetIds();
+    const seenSet = new Set();
+    const entries = [];
+    for (const r of farm.items) {
+        const sid = parseInt(r.beatmapset_id);
+        if (!sid || have.has(sid) || seenSet.has(sid)) continue;
+        if (top.goodScoreBeatmapIds.has(parseInt(r.beatmap_id))) continue;
+        seenSet.add(sid);
+        entries.push({ setId: sid });
+        if (entries.length >= PRACTICE_N_MAX) break;
+    }
+    if (entries.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
+
+    const report = await applyImportedCollections(
+        [{ name: practiceCatName(kind, { target }), entries }],
+        m => setS(m),
+    );
+    setS(t('collection_io_import_done', {
+        sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved,
+    }), '#34d399');
+}
+
 /* Remove several sets at once, cleaning their category memberships too
    (removeOsuSet only touches the mode arrays). */
 async function removeOsuSetsByIds(ids) {

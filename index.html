@@ -779,6 +779,21 @@
 
         <hr class="collection-io-sep">
 
+        <p class="pp-calc-hint" data-i18n="practice_hint">依你的成績生成練習收藏（需登入）。來源：farm 資料庫，5.5★ 以上——分段較低時目前還用不到。</p>
+        <div class="ctools-practice-row">
+            <select id="ctools-practice-mods" class="ctools-practice-mods" aria-label="mods">
+                <option value="NM">NM</option>
+                <option value="HD">HD</option>
+                <option value="HR">HR</option>
+                <option value="DT">DT</option>
+            </select>
+            <button class="btn" onclick="generatePracticeCollection('push')" data-i18n="practice_gen_push">突破分</button>
+            <button class="btn" onclick="generatePracticeCollection('goal')" data-i18n="practice_gen_goal">目標圖池</button>
+        </div>
+        <div id="ctools-practice-status" class="status"></div>
+
+        <hr class="collection-io-sep">
+
         <p class="pp-calc-hint" data-i18n="ctools_health_hint">掃描收藏，找出重複、已被刪除、非 ranked、難度數量有變的圖。</p>
         <button class="btn" onclick="runCollectionHealthCheck()" data-i18n="ctools_health_scan">掃描收藏</button>
         <div id="ctools-health-results"></div>
