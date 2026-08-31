@@ -24,11 +24,24 @@
 <meta name="apple-mobile-web-app-title" content="osu!收藏">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap">
+<!-- Set [data-theme] before first paint. theme.js is deferred now, so its
+     own top-level applyTheme() runs too late to stop a dark→light flash for
+     light-theme users; this tiny inline copy does it during head parse. -->
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');}catch(e){}</script>
+<!-- The Google Fonts stylesheet is an external-origin round trip and the
+     single most expensive thing on the critical path: load it as
+     media="print", then flip to "all" once it arrives, so FCP no longer
+     waits on it (Noto swaps in afterwards via font-display=swap).
+     particles.css stays blocking on purpose — it carries .bg-layer's
+     position:fixed, and deferring it flashes that layer into document flow. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/particles.css">
 <link rel="stylesheet" href="css/osu.css">
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap">
+</noscript>
 </head>
 <body>
 
@@ -786,37 +799,42 @@
 
 <div id="site-update-toast" class="share-toast share-toast-clickable" onclick="applySiteUpdate()"></div>
 
-<script src="js/icons.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/particles.js"></script>
-<script src="js/pwa.js"></script>
-<script src="js/i18n.js"></script>
-<script src="js/i18n/zh.js"></script>
-<script src="js/i18n/en.js"></script>
-<script src="js/i18n/ja.js"></script>
-<script src="js/i18n/ko.js"></script>
-<script src="js/i18n/ru.js"></script>
-<script src="js/i18n/fr.js"></script>
-<script src="js/i18n/es.js"></script>
-<script src="js/i18n/de.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<script src="js/osu.js"></script>
-<script src="js/replay-analyze.js"></script>
-<script src="js/public-collections.js"></script>
-<script src="js/farm-maps.js"></script>
-<script src="js/skins.js"></script>
-<script src="js/skin-screenshots.js"></script>
-<script src="js/updates.js"></script>
-<script src="js/resources-data.js"></script>
-<script src="js/tournaments.js"></script>
-<script src="js/celebrate.js"></script>
-<script src="js/notifications.js"></script>
-<script src="js/feedback.js"></script>
-<script src="js/main.js"></script>
-<script src="js/site-likes.js"></script>
-<script src="js/tooltip.js"></script>
+<!-- All deferred: nothing here needs to run before the document is parsed
+     (the theme bootstrap in <head> handles the one exception). defer keeps
+     execution in document order, so the global-dependency chain
+     (icons → theme, i18n.js → i18n/*, osu.js → main.js, …) still holds,
+     while ~600 KB of JS no longer blocks parsing or first paint. -->
+<script defer src="js/icons.js"></script>
+<script defer src="js/theme.js"></script>
+<script defer src="js/particles.js"></script>
+<script defer src="js/pwa.js"></script>
+<script defer src="js/i18n.js"></script>
+<script defer src="js/i18n/zh.js"></script>
+<script defer src="js/i18n/en.js"></script>
+<script defer src="js/i18n/ja.js"></script>
+<script defer src="js/i18n/ko.js"></script>
+<script defer src="js/i18n/ru.js"></script>
+<script defer src="js/i18n/fr.js"></script>
+<script defer src="js/i18n/es.js"></script>
+<script defer src="js/i18n/de.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script defer src="js/osu.js"></script>
+<script defer src="js/replay-analyze.js"></script>
+<script defer src="js/public-collections.js"></script>
+<script defer src="js/farm-maps.js"></script>
+<script defer src="js/skins.js"></script>
+<script defer src="js/skin-screenshots.js"></script>
+<script defer src="js/updates.js"></script>
+<script defer src="js/resources-data.js"></script>
+<script defer src="js/tournaments.js"></script>
+<script defer src="js/celebrate.js"></script>
+<script defer src="js/notifications.js"></script>
+<script defer src="js/feedback.js"></script>
+<script defer src="js/main.js"></script>
+<script defer src="js/site-likes.js"></script>
+<script defer src="js/tooltip.js"></script>
 </body>
 </html>
