@@ -44,6 +44,8 @@ I18N.ja = {
     digest_notifs: '新着 {n} 件',
     digest_practice: '{name} {d}pp · {hits}/{total} が top 100 入り',
     digest_logged_out: 'ログインすると、PP の変化、追跡中のプレイヤー／マッパーの動き、練習コレクションの成果がここに表示されます',
+    digest_welcome: 'ようこそ、{name} さん！自分を追跡に追加しました — PP が変化したら通知します',
+    digest_welcome_import: 'お気に入り／よくプレイをまとめて取り込み',
     osu_empty_fav: 'お気に入りはまだありません', osu_empty_fav_hint: '♥をクリックしてお気に入りに追加！',
     osu_category_add_prompt: '新しいカテゴリ名を入力：', osu_category_rename_prompt: 'カテゴリ名を変更：',
     osu_category_delete_confirm: 'このカテゴリを削除しますか？（収蔵したビートマップは削除されません。タグだけが外れます）',

@@ -44,6 +44,8 @@ I18N.ko = {
     digest_notifs: '새 소식 {n}건',
     digest_practice: '{name} {d}pp · {hits}/{total} top 100 진입',
     digest_logged_out: '로그인하면 PP 변화, 추적 중인 플레이어 / 매퍼 활동, 연습 컬렉션 성과가 여기에 표시됩니다',
+    digest_welcome: '환영합니다, {name}님! 자신을 추적에 추가했습니다 — PP가 변하면 알려드릴게요',
+    digest_welcome_import: '즐겨찾기 / 자주 플레이 가져오기',
     osu_empty_fav: '즐겨찾기가 없습니다', osu_empty_fav_hint: '♥를 눌러 즐겨찾기에 추가!',
     osu_category_add_prompt: '새 카테고리 이름 입력:', osu_category_rename_prompt: '카테고리 이름 변경:',
     osu_category_delete_confirm: '이 카테고리를 삭제할까요? (수집한 비트맵은 삭제되지 않고 태그만 제거됩니다)',

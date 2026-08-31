@@ -58,6 +58,11 @@
 .digest-item:hover { background: rgba(255, 255, 255, 0.14); }
 .digest-item .icon-svg { color: var(--accent-pink); }
 .digest-prompt { color: var(--text-secondary); }
+.digest-welcome {
+    background: rgba(52, 211, 153, 0.1);
+    border-color: rgba(52, 211, 153, 0.3);
+    color: var(--text-secondary);
+}
 .digest-cta {
     padding: 4px 12px;
     border-radius: 999px;
@@ -132,14 +137,14 @@
 }
 .collection-hero-cta {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 11px 24px;
     border-radius: 999px;
     background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
     color: #fff;
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 700;
     text-decoration: none;
-    box-shadow: 0 3px 14px rgba(var(--accent-pink-rgb), 0.35);
+    box-shadow: 0 4px 18px rgba(var(--accent-pink-rgb), 0.4);
     transition: transform 0.2s var(--ease-out);
 }
 .collection-hero-cta:hover { transform: translateY(-2px); }

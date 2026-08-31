@@ -44,6 +44,8 @@ I18N.es = {
     digest_notifs: '{n} novedades',
     digest_practice: '{name} {d}pp · {hits}/{total} en tu top 100',
     digest_logged_out: 'Inicia sesión y aquí verás tus cambios de PP, la actividad de jugadores / mappers seguidos y los resultados de tus colecciones de práctica',
+    digest_welcome: '¡Bienvenido, {name}! Ahora te sigues a ti mismo — te avisaremos cuando cambie tu PP',
+    digest_welcome_import: 'Importar favoritos / más jugados',
     osu_empty_fav: 'Aún no hay favoritos', osu_empty_fav_hint: '¡Haga clic en ♥ para agregar!',
     osu_category_add_prompt: 'Introduce el nombre de la nueva categoría:', osu_category_rename_prompt: 'Renombrar categoría:',
     osu_category_delete_confirm: '¿Eliminar esta categoría? (Los beatmaps permanecen en tu colección — solo se quita la etiqueta.)',

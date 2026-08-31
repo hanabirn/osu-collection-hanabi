@@ -41,6 +41,8 @@ I18N.zh = {
     digest_title: '為你更新', digest_pp: 'PP {d}（自 {from}）', digest_notifs: '{n} 則新消息',
     digest_practice: '{name} {d}pp · {hits}/{total} 進 top 100',
     digest_logged_out: '登入後這裡會顯示你的 PP 變化、追蹤玩家與 mapper 的動態、練習收藏成效',
+    digest_welcome: '歡迎，{name}！已幫你追蹤自己，PP 有變化會通知你',
+    digest_welcome_import: '一鍵匯入最愛 / 常玩',
     osu_empty_fav: '還沒有最愛的歌曲', osu_empty_fav_hint: '在其他分類中點擊 ♥ 加入最愛！',
     osu_category_add_prompt: '輸入新分類名稱：', osu_category_rename_prompt: '重新命名分類：',
     osu_category_delete_confirm: '確定要刪除這個分類嗎？（不會刪除收藏的圖譜，只移除分類標籤）',

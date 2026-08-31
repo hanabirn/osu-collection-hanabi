@@ -41,6 +41,8 @@ I18N.en = {
     digest_title: 'Since you were away', digest_pp: 'PP {d} (since {from})', digest_notifs: '{n} new updates',
     digest_practice: '{name} {d}pp · {hits}/{total} in your top 100',
     digest_logged_out: 'Log in and this shows your PP changes, tracked player / mapper activity, and practice-collection results',
+    digest_welcome: 'Welcome, {name}! You’re now tracking yourself — we’ll notify you when your PP changes',
+    digest_welcome_import: 'Import favourites / most-played',
     osu_empty_fav: 'No favorites yet', osu_empty_fav_hint: 'Click ♥ on beatmaps to add favorites!',
     osu_category_add_prompt: 'Enter new category name:', osu_category_rename_prompt: 'Rename category:',
     osu_category_delete_confirm: 'Delete this category? (Beatmaps stay in your collection — only the tag is removed.)',

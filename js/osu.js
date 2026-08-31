@@ -2118,8 +2118,13 @@ async function renderCollectionDigest() {
 
     const user = getLoggedInOsuUser();
     if (!user || !user.id) {
+        // The empty-collection state already leads with a login CTA (hero +
+        // the grid button). This prompt is for the *returning* logged-out
+        // visitor who has a collection — "you're missing the personalised
+        // stuff" — so only show it once there's a collection to speak of.
+        const emptyCol = OSU_MODES.every(m => getOsuCollection()[m].length === 0);
         let dismissed; try { dismissed = localStorage.getItem(DIGEST_PROMPT_DISMISSED_KEY) === '1'; } catch { dismissed = false; }
-        el.innerHTML = dismissed ? '' : `<div class="digest-strip digest-prompt">
+        el.innerHTML = (dismissed || emptyCol) ? '' : `<div class="digest-strip digest-prompt">
             <span>${escHtml(t('digest_logged_out'))}</span>
             <a class="digest-cta" href="/.netlify/functions/osu-login">${escHtml(t('osu_login_btn'))}</a>
             <button class="digest-dismiss" onclick="dismissDigestPrompt()" aria-label="dismiss">${icon('x', { size: '0.85em' })}</button>
@@ -2170,11 +2175,26 @@ async function renderCollectionDigest() {
     } catch { /* skip */ }
 
     stamp();
-    if (!rows.length) { el.innerHTML = ''; return; }
-    el.innerHTML = `<div class="digest-strip">
+
+    // One-time welcome after first login — confirms self-tracking is on and,
+    // if the collection is still empty, offers the one-tap profile import.
+    let welcomed; try { welcomed = localStorage.getItem('osu_welcomed') === '1'; } catch { welcomed = true; }
+    let welcomeHtml = '';
+    if (!welcomed) {
+        try { localStorage.setItem('osu_welcomed', '1'); } catch {}
+        const emptyCol = OSU_MODES.every(m => getOsuCollection()[m].length === 0);
+        welcomeHtml = `<div class="digest-strip digest-welcome">
+            <span>${escHtml(t('digest_welcome', { name: user.username || ('#' + user.id) }))}</span>
+            ${emptyCol ? `<button class="digest-cta" onclick="importFromOsuProfile()">${escHtml(t('digest_welcome_import'))}</button>` : ''}
+            <button class="digest-dismiss" onclick="document.querySelector('.digest-welcome').remove()" aria-label="dismiss">${icon('x', { size: '0.85em' })}</button>
+        </div>`;
+    }
+
+    if (!welcomeHtml && !rows.length) { el.innerHTML = ''; return; }
+    el.innerHTML = welcomeHtml + (rows.length ? `<div class="digest-strip">
         <span class="digest-label">${escHtml(t('digest_title'))}</span>
         ${rows.map(r => `<span class="digest-item" role="button" tabindex="0" onclick="${r.action}" onkeydown="if(event.key==='Enter'){${r.action}}">${icon(r.icon, { extraClass: 'icon-label-gap' })}${escHtml(r.text)}</span>`).join('')}
-    </div>`;
+    </div>` : '');
 }
 
 /* Remove several sets at once, cleaning their category memberships too
@@ -4190,6 +4210,46 @@ async function toggleTrackVisitorPlayer() {
     renderTrackedPlayersList();
 }
 
+/* Add a player to the tracked list without going through the lookup panel
+   (toggleTrackVisitorPlayer needs visitorLookupUserId set). Used to
+   auto-track the logged-in visitor themselves on first login. */
+async function trackPlayerById(id, username, country, pp) {
+    if (!id || isPlayerTracked(id)) return false;
+    const entry = { id: String(id), username: username || `#${id}`, country: country || null, lastPp: pp || 0 };
+    try {
+        const res = await fetch(`/.netlify/functions/osu-user-achievements?id=${id}`);
+        if (res.ok) entry.knownAchievementIds = (await res.json()).achievements || [];
+    } catch { /* notifications.js baselines it on the first check instead */ }
+    const list = getTrackedPlayers();
+    list.push(entry);
+    saveTrackedPlayers(list);
+    if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
+    return true;
+}
+
+const SELF_TRACK_DONE_KEY = 'osu_self_track_done';
+
+/* First time we see a logged-in visitor: track themselves so PP-change
+   notifications actually fire (the notification system's whole point), and
+   seed today's PP snapshot for the digest. Silent — surfaced in the digest
+   welcome line, undoable from the tracked-players panel. The flag means a
+   visitor who deliberately untracks themselves isn't re-added every load. */
+async function maybeAutoTrackSelf() {
+    const user = getLoggedInOsuUser();
+    if (!user || !user.id) return;
+    let done; try { done = localStorage.getItem(SELF_TRACK_DONE_KEY) === '1'; } catch { done = false; }
+    if (done || isPlayerTracked(user.id)) { try { localStorage.setItem(SELF_TRACK_DONE_KEY, '1'); } catch {} return; }
+    try {
+        const res = typeof fetchPlayerTotalPpAndHistory === 'function'
+            ? await fetchPlayerTotalPpAndHistory(user.id, false) : null;
+        if (res) await trackPlayerById(res.id, res.username, res.country, res.totalPP);
+        else await trackPlayerById(user.id, user.username, null, 0);
+    } catch {
+        await trackPlayerById(user.id, user.username, null, 0);
+    }
+    try { localStorage.setItem(SELF_TRACK_DONE_KEY, '1'); } catch {}
+}
+
 function untrackPlayerById(id) {
     saveTrackedPlayers(getTrackedPlayers().filter(p => String(p.id) !== String(id)));
     if (String(visitorLookupUserId) === String(id)) renderTrackButtonState();
@@ -4335,6 +4395,9 @@ function checkOsuLoginFromUrl() {
     }
 
     applyLoggedInOsuUser();
+
+    // Track yourself once, so PP-change notifications work from session one.
+    if (getLoggedInOsuUser()) setTimeout(() => { if (typeof maybeAutoTrackSelf === 'function') maybeAutoTrackSelf(); }, 1500);
 
     // First successful login on this device: if the collection is still empty,
     // offer to seed it from the visitor's own osu! profile (favourites +
