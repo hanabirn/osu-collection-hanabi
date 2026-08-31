@@ -80,6 +80,18 @@ function osuLangName(set) {
     return (set && set.language && set.language.name) || '';
 }
 
+/* osu! API v2 genre ids (osu.ppy.sh/docs — Genre). 8 is unused. */
+const OSU_GENRES = {
+    1: 'genre_unspecified', 2: 'genre_video_game', 3: 'genre_anime', 4: 'genre_rock',
+    5: 'genre_pop', 6: 'genre_other', 7: 'genre_novelty', 9: 'genre_hiphop',
+    10: 'genre_electronic', 11: 'genre_metal', 12: 'genre_classical', 13: 'genre_folk', 14: 'genre_jazz',
+};
+function osuGenreName(set) {
+    const g = set && set.genre;
+    if (!g) return '';
+    return OSU_GENRES[g.id] ? t(OSU_GENRES[g.id]) : (g.name || '');
+}
+
 const MODE_ICON_PATHS = {
     standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
     taiko: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/>',
@@ -158,7 +170,9 @@ let osuVolume = 0.4;
 let osuPage = 0;
 let osuSortMode = 'default';
 let osuSearchQuery = '';
-let osuLangFilter = 'all';   // 'all' | 'unknown' | '<language id>'
+let osuLangFilter = 'all';     // 'all' | 'unknown' | '<language id>'
+let osuGenreFilter = 'all';    // 'all' | 'unknown' | '<genre id>'
+let osuSourceFilter = 'all';   // 'all' | 'none' | '<source string>'
 const OSU_PAGE_SIZE = 8;
 // Populated by renderOsuCollection() on every render — the current page's
 // sets, one representative (hardest-visible-difficulty) beatmap id + mode
@@ -184,6 +198,18 @@ function switchOsuSort(mode) {
 
 function switchOsuLangFilter(v) {
     osuLangFilter = v;
+    osuPage = 0;
+    renderOsuCollection();
+}
+
+function switchOsuGenreFilter(v) {
+    osuGenreFilter = v;
+    osuPage = 0;
+    renderOsuCollection();
+}
+
+function switchOsuSourceFilter(v) {
+    osuSourceFilter = v;
     osuPage = 0;
     renderOsuCollection();
 }
@@ -217,7 +243,77 @@ function renderOsuLangFilterOptions(sets) {
     sel.value = osuLangFilter;
 }
 
-/* Pulls a set's language + genre from API v2 (see
+/* Same idea as the language filter but for API v2 genre (a fixed enum).
+   Hidden entirely when the current tab's sets don't span at least two
+   genres — nothing to choose between. */
+function renderOsuGenreFilterOptions(sets) {
+    const sel = document.getElementById('osu-genre-filter');
+    if (!sel) return;
+    const ids = new Set();
+    let hasUnknown = false;
+    for (const s of sets) {
+        if (s.genre && s.genre.id) ids.add(s.genre.id);
+        else hasUnknown = true;
+    }
+    if (ids.size + (hasUnknown ? 1 : 0) < 2) {
+        sel.style.display = 'none';
+        osuGenreFilter = 'all';   // no visible control — don't leave a hidden filter applied
+        return;
+    }
+    sel.style.display = '';
+    let html = `<option value="all">${t('osu_genre_filter_all')}</option>`;
+    for (const id of [...ids].sort((a, b) => a - b)) {
+        const name = OSU_GENRES[id] ? t(OSU_GENRES[id]) : String(id);
+        html += `<option value="${id}">${escHtml(name)}</option>`;
+    }
+    if (hasUnknown) html += `<option value="unknown">${t('lang_unknown')}</option>`;
+    if (osuGenreFilter !== 'all' && osuGenreFilter !== 'unknown' && !ids.has(Number(osuGenreFilter))) {
+        osuGenreFilter = 'all';
+    }
+    sel.innerHTML = html;
+    sel.value = osuGenreFilter;
+}
+
+/* Source is free text with a long tail, so unlike language/genre this list
+   is built from whatever's actually in the collection: one option per
+   source carrying >=2 maps (rarer ones fold into "all"), most-common first,
+   plus "(no source)". Hidden when there's nothing worth filtering by. */
+function renderOsuSourceFilterOptions(sets) {
+    const sel = document.getElementById('osu-source-filter');
+    if (!sel) return;
+    const counts = new Map();
+    let hasNone = false;
+    for (const s of sets) {
+        const src = (s.source || '').trim();
+        if (src) counts.set(src, (counts.get(src) || 0) + 1);
+        else hasNone = true;
+    }
+    const shown = [...counts.entries()]
+        .filter(([, n]) => n >= 2)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    if (shown.length + (hasNone ? 1 : 0) < 2) {
+        sel.style.display = 'none';
+        osuSourceFilter = 'all';
+        return;
+    }
+    sel.style.display = '';
+    // If a filtered-on source has since dropped below the >=2 cutoff, keep
+    // it as an option anyway so the active filter still has a matching row.
+    if (osuSourceFilter !== 'all' && osuSourceFilter !== 'none'
+        && counts.has(osuSourceFilter) && !shown.some(([s]) => s === osuSourceFilter)) {
+        shown.push([osuSourceFilter, counts.get(osuSourceFilter)]);
+    }
+    let html = `<option value="all">${t('osu_source_filter_all')}</option>`;
+    for (const [src, n] of shown) html += `<option value="${escHtml(src)}">${escHtml(src)} (${n})</option>`;
+    if (hasNone) html += `<option value="none">${t('osu_source_filter_none')}</option>`;
+    if (osuSourceFilter !== 'all' && osuSourceFilter !== 'none' && !counts.has(osuSourceFilter)) {
+        osuSourceFilter = 'all';
+    }
+    sel.innerHTML = html;
+    sel.value = osuSourceFilter;
+}
+
+/* Pulls a set's language, genre + source from API v2 (see
    netlify/functions/osu-beatmapset.js). Never throws — a null result just
    means the fields stay unset and the next backfill pass retries. */
 async function fetchOsuSetMeta(setId) {
@@ -225,7 +321,7 @@ async function fetchOsuSetMeta(setId) {
         const r = await fetch(`/.netlify/functions/osu-beatmapset?id=${setId}`);
         if (!r.ok) return null;
         const d = await r.json();
-        return { language: d.language || null, genre: d.genre || null };
+        return { language: d.language || null, genre: d.genre || null, source: (d.source || '').trim() };
     } catch {
         return null;
     }
@@ -235,11 +331,11 @@ async function fetchOsuSetMeta(setId) {
 // refreshAllOsuSets().
 let osuMetaBackfillRunning = false;
 
-/* Fills in `language`/`genre` for collection sets saved before this feature
-   existed. Runs a capped, gently-paced batch on page load (see js/main.js
-   init) so a large collection tops up over a few visits rather than firing
-   hundreds of API calls at once. New adds and "Refresh all" fetch the meta
-   inline, so this only ever has old data to catch up on. */
+/* Fills in `language`/`genre`/`source` for collection sets saved before
+   this feature existed. Runs a capped, gently-paced batch on page load (see
+   js/main.js init) so a large collection tops up over a few visits rather
+   than firing hundreds of API calls at once. New adds and "Refresh all"
+   fetch the meta inline, so this only ever has old data to catch up on. */
 async function backfillOsuLanguages() {
     if (osuMetaBackfillRunning) return;
     const col = getOsuCollection();
@@ -247,7 +343,10 @@ async function backfillOsuLanguages() {
     const pending = [];
     for (const mode of OSU_MODES) {
         for (const s of col[mode]) {
-            if (s.language || seen.has(s.beatmapset_id)) continue;
+            // `source` is the newest of the three fields — a set with a
+            // language but no `source` key was backfilled before source
+            // existed, so it still needs one more pass.
+            if ((s.language && s.source !== undefined) || seen.has(s.beatmapset_id)) continue;
             seen.add(s.beatmapset_id);
             pending.push(s.beatmapset_id);
         }
@@ -269,7 +368,7 @@ async function backfillOsuLanguages() {
                 if (!m) continue;
                 for (const mode of OSU_MODES) {
                     const set = fresh[mode].find(s => s.beatmapset_id === id);
-                    if (set) { set.language = m.language; set.genre = m.genre; changed = true; }
+                    if (set) { set.language = m.language; set.genre = m.genre; set.source = m.source; changed = true; }
                 }
             }
             if (changed) saveOsuCollection(fresh);
@@ -1261,7 +1360,7 @@ async function applyImportedCollections(named, onProgress) {
                 })).sort((a, b) => a.difficulty_rating - b.difficulty_rating),
             };
             const meta = await fetchOsuSetMeta(setId).catch(() => null);
-            if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; }
+            if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; setInfo.source = meta.source; }
             col[modeKey].push(setInfo);
             haveSetIds.add(setId);
             report.addedSets++;
@@ -2562,7 +2661,7 @@ async function addOsuBeatmap(explicitId) {
         // coarse language_id) — non-blocking-ish: one extra ~300ms call,
         // and the add still succeeds if it fails (backfill will retry).
         const meta = await fetchOsuSetMeta(setInfo.beatmapset_id);
-        if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; }
+        if (meta) { setInfo.language = meta.language; setInfo.genre = meta.genre; setInfo.source = meta.source; }
 
         col[modeKey].unshift(setInfo);
         saveOsuCollection(col);
@@ -2647,7 +2746,7 @@ async function refreshAllOsuSets() {
                             mode_int: parseInt(b.mode)
                         })).sort((a, b) => a.difficulty_rating - b.difficulty_rating);
                     }
-                    if (meta) { col[mode][idx].language = meta.language; col[mode][idx].genre = meta.genre; }
+                    if (meta) { col[mode][idx].language = meta.language; col[mode][idx].genre = meta.genre; col[mode][idx].source = meta.source; }
                     break;
                 }
             }
@@ -3008,14 +3107,26 @@ function renderOsuCollection() {
         );
     }
 
-    // Language filter options track whatever's actually in this tab's sets;
-    // do it before the language filter narrows `sets` so the dropdown still
-    // lists every option.
+    // Filter dropdowns track whatever's actually in this tab's sets; build
+    // all three from the same snapshot before any of them narrows `sets`, so
+    // each dropdown still lists every option regardless of the others.
     renderOsuLangFilterOptions(sets);
+    renderOsuGenreFilterOptions(sets);
+    renderOsuSourceFilterOptions(sets);
     if (osuLangFilter === 'unknown') {
         sets = sets.filter(s => !s.language);
     } else if (osuLangFilter !== 'all') {
         sets = sets.filter(s => s.language && String(s.language.id) === osuLangFilter);
+    }
+    if (osuGenreFilter === 'unknown') {
+        sets = sets.filter(s => !s.genre);
+    } else if (osuGenreFilter !== 'all') {
+        sets = sets.filter(s => s.genre && String(s.genre.id) === osuGenreFilter);
+    }
+    if (osuSourceFilter === 'none') {
+        sets = sets.filter(s => !(s.source || '').trim());
+    } else if (osuSourceFilter !== 'all') {
+        sets = sets.filter(s => (s.source || '').trim() === osuSourceFilter);
     }
 
     sets = sortOsuSets(sets);

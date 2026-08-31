@@ -6,8 +6,8 @@
    Uses the shared client_credentials token helper (OSU_CLIENT_ID /
    OSU_CLIENT_SECRET), same as osu-news.js / osu-tournaments.js.
 
-   Only language + genre are echoed back — the full v2 beatmapset object is
-   large and the rest is already covered by the v1 proxy. */
+   Only language, genre and source are echoed back — the full v2 beatmapset
+   object is large and the rest is already covered by the v1 proxy. */
 const { getOsuToken } = require('./_osu-auth');
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
@@ -42,6 +42,9 @@ exports.handler = async (event) => {
                 id: Number(id),
                 language: data.language || null,
                 genre: data.genre || null,
+                // Free-text field ("SOUND VOLTEX III GRAVITY WARS", "東方Project",
+                // an anime title…), often empty. Normalized to "" when absent.
+                source: (data.source || '').trim(),
             }),
         };
     } catch (err) {

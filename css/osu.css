@@ -869,7 +869,9 @@
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
 #osu-sort-select,
-#osu-lang-filter {
+#osu-lang-filter,
+#osu-genre-filter,
+#osu-source-filter {
     padding: 11px 12px;
     border-radius: 10px;
     border: 1px solid var(--border-input);
@@ -879,11 +881,16 @@
     font-family: inherit;
     max-width: 40%;
 }
+/* Source values are free text and can be long — cap the width so a
+   "SOUND VOLTEX III GRAVITY WARS (3)" option doesn't blow out the row. */
+#osu-source-filter { max-width: 30%; text-overflow: ellipsis; }
 @media (max-width: 480px) {
     .osu-search-row { flex-wrap: wrap; }
     #osu-search-input { flex: 1 1 100%; }
     #osu-sort-select,
-    #osu-lang-filter { flex: 1; max-width: none; }
+    #osu-lang-filter,
+    #osu-genre-filter,
+    #osu-source-filter { flex: 1; max-width: none; }
 }
 
 /* Small frosted pill at the top of a card's info block — the beatmapset's
