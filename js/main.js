@@ -176,6 +176,7 @@ function refreshDynamicContent() {
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof renderStaticIcons === 'function') renderStaticIcons();
+    if (typeof wireModalHowto === 'function') wireModalHowto();
     applyLang(siteLang);
     initMaintenanceBanner();
     initOsuBgCarousel();

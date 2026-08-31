@@ -28,6 +28,9 @@ I18N.ko = {
 
     osu_title: '♫ 비트맵 추가 ♫', osu_placeholder: 'ID 또는 URL 입력', osu_add: '추가',
     osu_password: '비밀번호 설정',
+    osu_refresh_all_title: '모든 맵의 최신 데이터 다시 가져오기 (별점, 상태)',
+    tools_group_io: '컬렉션 입출력', tools_group_tools: '도구・설정',
+    howto_summary: '사용 방법',
     osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
     hero_pitch: 'osu! 컬렉션을 한곳에서 정리: 게임에서 가져오고, 점수로 카테고리를 자동 생성하고, 게임으로 바로 내보내기.',
     hero_feat_import: '게임의 collection.db / .osdb 가져오기', hero_feat_generate: 'osu! 계정에서 카테고리 생성', hero_feat_share: '컬렉션 공유 (미리보기 카드 포함)',

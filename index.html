@@ -258,19 +258,31 @@
                     <div class="osu-volume">
                         <span data-icon="volume2"></span>
                         <input type="range" id="osu-volume" min="0" max="1" step="0.05" value="0.4" oninput="osuSetVolume(this.value)">
-                        <button class="osu-refresh-all" onclick="refreshAllOsuSets()" title="更新Beatmap" data-icon="refreshCw"></button>
-                        <button class="osu-refresh-all" onclick="exportOsuCollection()" data-i18n-title="osu_export" title="匯出收藏" data-icon="upload"></button>
-                        <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="匯入收藏" data-icon="download"></button>
-                        <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
-                        <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="分享收藏連結" data-icon="link2"></button>
-                        <button class="osu-refresh-all" onclick="downloadCollectionShareCard()" data-i18n-title="collection_card_btn" title="產生收藏卡" data-icon="camera"></button>
-                        <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="設定密碼" data-icon="lock"></button>
-                        <button class="osu-refresh-all" onclick="openCollectionDbModal()" data-i18n-title="collection_db_btn_title" title="匯出成 osu! Collection" data-icon="package"></button>
-                        <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="收藏統計儀表板" data-icon="barChart3"></button>
-                        <button class="osu-refresh-all" onclick="openCollectionToolsModal()" data-i18n-title="ctools_btn_title" title="收藏整理（從 osu! 帳號生成 / 健康檢查）" data-icon="sparkles"></button>
-                        <button class="osu-refresh-all" id="osu-check-played-btn" onclick="checkCollectionPlayedStatus()" data-i18n-title="check_played_btn_title" title="檢查本頁已遊玩" data-icon="target" style="display:none;"></button>
-                        <button class="osu-refresh-all" id="osu-import-profile-btn" onclick="importFromOsuProfile()" data-i18n-title="osu_profile_import_btn_title" title="從 osu! 個人檔案匯入最愛 / 常玩" data-icon="star" style="display:none;"></button>
                     </div>
+                    <div class="osu-tool-groups">
+                        <div class="osu-tool-group">
+                            <span class="osu-tool-group-label" data-i18n="tools_group_io">收藏進出</span>
+                            <div class="osu-tool-group-btns">
+                                <button class="osu-refresh-all" onclick="exportOsuCollection()" data-i18n-title="osu_export" title="下載收藏成 JSON 備份檔" data-icon="upload"></button>
+                                <button class="osu-refresh-all" onclick="document.getElementById('osu-import-file').click()" data-i18n-title="osu_import" title="從先前匯出的 JSON 檔還原收藏" data-icon="download"></button>
+                                <button class="osu-refresh-all" onclick="shareOsuCollectionLink()" data-i18n-title="osu_share_link_btn" title="複製一個可分享的收藏連結" data-icon="link2"></button>
+                                <button class="osu-refresh-all" onclick="downloadCollectionShareCard()" data-i18n-title="collection_card_btn" title="下載一張收藏預覽圖（PNG）" data-icon="camera"></button>
+                                <button class="osu-refresh-all" onclick="openCollectionDbModal()" data-i18n-title="collection_db_btn_title" title="匯出成 collection.db，直接丟進 osu! 使用" data-icon="package"></button>
+                            </div>
+                        </div>
+                        <div class="osu-tool-group">
+                            <span class="osu-tool-group-label" data-i18n="tools_group_tools">工具・設定</span>
+                            <div class="osu-tool-group-btns">
+                                <button class="osu-refresh-all" onclick="refreshAllOsuSets()" data-i18n-title="osu_refresh_all_title" title="重新抓取所有圖的最新資料（星數、狀態）" data-icon="refreshCw"></button>
+                                <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="看收藏的星數 / 模式 / mapper 分佈圖表" data-icon="barChart3"></button>
+                                <button class="osu-refresh-all" onclick="openCollectionToolsModal()" data-i18n-title="ctools_btn_title" title="從你的 osu! 成績生成分類、練習收藏，並做健康檢查" data-icon="sparkles"></button>
+                                <button class="osu-refresh-all" id="osu-check-played-btn" onclick="checkCollectionPlayedStatus()" data-i18n-title="check_played_btn_title" title="標出這頁哪些圖你已經打過（需登入）" data-icon="target" style="display:none;"></button>
+                                <button class="osu-refresh-all" id="osu-import-profile-btn" onclick="importFromOsuProfile()" data-i18n-title="osu_profile_import_btn_title" title="一鍵帶入你 osu! 帳號的最愛 / 常玩（需登入）" data-icon="star" style="display:none;"></button>
+                                <button class="osu-refresh-all" onclick="setupOsuPassword()" data-i18n-title="osu_password" title="設定密碼，保護發佈 / 編輯等操作" data-icon="lock"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="osu-import-file" accept="application/json" style="display:none" onchange="importOsuCollection(event)">
                 </div>
 
                 <div class="featured-beatmap-banner" id="featured-beatmap-banner" style="display:none;"></div>
@@ -738,6 +750,11 @@
         <button class="pp-calc-close" onclick="closeCollectionDbModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="collection_io_title">📦 osu! 遊戲收藏（匯入 / 匯出）</h3>
 
+        <details class="modal-howto" data-howto-key="db">
+            <summary data-i18n="howto_summary">怎麼用？</summary>
+            <div data-i18n="howto_db"></div>
+        </details>
+
         <p class="pp-calc-hint" data-i18n="collection_io_import_hint">從遊戲的 collection.db（在你的 osu! 資料夾裡）或別人分享的 .osdb 匯入。只會把你還沒有的圖加進來，並依原本的收藏名稱建立分類，不會覆蓋你現有的資料。</p>
         <div class="collection-db-upload-row">
             <input type="file" id="collection-io-import-input" accept=".db,.osdb" style="display:none" onchange="importOsuGameCollection(event)">
@@ -763,6 +780,11 @@
     <div class="pp-calc-modal">
         <button class="pp-calc-close" onclick="closeCollectionToolsModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="ctools_title">✨ 收藏整理</h3>
+
+        <details class="modal-howto" data-howto-key="ctools">
+            <summary data-i18n="howto_summary">怎麼用？</summary>
+            <div data-i18n="howto_ctools"></div>
+        </details>
 
         <p class="pp-calc-hint" data-i18n="ctools_gen_hint">從你的 osu! 帳號生成收藏分類（需登入）。全部合併、不覆蓋現有資料。</p>
         <div class="ctools-btn-grid">

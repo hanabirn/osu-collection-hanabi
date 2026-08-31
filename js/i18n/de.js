@@ -28,6 +28,9 @@ I18N.de = {
 
     osu_title: '♫ Beatmap hinzufügen ♫', osu_placeholder: 'ID oder URL eingeben', osu_add: 'Hinzufügen',
     osu_password: 'Passwort',
+    osu_refresh_all_title: 'Aktuelle Daten aller Maps neu laden (Sterne, Status)',
+    tools_group_io: 'Import / Export', tools_group_tools: 'Werkzeuge & Einstellungen',
+    howto_summary: 'Wie funktioniert das?',
     osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!', osu_empty_banner_hint: 'Sobald du welche sammelst, zeigen Banner und Seitenhintergrund deine Beatmap-Cover.',
     hero_pitch: 'Ein Ort für deine osu!-Sammlung: aus dem Spiel importieren, Kategorien aus deinen Scores erzeugen, direkt zurück ins Spiel exportieren.',
     hero_feat_import: 'collection.db / .osdb aus dem Spiel importieren', hero_feat_generate: 'Kategorien aus deinem osu!-Konto erzeugen', hero_feat_share: 'Sammlungen teilen (mit Vorschaukarten)',

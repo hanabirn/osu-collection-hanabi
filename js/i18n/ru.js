@@ -28,6 +28,9 @@ I18N.ru = {
 
     osu_title: '♫ Добавить битмап ♫', osu_placeholder: 'Введите ID или URL', osu_add: 'Добавить',
     osu_password: 'Пароль',
+    osu_refresh_all_title: 'Обновить данные всех карт (звёзды, статус)',
+    tools_group_io: 'Импорт / экспорт', tools_group_tools: 'Инструменты и настройки',
+    howto_summary: 'Как это работает?',
     osu_fav: 'Избранное', osu_empty_collection: 'Битмапов пока нет', osu_empty_hint: 'Введите ID выше!', osu_empty_banner_hint: 'Когда добавите несколько, баннер и фон страницы покажут обложки ваших карт.',
     hero_pitch: 'Одно место для вашей коллекции osu!: импорт из игры, авто-категории по вашим результатам, экспорт обратно в игру.',
     hero_feat_import: 'Импорт игрового collection.db / .osdb', hero_feat_generate: 'Категории из вашего аккаунта osu!', hero_feat_share: 'Делитесь коллекциями (с карточками-превью)',

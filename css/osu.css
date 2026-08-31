@@ -469,6 +469,67 @@
     to { transform: rotate(360deg); }
 }
 
+/* The old flat row of ~11 unlabelled icon buttons under "新增 Beatmap"
+   split into two captioned clusters so the row is scannable without
+   hovering every button. */
+.osu-tool-groups {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 18px;
+    margin-top: 12px;
+}
+.osu-tool-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.osu-tool-group-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim2);
+}
+.osu-tool-group-btns {
+    display: flex;
+    gap: 8px;
+}
+
+/* "怎麼用？" walkthrough inside the deeper modals (.db export, ✨ tools) */
+.modal-howto {
+    margin: 0 0 14px;
+    border: 1px solid var(--border-input);
+    border-radius: 10px;
+    background: rgba(168, 85, 247, 0.06);
+    font-size: 0.82rem;
+}
+.modal-howto > summary {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: var(--text-accent);
+    list-style: none;
+}
+.modal-howto > summary::-webkit-details-marker { display: none; }
+.modal-howto > summary::before {
+    content: '▸ ';
+    display: inline-block;
+    transition: transform 0.15s;
+}
+.modal-howto[open] > summary::before { transform: rotate(90deg); }
+.modal-howto > div {
+    padding: 0 14px 10px 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+.modal-howto ol {
+    margin: 4px 0;
+    padding-left: 1.3em;
+}
+.modal-howto li { margin: 3px 0; }
+.modal-howto p { margin: 6px 0 0; color: var(--text-dim2); }
+
 .osu-io-btns {
     display: flex;
     gap: 8px;

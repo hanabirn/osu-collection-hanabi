@@ -28,6 +28,9 @@ I18N.fr = {
 
     osu_title: '♫ Ajouter Beatmap ♫', osu_placeholder: 'Entrez ID ou URL', osu_add: 'Ajouter',
     osu_password: 'Mot de passe',
+    osu_refresh_all_title: 'Récupérer les données à jour de chaque map (difficulté, statut)',
+    tools_group_io: 'Import / export', tools_group_tools: 'Outils et réglages',
+    howto_summary: 'Comment ça marche ?',
     osu_fav: 'Favoris', osu_empty_collection: 'Pas encore de beatmaps', osu_empty_hint: 'Entrez un ID ci-dessus!', osu_empty_banner_hint: 'Une fois que vous en ajoutez, la bannière et le fond de page affichent vos covers.',
     hero_pitch: "Un seul endroit pour organiser votre collection osu! : import depuis le jeu, catégories auto d'après vos scores, export direct vers le jeu.",
     hero_feat_import: 'Importer le collection.db / .osdb du jeu', hero_feat_generate: 'Générer des catégories depuis votre compte osu!', hero_feat_share: 'Partager des collections (avec cartes de prévisualisation)',

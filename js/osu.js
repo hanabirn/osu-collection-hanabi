@@ -1339,6 +1339,21 @@ async function importFromOsuProfile() {
 
 /* ===== Collection tools modal — generate categories from your osu! account,
    and a health check for the collection ===== */
+/* <details class="modal-howto"> in the deeper modals (.db export, ✨ tools):
+   expanded by default, but remembers per-modal if the visitor collapses it
+   so it doesn't nag on every open. */
+function wireModalHowto() {
+    document.querySelectorAll('.modal-howto[data-howto-key]').forEach(el => {
+        const key = 'howto_open_' + el.dataset.howtoKey;
+        let stored;
+        try { stored = localStorage.getItem(key); } catch { stored = null; }
+        el.open = stored !== '0';
+        el.addEventListener('toggle', () => {
+            try { localStorage.setItem(key, el.open ? '1' : '0'); } catch { /* private mode */ }
+        });
+    });
+}
+
 function openCollectionToolsModal() {
     const gs = document.getElementById('ctools-gen-status');
     gs.innerText = ''; gs.style.color = '';

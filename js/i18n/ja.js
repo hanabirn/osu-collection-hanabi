@@ -28,6 +28,9 @@ I18N.ja = {
 
     osu_title: '♫ ビートマップ追加 ♫', osu_placeholder: 'IDまたはURLを入力', osu_add: '追加',
     osu_password: 'パスワード設定',
+    osu_refresh_all_title: '全マップの最新データを再取得（星・状態）',
+    tools_group_io: 'コレクションの入出力', tools_group_tools: 'ツール・設定',
+    howto_summary: '使い方',
     osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
     hero_pitch: 'osu! のコレクションをまとめて整理：ゲームから取り込み、スコアからカテゴリを自動生成、ゲームへそのまま書き出し。',
     hero_feat_import: 'ゲームの collection.db／.osdb を取り込み', hero_feat_generate: 'osu! アカウントからカテゴリを生成', hero_feat_share: 'コレクションを共有（プレビューカード付き）',
