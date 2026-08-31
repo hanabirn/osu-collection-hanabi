@@ -846,13 +846,17 @@
 }
 .osu-category-picker-item:hover { background: var(--bg-stat); }
 
+/* This row sits in the narrow left sidebar, so with the search box plus
+   up to four selects (sort + language + genre + source) it always wraps:
+   the search box takes its own line, the selects flow below two-per-line. */
 .osu-search-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 16px;
 }
 #osu-search-input {
-    flex: 1;
+    flex: 1 1 100%;
     min-width: 0;
     padding: 11px 14px;
     border-radius: 10px;
@@ -872,6 +876,8 @@
 #osu-lang-filter,
 #osu-genre-filter,
 #osu-source-filter {
+    flex: 1 1 45%;
+    min-width: 0;
     padding: 11px 12px;
     border-radius: 10px;
     border: 1px solid var(--border-input);
@@ -879,18 +885,6 @@
     color: var(--text);
     font-size: 0.85rem;
     font-family: inherit;
-    max-width: 40%;
-}
-/* Source values are free text and can be long — cap the width so a
-   "SOUND VOLTEX III GRAVITY WARS (3)" option doesn't blow out the row. */
-#osu-source-filter { max-width: 30%; text-overflow: ellipsis; }
-@media (max-width: 480px) {
-    .osu-search-row { flex-wrap: wrap; }
-    #osu-search-input { flex: 1 1 100%; }
-    #osu-sort-select,
-    #osu-lang-filter,
-    #osu-genre-filter,
-    #osu-source-filter { flex: 1; max-width: none; }
 }
 
 /* Small frosted pill at the top of a card's info block — the beatmapset's
