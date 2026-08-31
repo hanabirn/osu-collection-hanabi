@@ -1951,6 +1951,23 @@
     font-family: inherit;
     font-size: 0.85rem;
 }
+#ctools-practice-progress:not(:empty) {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-input);
+}
+.ctools-practice-progress-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+.ctools-practice-progress-row {
+    font-size: 0.8rem;
+    color: var(--text-dim2);
+    padding: 3px 0;
+    font-variant-numeric: tabular-nums;
+}
 .ctools-mapper-row input {
     flex: 1;
     min-width: 0;

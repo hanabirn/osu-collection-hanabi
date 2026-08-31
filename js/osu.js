@@ -1328,9 +1328,12 @@ async function importFromOsuProfile() {
 function openCollectionToolsModal() {
     const gs = document.getElementById('ctools-gen-status');
     gs.innerText = ''; gs.style.color = '';
+    const ps = document.getElementById('ctools-practice-status');
+    if (ps) { ps.innerText = ''; ps.style.color = ''; }
     document.getElementById('ctools-health-results').innerHTML = '';
     document.getElementById('ctools-mapper-input').value = '';
     document.getElementById('collection-tools-modal').style.display = 'flex';
+    if (typeof renderPracticeProgress === 'function') renderPracticeProgress();
 }
 function closeCollectionToolsModal() {
     document.getElementById('collection-tools-modal').style.display = 'none';
@@ -1704,6 +1707,15 @@ async function generatePracticeCollection(kind) {
     }
     if (!top || top.ppList.length < 10) { setS(t('practice_need_more_plays'), '#f59e0b'); return; }
 
+    // Current total pp — the baseline the progress loop diffs against later,
+    // and what 目標圖池 measures the target against. One fetch for all kinds.
+    let currentTotalPp = null;
+    try {
+        const me = await osuFetch(`u=${user.id}&m=${PRACTICE_MODE}`);
+        if (me && me[0] && me[0].pp_raw != null) currentTotalPp = parseFloat(me[0].pp_raw);
+    } catch { /* progress baseline just won't be recorded */ }
+    const recOpts = { ppAtCreation: currentTotalPp, userId: user.id };
+
     // Score-driven kinds: no farm dataset, no star floor — any rank.
     if (kind === 'lowacc' || kind === 'taste') {
         let entries;
@@ -1718,7 +1730,7 @@ async function generatePracticeCollection(kind) {
         }
         if (kind === 'lowacc' && !entries.length) { setS(t('practice_acc_stable'), '#34d399'); return; }
         if (kind === 'taste' && entries.length < 10) { setS(t('practice_taste_thin'), '#f59e0b'); return; }
-        return practiceApplyAndReport(kind, {}, entries, setS);
+        return practiceApplyAndReport(kind, recOpts, entries, setS);
     }
 
     let band, weakDim = null;
@@ -1746,11 +1758,7 @@ async function generatePracticeCollection(kind) {
         // goal — recompute `needed` against the LOGGED-IN user's own top 100
         // (the PP panel's own calc runs against whatever profile was last
         // looked up).
-        let actualTotal = 0;
-        try {
-            const me = await osuFetch(`u=${user.id}&m=${PRACTICE_MODE}`);
-            if (me && me[0] && me[0].pp_raw != null) actualTotal = parseFloat(me[0].pp_raw);
-        } catch { /* fall through with 0 → needed is just larger */ }
+        const actualTotal = currentTotalPp || 0;
         if (actualTotal && actualTotal >= target) { setS(t('practice_goal_reached'), '#34d399'); return; }
         const bonusPp = Math.max(0, actualTotal - weightedPpSum(top.ppList));
         const needed = ppNeededForTarget(top.ppList, bonusPp, target);
@@ -1789,20 +1797,102 @@ async function generatePracticeCollection(kind) {
     }
     if (entries.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
 
-    return practiceApplyAndReport(kind, { target, dim: weakDim }, entries, setS);
+    return practiceApplyAndReport(kind, { ...recOpts, target, dim: weakDim }, entries, setS);
 }
 
 /* Shared tail: hand the picked set ids to the normal import pipeline (set
-   resolution, category creation, progress, .db/.osdb export all free) and
-   report. */
+   resolution, category creation, progress, .db/.osdb export all free),
+   record the set for the progress loop, and report. */
 async function practiceApplyAndReport(kind, opts, entries, setS) {
-    const report = await applyImportedCollections(
-        [{ name: practiceCatName(kind, opts), entries }],
-        m => setS(m),
-    );
+    const name = practiceCatName(kind, opts);
+    const report = await applyImportedCollections([{ name, entries }], m => setS(m));
+
+    const cat = getOsuCategories().find(c => c.name === name);
+    if (cat) {
+        const store = getPracticeSets();
+        store[String(cat.id)] = {
+            kind,
+            dim: opts.dim || null,
+            target: opts.target || null,
+            createdAt: new Date().toISOString(),
+            ppAtCreation: opts.ppAtCreation != null ? opts.ppAtCreation : null,
+            userId: opts.userId || null,
+            memberSetIds: entries.map(e => e.setId),
+        };
+        savePracticeSets(store);
+    }
+
     setS(t('collection_io_import_done', {
         sets: report.addedSets, cats: report.touchedCats, missed: report.unresolved,
     }), '#34d399');
+}
+
+/* ===== Practice-set progress loop =====
+   Records each practice category at creation (kind, date, total pp then,
+   its member set ids). renderPracticeProgress() diffs live: current total
+   pp vs then, and how many of the set's maps now sit in the user's top
+   100. Shown in the ✨ modal only when there's at least one tracked set. */
+const PRACTICE_SETS_KEY = 'osu_practice_sets';
+function getPracticeSets() {
+    try { return JSON.parse(localStorage.getItem(PRACTICE_SETS_KEY)) || {}; }
+    catch { return {}; }
+}
+function savePracticeSets(m) {
+    localStorage.setItem(PRACTICE_SETS_KEY, JSON.stringify(m));
+}
+
+async function renderPracticeProgress() {
+    const el = document.getElementById('ctools-practice-progress');
+    if (!el) return;
+
+    const store = getPracticeSets();
+    const catById = new Map(getOsuCategories().map(c => [String(c.id), c]));
+    let pruned = false;
+    for (const id of Object.keys(store)) {
+        if (!catById.has(id)) { delete store[id]; pruned = true; }
+    }
+    if (pruned) savePracticeSets(store);
+
+    const ids = Object.keys(store);
+    if (!ids.length) { el.innerHTML = ''; return; }
+
+    el.innerHTML = `<div class="ctools-practice-progress-title">${escHtml(t('practice_progress_title'))}</div>`
+        + `<div class="status">${escHtml(t('practice_progress_loading'))}</div>`;
+
+    const user = getLoggedInOsuUser();
+    let curPp = null;
+    const topBids = new Set();
+    if (user && user.id) {
+        try {
+            const [me, best] = await Promise.all([
+                osuFetch(`u=${user.id}&m=${PRACTICE_MODE}`),
+                osuFetch(`best=${user.id}&limit=100&m=${PRACTICE_MODE}`),
+            ]);
+            if (me && me[0] && me[0].pp_raw != null) curPp = parseFloat(me[0].pp_raw);
+            (best || []).forEach(s => topBids.add(parseInt(s.beatmap_id)));
+        } catch { /* show what we can without the live numbers */ }
+    }
+
+    const beatmapsBySet = new Map();
+    const col = getOsuCollection();
+    OSU_MODES.forEach(m => col[m].forEach(s =>
+        beatmapsBySet.set(s.beatmapset_id, (s.beatmaps || []).map(b => parseInt(b.beatmap_id))),
+    ));
+
+    const rows = ids.map(id => {
+        const p = store[id];
+        const cat = catById.get(id);
+        const dPp = (curPp != null && p.ppAtCreation != null) ? Math.round(curPp - p.ppAtCreation) : null;
+        const hits = (p.memberSetIds || []).reduce(
+            (n, sid) => n + ((beatmapsBySet.get(sid) || []).some(b => topBids.has(b)) ? 1 : 0), 0,
+        );
+        const parts = [escHtml(cat.name), (p.createdAt || '').slice(0, 10)];
+        if (dPp != null) parts.push(t('practice_progress_dpp', { d: (dPp >= 0 ? '+' : '') + dPp.toLocaleString() }));
+        parts.push(t('practice_progress_hits', { n: hits, total: (p.memberSetIds || []).length }));
+        return `<div class="ctools-practice-progress-row">${parts.join(' · ')}</div>`;
+    });
+
+    el.innerHTML = `<div class="ctools-practice-progress-title">${escHtml(t('practice_progress_title'))}</div>` + rows.join('');
 }
 
 /* Remove several sets at once, cleaning their category memberships too
