@@ -445,6 +445,13 @@ a:hover { text-decoration: underline; }
     /* Enlarged ~1.5x in the header rework so the title is the page's clear
        focal point; clamped so it still fits a phone. */
     font-size: clamp(2.6rem, 6vw, 4.8rem);
+    /* Explicit line-height so the <h1> box is font-size * 1.15 no matter
+       which font is resolved: Noto Sans TC 900 and the system CJK fallback
+       have different intrinsic metrics, and without this the box changes
+       height when the web font swaps in — shoving the tagline, hero and the
+       whole grid down (the bulk of the lab CLS). Width still varies a hair
+       (glyph advances), but that only nudges the aria-hidden note glyphs. */
+    line-height: 1.15;
     font-weight: 900;
     background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple), var(--accent-pink), var(--text-pink));
     background-size: 300% auto;
