@@ -72,6 +72,8 @@ I18N.es = {
     practice_dim_bpm_low: 'BPM bajo (<160)', practice_dim_bpm_mid: 'BPM medio (160–200)', practice_dim_bpm_high: 'BPM alto (>200)',
     practice_dim_ar_low: 'AR bajo (<8.3)', practice_dim_ar_mid: 'AR medio (8.3–9.3)', practice_dim_ar_high: 'AR alto (>9.3)',
     practice_dim_cs_low: 'CS bajo (<3.7)', practice_dim_cs_mid: 'CS medio (3.7–4.3)', practice_dim_cs_high: 'CS alto (>4.3)',
+    practice_dim_sr_jump: 'saltos (enfoque aim)', practice_dim_sr_bal: 'aim/stream equilibrado', practice_dim_sr_stream: 'streams (enfoque speed)',
+    practice_enrich_strain: 'Analizando tu tendencia aim/stream… ({done}/{total})',
     practice_reading_top: 'Leyendo tu top… ({done}/{total})',
     practice_reading_recent: 'Leyendo plays recientes…',
     practice_scanning_farm: 'Escaneando el grupo farm… ({done}/{total})',

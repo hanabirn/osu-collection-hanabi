@@ -79,6 +79,11 @@ exports.handler = async (event) => {
         const body = JSON.stringify({
             stars: diffAttrs.stars,
             maxCombo: diffAttrs.maxCombo,
+            // osu!std aim / speed difficulty — used by the practice
+            // generator's stream/jump weak-spot dimension. null for other
+            // rulesets.
+            aim: diffAttrs.aim != null ? diffAttrs.aim : null,
+            speed: diffAttrs.speed != null ? diffAttrs.speed : null,
             pp,
             strains: { sectionLength: strainsRaw.sectionLength, values: strainValues },
             attrs: { ar: beatmapAttrs.ar, od: beatmapAttrs.od, cs: beatmapAttrs.cs, hp: beatmapAttrs.hp },

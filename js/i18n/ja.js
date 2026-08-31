@@ -72,6 +72,8 @@ I18N.ja = {
     practice_dim_bpm_low: '低 BPM（<160）', practice_dim_bpm_mid: '中 BPM（160–200）', practice_dim_bpm_high: '高 BPM（>200）',
     practice_dim_ar_low: '低 AR（<8.3）', practice_dim_ar_mid: '中 AR（8.3–9.3）', practice_dim_ar_high: '高 AR（>9.3）',
     practice_dim_cs_low: '低 CS（<3.7）', practice_dim_cs_mid: '中 CS（3.7–4.3）', practice_dim_cs_high: '高 CS（>4.3）',
+    practice_dim_sr_jump: 'ジャンプ（aim 主体）', practice_dim_sr_bal: 'aim・ストリーム均等', practice_dim_sr_stream: 'ストリーム（speed 主体）',
+    practice_enrich_strain: 'top plays の aim/ストリーム傾向を分析中…（{done}/{total}）',
     practice_reading_top: '上位プレイを読み込み中…（{done}/{total}）',
     practice_reading_recent: '最近のプレイを読み込み中…',
     practice_scanning_farm: 'farm プールをスキャン中…（{done}/{total}）',

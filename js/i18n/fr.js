@@ -72,6 +72,8 @@ I18N.fr = {
     practice_dim_bpm_low: 'BPM bas (<160)', practice_dim_bpm_mid: 'BPM moyen (160–200)', practice_dim_bpm_high: 'BPM élevé (>200)',
     practice_dim_ar_low: 'AR bas (<8.3)', practice_dim_ar_mid: 'AR moyen (8.3–9.3)', practice_dim_ar_high: 'AR élevé (>9.3)',
     practice_dim_cs_low: 'CS bas (<3.7)', practice_dim_cs_mid: 'CS moyen (3.7–4.3)', practice_dim_cs_high: 'CS élevé (>4.3)',
+    practice_dim_sr_jump: 'sauts (axé aim)', practice_dim_sr_bal: 'aim/stream équilibré', practice_dim_sr_stream: 'streams (axé speed)',
+    practice_enrich_strain: 'Analyse de ta tendance aim/stream… ({done}/{total})',
     practice_reading_top: 'Lecture de ton top… ({done}/{total})',
     practice_reading_recent: 'Lecture des plays récents…',
     practice_scanning_farm: 'Analyse du pool farm… ({done}/{total})',

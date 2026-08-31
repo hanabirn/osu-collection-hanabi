@@ -72,6 +72,8 @@ I18N.ru = {
     practice_dim_bpm_low: 'низкий BPM (<160)', practice_dim_bpm_mid: 'средний BPM (160–200)', practice_dim_bpm_high: 'высокий BPM (>200)',
     practice_dim_ar_low: 'низкий AR (<8.3)', practice_dim_ar_mid: 'средний AR (8.3–9.3)', practice_dim_ar_high: 'высокий AR (>9.3)',
     practice_dim_cs_low: 'низкий CS (<3.7)', practice_dim_cs_mid: 'средний CS (3.7–4.3)', practice_dim_cs_high: 'высокий CS (>4.3)',
+    practice_dim_sr_jump: 'джампы (упор на aim)', practice_dim_sr_bal: 'баланс aim/стрим', practice_dim_sr_stream: 'стримы (упор на speed)',
+    practice_enrich_strain: 'Анализ вашего уклона aim/стрим… ({done}/{total})',
     practice_reading_top: 'Загрузка ваших топ-плеев… ({done}/{total})',
     practice_reading_recent: 'Загрузка недавних плеев…',
     practice_scanning_farm: 'Поиск в пуле farm… ({done}/{total})',

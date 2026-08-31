@@ -72,6 +72,8 @@ I18N.zh = {
     practice_dim_bpm_low: '低 BPM（<160）', practice_dim_bpm_mid: '中 BPM（160–200）', practice_dim_bpm_high: '高 BPM（>200）',
     practice_dim_ar_low: '低 AR（<8.3）', practice_dim_ar_mid: '中 AR（8.3–9.3）', practice_dim_ar_high: '高 AR（>9.3）',
     practice_dim_cs_low: '低 CS（<3.7）', practice_dim_cs_mid: '中 CS（3.7–4.3）', practice_dim_cs_high: '高 CS（>4.3）',
+    practice_dim_sr_jump: '跳圖（aim 為主）', practice_dim_sr_bal: 'aim・串平衡', practice_dim_sr_stream: '串圖（speed 為主）',
+    practice_enrich_strain: '分析你 top plays 的串/跳傾向…（{done}/{total}）',
     practice_weak_none: '你的 top plays 在各長度／BPM 都很平均，沒有明顯弱項',
     practice_progress_title: '練習進度',
     practice_progress_loading: '讀取練習進度…',

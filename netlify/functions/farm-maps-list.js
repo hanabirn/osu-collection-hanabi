@@ -40,6 +40,7 @@ exports.handler = async (event) => {
     const lengthMin = num(qs.lengthMin), lengthMax = num(qs.lengthMax);
     const arMin = num(qs.arMin), arMax = num(qs.arMax);
     const csMin = num(qs.csMin), csMax = num(qs.csMax);
+    const srMin = num(qs.srMin), srMax = num(qs.srMax);
 
     const [sortField, sortDir] = (qs.sort || 'pp_desc').split('_');
     const SORT_FIELDS = { pp: '__pp', star: '__star', bpm: 'bpm', length: 'total_length', new: 'firstSeenAt' };
@@ -50,8 +51,15 @@ exports.handler = async (event) => {
         const dataset = (await store.get(`dataset:${mode}`, { type: 'json' })) || [];
         const crawlState = (await store.get(`crawl-state:${mode}`, { type: 'json' })) || {};
 
-        let items = dataset.map(r => ({ ...r, __pp: r.pp ? r.pp[mods] : undefined, __star: r.stars ? r.stars[mods] : undefined }))
-            .filter(r => r.__pp !== undefined && r.__star !== undefined);
+        let items = dataset.map(r => {
+            const a = r.aim && r.aim[mods];
+            const sp = r.speed && r.speed[mods];
+            // speed's share of aim+speed difficulty: >0.5 stream-leaning,
+            // <0.5 aim/jump-leaning. undefined for records not yet recrawled
+            // with aim/speed.
+            const sr = (a != null && sp != null && a + sp > 0) ? sp / (a + sp) : undefined;
+            return { ...r, __pp: r.pp ? r.pp[mods] : undefined, __star: r.stars ? r.stars[mods] : undefined, __sr: sr };
+        }).filter(r => r.__pp !== undefined && r.__star !== undefined);
 
         const farmClassifiedCount = items.filter(r => r.farmSignal).length;
         const farmMapCount = items.filter(r => r.farmSignal && r.farmSignal.isFarm).length;
@@ -69,6 +77,8 @@ exports.handler = async (event) => {
         if (arMax !== null) items = items.filter(r => r.ar != null && r.ar <= arMax);
         if (csMin !== null) items = items.filter(r => r.cs != null && r.cs >= csMin);
         if (csMax !== null) items = items.filter(r => r.cs != null && r.cs <= csMax);
+        if (srMin !== null) items = items.filter(r => r.__sr != null && r.__sr >= srMin);
+        if (srMax !== null) items = items.filter(r => r.__sr != null && r.__sr <= srMax);
         if (q) {
             items = items.filter(r =>
                 (r.title || '').toLowerCase().includes(q) ||
@@ -81,7 +91,7 @@ exports.handler = async (event) => {
         const total = items.length;
         const pageItems = items
             .slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
-            .map(({ __pp, __star, ...r }) => ({ ...r, pp: __pp, star: __star }));
+            .map(({ __pp, __star, __sr, ...r }) => ({ ...r, pp: __pp, star: __star, speedRatio: __sr != null ? __sr : null }));
 
         return {
             statusCode: 200,

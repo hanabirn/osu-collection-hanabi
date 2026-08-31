@@ -72,6 +72,8 @@ I18N.ko = {
     practice_dim_bpm_low: '낮은 BPM (<160)', practice_dim_bpm_mid: '중간 BPM (160–200)', practice_dim_bpm_high: '높은 BPM (>200)',
     practice_dim_ar_low: '낮은 AR (<8.3)', practice_dim_ar_mid: '중간 AR (8.3–9.3)', practice_dim_ar_high: '높은 AR (>9.3)',
     practice_dim_cs_low: '낮은 CS (<3.7)', practice_dim_cs_mid: '중간 CS (3.7–4.3)', practice_dim_cs_high: '높은 CS (>4.3)',
+    practice_dim_sr_jump: '점프 (aim 위주)', practice_dim_sr_bal: 'aim/스트림 균형', practice_dim_sr_stream: '스트림 (speed 위주)',
+    practice_enrich_strain: 'top plays의 aim/스트림 성향 분석 중… ({done}/{total})',
     practice_reading_top: '상위 기록 불러오는 중… ({done}/{total})',
     practice_reading_recent: '최근 기록 불러오는 중…',
     practice_scanning_farm: 'farm 풀 검색 중… ({done}/{total})',

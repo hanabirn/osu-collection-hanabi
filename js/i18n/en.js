@@ -72,6 +72,8 @@ I18N.en = {
     practice_dim_bpm_low: 'low BPM (<160)', practice_dim_bpm_mid: 'mid BPM (160–200)', practice_dim_bpm_high: 'high BPM (>200)',
     practice_dim_ar_low: 'low AR (<8.3)', practice_dim_ar_mid: 'mid AR (8.3–9.3)', practice_dim_ar_high: 'high AR (>9.3)',
     practice_dim_cs_low: 'low CS (<3.7)', practice_dim_cs_mid: 'mid CS (3.7–4.3)', practice_dim_cs_high: 'high CS (>4.3)',
+    practice_dim_sr_jump: 'jump (aim-heavy)', practice_dim_sr_bal: 'aim/stream balanced', practice_dim_sr_stream: 'stream (speed-heavy)',
+    practice_enrich_strain: 'Analysing your aim/stream lean… ({done}/{total})',
     practice_weak_none: 'Your top plays are evenly spread across length / BPM — no clear weak spot',
     practice_progress_title: 'Practice progress',
     practice_progress_loading: 'Loading practice progress…',

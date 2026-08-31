@@ -1508,21 +1508,60 @@ const PRACTICE_WEAK_BUCKETS = [
     { dim: 'cs_low',    band: { csMax: 3.7 },                 hit: d => d.cs != null && d.cs < 3.7 },
     { dim: 'cs_mid',    band: { csMin: 3.7, csMax: 4.3 },     hit: d => d.cs != null && d.cs >= 3.7 && d.cs <= 4.3 },
     { dim: 'cs_high',   band: { csMin: 4.3 },                 hit: d => d.cs != null && d.cs > 4.3 },
+    // stream/jump — needsRatio: only considered when the top plays have
+    // been enriched with a speedRatio (via osu-pp, behind the 精算
+    // checkbox). Farm query uses a BPM proxy plus srMin/srMax; srRange also
+    // refines the candidates client-side where they carry a speedRatio.
+    { dim: 'sr_jump',   needsRatio: true, srRange: [0, 0.42],    band: { srMax: 0.42, bpmMax: 190 },  hit: d => d.speedRatio != null && d.speedRatio < 0.42 },
+    { dim: 'sr_bal',    needsRatio: true, srRange: [0.42, 0.55], band: { srMin: 0.42, srMax: 0.55 },  hit: d => d.speedRatio != null && d.speedRatio >= 0.42 && d.speedRatio <= 0.55 },
+    { dim: 'sr_stream', needsRatio: true, srRange: [0.55, 1],    band: { srMin: 0.55, bpmMin: 170 },  hit: d => d.speedRatio != null && d.speedRatio > 0.55 },
 ];
 
-function practicePickWeakestBucket(top) {
-    const stats = PRACTICE_WEAK_BUCKETS.map(b => {
+/* Pick the weak spot: the bucket with the lowest share *within its own
+   dimension group* (len / bpm / ar / cs / sr), tie-broken by lowest
+   average pp. Share, not raw count, so groups with different classified-
+   play coverage (sr only has what osu-pp could enrich) compare fairly. A
+   group needs >= 8 classified plays to be judged at all. */
+function practicePickWeakestBucket(top, includeRatio) {
+    const buckets = PRACTICE_WEAK_BUCKETS.filter(b => includeRatio || !b.needsRatio);
+    const stats = buckets.map(b => {
         let count = 0, ppSum = 0;
         top.scores.forEach((s, i) => {
             const d = top.detailByBeatmap.get(parseInt(s.beatmap_id));
             if (d && b.hit(d)) { count++; ppSum += top.ppList[i] || parseFloat(s.pp) || 0; }
         });
-        return { ...b, count, avgPp: count ? ppSum / count : 0 };
+        return { ...b, group: b.dim.split('_')[0], count, avgPp: count ? ppSum / count : 0 };
     });
-    // need at least *some* bucketable data
-    if (!stats.some(s => s.count > 0)) return null;
-    stats.sort((a, b) => a.count - b.count || a.avgPp - b.avgPp);
-    return stats[0];
+    const groupTotal = {};
+    stats.forEach(b => { groupTotal[b.group] = (groupTotal[b.group] || 0) + b.count; });
+    const scored = stats
+        .filter(b => groupTotal[b.group] >= 8)
+        .map(b => ({ ...b, share: b.count / groupTotal[b.group] }));
+    if (!scored.length) return null;
+    scored.sort((a, b) => a.share - b.share || a.avgPp - b.avgPp);
+    return scored[0];
+}
+
+/* ~100 osu-pp calls to tag each top play with speedRatio = speed / (aim +
+   speed) difficulty. Slow — only run for 弱項 when 精算 is checked.
+   Mutates top.detailByBeatmap. */
+async function practiceEnrichStrainRatios(top, mods, onProgress) {
+    const ids = [...top.detailByBeatmap.keys()].filter(Boolean);
+    const CH = 6;
+    for (let i = 0; i < ids.length; i += CH) {
+        onProgress(t('practice_enrich_strain', { done: i, total: ids.length }));
+        await Promise.all(ids.slice(i, i + CH).map(async bid => {
+            try {
+                const qs = new URLSearchParams({ id: String(bid), acc: '100' });
+                if (mods && mods !== 'NM') qs.set('mods', mods);
+                const r = await fetch(`/.netlify/functions/osu-pp?${qs}`).then(x => x.json());
+                if (r && r.aim != null && r.speed != null && r.aim + r.speed > 0) {
+                    const d = top.detailByBeatmap.get(bid);
+                    if (d) d.speedRatio = r.speed / (r.aim + r.speed);
+                }
+            } catch { /* leave speedRatio unset */ }
+        }));
+    }
 }
 
 /* get_user_best has pp but no star rating, set id or mapper, so this joins
@@ -1757,7 +1796,7 @@ async function generatePracticeCollection(kind) {
     }
 
     const precise = !!(document.getElementById('ctools-practice-precise') || {}).checked;
-    let band, weakDim = null, needed = null;
+    let band, weakDim = null, needed = null, weakSrRange = null;
     if (kind === 'push') {
         band = {
             mods,
@@ -1768,12 +1807,19 @@ async function generatePracticeCollection(kind) {
             sort: 'pp_desc',
         };
     } else if (kind === 'weak') {
-        const bucket = practicePickWeakestBucket(top);
+        // 精算 unlocks the stream/jump dimension — needs ~100 osu-pp calls
+        // to tag the top plays with an aim/speed ratio first.
+        if (precise) {
+            setS(t('practice_enrich_strain', { done: 0, total: '…' }));
+            await practiceEnrichStrainRatios(top, mods, setS);
+        }
+        const bucket = practicePickWeakestBucket(top, precise);
         if (!bucket) { setS(t('practice_weak_none'), '#34d399'); return; }
         weakDim = bucket.dim;
+        weakSrRange = bucket.srRange || null;
         band = {
             mods,
-            ...bucket.band,   // bpmMin/Max or lengthMin/Max
+            ...bucket.band,   // bpm/length/ar/cs/sr range for this bucket
             // Cap length so a high-BPM bucket doesn't fill up with 10-minute
             // marathon compilations — not a practice target.
             lengthMax: Math.min(bucket.band.lengthMax || Infinity, PRACTICE_WEAK_LENGTH_CAP),
@@ -1819,10 +1865,24 @@ async function generatePracticeCollection(kind) {
         if (!sid || have.has(sid) || seenSet.has(sid)) continue;
         if (top.goodScoreBeatmapIds.has(parseInt(r.beatmap_id))) continue;
         seenSet.add(sid);
-        candidates.push({ setId: sid, beatmapId: parseInt(r.beatmap_id) || null, farmPp: parseFloat(r.pp) || 0 });
+        candidates.push({
+            setId: sid,
+            beatmapId: parseInt(r.beatmap_id) || null,
+            farmPp: parseFloat(r.pp) || 0,
+            speedRatio: r.speedRatio != null ? r.speedRatio : null,
+        });
         if (candidates.length >= PRACTICE_N_MAX * 2) break;
     }
     if (candidates.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
+
+    // 弱項 stream/jump: tighten to candidates whose speedRatio matches the
+    // weak lean; ones the farm hasn't computed yet pass on the BPM proxy
+    // already applied in the query. Only if that still leaves a full set.
+    if (weakSrRange) {
+        const refined = candidates.filter(c => c.speedRatio == null
+            || (c.speedRatio >= weakSrRange[0] && c.speedRatio <= weakSrRange[1]));
+        if (refined.length >= PRACTICE_N_MIN) { candidates.length = 0; candidates.push(...refined); }
+    }
 
     let ranked = candidates;
     if (precise && (kind === 'push' || kind === 'goal')) {

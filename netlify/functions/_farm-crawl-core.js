@@ -169,11 +169,19 @@ async function computeOne(item, mode, existingRecord, token) {
     const map = new rosu.Beatmap(text);
     const stars = {};
     const pp = {};
+    // aim / speed difficulty per mod combo — feeds farm-maps-list's
+    // speedRatio and the practice generator's stream/jump weak dimension.
+    // Old records lack these until their next recompute (this runs on every
+    // recrawl, same as stars/pp), so coverage fills in gradually.
+    const aim = {};
+    const speed = {};
     for (const mods of MOD_COMBOS) {
         const diffAttrs = new rosu.Difficulty({ mods }).calculate(map);
         const perf = new rosu.Performance({ mods, accuracy: COMPUTE_ACCURACY });
         stars[modKey(mods)] = diffAttrs.stars;
         pp[modKey(mods)] = perf.calculate(diffAttrs).pp;
+        aim[modKey(mods)] = diffAttrs.aim != null ? diffAttrs.aim : null;
+        speed[modKey(mods)] = diffAttrs.speed != null ? diffAttrs.speed : null;
     }
 
     // farmSignal only needs computing once per beatmap — a top-50 leaderboard's
@@ -193,7 +201,7 @@ async function computeOne(item, mode, existingRecord, token) {
         }
     }
 
-    return { ...item, stars, pp, farmSignal };
+    return { ...item, stars, pp, aim, speed, farmSignal };
 }
 
 async function runCrawlBatch(mode, budgetMs) {
