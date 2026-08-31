@@ -779,7 +779,7 @@
 
         <hr class="collection-io-sep">
 
-        <p class="pp-calc-hint" data-i18n="practice_hint">依你的成績生成練習收藏（需登入）。來源：farm 資料庫，5.5★ 以上——分段較低時目前還用不到。</p>
+        <p class="pp-calc-hint" data-i18n="practice_hint">依你的成績生成練習收藏（需登入）。突破分／目標圖池吃 farm 資料庫（5.5★ 以上）；低準度／相似圖吃你自己的成績，任何分段都能用。</p>
         <div class="ctools-practice-row">
             <select id="ctools-practice-mods" class="ctools-practice-mods" aria-label="mods">
                 <option value="NM">NM</option>
@@ -789,6 +789,10 @@
             </select>
             <button class="btn" onclick="generatePracticeCollection('push')" data-i18n="practice_gen_push">突破分</button>
             <button class="btn" onclick="generatePracticeCollection('goal')" data-i18n="practice_gen_goal">目標圖池</button>
+        </div>
+        <div class="ctools-practice-row">
+            <button class="btn" onclick="generatePracticeCollection('lowacc')" data-i18n="practice_gen_lowacc">低準度重練</button>
+            <button class="btn" onclick="generatePracticeCollection('taste')" data-i18n="practice_gen_taste">沒打過的相似圖</button>
         </div>
         <div id="ctools-practice-status" class="status"></div>
 

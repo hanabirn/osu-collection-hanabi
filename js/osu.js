@@ -1446,41 +1446,142 @@ function practicePercentile(nums, p) {
     return s[Math.min(s.length - 1, Math.max(0, Math.round((p / 100) * (s.length - 1))))];
 }
 
-/* get_user_best has pp but no star rating and no set id, so this batches
-   get_beatmap (b=) in chunks the same way generateCollectionFor('best')
-   does. Returns the pp/star summary both kinds need, plus the beatmap_ids
-   the user has already scored well on (so we don't recommend those back). */
+/* Chunked get_beatmap (b=) fill: for every beatmap_id not already in
+   `detailByBeatmap`, fetch its details and store { setId, stars, creator }.
+   Mutates the map; used by practiceFetchTopPlays and by the low-acc kind
+   for recent plays outside the top 100. */
+async function practiceResolveMissingDetails(beatmapIds, detailByBeatmap, onProgress, label) {
+    const need = [...new Set(beatmapIds)].filter(id => id && !detailByBeatmap.has(id));
+    const CH = 10;
+    for (let i = 0; i < need.length; i += CH) {
+        if (onProgress) onProgress(t(label || 'practice_reading_top', { done: i, total: need.length }));
+        const chunk = need.slice(i, i + CH);
+        const rs = await Promise.all(chunk.map(id => osuFetch(`b=${id}`).catch(() => null)));
+        rs.forEach((r, j) => {
+            const b = r && r[0];
+            if (!b) return;
+            detailByBeatmap.set(chunk[j], {
+                setId: parseInt(b.beatmapset_id) || null,
+                stars: parseFloat(b.difficultyrating),
+                creator: b.creator || null,
+            });
+        });
+    }
+}
+
+/* get_user_best has pp but no star rating, set id or mapper, so this joins
+   each top-100 play with its get_beatmap details (batched like
+   generateCollectionFor('best')). Returns everything the four kinds need:
+   pp band edges, star median / P90 / IQR, weighted mean accuracy, the set
+   of beatmap_ids already FC'd, and the per-play detail map. */
 async function practiceFetchTopPlays(uid, mode, onProgress) {
     const scores = await osuFetch(`best=${uid}&limit=100&m=${mode}`) || [];
     if (!scores.length) return null;
     const ppList = scores.map(s => parseFloat(s.pp)).filter(Number.isFinite).sort((a, b) => b - a);
 
-    const starByBeatmap = new Map();
-    const bmIds = [...new Set(scores.map(s => s.beatmap_id).filter(Boolean))];
-    const CH = 10;
-    for (let i = 0; i < bmIds.length; i += CH) {
-        if (onProgress) onProgress(t('practice_reading_top', { done: i, total: bmIds.length }));
-        const chunk = bmIds.slice(i, i + CH);
-        const rs = await Promise.all(chunk.map(id => osuFetch(`b=${id}`).catch(() => null)));
-        rs.forEach((r, j) => {
-            const b = r && r[0];
-            if (b) starByBeatmap.set(chunk[j], parseFloat(b.difficultyrating));
-        });
-    }
-    const stars = [...starByBeatmap.values()].filter(Number.isFinite);
-
-    const goodScoreBeatmapIds = new Set(
-        scores.filter(s => parseFloat(calcOsuAccuracy(s, mode)) >= PRACTICE_GOOD_ACC)
-              .map(s => parseInt(s.beatmap_id)),
+    const detailByBeatmap = new Map();
+    await practiceResolveMissingDetails(
+        scores.map(s => parseInt(s.beatmap_id)), detailByBeatmap, onProgress,
     );
 
+    const stars = [...detailByBeatmap.values()].map(d => d.stars).filter(Number.isFinite);
+
+    // weighted mean accuracy of the top plays (same 0.95^rank weighting as pp)
+    let accW = 0, wSum = 0;
+    scores.forEach((s, i) => {
+        const w = Math.pow(0.95, i);
+        accW += parseFloat(calcOsuAccuracy(s, mode)) * w;
+        wSum += w;
+    });
+
     return {
+        scores,
         ppList,
         p100: ppList.length ? ppList[Math.min(99, ppList.length - 1)] : 0,
         starMedian: practiceMedian(stars),
         star90: practicePercentile(stars, 90),
-        goodScoreBeatmapIds,
+        starP25: practicePercentile(stars, 25),
+        starP75: practicePercentile(stars, 75),
+        avgAccWeighted: wSum ? accW / wSum : 100,
+        goodScoreBeatmapIds: new Set(
+            scores.filter(s => parseFloat(calcOsuAccuracy(s, mode)) >= PRACTICE_GOOD_ACC)
+                  .map(s => parseInt(s.beatmap_id)),
+        ),
+        playedBeatmapIds: new Set(scores.map(s => parseInt(s.beatmap_id))),
+        detailByBeatmap,
     };
+}
+
+/* 低準度重練 — beatmaps you've played but under your own weighted-mean acc,
+   worst first. No farm dataset, no star floor: works at any rank. */
+async function practiceCandidatesLowAcc(uid, mode, top, onProgress) {
+    onProgress(t('practice_reading_recent'));
+    const recent = (await osuFetch(`recent=${uid}&limit=50&m=${mode}`).catch(() => [])) || [];
+    const passed = (s) => s.rank && s.rank.toUpperCase() !== 'F';
+
+    const accByBeatmap = new Map();
+    const consider = (s, isRecent) => {
+        if (isRecent && !passed(s)) return;
+        const bid = parseInt(s.beatmap_id);
+        const a = parseFloat(calcOsuAccuracy(s, mode));
+        if (!accByBeatmap.has(bid) || a < accByBeatmap.get(bid)) accByBeatmap.set(bid, a);
+    };
+    top.scores.forEach(s => consider(s, false));
+    recent.forEach(s => consider(s, true));
+
+    let thr = top.avgAccWeighted - 1.5;
+    let low = [...accByBeatmap].filter(([, a]) => a < thr);
+    if (low.length < PRACTICE_N_MIN) low = [...accByBeatmap].filter(([, a]) => a < 97); // widen
+    low.sort((a, b) => a[1] - b[1]); // worst acc first
+
+    await practiceResolveMissingDetails(low.map(([bid]) => bid), top.detailByBeatmap, onProgress);
+    const have = practiceExistingSetIds();
+    const seen = new Set();
+    const entries = [];
+    for (const [bid] of low) {
+        const d = top.detailByBeatmap.get(bid);
+        if (!d || !d.setId || have.has(d.setId) || seen.has(d.setId)) continue;
+        seen.add(d.setId);
+        entries.push({ setId: d.setId });
+        if (entries.length >= PRACTICE_N_MAX) break;
+    }
+    return entries;
+}
+
+/* 沒打過的相似圖 — ranked maps by the mappers behind your top plays, star
+   rating inside your top-play IQR, that you have no top-100 score on;
+   closest to your median difficulty first. No farm dataset, no star floor. */
+async function practiceCandidatesTaste(uid, mode, top, onProgress) {
+    const count = new Map();
+    for (const bid of top.playedBeatmapIds) {
+        const c = top.detailByBeatmap.get(bid) && top.detailByBeatmap.get(bid).creator;
+        if (c) count.set(c, (count.get(c) || 0) + 1);
+    }
+    let mappers = [...count.entries()].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).map(([m]) => m);
+    if (mappers.length < 3) mappers = [...count.entries()].sort((a, b) => b[1] - a[1]).map(([m]) => m);
+    mappers = mappers.slice(0, 6);
+    if (!mappers.length) return [];
+
+    const sMin = top.starP25, sMax = top.starP75;
+    const RANKED = new Set(['1', '2', '4']);
+    const have = practiceExistingSetIds();
+    const seen = new Set();
+    const scored = [];
+    for (let i = 0; i < mappers.length; i++) {
+        onProgress(t('practice_scanning_mapper', { done: i, total: mappers.length }));
+        const rows = (await osuFetch(`mapper=${encodeURIComponent(mappers[i])}&mapper_type=string`).catch(() => [])) || [];
+        for (const r of rows) {
+            if (!RANKED.has(String(r.approved))) continue;
+            const st = parseFloat(r.difficultyrating);
+            if (!(st >= sMin && st <= sMax)) continue;
+            const bid = parseInt(r.beatmap_id), sid = parseInt(r.beatmapset_id);
+            if (!sid || top.playedBeatmapIds.has(bid) || have.has(sid) || seen.has(sid)) continue;
+            seen.add(sid);
+            scored.push({ setId: sid, dist: Math.abs(st - top.starMedian) });
+        }
+    }
+    scored.sort((a, b) => a.dist - b.dist);
+    return scored.slice(0, PRACTICE_N_MAX).map(x => ({ setId: x.setId }));
 }
 
 /* Page farm-maps-list within a pp/star band, collecting up to `want` rows.
@@ -1532,6 +1633,8 @@ function practiceExistingSetIds() {
 
 function practiceCatName(kind, opts = {}) {
     if (kind === 'goal') return t('practice_cat_goal', { target: Math.round(opts.target).toLocaleString() });
+    if (kind === 'lowacc') return t('practice_cat_lowacc');
+    if (kind === 'taste') return t('practice_cat_taste');
     return t('practice_cat_push');
 }
 
@@ -1561,6 +1664,23 @@ async function generatePracticeCollection(kind) {
         return;
     }
     if (!top || top.ppList.length < 10) { setS(t('practice_need_more_plays'), '#f59e0b'); return; }
+
+    // Score-driven kinds: no farm dataset, no star floor — any rank.
+    if (kind === 'lowacc' || kind === 'taste') {
+        let entries;
+        try {
+            entries = kind === 'lowacc'
+                ? await practiceCandidatesLowAcc(user.id, PRACTICE_MODE, top, setS)
+                : await practiceCandidatesTaste(user.id, PRACTICE_MODE, top, setS);
+        } catch (e) {
+            console.error(`practice: ${kind} failed:`, e);
+            setS(t('osu_profile_import_fail'), '#ff5252');
+            return;
+        }
+        if (kind === 'lowacc' && !entries.length) { setS(t('practice_acc_stable'), '#34d399'); return; }
+        if (kind === 'taste' && entries.length < 10) { setS(t('practice_taste_thin'), '#f59e0b'); return; }
+        return practiceApplyAndReport(kind, {}, entries, setS);
+    }
 
     let band;
     if (kind === 'push') {
@@ -1618,8 +1738,15 @@ async function generatePracticeCollection(kind) {
     }
     if (entries.length < PRACTICE_N_MIN) { setS(t('practice_low_coverage'), '#f59e0b'); return; }
 
+    return practiceApplyAndReport(kind, { target }, entries, setS);
+}
+
+/* Shared tail: hand the picked set ids to the normal import pipeline (set
+   resolution, category creation, progress, .db/.osdb export all free) and
+   report. */
+async function practiceApplyAndReport(kind, opts, entries, setS) {
     const report = await applyImportedCollections(
-        [{ name: practiceCatName(kind, { target }), entries }],
+        [{ name: practiceCatName(kind, opts), entries }],
         m => setS(m),
     );
     setS(t('collection_io_import_done', {
