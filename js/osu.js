@@ -2162,6 +2162,32 @@ async function renderCollectionDigest() {
         }
     }
 
+    // improvement streak — consecutive most-recent days where pp went up
+    if (history.length >= 3) {
+        let streak = 0;
+        for (let i = history.length - 1; i > 0; i--) {
+            if (history[i].pp > history[i - 1].pp) streak++;
+            else break;
+        }
+        if (streak >= 2) rows.push({ icon: 'trendingUp', text: t('digest_streak', { n: streak }), action: "switchTab('lookup')" });
+    }
+
+    // personal PP goal progress (target lives in the PP panel's #pp-goal-target)
+    let goalHtml = '';
+    const curPp = history.length ? history[history.length - 1].pp : null;
+    const goalTarget = parseFloat((document.getElementById('pp-goal-target') || {}).value);
+    if (curPp != null && Number.isFinite(goalTarget) && goalTarget > 0) {
+        if (curPp >= goalTarget) {
+            goalHtml = `<div class="digest-strip digest-goal"><span>${escHtml(t('digest_goal_done', { target: Math.round(goalTarget).toLocaleString() }))}</span></div>`;
+        } else {
+            const pct = Math.max(2, Math.min(99, Math.round(curPp / goalTarget * 100)));
+            goalHtml = `<div class="digest-strip digest-goal" role="button" tabindex="0" onclick="switchTab('lookup')">
+                <span>${escHtml(t('digest_goal', { target: Math.round(goalTarget).toLocaleString(), remaining: Math.round(goalTarget - curPp).toLocaleString(), pct }))}</span>
+                <span class="digest-goal-bar"><span style="width:${pct}%"></span></span>
+            </div>`;
+        }
+    }
+
     // notifications since last visit
     if (lastVisit && typeof getNotifications === 'function') {
         const fresh = getNotifications().filter(n => n.createdAt && n.createdAt > lastVisit);
@@ -2190,8 +2216,8 @@ async function renderCollectionDigest() {
         </div>`;
     }
 
-    if (!welcomeHtml && !rows.length) { el.innerHTML = ''; return; }
-    el.innerHTML = welcomeHtml + (rows.length ? `<div class="digest-strip">
+    if (!welcomeHtml && !goalHtml && !rows.length) { el.innerHTML = ''; return; }
+    el.innerHTML = welcomeHtml + goalHtml + (rows.length ? `<div class="digest-strip">
         <span class="digest-label">${escHtml(t('digest_title'))}</span>
         ${rows.map(r => `<span class="digest-item" role="button" tabindex="0" onclick="${r.action}" onkeydown="if(event.key==='Enter'){${r.action}}">${icon(r.icon, { extraClass: 'icon-label-gap' })}${escHtml(r.text)}</span>`).join('')}
     </div>` : '');
@@ -2912,13 +2938,19 @@ function initCollectionHero() {
     const statsEl = document.getElementById('collection-hero-stats');
     if (!statsEl) return;
     Promise.allSettled([
-        fetch('/.netlify/functions/collections-list?page=0').then(r => (r.ok ? r.json() : null)),
+        // The published-collection count is tiny while the gallery is young
+        // and reads as "nobody uses this" — lead instead with the farm
+        // dataset the crawler has actually built (tens of thousands of maps).
+        fetch('/.netlify/functions/farm-maps-list?mode=osu&mods=NM&page=0').then(r => (r.ok ? r.json() : null)),
         fetch('/.netlify/functions/site-likes').then(r => (r.ok ? r.json() : null)),
     ]).then(([a, b]) => {
-        const total = a.status === 'fulfilled' && a.value && typeof a.value.total === 'number' ? a.value.total : null;
+        const computed = a.status === 'fulfilled' && a.value && a.value.coverage && typeof a.value.coverage.computedCount === 'number'
+            ? a.value.coverage.computedCount : null;
         const likes = b.status === 'fulfilled' && b.value && typeof b.value.likes === 'number' ? b.value.likes : null;
         const parts = [];
-        if (total != null) parts.push(t('hero_stat_collections', { n: total.toLocaleString() }));
+        if (computed != null && computed > 1000) {
+            parts.push(t('hero_stat_farm', { n: (Math.floor(computed / 1000) * 1000).toLocaleString() }));
+        }
         if (likes != null) parts.push(t('hero_stat_likes', { n: likes.toLocaleString() }));
         statsEl.textContent = parts.join('   ·   ');
     });

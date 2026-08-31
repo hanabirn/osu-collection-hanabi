@@ -127,8 +127,10 @@ function renderPublicCollectionsList() {
     }
 
     const loggedInUser = getLoggedInOsuUser();
+    const freshCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
     listEl.innerHTML = publicCollectionsItems.map(item => {
+        const isNew = item.updatedAt && Date.parse(item.updatedAt) >= freshCutoff;
         const isOwnCard = loggedInUser && String(loggedInUser.id) === String(item.id);
         const likeBtnHtml = isOwnCard ? '' : `
             <button class="pcc-like-btn ${item.likedByMe ? 'liked' : ''}" onclick="event.stopPropagation();toggleGalleryLike(${item.id}, this)" title="${t('gallery_like_btn_title')}">
@@ -146,7 +148,7 @@ function renderPublicCollectionsList() {
                     ${item.country ? `<img class="avatar-flag-badge" src="${flagUrl(item.country)}" alt="" onerror="this.style.display='none';">` : ''}
                 </div>
                 <div>
-                    <div class="pcc-name">${escapeHtmlOsu(item.username || ('#' + item.id))}</div>
+                    <div class="pcc-name">${escapeHtmlOsu(item.username || ('#' + item.id))}${isNew ? `<span class="pcc-new-badge">${t('gallery_new_badge')}</span>` : ''}</div>
                     <div class="pcc-updated">${escapeHtmlOsu(String(item.updatedAt || '').slice(0, 10))}</div>
                 </div>
                 ${likeBtnHtml}

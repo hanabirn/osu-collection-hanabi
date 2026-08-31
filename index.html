@@ -225,6 +225,21 @@
 
 <main class="site-main">
 
+<!-- Persistent horizontal nav for desktop — the ☰ drawer is the only nav
+     on mobile, but on a wide screen the primary tabs should just be visible.
+     Six primary tabs + 更多 (opens the drawer for the full list). Sits at
+     the top of the frosted panel so the header overlap doesn't cover it. -->
+<nav id="site-topnav" aria-label="Primary">
+    <button class="site-topnav-btn active" data-tab="collection" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
+    <button class="site-topnav-btn" data-tab="lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
+    <button class="site-topnav-btn" data-tab="farm-maps" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
+    <button class="site-topnav-btn" data-tab="public-collections" onclick="switchTab('public-collections', this)" data-i18n="nav_public_collections">收藏廣場</button>
+    <button class="site-topnav-btn" data-tab="mapper-tracking" onclick="switchTab('mapper-tracking', this)" data-i18n="nav_mapper_tracking">追蹤 Mapper</button>
+    <button class="site-topnav-btn" data-tab="replay-analyze" onclick="switchTab('replay-analyze', this)" data-i18n="nav_replay_analyze">Replay 分析</button>
+    <button class="site-topnav-btn site-topnav-more" onclick="openNavDrawer()" data-icon="menu" data-icon-gap><span data-i18n="nav_more">更多</span></button>
+</nav>
+
+
     <section id="page-collection" class="site-page">
         <div id="collection-digest"></div>
         <!-- Visible by default: this is the empty-collection landing state a

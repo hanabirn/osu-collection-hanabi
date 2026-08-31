@@ -106,6 +106,26 @@
     border-color: rgba(52, 211, 153, 0.3);
     color: var(--text-secondary);
 }
+.digest-goal {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.32);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.digest-goal-bar {
+    flex: 1;
+    min-width: 90px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+}
+.digest-goal-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
+}
 .digest-cta {
     padding: 4px 12px;
     border-radius: 999px;
@@ -2376,6 +2396,17 @@
 .pcc-header { display: flex; align-items: center; gap: 10px; }
 .pcc-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,102,153,0.5); object-fit: cover; }
 .pcc-name { font-weight: bold; color: var(--text); font-size: 0.95rem; }
+.pcc-new-badge {
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    color: #fff;
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
+}
 .pcc-updated { font-size: 0.72rem; color: var(--text-dim2); }
 
 .pcc-like-btn {

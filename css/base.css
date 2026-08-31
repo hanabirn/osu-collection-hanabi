@@ -1213,6 +1213,46 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     box-shadow: 0 4px 14px rgba(var(--accent-pink-rgb), 0.35);
 }
 
+/* ===== Persistent desktop top-nav =====
+   Lives as the first child of .site-main (the frosted tray), so the
+   header's upward overlap can't cover it. Hidden on mobile — the ☰
+   drawer covers that. */
+#site-topnav { display: none; }
+@media (min-width: 900px) {
+    #site-topnav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin: -2px 0 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-card);
+    }
+    /* the drawer's own ☰ trigger is redundant once the bar is visible */
+    #nav-menu-btn { display: none !important; }
+}
+.site-topnav-btn {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.78);
+    padding: 7px 14px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+.site-topnav-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.site-topnav-btn.active {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    color: #fff;
+    font-weight: 700;
+}
+.site-topnav-more { opacity: 0.85; }
+
 /* ===== Page-refresh FAB =====
    The old header refresh button, promoted to a fixed circular control so
    it's reachable while scrolling any tab. Glassmorphism + faint purple

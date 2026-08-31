@@ -35,8 +35,13 @@ function switchTab(tab, el) {
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
     if (el) {
         el.classList.add('active');
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        if (!el.classList.contains('site-topnav-btn')) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
     }
+    // Keep the persistent desktop top-nav highlight in sync however the tab
+    // was switched (drawer button, explore card, deep link, …).
+    document.querySelectorAll('#site-topnav [data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
