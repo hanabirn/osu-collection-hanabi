@@ -10,24 +10,27 @@
    cache — the fetch strategy below is network-first for the shell (so
    normal visits always get the latest code), so this mostly matters for
    forcing a clean slate rather than for staleness. */
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
 const FONT_CACHE = `osu-fonts-${CACHE_VERSION}`;
 const KNOWN_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE, FONT_CACHE]);
 
+/* Only what the collection page needs to render offline in the default
+   locale. install' used to addAll() ~45 entries — every feature script,
+   all 8 locales, every icon asset — and those ~45 parallel fetches fired
+   during the first paint, competing with the page's own resources; that
+   was most of the ~1s Lighthouse charged as a cold-load "redirect".
+   Everything else caches organically anyway: networkFirstShell() puts
+   every script/style it serves into SHELL_CACHE as you hit it, and the
+   image handler caches icons/covers on demand. So after one ordinary
+   visit the full app is offline-capable — the first paint just isn't
+   paying to prefetch all of it up front. */
 const SHELL_ASSETS = [
     '/', '/index.html', '/manifest.json',
     '/css/base.css', '/css/theme.css', '/css/particles.css', '/css/osu.css',
-    '/js/main.js', '/js/osu.js', '/js/replay-analyze.js', '/js/public-collections.js', '/js/skins.js',
-    '/js/updates.js', '/js/resources-data.js', '/js/tournaments.js', '/js/notifications.js', '/js/feedback.js', '/js/celebrate.js',
-    '/js/icons.js', '/js/theme.js', '/js/particles.js', '/js/pwa.js', '/js/i18n.js',
-    '/js/i18n/zh.js', '/js/i18n/en.js', '/js/i18n/ja.js', '/js/i18n/ko.js',
-    '/js/i18n/ru.js', '/js/i18n/fr.js', '/js/i18n/es.js', '/js/i18n/de.js',
-    '/assets/icons/icon-192.png', '/assets/icons/icon-512.png',
-    '/assets/icons/icon-maskable-512.png', '/assets/icons/apple-touch-icon.png',
-    '/assets/icons/osu-logo.svg', '/assets/icons/mode-standard.svg',
-    '/assets/icons/mode-taiko.svg', '/assets/icons/mode-catch.svg', '/assets/icons/mode-mania.svg',
+    '/js/icons.js', '/js/theme.js', '/js/particles.js', '/js/pwa.js',
+    '/js/i18n.js', '/js/i18n/zh.js', '/js/main.js', '/js/osu.js',
 ];
 
 self.addEventListener('install', event => {
