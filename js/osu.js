@@ -2049,6 +2049,134 @@ async function renderPracticeProgress() {
     el.innerHTML = `<div class="ctools-practice-progress-title">${escHtml(t('practice_progress_title'))}</div>` + rows.join('');
 }
 
+/* ===== 「為你更新」digest =====
+   A compact strip at the top of the collection page so a returning visitor
+   lands on "something happened", not the same static grid. Aggregates data
+   that already exists — PP history, the notification store, practice-set
+   progress. Renders nothing (no empty "nothing new" box) when there's
+   nothing to say; a soft feature-discovery prompt when logged out. */
+const DIGEST_LAST_VISIT_KEY = 'osu_last_visit_at';
+const DIGEST_PP_CHECK_KEY = 'osu_digest_pp_checked_at';
+const DIGEST_PROMPT_DISMISSED_KEY = 'osu_digest_prompt_dismissed';
+const DIGEST_PP_CHECK_MS = 6 * 60 * 60 * 1000;
+
+function dismissDigestPrompt() {
+    try { localStorage.setItem(DIGEST_PROMPT_DISMISSED_KEY, '1'); } catch {}
+    const el = document.getElementById('collection-digest');
+    if (el) el.innerHTML = '';
+}
+
+async function digestPracticeRow(user) {
+    const store = getPracticeSets();
+    const ids = Object.keys(store);
+    if (!ids.length) return null;
+    const catById = new Map(getOsuCategories().map(c => [String(c.id), c]));
+    const live = ids.filter(id => catById.has(id));
+    if (!live.length) return null;
+
+    let curPp = null;
+    const topBids = new Set();
+    try {
+        const [me, best] = await Promise.all([
+            osuFetch(`u=${user.id}&m=${PRACTICE_MODE}`),
+            osuFetch(`best=${user.id}&limit=100&m=${PRACTICE_MODE}`),
+        ]);
+        if (me && me[0] && me[0].pp_raw != null) curPp = parseFloat(me[0].pp_raw);
+        (best || []).forEach(s => topBids.add(parseInt(s.beatmap_id)));
+    } catch { return null; }
+
+    const bmBySet = new Map();
+    const col = getOsuCollection();
+    OSU_MODES.forEach(m => col[m].forEach(s => bmBySet.set(s.beatmapset_id, (s.beatmaps || []).map(b => parseInt(b.beatmap_id)))));
+
+    let best = null;
+    for (const id of live) {
+        const p = store[id];
+        const dPp = (curPp != null && p.ppAtCreation != null) ? Math.round(curPp - p.ppAtCreation) : 0;
+        const hits = (p.memberSetIds || []).reduce((n, sid) => n + ((bmBySet.get(sid) || []).some(b => topBids.has(b)) ? 1 : 0), 0);
+        if (!best || hits > best.hits || (hits === best.hits && dPp > best.dPp)) {
+            best = { name: catById.get(id).name, dPp, hits, total: (p.memberSetIds || []).length };
+        }
+    }
+    if (!best || (best.hits === 0 && best.dPp <= 0)) return null;
+    return {
+        icon: 'target',
+        text: t('digest_practice', {
+            name: best.name, d: (best.dPp >= 0 ? '+' : '') + best.dPp.toLocaleString(),
+            hits: best.hits, total: best.total,
+        }),
+        action: "switchTab('collection')",
+    };
+}
+
+async function renderCollectionDigest() {
+    const el = document.getElementById('collection-digest');
+    if (!el) return;
+    const nowIso = new Date().toISOString();
+    const lastVisit = (() => { try { return localStorage.getItem(DIGEST_LAST_VISIT_KEY); } catch { return null; } })();
+    const stamp = () => { try { localStorage.setItem(DIGEST_LAST_VISIT_KEY, nowIso); } catch {} };
+
+    const user = getLoggedInOsuUser();
+    if (!user || !user.id) {
+        let dismissed; try { dismissed = localStorage.getItem(DIGEST_PROMPT_DISMISSED_KEY) === '1'; } catch { dismissed = false; }
+        el.innerHTML = dismissed ? '' : `<div class="digest-strip digest-prompt">
+            <span>${escHtml(t('digest_logged_out'))}</span>
+            <a class="digest-cta" href="/.netlify/functions/osu-login">${escHtml(t('osu_login_btn'))}</a>
+            <button class="digest-dismiss" onclick="dismissDigestPrompt()" aria-label="dismiss">${icon('x', { size: '0.85em' })}</button>
+        </div>`;
+        stamp();
+        return;
+    }
+
+    const rows = [];
+
+    // PP since last visit — refresh at most every 6h, otherwise use cache
+    let history = getPpHistory(ppHistoryKeyFor(user.id));
+    const ppStale = !history.length ||
+        (Date.now() - (parseInt((() => { try { return localStorage.getItem(DIGEST_PP_CHECK_KEY); } catch { return 0; } })(), 10) || 0) > DIGEST_PP_CHECK_MS);
+    if (ppStale && typeof fetchPlayerTotalPpAndHistory === 'function') {
+        try {
+            const res = await fetchPlayerTotalPpAndHistory(user.id, false);
+            if (res) {
+                history = res.history || getPpHistory(ppHistoryKeyFor(user.id));
+                try { localStorage.setItem(DIGEST_PP_CHECK_KEY, String(Date.now())); } catch {}
+            }
+        } catch { /* keep cache */ }
+    }
+    if (lastVisit && history.length >= 2) {
+        const cutoff = lastVisit.slice(0, 10);
+        const base = [...history].reverse().find(h => h.date <= cutoff) || history[0];
+        const latest = history[history.length - 1];
+        const d = latest.pp - base.pp;
+        if (d !== 0 && base.date !== latest.date) {
+            rows.push({
+                icon: 'trendingUp',
+                text: t('digest_pp', { d: (d > 0 ? '+' : '') + d.toLocaleString(), from: formatPpChartDate(base.date) }),
+                action: "switchTab('lookup')",
+            });
+        }
+    }
+
+    // notifications since last visit
+    if (lastVisit && typeof getNotifications === 'function') {
+        const fresh = getNotifications().filter(n => n.createdAt && n.createdAt > lastVisit);
+        if (fresh.length) rows.push({ icon: 'bell', text: t('digest_notifs', { n: fresh.length }), action: 'toggleNotifDropdown(true)' });
+    }
+
+    // best-performing practice collection
+    try {
+        const pr = await digestPracticeRow(user);
+        if (pr) rows.push(pr);
+    } catch { /* skip */ }
+
+    stamp();
+    if (!rows.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="digest-strip">
+        <span class="digest-label">${escHtml(t('digest_title'))}</span>
+        ${rows.map(r => `<span class="digest-item" role="button" tabindex="0" onclick="${r.action}" onkeydown="if(event.key==='Enter'){${r.action}}">${icon(r.icon, { extraClass: 'icon-label-gap' })}${escHtml(r.text)}</span>`).join('')}
+    </div>`;
+}
+
 /* Remove several sets at once, cleaning their category memberships too
    (removeOsuSet only touches the mode arrays). */
 async function removeOsuSetsByIds(ids) {

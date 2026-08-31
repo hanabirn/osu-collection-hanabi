@@ -188,4 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof checkGalleryDeepLink === 'function') checkGalleryDeepLink();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof initNotifications === 'function') initNotifications();
+    // "為你更新" digest — runs after notifications so it can count what just
+    // landed; its own network calls are gated (PP at most every 6h).
+    setTimeout(() => { if (typeof renderCollectionDigest === 'function') renderCollectionDigest(); }, 1200);
 });

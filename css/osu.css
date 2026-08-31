@@ -24,6 +24,60 @@
     gap: 20px;
 }
 
+/* "為你更新" digest strip (js/osu.js renderCollectionDigest) — empty unless
+   there's something to report, so it collapses to nothing most visits. */
+#collection-digest:empty { display: none; }
+.digest-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin: 0 auto 16px;
+    max-width: 760px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.28);
+    font-size: 0.82rem;
+}
+.digest-label {
+    font-weight: 700;
+    color: var(--text-accent);
+    letter-spacing: 0.02em;
+}
+.digest-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.digest-item:hover { background: rgba(255, 255, 255, 0.14); }
+.digest-item .icon-svg { color: var(--accent-pink); }
+.digest-prompt { color: var(--text-secondary); }
+.digest-cta {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.digest-dismiss {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--text-dim2);
+    cursor: pointer;
+    display: inline-flex;
+    padding: 2px;
+}
+.digest-dismiss:hover { color: var(--text); }
+
 /* Landing pitch shown above the grid while the collection is empty (js/osu.js
    updateCollectionHeroVisibility). */
 .collection-hero {
