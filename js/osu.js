@@ -105,6 +105,28 @@ function primaryArtist(artist) {
     return a.trim();
 }
 
+/* Every artist a set should be findable under: the lead artist (as above)
+   plus any name credited after a feat./ft./featuring, split on the safe
+   separators only (",", "&", "×", " x "). Deduped. "vs." mashups and
+   "(CV: ...)" are still left whole by primaryArtist() — this only expands
+   the feat. tail. */
+function artistKeys(artist) {
+    const raw = (artist || '').trim();
+    if (!raw) return [];
+    const keys = new Set();
+    const lead = primaryArtist(raw);
+    if (lead) keys.add(lead);
+    const m = raw.match(/\s+(?:feat\.?|ft\.?|featuring)\s+(.+)$/i);
+    if (m) {
+        const tail = m[1].replace(/\s*\([^)]*\)\s*$/, '');   // drop a trailing "(...)" on the chunk
+        for (const part of tail.split(/\s*[,&×]\s*|\s+x\s+/i)) {
+            const p = part.trim();
+            if (p) keys.add(p);
+        }
+    }
+    return [...keys];
+}
+
 const MODE_ICON_PATHS = {
     standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
     taiko: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/>',
@@ -333,16 +355,16 @@ function renderOsuSourceFilterOptions(sets) {
     sel.value = osuSourceFilter;
 }
 
-/* Same build-from-the-collection approach as source, keyed on
-   primaryArtist(). No "(none)" bucket — an osu! set essentially always has
-   an artist. Hidden when fewer than two lead artists have >=2 maps. */
+/* Same build-from-the-collection approach as source, keyed on artistKeys()
+   so a set counts under its lead artist AND every feat. name. No "(none)"
+   bucket — an osu! set essentially always has an artist. Hidden when fewer
+   than two names have >=2 maps. */
 function renderOsuArtistFilterOptions(sets) {
     const sel = document.getElementById('osu-artist-filter');
     if (!sel) return;
     const counts = new Map();
     for (const s of sets) {
-        const a = primaryArtist(s.artist);
-        if (a) counts.set(a, (counts.get(a) || 0) + 1);
+        for (const a of artistKeys(s.artist)) counts.set(a, (counts.get(a) || 0) + 1);
     }
     const shown = [...counts.entries()]
         .filter(([, n]) => n >= 2)
@@ -3181,7 +3203,7 @@ function renderOsuCollection() {
         sets = sets.filter(s => (s.source || '').trim() === osuSourceFilter);
     }
     if (osuArtistFilter !== 'all') {
-        sets = sets.filter(s => primaryArtist(s.artist) === osuArtistFilter);
+        sets = sets.filter(s => artistKeys(s.artist).includes(osuArtistFilter));
     }
 
     sets = sortOsuSets(sets);
