@@ -92,6 +92,19 @@ function osuGenreName(set) {
     return OSU_GENRES[g.id] ? t(OSU_GENRES[g.id]) : (g.name || '');
 }
 
+/* Collapses an osu! Artist string to its lead artist for the artist filter:
+   "Camellia feat. Nanahira" and "ClariS (CV: ...)" both key on the part
+   before the qualifier. Deliberately conservative — only strips a trailing
+   feat./ft./featuring or (CV: ...), never inner separators like "&", ",",
+   or "vs." (a mashup stays its own entry). */
+function primaryArtist(artist) {
+    let a = (artist || '').trim();
+    if (!a) return '';
+    a = a.replace(/\s*\((?:CV|cv)[:：][^)]*\)\s*$/, '');
+    a = a.replace(/\s+(?:feat\.?|ft\.?|featuring)\s+.+$/i, '');
+    return a.trim();
+}
+
 const MODE_ICON_PATHS = {
     standard: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/>',
     taiko: '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/>',
@@ -173,6 +186,7 @@ let osuSearchQuery = '';
 let osuLangFilter = 'all';     // 'all' | 'unknown' | '<language id>'
 let osuGenreFilter = 'all';    // 'all' | 'unknown' | '<genre id>'
 let osuSourceFilter = 'all';   // 'all' | 'none' | '<source string>'
+let osuArtistFilter = 'all';   // 'all' | '<primary artist string>'
 const OSU_PAGE_SIZE = 8;
 // Populated by renderOsuCollection() on every render — the current page's
 // sets, one representative (hardest-visible-difficulty) beatmap id + mode
@@ -210,6 +224,12 @@ function switchOsuGenreFilter(v) {
 
 function switchOsuSourceFilter(v) {
     osuSourceFilter = v;
+    osuPage = 0;
+    renderOsuCollection();
+}
+
+function switchOsuArtistFilter(v) {
+    osuArtistFilter = v;
     osuPage = 0;
     renderOsuCollection();
 }
@@ -311,6 +331,37 @@ function renderOsuSourceFilterOptions(sets) {
     }
     sel.innerHTML = html;
     sel.value = osuSourceFilter;
+}
+
+/* Same build-from-the-collection approach as source, keyed on
+   primaryArtist(). No "(none)" bucket — an osu! set essentially always has
+   an artist. Hidden when fewer than two lead artists have >=2 maps. */
+function renderOsuArtistFilterOptions(sets) {
+    const sel = document.getElementById('osu-artist-filter');
+    if (!sel) return;
+    const counts = new Map();
+    for (const s of sets) {
+        const a = primaryArtist(s.artist);
+        if (a) counts.set(a, (counts.get(a) || 0) + 1);
+    }
+    const shown = [...counts.entries()]
+        .filter(([, n]) => n >= 2)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    if (shown.length < 2) {
+        sel.style.display = 'none';
+        osuArtistFilter = 'all';
+        return;
+    }
+    sel.style.display = '';
+    if (osuArtistFilter !== 'all' && counts.has(osuArtistFilter)
+        && !shown.some(([a]) => a === osuArtistFilter)) {
+        shown.push([osuArtistFilter, counts.get(osuArtistFilter)]);
+    }
+    let html = `<option value="all">${t('osu_artist_filter_all')}</option>`;
+    for (const [a, n] of shown) html += `<option value="${escHtml(a)}">${escHtml(a)} (${n})</option>`;
+    if (osuArtistFilter !== 'all' && !counts.has(osuArtistFilter)) osuArtistFilter = 'all';
+    sel.innerHTML = html;
+    sel.value = osuArtistFilter;
 }
 
 /* Pulls a set's language, genre + source from API v2 (see
@@ -3113,6 +3164,7 @@ function renderOsuCollection() {
     renderOsuLangFilterOptions(sets);
     renderOsuGenreFilterOptions(sets);
     renderOsuSourceFilterOptions(sets);
+    renderOsuArtistFilterOptions(sets);
     if (osuLangFilter === 'unknown') {
         sets = sets.filter(s => !s.language);
     } else if (osuLangFilter !== 'all') {
@@ -3127,6 +3179,9 @@ function renderOsuCollection() {
         sets = sets.filter(s => !(s.source || '').trim());
     } else if (osuSourceFilter !== 'all') {
         sets = sets.filter(s => (s.source || '').trim() === osuSourceFilter);
+    }
+    if (osuArtistFilter !== 'all') {
+        sets = sets.filter(s => primaryArtist(s.artist) === osuArtistFilter);
     }
 
     sets = sortOsuSets(sets);

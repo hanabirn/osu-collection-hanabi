@@ -847,8 +847,8 @@
 .osu-category-picker-item:hover { background: var(--bg-stat); }
 
 /* This row sits in the narrow left sidebar, so with the search box plus
-   up to four selects (sort + language + genre + source) it always wraps:
-   the search box takes its own line, the selects flow below two-per-line. */
+   up to five selects (sort + language + genre + source + artist) it always
+   wraps: the search box takes its own line, the selects flow two-per-line. */
 .osu-search-row {
     display: flex;
     flex-wrap: wrap;
@@ -875,7 +875,8 @@
 #osu-sort-select,
 #osu-lang-filter,
 #osu-genre-filter,
-#osu-source-filter {
+#osu-source-filter,
+#osu-artist-filter {
     flex: 1 1 45%;
     min-width: 0;
     padding: 11px 12px;
