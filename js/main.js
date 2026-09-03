@@ -49,6 +49,7 @@ function switchTab(tab, el) {
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'farm-maps') ensureFarmMapsLoaded();
+    if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
     // Tab buttons now live in the slide-in drawer — picking one should also
     // dismiss it.
@@ -176,6 +177,7 @@ function refreshDynamicContent() {
     if (typeof renderResourcesList === 'function') renderResourcesList();
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
     if (typeof renderFarmMapsList === 'function') renderFarmMapsList();
+    if (typeof refreshCatalogLocalized === 'function') refreshCatalogLocalized();
 }
 
 /* ===== Init ===== */

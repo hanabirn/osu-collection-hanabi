@@ -1335,6 +1335,54 @@
     }
 }
 
+/* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
+   language / genre / source pills instead of pp/star/bpm. */
+#catalog-list.osu-collection {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+}
+#catalog-list .osu-card {
+    aspect-ratio: 4 / 1.35;
+    border-radius: 10px;
+}
+#catalog-list .osu-card-info {
+    padding: 8px 40px 6px 10px;
+}
+#catalog-list .osu-card-title { font-size: 0.85rem; }
+#catalog-list .osu-card-artist { font-size: 0.7rem; }
+#catalog-list .osu-card-mapper {
+    font-size: 0.62rem;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.catalog-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    align-items: baseline;
+    margin-top: 3px;
+    font-size: 0.66rem;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+}
+.catalog-card-meta > span {
+    background: rgba(0,0,0,0.32);
+    border-radius: 6px;
+    padding: 1px 6px;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+@media (max-width: 480px) {
+    #catalog-list.osu-collection {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+    }
+}
+
 .osu-play-btn.playing {
     opacity: 1;
     color: #fff;

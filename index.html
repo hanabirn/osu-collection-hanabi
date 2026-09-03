@@ -205,6 +205,7 @@
         <div class="nav-drawer-group">
             <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
             <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
+            <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
             <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
             <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
@@ -371,6 +372,11 @@
                     <span class="explore-card-t" data-i18n="nav_mapper_tracking">追蹤 Mapper</span>
                     <span class="explore-card-d" data-i18n="explore_mapper_d">喜歡的 mapper 出新圖時通知你</span>
                 </button>
+                <button class="explore-card" onclick="switchTab('catalog')">
+                    <span class="explore-card-icon" data-icon="tag"></span>
+                    <span class="explore-card-t" data-i18n="nav_catalog">曲庫分類</span>
+                    <span class="explore-card-d" data-i18n="explore_catalog_d">依歌手／語言／曲風瀏覽全 ranked 曲庫，一鍵成收藏</span>
+                </button>
                 <button class="explore-card" onclick="switchTab('replay-analyze')">
                     <span class="explore-card-icon" data-icon="barChart3"></span>
                     <span class="explore-card-t" data-i18n="nav_replay_analyze">Replay 分析</span>
@@ -465,6 +471,41 @@
         <div id="farm-coverage" class="farm-coverage"></div>
         <div id="farm-maps-list" class="osu-collection"></div>
         <div id="farm-maps-pagination" class="osu-pagination"></div>
+    </section>
+
+    <section id="page-catalog" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="catalog_page_title">✦ 曲庫分類 ✦</h2>
+        <p class="tournaments-hint" data-i18n="catalog_hint">依歌手／語言／曲風／來源／feat. 瀏覽整個 ranked 曲庫，選定一個分類後可一鍵建立成收藏分類。資料由本站背景爬蟲持續建立，尚未涵蓋全部 ranked 圖。</p>
+
+        <div class="osu-search-row">
+            <input type="text" id="catalog-search-input" data-i18n-placeholder="catalog_search_placeholder" placeholder="搜尋曲名／歌手／來源..." oninput="searchCatalog(this.value)">
+            <select id="catalog-sort-select" onchange="switchCatalogSort(this.value)">
+                <option value="ranked_desc" data-i18n="catalog_sort_ranked_desc">上榜日期：新到舊</option>
+                <option value="ranked_asc" data-i18n="catalog_sort_ranked_asc">上榜日期：舊到新</option>
+                <option value="title_asc" data-i18n="catalog_sort_title_asc">曲名 A→Z</option>
+                <option value="artist_asc" data-i18n="catalog_sort_artist_asc">歌手 A→Z</option>
+            </select>
+            <select id="catalog-mode-select" onchange="switchCatalogMode(this.value)">
+                <option value="" data-i18n="catalog_mode_all">全部模式</option>
+                <option value="standard">osu!</option>
+                <option value="taiko">Taiko</option>
+                <option value="catch">Catch</option>
+                <option value="mania">Mania</option>
+            </select>
+            <select id="catalog-lang-filter" onchange="switchCatalogLang(this.value)"><option value="all" data-i18n="osu_lang_filter_all">全部語言</option></select>
+            <select id="catalog-genre-filter" onchange="switchCatalogGenre(this.value)"><option value="all" data-i18n="osu_genre_filter_all">全部曲風</option></select>
+            <select id="catalog-source-filter" onchange="switchCatalogSource(this.value)"><option value="all" data-i18n="osu_source_filter_all">全部來源</option></select>
+            <select id="catalog-artist-filter" onchange="switchCatalogArtist(this.value)"><option value="all" data-i18n="osu_artist_filter_all">全部歌手</option></select>
+            <label class="gallery-liked-only-label">
+                <input type="checkbox" id="catalog-nsfw-checkbox" onchange="toggleCatalogNsfw(this.checked)">
+                <span data-i18n="catalog_nsfw_toggle">含 18+ 標記</span>
+            </label>
+            <button id="catalog-create-collection-btn" class="btn" onclick="catalogCreateCollectionFromFacet()" disabled data-i18n="catalog_create_collection_btn">➕ 建立此分類的收藏</button>
+        </div>
+
+        <div id="catalog-coverage" class="farm-coverage"></div>
+        <div id="catalog-list" class="osu-collection"></div>
+        <div id="catalog-pagination" class="osu-pagination"></div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -950,6 +991,7 @@
 <script defer src="js/replay-analyze.js"></script>
 <script defer src="js/public-collections.js"></script>
 <script defer src="js/farm-maps.js"></script>
+<script defer src="js/catalog.js"></script>
 <script defer src="js/skins.js"></script>
 <script defer src="js/skin-screenshots.js"></script>
 <script defer src="js/updates.js"></script>
