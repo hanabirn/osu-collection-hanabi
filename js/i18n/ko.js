@@ -176,6 +176,7 @@ I18N.ko = {
     farm_only_toggle: '🔥 파밍맵만 보기',
     farm_coverage_farm: '(파밍맵 기준 충족: {n}개 / 분류 완료 {c}개)',
 
+    cdn_lib_fail: '외부 구성요소를 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도하세요',
     nav_catalog: '곡 카탈로그', explore_catalog_d: '아티스트／언어／장르로 전체 ranked 곡 탐색, 원클릭으로 컬렉션화',
     catalog_page_title: '✦ 곡 카탈로그 ✦',
     catalog_hint: '아티스트／언어／장르／소스／feat. 기준으로 전체 ranked 곡을 탐색하세요. 분류 하나를 고르면 그 이름으로 컬렉션 카테고리를 원클릭으로 만들 수 있습니다. 데이터는 이 사이트의 백그라운드 크롤러가 계속 수집 중이며 아직 모든 ranked 맵을 포함하지 않습니다.',

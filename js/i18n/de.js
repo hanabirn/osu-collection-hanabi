@@ -176,6 +176,7 @@ I18N.de = {
     farm_only_toggle: '🔥 Nur Farm-Maps',
     farm_coverage_farm: '({n} als Farm-Map eingestuft von {c} bewerteten)',
 
+    cdn_lib_fail: 'Eine externe Komponente konnte nicht geladen werden — Verbindung prüfen und erneut versuchen',
     nav_catalog: 'Katalog', explore_catalog_d: 'Durchstöbere den ganzen ranked-Katalog nach Künstler / Sprache / Genre — Sammlung mit einem Klick',
     catalog_page_title: '✦ Katalog ✦',
     catalog_hint: 'Durchstöbere den gesamten ranked-Katalog nach Künstler / Sprache / Genre / Quelle / feat. Wähle ein Merkmal und mach mit einem Klick eine Sammlungskategorie daraus. Der Index wird vom Hintergrund-Crawler der Seite aufgebaut und deckt noch nicht jede ranked-Map ab.',

@@ -174,6 +174,7 @@ I18N.zh = {
     farm_only_toggle: '🔥 只看農圖',
     farm_coverage_farm: '（符合農圖標準：{n} 張，已分類 {c} 張）',
 
+    cdn_lib_fail: '外部元件載入失敗，請檢查網路後重試',
     nav_catalog: '曲庫分類', explore_catalog_d: '依歌手／語言／曲風瀏覽全 ranked 曲庫，一鍵成收藏',
     catalog_page_title: '✦ 曲庫分類 ✦',
     catalog_hint: '依歌手／語言／曲風／來源／feat. 瀏覽整個 ranked 曲庫，選定一個分類後可一鍵建立成收藏分類。資料由本站背景爬蟲持續建立，尚未涵蓋全部 ranked 圖。',

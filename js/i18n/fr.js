@@ -176,6 +176,7 @@ I18N.fr = {
     farm_only_toggle: '🔥 Farm maps uniquement',
     farm_coverage_farm: '({n} classées farm map sur {c} évaluées)',
 
+    cdn_lib_fail: 'Échec du chargement d\'un composant externe — vérifiez votre connexion et réessayez',
     nav_catalog: 'Catalogue', explore_catalog_d: 'Parcourez tout le catalogue ranked par artiste / langue / genre — une collection en un clic',
     catalog_page_title: '✦ Catalogue ✦',
     catalog_hint: 'Parcourez tout le catalogue ranked par artiste / langue / genre / source / feat. Choisissez un critère et transformez-le en catégorie de collection en un clic. L\'index est construit par le crawler en arrière-plan du site et ne couvre pas encore toutes les maps ranked.',

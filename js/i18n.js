@@ -16,11 +16,34 @@ function detectBrowserLang() {
     return 'zh';
 }
 
-let siteLang = localStorage.getItem('site_lang') || detectBrowserLang();
+let siteLang = window.__LANG || localStorage.getItem('site_lang') || detectBrowserLang();
+
+/* Only the active locale ships in the initial HTML (see the bootstrap in
+   index.html). Any other language the switcher picks is fetched on demand,
+   once, then cached in I18N. */
+const _localeLoads = {};
+function loadLocale(lang) {
+    if (I18N[lang]) return Promise.resolve();
+    return _localeLoads[lang] || (_localeLoads[lang] = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = `js/i18n/${lang}.js`;
+        s.async = false;
+        s.onload = resolve;
+        s.onerror = () => { delete _localeLoads[lang]; reject(new Error('locale load failed: ' + lang)); };
+        document.head.appendChild(s);
+    }));
+}
 
 function applyLang(lang) {
     siteLang = lang;
-    localStorage.setItem('site_lang', lang);
+    try { localStorage.setItem('site_lang', lang); } catch (e) {}
+    if (I18N[lang]) { applyLangDom(lang); return; }
+    loadLocale(lang).then(() => applyLangDom(lang)).catch(() => applyLangDom('zh'));
+}
+
+/* Applied text pass — split out of applyLang() so the initial pre-paint
+   bootstrap and the on-demand language switch share it. */
+function applyLangDom(lang) {
     document.documentElement.lang = lang;
     const t = I18N[lang] || I18N.zh;
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -48,9 +71,13 @@ function applyLang(lang) {
     if (typeof refreshDynamicContent === 'function') refreshDynamicContent();
 }
 
-/* ===== i18n helpers for dynamic content ===== */
+/* ===== i18n helpers for dynamic content =====
+   Only the active locale (+ any the switcher lazy-loaded) is in I18N, so
+   neither I18N[siteLang] nor I18N.zh is guaranteed present — fall back to
+   the raw key rather than throwing. */
 function t(key, params) {
-    const str = (I18N[siteLang] || I18N.zh)[key] || (I18N.zh)[key] || key;
+    const dict = I18N[siteLang] || I18N.zh || {};
+    const str = dict[key] || (I18N.zh || {})[key] || key;
     if (!params) return str;
     return Object.entries(params).reduce((s, [k, v]) => s.replace(`{${k}}`, v), str);
 }

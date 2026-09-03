@@ -176,6 +176,7 @@ I18N.es = {
     farm_only_toggle: '🔥 Solo farm maps',
     farm_coverage_farm: '({n} clasificados como farm map de {c} evaluados)',
 
+    cdn_lib_fail: 'No se pudo cargar un componente externo — comprueba tu conexión y reinténtalo',
     nav_catalog: 'Catálogo', explore_catalog_d: 'Explora todo el catálogo ranked por artista / idioma / género — una colección en un clic',
     catalog_page_title: '✦ Catálogo ✦',
     catalog_hint: 'Explora todo el catálogo ranked por artista / idioma / género / fuente / feat. Elige un criterio y conviértelo en una categoría de colección con un clic. El índice lo construye el rastreador en segundo plano del sitio y aún no cubre todos los mapas ranked.',

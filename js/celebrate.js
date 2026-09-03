@@ -5,9 +5,12 @@
    canvas-confetti (CDN, see index.html) rather than a full particle-system
    library since this is only an occasional one-off burst, not a persistent
    background layer like js/particles.js. */
-function celebrateBurst() {
-    if (typeof confetti !== 'function') return;
+async function celebrateBurst() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (typeof confetti !== 'function') {
+        try { await ensureConfetti(); } catch (e) { return; }
+    }
+    if (typeof confetti !== 'function') return;
 
     function cssVar(name) {
         return getComputedStyle(document.documentElement).getPropertyValue(name).trim();

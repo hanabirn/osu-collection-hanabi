@@ -971,22 +971,49 @@
      still holds while ~580 KB of JS is off the critical path. -->
 <script src="js/icons.js"></script>
 <script>renderStaticIcons();</script>
+<script defer src="js/lazylib.js"></script>
 <script defer src="js/theme.js"></script>
 <script defer src="js/particles.js"></script>
 <script defer src="js/pwa.js"></script>
-<script defer src="js/i18n.js"></script>
-<script defer src="js/i18n/zh.js"></script>
-<script defer src="js/i18n/en.js"></script>
-<script defer src="js/i18n/ja.js"></script>
-<script defer src="js/i18n/ko.js"></script>
-<script defer src="js/i18n/ru.js"></script>
-<script defer src="js/i18n/fr.js"></script>
-<script defer src="js/i18n/es.js"></script>
-<script defer src="js/i18n/de.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<!-- i18n.js is NOT deferred: it must define `I18N` + applyLang*() before the
+     inline bootstrap below injects the active-locale dict (which does
+     `I18N.xx = {…}` on load). It's ~1 KB — a negligible blocking cost. -->
+<script src="js/i18n.js"></script>
+<!-- Load ONLY the visitor's active locale (the other 7 were ~75 KB gz of
+     unused JS on every visit). document.write() emits a parser-blocking
+     <script> for it right here, so the dict is guaranteed present before any
+     deferred script (osu.js/main.js/…) runs t() — a dynamically-injected
+     script would race main.js's DOMContentLoaded init and throw. This runs
+     far earlier than main.js's old applyLang() call (which was after ~600 KB
+     of deferred JS), so the [data-i18n] pass lands near first paint instead
+     of well after it — that late swap was the bulk of the CLS. Languages the
+     switcher picks later are lazy-loaded on demand (see js/i18n.js). -->
+<script>
+(function () {
+    var SUPPORTED = ['zh', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de'];
+    var lang = 'zh';
+    try { var s = localStorage.getItem('site_lang'); if (s && SUPPORTED.indexOf(s) >= 0) lang = s; else throw 0; }
+    catch (e) {
+        var langs = navigator.languages || [navigator.language || 'zh'];
+        for (var i = 0; i < langs.length; i++) {
+            var c = (langs[i] || '').toLowerCase();
+            if (c.indexOf('zh') === 0) { lang = 'zh'; break; }
+            var short = c.split('-')[0];
+            if (SUPPORTED.indexOf(short) >= 0) { lang = short; break; }
+        }
+    }
+    window.__LANG = lang;
+    document.write('<script src="js/i18n/' + lang + '.js"><\/script>');
+})();
+</script>
+<!-- Applies the active locale's text now that its dict is in — before first
+     paint, before the deferred bundle. -->
+<script>
+if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'undefined' && I18N[window.__LANG]) {
+    applyLangDom(window.__LANG);
+    if (typeof renderStaticIcons === 'function') renderStaticIcons();
+}
+</script>
 <script defer src="js/osu.js"></script>
 <script defer src="js/replay-analyze.js"></script>
 <script defer src="js/public-collections.js"></script>

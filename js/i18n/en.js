@@ -174,6 +174,7 @@ I18N.en = {
     farm_only_toggle: '🔥 Farm maps only',
     farm_coverage_farm: '({n} classified as farm maps out of {c} scored so far)',
 
+    cdn_lib_fail: 'A required component failed to load — check your connection and retry',
     nav_catalog: 'Catalog', explore_catalog_d: 'Browse the whole ranked catalog by artist / language / genre — one click to a collection',
     catalog_page_title: '✦ Catalog ✦',
     catalog_hint: 'Browse the entire ranked catalog by artist / language / genre / source / feat. Pick one facet and turn it into a collection category in one click. The index is built by this site\'s background crawler and does not cover every ranked map yet.',

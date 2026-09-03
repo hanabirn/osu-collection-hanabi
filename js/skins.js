@@ -114,8 +114,8 @@ function parseSkinIni(text) {
 }
 
 function extractSkinAssets(file) {
-    if (typeof fflate === 'undefined') return Promise.resolve({ thumbUrl: null, info: null });
-    return file.arrayBuffer().then(buf => new Promise(resolve => {
+    const ready = typeof fflate !== 'undefined' ? Promise.resolve() : ensureFflate();
+    return ready.then(() => file.arrayBuffer()).then(buf => new Promise(resolve => {
         try {
             fflate.unzip(new Uint8Array(buf), {
                 filter: entry => SKIN_THUMB_CANDIDATES.includes(entry.name.toLowerCase()) || entry.name.toLowerCase() === 'skin.ini',

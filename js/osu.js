@@ -1273,7 +1273,7 @@ function parseOsdb(buffer) {
    the collection.db export this needs no network calls — .osdb carries the
    ids the site already has. One .osdb collection per category (+ Favorites),
    or a single "osu!收藏" collection if there are no categories. */
-function exportOsuOsdb() {
+async function exportOsuOsdb() {
     const status = document.getElementById('collection-db-status');
     const col = getOsuCollection();
     const allSets = OSU_MODES.flatMap(m => col[m]);
@@ -1316,6 +1316,8 @@ function exportOsuOsdb() {
     if (osdbCollections.length === 0) addColl(t('collection_db_all_name'), allSets.map(s => s.beatmapset_id));
 
     const editor = (getLoggedInOsuUser && getLoggedInOsuUser() && getLoggedInOsuUser().username) || 'osu! collection';
+    try { if (typeof fflate === 'undefined') await ensureFflate(); }
+    catch (e) { if (status) { status.innerText = t('cdn_lib_fail'); status.style.color = '#ff5252'; } return; }
     triggerBytesDownload(buildOsdb(osdbCollections, editor), 'osu!collection.osdb');
     if (status) { status.innerText = t('collection_io_osdb_done'); status.style.color = '#34d399'; }
 }
@@ -1343,6 +1345,8 @@ async function importOsuGameCollection(event) {
         let unresolved = 0;
 
         if (isOsdb) {
+            try { if (typeof fflate === 'undefined') await ensureFflate(); }
+            catch (e) { setStatus(t('cdn_lib_fail'), '#ff5252'); fileInput.value = ''; return; }
             let parsed;
             try {
                 parsed = parseOsdb(buffer);
@@ -2940,7 +2944,8 @@ function closeStatsDashboardModal() {
     statsDashboardCharts = [];
 }
 
-function renderStatsDashboardCharts(col, allSets) {
+async function renderStatsDashboardCharts(col, allSets) {
+    if (typeof Chart === 'undefined') { try { await ensureCharts(); } catch (e) { return; } }
     const colors = ppChartColors();
     const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
     statsDashboardCharts.forEach(c => c.destroy());
@@ -3642,9 +3647,10 @@ function mergePpHistory(remote, local) {
 let ppHistoryChart = null;
 let ppHistoryChartArgs = null;
 
-function renderPpHistoryChart(historyOverride, key, panelId) {
+async function renderPpHistoryChart(historyOverride, key, panelId) {
     const el = document.getElementById(panelId);
     if (!el) return;
+    if (typeof Chart === 'undefined') { try { await ensureCharts(); } catch (e) { return; } }
     const history = historyOverride || getPpHistory(key);
 
     if (ppHistoryChart) { ppHistoryChart.destroy(); ppHistoryChart = null; }
@@ -3756,9 +3762,10 @@ function renderPpCompareSide(elId, player) {
 let ppCompareChart = null;
 let ppCompareChartArgs = null;
 
-function renderPpCompareChart(playerA, playerB, panelId) {
+async function renderPpCompareChart(playerA, playerB, panelId) {
     const el = document.getElementById(panelId);
     if (!el) return;
+    if (typeof Chart === 'undefined') { try { await ensureCharts(); } catch (e) { return; } }
     if (ppCompareChart) { ppCompareChart.destroy(); ppCompareChart = null; }
 
     const dates = [...new Set([...playerA.history.map(p => p.date), ...playerB.history.map(p => p.date)])].sort();
@@ -3848,9 +3855,10 @@ function ppRaceColor(i, accent, purple) {
     return `hsl(${(i * 47) % 360}, 70%, 60%)`;
 }
 
-function renderPpRaceChart(players, panelId) {
+async function renderPpRaceChart(players, panelId) {
     const el = document.getElementById(panelId);
     if (!el) return;
+    if (typeof Chart === 'undefined') { try { await ensureCharts(); } catch (e) { return; } }
     if (ppRaceChart) { ppRaceChart.destroy(); ppRaceChart = null; }
 
     const dates = [...new Set(players.flatMap(p => p.history.map(h => h.date)))].sort();
@@ -4969,6 +4977,7 @@ function buildShareCard({ title, avatarUrl, name, sub, stats }) {
 async function downloadShareCardPng(card, filename, doneMsg, failMsg) {
     document.body.appendChild(card);
     try {
+        if (typeof htmlToImage === 'undefined') await ensureHtmlToImage();
         const dataUrl = await htmlToImage.toPng(card, { pixelRatio: 2, cacheBust: true });
         const a = document.createElement('a');
         a.href = dataUrl;
