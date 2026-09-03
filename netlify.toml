@@ -17,6 +17,12 @@
 [functions."push-cron"]
   schedule = "*/30 * * * *"
 
+# Ranked-catalog metadata crawler (artist / language / genre / source index
+# for the Catalog tab) — one search page per loop, all rulesets in one pass,
+# see netlify/functions/_catalog-crawl-core.js.
+[functions."catalog-crawl-cron"]
+  schedule = "*/15 * * * *"
+
 [functions."farm-crawl-run"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
 

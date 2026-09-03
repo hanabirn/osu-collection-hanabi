@@ -41,6 +41,17 @@ function getSkinScreenshotsStore() {
     });
 }
 
+// Ranked-catalog metadata index (artist / language / genre / source / feat.),
+// built by catalog-crawl-cron.js — see _catalog-crawl-core.js. Separate from
+// the farm-maps store: no star floor, no PP, one lean record per beatmapSET.
+function getCatalogStore() {
+    return getStore({
+        name: 'osu-catalog',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
 // Small key/value bucket for site-wide counters (currently just the "like
 // this site" total — see site-likes.js).
 function getSiteStatsStore() {
@@ -51,4 +62,4 @@ function getSiteStatsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore };
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore };
