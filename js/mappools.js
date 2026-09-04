@@ -37,13 +37,14 @@ function mappoolEditionsFor(key, variant) {
         .sort((a, b) => a.year - b.year || String(a.folder).localeCompare(String(b.folder)));
 }
 
-/* Short label for an edition chip: the year for most, "#1 '11" / "#2 '11"
-   for the two 2011 OWCs, and just the year when the wiki title carries
-   neither (e.g. the first CWC, titled "Catch the Beat World Cup"). */
+/* Short label for an edition chip: just the year for most. The three
+   pre-2013 OWCs were numbered, and #1/#2 were both in 2011, so those show
+   "2011 #1" / "2011 #2" / "2012 #3" — year first (keeps the strip in
+   chronological order), ordinal to tell the two 2011s apart. */
 function mappoolEditionShort(e) {
     const tok = (e.label || '').trim().split(/\s+/).pop() || '';
     if (/^20\d{2}$/.test(tok)) return tok;
-    if (tok.charAt(0) === '#') return `${tok} '${String(e.year).slice(2)}`;
+    if (tok.charAt(0) === '#') return `${e.year} ${tok}`;
     return String(e.year);
 }
 

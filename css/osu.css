@@ -1479,7 +1479,21 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border-radius: 14px;
     background: rgba(var(--accent-purple-rgb), 0.05);
 }
-#mappool-tourney-tabs { flex-wrap: wrap; justify-content: flex-start; margin: 0 0 10px; }
+/* Tournament segmented control — centred and enlarged (this is the main
+   thing you pick, so it earns the size). */
+#mappool-tourney-tabs { flex-wrap: wrap; justify-content: center; gap: 10px; margin: 2px 0 12px; }
+#mappool-tourney-tabs .osu-mode-tab {
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 9px 20px;
+    border-radius: 22px;
+}
+#mappool-tourney-tabs .mode-icon-inline {
+    width: 19px;
+    height: 19px;
+    vertical-align: -4px;
+    margin-right: 3px;
+}
 .mappool-edition-strip {
     display: flex;
     gap: 6px;
@@ -1627,9 +1641,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .mappool-bracket-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 14px 0 6px;
-    font-size: 0.7rem;
+    gap: 9px;
+    margin: 16px 0 7px;
+    font-size: 0.76rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -1651,12 +1665,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
-    height: 21px;
-    padding: 0 9px;
-    font-size: 0.7rem;
+    min-width: 50px;
+    height: 27px;
+    padding: 0 12px;
+    font-size: 0.84rem;
     font-weight: 800;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     color: #cfd3d6;
     background: #24282b;
     clip-path: polygon(22% 0%, 78% 0%, 100% 50%, 78% 100%, 22% 100%, 0% 50%);
