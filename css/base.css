@@ -937,6 +937,10 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     flex-direction: column;
     gap: 6px;
     min-width: 150px;
+    max-height: min(70vh, 460px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     padding: 8px;
     border-radius: 14px;
     background: var(--bg-card);
@@ -947,6 +951,19 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     transform: translateY(-8px);
     transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
     z-index: 210;
+}
+/* On a phone the menu drops out of the header, which has overflow:hidden
+   (for the cover carousel) and clips it — so pin it to the viewport's
+   top-right corner as a scrollable panel instead. */
+@media (max-width: 600px) {
+    .lang-globe-menu {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        left: auto;
+        max-height: calc(100dvh - 24px);
+        z-index: 220;
+    }
 }
 .lang-globe.open .lang-globe-menu {
     opacity: 1;
