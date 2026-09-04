@@ -38,24 +38,33 @@ const FETCH_CONCURRENCY = 8;
 const RESOLVE_CHUNK = 50;
 const REVISIT_404_MS = 30 * 24 * 60 * 60 * 1000; // re-check a missing folder monthly
 
+/* Bump when the wiki parser or year logic changes in a way that would
+   re-shape already-stored pages: a mismatch forces one full re-parse
+   (clears pageHashes) even though the wiki markdown itself is unchanged. */
+const PARSE_VERSION = 2;
+
+/* The handful of ordinal-named wiki folders whose year can't be trusted to
+   the folder name and isn't reliably in a parseable spot in the prose.
+   Fixed, historical set. NB OWC #1 and #2 were BOTH held in 2011 — an
+   edition is keyed by its folder, not by (tournament, year). */
+const ORDINAL_YEAR = { 'OWC/1': 2011, 'OWC/2': 2011, 'OWC/3': 2012, 'TWC/3': 2013, 'CWC/1': 2012 };
+
 function freshState() {
-    return { pageHashes: {}, known404: {}, resolveQueue: [], coverage: null, lastRunAt: null, lastSweepAt: null, lastError: null };
+    return { parseVersion: PARSE_VERSION, pageHashes: {}, known404: {}, resolveQueue: [], coverage: null, lastRunAt: null, lastSweepAt: null, lastError: null };
 }
 
 function sha1(s) {
     return crypto.createHash('sha1').update(s).digest('hex');
 }
 
-/* Candidate wiki folders. A superset — 404s are recorded and skipped for a
-   month. The edition's real year is parsed from the page content, not the
-   folder name, so early ordinal folders (OWC/1, CWC/2, …) just work. */
+/* Candidate wiki folders — a superset; 404s are recorded and skipped for a
+   month. Year-named folders (OWC/2024, MWC/2024_4K) carry their own year;
+   the five ordinal folders are pinned via ORDINAL_YEAR. */
 function buildCandidates() {
     const now = new Date().getUTCFullYear();
     const out = [];
-    for (const y of ['1', '2', '3', '4', '5']) {
-        out.push({ key: 'OWC', variant: '', folder: `OWC/${y}` });
-        out.push({ key: 'TWC', variant: '', folder: `TWC/${y}` });
-        out.push({ key: 'CWC', variant: '', folder: `CWC/${y}` });
+    for (const f of Object.keys(ORDINAL_YEAR)) {
+        out.push({ key: f.split('/')[0], variant: '', folder: f });
     }
     for (let y = 2011; y <= now + 1; y++) {
         out.push({ key: 'OWC', variant: '', folder: `OWC/${y}` });
@@ -68,6 +77,16 @@ function buildCandidates() {
     out.push({ key: 'MWC', variant: '4K', folder: 'MWC/2014' });
     out.push({ key: 'MWC', variant: '4K', folder: 'MWC/2015' });
     return out;
+}
+
+/* Year for grouping/sorting only (editions are keyed by folder). Prefer a
+   year in the folder name, then the ORDINAL_YEAR pin, then the prose. */
+function editionYear(folder, md) {
+    const seg = folder.split('/')[1] || '';
+    const fm = seg.match(/^(20\d{2})(?:_[47]K)?$/);
+    if (fm) return Number(fm[1]);
+    if (ORDINAL_YEAR[folder]) return ORDINAL_YEAR[folder];
+    return parseHeader(md).year;
 }
 
 function normBracket(raw) {
@@ -209,6 +228,12 @@ async function runCrawlBatch(budgetMs) {
     if (!state.pageHashes) state.pageHashes = {};
     if (!state.known404) state.known404 = {};
     if (!Array.isArray(state.resolveQueue)) state.resolveQueue = [];
+    // Parser changed since these pages were last stored — drop the hashes so
+    // phase 1 re-parses every page once (wiki markdown itself is unchanged).
+    if (state.parseVersion !== PARSE_VERSION) {
+        state.pageHashes = {};
+        state.parseVersion = PARSE_VERSION;
+    }
     let pools = (await store.get(DATASET_KEY, { type: 'json' })) || [];
     const cache = (await store.get(BEATMAP_CACHE_KEY, { type: 'json' })) || {};
 
@@ -251,7 +276,8 @@ async function runCrawlBatch(budgetMs) {
                 delete state.known404[folder];
                 const hash = sha1(r.md);
                 if (state.pageHashes[folder] === hash) continue;
-                const { label, year } = parseHeader(r.md);
+                const { label } = parseHeader(r.md);
+                const year = editionYear(folder, r.md);
                 const rounds = parseMappools(r.md);
                 state.pageHashes[folder] = hash;
                 if (!rounds.length || !year) {
@@ -299,7 +325,7 @@ async function runCrawlBatch(budgetMs) {
         error = err.message;
     }
 
-    pools.sort((a, b) => a.key.localeCompare(b.key) || a.variant.localeCompare(b.variant) || a.year - b.year);
+    pools.sort((a, b) => a.key.localeCompare(b.key) || a.variant.localeCompare(b.variant) || a.year - b.year || a.folder.localeCompare(b.folder));
     state.lastRunAt = new Date().toISOString();
     state.lastError = error;
     state.coverage = computeCoverage(pools, cache);

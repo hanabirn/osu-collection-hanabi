@@ -2,9 +2,10 @@
    (built by wc-mappool-crawl-cron.js — see _wc-mappools-core.js). No auth.
 
    GET with no params  -> index:
-     { editions: [{ key, variant, year, label, roundCount, mapCount }],
+     { editions: [{ key, variant, year, label, folder, roundCount, mapCount }],
        coverage, lastRunAt }
-   GET ?tournament=OWC&variant=&year=2024  -> one edition, maps joined
+   GET ?folder=OWC/2024  (or the legacy ?tournament=OWC&variant=&year=2024)
+       -> one edition, maps joined
    against the resolved-metadata cache:
      { key, variant, year, label, folder,
        rounds: [{ name, mappackUrl, showcaseUrl,
@@ -22,6 +23,7 @@ exports.handler = async (event) => {
     }
 
     const qs = event.queryStringParameters || {};
+    const folder = (qs.folder || '').trim();
     const tournament = (qs.tournament || '').trim().toUpperCase();
     const variant = (qs.variant || '').trim().toUpperCase();
     const year = parseInt(qs.year, 10) || 0;
@@ -31,11 +33,11 @@ exports.handler = async (event) => {
         const pools = (await store.get('pools:all', { type: 'json' })) || [];
         const state = (await store.get('wc-state', { type: 'json' })) || {};
 
-        if (!tournament || !year) {
+        if (!folder && (!tournament || !year)) {
             const editions = pools.map((p) => {
                 let mapCount = 0;
                 for (const r of p.rounds) for (const b of r.brackets) mapCount += b.maps.length;
-                return { key: p.key, variant: p.variant || '', year: p.year, label: p.label, roundCount: p.rounds.length, mapCount };
+                return { key: p.key, variant: p.variant || '', year: p.year, label: p.label, folder: p.folder, roundCount: p.rounds.length, mapCount };
             });
             return {
                 statusCode: 200,
@@ -48,7 +50,9 @@ exports.handler = async (event) => {
             };
         }
 
-        const pool = pools.find((p) => p.key === tournament && (p.variant || '') === variant && p.year === year);
+        const pool = folder
+            ? pools.find((p) => p.folder === folder)
+            : pools.find((p) => p.key === tournament && (p.variant || '') === variant && p.year === year);
         if (!pool) {
             return { statusCode: 404, headers, body: JSON.stringify({ error: 'No such edition' }) };
         }

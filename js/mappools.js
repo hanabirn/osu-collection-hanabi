@@ -18,9 +18,9 @@ const MAPPOOL_TOURNEYS = [
 ];
 
 let mappoolsLoaded = false;
-let mappoolIndex = null;   // { editions:[{key,variant,year,label,roundCount,mapCount}], coverage, lastRunAt }
+let mappoolIndex = null;   // { editions:[{key,variant,year,label,folder,roundCount,mapCount}], coverage, lastRunAt }
 let mappoolData = null;    // last-rendered edition payload
-let mappoolCur = { key: '', variant: '', year: 0 };
+let mappoolCur = { key: '', variant: '', folder: '', year: 0 };
 
 function ensureMappoolsLoaded() {
     if (!mappoolsLoaded) loadMappoolIndex();
@@ -34,7 +34,17 @@ function mappoolEditionsFor(key, variant) {
     if (!mappoolIndex) return [];
     return (mappoolIndex.editions || [])
         .filter((e) => e.key === key && (e.variant || '') === (variant || ''))
-        .sort((a, b) => a.year - b.year);
+        .sort((a, b) => a.year - b.year || String(a.folder).localeCompare(String(b.folder)));
+}
+
+/* Short label for the edition <select>: the year for most, "#1 (2011)" /
+   "#2 (2011)" for the two 2011 OWCs, and just the year when the wiki title
+   carries neither (e.g. the first CWC, titled "Catch the Beat World Cup"). */
+function mappoolEditionShort(e) {
+    const tok = (e.label || '').trim().split(/\s+/).pop() || '';
+    if (/^20\d{2}$/.test(tok)) return tok;
+    if (tok.charAt(0) === '#') return `${tok} (${e.year})`;
+    return String(e.year);
 }
 
 async function loadMappoolIndex() {
@@ -56,7 +66,7 @@ async function loadMappoolIndex() {
     const first = MAPPOOL_TOURNEYS.find((tr) => mappoolEditionsFor(tr.key, tr.variant).length);
     if (first) {
         const eds = mappoolEditionsFor(first.key, first.variant);
-        selectMappool(first.key, first.variant, eds[eds.length - 1].year);
+        selectMappool(eds[eds.length - 1]);
     } else if (roundsEl) {
         roundsEl.innerHTML = `<p class="osu-empty">${t('mappools_empty')}</p>`;
     }
@@ -72,29 +82,30 @@ function renderMappoolTourneyTabs() {
     }).join('');
 }
 
-function renderMappoolYearSelect() {
+function renderMappoolEditionSelect() {
     const sel = document.getElementById('mappool-year-select');
     if (!sel) return;
     const eds = mappoolEditionsFor(mappoolCur.key, mappoolCur.variant);
     sel.innerHTML = eds.slice().reverse()
-        .map((e) => `<option value="${e.year}"${e.year === mappoolCur.year ? ' selected' : ''}>${e.year}</option>`)
+        .map((e) => `<option value="${escHtml(e.folder)}"${e.folder === mappoolCur.folder ? ' selected' : ''}>${escHtml(mappoolEditionShort(e))}</option>`)
         .join('');
 }
 
 function switchMappoolTourney(key, variant) {
     const eds = mappoolEditionsFor(key, variant);
-    if (!eds.length) return;
-    selectMappool(key, variant, eds[eds.length - 1].year);
+    if (eds.length) selectMappool(eds[eds.length - 1]);
 }
 
-function switchMappoolYear(year) {
-    selectMappool(mappoolCur.key, mappoolCur.variant, Number(year));
+function switchMappoolEdition(folder) {
+    const e = mappoolIndex && (mappoolIndex.editions || []).find((x) => x.folder === folder);
+    if (e) selectMappool(e);
 }
 
-function selectMappool(key, variant, year) {
-    mappoolCur = { key, variant: variant || '', year };
+function selectMappool(e) {
+    if (!e) return;
+    mappoolCur = { key: e.key, variant: e.variant || '', folder: e.folder, year: e.year };
     renderMappoolTourneyTabs();
-    renderMappoolYearSelect();
+    renderMappoolEditionSelect();
     loadMappool();
 }
 
@@ -104,9 +115,7 @@ async function loadMappool() {
     if (addBtn) addBtn.disabled = true;
     if (roundsEl) roundsEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     try {
-        const p = new URLSearchParams({ tournament: mappoolCur.key, year: String(mappoolCur.year) });
-        if (mappoolCur.variant) p.set('variant', mappoolCur.variant);
-        const res = await fetch(`/.netlify/functions/wc-mappools-list?${p}`);
+        const res = await fetch(`/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(mappoolCur.folder)}`);
         if (!res.ok) throw new Error('bad response');
         mappoolData = await res.json();
         renderMappool();
@@ -248,7 +257,7 @@ async function mappoolImport(label, ids) {
 function refreshMappoolsLocalized() {
     if (!mappoolsLoaded) return;
     renderMappoolTourneyTabs();
-    renderMappoolYearSelect();
+    renderMappoolEditionSelect();
     renderMappoolCoverage();
     if (mappoolData) renderMappool();
 }
