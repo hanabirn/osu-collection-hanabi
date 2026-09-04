@@ -1465,36 +1465,183 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     }
 }
 
-/* ===== 世界盃圖池 tab — round/bracket chrome + the same dense card grid
-   as Farm 圖 / Catalog (scoped to .mappool-list so the main collection grid
-   keeps its own proportions). ===== */
-.mappool-controls { align-items: center; }
-#mappool-tourney-tabs { flex-wrap: wrap; }
+/* ===== 世界盃圖池 tab =====
+   Three zones: a picker card (tournament + edition), a summary strip for the
+   chosen edition, then the pool itself (a sticky round jump-bar over
+   round → bracket → the shared dense card grid). .mappool-list is scoped so
+   the main collection grid keeps its own proportions. */
 
-.mappool-round { margin: 18px 0 22px; }
+/* — Picker: tournament segmented control + a scrollable edition strip — */
+.mappool-picker {
+    margin-bottom: 14px;
+    padding: 12px;
+    border: 1px solid var(--border-card);
+    border-radius: 14px;
+    background: rgba(var(--accent-purple-rgb), 0.05);
+}
+#mappool-tourney-tabs { flex-wrap: wrap; justify-content: flex-start; margin: 0 0 10px; }
+.mappool-edition-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 8px 2px 4px;
+    border-top: 1px solid var(--border-card);
+    scrollbar-width: thin;
+}
+.mappool-edition-strip::-webkit-scrollbar { height: 5px; }
+.mappool-edition-strip::-webkit-scrollbar-thumb { background: rgba(var(--accent-purple-rgb), 0.4); border-radius: 3px; }
+.mappool-edition-chip {
+    flex: 0 0 auto;
+    padding: 5px 13px;
+    border-radius: 8px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
+}
+.mappool-edition-chip:hover { color: var(--text-pink); border-color: rgba(var(--accent-pink-rgb), 0.4); }
+.mappool-edition-chip.active {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 0 14px rgba(var(--accent-pink-rgb), 0.28);
+}
+
+/* — Summary strip for the chosen edition — */
+.mappool-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-card);
+    border-left: 3px solid var(--accent-pink);
+    background: var(--bg-card);
+}
+.mappool-summary-main { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.mappool-summary-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.mappool-summary-title .mode-icon-inline { width: 17px; height: 17px; }
+.mappool-summary-stats { font-size: 0.82rem; color: var(--text-dim); }
+.mappool-add-event { margin-left: auto; }
+
+/* Shared quiet/ghost button for the two "add to collection" actions here */
+.mappool-add-event,
+.mappool-round-add {
+    padding: 5px 13px;
+    border-radius: 8px;
+    border: 1px solid rgba(var(--accent-pink-rgb), 0.45);
+    background: transparent;
+    color: var(--text-pink);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out), transform 0.15s var(--ease-spring);
+}
+.mappool-add-event:hover:not(:disabled),
+.mappool-round-add:hover {
+    background: rgba(var(--accent-pink-rgb), 0.14);
+    border-color: var(--accent-pink);
+}
+.mappool-add-event:active:not(:disabled),
+.mappool-round-add:active { transform: scale(0.96); }
+.mappool-add-event:disabled { opacity: 0.4; cursor: default; }
+
+/* — Sticky round jump-bar — */
+.mappool-round-nav {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin: 0 0 14px;
+    padding: 8px 0;
+    /* Opaque (content scrolls under it): card tint over a solid body colour,
+       both theme-aware. Longhand so background-color re-resolves on a theme
+       swap. */
+    background-color: var(--bg-body-1);
+    background-image: linear-gradient(var(--bg-card), var(--bg-card));
+    border-bottom: 1px solid var(--border-card);
+    scrollbar-width: none;
+}
+.mappool-round-nav::-webkit-scrollbar { display: none; }
+.mappool-round-nav:empty { display: none; }
+.mappool-round-nav-chip {
+    flex: 0 0 auto;
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--border-card);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.76rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s var(--ease-out), border-color 0.15s var(--ease-out);
+}
+.mappool-round-nav-chip:hover { color: var(--text-pink); border-color: rgba(var(--accent-pink-rgb), 0.45); }
+
+/* — Round section — */
+.mappool-round { margin: 0 0 26px; scroll-margin-top: 52px; }
 .mappool-round-head {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(var(--accent-purple-rgb), 0.22);
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 2px 0 8px 10px;
+    border-left: 3px solid var(--accent-purple);
+    border-bottom: 1px solid var(--border-card);
 }
-.mappool-round-head h3 { margin: 0; font-size: 1.05rem; }
-.mappool-round-links { display: flex; gap: 10px; font-size: 0.8rem; }
-.mappool-round-links a { color: var(--accent-light-purple); }
-.mappool-round-add { margin-left: auto; font-size: 0.78rem; padding: 4px 12px; }
+.mappool-round-head h3 { margin: 0; font-size: 1.06rem; font-weight: 700; }
+.mappool-round-links { display: inline-flex; gap: 8px; }
+.mappool-round-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border-card);
+    color: var(--text-secondary);
+    transition: color 0.15s var(--ease-out), border-color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+.mappool-round-link:hover { color: var(--text-pink); border-color: rgba(var(--accent-pink-rgb), 0.45); background: rgba(var(--accent-pink-rgb), 0.08); }
+.mappool-round-link .icon-svg { width: 15px; height: 15px; }
+.mappool-round-add { margin-left: auto; }
+
+/* — Bracket sub-heading: a slim row, mod hexagon + name — */
 .mappool-bracket-label {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 12px 0 6px;
-    font-size: 0.72rem;
+    margin: 14px 0 6px;
+    font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--text-dim);
+}
+
+/* — Dataset footnote — */
+.mappool-coverage-foot {
+    margin: 20px 0 0;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-align: center;
 }
 
 /* Tournament-style mod icon: a flat-topped hexagon with bold 2-letter text
@@ -1553,6 +1700,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .mappool-list .osu-play-btn { left: 50%; right: auto; transform: translateX(-50%); }
 .mappool-list .osu-copy-btn { right: 8px; }
 .mappool-list .osu-download-btn { right: 48px; }
+@media (max-width: 600px) {
+    .mappool-summary-title { font-size: 0.98rem; }
+    .mappool-add-event { margin-left: 0; }
+    .mappool-round-head { flex-wrap: wrap; }
+    .mappool-round-add { margin-left: 0; }
+}
 @media (max-width: 480px) {
     .mappool-list.osu-collection {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

@@ -210,6 +210,7 @@ I18N.fr = {
     mappools_empty: 'Aucun mappool à afficher pour cette édition',
     mappools_load_fail: 'Échec du chargement du mappool, réessayez plus tard',
     mappools_coverage: '{e} éditions de World Cup indexées · {n} maps · mis à jour le {t}',
+    mappools_stats: '{r} rounds · {n} maps',
     mappools_copy_id: 'Copier l’ID',
     mappools_preview: 'Aperçu',
 

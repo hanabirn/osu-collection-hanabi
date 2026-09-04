@@ -208,6 +208,7 @@ I18N.zh = {
     mappools_empty: '這一屆還沒有可顯示的圖池',
     mappools_load_fail: '載入圖池失敗，稍後再試',
     mappools_coverage: '已收錄 {e} 屆世界盃・共 {n} 張圖・上次更新 {t}',
+    mappools_stats: '{r} 輪 · {n} 張圖',
     mappools_copy_id: '複製 ID',
     mappools_preview: '播放預覽',
 

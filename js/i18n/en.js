@@ -208,6 +208,7 @@ I18N.en = {
     mappools_empty: 'No mappool to show for this edition yet',
     mappools_load_fail: 'Failed to load the mappool, try again later',
     mappools_coverage: '{e} World Cup editions indexed · {n} maps · updated {t}',
+    mappools_stats: '{r} rounds · {n} maps',
     mappools_copy_id: 'Copy ID',
     mappools_preview: 'Preview',
 

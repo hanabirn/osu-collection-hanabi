@@ -210,6 +210,7 @@ I18N.es = {
     mappools_empty: 'Aún no hay mappool para esta edición',
     mappools_load_fail: 'Error al cargar el mappool, inténtalo más tarde',
     mappools_coverage: '{e} ediciones de World Cup indexadas · {n} mapas · actualizado {t}',
+    mappools_stats: '{r} rondas · {n} mapas',
     mappools_copy_id: 'Copiar ID',
     mappools_preview: 'Vista previa',
 

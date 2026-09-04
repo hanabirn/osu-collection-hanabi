@@ -210,6 +210,7 @@ I18N.ru = {
     mappools_empty: 'Для этого розыгрыша маппула пока нет',
     mappools_load_fail: 'Не удалось загрузить маппул, попробуйте позже',
     mappools_coverage: 'Розыгрышей World Cup: {e} · карт: {n} · обновлено {t}',
+    mappools_stats: 'раундов: {r} · карт: {n}',
     mappools_copy_id: 'Скопировать ID',
     mappools_preview: 'Прослушать',
 

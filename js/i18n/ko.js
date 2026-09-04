@@ -210,6 +210,7 @@ I18N.ko = {
     mappools_empty: '이 대회의 맵풀이 아직 없습니다',
     mappools_load_fail: '맵풀을 불러오지 못했습니다. 나중에 다시 시도하세요',
     mappools_coverage: '월드컵 {e}개 대회 수록 · 맵 {n}개 · 업데이트 {t}',
+    mappools_stats: '{r}개 라운드 · 맵 {n}개',
     mappools_copy_id: 'ID 복사',
     mappools_preview: '미리듣기',
 

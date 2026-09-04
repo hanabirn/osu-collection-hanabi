@@ -37,13 +37,13 @@ function mappoolEditionsFor(key, variant) {
         .sort((a, b) => a.year - b.year || String(a.folder).localeCompare(String(b.folder)));
 }
 
-/* Short label for the edition <select>: the year for most, "#1 (2011)" /
-   "#2 (2011)" for the two 2011 OWCs, and just the year when the wiki title
-   carries neither (e.g. the first CWC, titled "Catch the Beat World Cup"). */
+/* Short label for an edition chip: the year for most, "#1 '11" / "#2 '11"
+   for the two 2011 OWCs, and just the year when the wiki title carries
+   neither (e.g. the first CWC, titled "Catch the Beat World Cup"). */
 function mappoolEditionShort(e) {
     const tok = (e.label || '').trim().split(/\s+/).pop() || '';
     if (/^20\d{2}$/.test(tok)) return tok;
-    if (tok.charAt(0) === '#') return `${tok} (${e.year})`;
+    if (tok.charAt(0) === '#') return `${tok} '${String(e.year).slice(2)}`;
     return String(e.year);
 }
 
@@ -83,13 +83,16 @@ function renderMappoolTourneyTabs() {
     }).join('');
 }
 
-function renderMappoolEditionSelect() {
-    const sel = document.getElementById('mappool-year-select');
-    if (!sel) return;
+function renderMappoolEditionStrip() {
+    const el = document.getElementById('mappool-edition-strip');
+    if (!el) return;
     const eds = mappoolEditionsFor(mappoolCur.key, mappoolCur.variant);
-    sel.innerHTML = eds.slice().reverse()
-        .map((e) => `<option value="${escHtml(e.folder)}"${e.folder === mappoolCur.folder ? ' selected' : ''}>${escHtml(mappoolEditionShort(e))}</option>`)
-        .join('');
+    el.innerHTML = eds.slice().reverse().map((e) => {
+        const active = e.folder === mappoolCur.folder;
+        return `<button role="tab" aria-selected="${active}" class="mappool-edition-chip${active ? ' active' : ''}" onclick="switchMappoolEdition('${escHtml(e.folder)}')">${escHtml(mappoolEditionShort(e))}</button>`;
+    }).join('');
+    const cur = el.querySelector('.mappool-edition-chip.active');
+    if (cur) cur.scrollIntoView({ inline: 'center', block: 'nearest' });
 }
 
 function switchMappoolTourney(key, variant) {
@@ -106,7 +109,7 @@ function selectMappool(e) {
     if (!e) return;
     mappoolCur = { key: e.key, variant: e.variant || '', folder: e.folder, year: e.year };
     renderMappoolTourneyTabs();
-    renderMappoolEditionSelect();
+    renderMappoolEditionStrip();
     loadMappool();
 }
 
@@ -184,40 +187,81 @@ function renderMappoolCard(mp, inCollection) {
     </div>`;
 }
 
+function mappoolMapCount(d) {
+    let n = 0;
+    for (const r of (d.rounds || [])) for (const b of r.brackets) n += b.maps.length;
+    return n;
+}
+
+/* Summary strip: which edition is showing, how big it is, and the
+   whole-event collect action. */
+function renderMappoolSummary() {
+    const box = document.getElementById('mappool-summary');
+    const titleEl = document.getElementById('mappool-summary-title');
+    const statsEl = document.getElementById('mappool-summary-stats');
+    const addBtn = document.getElementById('mappool-add-event-btn');
+    if (!box || !titleEl || !statsEl || !mappoolData) return;
+    const d = mappoolData;
+    const tr = MAPPOOL_TOURNEYS.find((x) => x.key === d.key && (x.variant || '') === (d.variant || ''));
+    const ico = tr && typeof modeIconSvg === 'function' ? modeIconSvg(tr.mode) : '';
+    titleEl.innerHTML = `${ico}<span>${escHtml(d.label)}</span>`;
+    statsEl.textContent = t('mappools_stats', { r: (d.rounds || []).length, n: mappoolMapCount(d).toLocaleString() });
+    if (addBtn) addBtn.disabled = !(d.rounds && d.rounds.length);
+    box.hidden = false;
+}
+
+/* Sticky jump-bar over the round sections. */
+function renderMappoolRoundNav() {
+    const el = document.getElementById('mappool-round-nav');
+    if (!el || !mappoolData) return;
+    el.innerHTML = (mappoolData.rounds || []).map((r, ri) =>
+        `<button class="mappool-round-nav-chip" onclick="scrollToMappoolRound(${ri})">${escHtml(r.name)}</button>`
+    ).join('');
+}
+
+function scrollToMappoolRound(ri) {
+    const el = document.getElementById(`mappool-round-${ri}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderMappool() {
     const roundsEl = document.getElementById('mappool-rounds');
-    const addBtn = document.getElementById('mappool-add-event-btn');
+    const navEl = document.getElementById('mappool-round-nav');
     if (!roundsEl || !mappoolData) return;
     const d = mappoolData;
 
+    renderMappoolSummary();
+
     if (!d.rounds || !d.rounds.length) {
         roundsEl.innerHTML = `<p class="osu-empty">${t('mappools_empty')}</p>`;
-        if (addBtn) addBtn.disabled = true;
+        if (navEl) navEl.innerHTML = '';
         return;
     }
 
     const collected = new Set(OSU_MODES.flatMap((m) => (getOsuCollection()[m] || []).map((s) => s.beatmapset_id)));
+    const dl = icon('download');
+    const sc = icon('play', { filled: true });
 
     roundsEl.innerHTML = d.rounds.map((r, ri) => {
         const links = [];
-        if (r.mappackUrl) links.push(`<a href="${escHtml(r.mappackUrl)}" target="_blank" rel="noopener">${t('mappools_mappack')}</a>`);
-        if (r.showcaseUrl) links.push(`<a href="${escHtml(r.showcaseUrl)}" target="_blank" rel="noopener">${t('mappools_showcase')}</a>`);
+        if (r.mappackUrl) links.push(`<a class="mappool-round-link" href="${escHtml(r.mappackUrl)}" target="_blank" rel="noopener" title="${t('mappools_mappack')}" aria-label="${t('mappools_mappack')}">${dl}</a>`);
+        if (r.showcaseUrl) links.push(`<a class="mappool-round-link" href="${escHtml(r.showcaseUrl)}" target="_blank" rel="noopener" title="${t('mappools_showcase')}" aria-label="${t('mappools_showcase')}">${sc}</a>`);
         const brackets = r.brackets.map((b) => {
             const cards = b.maps.map((mp) => renderMappoolCard(mp, collected.has(mp.setId))).join('');
             return `${mappoolBracketHead(b.label)}<div class="osu-collection mappool-list">${cards}</div>`;
         }).join('');
         return `
-        <div class="mappool-round">
+        <div class="mappool-round" id="mappool-round-${ri}">
             <div class="mappool-round-head">
                 <h3>${escHtml(r.name)}</h3>
-                <div class="mappool-round-links">${links.join('')}</div>
-                <button class="btn mappool-round-add" onclick="addMappoolRoundToCollection(${ri})">${t('mappools_round_add_btn')}</button>
+                ${links.length ? `<div class="mappool-round-links">${links.join('')}</div>` : ''}
+                <button class="mappool-round-add" onclick="addMappoolRoundToCollection(${ri})">${t('mappools_round_add_btn')}</button>
             </div>
             ${brackets}
         </div>`;
     }).join('');
 
-    if (addBtn) addBtn.disabled = false;
+    renderMappoolRoundNav();
 }
 
 function renderMappoolCoverage() {
@@ -280,11 +324,11 @@ async function mappoolImport(label, ids) {
 }
 
 /* Called from refreshDynamicContent() on a site-language switch — the
-   tourney tabs / year <select> / cards are built in JS. */
+   tourney tabs / edition strip / summary / cards are built in JS. */
 function refreshMappoolsLocalized() {
     if (!mappoolsLoaded) return;
     renderMappoolTourneyTabs();
-    renderMappoolEditionSelect();
+    renderMappoolEditionStrip();
     renderMappoolCoverage();
     if (mappoolData) renderMappool();
 }

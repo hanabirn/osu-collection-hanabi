@@ -210,6 +210,7 @@ I18N.de = {
     mappools_empty: 'Für diese Austragung gibt es noch keinen Mappool',
     mappools_load_fail: 'Mappool konnte nicht geladen werden, später erneut versuchen',
     mappools_coverage: '{e} World-Cup-Austragungen erfasst · {n} Maps · aktualisiert {t}',
+    mappools_stats: '{r} Runden · {n} Maps',
     mappools_copy_id: 'ID kopieren',
     mappools_preview: 'Vorschau',
 

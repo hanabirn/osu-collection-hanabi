@@ -210,6 +210,7 @@ I18N.ja = {
     mappools_empty: 'この大会の譜面プールはまだありません',
     mappools_load_fail: '譜面プールの読み込みに失敗しました。後でもう一度お試しください',
     mappools_coverage: 'World Cup {e} 大会を収録・{n} 譜面・最終更新 {t}',
+    mappools_stats: '{r} ラウンド・{n} 譜面',
     mappools_copy_id: 'ID をコピー',
     mappools_preview: 'プレビュー再生',
 

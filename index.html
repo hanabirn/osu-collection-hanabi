@@ -507,14 +507,22 @@
         <h2 class="osu-page-title" data-i18n="mappools_page_title">✦ 世界盃圖池 ✦</h2>
         <p class="tournaments-hint" data-i18n="mappools_hint">歷屆 osu! 世界盃（OWC／TWC／MWC 4K・7K／CWC）的官方圖池，資料取自 osu! wiki。選一屆比賽，把整屆或某一輪一鍵加成收藏分類。</p>
 
-        <div class="osu-search-row mappool-controls">
+        <div class="mappool-picker">
             <div class="osu-mode-tabs" id="mappool-tourney-tabs"></div>
-            <select id="mappool-year-select" onchange="switchMappoolEdition(this.value)"></select>
-            <button id="mappool-add-event-btn" class="btn" onclick="addMappoolEventToCollection()" disabled data-i18n="mappools_add_event_btn">➕ 整屆加入收藏</button>
+            <div class="mappool-edition-strip" id="mappool-edition-strip" role="tablist" aria-label="Edition"></div>
         </div>
 
-        <div id="mappool-coverage" class="farm-coverage"></div>
+        <div class="mappool-summary" id="mappool-summary" hidden>
+            <div class="mappool-summary-main">
+                <span class="mappool-summary-title" id="mappool-summary-title"></span>
+                <span class="mappool-summary-stats" id="mappool-summary-stats"></span>
+            </div>
+            <button id="mappool-add-event-btn" class="mappool-add-event" onclick="addMappoolEventToCollection()" disabled data-i18n="mappools_add_event_btn">➕ 整屆加入收藏</button>
+        </div>
+
+        <div class="mappool-round-nav" id="mappool-round-nav"></div>
         <div id="mappool-rounds"></div>
+        <p class="mappool-coverage-foot" id="mappool-coverage"></p>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
