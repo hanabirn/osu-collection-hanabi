@@ -1,6 +1,6 @@
 I18N.es = {
-    title: 'osu! Colección', site_title: 'osu! Colección', site_tagline: '✦ ¡Crea tu propia colección de canciones! ✦',
-    site_like_label: 'Me gusta', site_like_title: '¿Te gusta este sitio? ¡Dale me gusta!', site_share_label: 'Compartir', site_share_title: 'Comparte este sitio con amigos', site_share_copied: '¡Enlace del sitio copiado!', site_share_text: '¡Crea tu propia colección de canciones de osu!',
+    title: 'osu!Hanabi — kit de colecciones y práctica para osu!', site_title: 'osu!Hanabi', site_tagline: '✦ Tu kit osu! para colecciones y práctica ✦',
+    site_like_label: 'Me gusta', site_like_title: '¿Te gusta este sitio? ¡Dale me gusta!', site_share_label: 'Compartir', site_share_title: 'Comparte este sitio con amigos', site_share_copied: '¡Enlace del sitio copiado!', site_share_text: 'osu!Hanabi — organiza tus colecciones osu!, crea listas de práctica a partir de tus puntuaciones, consulta el PP',
     pwa_install_btn_title: 'Añadir a la pantalla de inicio (funciona sin conexión)',
     site_update_btn_title: 'Hay una actualización disponible, haz clic para actualizar', site_update_available: 'Hay una nueva versión del sitio disponible — haz clic para recargar y obtener la última versión',
     maintenance_banner_text: 'Este sitio está actualmente en proceso de modificación — si tienes alguna duda o encuentras un error, ¡contáctame!',

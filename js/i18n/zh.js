@@ -1,6 +1,6 @@
 I18N.zh = {
-    title: 'osu! 收藏', site_title: 'osu! 收藏', site_tagline: '✦ 一起來收藏你專屬的歌曲收藏庫吧! ✦',
-    site_like_label: '讚', site_like_title: '喜歡這個網站的話，幫我按個讚吧！', site_share_label: '分享', site_share_title: '把這個網站分享給朋友', site_share_copied: '網站連結已複製！', site_share_text: '一起來收藏你專屬的 osu! 歌曲收藏庫吧！',
+    title: 'osu!Hanabi — osu! 收藏與練習工具', site_title: 'osu!Hanabi', site_tagline: '✦ 你的 osu! 收藏與練習工具箱 ✦',
+    site_like_label: '讚', site_like_title: '喜歡這個網站的話，幫我按個讚吧！', site_share_label: '分享', site_share_title: '把這個網站分享給朋友', site_share_copied: '網站連結已複製！', site_share_text: 'osu!Hanabi — 整理 osu! 收藏、依成績生成練習圖池、查 PP',
     pwa_install_btn_title: '加到主畫面（離線可用）',
     site_update_btn_title: '網站有更新，點擊更新', site_update_available: '目前網站有更新，請點擊重新載入以獲取最新版本',
     maintenance_banner_text: '目前該網頁正在修改中，如果有任何疑問或 bug 的話請聯絡我！',

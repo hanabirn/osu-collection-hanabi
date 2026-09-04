@@ -1,7 +1,7 @@
 {
-    "name": "osu! 歌曲收藏 + PP 查詢",
-    "short_name": "osu!收藏",
-    "description": "osu! Beatmap 收藏管理、PP 查詢、皮膚收藏與賽事情報",
+    "name": "osu!Hanabi — osu! 收藏與練習工具箱",
+    "short_name": "osu!Hanabi",
+    "description": "osu!Hanabi：整理 osu! 收藏、依成績生成練習圖池、瀏覽曲庫補完度、查 PP，一鍵匯出回遊戲。",
     "start_url": "/?pwa=1",
     "id": "/",
     "scope": "/",

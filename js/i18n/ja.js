@@ -1,6 +1,6 @@
 I18N.ja = {
-    title: 'osu! コレクション', site_title: 'osu! コレクション', site_tagline: '✦ あなただけの楽曲コレクションを作ろう！ ✦',
-    site_like_label: 'いいね', site_like_title: 'このサイトが気に入ったら、いいねしてね！', site_share_label: 'シェア', site_share_title: 'このサイトを友達にシェア', site_share_copied: 'サイトのリンクをコピーしました！', site_share_text: 'あなただけの osu! 楽曲コレクションを作ろう！',
+    title: 'osu!Hanabi — osu! コレクション＆練習ツール', site_title: 'osu!Hanabi', site_tagline: '✦ あなたの osu! コレクション＆練習ツールボックス ✦',
+    site_like_label: 'いいね', site_like_title: 'このサイトが気に入ったら、いいねしてね！', site_share_label: 'シェア', site_share_title: 'このサイトを友達にシェア', site_share_copied: 'サイトのリンクをコピーしました！', site_share_text: 'osu!Hanabi — osu! コレクション整理、成績から練習譜面生成、PP 確認',
     pwa_install_btn_title: 'ホーム画面に追加（オフライン対応）',
     site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。クリックして再読み込みし、最新版を取得してください',
     maintenance_banner_text: '現在このサイトは修正中です。ご質問やバグがあればご連絡ください！',
