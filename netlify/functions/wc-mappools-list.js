@@ -27,11 +27,45 @@ exports.handler = async (event) => {
     const tournament = (qs.tournament || '').trim().toUpperCase();
     const variant = (qs.variant || '').trim().toUpperCase();
     const year = parseInt(qs.year, 10) || 0;
+    const q = (qs.q || '').trim().toLowerCase().slice(0, 100);
+    const limit = Math.min(50, Math.max(1, parseInt(qs.limit, 10) || 20));
 
     try {
         const store = getWcMappoolsStore();
         const pools = (await store.get('pools:all', { type: 'json' })) || [];
         const state = (await store.get('wc-state', { type: 'json' })) || {};
+
+        // Cross-edition free-text search (used by the site's global search),
+        // separate from the folder/tournament+year single-edition lookup
+        // below — the dataset is small (~6.5k maps total) so a full scan per
+        // request is cheap, no separate search index needed.
+        if (q && !folder) {
+            const cache = (await store.get('beatmaps:cache', { type: 'json' })) || {};
+            const results = [];
+            outer:
+            for (const p of pools) {
+                for (const r of p.rounds) {
+                    for (const b of r.brackets) {
+                        for (const m of b.maps) {
+                            const c = cache[m.beatmapId];
+                            if (!c || c.unresolvable) continue;
+                            const hay = `${c.artist || ''} ${c.artist_unicode || ''} ${c.title || ''} ${c.title_unicode || ''} ${c.creator || ''}`.toLowerCase();
+                            if (!hay.includes(q)) continue;
+                            results.push({
+                                folder: p.folder, key: p.key, variant: p.variant || '', year: p.year, label: p.label,
+                                beatmapId: m.beatmapId, artist: c.artist, title: c.title, creator: c.creator, version: c.version,
+                            });
+                            if (results.length >= limit) break outer;
+                        }
+                    }
+                }
+            }
+            return {
+                statusCode: 200,
+                headers: { ...headers, 'Cache-Control': 'public, max-age=600' },
+                body: JSON.stringify({ query: q, results }),
+            };
+        }
 
         if (!folder && (!tournament || !year)) {
             const editions = pools.map((p) => {

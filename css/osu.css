@@ -3188,6 +3188,54 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transition: all 0.2s;
 }
 .pp-calc-close:hover { color: #f87171; border-color: #f87171; }
+
+/* ===== Global search modal — jumps into 個人收藏/曲庫分類/世界盃圖池 ===== */
+#global-search-modal { align-items: flex-start; padding-top: 10vh; }
+.global-search-modal { max-width: 560px; }
+.global-search-input { width: 100%; margin-bottom: 14px; font-size: 0.95rem; }
+.global-search-results { display: flex; flex-direction: column; gap: 16px; max-height: 60vh; overflow-y: auto; }
+.global-search-section-title {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-card);
+}
+.global-search-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.global-search-item:hover { background: var(--bg-stat); }
+.global-search-item-cover {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--bg-stat);
+}
+.global-search-item-text { min-width: 0; }
+.global-search-item-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.global-search-item-subtitle {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .pp-calc-title {
     margin: 0 32px 16px 0;
     font-size: 1.05rem;
