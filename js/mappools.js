@@ -129,6 +129,32 @@ function mappoolModeApi(m) {
     return (m === 'taiko' || m === 'fruits' || m === 'mania') ? m : 'osu';
 }
 
+/* Tournament-style mod badge for a bracket label — the 2-letter hexagon
+   icons pools use (NM / HD / HR / DT / FM / TB), plus the osu!mania-only
+   ones. `slug` -> a css/osu.css `.mod-badge--<slug>` colour class. */
+const MOD_BADGE = {
+    'No Mod': { ab: 'NM', slug: 'nm' },
+    'Hidden': { ab: 'HD', slug: 'hd' },
+    'Hard Rock': { ab: 'HR', slug: 'hr' },
+    'Double Time': { ab: 'DT', slug: 'dt' },
+    'Free Mod': { ab: 'FM', slug: 'fm' },
+    'Tiebreaker': { ab: 'TB', slug: 'tb' },
+    'Rice': { ab: 'RC', slug: 'rc' },
+    'Long Note': { ab: 'LN', slug: 'ln' },
+    'Hybrid': { ab: 'HB', slug: 'hb' },
+    'SV': { ab: 'SV', slug: 'sv' },
+    'Extreme': { ab: 'EX', slug: 'ex' },
+    'Mixed Mod': { ab: 'MM', slug: 'mm' },
+};
+
+function mappoolBracketHead(label) {
+    const b = MOD_BADGE[label];
+    const badge = b
+        ? `<span class="mod-badge mod-badge--${b.slug}" aria-hidden="true">${b.ab}</span>`
+        : '';
+    return `<div class="mappool-bracket-label">${badge}<span>${escHtml(label)}</span></div>`;
+}
+
 function renderMappoolCard(mp, inCollection) {
     const setId = mp.setId;
     const cover = `https://assets.ppy.sh/beatmaps/${setId}/covers/card.jpg`;
@@ -177,7 +203,7 @@ function renderMappool() {
         if (r.showcaseUrl) links.push(`<a href="${escHtml(r.showcaseUrl)}" target="_blank" rel="noopener">${t('mappools_showcase')}</a>`);
         const brackets = r.brackets.map((b) => {
             const cards = b.maps.map((mp) => renderMappoolCard(mp, collected.has(mp.setId))).join('');
-            return `<div class="mappool-bracket-label">${escHtml(b.label)}</div><div class="osu-collection mappool-list">${cards}</div>`;
+            return `${mappoolBracketHead(b.label)}<div class="osu-collection mappool-list">${cards}</div>`;
         }).join('');
         return `
         <div class="mappool-round">

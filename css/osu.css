@@ -1486,13 +1486,47 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .mappool-round-links a { color: var(--accent-light-purple); }
 .mappool-round-add { margin-left: auto; font-size: 0.78rem; padding: 4px 12px; }
 .mappool-bracket-label {
-    margin: 10px 0 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 6px;
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(var(--accent-cyan-rgb), 0.9);
+    color: var(--text-secondary);
 }
+
+/* Tournament-style mod icon: a flat-topped hexagon with bold 2-letter text
+   in the mod's colour, on a near-black chip (matches the NM/HD/HR/DT/FM/TB
+   pool icons). */
+.mod-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 21px;
+    padding: 0 9px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #cfd3d6;
+    background: #24282b;
+    clip-path: polygon(22% 0%, 78% 0%, 100% 50%, 78% 100%, 22% 100%, 0% 50%);
+    flex-shrink: 0;
+}
+.mod-badge--nm { color: #4ab7ff; }
+.mod-badge--hd { color: #f5c518; }
+.mod-badge--hr { color: #ff5b6a; }
+.mod-badge--dt { color: #b98cff; }
+.mod-badge--fm { color: #8ad64f; }
+.mod-badge--tb { color: #c2c7cb; }
+.mod-badge--rc { color: #ff9f43; }
+.mod-badge--ln { color: #4fd6c8; }
+.mod-badge--hb { color: #e07be0; }
+.mod-badge--sv { color: #7bd0a0; }
+.mod-badge--ex { color: #ff7a45; }
+.mod-badge--mm { color: #9aa7ff; }
 
 .mappool-list.osu-collection {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
