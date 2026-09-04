@@ -1521,9 +1521,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .mod-badge--dt { color: #b98cff; }
 .mod-badge--fm { color: #8ad64f; }
 .mod-badge--tb { color: #c2c7cb; }
-.mod-badge--rc { color: #ff9f43; }
-.mod-badge--ln { color: #4fd6c8; }
-.mod-badge--hb { color: #e07be0; }
+/* osu!mania pool mods — community-standard colours: Rice purple,
+   Long Note yellow, Hybrid red. */
+.mod-badge--rc { color: #b884e6; }
+.mod-badge--ln { color: #e6c94a; }
+.mod-badge--hb { color: #dc5342; }
 .mod-badge--sv { color: #7bd0a0; }
 .mod-badge--ex { color: #ff7a45; }
 .mod-badge--mm { color: #9aa7ff; }
