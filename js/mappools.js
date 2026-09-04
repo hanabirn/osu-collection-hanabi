@@ -10,11 +10,11 @@
    downloadBeatmapset, addOsuBeatmap, applyImportedCollections,
    showShareToast, getOsuCollection, OSU_MODES. */
 const MAPPOOL_TOURNEYS = [
-    { key: 'OWC', variant: '' },
-    { key: 'TWC', variant: '' },
-    { key: 'CWC', variant: '' },
-    { key: 'MWC', variant: '4K' },
-    { key: 'MWC', variant: '7K' },
+    { key: 'OWC', variant: '', mode: 'standard' },
+    { key: 'TWC', variant: '', mode: 'taiko' },
+    { key: 'CWC', variant: '', mode: 'catch' },
+    { key: 'MWC', variant: '4K', mode: 'mania' },
+    { key: 'MWC', variant: '7K', mode: 'mania' },
 ];
 
 let mappoolsLoaded = false;
@@ -78,7 +78,8 @@ function renderMappoolTourneyTabs() {
     el.innerHTML = MAPPOOL_TOURNEYS.map((tr) => {
         const has = mappoolEditionsFor(tr.key, tr.variant).length;
         const active = mappoolCur.key === tr.key && mappoolCur.variant === (tr.variant || '');
-        return `<button class="osu-mode-tab${active ? ' active' : ''}" ${has ? '' : 'disabled'} onclick="switchMappoolTourney('${tr.key}','${tr.variant}')">${mappoolTourneyShort(tr.key, tr.variant)}</button>`;
+        const ico = typeof modeIconSvg === 'function' ? modeIconSvg(tr.mode) : '';
+        return `<button class="osu-mode-tab${active ? ' active' : ''}" ${has ? '' : 'disabled'} onclick="switchMappoolTourney('${tr.key}','${tr.variant}')">${ico} ${mappoolTourneyShort(tr.key, tr.variant)}</button>`;
     }).join('');
 }
 
