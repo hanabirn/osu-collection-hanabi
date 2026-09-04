@@ -362,7 +362,7 @@ a:hover { text-decoration: underline; }
 }
 @media (prefers-reduced-motion: reduce) {
     .header-ctl, .contact-info-btn, .notif-bell-btn, .nav-menu-btn,
-    .lang-globe-btn, .theme-toggle-btn, .osu-login-btn-large {
+    .lang-globe-btn, .theme-toggle-btn, .osu-login-btn-large, .global-search-btn {
         transition: none;
     }
 }
@@ -848,6 +848,35 @@ a:hover { text-decoration: underline; }
     height: 42px;
     font-size: 1.2rem;
 }
+/* Same sizing pattern as .contact-info-btn/.notif-bell-btn — .header-ctl
+   only owns the frosted-chip color treatment, not shape (see the comment
+   above it), so every corner control needs its own size rule. */
+.global-search-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--lang-pill-bg);
+    border: 1px solid var(--lang-pill-border);
+    color: var(--lang-pill-text);
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+}
+.global-search-btn:hover {
+    background: rgba(var(--accent-pink-rgb), 0.14);
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.30);
+    transform: scale(1.05);
+}
+.header-corner-actions .global-search-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+}
+
 .contact-info-menu {
     position: absolute;
     top: calc(100% + 8px);
