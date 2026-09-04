@@ -10,11 +10,10 @@
    cache — the fetch strategy below is network-first for the shell (so
    normal visits always get the latest code), so this mostly matters for
    forcing a clean slate rather than for staleness. */
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
-const FONT_CACHE = `osu-fonts-${CACHE_VERSION}`;
-const KNOWN_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE, FONT_CACHE]);
+const KNOWN_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE]);
 
 /* Only what the collection page needs to render offline in the default
    locale. install' used to addAll() ~45 entries — every feature script,
@@ -115,17 +114,6 @@ async function networkFirstShell(request, preloadResponsePromise) {
     }
 }
 
-async function cacheFirst(request, cacheName) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    const res = await fetch(request);
-    if (res.ok) {
-        const cache = await caches.open(cacheName);
-        cache.put(request, res.clone());
-    }
-    return res;
-}
-
 /* Cover art / avatars: serve the cached copy immediately if there is one
    (this is what makes a stale collection list feel instant offline), then
    refresh it in the background so next time it's up to date. */
@@ -148,11 +136,6 @@ self.addEventListener('fetch', event => {
     // The osu! API proxy (Netlify Functions) is never cached — PP, gallery
     // and lookup data must always be live-or-nothing, never a stale replay.
     if (url.pathname.startsWith('/.netlify/functions/')) return;
-
-    if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-        event.respondWith(cacheFirst(request, FONT_CACHE));
-        return;
-    }
 
     if (request.destination === 'image') {
         event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));

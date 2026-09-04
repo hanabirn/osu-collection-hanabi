@@ -22,25 +22,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="osu!收藏">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Set [data-theme] before first paint. theme.js is deferred now, so its
      own top-level applyTheme() runs too late to stop a dark→light flash for
      light-theme users; this tiny inline copy does it during head parse. -->
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');}catch(e){}</script>
-<!-- Fonts: a normal blocking <link>, but with display=optional. That pair
-     is what keeps CLS flat: the @font-face is known from navigation, so the
-     optional block window elapses during initial load — by first paint the
-     CJK font is either ready (used from the start, no swap) or not (system
-     fallback locked in for this pageview, no swap). Either way the text
-     metrics never change after paint. The earlier media="print"+onload
-     trick defeated this by only starting optional's timer post-paint, so
-     the font landed mid-view and reflowed the header + grid.
-     One preconnected same-CDN round trip is a cheap price now that ~580 KB
-     of JS is deferred off the critical path.
+<!-- No web font. The Google Fonts <link> for Noto Sans TC/JP/KR (400/700/900
+     each) returned a ~1 MB render-blocking stylesheet — on throttled mobile
+     that alone was ~5 s of FCP. The system-font stacks in css/base.css keep
+     "Noto Sans TC" first (used if the visitor has it installed) and fall
+     straight through to the platform CJK font otherwise, so text paints
+     instantly with no swap and no CLS. Re-add a <link> here to bring the
+     web font back.
      particles.css stays blocking on purpose — it carries .bg-layer's
      position:fixed, and deferring it flashes that layer into document flow. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=optional">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/particles.css">
