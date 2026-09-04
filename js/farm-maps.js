@@ -37,20 +37,9 @@ function switchFarmMode(mode, btn) {
     farmMode = mode;
     document.querySelectorAll('#farm-mode-tabs .osu-tab').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-
-    // mania has no farm-map classification (see fetchFarmSignal in
-    // _farm-crawl-core.js — DT isn't a pp-farming signal there), so the
-    // toggle would just always return zero results. Hide it and fall back
-    // to the unfiltered view rather than leave a checkbox that silently
-    // does nothing.
-    const farmOnlyLabel = document.getElementById('farm-only-checkbox')?.closest('label');
-    if (farmOnlyLabel) farmOnlyLabel.style.display = mode === 'mania' ? 'none' : '';
-    if (mode === 'mania' && farmOnly) {
-        farmOnly = false;
-        const checkbox = document.getElementById('farm-only-checkbox');
-        if (checkbox) checkbox.checked = false;
-    }
-
+    // All four modes are farm-classified now (osu!/taiko by DT ratio,
+    // catch/mania by 100%-acc ratio — see fetchFarmSignal in
+    // _farm-crawl-core.js), so the 只看農圖 toggle stays available for each.
     loadFarmMapsPage(0);
 }
 

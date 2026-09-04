@@ -28,7 +28,7 @@ const { getOsuToken } = require('./_osu-auth');
 const { getFarmMapsStore } = require('./_blobs-store');
 const {
     STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES,
-    FARM_DT_RATIO_THRESHOLD, FARM_PLAYCOUNT_THRESHOLD,
+    FARM_DT_RATIO_THRESHOLD, FARM_ACC_RATIO_THRESHOLD, FARM_PLAYCOUNT_THRESHOLD,
 } = require('./_farm-constants');
 
 function stateKey(mode) { return `crawl-state:${mode}`; }
@@ -95,17 +95,14 @@ async function discoverBatch(mode, state) {
     return sets.length;
 }
 
-/* "Genuine farm map" heuristic: what fraction of the beatmap's top-50
-   leaderboard was set with DT/NC (a cheap proxy for "the community is
-   abusing this map for pp, not just playing it at face value"), gated by
-   playcount so a handful of DT scores on a barely-played map doesn't count
-   as a real signal. Both thresholds are the site owner's judgment call,
-   not derived from anything (see FARM_DT_RATIO_THRESHOLD/FARM_PLAYCOUNT_
-   THRESHOLD in _farm-constants.js). This is deliberately *not* the same
-   thing osu-pps.com does (cross-referencing thousands of players' top-100
-   lists to see how many have this map in them) — that needs a standing
-   database continuously ingesting player score history, which doesn't fit
-   a time-boxed Netlify cron function. */
+/* "Genuine farm map" heuristic over the beatmap's top-50 leaderboard,
+   mode-specific (see _farm-constants.js):
+     - osu! / taiko: fraction set with DT/NC (incl. HDDT) >= 0.7
+     - catch / mania: fraction with 100% accuracy >= 0.7
+   Gated by playcount so a handful of scores on a barely-played map doesn't
+   count. This is deliberately *not* what osu-pps.com does (cross-referencing
+   thousands of players' top-100 lists) — that needs a standing database
+   ingesting player score history, which doesn't fit a time-boxed cron. */
 // Without an explicit x-api-version header, /beatmaps/{id}/scores serves
 // osu!'s legacy score shape where `mods` is an array of plain acronym
 // strings (e.g. ["HD","DT"]), not the newer `{acronym, settings}` objects —
@@ -117,17 +114,19 @@ function modAcronym(m) { return typeof m === 'string' ? m : m.acronym; }
 // a stale-versioned signal is treated the same as a missing one and gets
 // recomputed on the map's next crawl pass, rather than being cached wrong
 // forever).
-const FARM_SIGNAL_VERSION = 2;
+// v3: catch/mania switched from "never a farm map" to the 100%-accuracy
+// ratio; osu!/taiko DT-ratio logic unchanged.
+const FARM_SIGNAL_VERSION = 3;
+
+// A score counts as "100%" for the catch/mania signal if the API reports
+// full accuracy, or (fallback) an SS/silver-SS rank.
+function isPerfectScore(s) {
+    if (typeof s.accuracy === 'number') return s.accuracy >= 0.9999;
+    return s.rank === 'X' || s.rank === 'XH';
+}
 
 async function fetchFarmSignal(beatmapId, mode, token) {
-    // mania has no score-multiplying mods the way std/taiko/catch do — DT in
-    // mania is purely a personal scroll-speed/readability preference, not a
-    // pp-farming signal, so a high DT ratio there means nothing. Skip the DT
-    // check entirely for mania and never classify a mania map as a farm map
-    // through this heuristic (playcount alone isn't a strong enough signal).
-    if (mode === 'mania') {
-        return { dtRatio: 0, sampleSize: 0, playcount: 0, isFarm: false, applicable: false, computedAt: Date.now(), signalVersion: FARM_SIGNAL_VERSION };
-    }
+    const dtBased = mode === 'osu' || mode === 'taiko';
 
     const [scoresRes, beatmapRes] = await Promise.all([
         fetch(`https://osu.ppy.sh/api/v2/beatmaps/${beatmapId}/scores?mode=${mode}&limit=50`, {
@@ -138,7 +137,7 @@ async function fetchFarmSignal(beatmapId, mode, token) {
         }),
     ]);
 
-    let dtRatio = 0, sampleSize = 0;
+    let dtRatio = 0, accRatio = 0, sampleSize = 0;
     if (scoresRes.ok) {
         const scoresData = await scoresRes.json();
         const scores = scoresData.scores || [];
@@ -146,6 +145,8 @@ async function fetchFarmSignal(beatmapId, mode, token) {
         if (sampleSize > 0) {
             const dtCount = scores.filter(s => (s.mods || []).some(m => modAcronym(m) === 'DT' || modAcronym(m) === 'NC')).length;
             dtRatio = dtCount / sampleSize;
+            const perfectCount = scores.filter(isPerfectScore).length;
+            accRatio = perfectCount / sampleSize;
         }
     }
 
@@ -155,8 +156,11 @@ async function fetchFarmSignal(beatmapId, mode, token) {
         playcount = beatmapData.playcount || 0;
     }
 
-    const isFarm = dtRatio >= FARM_DT_RATIO_THRESHOLD && playcount >= FARM_PLAYCOUNT_THRESHOLD;
-    return { dtRatio, sampleSize, playcount, isFarm, applicable: true, computedAt: Date.now(), signalVersion: FARM_SIGNAL_VERSION };
+    const ratioOk = dtBased
+        ? dtRatio >= FARM_DT_RATIO_THRESHOLD
+        : accRatio >= FARM_ACC_RATIO_THRESHOLD;
+    const isFarm = ratioOk && playcount >= FARM_PLAYCOUNT_THRESHOLD;
+    return { dtRatio, accRatio, sampleSize, playcount, isFarm, applicable: true, criterion: dtBased ? 'dt' : 'acc', computedAt: Date.now(), signalVersion: FARM_SIGNAL_VERSION };
 }
 
 async function computeOne(item, mode, existingRecord, token) {
