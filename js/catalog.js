@@ -175,14 +175,88 @@ function rebuildCatalogFacetSelects() {
         artistSel.value = [...artistSel.options].some(o => o.value === catalogArtist) ? catalogArtist : (catalogArtist = 'all');
     }
 
-    const btn = document.getElementById('catalog-create-collection-btn');
-    if (btn) {
-        const facet = catalogActiveFacet();
-        btn.disabled = !facet;
-        btn.title = facet
-            ? t('catalog_create_collection_btn') + '：' + catalogFacetLabel(facet)
-            : t('catalog_create_collection_hint');
+}
+
+/* How many sets in the visitor's own collection match the active facet.
+   artist uses the same artistKeys() split as the crawler; source/genre/
+   language read the per-set metadata that backfillOsuLanguages() tops up
+   (so those can undercount until the backfill catches a set — surfaced in
+   the UI note, not hidden). */
+function catalogCollectionMatchCount(facet) {
+    if (!facet) return 0;
+    const sets = OSU_MODES.flatMap(m => getOsuCollection()[m] || []);
+    let n = 0;
+    for (const s of sets) {
+        let hit = false;
+        if (facet.type === 'artist') {
+            hit = artistKeys(s.artist).includes(facet.value);
+        } else if (facet.type === 'source') {
+            hit = facet.value === 'none' ? !s.source : (s.source || '') === facet.value;
+        } else if (facet.type === 'language') {
+            hit = facet.value === 'unknown' ? !(s.language && s.language.id) : (s.language && s.language.id) === Number(facet.value);
+        } else if (facet.type === 'genre') {
+            hit = facet.value === 'unknown' ? !(s.genre && s.genre.id) : (s.genre && s.genre.id) === Number(facet.value);
+        }
+        if (hit) n++;
     }
+    return n;
+}
+
+/* The "➕ build / 補完" button's state, driven by the active facet and how
+   much of it the visitor already owns. Called from renderCatalogCompletion(). */
+function updateCatalogCreateBtn(facet, have, total) {
+    const btn = document.getElementById('catalog-create-collection-btn');
+    if (!btn) return;
+    if (!facet) {
+        btn.disabled = true;
+        btn.textContent = t('catalog_create_collection_btn');
+        btn.title = t('catalog_create_collection_hint');
+        return;
+    }
+    const label = catalogFacetLabel(facet);
+    if (have >= total && total > 0) {
+        btn.disabled = true;
+        btn.textContent = t('catalog_complete_done');
+        btn.title = label;
+    } else if (have > 0) {
+        btn.disabled = false;
+        btn.textContent = t('catalog_complete_btn', { n: total - have });
+        btn.title = t('catalog_create_collection_btn') + '：' + label;
+    } else {
+        btn.disabled = false;
+        btn.textContent = t('catalog_create_collection_btn');
+        btn.title = t('catalog_create_collection_btn') + '：' + label;
+    }
+}
+
+/* 「補完度」panel between the coverage line and the grid: when exactly one
+   facet is active, how much of that artist / source / genre / language the
+   visitor has already collected, of what this site has indexed. */
+function renderCatalogCompletion() {
+    const el = document.getElementById('catalog-completion');
+    if (!el) return;
+    const facet = catalogActiveFacet();
+    if (!facet) {
+        el.hidden = true;
+        updateCatalogCreateBtn(null);
+        return;
+    }
+    const total = catalogTotal;
+    const have = catalogCollectionMatchCount(facet);
+    const pct = total > 0 ? Math.min(100, Math.round((have / total) * 100)) : 0;
+    const note = facet.type === 'artist' ? '' :
+        `<div class="catalog-completion-note">${t('catalog_completion_meta_note')}</div>`;
+    el.innerHTML = `
+        <div class="catalog-completion-row">
+            <span class="catalog-completion-text">${t('catalog_completion_have', {
+                name: escHtml(catalogFacetLabel(facet)),
+                have: have.toLocaleString(),
+                total: total.toLocaleString(),
+            })}</span>
+            <div class="catalog-completion-bar"><span style="width:${pct}%"></span></div>
+        </div>${note}`;
+    el.hidden = false;
+    updateCatalogCreateBtn(facet, have, total);
 }
 
 function renderCatalogList() {
@@ -191,6 +265,7 @@ function renderCatalogList() {
     if (!listEl || !catalogLoaded) return;
 
     renderCatalogCoverage();
+    renderCatalogCompletion();
 
     if (catalogItems.length === 0) {
         listEl.innerHTML = `<p class="osu-empty">${t('catalog_empty')}</p>`;
@@ -294,17 +369,17 @@ async function catalogCreateCollectionFromFacet() {
     } catch (e) {
         console.error('Catalog facet fetch failed:', e);
         alert(t('catalog_load_fail'));
-        if (btn) { btn.disabled = false; btn.textContent = t('catalog_create_collection_btn'); }
+        renderCatalogCompletion();
         return;
     }
 
     if (ids.length === 0) {
         alert(t('catalog_empty'));
-        if (btn) { btn.disabled = false; btn.textContent = t('catalog_create_collection_btn'); }
+        renderCatalogCompletion();
         return;
     }
     if (!confirm(t('catalog_create_collection_confirm', { name: label, n: ids.length }))) {
-        if (btn) { btn.disabled = false; btn.textContent = t('catalog_create_collection_btn'); }
+        renderCatalogCompletion();
         return;
     }
 
@@ -316,6 +391,6 @@ async function catalogCreateCollectionFromFacet() {
         console.error('Catalog import failed:', e);
         alert(t('catalog_load_fail'));
     } finally {
-        if (btn) { btn.disabled = false; btn.textContent = t('catalog_create_collection_btn'); }
+        renderCatalogCompletion();
     }
 }

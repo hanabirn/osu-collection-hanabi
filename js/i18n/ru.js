@@ -192,6 +192,10 @@ I18N.ru = {
     catalog_create_collection_hint: 'Сначала выберите один исполнитель / язык / жанр / источник',
     catalog_create_collection_confirm: 'Добавить {n} наборов карт «{name}» в вашу коллекцию и создать категорию с этим именем?',
     catalog_create_collection_done: '«{name}» добавлено в коллекцию: {n} новых наборов карт, категорий: {cat}',
+    catalog_completion_have: '«{name}» — у тебя собрано {have} / {total}',
+    catalog_completion_meta_note: 'Источник / жанр / язык определяются по метаданным твоей коллекции и могут занижаться, пока она не дозаполнится',
+    catalog_complete_btn: '➕ Дополнить (осталось {n})',
+    catalog_complete_done: 'Всё собрано ✓',
 
     pp_goal_tab: 'Цель по PP', pp_goal_hint: 'Текущий общий PP в {mode}: {current}pp. Введите цель, чтобы узнать минимальный PP новой игры.',
     pp_goal_placeholder: 'Целевой общий PP', pp_goal_btn: 'Рассчитать', pp_goal_invalid: 'Введите корректный целевой PP',

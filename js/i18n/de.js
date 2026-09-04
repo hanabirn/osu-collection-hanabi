@@ -192,6 +192,10 @@ I18N.de = {
     catalog_create_collection_hint: 'Wähle zuerst einen Künstler / eine Sprache / ein Genre / eine Quelle',
     catalog_create_collection_confirm: 'Die {n} Beatmapsets von „{name}“ zu deiner Sammlung hinzufügen und eine Kategorie mit diesem Namen erstellen?',
     catalog_create_collection_done: '„{name}“ zu deiner Sammlung hinzugefügt: {n} neue Beatmapsets, {cat} Kategorien',
+    catalog_completion_have: '„{name}“ — du hast {have} / {total} gesammelt',
+    catalog_completion_meta_note: 'Quelle / Genre / Sprache werden aus den Metadaten deiner Sammlung ermittelt und können zu niedrig sein, bis diese vollständig sind',
+    catalog_complete_btn: '➕ Auffüllen (noch {n})',
+    catalog_complete_done: 'Alles gesammelt ✓',
 
     pp_goal_tab: 'PP-Ziel', pp_goal_hint: 'Aktuelles Gesamt-PP in {mode}: {current}pp. Ziel eingeben, um das minimal benötigte PP für einen neuen Play zu sehen.',
     pp_goal_placeholder: 'Ziel-Gesamt-PP', pp_goal_btn: 'Berechnen', pp_goal_invalid: 'Bitte ein gültiges Ziel-PP eingeben',

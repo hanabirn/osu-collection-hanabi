@@ -192,6 +192,10 @@ I18N.ja = {
     catalog_create_collection_hint: 'まずアーティスト／言語／ジャンル／ソースを1つ選んでください',
     catalog_create_collection_confirm: '「{name}」の {n} 個のビートマップセットをコレクションに追加し、同名のカテゴリを作成しますか？',
     catalog_create_collection_done: '「{name}」をコレクションに追加：{n} 個の新規ビートマップセット、{cat} 個のカテゴリ',
+    catalog_completion_have: '「{name}」コレクション済み {have} / {total}',
+    catalog_completion_meta_note: 'ソース／ジャンル／言語はコレクションのメタデータで判定するため、補完前は少なく出ることがあります',
+    catalog_complete_btn: '➕ 補完（あと {n} 個）',
+    catalog_complete_done: 'すべて収集済み ✓',
 
     pp_goal_tab: 'PP目標', pp_goal_hint: '現在の{mode}の合計PP：{current}pp。目標を入力すると、新しいプレイに最低限必要なPPがわかります。',
     pp_goal_placeholder: '目標の合計PP', pp_goal_btn: '計算', pp_goal_invalid: '有効な目標PPを入力してください',

@@ -192,6 +192,10 @@ I18N.fr = {
     catalog_create_collection_hint: 'Choisissez d\'abord un artiste / une langue / un genre / une source',
     catalog_create_collection_confirm: 'Ajouter les {n} beatmapsets de « {name} » à votre collection et créer une catégorie de ce nom ?',
     catalog_create_collection_done: '« {name} » ajouté à votre collection : {n} nouveaux beatmapsets, {cat} catégories',
+    catalog_completion_have: '« {name} » — vous en avez collecté {have} / {total}',
+    catalog_completion_meta_note: 'La source / le genre / la langue sont déduits des métadonnées de votre collection et peuvent être sous-estimés tant qu\'elles ne sont pas complétées',
+    catalog_complete_btn: '➕ Compléter ({n} restants)',
+    catalog_complete_done: 'Tout collecté ✓',
 
     pp_goal_tab: 'Objectif PP', pp_goal_hint: 'PP total actuel en {mode} : {current}pp. Entrez un objectif pour voir le PP minimum requis pour un nouveau score.',
     pp_goal_placeholder: 'PP total visé', pp_goal_btn: 'Calculer', pp_goal_invalid: 'Veuillez entrer un objectif PP valide',

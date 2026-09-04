@@ -190,6 +190,10 @@ I18N.zh = {
     catalog_create_collection_hint: '先選定一個歌手／語言／曲風／來源，才能建立對應的收藏分類',
     catalog_create_collection_confirm: '要把「{name}」的 {n} 個譜面組加進你的收藏、並建立同名分類嗎？',
     catalog_create_collection_done: '已把「{name}」加進收藏：新增 {n} 個譜面組、{cat} 個分類',
+    catalog_completion_have: '「{name}」你已收藏 {have} / {total}',
+    catalog_completion_meta_note: '來源／曲風／語言依你收藏的中繼資料判斷，可能因尚未補齊而少算',
+    catalog_complete_btn: '➕ 補完（還缺 {n} 首）',
+    catalog_complete_done: '已全部收藏 ✓',
 
     pp_goal_tab: 'PP 目標', pp_goal_hint: '{mode} 目前總 PP：{current}pp。輸入目標，看新增一張成績最少要打多少 PP。',
     pp_goal_placeholder: '目標總 PP', pp_goal_btn: '計算', pp_goal_invalid: '請輸入有效的目標 PP',

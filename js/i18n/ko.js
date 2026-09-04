@@ -192,6 +192,10 @@ I18N.ko = {
     catalog_create_collection_hint: '먼저 아티스트／언어／장르／소스 하나를 선택하세요',
     catalog_create_collection_confirm: '"{name}"의 비트맵셋 {n}개를 컬렉션에 추가하고 같은 이름의 카테고리를 만들까요?',
     catalog_create_collection_done: '"{name}"을(를) 컬렉션에 추가: 신규 비트맵셋 {n}개, 카테고리 {cat}개',
+    catalog_completion_have: '"{name}" 이미 수집 {have} / {total}',
+    catalog_completion_meta_note: '소스／장르／언어는 컬렉션 메타데이터로 판단하므로 채워지기 전에는 적게 나올 수 있습니다',
+    catalog_complete_btn: '➕ 채우기 ({n}개 남음)',
+    catalog_complete_done: '전부 수집됨 ✓',
 
     pp_goal_tab: 'PP 목표', pp_goal_hint: '현재 {mode} 총 PP: {current}pp. 목표를 입력하면 새 기록에 필요한 최소 PP를 계산합니다.',
     pp_goal_placeholder: '목표 총 PP', pp_goal_btn: '계산', pp_goal_invalid: '유효한 목표 PP를 입력해주세요',

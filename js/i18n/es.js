@@ -192,6 +192,10 @@ I18N.es = {
     catalog_create_collection_hint: 'Elige primero un artista / idioma / género / fuente',
     catalog_create_collection_confirm: '¿Añadir los {n} beatmapsets de «{name}» a tu colección y crear una categoría con ese nombre?',
     catalog_create_collection_done: '«{name}» añadido a tu colección: {n} beatmapsets nuevos, {cat} categorías',
+    catalog_completion_have: '«{name}» — has coleccionado {have} / {total}',
+    catalog_completion_meta_note: 'La fuente / género / idioma se deducen de los metadatos de tu colección y pueden quedarse cortos hasta que terminen de rellenarse',
+    catalog_complete_btn: '➕ Completar (faltan {n})',
+    catalog_complete_done: 'Todo coleccionado ✓',
 
     pp_goal_tab: 'Meta de PP', pp_goal_hint: 'PP total actual en {mode}: {current}pp. Introduce una meta para ver el PP mínimo que necesita una nueva partida.',
     pp_goal_placeholder: 'PP total objetivo', pp_goal_btn: 'Calcular', pp_goal_invalid: 'Introduce un PP objetivo válido',

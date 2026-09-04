@@ -1350,6 +1350,52 @@
     }
 }
 
+/* 補完度 panel — appears above the grid when a single facet is active:
+   how much of that artist/source/genre/language the visitor already owns,
+   of what this site has indexed. Bar borrows .digest-goal-bar's shape but a
+   cyan→purple fill so it doesn't read as the pink pp-goal bar. */
+.catalog-completion {
+    margin: 6px 0 10px;
+    padding: 8px 12px;
+    border: 1px solid rgba(var(--accent-purple-rgb), 0.25);
+    border-radius: 12px;
+    background: rgba(var(--accent-purple-rgb), 0.08);
+}
+.catalog-completion-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.catalog-completion-text {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.catalog-completion-bar {
+    flex: 1;
+    min-width: 120px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+}
+.catalog-completion-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-light-purple));
+    transition: width 0.4s var(--ease-out);
+}
+.catalog-completion-note {
+    margin-top: 5px;
+    font-size: 0.7rem;
+    color: var(--text-label);
+}
+@media (prefers-reduced-motion: reduce) {
+    .catalog-completion-bar > span { transition: none; }
+}
+
 /* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
    language / genre / source pills instead of pp/star/bpm. */
 #catalog-list.osu-collection {
