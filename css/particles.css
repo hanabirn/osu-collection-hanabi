@@ -33,17 +33,13 @@
     background-position: center 30%;
     opacity: 0;
     transition: opacity 2.5s ease;
-    animation: bgSlideDrift 12s ease-in-out infinite;
+    /* No slow-zoom drift: this sits behind the header's and page's
+       backdrop-filter panels, so animating it re-blurred those frosted
+       surfaces every frame and the compositor never idled (phones ran
+       hot). The 2.5s opacity cross-fade between covers is occasional, not
+       per-frame, so it stays. */
 }
 .bg-slide.active { opacity: 1; }
-@keyframes bgSlideDrift {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.06); }
-    100% { transform: scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-    .bg-slide { animation: none; }
-}
 
 .bg-layer {
     position: fixed;
@@ -60,42 +56,32 @@
     height: 100%;
 }
 
-/* ── Drifting glow blobs ── */
+/* ── Glow blobs ──
+   Static: `filter: blur(80px)` over a 400–600px element is a large GPU
+   blur, and animating position/scale re-ran that blur every frame for no
+   real payoff (they're barely-there at 0.18 opacity). Rasterized once and
+   left still, they cost nothing. */
 .bg-glow {
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
     opacity: 0.18;
-    animation: driftGlow 12s ease-in-out infinite alternate;
 }
 .glow-1 {
     width: 600px; height: 600px;
     background: radial-gradient(circle, rgba(var(--accent-pink-rgb), 0.9), transparent 70%);
     top: -150px; left: -150px;
-    animation-delay: 0s;
 }
 .glow-2 {
     width: 500px; height: 500px;
     background: radial-gradient(circle, rgba(var(--accent-cyan-rgb), 0.9), transparent 70%);
     bottom: -100px; right: -100px;
-    animation-delay: -5s;
 }
 .glow-3 {
     width: 400px; height: 400px;
     background: radial-gradient(circle, rgba(var(--accent-purple-rgb), 0.9), transparent 70%);
     top: 40%; left: 50%;
-    animation: driftGlow3 12s ease-in-out infinite alternate;
-    animation-delay: -9s;
-}
-@keyframes driftGlow {
-    0%   { transform: translate(0, 0) scale(1); opacity: 0.15; }
-    50%  { opacity: 0.22; }
-    100% { transform: translate(40px, 30px) scale(1.1); opacity: 0.15; }
-}
-@keyframes driftGlow3 {
-    0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
-    50%  { opacity: 0.22; }
-    100% { transform: translate(calc(-50% + 40px), calc(-50% + 30px)) scale(1.1); opacity: 0.15; }
+    transform: translate(-50%, -50%);
 }
 
 /* ── Globe with orbiting satellites — a small sphere hint (limb + a
@@ -185,9 +171,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .bg-glow, .hit-circle, .world-globe-spin, .globe-dot { animation: none; }
+    .hit-circle, .world-globe-spin, .globe-dot { animation: none; }
     /* The orbiting dots use SMIL <animateMotion>, which CSS `animation: none`
        can't stop — hiding them outright is the simplest way to honor
        reduced-motion here (the static orbit rings/sphere stay visible). */
     .globe-satellite { display: none; }
+}
+
+/* ── Touch / phone: drop the moving ambient decoration entirely ──
+   The particle canvas, the spinning globe and the pulsing hit-circles are
+   pure decoration and were the reason the compositor never idled on a
+   still page — enough to warm an iPhone within minutes. Phones keep the
+   static gradient + still glow blobs + the beating logo; nothing here
+   loops. (js/particles.js bails on the same media query, so the canvas is
+   never even initialised.) */
+@media (hover: none), (max-width: 700px) {
+    #particles-canvas { display: none; }
+    .world-globe { display: none; }
+    .hit-circles { display: none; }
 }

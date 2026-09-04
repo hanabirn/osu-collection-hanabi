@@ -1451,6 +1451,22 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-main { margin-top: -32px; border-radius: 22px 22px 0 0; }
 }
 
+/* ===== Touch / phone: lighten the stacked frosted surfaces =====
+   .site-header, .site-main and .site-page each carry their own
+   backdrop-filter and they nest, so every composite re-samples and
+   re-blurs the layers below up to three times over — a big part of why
+   the compositor stayed busy on a still page and phones heated up. On
+   touch / small screens, halve the blur and drop the saturate() so each
+   pass is cheap. The header cover no longer slow-zooms (css/particles.css)
+   so there's nothing moving behind these anyway. Modals, the nav drawer
+   and the refresh FAB keep their full blur — they're only on screen
+   briefly. */
+@media (hover: none), (max-width: 700px) {
+    .site-header { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .site-main { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .site-page { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+}
+
 /* ===== Per-tab gradient border =====
    Every .site-page section gets a static subtle outline (this rule's own
    `border`) plus three fixed "comets" of light on ::before — a masked

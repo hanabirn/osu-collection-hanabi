@@ -92,9 +92,13 @@
 }
 
 /* ===== Ambient background glow =====
-   Two slow-drifting radial blobs behind the content, in the theme's own
+   Two faint radial blobs behind the content, in the theme's own
    pink/purple accents — same "ambient light" pattern as the main site,
-   kept faint (0.08-0.12 opacity) so it reads as depth, not decoration. */
+   kept faint (0.08-0.12 opacity) so it reads as depth, not decoration.
+   Static on purpose: each is a 46vw element under `filter: blur(80px)`, so
+   animating position/scale re-ran a large GPU blur every frame and kept
+   the compositor from ever idling (phones ran hot). Rasterized once and
+   left still, they cost nothing. */
 body::before, body::after {
     content: '';
     position: fixed;
@@ -106,7 +110,6 @@ body::before, body::after {
     pointer-events: none;
     z-index: 0;
     filter: blur(80px);
-    animation: orb-drift 14s ease-in-out infinite;
 }
 body::before {
     top: -12%;
@@ -117,12 +120,4 @@ body::after {
     bottom: -14%;
     right: -10%;
     background: radial-gradient(circle, rgba(var(--accent-purple-rgb), 0.10) 0%, transparent 70%);
-    animation-delay: -7s;
-}
-@keyframes orb-drift {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(3%, 4%) scale(1.08); }
-}
-@media (prefers-reduced-motion: reduce) {
-    body::before, body::after { animation: none; }
 }
