@@ -20,9 +20,10 @@
 
 # Ranked-catalog metadata crawler (artist / language / genre / source index
 # for the Catalog tab) — one search page per loop, all rulesets in one pass,
-# see netlify/functions/_catalog-crawl-core.js.
+# see netlify/functions/_catalog-crawl-core.js. Every 30 min: the dataset is
+# already ~55k sets and only needs to keep pace with newly-ranked maps now.
 [functions."catalog-crawl-cron"]
-  schedule = "*/15 * * * *"
+  schedule = "*/30 * * * *"
 
 [functions."farm-crawl-run"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
