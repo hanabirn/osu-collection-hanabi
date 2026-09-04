@@ -123,6 +123,7 @@ I18N.ko = {
     ctools_health_dedupe_btn: '중복 제거', ctools_health_remove_btn: '제거', ctools_health_refresh_btn: '새로고침', ctools_health_ok: '컬렉션 상태가 양호합니다 ✓',
     osu_stat_global: '글로벌 랭크', osu_stat_accuracy: '정확도', osu_stat_playcount: '플레이 수', osu_total_pp: '전 모드 PP 합계',
     osu_recent_title: '최근 플레이', osu_top_title: '베스트 플레이',
+    osu_plays_empty_recent: '최근 24시간 동안 플레이 기록이 없습니다', osu_plays_empty_best: '베스트 플레이 데이터가 없습니다',
     pp_compare_title: '⚔ 두 플레이어 PP 비교', pp_compare_placeholder_a: '플레이어 A: 유저명 또는 ID', pp_compare_placeholder_b: '플레이어 B: 유저명 또는 ID', pp_compare_btn: '비교', pp_compare_topplays_title: '⚔ Top Play 비교', pp_compare_topplays_empty: '이 모드에는 기록이 없습니다',
     osu_search_placeholder: '곡명 또는 아티스트로 검색...', osu_search_empty: '일치하는 비트맵을 찾을 수 없습니다',
     osu_sort_default: '기본 정렬', osu_sort_rating_desc: '난이도 (높은순)', osu_sort_rating_asc: '난이도 (낮은순)',

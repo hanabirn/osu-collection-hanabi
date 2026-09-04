@@ -123,6 +123,7 @@ I18N.ja = {
     ctools_health_dedupe_btn: '重複を削除', ctools_health_remove_btn: '削除', ctools_health_refresh_btn: '更新', ctools_health_ok: 'コレクションは健全です ✓',
     osu_stat_global: '世界ランク', osu_stat_accuracy: '精度', osu_stat_playcount: 'プレイ数', osu_total_pp: '全モード合計PP',
     osu_recent_title: '最近のプレイ', osu_top_title: 'ベストプレイ',
+    osu_plays_empty_recent: '過去24時間のプレイ記録がありません', osu_plays_empty_best: 'ベストプレイのデータがありません',
     pp_compare_title: '⚔ 2人のPP比較', pp_compare_placeholder_a: 'プレイヤーA：ユーザー名またはID', pp_compare_placeholder_b: 'プレイヤーB：ユーザー名またはID', pp_compare_btn: '比較する', pp_compare_topplays_title: '⚔ Top Play 比較', pp_compare_topplays_empty: 'このモードには記録がありません',
     osu_search_placeholder: '曲名またはアーティストで検索...', osu_search_empty: '該当するビートマップが見つかりません',
     osu_sort_default: 'デフォルト順', osu_sort_rating_desc: '星評価（高い順）', osu_sort_rating_asc: '星評価（低い順）',

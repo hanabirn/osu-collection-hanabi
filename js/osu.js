@@ -3487,8 +3487,12 @@ async function renderOsuPlaysList(userId, mode, type, listId, wrapId) {
     container.innerHTML = playsListSkeletonHTML(type === 'best' ? 5 : 3);
     wrap.style.display = 'block';
     const html = await fetchOsuPlaysHtml(userId, mode, type, type === 'best' ? 10 : 5);
-    if (!html) { wrap.style.display = 'none'; return; }
-    container.innerHTML = html;
+    // An empty recent/best list (e.g. no plays in the last 24h) used to hide
+    // this whole wrap — which also contains the goal/medals/grade-history
+    // tabs, making them unreachable whenever the *default* recent tab
+    // happened to be empty. Show an empty state inside the list instead so
+    // the tab bar and the other tabs stay reachable.
+    container.innerHTML = html || `<p class="osu-empty">${t(type === 'best' ? 'osu_plays_empty_best' : 'osu_plays_empty_recent')}</p>`;
     wrap.style.display = 'block';
 }
 

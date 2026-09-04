@@ -123,6 +123,7 @@ I18N.de = {
     ctools_health_dedupe_btn: 'Duplikate entfernen', ctools_health_remove_btn: 'Entfernen', ctools_health_refresh_btn: 'Aktualisieren', ctools_health_ok: 'Die Sammlung sieht gesund aus ✓',
     osu_stat_global: 'Weltrang', osu_stat_accuracy: 'Genauigkeit', osu_stat_playcount: 'Spiele', osu_total_pp: 'PP gesamt (alle Modi)',
     osu_recent_title: 'Letzte Spiele', osu_top_title: 'Beste Spiele',
+    osu_plays_empty_recent: 'Keine Spiele in den letzten 24 Stunden', osu_plays_empty_best: 'Keine Daten zu besten Spielen',
     pp_compare_title: '⚔ Zwei Spieler vergleichen', pp_compare_placeholder_a: 'Spieler A: Name oder ID', pp_compare_placeholder_b: 'Spieler B: Name oder ID', pp_compare_btn: 'Vergleichen', pp_compare_topplays_title: '⚔ Top-Play-Vergleich', pp_compare_topplays_empty: 'Keine Ergebnisse in diesem Modus',
     osu_search_placeholder: 'Nach Titel oder Künstler suchen...', osu_search_empty: 'Keine passenden Beatmaps gefunden',
     osu_sort_default: 'Standardreihenfolge', osu_sort_rating_desc: 'Sterne (absteigend)', osu_sort_rating_asc: 'Sterne (aufsteigend)',

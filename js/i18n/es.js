@@ -123,6 +123,7 @@ I18N.es = {
     ctools_health_dedupe_btn: 'Quitar duplicados', ctools_health_remove_btn: 'Quitar', ctools_health_refresh_btn: 'Actualizar', ctools_health_ok: 'La colección se ve sana ✓',
     osu_stat_global: 'Ranking global', osu_stat_accuracy: 'Precisión', osu_stat_playcount: 'Partidas', osu_total_pp: 'PP total (todos los modos)',
     osu_recent_title: 'Partidas recientes', osu_top_title: 'Mejores partidas',
+    osu_plays_empty_recent: 'Sin partidas en las últimas 24 horas', osu_plays_empty_best: 'Sin datos de mejores partidas',
     pp_compare_title: '⚔ Comparar dos jugadores', pp_compare_placeholder_a: 'Jugador A: nombre o ID', pp_compare_placeholder_b: 'Jugador B: nombre o ID', pp_compare_btn: 'Comparar', pp_compare_topplays_title: '⚔ Comparación de mejores puntuaciones', pp_compare_topplays_empty: 'Sin puntuaciones en este modo',
     osu_search_placeholder: 'Buscar por título o artista...', osu_search_empty: 'No se encontraron beatmaps',
     osu_sort_default: 'Orden predeterminado', osu_sort_rating_desc: 'Estrellas (mayor a menor)', osu_sort_rating_asc: 'Estrellas (menor a mayor)',

@@ -120,6 +120,7 @@ I18N.en = {
     ctools_health_dedupe_btn: 'Remove duplicates', ctools_health_remove_btn: 'Remove', ctools_health_refresh_btn: 'Refresh', ctools_health_ok: 'Collection looks healthy ✓',
     osu_stat_global: 'Global Rank', osu_stat_accuracy: 'Accuracy', osu_stat_playcount: 'Play Count', osu_total_pp: 'Total PP (All Modes)',
     osu_recent_title: 'Recent Plays', osu_top_title: 'Top Plays',
+    osu_plays_empty_recent: 'No plays in the last 24 hours', osu_plays_empty_best: 'No top-play data',
     pp_compare_title: '⚔ Compare Two Players', pp_compare_placeholder_a: 'Player A: username or ID', pp_compare_placeholder_b: 'Player B: username or ID', pp_compare_btn: 'Compare', pp_compare_topplays_title: '⚔ Top Play Comparison', pp_compare_topplays_empty: 'No scores in this mode',
     osu_search_placeholder: 'Search by title or artist...', osu_search_empty: 'No matching beatmaps found',
     osu_sort_default: 'Default Order', osu_sort_rating_desc: 'Star Rating (High to Low)', osu_sort_rating_asc: 'Star Rating (Low to High)',

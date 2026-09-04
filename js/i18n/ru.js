@@ -123,6 +123,7 @@ I18N.ru = {
     ctools_health_dedupe_btn: 'Убрать дубли', ctools_health_remove_btn: 'Удалить', ctools_health_refresh_btn: 'Обновить', ctools_health_ok: 'Коллекция в порядке ✓',
     osu_stat_global: 'Мировой рейтинг', osu_stat_accuracy: 'Точность', osu_stat_playcount: 'Игр', osu_total_pp: 'Всего PP (все режимы)',
     osu_recent_title: 'Недавние игры', osu_top_title: 'Лучшие игры',
+    osu_plays_empty_recent: 'Нет игр за последние 24 часа', osu_plays_empty_best: 'Нет данных о лучших играх',
     pp_compare_title: '⚔ Сравнение двух игроков', pp_compare_placeholder_a: 'Игрок A: имя или ID', pp_compare_placeholder_b: 'Игрок B: имя или ID', pp_compare_btn: 'Сравнить', pp_compare_topplays_title: '⚔ Сравнение лучших результатов', pp_compare_topplays_empty: 'Нет результатов в этом режиме',
     osu_search_placeholder: 'Поиск по названию или автору...', osu_search_empty: 'Битмапы не найдены',
     osu_sort_default: 'По умолчанию', osu_sort_rating_desc: 'Звёзды (по убыванию)', osu_sort_rating_asc: 'Звёзды (по возрастанию)',

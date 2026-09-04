@@ -120,6 +120,7 @@ I18N.zh = {
     ctools_health_dedupe_btn: '移除重複', ctools_health_remove_btn: '移除', ctools_health_refresh_btn: '更新', ctools_health_ok: '收藏看起來很健康 ✓',
     osu_stat_global: '全球排名', osu_stat_accuracy: '準確率', osu_stat_playcount: '遊戲數', osu_total_pp: '全模式 PP',
     osu_recent_title: '最近遊玩', osu_top_title: '最佳成績',
+    osu_plays_empty_recent: '最近 24 小時內沒有遊玩紀錄', osu_plays_empty_best: '沒有最佳成績資料',
     pp_compare_title: '⚔ 雙人 PP 對比', pp_compare_placeholder_a: '玩家 A：用戶名或 ID', pp_compare_placeholder_b: '玩家 B：用戶名或 ID', pp_compare_btn: '比較', pp_compare_topplays_title: '⚔ Top Play 對比', pp_compare_topplays_empty: '這個模式沒有成績',
     osu_search_placeholder: '搜尋曲名或作者...', osu_search_empty: '找不到符合的 Beatmap',
     osu_sort_default: '預設排序', osu_sort_rating_desc: '星數（高到低）', osu_sort_rating_asc: '星數（低到高）',
