@@ -1476,6 +1476,20 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     color: var(--text-secondary);
     font-size: 0.75rem;
 }
+/* Low-key Ko-fi link — muted until hover, then the coral brand colour. */
+.footer-support-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 6px;
+    color: var(--text-label);
+    font-size: 0.75rem;
+    transition: color 0.2s var(--ease-out);
+}
+.footer-support-link:hover {
+    color: #ff5e5b;
+    text-decoration: none;
+}
+.footer-support-link .icon-svg { color: inherit; }
 
 .status {
     color: var(--text-secondary);
