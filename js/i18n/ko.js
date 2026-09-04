@@ -1,6 +1,6 @@
 I18N.ko = {
-    title: 'osu!Hanabi — osu! 컬렉션 & 연습 도구', site_title: 'osu!Hanabi', site_tagline: '✦ 당신의 osu! 컬렉션 & 연습 도구 상자 ✦',
-    site_like_label: '좋아요', site_like_title: '이 사이트가 마음에 들면 좋아요를 눌러주세요!', site_share_label: '공유', site_share_title: '이 사이트를 친구에게 공유하기', site_share_copied: '사이트 링크를 복사했습니다!', site_share_text: 'osu!Hanabi — osu! 컬렉션 정리, 성적 기반 연습 풀 생성, PP 조회',
+    title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 나만의 곡 컬렉션을 만들어보세요! ✦',
+    site_like_label: '좋아요', site_like_title: '이 사이트가 마음에 들면 좋아요를 눌러주세요!', site_share_label: '공유', site_share_title: '이 사이트를 친구에게 공유하기', site_share_copied: '사이트 링크를 복사했습니다!', site_share_text: '나만의 osu! 곡 컬렉션을 만들어 보세요!',
     pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
     site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 클릭하면 새로고침하여 최신 버전을 받습니다',
     maintenance_banner_text: '현재 이 사이트는 수정 중입니다. 궁금한 점이나 버그가 있으면 연락해 주세요!',

@@ -1,6 +1,6 @@
 I18N.fr = {
-    title: 'osu!Hanabi — boîte à outils osu! collections & entraînement', site_title: 'osu!Hanabi', site_tagline: '✦ Ta boîte à outils osu! : collections et entraînement ✦',
-    site_like_label: 'J’aime', site_like_title: 'Ce site vous plaît ? Mettez un like !', site_share_label: 'Partager', site_share_title: 'Partager ce site avec des amis', site_share_copied: 'Lien du site copié !', site_share_text: 'osu!Hanabi — organise tes collections osu!, crée des pools d\'entraînement à partir de tes scores, consulte le PP',
+    title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Constitue ta propre collection de morceaux ! ✦',
+    site_like_label: 'J’aime', site_like_title: 'Ce site vous plaît ? Mettez un like !', site_share_label: 'Partager', site_share_title: 'Partager ce site avec des amis', site_share_copied: 'Lien du site copié !', site_share_text: 'Constitue ta propre collection de musiques osu !',
     pwa_install_btn_title: "Ajouter à l'écran d'accueil (fonctionne hors ligne)",
     site_update_btn_title: 'Une mise à jour est disponible, cliquez pour mettre à jour', site_update_available: 'Une nouvelle version du site est disponible — cliquez pour recharger et obtenir la dernière version',
     maintenance_banner_text: "Ce site est actuellement en cours de modification — si vous avez des questions ou rencontrez un bug, n'hésitez pas à me contacter !",

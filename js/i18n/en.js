@@ -1,6 +1,6 @@
 I18N.en = {
-    title: 'osu!Hanabi — osu! collection & practice toolkit', site_title: 'osu!Hanabi', site_tagline: '✦ Your osu! collection & practice toolkit ✦',
-    site_like_label: 'Like', site_like_title: 'Like this site if you enjoy it!', site_share_label: 'Share', site_share_title: 'Share this site with friends', site_share_copied: 'Site link copied!', site_share_text: 'osu!Hanabi — organise your osu! collections, build practice pools from your scores, look up PP',
+    title: 'osu! Collection', site_title: 'osu! Collection', site_tagline: '✦ Build your very own song collection! ✦',
+    site_like_label: 'Like', site_like_title: 'Like this site if you enjoy it!', site_share_label: 'Share', site_share_title: 'Share this site with friends', site_share_copied: 'Site link copied!', site_share_text: 'Build your very own osu! song collection!',
     pwa_install_btn_title: 'Add to home screen (works offline)',
     site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click to reload and get the latest version',
     maintenance_banner_text: 'This site is currently being updated — if you run into any questions or bugs, please get in touch!',
