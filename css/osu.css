@@ -261,9 +261,15 @@
     line-height: 1.6;
     margin: -4px 0 16px;
 }
-.skin-upload-row { display: flex; gap: 8px; }
+/* Native <input type=file> has a wide intrinsic size and won't shrink on
+   its own — on a phone it pushed past its card. Clamp it everywhere, and
+   let flex rows actually collapse it (default min-width:auto blocks that). */
+input[type="file"] { max-width: 100%; box-sizing: border-box; }
+.skin-upload-row { display: flex; gap: 8px; min-width: 0; }
 .skin-upload-row input[type="file"] {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid var(--border-input);
@@ -271,6 +277,7 @@
     color: var(--text);
     font-size: 0.85rem;
 }
+.collection-db-upload-row input[type="file"] { min-width: 0; overflow: hidden; }
 .skins-list {
     display: flex;
     flex-direction: column;
