@@ -4088,6 +4088,7 @@ function switchVisitorRecentMode(mode, el) {
     visitorCurrentMode = mode;
     if (!visitorLookupUserId) return;
     if (visitorPlaysType === 'goal') renderPpGoalPlannerUI();
+    else if (visitorPlaysType === 'gradehistory') ensureGradeHistoryLoaded();
     else renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
 }
 
@@ -4098,13 +4099,17 @@ function switchVisitorPlaysType(type, el) {
     const listEl = document.getElementById('visitor-recent-list');
     const goalEl = document.getElementById('pp-goal-planner');
     const medalsEl = document.getElementById('medals-gallery');
+    const gradeHistoryEl = document.getElementById('grade-history-panel');
     listEl.style.display = type === 'recent' || type === 'best' ? '' : 'none';
     goalEl.style.display = type === 'goal' ? '' : 'none';
     medalsEl.style.display = type === 'medals' ? '' : 'none';
+    gradeHistoryEl.style.display = type === 'gradehistory' ? '' : 'none';
     if (type === 'goal') {
         renderPpGoalPlannerUI();
     } else if (type === 'medals') {
         ensureMedalsGalleryLoaded();
+    } else if (type === 'gradehistory') {
+        ensureGradeHistoryLoaded();
     } else if (visitorLookupUserId) {
         renderOsuPlaysList(visitorLookupUserId, visitorCurrentMode, type, 'visitor-recent-list', 'visitor-recent-plays');
     }
@@ -4235,6 +4240,125 @@ function renderMedalsList() {
             </div>
         </div>
     `).join('');
+}
+
+/* ===== Grade history — "show me every score I've gotten, grouped by rank"
+   (SS/S/A/B/C/D), a feature request that's structurally impossible to answer
+   from osu!'s own API (v1/v2 only ever expose best-100-by-pp and last-50-
+   recent, never a full history). osu!Track (the same service behind
+   osu!stats) has been polling most active players' hiscores for years and
+   keeps every one it ever recorded, so netlify/functions/osu-score-history.js
+   proxies its /hiscores endpoint instead. Coverage still isn't complete —
+   see the header comment there — hence the caveat line in the empty/loaded
+   states below. ===== */
+let gradeHistoryRaw = [];
+let gradeHistoryLoadedKey = null;
+let gradeHistoryFilter = 'all';
+
+const GRADE_HISTORY_GROUPS = {
+    ss: r => r.rank === 'X' || r.rank === 'XH',
+    s: r => r.rank === 'S' || r.rank === 'SH',
+    a: r => r.rank === 'A',
+    b: r => r.rank === 'B',
+    c: r => r.rank === 'C',
+    d: r => r.rank === 'D',
+};
+
+async function ensureGradeHistoryLoaded() {
+    const el = document.getElementById('grade-history-panel');
+    if (!el) return;
+    if (!visitorLookupUserId) { el.innerHTML = `<p class="osu-empty">${t('grade_history_need_lookup')}</p>`; return; }
+    const key = `${visitorLookupUserId}:${visitorCurrentMode}`;
+    if (gradeHistoryLoadedKey === key) { renderGradeHistoryGallery(); return; }
+    el.innerHTML = `<p class="osu-empty">${t('grade_history_loading')}</p>`;
+    try {
+        const res = await fetch(`/.netlify/functions/osu-score-history?user=${visitorLookupUserId}&mode=${visitorCurrentMode}`);
+        const data = res.ok ? await res.json() : [];
+        gradeHistoryRaw = Array.isArray(data) ? data : [];
+        gradeHistoryLoadedKey = key;
+        renderGradeHistoryGallery();
+    } catch (e) {
+        console.error('Grade history load failed:', e);
+        el.innerHTML = `<p class="osu-empty">${t('grade_history_load_fail')}</p>`;
+    }
+}
+
+function gradeHistoryFilterGallery(filter, el) {
+    gradeHistoryFilter = filter;
+    document.querySelectorAll('#grade-history-panel .grade-history-filter-tabs .osu-tab').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    renderGradeHistoryList();
+}
+
+function renderGradeHistoryGallery() {
+    const el = document.getElementById('grade-history-panel');
+    if (!el) return;
+    const counts = { ss: 0, s: 0, a: 0, b: 0, c: 0, d: 0 };
+    for (const r of gradeHistoryRaw) {
+        for (const g in GRADE_HISTORY_GROUPS) if (GRADE_HISTORY_GROUPS[g](r)) counts[g]++;
+    }
+    if (gradeHistoryRaw.length === 0) {
+        el.innerHTML = `
+            <div class="grade-history-note">${t('grade_history_note')}</div>
+            <p class="osu-empty">${t('grade_history_empty')}</p>`;
+        return;
+    }
+    gradeHistoryFilter = 'all';
+    el.innerHTML = `
+        <div class="grade-history-note">${t('grade_history_note')}</div>
+        <div class="osu-mode-tabs grade-history-filter-tabs">
+            <button class="osu-tab active" onclick="gradeHistoryFilterGallery('all', this)">${t('grade_history_filter_all')} (${gradeHistoryRaw.length})</button>
+            <button class="osu-tab" onclick="gradeHistoryFilterGallery('ss', this)">SS (${counts.ss})</button>
+            <button class="osu-tab" onclick="gradeHistoryFilterGallery('s', this)">S (${counts.s})</button>
+            <button class="osu-tab" onclick="gradeHistoryFilterGallery('a', this)">A (${counts.a})</button>
+            <button class="osu-tab" onclick="gradeHistoryFilterGallery('b', this)">B (${counts.b})</button>
+            <button class="osu-tab" onclick="gradeHistoryFilterGallery('c', this)">C (${counts.c})</button>
+            <button class="osu-tab" onclick="gradeHistoryFilterGallery('d', this)">D (${counts.d})</button>
+        </div>
+        <div class="osu-recent-list" id="grade-history-list"></div>`;
+    renderGradeHistoryList();
+}
+
+const GRADE_HISTORY_MAX_SHOWN = 200;
+
+async function renderGradeHistoryList() {
+    const listEl = document.getElementById('grade-history-list');
+    if (!listEl) return;
+    const filtered = gradeHistoryFilter === 'all' ? gradeHistoryRaw : gradeHistoryRaw.filter(GRADE_HISTORY_GROUPS[gradeHistoryFilter]);
+    if (!filtered.length) { listEl.innerHTML = `<p class="osu-empty">${t('grade_history_filter_empty')}</p>`; return; }
+    const sorted = [...filtered].sort((a, b) => new Date(b.score_time) - new Date(a.score_time));
+    const capped = sorted.slice(0, GRADE_HISTORY_MAX_SHOWN);
+    listEl.innerHTML = playsListSkeletonHTML(Math.min(capped.length, 5));
+    const beatmapIds = [...new Set(capped.map(r => r.beatmap_id))];
+    const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`)));
+    const beatmapMap = {};
+    beatmapIds.forEach((id, i) => {
+        const bm = beatmapResults[i] && beatmapResults[i][0];
+        if (bm) beatmapMap[id] = bm;
+    });
+    const truncNote = sorted.length > GRADE_HISTORY_MAX_SHOWN
+        ? `<div class="grade-history-truncated">${t('grade_history_truncated', { n: GRADE_HISTORY_MAX_SHOWN, total: sorted.length })}</div>` : '';
+    listEl.innerHTML = capped.map(r => gradeHistoryItemHtml(r, beatmapMap[r.beatmap_id])).join('') + truncNote;
+}
+
+function gradeHistoryItemHtml(r, bm) {
+    const title = bm ? `${bm.title} [${bm.version}]` : `Beatmap #${r.beatmap_id}`;
+    const coverUrl = bm ? `https://assets.ppy.sh/beatmaps/${bm.beatmapset_id}/covers/card.jpg` : '';
+    const rankClass = OSU_RANK_CLASS[r.rank] || 'f';
+    const mods = decodeOsuMods(r.mods);
+    const modsStr = mods.length > 0 ? ' · ' + mods.join(',') : '';
+    const d = new Date(r.score_time);
+    const dateStr = isNaN(d) ? '' : `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+    const ppStr = r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
+    return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
+        <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="osu-recent-overlay"></div>
+        <span class="osu-recent-rank rank-${rankClass}">${r.rank || '—'}</span>
+        <div class="osu-recent-info">
+            <div class="osu-recent-song">${escHtml(title)}</div>
+            <div class="osu-recent-meta">${ppStr}${Number(r.score || 0).toLocaleString()}${modsStr} · ${dateStr}</div>
+        </div>
+    </a>`;
 }
 
 /* ===== PP goal planner — "what pp does one new play need to reach a target

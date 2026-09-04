@@ -2478,6 +2478,24 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .medal-rarity { font-size: 0.68rem; color: var(--text-dim2); margin-top: 3px; }
 
+/* ===== Grade history (5th tab alongside 最近遊玩/最佳成績/PP 目標/獎章) ===== */
+.grade-history-note {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    background: var(--bg-card-2, rgba(255,255,255,0.04));
+    border-radius: 8px;
+}
+.grade-history-filter-tabs { margin-bottom: 14px; flex-wrap: wrap; }
+.grade-history-truncated {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 10px;
+}
+
 /* ===== Collection.db export modal ===== */
 .collection-db-upload-row {
     display: flex;
