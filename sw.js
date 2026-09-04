@@ -10,7 +10,7 @@
    cache — the fetch strategy below is network-first for the shell (so
    normal visits always get the latest code), so this mostly matters for
    forcing a clean slate rather than for staleness. */
-const CACHE_VERSION = 'v24';
+const CACHE_VERSION = 'v25';
 const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
 const KNOWN_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE]);

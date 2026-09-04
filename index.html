@@ -201,6 +201,7 @@
             <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
             <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
             <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
+            <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
             <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
             <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
@@ -500,6 +501,20 @@
         <div id="catalog-completion" class="catalog-completion" hidden></div>
         <div id="catalog-list" class="osu-collection"></div>
         <div id="catalog-pagination" class="osu-pagination"></div>
+    </section>
+
+    <section id="page-mappools" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="mappools_page_title">✦ 世界盃圖池 ✦</h2>
+        <p class="tournaments-hint" data-i18n="mappools_hint">歷屆 osu! 世界盃（OWC／TWC／MWC 4K・7K／CWC）的官方圖池，資料取自 osu! wiki。選一屆比賽，把整屆或某一輪一鍵加成收藏分類。</p>
+
+        <div class="osu-search-row mappool-controls">
+            <div class="osu-mode-tabs" id="mappool-tourney-tabs"></div>
+            <select id="mappool-year-select" onchange="switchMappoolYear(this.value)"></select>
+            <button id="mappool-add-event-btn" class="btn" onclick="addMappoolEventToCollection()" disabled data-i18n="mappools_add_event_btn">➕ 整屆加入收藏</button>
+        </div>
+
+        <div id="mappool-coverage" class="farm-coverage"></div>
+        <div id="mappool-rounds"></div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -1014,6 +1029,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/public-collections.js"></script>
 <script defer src="js/farm-maps.js"></script>
 <script defer src="js/catalog.js"></script>
+<script defer src="js/mappools.js"></script>
 <script defer src="js/skins.js"></script>
 <script defer src="js/skin-screenshots.js"></script>
 <script defer src="js/updates.js"></script>

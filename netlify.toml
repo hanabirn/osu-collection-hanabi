@@ -25,6 +25,13 @@
 [functions."catalog-crawl-cron"]
   schedule = "*/30 * * * *"
 
+# Official World Cup mappool index (OWC / TWC / MWC 4K+7K / CWC, every year),
+# parsed from the ppy/osu-wiki markdown — see netlify/functions/_wc-mappools-core.js.
+# Weekly: the data is ~annual and hash-compared, so most runs are a no-op.
+# Use wc-mappool-crawl-run.js (WC_MAPPOOL_CRAWL_SECRET) to force the initial fill.
+[functions."wc-mappool-crawl-cron"]
+  schedule = "0 6 * * 1"
+
 [functions."farm-crawl-run"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
 

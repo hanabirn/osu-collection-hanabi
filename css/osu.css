@@ -1465,6 +1465,65 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     }
 }
 
+/* ===== 世界盃圖池 tab — round/bracket chrome + the same dense card grid
+   as Farm 圖 / Catalog (scoped to .mappool-list so the main collection grid
+   keeps its own proportions). ===== */
+.mappool-controls { align-items: center; }
+#mappool-tourney-tabs { flex-wrap: wrap; }
+
+.mappool-round { margin: 18px 0 22px; }
+.mappool-round-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(var(--accent-purple-rgb), 0.22);
+}
+.mappool-round-head h3 { margin: 0; font-size: 1.05rem; }
+.mappool-round-links { display: flex; gap: 10px; font-size: 0.8rem; }
+.mappool-round-links a { color: var(--accent-light-purple); }
+.mappool-round-add { margin-left: auto; font-size: 0.78rem; padding: 4px 12px; }
+.mappool-bracket-label {
+    margin: 10px 0 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(var(--accent-cyan-rgb), 0.9);
+}
+
+.mappool-list.osu-collection {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.mappool-list .osu-card { aspect-ratio: 4 / 1.35; border-radius: 10px; }
+.mappool-list .osu-card.mappool-tb {
+    outline: 2px solid rgba(var(--accent-pink-rgb), 0.75);
+    outline-offset: -2px;
+}
+.mappool-list .osu-card-info { padding: 8px 40px 6px 10px; }
+.mappool-list .osu-card-title { font-size: 0.85rem; }
+.mappool-list .osu-card-artist { font-size: 0.7rem; }
+.mappool-list .osu-card-mapper {
+    font-size: 0.62rem;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mappool-list .osu-play-btn { left: 50%; right: auto; transform: translateX(-50%); }
+.mappool-list .osu-copy-btn { right: 8px; }
+.mappool-list .osu-download-btn { right: 48px; }
+@media (max-width: 480px) {
+    .mappool-list.osu-collection {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+    }
+}
+
 .osu-play-btn.playing {
     opacity: 1;
     color: #fff;

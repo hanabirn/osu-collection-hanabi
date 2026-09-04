@@ -62,4 +62,15 @@ function getSiteStatsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore };
+// Official World Cup mappools (OWC / TWC / MWC 4K+7K / CWC, every year),
+// parsed from the ppy/osu-wiki markdown by wc-mappool-crawl-cron.js — see
+// _wc-mappools-core.js. Near-static: one weekly sweep, hash-compared.
+function getWcMappoolsStore() {
+    return getStore({
+        name: 'osu-wc-mappools',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore };
