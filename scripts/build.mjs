@@ -11,10 +11,30 @@
 import { rm, mkdir, cp, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 import { transform } from 'esbuild';
+import * as OpenCC from 'opencc-js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT = join(ROOT, 'dist');
+
+/* Generate js/i18n/zh-Hans.js (Simplified) from js/i18n/zh.js (Traditional,
+   the hand-edited source of truth) via OpenCC's Taiwan-idiom -> Mainland
+   conversion, which handles vocab (記憶體->内存, 螢幕->屏幕, 影片->视频) not
+   just characters. Written into the source tree (gitignored) so both a
+   repo-root dev server and the dist/ build pick it up. */
+async function genSimplifiedLocale() {
+    const src = await readFile(join(ROOT, 'js/i18n/zh.js'), 'utf8');
+    const sandbox = { I18N: {} };
+    vm.runInNewContext(src, sandbox, { filename: 'zh.js' });
+    const zh = sandbox.I18N.zh;
+    const conv = OpenCC.Converter({ from: 'twp', to: 'cn' });
+    const hans = {};
+    for (const [k, v] of Object.entries(zh)) hans[k] = typeof v === 'string' ? conv(v) : v;
+    const out = 'I18N["zh-Hans"] = ' + JSON.stringify(hans) + ';\n';
+    await writeFile(join(ROOT, 'js/i18n/zh-Hans.js'), out);
+    return Object.keys(hans).length;
+}
 
 // Copied verbatim.
 const COPY = ['index.html', 'manifest.json', 'assets'];
@@ -71,6 +91,9 @@ async function cleanOut() {
 }
 
 async function main() {
+    const hansKeys = await genSimplifiedLocale();
+    console.log(`generated js/i18n/zh-Hans.js (${hansKeys} keys)`);
+
     await cleanOut();
     await mkdir(OUT, { recursive: true });
 

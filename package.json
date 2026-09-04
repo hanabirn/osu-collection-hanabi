@@ -5,6 +5,7 @@
     "build": "node scripts/build.mjs"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "opencc-js": "^1.4.2"
   }
 }

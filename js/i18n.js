@@ -4,12 +4,18 @@
    this file declares I18N, and BEFORE any code below calls t()/applyLang(). ===== */
 const I18N = {};
 
-const SUPPORTED_LANGS = ['zh', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de'];
+const SUPPORTED_LANGS = ['zh', 'zh-Hans', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de'];
+
+/* zh-CN / zh-SG / zh-Hans* -> Simplified; every other zh tag
+   (zh-TW / zh-HK / zh-Hant / bare zh) -> Traditional (the `zh` file). */
+function resolveZh(code) {
+    return /^zh-(cn|sg|hans)/.test(code) ? 'zh-Hans' : 'zh';
+}
 
 function detectBrowserLang() {
     for (const tag of navigator.languages || [navigator.language]) {
         const code = tag.toLowerCase();
-        if (code.startsWith('zh')) return 'zh';
+        if (code.startsWith('zh')) return resolveZh(code);
         const short = code.split('-')[0];
         if (SUPPORTED_LANGS.includes(short)) return short;
     }
@@ -61,12 +67,14 @@ function applyLangDom(lang) {
     document.querySelectorAll('.lang-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
-    // Each language names itself (not translated content), so this just
-    // copies whichever .lang-pill already carries that name rather than
-    // duplicating the eight labels into a separate lookup table.
+    // Header button just shows the active language's flag chip (the full
+    // name is too wide there) — mirror the matching pill's data-flag code.
     const currentPill = document.querySelector(`.lang-pill[data-lang="${lang}"]`);
     const currentLabel = document.getElementById('lang-globe-current');
-    if (currentPill && currentLabel) currentLabel.textContent = currentPill.textContent;
+    if (currentPill && currentLabel) {
+        const code = currentPill.dataset.flag;
+        currentLabel.innerHTML = /^[a-z]{2}$/.test(code || '') ? `<span class="flag flag--${code}"></span>` : (currentPill.textContent || '');
+    }
     if (t.title) document.title = t.title;
     if (typeof refreshDynamicContent === 'function') refreshDynamicContent();
 }

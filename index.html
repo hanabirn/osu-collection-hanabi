@@ -133,16 +133,17 @@
             </div>
         </div>
         <div class="lang-globe" id="lang-globe">
-            <button class="lang-globe-btn header-ctl" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language" data-icon="globe" data-icon-gap><span id="lang-globe-current">中文</span></button>
+            <button class="lang-globe-btn header-ctl" id="lang-globe-btn" onclick="toggleLangMenu()" aria-haspopup="true" aria-expanded="false" aria-label="Select language" title="Select language" data-icon="globe" data-icon-gap><span id="lang-globe-current"><span class="flag flag--tw"></span></span></button>
             <div class="lang-globe-menu" id="lang-globe-menu">
-                <button class="lang-pill active" data-lang="zh" onclick="applyLang('zh'); toggleLangMenu(false)">中文</button>
-                <button class="lang-pill" data-lang="en" onclick="applyLang('en'); toggleLangMenu(false)">EN</button>
-                <button class="lang-pill" data-lang="ja" onclick="applyLang('ja'); toggleLangMenu(false)">日本語</button>
-                <button class="lang-pill" data-lang="ko" onclick="applyLang('ko'); toggleLangMenu(false)">한국어</button>
-                <button class="lang-pill" data-lang="ru" onclick="applyLang('ru'); toggleLangMenu(false)">Русский</button>
-                <button class="lang-pill" data-lang="fr" onclick="applyLang('fr'); toggleLangMenu(false)">Français</button>
-                <button class="lang-pill" data-lang="es" onclick="applyLang('es'); toggleLangMenu(false)">Español</button>
-                <button class="lang-pill" data-lang="de" onclick="applyLang('de'); toggleLangMenu(false)">Deutsch</button>
+                <button class="lang-pill active" data-lang="zh" data-flag="tw" onclick="applyLang('zh'); toggleLangMenu(false)"><span class="flag flag--tw"></span>繁體中文</button>
+                <button class="lang-pill" data-lang="zh-Hans" data-flag="cn" onclick="applyLang('zh-Hans'); toggleLangMenu(false)"><span class="flag flag--cn"></span>简体中文</button>
+                <button class="lang-pill" data-lang="en" data-flag="gb" onclick="applyLang('en'); toggleLangMenu(false)"><span class="flag flag--gb"></span>English</button>
+                <button class="lang-pill" data-lang="ja" data-flag="jp" onclick="applyLang('ja'); toggleLangMenu(false)"><span class="flag flag--jp"></span>日本語</button>
+                <button class="lang-pill" data-lang="ko" data-flag="kr" onclick="applyLang('ko'); toggleLangMenu(false)"><span class="flag flag--kr"></span>한국어</button>
+                <button class="lang-pill" data-lang="ru" data-flag="ru" onclick="applyLang('ru'); toggleLangMenu(false)"><span class="flag flag--ru"></span>Русский</button>
+                <button class="lang-pill" data-lang="fr" data-flag="fr" onclick="applyLang('fr'); toggleLangMenu(false)"><span class="flag flag--fr"></span>Français</button>
+                <button class="lang-pill" data-lang="es" data-flag="es" onclick="applyLang('es'); toggleLangMenu(false)"><span class="flag flag--es"></span>Español</button>
+                <button class="lang-pill" data-lang="de" data-flag="de" onclick="applyLang('de'); toggleLangMenu(false)"><span class="flag flag--de"></span>Deutsch</button>
             </div>
         </div>
         </div>
@@ -984,14 +985,14 @@
      switcher picks later are lazy-loaded on demand (see js/i18n.js). -->
 <script>
 (function () {
-    var SUPPORTED = ['zh', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de'];
+    var SUPPORTED = ['zh', 'zh-Hans', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de'];
     var lang = 'zh';
     try { var s = localStorage.getItem('site_lang'); if (s && SUPPORTED.indexOf(s) >= 0) lang = s; else throw 0; }
     catch (e) {
         var langs = navigator.languages || [navigator.language || 'zh'];
         for (var i = 0; i < langs.length; i++) {
             var c = (langs[i] || '').toLowerCase();
-            if (c.indexOf('zh') === 0) { lang = 'zh'; break; }
+            if (c.indexOf('zh') === 0) { lang = /^zh-(cn|sg|hans)/.test(c) ? 'zh-Hans' : 'zh'; break; }
             var short = c.split('-')[0];
             if (SUPPORTED.indexOf(short) >= 0) { lang = short; break; }
         }
