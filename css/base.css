@@ -1,5 +1,22 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Keyboard-focus ring. Only the <input> fields had any :focus treatment
+   before, so tabbing through the buttons / tabs / links / <select>s landed
+   nowhere visible. :focus-visible keeps it keyboard-only; the :not() line
+   clears the ring for pointer focus (and is the graceful-degradation path
+   for engines without :focus-visible). Modern engines round the outline to
+   the element's own border-radius automatically. */
+:focus-visible {
+    outline: 2px solid var(--accent-light-purple);
+    outline-offset: 2px;
+}
+:focus:not(:focus-visible) { outline: none; }
+/* .explore-card clips its content (overflow:hidden) and sits tight in a
+   grid — draw its ring just inside the edge instead of outset. (The
+   onclick <div> cards — .osu-card etc. — aren't in the tab order at all;
+   giving them keyboard operability is a separate change.) */
+.explore-card:focus-visible { outline-offset: -3px; }
+
 /* No web font is loaded (see index.html) — "Noto Sans TC" leads in case the
    visitor has it installed locally, then it falls through to each
    platform's own CJK sans (PingFang / 微軟正黑 / 源ノ角ゴシック / system Noto)
