@@ -194,6 +194,7 @@ I18N.zh = {
     catalog_completion_meta_note: '來源／曲風／語言依你收藏的中繼資料判斷，可能因尚未補齊而少算',
     catalog_complete_btn: '➕ 補完（還缺 {n} 首）',
     catalog_complete_done: '已全部收藏 ✓',
+    catalog_meta_backfill_btn: '補齊 {n} 個',
 
     pp_goal_tab: 'PP 目標', pp_goal_hint: '{mode} 目前總 PP：{current}pp。輸入目標，看新增一張成績最少要打多少 PP。',
     pp_goal_placeholder: '目標總 PP', pp_goal_btn: '計算', pp_goal_invalid: '請輸入有效的目標 PP',

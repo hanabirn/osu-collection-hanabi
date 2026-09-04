@@ -196,6 +196,7 @@ I18N.ru = {
     catalog_completion_meta_note: 'Источник / жанр / язык определяются по метаданным твоей коллекции и могут занижаться, пока она не дозаполнится',
     catalog_complete_btn: '➕ Дополнить (осталось {n})',
     catalog_complete_done: 'Всё собрано ✓',
+    catalog_meta_backfill_btn: 'Дозаполнить {n}',
 
     pp_goal_tab: 'Цель по PP', pp_goal_hint: 'Текущий общий PP в {mode}: {current}pp. Введите цель, чтобы узнать минимальный PP новой игры.',
     pp_goal_placeholder: 'Целевой общий PP', pp_goal_btn: 'Рассчитать', pp_goal_invalid: 'Введите корректный целевой PP',

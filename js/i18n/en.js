@@ -194,6 +194,7 @@ I18N.en = {
     catalog_completion_meta_note: 'Source / genre / language are judged from your collection\'s metadata, which may undercount until it finishes filling in',
     catalog_complete_btn: '➕ Fill the gap ({n} left)',
     catalog_complete_done: 'All collected ✓',
+    catalog_meta_backfill_btn: 'Fill in {n}',
 
     pp_goal_tab: 'PP Goal', pp_goal_hint: 'Current {mode} total PP: {current}pp. Enter a target to see the minimum PP a new play needs.',
     pp_goal_placeholder: 'Target total PP', pp_goal_btn: 'Calculate', pp_goal_invalid: 'Please enter a valid target PP',

@@ -244,8 +244,14 @@ function renderCatalogCompletion() {
     const total = catalogTotal;
     const have = catalogCollectionMatchCount(facet);
     const pct = total > 0 ? Math.min(100, Math.round((have / total) * 100)) : 0;
-    const note = facet.type === 'artist' ? '' :
-        `<div class="catalog-completion-note">${t('catalog_completion_meta_note')}</div>`;
+    let note = '';
+    if (facet.type !== 'artist') {
+        const pending = typeof osuMetaPendingCount === 'function' ? osuMetaPendingCount() : 0;
+        const fill = pending > 0
+            ? ` <button class="catalog-meta-backfill-btn" onclick="catalogRunMetaBurst()">${t('catalog_meta_backfill_btn', { n: pending })}</button>`
+            : '';
+        note = `<div class="catalog-completion-note">${t('catalog_completion_meta_note')}${fill}</div>`;
+    }
     el.innerHTML = `
         <div class="catalog-completion-row">
             <span class="catalog-completion-text">${t('catalog_completion_have', {
@@ -341,6 +347,25 @@ function refreshCatalogLocalized() {
     if (!catalogLoaded) return;
     rebuildCatalogFacetSelects();
     renderCatalogList();
+}
+
+/* One-click burst of the language/genre/source backfill, from the completion
+   panel's note — the default on-load pass only does 24/visit, so source/
+   genre/language completion undercounts for a while. Runs a bigger, faster
+   batch, then re-renders the panel with the improved count. */
+async function catalogRunMetaBurst() {
+    if (typeof backfillOsuLanguages !== 'function') return;
+    const btn = document.querySelector('.catalog-meta-backfill-btn');
+    if (btn) { btn.disabled = true; btn.textContent = t('gallery_loading'); }
+    try {
+        await backfillOsuLanguages({
+            max: 250, chunk: 6, pauseMs: 350,
+            onProgress: (done, tot) => { if (btn) btn.textContent = `${done} / ${tot}`; },
+        });
+    } catch (e) {
+        console.error('catalog meta burst failed:', e);
+    }
+    renderCatalogCompletion();
 }
 
 async function addCatalogToCollection(setId, event) {

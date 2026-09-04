@@ -196,6 +196,7 @@ I18N.ja = {
     catalog_completion_meta_note: 'ソース／ジャンル／言語はコレクションのメタデータで判定するため、補完前は少なく出ることがあります',
     catalog_complete_btn: '➕ 補完（あと {n} 個）',
     catalog_complete_done: 'すべて収集済み ✓',
+    catalog_meta_backfill_btn: '{n} 件を補完',
 
     pp_goal_tab: 'PP目標', pp_goal_hint: '現在の{mode}の合計PP：{current}pp。目標を入力すると、新しいプレイに最低限必要なPPがわかります。',
     pp_goal_placeholder: '目標の合計PP', pp_goal_btn: '計算', pp_goal_invalid: '有効な目標PPを入力してください',

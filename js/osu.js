@@ -409,8 +409,26 @@ let osuMetaBackfillRunning = false;
    js/main.js init) so a large collection tops up over a few visits rather
    than firing hundreds of API calls at once. New adds and "Refresh all"
    fetch the meta inline, so this only ever has old data to catch up on. */
-async function backfillOsuLanguages() {
-    if (osuMetaBackfillRunning) return;
+/* Set ids in the collection still missing language/source metadata — the
+   scan backfillOsuLanguages() uses, exposed so the Catalog completion panel
+   can show "還有 N 個" and decide whether a burst is worth it. */
+function osuMetaPendingCount() {
+    const col = getOsuCollection();
+    const seen = new Set();
+    let n = 0;
+    for (const mode of OSU_MODES) {
+        for (const s of col[mode]) {
+            if ((s.language && s.source !== undefined) || seen.has(s.beatmapset_id)) continue;
+            seen.add(s.beatmapset_id);
+            n++;
+        }
+    }
+    return n;
+}
+
+async function backfillOsuLanguages(opts) {
+    if (osuMetaBackfillRunning) return false;
+    const { max = 24, chunk = 4, pauseMs = 800, onProgress } = opts || {};
     const col = getOsuCollection();
     const seen = new Set();
     const pending = [];
@@ -424,14 +442,13 @@ async function backfillOsuLanguages() {
             pending.push(s.beatmapset_id);
         }
     }
-    if (pending.length === 0) return;
+    if (pending.length === 0) return 0;
 
     osuMetaBackfillRunning = true;
-    const MAX_PER_VISIT = 24, CHUNK = 4, PAUSE_MS = 800;
-    const batch = pending.slice(0, MAX_PER_VISIT);
+    const batch = pending.slice(0, max);
     try {
-        for (let i = 0; i < batch.length; i += CHUNK) {
-            const ids = batch.slice(i, i + CHUNK);
+        for (let i = 0; i < batch.length; i += chunk) {
+            const ids = batch.slice(i, i + chunk);
             const metas = await Promise.all(ids.map(id =>
                 fetchOsuSetMeta(id).then(m => ({ id, m }))
             ));
@@ -445,12 +462,14 @@ async function backfillOsuLanguages() {
                 }
             }
             if (changed) saveOsuCollection(fresh);
-            if (i + CHUNK < batch.length) await new Promise(res => setTimeout(res, PAUSE_MS));
+            if (onProgress) onProgress(Math.min(i + chunk, batch.length), batch.length);
+            if (i + chunk < batch.length) await new Promise(res => setTimeout(res, pauseMs));
         }
         renderOsuCollection();
     } finally {
         osuMetaBackfillRunning = false;
     }
+    return batch.length;
 }
 
 function osuSetMaxRating(set) {

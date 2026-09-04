@@ -196,6 +196,7 @@ I18N.ko = {
     catalog_completion_meta_note: '소스／장르／언어는 컬렉션 메타데이터로 판단하므로 채워지기 전에는 적게 나올 수 있습니다',
     catalog_complete_btn: '➕ 채우기 ({n}개 남음)',
     catalog_complete_done: '전부 수집됨 ✓',
+    catalog_meta_backfill_btn: '{n}개 채우기',
 
     pp_goal_tab: 'PP 목표', pp_goal_hint: '현재 {mode} 총 PP: {current}pp. 목표를 입력하면 새 기록에 필요한 최소 PP를 계산합니다.',
     pp_goal_placeholder: '목표 총 PP', pp_goal_btn: '계산', pp_goal_invalid: '유효한 목표 PP를 입력해주세요',

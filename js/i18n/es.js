@@ -196,6 +196,7 @@ I18N.es = {
     catalog_completion_meta_note: 'La fuente / género / idioma se deducen de los metadatos de tu colección y pueden quedarse cortos hasta que terminen de rellenarse',
     catalog_complete_btn: '➕ Completar (faltan {n})',
     catalog_complete_done: 'Todo coleccionado ✓',
+    catalog_meta_backfill_btn: 'Completar {n}',
 
     pp_goal_tab: 'Meta de PP', pp_goal_hint: 'PP total actual en {mode}: {current}pp. Introduce una meta para ver el PP mínimo que necesita una nueva partida.',
     pp_goal_placeholder: 'PP total objetivo', pp_goal_btn: 'Calcular', pp_goal_invalid: 'Introduce un PP objetivo válido',

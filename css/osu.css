@@ -1392,6 +1392,21 @@
     font-size: 0.7rem;
     color: var(--text-label);
 }
+.catalog-meta-backfill-btn {
+    font: inherit;
+    font-size: 0.7rem;
+    margin-left: 4px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(var(--accent-purple-rgb), 0.4);
+    background: rgba(var(--accent-purple-rgb), 0.12);
+    color: var(--text-accent);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.catalog-meta-backfill-btn:hover { background: rgba(var(--accent-purple-rgb), 0.22); }
+.catalog-meta-backfill-btn:active { transform: scale(0.96); }
+.catalog-meta-backfill-btn:disabled { opacity: 0.6; cursor: default; }
 @media (prefers-reduced-motion: reduce) {
     .catalog-completion-bar > span { transition: none; }
 }

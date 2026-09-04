@@ -196,6 +196,7 @@ I18N.fr = {
     catalog_completion_meta_note: 'La source / le genre / la langue sont déduits des métadonnées de votre collection et peuvent être sous-estimés tant qu\'elles ne sont pas complétées',
     catalog_complete_btn: '➕ Compléter ({n} restants)',
     catalog_complete_done: 'Tout collecté ✓',
+    catalog_meta_backfill_btn: 'Compléter {n}',
 
     pp_goal_tab: 'Objectif PP', pp_goal_hint: 'PP total actuel en {mode} : {current}pp. Entrez un objectif pour voir le PP minimum requis pour un nouveau score.',
     pp_goal_placeholder: 'PP total visé', pp_goal_btn: 'Calculer', pp_goal_invalid: 'Veuillez entrer un objectif PP valide',
