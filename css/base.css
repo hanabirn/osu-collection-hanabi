@@ -115,7 +115,16 @@ a:hover { text-decoration: underline; }
     .logo-icon svg { width: 60px; height: 60px; }
 }
 @media (max-width: 600px) {
-    .site-header { padding: 12px 20px 46px; min-height: 196px; }
+    /* Let the header grow to fit its content on a phone — the fixed
+       aspect-ratio (3.6:1 ≈ 108px at 390px wide) plus a min-height was
+       shorter than the stacked controls + title, so overflow:hidden +
+       justify-content:center clipped the top row of controls off. */
+    .site-header {
+        padding: 10px 16px 42px;
+        aspect-ratio: auto;
+        min-height: 0;
+        max-height: none;
+    }
 }
 /* ===== Beatmap-cover hero banner, behind the header's own content =====
    #bg-carousel (its slides populated by js/osu.js's renderOsuBgCarousel,
@@ -333,15 +342,22 @@ a:hover { text-decoration: underline; }
 .osu-login-btn-large:hover { transform: scale(1.04); }
 
 @media (max-width: 600px) {
+    /* Both corner clusters flow inline under the cover instead of floating;
+       corner-actions was a vertical column of ~5 buttons (~190px tall) —
+       lay it out as a wrapping row so it's ~one line. */
     .header-corner-actions {
         position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
-        margin-top: 10px;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 8px;
     }
     .header-corner-left {
         position: static;
         justify-content: center;
-        margin-top: 10px;
+        margin-top: 8px;
     }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -404,8 +420,11 @@ a:hover { text-decoration: underline; }
     .header-logo { gap: 4px; }
     .title-notes { gap: 2px; }
     .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: 1rem; padding: 0 8px; }
-    .site-title-block h1 { font-size: 3rem; }
-    .logo-icon svg { width: 54px; height: 54px; }
+    /* 3rem (48px) forced "osu! 歌曲收藏" onto two lines on a ~390px screen
+       and it overlapped the logo ring — scale it with the viewport. */
+    .site-title-block h1 { font-size: clamp(1.7rem, 7.5vw, 2.6rem); letter-spacing: 1px; }
+    .logo-icon svg { width: 46px; height: 46px; }
+    .header-logo { gap: 6px; }
 }
 
 .site-header-top {
