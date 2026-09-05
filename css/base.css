@@ -1362,9 +1362,9 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 4px;
-        margin: -2px 0 10px;
-        padding-bottom: 8px;
+        gap: 8px;
+        margin: -2px 0 12px;
+        padding-bottom: 10px;
         border-bottom: 1px solid var(--border-card);
     }
     /* the drawer's own ☰ trigger is redundant once the bar is visible */
@@ -1377,8 +1377,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border: none;
     border-radius: 999px;
     color: rgba(255, 255, 255, 0.78);
-    padding: 7px 14px;
-    font-size: 0.88rem;
+    padding: 11px 20px;
+    font-size: 1.05rem;
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
