@@ -228,6 +228,9 @@ I18N.zh = {
     pp_goal_achieved: '🎉 已經達標！', pp_goal_result_label: '新成績至少需要',
 
     collection_db_btn_title: '匯出成 collection.db，直接丟進 osu! 使用', collection_db_title: '📦 匯出成 osu! Collection',
+    collection_compare_btn_title: '上傳一份舊的 JSON 備份，看跟現在的收藏差在哪', collection_compare_title: '⚔ 收藏差異比較',
+    collection_compare_hint: '上傳一份之前用「下載收藏成 JSON 備份檔」匯出的舊檔案，看跟現在的收藏比起來新增、移除了哪些圖——純比較，不會動到你現在的收藏。',
+    collection_compare_no_diff: '兩份收藏一模一樣，沒有差異',
     collection_io_title: '📦 osu! 遊戲收藏（匯入 / 匯出）',
     collection_io_import_hint: '從遊戲的 collection.db（在你的 osu! 資料夾裡）或別人分享的 .osdb 匯入。只會把你還沒有的圖加進來，並依原本的收藏名稱建立分類，不會覆蓋你現有的資料。',
     collection_io_import_btn: '選擇 .db / .osdb 檔匯入', collection_io_osdb_btn: '匯出 .osdb',

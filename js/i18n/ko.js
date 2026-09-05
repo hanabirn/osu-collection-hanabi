@@ -254,6 +254,9 @@ I18N.ko = {
     pp_goal_achieved: '🎉 이미 달성했습니다!', pp_goal_result_label: '새 기록에 최소 필요한 PP',
 
     collection_db_btn_title: 'collection.db로 내보내 osu!에 바로 넣기', collection_db_title: '📦 osu! 컬렉션으로 내보내기',
+    collection_compare_btn_title: '예전 JSON 백업을 업로드해서 뭐가 바뀌었는지 보기', collection_compare_title: '⚔ 컬렉션 비교',
+    collection_compare_hint: '"컬렉션을 JSON으로 다운로드" 버튼으로 예전에 내보낸 백업을 업로드하면 현재 컬렉션과 비교해서 뭐가 추가/삭제됐는지 볼 수 있어요 — 비교만 할 뿐, 현재 컬렉션은 전혀 바뀌지 않아요.',
+    collection_compare_no_diff: '두 컬렉션이 완전히 같아요 — 차이 없음',
     collection_io_title: '📦 osu! 게임 컬렉션 (가져오기 / 내보내기)',
     collection_io_import_hint: '게임의 collection.db(osu! 폴더 안)나 공유된 .osdb에서 가져옵니다. 아직 없는 비트맵만 추가하고 컬렉션 이름별로 분류를 만듭니다. 기존 데이터는 덮어쓰지 않습니다.',
     collection_io_import_btn: '.db / .osdb 파일 선택해서 가져오기', collection_io_osdb_btn: '.osdb 내보내기',

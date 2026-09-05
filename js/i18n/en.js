@@ -252,6 +252,9 @@ I18N.en = {
     pp_goal_achieved: '🎉 Already there!', pp_goal_result_label: 'New play needs at least',
 
     collection_db_btn_title: 'Export a collection.db to drop straight into osu!', collection_db_title: '📦 Export to osu! Collection',
+    collection_compare_btn_title: 'Upload an old JSON backup to see what changed since then', collection_compare_title: '⚔ Collection Diff',
+    collection_compare_hint: 'Upload an old backup from the "Download collection as JSON" button to see what was added or removed compared to your current collection — this only compares, it never touches your current collection.',
+    collection_compare_no_diff: 'Both collections are identical — no differences',
     collection_io_title: '📦 osu! Game Collections (import / export)',
     collection_io_import_hint: "Import from the game's collection.db (in your osu! folder) or a shared .osdb. Only adds sets you don't already have, and creates a category per collection name — nothing you already have is overwritten.",
     collection_io_import_btn: 'Choose a .db / .osdb file to import', collection_io_osdb_btn: 'Export .osdb',

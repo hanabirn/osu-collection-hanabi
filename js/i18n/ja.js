@@ -254,6 +254,9 @@ I18N.ja = {
     pp_goal_achieved: '🎉 すでに達成しています！', pp_goal_result_label: '新しいプレイに最低限必要なPP',
 
     collection_db_btn_title: 'collection.db を書き出して osu! にそのまま入れる', collection_db_title: '📦 osu! Collectionとして書き出す',
+    collection_compare_btn_title: '以前のJSONバックアップをアップロードして変化を確認', collection_compare_title: '⚔ コレクション比較',
+    collection_compare_hint: '「収藏をJSONバックアップとしてダウンロード」で以前に書き出したファイルをアップロードすると、現在のコレクションと比べて追加・削除されたものが分かります——比較するだけで、現在のコレクションが変わることはありません。',
+    collection_compare_no_diff: '両方のコレクションは同じです — 差分なし',
     collection_io_title: '📦 osu! ゲームのコレクション（読み込み / 書き出し）',
     collection_io_import_hint: 'ゲームの collection.db（osu! フォルダ内）や共有された .osdb から読み込みます。まだ持っていない譜面だけを追加し、コレクション名ごとにカテゴリを作成します。既存のデータは上書きされません。',
     collection_io_import_btn: '.db / .osdb ファイルを選んで読み込む', collection_io_osdb_btn: '.osdb を書き出す',

@@ -254,6 +254,9 @@ I18N.de = {
     pp_goal_achieved: '🎉 Bereits erreicht!', pp_goal_result_label: 'Neuer Play braucht mindestens',
 
     collection_db_btn_title: 'Eine collection.db exportieren, direkt für osu!', collection_db_title: '📦 Als osu! Collection exportieren',
+    collection_compare_btn_title: 'Lade ein altes JSON-Backup hoch, um Änderungen zu sehen', collection_compare_title: '⚔ Sammlungsvergleich',
+    collection_compare_hint: 'Lade ein altes Backup vom Button „Sammlung als JSON herunterladen" hoch, um zu sehen, was im Vergleich zu deiner aktuellen Sammlung hinzugefügt oder entfernt wurde — dies vergleicht nur, es ändert nie deine aktuelle Sammlung.',
+    collection_compare_no_diff: 'Beide Sammlungen sind identisch — keine Unterschiede',
     collection_io_title: '📦 osu!-Spielsammlungen (Import / Export)',
     collection_io_import_hint: 'Importiere aus der collection.db des Spiels (in deinem osu!-Ordner) oder einer geteilten .osdb. Es werden nur Sets hinzugefügt, die du noch nicht hast, und pro Sammlung eine Kategorie angelegt. Nichts Vorhandenes wird überschrieben.',
     collection_io_import_btn: '.db- / .osdb-Datei zum Importieren wählen', collection_io_osdb_btn: '.osdb exportieren',

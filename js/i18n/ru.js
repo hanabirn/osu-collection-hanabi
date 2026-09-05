@@ -254,6 +254,9 @@ I18N.ru = {
     pp_goal_achieved: '🎉 Уже достигнуто!', pp_goal_result_label: 'Новой игре нужно минимум',
 
     collection_db_btn_title: 'Экспорт в collection.db — сразу для osu!', collection_db_title: '📦 Экспорт в osu! Collection',
+    collection_compare_btn_title: 'Загрузите старую JSON-резервную копию, чтобы увидеть изменения', collection_compare_title: '⚔ Сравнение коллекций',
+    collection_compare_hint: 'Загрузите старую резервную копию, экспортированную кнопкой «Скачать коллекцию как JSON», чтобы увидеть, что добавилось или удалилось по сравнению с текущей коллекцией — это только сравнение, ваша текущая коллекция не изменится.',
+    collection_compare_no_diff: 'Обе коллекции идентичны — различий нет',
     collection_io_title: '📦 Игровые коллекции osu! (импорт / экспорт)',
     collection_io_import_hint: 'Импорт из игрового collection.db (в папке osu!) или из общего .osdb. Добавляются только карты, которых у вас ещё нет, и создаётся категория для каждой коллекции. Существующие данные не перезаписываются.',
     collection_io_import_btn: 'Выбрать файл .db / .osdb для импорта', collection_io_osdb_btn: 'Экспорт .osdb',

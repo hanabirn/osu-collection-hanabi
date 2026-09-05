@@ -992,6 +992,80 @@ async function importOsuCollection(event) {
     }
 }
 
+/* ===== Collection diff — compare an old exportOsuCollection() JSON backup
+   against the current collection =====
+   Purely a read: never touches localStorage, so unlike importOsuCollection
+   this doesn't need verifyOsuPassword(). Reuses the same export file shape
+   (same validation as importOsuCollection) so any backup a user already has
+   from the "下載收藏成 JSON 備份檔" button works as-is. */
+function diffOsuCollections(oldCol, newCol) {
+    const result = { added: [], removed: [] };
+    for (const mode of OSU_MODES) {
+        const oldIds = new Set((oldCol[mode] || []).map(s => s.beatmapset_id));
+        const newIds = new Set((newCol[mode] || []).map(s => s.beatmapset_id));
+        (newCol[mode] || []).forEach(s => { if (!oldIds.has(s.beatmapset_id)) result.added.push(s); });
+        (oldCol[mode] || []).forEach(s => { if (!newIds.has(s.beatmapset_id)) result.removed.push(s); });
+    }
+    return result;
+}
+
+function collectionCompareRowHtml(set, sign) {
+    return `<div class="collection-compare-row ${sign > 0 ? 'added' : 'removed'}">
+        <span class="collection-compare-sign">${sign > 0 ? '+' : '−'}</span>
+        <span class="collection-compare-title">${escHtml(set.title || ('#' + set.beatmapset_id))}</span>
+        <span class="collection-compare-artist">${escHtml(set.artist || '')}</span>
+    </div>`;
+}
+
+function renderCollectionCompareResult(diff) {
+    const body = document.getElementById('collection-compare-body');
+    if (!body) return;
+    if (diff.added.length === 0 && diff.removed.length === 0) {
+        body.innerHTML = `<p class="osu-empty">${t('collection_compare_no_diff')}</p>`;
+        return;
+    }
+    body.innerHTML = `
+        <div class="collection-compare-summary">
+            <span class="collection-compare-added-count">+${diff.added.length}</span>
+            <span class="collection-compare-removed-count">−${diff.removed.length}</span>
+        </div>
+        <div class="collection-compare-list">
+            ${diff.added.map(s => collectionCompareRowHtml(s, 1)).join('')}
+            ${diff.removed.map(s => collectionCompareRowHtml(s, -1)).join('')}
+        </div>`;
+}
+
+async function compareOsuCollectionFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const body = document.getElementById('collection-compare-body');
+    document.getElementById('collection-compare-modal').style.display = 'flex';
+    body.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+
+    let data;
+    try {
+        const text = await file.text();
+        data = JSON.parse(text);
+    } catch (e) {
+        body.innerHTML = `<p class="osu-empty">${t('osu_import_fail_json')}</p>`;
+        event.target.value = '';
+        return;
+    }
+    if (!data || typeof data !== 'object' || !data.collection || !OSU_MODES.every(m => Array.isArray(data.collection[m]))) {
+        body.innerHTML = `<p class="osu-empty">${t('osu_import_fail_format')}</p>`;
+        event.target.value = '';
+        return;
+    }
+
+    const diff = diffOsuCollections(data.collection, getOsuCollection());
+    renderCollectionCompareResult(diff);
+    event.target.value = '';
+}
+
+function closeCollectionCompareModal() {
+    document.getElementById('collection-compare-modal').style.display = 'none';
+}
+
 /* ===== Export to osu!'s own collection.db =====
    Binary format per ppy's "Legacy database file structure" docs (also used
    by community tools like osu-db and osu!collection exporter): int32
