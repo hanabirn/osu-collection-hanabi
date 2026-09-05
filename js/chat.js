@@ -67,6 +67,21 @@ async function loadInitialChatMessages() {
     }
 }
 
+/* Appends only messages not already in the DOM. Needed because a poll in
+   flight when sendChatMessage() optimistically appends its own just-sent
+   message (or two overlapping polls) can otherwise race and render the same
+   message twice — id doubles as both the poll cursor and a dedupe key. */
+function chatAppendMessages(listEl, messages) {
+    const fresh = messages.filter(m => !document.getElementById(`chat-msg-${m.id}`));
+    if (!fresh.length) return;
+    const wasNearBottom = chatIsNearBottom(listEl);
+    const empty = listEl.querySelector('.osu-empty');
+    if (empty) listEl.innerHTML = '';
+    listEl.insertAdjacentHTML('beforeend', fresh.map(chatMessageHtml).join(''));
+    chatLastId = Math.max(chatLastId, fresh[fresh.length - 1].id);
+    if (wasNearBottom) listEl.scrollTop = listEl.scrollHeight;
+}
+
 async function pollChatMessages() {
     const listEl = document.getElementById('chat-messages-list');
     if (!listEl) return;
@@ -76,13 +91,7 @@ async function pollChatMessages() {
         const data = await res.json();
         const messages = data.messages || [];
         if (!messages.length) return;
-
-        const wasNearBottom = chatIsNearBottom(listEl);
-        const empty = listEl.querySelector('.osu-empty');
-        if (empty) listEl.innerHTML = '';
-        listEl.insertAdjacentHTML('beforeend', messages.map(chatMessageHtml).join(''));
-        chatLastId = messages[messages.length - 1].id;
-        if (wasNearBottom) listEl.scrollTop = listEl.scrollHeight;
+        chatAppendMessages(listEl, messages);
     } catch (e) {
         console.error('Chat poll failed:', e);
     }
@@ -186,10 +195,10 @@ async function sendChatMessage() {
 
         const listEl = document.getElementById('chat-messages-list');
         if (listEl) {
-            const empty = listEl.querySelector('.osu-empty');
-            if (empty) listEl.innerHTML = '';
-            listEl.insertAdjacentHTML('beforeend', chatMessageHtml(data.message));
-            chatLastId = Math.max(chatLastId, data.message.id);
+            // A poll already in flight when this resolves can render the same
+            // message first — chatAppendMessages() no-ops in that case rather
+            // than duplicating it.
+            chatAppendMessages(listEl, [data.message]);
             // Always jump to the bottom for your own just-sent message,
             // regardless of prior scroll position — unlike a poll picking up
             // someone else's message, you unambiguously want to see this one.
