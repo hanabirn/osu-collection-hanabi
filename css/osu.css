@@ -2393,11 +2393,17 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .pp-compare-vs { font-size: 0.8rem; font-weight: bold; color: var(--text-dim2); }
 
 /* ===== Two-player Top Play comparison (loadPpCompareTopPlays) =====
-   auto-fit/minmax rather than a fixed 2-column grid: .pp-compare-card can
-   end up quite narrow (it shares a row with the single-player lookup card
-   above 760px — see .lookup-page-row), so this self-stacks to one column
-   there and only goes side-by-side once there's actually ~480px+ to split,
-   same width each .osu-recent-item already needs to read comfortably. */
+   auto-fit/minmax rather than a fixed 2-column grid so this still stacks to
+   one column on a true single-column phone layout. .pp-compare-card shares
+   a row with the single-player lookup card above 760px (see .lookup-page-row)
+   and is capped at max-width:520px there, so its usable interior is only
+   ~470px after padding — a 240px minimum (2*240=480) never actually fit two
+   columns in that shared-row layout, forcing a permanent single-column stack
+   even on wide desktop screens. 200px (2*200=400, comfortably under ~470px)
+   matches the mobile-fallback minimum already used for this same card type
+   elsewhere (#farm-maps-list/#catalog-list/.mappool-list at <=480px) and
+   reliably gives two side-by-side columns whenever the compare card itself
+   has reasonable width. */
 .pp-compare-topplays-title {
     margin: 1rem 0 10px;
     text-align: center;
@@ -2406,7 +2412,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .pp-compare-topplays-columns {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 14px;
 }
 .pp-compare-topplays-col { display: flex; flex-direction: column; gap: 6px; }

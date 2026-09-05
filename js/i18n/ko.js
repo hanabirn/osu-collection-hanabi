@@ -68,6 +68,7 @@ I18N.ko = {
     osu_category_delete_confirm: '이 카테고리를 삭제할까요? (수집한 비트맵은 삭제되지 않고 태그만 제거됩니다)',
     osu_category_add_title: '카테고리 추가', osu_category_rename_title: '이름 변경', osu_category_delete_title: '카테고리 삭제',
     osu_category_btn_title: '카테고리에 추가...', osu_category_picker_title: '카테고리 선택',
+    osu_fav_btn_title: '즐겨찾기에 추가', osu_unfav_btn_title: '즐겨찾기에서 제거', osu_delete_btn_title: '삭제',
     osu_category_picker_empty: '아직 카테고리가 없습니다. +를 눌러 추가해보세요!', osu_empty_category: '이 카테고리에는 아직 비트맵이 없습니다',
     osu_category_manage_title: '카테고리 관리',
     osu_searching: '검색 중...', osu_not_found: '비트맵을 찾을 수 없습니다',
@@ -178,6 +179,7 @@ I18N.ko = {
     farm_coverage_pending: '데이터베이스를 아직 준비 중입니다. 잠시 후 다시 확인해주세요',
     farm_coverage: '{n}개 맵 수집됨 · 마지막 업데이트 {t} (데이터베이스가 계속 늘어나는 중이며 아직 모든 ranked 맵을 다루지 못합니다)',
     farm_only_toggle: '🔥 파밍맵만 보기',
+    farm_only_toggle_title: 'osu!／taiko: Top 50 중 DT 비율 ≥ 70%; catch／mania: Top 50 중 100% acc 비율 ≥ 70%(모두 플레이 횟수 ≥ 500 필요)',
     farm_coverage_farm: '(파밍맵 기준 충족: {n}개 / 분류 완료 {c}개)',
 
     cdn_lib_fail: '외부 구성요소를 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도하세요',

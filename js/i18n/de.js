@@ -68,6 +68,7 @@ I18N.de = {
     osu_category_delete_confirm: 'Diese Kategorie löschen? (Beatmaps bleiben in deiner Sammlung — nur das Tag wird entfernt.)',
     osu_category_add_title: 'Kategorie hinzufügen', osu_category_rename_title: 'Umbenennen', osu_category_delete_title: 'Kategorie löschen',
     osu_category_btn_title: 'Zu Kategorien hinzufügen...', osu_category_picker_title: 'Kategorien wählen',
+    osu_fav_btn_title: 'Zu Favoriten hinzufügen', osu_unfav_btn_title: 'Aus Favoriten entfernen', osu_delete_btn_title: 'Entfernen',
     osu_category_picker_empty: 'Noch keine Kategorien — klicke auf +, um eine hinzuzufügen!', osu_empty_category: 'Noch keine Beatmaps in dieser Kategorie',
     osu_category_manage_title: 'Kategorien verwalten',
     osu_searching: 'Suche...', osu_not_found: 'Beatmap nicht gefunden',
@@ -178,6 +179,7 @@ I18N.de = {
     farm_coverage_pending: 'Die Datenbank wird noch aufgebaut, schau bald wieder vorbei',
     farm_coverage: '{n} Maps erfasst · zuletzt aktualisiert {t} (Datenbank wächst noch, deckt noch nicht alle ranked Maps ab)',
     farm_only_toggle: '🔥 Nur Farm-Maps',
+    farm_only_toggle_title: 'osu!／taiko: DT-Anteil in den Top 50 ≥ 70 %; catch／mania: Anteil mit 100 % Genauigkeit in den Top 50 ≥ 70 % (jeweils ≥ 500 Spiele erforderlich)',
     farm_coverage_farm: '({n} als Farm-Map eingestuft von {c} bewerteten)',
 
     cdn_lib_fail: 'Eine externe Komponente konnte nicht geladen werden — Verbindung prüfen und erneut versuchen',

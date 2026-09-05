@@ -471,7 +471,7 @@ function renderGalleryDetailGrid() {
             <img class="gallery-detail-item-bg" src="${coverUrl}" alt="" loading="lazy" onerror="this.style.visibility='hidden';">
             <div class="gallery-detail-item-overlay"></div>
             ${modeBadge}
-            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event); event.preventDefault();" title="播放預覽">${icon('play', { filled: true })}</button>
+            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event); event.preventDefault();" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
             <div class="gallery-detail-item-info">
                 <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
                 <span class="gallery-detail-item-stars">${maxDiff.toFixed(2)}⭐</span>

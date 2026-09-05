@@ -65,6 +65,7 @@ I18N.zh = {
     osu_category_delete_confirm: '確定要刪除這個分類嗎？（不會刪除收藏的圖譜，只移除分類標籤）',
     osu_category_add_title: '新增分類', osu_category_rename_title: '重新命名', osu_category_delete_title: '刪除分類',
     osu_category_btn_title: '加入分類...', osu_category_picker_title: '選擇分類',
+    osu_fav_btn_title: '加入最愛', osu_unfav_btn_title: '取消最愛', osu_delete_btn_title: '移除',
     osu_category_picker_empty: '還沒有任何分類，點擊 ＋ 新增！', osu_empty_category: '這個分類還沒有圖譜',
     osu_category_manage_title: '管理分類',
     osu_searching: '搜尋中...', osu_not_found: '找不到該 Beatmap，請確認 ID 或網址是否正確',
@@ -176,6 +177,7 @@ I18N.zh = {
     farm_coverage_pending: '資料庫尚在準備中，稍後再回來看看',
     farm_coverage: '已收錄 {n} 張圖・上次更新於 {t}（資料庫持續擴充中，尚未涵蓋全部 ranked 圖）',
     farm_only_toggle: '🔥 只看農圖',
+    farm_only_toggle_title: 'osu!／taiko：Top 50 中 DT 佔比 ≥ 70%；catch／mania：Top 50 中 100% acc 佔比 ≥ 70%（皆需遊玩次數 ≥ 500）',
     farm_coverage_farm: '（符合農圖標準：{n} 張，已分類 {c} 張）',
 
     cdn_lib_fail: '外部元件載入失敗，請檢查網路後重試',

@@ -68,6 +68,7 @@ I18N.ru = {
     osu_category_delete_confirm: 'Удалить эту категорию? (Битмапы останутся в коллекции — удалится только тег.)',
     osu_category_add_title: 'Добавить категорию', osu_category_rename_title: 'Переименовать', osu_category_delete_title: 'Удалить категорию',
     osu_category_btn_title: 'Добавить в категории...', osu_category_picker_title: 'Выберите категории',
+    osu_fav_btn_title: 'Добавить в избранное', osu_unfav_btn_title: 'Убрать из избранного', osu_delete_btn_title: 'Удалить',
     osu_category_picker_empty: 'Пока нет категорий — нажмите +, чтобы добавить!', osu_empty_category: 'В этой категории пока нет битмапов',
     osu_category_manage_title: 'Управление категориями',
     osu_searching: 'Поиск...', osu_not_found: 'Битмап не найден',
@@ -178,6 +179,7 @@ I18N.ru = {
     farm_coverage_pending: 'База данных ещё формируется, загляните позже',
     farm_coverage: 'Проиндексировано карт: {n} · обновлено {t} (база пополняется, охватывает не все ranked карты)',
     farm_only_toggle: '🔥 Только фарм-карты',
+    farm_only_toggle_title: 'osu!／taiko: доля DT в Топ-50 ≥ 70%; catch／mania: доля 100%-acc в Топ-50 ≥ 70% (нужно ≥ 500 игр)',
     farm_coverage_farm: '(соответствуют критериям фарм-карты: {n} из {c} проверенных)',
 
     cdn_lib_fail: 'Не удалось загрузить внешний компонент — проверьте подключение и повторите',

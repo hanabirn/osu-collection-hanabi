@@ -68,6 +68,7 @@ I18N.ja = {
     osu_category_delete_confirm: 'このカテゴリを削除しますか？（収蔵したビートマップは削除されません。タグだけが外れます）',
     osu_category_add_title: 'カテゴリを追加', osu_category_rename_title: '名前を変更', osu_category_delete_title: 'カテゴリを削除',
     osu_category_btn_title: 'カテゴリに追加...', osu_category_picker_title: 'カテゴリを選択',
+    osu_fav_btn_title: 'お気に入りに追加', osu_unfav_btn_title: 'お気に入りから削除', osu_delete_btn_title: '削除',
     osu_category_picker_empty: 'まだカテゴリがありません。＋をクリックして追加しましょう！', osu_empty_category: 'このカテゴリにはまだビートマップがありません',
     osu_category_manage_title: 'カテゴリを管理',
     osu_searching: '検索中...', osu_not_found: 'ビートマップが見つかりません',
@@ -178,6 +179,7 @@ I18N.ja = {
     farm_coverage_pending: 'データベースを準備中です。しばらくしてからまた確認してください',
     farm_coverage: '{n} 件の譜面を収録・最終更新 {t}（データベースは構築中で、まだすべての ranked 譜面を網羅していません）',
     farm_only_toggle: '🔥 農圖のみ表示',
+    farm_only_toggle_title: 'osu!／taiko：Top 50 中の DT 割合 ≥ 70%；catch／mania：Top 50 中の 100% acc 割合 ≥ 70%（いずれもプレイ回数 500 回以上が必要）',
     farm_coverage_farm: '（農圖基準を満たす譜面：{n} 件 / 判定済み {c} 件）',
 
     cdn_lib_fail: '外部コンポーネントの読み込みに失敗しました。接続を確認して再試行してください',
