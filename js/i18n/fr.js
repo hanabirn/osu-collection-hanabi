@@ -75,6 +75,7 @@ I18N.fr = {
     digest_pp: 'PP {d} (depuis le {from})',
     digest_notifs: '{n} nouveautés',
     digest_practice: '{name} {d}pp · {hits}/{total} dans ton top 100',
+    digest_on_this_day: 'Il y a {years} an(s) jour pour jour, tu as ajouté « {title} »',
     digest_logged_out: 'Connecte-toi et cet encart affichera tes variations de PP, l’activité des joueurs / mappeurs suivis et les résultats de tes collections d’entraînement',
     digest_welcome: 'Bienvenue, {name} ! Tu te suis maintenant toi-même — on te préviendra quand ton PP change',
     digest_welcome_import: 'Importer favoris / plus jouées',

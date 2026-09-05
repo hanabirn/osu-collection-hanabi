@@ -75,6 +75,7 @@ I18N.es = {
     digest_pp: 'PP {d} (desde el {from})',
     digest_notifs: '{n} novedades',
     digest_practice: '{name} {d}pp · {hits}/{total} en tu top 100',
+    digest_on_this_day: 'Hace {years} año(s), añadiste "{title}"',
     digest_logged_out: 'Inicia sesión y aquí verás tus cambios de PP, la actividad de jugadores / mappers seguidos y los resultados de tus colecciones de práctica',
     digest_welcome: '¡Bienvenido, {name}! Ahora te sigues a ti mismo — te avisaremos cuando cambie tu PP',
     digest_welcome_import: 'Importar favoritos / más jugados',

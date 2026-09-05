@@ -2266,6 +2266,53 @@ const DIGEST_PP_CHECK_KEY = 'osu_digest_pp_checked_at';
 const DIGEST_PROMPT_DISMISSED_KEY = 'osu_digest_prompt_dismissed';
 const DIGEST_PP_CHECK_MS = 6 * 60 * 60 * 1000;
 
+/* Jumps to the collection tab pre-filtered by a title/artist string. Takes
+   the query URI-encoded (with `'` additionally escaped to %27, since
+   encodeURIComponent alone doesn't touch it — see chatEncodeForOnclick in
+   js/chat.js for the same fix) rather than embedding raw beatmap text
+   straight into an inline onclick="" attribute, because titles can contain
+   quotes that would otherwise break the attribute or need fragile escaping. */
+function jumpToCollectionSearch(encodedQuery) {
+    const query = decodeURIComponent(encodedQuery);
+    switchTab('collection');
+    const input = document.getElementById('osu-search-input');
+    if (input) input.value = query;
+    filterOsuCollection(query);
+}
+
+/* "On this day" — surfaces a set added on this exact month/day in a past
+   year, using the addedAt timestamps already saved per-set (same field the
+   growth chart in the stats dashboard reads). Picks the oldest matching
+   anniversary (most years back) when more than one set qualifies, since
+   that's the more nostalgic one. Returns null (no row) on any day with no
+   match — there's no sensible "closest" fallback for a feature that's
+   specifically about the actual date. */
+function digestOnThisDayRow() {
+    const col = getOsuCollection();
+    const seen = new Set();
+    const allSets = OSU_MODES.flatMap(m => col[m]).filter(s => {
+        if (!s.addedAt || seen.has(s.beatmapset_id)) return false;
+        seen.add(s.beatmapset_id);
+        return true;
+    });
+    const today = new Date();
+    const mmdd = `${today.getMonth()}-${today.getDate()}`;
+    const matches = allSets
+        .map(s => ({ s, added: new Date(s.addedAt) }))
+        .filter(({ added }) => added.getFullYear() !== today.getFullYear() && `${added.getMonth()}-${added.getDate()}` === mmdd)
+        .sort((a, b) => a.added - b.added);
+    if (!matches.length) return null;
+
+    const { s: set, added } = matches[0];
+    const years = today.getFullYear() - added.getFullYear();
+    const query = set.title || set.artist || '';
+    return {
+        icon: 'calendar',
+        text: t('digest_on_this_day', { years, title: query }),
+        action: `jumpToCollectionSearch('${encodeURIComponent(query).replace(/'/g, '%27')}')`,
+    };
+}
+
 function dismissDigestPrompt() {
     try { localStorage.setItem(DIGEST_PROMPT_DISMISSED_KEY, '1'); } catch {}
     const el = document.getElementById('collection-digest');
@@ -2404,6 +2451,12 @@ async function renderCollectionDigest() {
     try {
         const pr = await digestPracticeRow(user);
         if (pr) rows.push(pr);
+    } catch { /* skip */ }
+
+    // "on this day" anniversary
+    try {
+        const otd = digestOnThisDayRow();
+        if (otd) rows.push(otd);
     } catch { /* skip */ }
 
     stamp();

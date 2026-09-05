@@ -75,6 +75,7 @@ I18N.ja = {
     digest_pp: 'PP {d}（{from} 以降）',
     digest_notifs: '新着 {n} 件',
     digest_practice: '{name} {d}pp · {hits}/{total} が top 100 入り',
+    digest_on_this_day: '{years}年前の今日、「{title}」を追加しました',
     digest_logged_out: 'ログインすると、PP の変化、追跡中のプレイヤー／マッパーの動き、練習コレクションの成果がここに表示されます',
     digest_welcome: 'ようこそ、{name} さん！自分を追跡に追加しました — PP が変化したら通知します',
     digest_welcome_import: 'お気に入り／よくプレイをまとめて取り込み',

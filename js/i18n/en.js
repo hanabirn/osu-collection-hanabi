@@ -72,6 +72,7 @@ I18N.en = {
     hero_login_cta: 'Log in with osu! to pull in your favourites',
     digest_title: 'Since you were away', digest_pp: 'PP {d} (since {from})', digest_notifs: '{n} new updates',
     digest_practice: '{name} {d}pp · {hits}/{total} in your top 100',
+    digest_on_this_day: '{years} year(s) ago today, you added "{title}"',
     digest_logged_out: 'Log in and this shows your PP changes, tracked player / mapper activity, and practice-collection results',
     digest_welcome: 'Welcome, {name}! You’re now tracking yourself — we’ll notify you when your PP changes',
     digest_welcome_import: 'Import favourites / most-played',
