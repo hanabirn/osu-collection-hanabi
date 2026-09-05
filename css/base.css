@@ -1395,8 +1395,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 /* ===== Page-refresh FAB =====
    The old header refresh button, promoted to a fixed circular control so
    it's reachable while scrolling any tab. Glassmorphism + faint purple
-   glow; sits above the decorative .world-globe (pointer-events:none) in
-   the bottom-right corner. */
+   glow; sits in the bottom-right corner. */
 .page-refresh-fab {
     position: fixed;
     right: 24px;
@@ -1542,6 +1541,70 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-main { margin-top: -32px; border-radius: 22px 22px 0 0; }
 }
 
+/* ===== Side rails — fill the gutters beside .site-main on a wide monitor =====
+   Positioned relative to .site-main itself (not the viewport) via
+   right/left: calc(100% + gap), so they start exactly where the content
+   column starts (clearing the hero) rather than needing to be pinned to
+   the viewport and manually dodge it. Only shown once there's provably
+   enough room either side to clear the 1080px column without touching it
+   — at 1700px that's a (1700-1080)/2 = 310px gutter each side, comfortably
+   more than this rail's 260px + 32px gap. Replaced the old decorative
+   .world-globe (css/particles.css, removed) which sat in this same visual
+   area doing nothing but spin. */
+.side-rail {
+    position: absolute;
+    top: 0;
+    width: 260px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--shadow-card), var(--shadow-card-inset);
+    display: none;
+}
+.side-rail-left { right: calc(100% + 32px); }
+.side-rail-right { left: calc(100% + 32px); }
+@media (min-width: 1700px) {
+    .side-rail { display: block; }
+}
+.side-rail-title {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: var(--text-pink);
+    margin-bottom: 12px;
+}
+.side-rail-list { display: flex; flex-direction: column; gap: 8px; }
+.side-rail-item {
+    display: flex;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s var(--ease-out);
+}
+.side-rail-item:hover { background: var(--bg-stat); }
+.side-rail-item-body { min-width: 0; flex: 1; }
+.side-rail-item-text {
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.side-rail-item-text b { color: var(--text-pink); }
+.side-rail-item-text .icon-svg { color: var(--text-dim2); }
+.side-rail-item-time { font-size: 0.68rem; color: var(--text-dim2); margin-top: 3px; }
+.side-rail-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.side-rail-stats-grid .osu-stat { padding: 10px 6px; }
+.side-rail-stats-grid .osu-stat-value { font-size: 1rem; }
+
 /* ===== Touch / phone: lighten the stacked frosted surfaces =====
    .site-header, .site-main and .site-page each carry their own
    backdrop-filter and they nest, so every composite re-samples and
@@ -1586,9 +1649,9 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
        tab shell is affected, not the inner .osu-card etc. */
     background: var(--site-page-bg);
     /* Frosted-glass so the ambient background layer (.bg-layer's glows/
-       particles/world-globe, css/particles.css) and, where they overlap,
-       the header cover image still show through as soft blurred color/light
-       behind the card instead of being fully blocked by its own background. */
+       particles, css/particles.css) and, where they overlap, the header
+       cover image still show through as soft blurred color/light behind
+       the card instead of being fully blocked by its own background. */
     backdrop-filter: blur(18px) saturate(1.25);
     -webkit-backdrop-filter: blur(18px) saturate(1.25);
     /* Upward "floating above the header" shadow first, then the card's

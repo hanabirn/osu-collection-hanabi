@@ -84,67 +84,6 @@
     transform: translate(-50%, -50%);
 }
 
-/* ── Globe with orbiting satellites — a small sphere hint (limb + a
-   flattened "equator" ellipse for a 3D suggestion, far less busy than a
-   full lat/long grid) ringed by two tilted elliptical orbit paths, each
-   with a dot travelling around it via native SMIL <animateMotion> tracing
-   the paired <path>'s exact geometry (see the <mpath> reference in
-   index.html) — precise elliptical motion that plain CSS keyframes can't
-   give without hand-computing an x/y curve. .world-globe-spin turns just
-   the sphere itself slowly; the two .globe-orbit-group tilts stay fixed
-   (like the reference photo's crossed rings) while their satellites move
-   independently at different speeds so the two never sync up. The pair of
-   .globe-dot markers on the sphere are the more literal "activity/rhythm
-   pulse" — same beat-pulse idea as .hit-circle below, just placed on the
-   globe's surface instead of scattered loose. Pinned to the bottom-right
-   corner but kept fully on-screen (no negative inset, no radial mask) —
-   the orbit ellipses reach close to the SVG viewBox's own edges, so both
-   of those were cropping into the rings themselves rather than just
-   softening a background edge, which read as the globe being cut off. ── */
-.world-globe {
-    position: absolute;
-    bottom: 20px;
-    right: 12px;
-    width: min(50vw, 400px);
-    height: min(50vw, 400px);
-    opacity: 0.7;
-}
-.globe-line {
-    fill: none;
-    stroke: rgba(var(--accent-purple-rgb), 0.5);
-    stroke-width: 0.7;
-}
-.globe-limb { stroke: rgba(var(--accent-purple-rgb), 0.7); stroke-width: 1; }
-.globe-orbit {
-    fill: none;
-    stroke: rgba(var(--accent-cyan-rgb), 0.4);
-    stroke-width: 0.6;
-}
-.globe-satellite {
-    fill: var(--accent-cyan);
-    filter: drop-shadow(0 0 4px var(--accent-cyan));
-}
-.globe-satellite-b {
-    fill: var(--accent-pink);
-    filter: drop-shadow(0 0 4px var(--accent-pink));
-}
-.globe-dot {
-    fill: var(--accent-cyan);
-    filter: drop-shadow(0 0 3px var(--accent-cyan));
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: globeDotPulse 3.2s ease-in-out infinite;
-}
-.globe-dot:nth-of-type(2) { animation-delay: 1.4s; }
-.world-globe-spin { animation: worldGlobeSpin 120s linear infinite; transform-origin: 100px 100px; }
-@keyframes worldGlobeSpin {
-    to { transform: rotate(360deg); }
-}
-@keyframes globeDotPulse {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50%      { opacity: 1; transform: scale(1.8); }
-}
-
 /* ── Hit-circle geometry (osu!'s own ring motif, used as faint ambient decoration) ── */
 .hit-circles { position: absolute; inset: 0; }
 .hit-circle {
@@ -171,22 +110,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hit-circle, .world-globe-spin, .globe-dot { animation: none; }
-    /* The orbiting dots use SMIL <animateMotion>, which CSS `animation: none`
-       can't stop — hiding them outright is the simplest way to honor
-       reduced-motion here (the static orbit rings/sphere stay visible). */
-    .globe-satellite { display: none; }
+    .hit-circle { animation: none; }
 }
 
 /* ── Touch / phone: drop the moving ambient decoration entirely ──
-   The particle canvas, the spinning globe and the pulsing hit-circles are
-   pure decoration and were the reason the compositor never idled on a
-   still page — enough to warm an iPhone within minutes. Phones keep the
-   static gradient + still glow blobs + the beating logo; nothing here
-   loops. (js/particles.js bails on the same media query, so the canvas is
-   never even initialised.) */
+   The particle canvas and the pulsing hit-circles are pure decoration and
+   were part of why the compositor never idled on a still page — enough to
+   warm an iPhone within minutes. Phones keep the static gradient + still
+   glow blobs + the beating logo; nothing here loops. (js/particles.js
+   bails on the same media query, so the canvas is never even initialised.) */
 @media (hover: none), (max-width: 700px) {
     #particles-canvas { display: none; }
-    .world-globe { display: none; }
     .hit-circles { display: none; }
 }

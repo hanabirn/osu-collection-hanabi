@@ -29,6 +29,11 @@ I18N.ko = {
     dm_thread_empty: '아직 메시지가 없어요. 인사를 건네보세요!',
     dm_back_btn: '뒤로',
     dm_self_error: '자신에게는 메시지를 보낼 수 없습니다',
+
+    side_rail_activity_title: '✦ 최신 소식 ✦', side_rail_stats_title: '✦ 사이트 통계 ✦',
+    side_rail_published_collection: '님이 컬렉션을 발행했습니다', side_rail_activity_empty: '아직 소식이 없습니다',
+    side_rail_just_now: '방금 전', side_rail_minutes_ago: '{n}분 전', side_rail_hours_ago: '{n}시간 전', side_rail_days_ago: '{n}일 전',
+    side_rail_stat_catalog: '곡 카탈로그 수록 곡수', side_rail_stat_mappools: '월드컵 매핑풀 맵 수', side_rail_stat_farm: 'Farm 맵 데이터베이스', side_rail_stat_gallery: '컬렉션 공유 수',
     global_search_title: '전체 검색', global_search_placeholder: '곡, 매핑풀, 내 컬렉션 검색...',
     global_search_section_collection: '내 컬렉션', global_search_section_catalog: '곡 분류', global_search_section_mappools: '월드컵 매핑풀',
     global_search_empty: '일치하는 결과가 없습니다',

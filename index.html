@@ -47,31 +47,6 @@
     <div class="bg-glow glow-1"></div>
     <div class="bg-glow glow-2"></div>
     <div class="bg-glow glow-3"></div>
-    <svg class="world-globe" viewBox="0 0 200 200" aria-hidden="true">
-        <g class="world-globe-spin">
-            <circle class="globe-line globe-limb" cx="100" cy="100" r="58"/>
-            <ellipse class="globe-line" cx="100" cy="100" rx="58" ry="20"/>
-            <line class="globe-line" x1="100" y1="42" x2="100" y2="158"/>
-            <circle class="globe-dot" cx="78" cy="78" r="2.6"/>
-            <circle class="globe-dot" cx="122" cy="118" r="2.6"/>
-        </g>
-        <g class="globe-orbit-group" transform="rotate(-20 100 100)">
-            <path id="globeOrbit1" class="globe-orbit" d="M14,100 A86,34 0 1,0 186,100 A86,34 0 1,0 14,100" fill="none"/>
-            <circle class="globe-satellite" r="3.4">
-                <animateMotion dur="9s" repeatCount="indefinite">
-                    <mpath href="#globeOrbit1"/>
-                </animateMotion>
-            </circle>
-        </g>
-        <g class="globe-orbit-group" transform="rotate(26 100 100)">
-            <path id="globeOrbit2" class="globe-orbit" d="M8,100 A92,44 0 1,0 192,100 A92,44 0 1,0 8,100" fill="none"/>
-            <circle class="globe-satellite globe-satellite-b" r="2.8">
-                <animateMotion dur="13s" repeatCount="indefinite">
-                    <mpath href="#globeOrbit2"/>
-                </animateMotion>
-            </circle>
-        </g>
-    </svg>
     <div class="hit-circles">
         <div class="hit-circle hc-1"></div>
         <div class="hit-circle hc-2"></div>
@@ -232,6 +207,18 @@
 </div>
 
 <main class="site-main">
+
+<!-- Wide-screen-only side panels filling the empty gutters beside this
+     centered column with live content instead of pure decoration — see
+     css/base.css .side-rail and js/side-rails.js. Hidden below 1700px. -->
+<aside class="side-rail side-rail-left" id="side-rail-activity">
+    <div class="side-rail-title" data-i18n="side_rail_activity_title">✦ 最新動態 ✦</div>
+    <div class="side-rail-list" id="side-rail-activity-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
+</aside>
+<aside class="side-rail side-rail-right" id="side-rail-stats">
+    <div class="side-rail-title" data-i18n="side_rail_stats_title">✦ 本站數據 ✦</div>
+    <div class="side-rail-stats-grid" id="side-rail-stats-grid"></div>
+</aside>
 
 <!-- Persistent horizontal nav for desktop — the ☰ drawer is the only nav
      on mobile, but on a wide screen the primary tabs should just be visible.
@@ -1115,6 +1102,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/updates.js"></script>
 <script defer src="js/chat.js"></script>
 <script defer src="js/dm.js"></script>
+<script defer src="js/side-rails.js"></script>
 <script defer src="js/resources-data.js"></script>
 <script defer src="js/tournaments.js"></script>
 <script defer src="js/celebrate.js"></script>
