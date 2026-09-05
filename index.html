@@ -739,7 +739,7 @@
                 <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
             </div>
             <div id="chat-input-row" class="input-group" style="display:none;">
-                <input type="text" id="chat-input" maxlength="300" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
+                <input type="text" id="chat-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
                 <button onclick="sendChatMessage()" data-i18n="chat_send_btn">送出</button>
             </div>
         </div>
@@ -772,7 +772,7 @@
             </div>
             <div id="dm-thread-messages" class="chat-messages-list"></div>
             <div class="input-group">
-                <input type="text" id="dm-thread-input" maxlength="300" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDmMessage();}">
+                <input type="text" id="dm-thread-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDmMessage();}">
                 <button onclick="sendDmMessage()" data-i18n="chat_send_btn">送出</button>
             </div>
         </div>

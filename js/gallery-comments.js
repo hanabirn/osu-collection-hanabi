@@ -75,7 +75,7 @@ function renderGalleryCommentsComposer() {
     const el = document.getElementById('gallery-comments-composer');
     if (!el) return;
     el.innerHTML = `
-        <input type="text" id="gallery-comment-input" maxlength="300"
+        <input type="text" id="gallery-comment-input" maxlength="300" autocomplete="off"
             data-i18n-placeholder="gallery_comments_placeholder" placeholder="${t('gallery_comments_placeholder')}"
             onkeydown="if(event.key==='Enter') sendGalleryComment()">
         <button class="btn" onclick="sendGalleryComment()">${t('gallery_comments_send')}</button>`;
