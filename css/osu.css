@@ -3438,6 +3438,18 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     line-height: 1.5;
     word-break: break-word;
 }
+.chat-translation {
+    margin-top: 4px;
+    padding: 5px 10px;
+    border-left: 2px solid rgba(var(--accent-purple-rgb), 0.5);
+    background: var(--bg-stat);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+.chat-translation .icon-svg { font-style: normal; }
+.chat-translation-error { color: #ff8080; font-style: normal; }
 
 /* Beatmap-add card — the site's own differentiator vs. a plain-text/generic
    score-preview chat: a horizontal card (not the site's usual 4:1 .osu-card

@@ -15,6 +15,8 @@ I18N.ko = {
     chat_login_required: 'osu!에 로그인해야 채팅할 수 있습니다',
     chat_reply_btn_title: '이 메시지에 답장', chat_reply_cancel_title: '답장 취소',
     chat_view_profile_title: '이 플레이어의 osu! 프로필 보기',
+    chat_translate_btn_title: '이 메시지 번역', chat_translate_hide_title: '번역 숨기기',
+    chat_translate_loading: '번역 중...', chat_translate_fail: '번역 실패, 나중에 다시 시도해 주세요',
     chat_replying_to: '{name}님에게 답장: {content}',
     chat_delete_btn_title: '이 메시지 삭제', chat_delete_confirm: '이 메시지를 삭제하시겠습니까?', chat_delete_fail: '삭제 실패',
     chat_add_to_collection_btn: '컬렉션에 추가',

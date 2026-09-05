@@ -15,6 +15,8 @@ I18N.fr = {
     chat_login_required: 'Connectez-vous avec osu! pour discuter',
     chat_reply_btn_title: 'Répondre à ce message', chat_reply_cancel_title: 'Annuler la réponse',
     chat_view_profile_title: 'Voir le profil osu! de ce joueur',
+    chat_translate_btn_title: 'Traduire ce message', chat_translate_hide_title: 'Masquer la traduction',
+    chat_translate_loading: 'Traduction en cours...', chat_translate_fail: 'Échec de la traduction, réessayez plus tard',
     chat_replying_to: 'Réponse à {name} : {content}',
     chat_delete_btn_title: 'Supprimer ce message', chat_delete_confirm: 'Supprimer ce message ?', chat_delete_fail: 'Échec de la suppression',
     chat_add_to_collection_btn: 'Ajouter à ma collection',

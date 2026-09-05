@@ -15,6 +15,8 @@ I18N.es = {
     chat_login_required: 'Inicia sesión con osu! para chatear',
     chat_reply_btn_title: 'Responder a este mensaje', chat_reply_cancel_title: 'Cancelar respuesta',
     chat_view_profile_title: 'Ver el perfil de osu! de este jugador',
+    chat_translate_btn_title: 'Traducir este mensaje', chat_translate_hide_title: 'Ocultar traducción',
+    chat_translate_loading: 'Traduciendo...', chat_translate_fail: 'Error al traducir, inténtalo más tarde',
     chat_replying_to: 'Respondiendo a {name}: {content}',
     chat_delete_btn_title: 'Eliminar este mensaje', chat_delete_confirm: '¿Eliminar este mensaje?', chat_delete_fail: 'Error al eliminar',
     chat_add_to_collection_btn: 'Añadir a mi colección',

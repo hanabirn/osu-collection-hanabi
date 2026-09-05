@@ -132,14 +132,63 @@ function chatMessageHtml(m) {
             <div class="chat-message-header">
                 <a class="chat-message-name" href="${profileUrl}" target="_blank" rel="noopener noreferrer">${escapeHtmlOsu(m.authorUsername)}</a>
                 <span class="chat-message-time">${chatFormatTime(m.createdAt)}</span>
+                <button class="chat-reply-btn" onclick="toggleChatTranslation(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.content)}'), this)" title="${t('chat_translate_btn_title')}">${icon('globe')}</button>
                 <button class="chat-reply-btn" onclick="setChatReplyTarget(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.authorUsername)}'), decodeURIComponent('${chatEncodeForOnclick(m.content)}'))" title="${t('chat_reply_btn_title')}">${icon('cornerUpLeft')}</button>
                 ${canDelete ? `<button class="chat-delete-btn" onclick="deleteChatMessage(${m.id})" title="${t('chat_delete_btn_title')}">${icon('x')}</button>` : ''}
             </div>
             ${replyHtml}
             <div class="chat-message-content">${escapeHtmlOsu(m.content)}</div>
+            <div class="chat-translation" id="chat-translation-${m.id}" style="display:none;"></div>
             ${cardHtml}
         </div>
     </div>`;
+}
+
+/* ===== On-demand translation ("🌐" per message) =====
+   Opt-in rather than auto-translating every message — most chat messages
+   don't need it, and this keeps the free MyMemory API (see
+   netlify/functions/chat-translate.js) called only for messages a visitor
+   actually asked about. Cached per message+site-language so re-clicking
+   (or a language switch mid-session) doesn't needlessly re-hit the API for
+   text already translated once. */
+const chatTranslationCache = {}; // `${messageId}:${lang}` -> translatedText
+
+async function toggleChatTranslation(id, content, btnEl) {
+    const box = document.getElementById(`chat-translation-${id}`);
+    if (!box) return;
+
+    if (box.style.display !== 'none') {
+        box.style.display = 'none';
+        if (btnEl) btnEl.title = t('chat_translate_btn_title');
+        return;
+    }
+
+    const cacheKey = `${id}:${siteLang}`;
+    if (chatTranslationCache[cacheKey]) {
+        box.innerHTML = chatTranslationCache[cacheKey];
+        box.style.display = 'block';
+        if (btnEl) btnEl.title = t('chat_translate_hide_title');
+        return;
+    }
+
+    box.style.display = 'block';
+    box.innerHTML = `<span class="chat-translation-loading">${t('chat_translate_loading')}</span>`;
+    try {
+        const res = await fetch('/.netlify/functions/chat-translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: content, targetLang: siteLang }),
+        });
+        if (!res.ok) throw new Error('translate failed');
+        const data = await res.json();
+        const html = `${icon('globe', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(data.translatedText)}`;
+        chatTranslationCache[cacheKey] = html;
+        box.innerHTML = html;
+        if (btnEl) btnEl.title = t('chat_translate_hide_title');
+    } catch (e) {
+        console.error('Chat translation failed:', e);
+        box.innerHTML = `<span class="chat-translation-error">${t('chat_translate_fail')}</span>`;
+    }
 }
 
 function chatBeatmapCardHtml(p) {
