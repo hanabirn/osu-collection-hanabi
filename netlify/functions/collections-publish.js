@@ -53,6 +53,8 @@ exports.handler = async (event) => {
 
     const seen = new Set();
     let maxRating = 0;
+    let ratingSum = 0;
+    let ratingCount = 0;
     for (const mode of OSU_MODES) {
         for (const set of collection[mode]) {
             if (typeof set.beatmapset_id !== 'number' || !Array.isArray(set.beatmaps)) {
@@ -60,10 +62,18 @@ exports.handler = async (event) => {
             }
             seen.add(set.beatmapset_id);
             for (const bm of set.beatmaps) {
-                if (typeof bm.difficulty_rating === 'number' && bm.difficulty_rating > maxRating) maxRating = bm.difficulty_rating;
+                if (typeof bm.difficulty_rating === 'number') {
+                    if (bm.difficulty_rating > maxRating) maxRating = bm.difficulty_rating;
+                    ratingSum += bm.difficulty_rating;
+                    ratingCount++;
+                }
             }
         }
     }
+    // Same "average across every difficulty in the collection" definition
+    // js/osu.js's own personal-collection stat tile uses, so 平均星數 means
+    // the same thing everywhere on the site.
+    const avgRating = ratingCount ? ratingSum / ratingCount : 0;
     if (seen.size === 0) {
         return { statusCode: 422, headers, body: JSON.stringify({ error: 'Collection is empty' }) };
     }
@@ -134,6 +144,7 @@ exports.handler = async (event) => {
             username: user.username,
             totalSets: seen.size,
             maxRating,
+            avgRating,
             updatedAt,
             tags,
             country,

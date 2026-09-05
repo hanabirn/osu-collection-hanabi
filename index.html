@@ -197,6 +197,7 @@
             <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
             <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
             <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_skin_screenshots">皮膚廣場</span></button>
+            <button class="site-nav-btn" onclick="switchTab('chat', this)" data-icon="messageCircle" data-icon-gap><span data-i18n="nav_chat">聊天室</span></button>
         </div>
         <div class="nav-drawer-group">
             <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
@@ -741,6 +742,30 @@
         <div id="skin-screenshots-pagination" class="osu-pagination"></div>
     </section>
 
+    <section id="page-chat" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="chat_page_title">✦ 聊天室 ✦</h2>
+        <p class="tournaments-hint" data-i18n="chat_page_hint">跟其他玩家聊聊天、約圖分享——貼上 osu! 圖面網址會自動變成可以一鍵加入收藏的卡片。</p>
+
+        <div class="osu-add-card chat-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div id="chat-messages-list" class="chat-messages-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
+
+            <div id="chat-reply-banner" class="chat-reply-banner" style="display:none;">
+                <span id="chat-reply-banner-text"></span>
+                <button onclick="clearChatReplyTarget()" data-i18n-title="chat_reply_cancel_title" title="取消回覆" data-icon="x"></button>
+            </div>
+            <div id="chat-login-required" class="chat-login-required" style="display:none;">
+                <span data-i18n="chat_login_required">登入 osu! 才能在聊天室發言</span>
+                <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
+            </div>
+            <div id="chat-input-row" class="input-group" style="display:none;">
+                <input type="text" id="chat-input" maxlength="300" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
+                <button onclick="sendChatMessage()" data-i18n="chat_send_btn">送出</button>
+            </div>
+        </div>
+    </section>
+
     <section id="page-updates" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="updates_title">✦ 更新情報 ✦</h2>
         <div class="osu-add-card">
@@ -1053,6 +1078,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/skins.js"></script>
 <script defer src="js/skin-screenshots.js"></script>
 <script defer src="js/updates.js"></script>
+<script defer src="js/chat.js"></script>
 <script defer src="js/resources-data.js"></script>
 <script defer src="js/tournaments.js"></script>
 <script defer src="js/celebrate.js"></script>

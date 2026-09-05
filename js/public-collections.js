@@ -156,7 +156,8 @@ function renderPublicCollectionsList() {
             ${tagsHtml}
             <div class="pcc-stats">
                 <span>${item.totalSets.toLocaleString()} ${t('osu_stats_total')}</span>
-                <span>${item.maxRating.toFixed(2)}⭐</span>
+                ${item.avgRating != null ? `<span>${item.avgRating.toFixed(2)}⭐ ${t('osu_stats_avg_rating')}</span>` : ''}
+                <span>${item.maxRating.toFixed(2)}⭐ ${t('osu_stats_max_rating')}</span>
             </div>
             <div class="pcc-btn-row">
                 <button class="btn pcc-view-btn" onclick="event.stopPropagation();openGalleryDetailModal(${item.id})" title="${t('gallery_view_btn_title')}">${icon('search')}</button>

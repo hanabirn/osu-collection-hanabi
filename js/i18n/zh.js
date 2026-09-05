@@ -288,6 +288,7 @@ I18N.zh = {
     pp_race_title: 'PP 賽跑',
 
     nav_skin_screenshots: '皮膚廣場',
+    nav_chat: '聊天室',
     ssc_page_title: '✦ 皮膚截圖廣場 ✦',
     ssc_page_hint: '分享你實際遊玩時的皮膚截圖給其他人參考——下載連結或 .osk 檔案至少擇一，這樣別人才能下載到這個皮膚。',
     ssc_upload_title: '✦ 分享我的皮膚截圖 ✦',
@@ -307,4 +308,15 @@ I18N.zh = {
     ssc_by_author: 'by {author}',
     ssc_download_link_title: '前往下載', ssc_download_file_title: '下載 .osk',
     ssc_delete_btn_title: '刪除這張截圖', ssc_delete_confirm: '確定要刪除這張截圖嗎？', ssc_delete_done: '已刪除', ssc_delete_fail: '刪除失敗',
+
+    chat_page_title: '✦ 聊天室 ✦',
+    chat_page_hint: '跟其他玩家聊聊天、約圖分享——貼上 osu! 圖面網址會自動變成可以一鍵加入收藏的卡片。',
+    chat_empty: '還沒有人說話，來當第一個吧！', chat_load_fail: '載入聊天室失敗，稍後再試',
+    chat_input_placeholder: '輸入訊息...', chat_send_btn: '送出',
+    chat_login_required: '登入 osu! 才能在聊天室發言',
+    chat_reply_btn_title: '回覆這則訊息', chat_reply_cancel_title: '取消回覆',
+    chat_replying_to: '回覆 {name}：{content}',
+    chat_delete_btn_title: '刪除這則訊息', chat_delete_confirm: '確定要刪除這則訊息嗎？', chat_delete_fail: '刪除失敗',
+    chat_add_to_collection_btn: '加入收藏',
+    chat_rate_limited: '傳送太快了，慢一點再試', chat_send_fail: '傳送失敗，稍後再試',
 };

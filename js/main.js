@@ -52,6 +52,12 @@ function switchTab(tab, el) {
     if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();
     if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
+    // Chat polls on a timer only while its own tab is visible — started/
+    // stopped here on every tab switch (not just the lazy first-load other
+    // ensureXLoaded() calls do) since leaving and returning to the tab
+    // should resume polling, not just load once per session.
+    if (tab === 'chat' && typeof ensureChatLoaded === 'function') ensureChatLoaded();
+    if (tab !== 'chat' && typeof stopChatPolling === 'function') stopChatPolling();
     // Tab buttons now live in the slide-in drawer — picking one should also
     // dismiss it.
     if (typeof closeNavDrawer === 'function') closeNavDrawer();

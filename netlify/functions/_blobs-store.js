@@ -73,4 +73,14 @@ function getWcMappoolsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore };
+// Public chat room (chat-list/chat-send/chat-delete.js) — one ring-buffered
+// message array plus a per-user last-post-time key for the send cooldown.
+function getChatStore() {
+    return getStore({
+        name: 'osu-chat',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore };
