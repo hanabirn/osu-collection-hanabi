@@ -30,7 +30,6 @@ I18N.ja = {
     dm_back_btn: '戻る',
     dm_self_error: '自分にはメッセージを送れません',
 
-    side_rail_tournaments_title: '大会ニュース', side_rail_resources_title: 'その他のリソース', side_rail_view_all: 'すべて見る →',
     global_search_title: 'サイト内検索', global_search_placeholder: '曲・図池・自分のコレクションを検索...',
     global_search_section_collection: '自分のコレクション', global_search_section_catalog: '曲庫分類', global_search_section_mappools: 'ワールドカップ図池',
     global_search_empty: '該当する結果がありません',

@@ -1519,6 +1519,17 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
        as .site-header's padding-bottom (and kept ~6px shallower than it) so
        the title always keeps a little clearance above the panel. */
     margin-top: -114px;
+    padding: 14px 16px 60px;
+    /* Frosted "tray" the .site-page card sits on: a translucent glass base
+       so the header illustration bleeds faintly through where they overlap,
+       a blur, a rounded top, a hairline top keyline, and a lift shadow that
+       reads as the panel floating above the cover. */
+    background: var(--overlap-panel-bg);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    backdrop-filter: blur(12px) saturate(1.3);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -16px 44px rgba(0, 0, 0, 0.34);
 }
 @media (max-width: 1100px) {
     .site-main { margin-top: -74px; }
@@ -1527,144 +1538,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-main { margin-top: -50px; }
 }
 @media (max-width: 600px) {
-    .site-main { margin-top: -32px; }
+    .site-main { margin-top: -32px; border-radius: 22px 22px 0 0; }
 }
-/* The actual frosted "tray" the .site-page card sits on lives here rather
-   than on .site-main itself, so that at >=1700px .site-main can turn into a
-   plain 3-column grid (rail / this / rail, see below) without its own
-   background painting behind the rails too — the two rails stay visually
-   separate floating cards, same as at every narrower width. */
-.site-main-center {
-    padding: 14px 16px 60px;
-    /* Translucent glass base so the header illustration bleeds faintly
-       through where they overlap, a blur, a rounded top, a hairline top
-       keyline, and a lift shadow that reads as the panel floating above
-       the cover. */
-    background: var(--overlap-panel-bg);
-    -webkit-backdrop-filter: blur(12px) saturate(1.3);
-    backdrop-filter: blur(12px) saturate(1.3);
-    border-radius: 28px 28px 0 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 -16px 44px rgba(0, 0, 0, 0.34);
-}
-@media (max-width: 600px) {
-    .site-main-center { border-radius: 22px 22px 0 0; }
-}
-
-/* ===== Side rails — fill the gutters beside .site-main on a wide monitor =====
-   Below 1700px these stay display:none (no room to clear the 1080px
-   column without touching it — at 1700px that's a (1700-1080)/2 = 310px
-   gutter each side, comfortably more than this rail's 260px width).
-   At >=1700px, .site-main itself becomes a 3-column grid (rail /
-   .site-main-center / rail) so the rails are real grid items rather than
-   absolutely-positioned overlays — that's what lets position:sticky below
-   actually work: a sticky element needs to stay in normal flow, and grid
-   placement keeps it there without disturbing .site-main-center's own
-   internal layout.
-
-   .site-main itself spans the *full* viewport width here (not a fixed,
-   centered max-width) with the two outer grid columns set to `1fr` — so on
-   an ultrawide monitor the rails sit flush against the actual screen edges
-   (justify-self below) instead of floating in the middle of a big unused
-   margin between the edge and a narrower centered block, while the
-   1080px center column stays exactly centered regardless of how wide the
-   screen is.
-
-   The card's own height is a viewport-relative cap (not 100% of
-   .site-main-center) *on purpose*: position:sticky only has room to pin an
-   element within a containing block that's taller than the element itself
-   — a card stretched to exactly match a much-taller .site-main-center
-   would have zero slack to stick with and just scroll normally. So this
-   card intentionally stays shorter than .site-main-center and relies on
-   sticky to keep it in view across that whole scroll range, rather than
-   trying to make its own box span the entire page. Mini previews of the
-   賽事/資源 tabs (js/side-rails.js) rather than pure decoration — replaced
-   the old .world-globe (css/particles.css, removed) that sat here. */
-.side-rail {
-    width: 260px;
-    min-height: calc(100vh - 48px);
-    max-height: calc(100vh - 48px);
-    overflow-y: auto;
-    padding: 14px;
-    border-radius: 16px;
-    /* Deliberately lower-contrast than .site-main-center/.news-item/
-       .resource-link-card (no border, no shadow, more transparent) — these
-       are secondary previews, not a third column competing on equal visual
-       footing with the actual page content. */
-    background: var(--bg-card-alt);
-    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.6));
-    backdrop-filter: blur(calc(var(--glass-blur) * 0.6));
-    display: none;
-}
-@media (min-width: 1700px) {
-    .site-main {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 1080px minmax(0, 1fr);
-        column-gap: 32px;
-        align-items: start;
-        max-width: none;
-        padding: 0 24px;
-    }
-    .site-main-center { grid-column: 2; grid-row: 1; }
-    .side-rail {
-        /* Column layout so the "查看全部" button can be pinned to the
-           bottom of this viewport-height card via margin-top:auto on the
-           button, instead of sitting right under a short list with a dead
-           gap below it. */
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        position: sticky;
-        top: 24px;
-        grid-row: 1;
-    }
-    /* justify-self pins the fixed-260px card to the true edge of its (now
-       flexible, 1fr) column — flush against the actual screen edge rather
-       than sitting centered in the middle of that column's free space. */
-    .side-rail-left { grid-column: 1; justify-self: start; }
-    .side-rail-right { grid-column: 3; justify-self: end; }
-}
-.side-rail-title {
-    text-align: center;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 12px;
-}
-.side-rail-list { display: flex; flex-direction: column; gap: 8px; }
-/* Scaled-down variants of .news-item (tournaments) and .resource-link-card
-   (resources) — same components the full tabs use, just smaller to fit a
-   260px column instead of duplicating their markup/styling from scratch. */
-.side-rail .news-item { padding: 8px; gap: 8px; }
-.side-rail .news-thumb { width: 44px; height: 44px; }
-.side-rail .news-title { font-size: 0.78rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.side-rail .news-item-header { font-size: 0.68rem; margin-bottom: 2px; }
-.side-rail .resource-link-card { padding: 8px 10px; }
-.side-rail .resource-link-title { font-size: 0.82rem; }
-.side-rail .resource-link-desc { font-size: 0.72rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.side-rail-viewall-btn {
-    display: block;
-    width: 100%;
-    /* Pinned to the bottom of the now-fixed-height .side-rail (flex column)
-       instead of sitting right under the list — see .side-rail above. The
-       10px min-gap above it (even once pushed to the bottom) comes from
-       .side-rail's own `gap`, not a margin here. */
-    margin-top: auto;
-    padding: 7px;
-    border: none;
-    border-radius: 999px;
-    background: rgba(var(--accent-pink-rgb), 0.12);
-    color: var(--text-pink);
-    font-size: 0.78rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.side-rail-viewall-btn:hover { background: rgba(var(--accent-pink-rgb), 0.22); }
 
 /* ===== Touch / phone: lighten the stacked frosted surfaces =====
-   .site-header, .site-main-center and .site-page each carry their own
+   .site-header, .site-main and .site-page each carry their own
    backdrop-filter and they nest, so every composite re-samples and
    re-blurs the layers below up to three times over — a big part of why
    the compositor stayed busy on a still page and phones heated up. On
@@ -1675,7 +1553,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    briefly. */
 @media (hover: none), (max-width: 700px) {
     .site-header { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-    .site-main-center { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .site-main { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
     .site-page { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 }
 

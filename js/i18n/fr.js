@@ -30,7 +30,6 @@ I18N.fr = {
     dm_back_btn: 'Retour',
     dm_self_error: 'Vous ne pouvez pas vous envoyer un message à vous-même',
 
-    side_rail_tournaments_title: 'Actualités tournois', side_rail_resources_title: 'Plus de ressources', side_rail_view_all: 'Tout voir →',
     global_search_title: 'Rechercher sur le site', global_search_placeholder: 'Rechercher des chansons, mappools, ma collection...',
     global_search_section_collection: 'Ma collection', global_search_section_catalog: 'Catalogue', global_search_section_mappools: 'Mappools de la Coupe du monde',
     global_search_empty: 'Aucun résultat correspondant',
