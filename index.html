@@ -217,6 +217,10 @@
         </div>
     </nav>
 </aside>
+<div class="volume-fab" id="volume-fab" data-i18n-title="volume_fab_title" title="調整預覽音量">
+    <span data-icon="volume2"></span>
+    <input type="range" id="osu-volume" min="0" max="1" step="0.05" value="0.4" oninput="osuSetVolume(this.value)">
+</div>
 <button class="page-refresh-fab" id="page-refresh-fab" onclick="location.reload()" data-i18n-title="page_refresh_btn_title" title="重新整理頁面" data-icon="rotateCw"></button>
 
 <div id="maintenance-banner" class="maintenance-banner" style="display:none;">
@@ -271,10 +275,6 @@
                         <button onclick="addOsuBeatmap()" data-i18n="osu_add">新增</button>
                     </div>
                     <p id="osu-status" class="status"></p>
-                    <div class="osu-volume">
-                        <span data-icon="volume2"></span>
-                        <input type="range" id="osu-volume" min="0" max="1" step="0.05" value="0.4" oninput="osuSetVolume(this.value)">
-                    </div>
                     <div class="osu-tool-groups">
                         <div class="osu-tool-group">
                             <span class="osu-tool-group-label" data-i18n="tools_group_io">收藏進出</span>

@@ -1426,12 +1426,74 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .page-refresh-fab .icon-svg { transition: transform 0.3s var(--ease-out); }
 .page-refresh-fab:active .icon-svg { transform: rotate(90deg); }
 
+/* Beatmap-preview volume slider (js/osu.js osuSetVolume/playOsuPreview) —
+   used to live buried in the Collection tab's "Add Beatmap" card even
+   though the preview player it controls is shared across every tab
+   (Catalog/Farm/Mappools/Gallery all call the same playOsuPreview). Same
+   glass-pill treatment as .page-refresh-fab, floating just to its left so
+   it's reachable everywhere; see index.html for the fixed left/right math
+   between the two. */
+.volume-fab {
+    position: fixed;
+    right: 88px;
+    bottom: 24px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: rgba(30, 20, 50, 0.55);
+    border: 1px solid rgba(var(--accent-purple-rgb), 0.4);
+    color: var(--text-secondary);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 18px rgba(var(--accent-purple-rgb), 0.35), 0 6px 20px rgba(0, 0, 0, 0.35);
+    transition: box-shadow 0.25s var(--ease-out), color 0.2s var(--ease-out);
+}
+.volume-fab:hover {
+    color: var(--text-pink);
+    box-shadow: 0 0 26px rgba(var(--accent-purple-rgb), 0.55), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.volume-fab .icon-svg { flex-shrink: 0; }
+.volume-fab input[type="range"] {
+    width: 90px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(168,85,247,0.3);
+    border-radius: 2px;
+    outline: none;
+}
+.volume-fab input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-light-purple));
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(244,114,182,0.4);
+}
+.volume-fab input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-light-purple));
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(244,114,182,0.4);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .nav-drawer, .nav-drawer-scrim,
-    .page-refresh-fab, .page-refresh-fab .icon-svg { transition: none; }
+    .page-refresh-fab, .page-refresh-fab .icon-svg,
+    .volume-fab { transition: none; }
 }
 @media (max-width: 600px) {
     .page-refresh-fab { width: 46px; height: 46px; right: 16px; bottom: 16px; }
+    .volume-fab { height: 46px; right: 74px; bottom: 16px; padding: 0 12px; }
+    .volume-fab input[type="range"] { width: 60px; }
 }
 
 /* 1080px matches what #page-collection (js/osu.js's two-column layout)

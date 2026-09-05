@@ -5,6 +5,7 @@ I18N.zh = {
     site_update_btn_title: '網站有更新，點擊更新', site_update_available: '目前網站有更新，請點擊重新載入以獲取最新版本',
     maintenance_banner_text: '目前該網頁正在修改中，如果有任何疑問或 bug 的話請聯絡我！',
     page_refresh_btn_title: '重新整理頁面',
+    volume_fab_title: '調整預覽音量',
     global_search_title: '搜尋全站', global_search_placeholder: '搜尋歌曲、圖池、我的收藏...',
     global_search_section_collection: '我的收藏', global_search_section_catalog: '曲庫分類', global_search_section_mappools: '世界盃圖池',
     global_search_empty: '找不到符合的結果',

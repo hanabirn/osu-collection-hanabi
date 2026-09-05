@@ -5,6 +5,7 @@ I18N.ko = {
     site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 클릭하면 새로고침하여 최신 버전을 받습니다',
     maintenance_banner_text: '현재 이 사이트는 수정 중입니다. 궁금한 점이나 버그가 있으면 연락해 주세요!',
     page_refresh_btn_title: '페이지 새로고침',
+    volume_fab_title: '미리듣기 음량 조절',
     global_search_title: '전체 검색', global_search_placeholder: '곡, 매핑풀, 내 컬렉션 검색...',
     global_search_section_collection: '내 컬렉션', global_search_section_catalog: '곡 분류', global_search_section_mappools: '월드컵 매핑풀',
     global_search_empty: '일치하는 결과가 없습니다',

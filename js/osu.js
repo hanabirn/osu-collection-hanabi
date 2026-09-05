@@ -201,7 +201,17 @@ function modeDiffIcon(mode, stars, label, url) {
 }
 let osuCurrentTab = 'standard';
 let osuCurrentAudio = null;
-let osuVolume = 0.4;
+// Persisted across visits so a returning visitor doesn't have to re-lower a
+// loud default every time — read once at load, written on every slider move.
+const OSU_VOLUME_KEY = 'osu_preview_volume';
+let osuVolume = (() => {
+    const saved = parseFloat(localStorage.getItem(OSU_VOLUME_KEY));
+    return saved >= 0 && saved <= 1 ? saved : 0.4;
+})();
+{
+    const volumeSlider = document.getElementById('osu-volume');
+    if (volumeSlider) volumeSlider.value = osuVolume;
+}
 let osuPage = 0;
 let osuSortMode = 'default';
 let osuSearchQuery = '';
@@ -542,6 +552,7 @@ function downloadBeatmapset(setId, event) {
 
 function osuSetVolume(val) {
     osuVolume = parseFloat(val);
+    localStorage.setItem(OSU_VOLUME_KEY, String(osuVolume));
     if (osuCurrentAudio && !osuCurrentAudio.ended) osuCurrentAudio.volume = osuVolume;
 }
 

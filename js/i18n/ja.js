@@ -5,6 +5,7 @@ I18N.ja = {
     site_update_btn_title: '更新があります。クリックして更新', site_update_available: 'サイトの新しいバージョンがあります。クリックして再読み込みし、最新版を取得してください',
     maintenance_banner_text: '現在このサイトは修正中です。ご質問やバグがあればご連絡ください！',
     page_refresh_btn_title: 'ページを再読み込み',
+    volume_fab_title: 'プレビュー音量を調整',
     global_search_title: 'サイト内検索', global_search_placeholder: '曲・図池・自分のコレクションを検索...',
     global_search_section_collection: '自分のコレクション', global_search_section_catalog: '曲庫分類', global_search_section_mappools: 'ワールドカップ図池',
     global_search_empty: '該当する結果がありません',

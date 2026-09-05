@@ -5,6 +5,7 @@ I18N.fr = {
     site_update_btn_title: 'Une mise à jour est disponible, cliquez pour mettre à jour', site_update_available: 'Une nouvelle version du site est disponible — cliquez pour recharger et obtenir la dernière version',
     maintenance_banner_text: "Ce site est actuellement en cours de modification — si vous avez des questions ou rencontrez un bug, n'hésitez pas à me contacter !",
     page_refresh_btn_title: 'Actualiser la page',
+    volume_fab_title: "Régler le volume d'aperçu",
     global_search_title: 'Rechercher sur le site', global_search_placeholder: 'Rechercher des chansons, mappools, ma collection...',
     global_search_section_collection: 'Ma collection', global_search_section_catalog: 'Catalogue', global_search_section_mappools: 'Mappools de la Coupe du monde',
     global_search_empty: 'Aucun résultat correspondant',

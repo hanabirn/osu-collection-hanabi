@@ -5,6 +5,7 @@ I18N.ru = {
     site_update_btn_title: 'Доступно обновление, нажмите для обновления', site_update_available: 'Доступна новая версия сайта — нажмите, чтобы перезагрузить и получить последнюю версию',
     maintenance_banner_text: 'Сайт сейчас находится в процессе доработки — если у вас есть вопросы или вы нашли баг, пожалуйста, свяжитесь со мной!',
     page_refresh_btn_title: 'Обновить страницу',
+    volume_fab_title: 'Настроить громкость превью',
     global_search_title: 'Поиск по сайту', global_search_placeholder: 'Поиск песен, маппулов, моей коллекции...',
     global_search_section_collection: 'Моя коллекция', global_search_section_catalog: 'Каталог', global_search_section_mappools: 'Маппулы Чемпионата мира',
     global_search_empty: 'Ничего не найдено',

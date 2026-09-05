@@ -5,6 +5,7 @@ I18N.en = {
     site_update_btn_title: 'An update is available, click to update', site_update_available: 'A new version of the site is available — click to reload and get the latest version',
     maintenance_banner_text: 'This site is currently being updated — if you run into any questions or bugs, please get in touch!',
     page_refresh_btn_title: 'Refresh page',
+    volume_fab_title: 'Adjust preview volume',
     global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',

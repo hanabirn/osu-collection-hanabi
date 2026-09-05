@@ -5,6 +5,7 @@ I18N.de = {
     site_update_btn_title: 'Ein Update ist verfügbar, zum Aktualisieren klicken', site_update_available: 'Eine neue Version der Seite ist verfügbar — klicke, um neu zu laden und die neueste Version zu erhalten',
     maintenance_banner_text: 'Diese Website wird gerade überarbeitet — bei Fragen oder Bugs meld dich gerne bei mir!',
     page_refresh_btn_title: 'Seite neu laden',
+    volume_fab_title: 'Vorschau-Lautstärke einstellen',
     global_search_title: 'Gesamte Seite durchsuchen', global_search_placeholder: 'Songs, Mappools, meine Sammlung durchsuchen...',
     global_search_section_collection: 'Meine Sammlung', global_search_section_catalog: 'Katalog', global_search_section_mappools: 'World-Cup-Mappools',
     global_search_empty: 'Keine passenden Ergebnisse',

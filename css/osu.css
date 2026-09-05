@@ -542,6 +542,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 12px;
 }
 
+/* Still used by the publish/unpublish button row on the gallery page
+   (index.html #page-public-collections) — the volume slider that used to
+   share this class moved to the standalone .volume-fab (css/base.css),
+   floating next to .page-refresh-fab, so every page can reach it instead
+   of only the Collection tab's Add Beatmap card. */
 .osu-volume {
     display: flex;
     flex-wrap: wrap;
@@ -551,24 +556,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     justify-content: center;
     color: var(--text-accent);
     font-size: 0.85rem;
-}
-.osu-volume input[type="range"] {
-    width: 120px;
-    height: 4px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(168,85,247,0.3);
-    border-radius: 2px;
-    outline: none;
-}
-.osu-volume input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-pink), var(--accent-light-purple));
-    cursor: pointer;
-    box-shadow: 0 0 6px rgba(244,114,182,0.4);
 }
 
 .osu-refresh-all {

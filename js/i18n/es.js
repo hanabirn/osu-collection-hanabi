@@ -5,6 +5,7 @@ I18N.es = {
     site_update_btn_title: 'Hay una actualización disponible, haz clic para actualizar', site_update_available: 'Hay una nueva versión del sitio disponible — haz clic para recargar y obtener la última versión',
     maintenance_banner_text: 'Este sitio está actualmente en proceso de modificación — si tienes alguna duda o encuentras un error, ¡contáctame!',
     page_refresh_btn_title: 'Actualizar página',
+    volume_fab_title: 'Ajustar volumen de vista previa',
     global_search_title: 'Buscar en el sitio', global_search_placeholder: 'Buscar canciones, mappools, mi colección...',
     global_search_section_collection: 'Mi colección', global_search_section_catalog: 'Catálogo', global_search_section_mappools: 'Mappools de la Copa del Mundo',
     global_search_empty: 'Sin resultados coincidentes',
