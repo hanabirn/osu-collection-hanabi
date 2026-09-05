@@ -1554,29 +1554,36 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 /* ===== Side rails — fill the gutters beside .site-main on a wide monitor =====
    Below 1700px these stay display:none (no room to clear the 1080px
    column without touching it — at 1700px that's a (1700-1080)/2 = 310px
-   gutter each side, comfortably more than this rail's 260px + 32px gap).
+   gutter each side, comfortably more than this rail's 260px width).
    At >=1700px, .site-main itself becomes a 3-column grid (rail /
    .site-main-center / rail) so the rails are real grid items rather than
    absolutely-positioned overlays — that's what lets position:sticky below
    actually work: a sticky element needs to stay in normal flow, and grid
    placement keeps it there without disturbing .site-main-center's own
-   internal layout. Sticky (rather than a fixed top:0 island) matters
-   because .site-main-center is often much taller than these previews (a
-   long collection grid, say) — an absolutely-positioned rail would end
-   partway down and leave the rest of the gutter empty again below it;
-   sticky keeps the rail in view for as long as .site-main-center scrolls.
-   Mini previews of the 賽事/資源 tabs (js/side-rails.js) rather than pure
-   decoration — replaced the old .world-globe (css/particles.css, removed)
-   that sat in this same area. */
+   internal layout.
+
+   .site-main itself spans the *full* viewport width here (not a fixed,
+   centered max-width) with the two outer grid columns set to `1fr` — so on
+   an ultrawide monitor the rails sit flush against the actual screen edges
+   (justify-self below) instead of floating in the middle of a big unused
+   margin between the edge and a narrower centered block, while the
+   1080px center column stays exactly centered regardless of how wide the
+   screen is.
+
+   The card's own height is a viewport-relative cap (not 100% of
+   .site-main-center) *on purpose*: position:sticky only has room to pin an
+   element within a containing block that's taller than the element itself
+   — a card stretched to exactly match a much-taller .site-main-center
+   would have zero slack to stick with and just scroll normally. So this
+   card intentionally stays shorter than .site-main-center and relies on
+   sticky to keep it in view across that whole scroll range, rather than
+   trying to make its own box span the entire page. Mini previews of the
+   賽事/資源 tabs (js/side-rails.js) rather than pure decoration — replaced
+   the old .world-globe (css/particles.css, removed) that sat here. */
 .side-rail {
     width: 260px;
-    /* No explicit height here — at >=1700px this is a grid item and
-       align-items' default (stretch) makes it exactly match .site-
-       main-center's real height (see below), so short content doesn't
-       leave a gap and a tall page doesn't get cut short either. Height is
-       whatever .site-main-center actually is, not a viewport-relative
-       guess. overflow-y:auto is the safety net for the rare page shorter
-       than this rail's own content. */
+    min-height: calc(100vh - 48px);
+    max-height: calc(100vh - 48px);
     overflow-y: auto;
     padding: 14px;
     border-radius: 16px;
@@ -1592,19 +1599,18 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 @media (min-width: 1700px) {
     .site-main {
         display: grid;
-        grid-template-columns: 260px minmax(0, 1080px) 260px;
+        grid-template-columns: minmax(0, 1fr) 1080px minmax(0, 1fr);
         column-gap: 32px;
-        /* align-items defaults to stretch — deliberately not overridden to
-           `start`, so both rails stretch to match .site-main-center's real
-           height instead of sizing to their own short content. */
-        max-width: calc(1080px + 2 * (260px + 32px));
+        align-items: start;
+        max-width: none;
+        padding: 0 24px;
     }
     .site-main-center { grid-column: 2; grid-row: 1; }
     .side-rail {
         /* Column layout so the "查看全部" button can be pinned to the
-           bottom of the (now stretched to match .site-main-center) card
-           via margin-top:auto on the button, instead of sitting right
-           under a short list with a dead gap below it. */
+           bottom of this viewport-height card via margin-top:auto on the
+           button, instead of sitting right under a short list with a dead
+           gap below it. */
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -1612,8 +1618,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
         top: 24px;
         grid-row: 1;
     }
-    .side-rail-left { grid-column: 1; }
-    .side-rail-right { grid-column: 3; }
+    /* justify-self pins the fixed-260px card to the true edge of its (now
+       flexible, 1fr) column — flush against the actual screen edge rather
+       than sitting centered in the middle of that column's free space. */
+    .side-rail-left { grid-column: 1; justify-self: start; }
+    .side-rail-right { grid-column: 3; justify-self: end; }
 }
 .side-rail-title {
     text-align: center;
