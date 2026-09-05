@@ -248,6 +248,7 @@ I18N.ko = {
     tracked_mappers_title: '🎨 매퍼 추적', tracked_mappers_hint: '매퍼의 osu! 유저명을 입력하면 새 맵이 랭크될 때 알려드립니다.',
     mapper_track_placeholder: '매퍼 유저명 입력...', mapper_track_btn: '추적',
     mapper_already_tracked: '이미 이 매퍼를 추적 중입니다', mapper_track_done: '추적 목록에 추가되었습니다. 새 맵이 나오면 알려드릴게요',
+    mapper_not_found: '이 osu! 플레이어를 찾을 수 없습니다. 사용자 이름을 확인해 주세요',
     tracked_mappers_empty: '아직 추적 중인 매퍼가 없습니다', notif_mapper_new_title: '{name} 님이 새 맵을 랭크했습니다',
     notif_achievement_new_title: '{n} 님이 새 메달을 획득했습니다', notif_achievement_detail: '새 메달 {count}개 — 클릭해서 보기',
     notif_mapper_graveyard_title: '{name} 님의 새 Graveyard 맵', notif_mapper_loved_title: '{name} 님의 맵이 Loved에 등록되었습니다!',

@@ -75,8 +75,13 @@ function escapeHtmlOsu(str) {
 /* ===== Mapper tracking — same lightweight localStorage pattern as tracked
    players (js/osu.js), just for "has this mapper ranked anything new"
    instead of PP. Tracked by username directly (get_beatmaps' u=&type=string
-   filter accepts it), so there's no separate lookup step first — see
-   js/notifications.js's checkTrackedMappers() for the actual polling. */
+   filter accepts it), so the ranked/graveyard/loved polling itself needs no
+   id lookup — see js/notifications.js's checkTrackedMappers(). The id/
+   country stored alongside the name are only for the card's avatar+flag+
+   profile-link, resolved via a v1 get_user lookup (same osuFetch('u=...')
+   call renderTrackedPlayersList's entries already come from). Entries
+   tracked before this lookup existed just have id/country as null;
+   checkTrackedMappers() backfills them lazily on its own periodic pass. */
 const TRACKED_MAPPERS_KEY = 'osu_tracked_mappers';
 
 function getTrackedMappers() {
@@ -87,8 +92,9 @@ function saveTrackedMappers(list) {
     localStorage.setItem(TRACKED_MAPPERS_KEY, JSON.stringify(list));
 }
 
-function trackMapperFromInput() {
+async function trackMapperFromInput() {
     const input = document.getElementById('mapper-track-input');
+    const btn = input && input.nextElementSibling;
     const name = input.value.trim();
     if (!name) return;
     const list = getTrackedMappers();
@@ -96,7 +102,28 @@ function trackMapperFromInput() {
         showShareToast(t('mapper_already_tracked'));
         return;
     }
-    list.push({ name, lastMaxApprovedDate: null, knownGraveyardIds: null, knownLovedIds: null });
+
+    if (btn) btn.disabled = true;
+    let id = null, country = null, canonicalName = name;
+    try {
+        const users = await osuFetch(`u=${encodeURIComponent(name)}&type=string`);
+        const u = Array.isArray(users) ? users[0] : null;
+        if (!u) {
+            showShareToast(t('mapper_not_found'));
+            return;
+        }
+        id = u.user_id;
+        country = u.country || null;
+        canonicalName = u.username;
+    } catch (e) {
+        console.error('Mapper lookup failed:', e);
+        showShareToast(t('mapper_not_found'));
+        return;
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+
+    list.push({ name: canonicalName, id, country, lastMaxApprovedDate: null, knownGraveyardIds: null, knownLovedIds: null });
     saveTrackedMappers(list);
     input.value = '';
     showShareToast(t('mapper_track_done'));
@@ -117,9 +144,14 @@ function renderTrackedMappersList() {
         return;
     }
     panel.innerHTML = `<div class="tracked-players-list">${list.map(m => `
-        <div class="tracked-player-card tracked-mapper-card">
+        <div class="tracked-player-card tracked-mapper-card" ${m.id ? `onclick="window.open('https://osu.ppy.sh/users/${m.id}','_blank')"` : ''}>
+            ${m.id ? `
+            <div class="avatar-with-flag">
+                <img class="tracked-player-avatar" src="${osuAvatarUrl(m.id)}" alt="" onerror="this.style.visibility='hidden';">
+                ${m.country ? `<img class="avatar-flag-badge" src="${flagUrl(m.country)}" alt="" onerror="this.style.display='none';">` : ''}
+            </div>` : ''}
             <span class="tracked-player-name">${icon('palette', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(m.name)}</span>
-            <button class="tracked-player-remove" onclick="untrackMapperByName(decodeURIComponent('${encodeURIComponent(m.name)}'))" title="${t('untrack_player_btn')}">${icon('x')}</button>
+            <button class="tracked-player-remove" onclick="event.stopPropagation();untrackMapperByName(decodeURIComponent('${encodeURIComponent(m.name)}'))" title="${t('untrack_player_btn')}">${icon('x')}</button>
         </div>`).join('')}
     </div>`;
 }

@@ -246,6 +246,7 @@ I18N.zh = {
     tracked_mappers_title: '🎨 追蹤 Mapper', tracked_mappers_hint: '輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。',
     mapper_track_placeholder: '輸入 mapper 用戶名...', mapper_track_btn: '追蹤',
     mapper_already_tracked: '已經在追蹤這位 mapper 了', mapper_track_done: '已加入追蹤，有新圖上架時會通知你',
+    mapper_not_found: '找不到這位 osu! 玩家，請確認用戶名是否正確',
     tracked_mappers_empty: '尚未追蹤任何 mapper', notif_mapper_new_title: '{name} 上架新圖了',
     notif_achievement_new_title: '{n} 獲得新獎章', notif_achievement_detail: '新增了 {count} 個獎章，點此查看',
     notif_mapper_graveyard_title: '{name} 有新的 Graveyard 圖', notif_mapper_loved_title: '{name} 的圖被加入 Loved！',
@@ -276,7 +277,6 @@ I18N.zh = {
     replay_stat_accuracy: '準確率', replay_stat_combo: '最大 Combo', replay_stat_misses: 'Miss 數',
     replay_stat_mods: 'Mods', replay_stat_rank: '評級', replay_stat_player: '玩家',
     replay_approx_note: '時間誤差是用按鍵時間比對譜面音符估算出來的，不是完整的判定重現，僅供參考',
-    replay_heatmap_title: '游標熱點圖', replay_heatmap_note: '疊在圖面封面上的滑鼠位置密度分布，紅色 ✕ 是估計的 miss 位置。背景僅為示意，非遊戲內實際畫面。',
 
     fc_sim_btn: 'FC 模擬', fc_sim_btn_title: '模擬這張圖 FC 後大概多少 PP',
     fc_sim_popover_title: 'FC 預估 PP', fc_sim_loading: '計算中...', fc_sim_error: '計算失敗，請稍後再試',

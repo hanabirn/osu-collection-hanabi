@@ -248,6 +248,7 @@ I18N.ru = {
     tracked_mappers_title: '🎨 Отслеживаемые мапперы', tracked_mappers_hint: 'Введите ник маппера на osu! — вы получите уведомление, когда он зарангует новую карту.',
     mapper_track_placeholder: 'Введите ник маппера...', mapper_track_btn: 'Отслеживать',
     mapper_already_tracked: 'Вы уже отслеживаете этого маппера', mapper_track_done: 'Добавлено в отслеживаемые — сообщим о новых картах',
+    mapper_not_found: 'Игрок osu! не найден — проверьте имя пользователя',
     tracked_mappers_empty: 'Вы пока не отслеживаете ни одного маппера', notif_mapper_new_title: '{name} зарангал новую карту',
     notif_achievement_new_title: '{n} получил новую медаль', notif_achievement_detail: 'Новых медалей: {count} — нажмите, чтобы посмотреть',
     notif_mapper_graveyard_title: 'У {name} новая карта в graveyard', notif_mapper_loved_title: 'Карта {name} попала в Loved!',

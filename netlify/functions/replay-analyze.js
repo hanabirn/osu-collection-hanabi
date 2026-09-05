@@ -30,14 +30,7 @@
    clock rate (1.5x for DT/NC, 0.75x for HT) to line back up with the
    beatmap's original, unscaled hit object times. Only osu!std (rulesetId 0)
    is supported — taiko/catch/mania judge hits too differently for this same
-   keypress-matching approach to mean anything.
-
-   The same pass (computeReplayAnalysis) also buckets every cursor position
-   into a fixed-resolution grid over osu!std's 512x384 playfield, for the
-   client to render as a blurred heatmap over the beatmap's cover art, and
-   records an approximate cursor position (nearest cursor frame in time) for
-   every note the keypress matcher couldn't pair — the client shows these as
-   miss markers on the same overlay. */
+   keypress-matching approach to mean anything. */
 const rosu = require('rosu-pp-js');
 const { ScoreDecoder, BeatmapDecoder } = require('osu-parsers');
 const { getOsuToken } = require('./_osu-auth');
@@ -47,15 +40,6 @@ const MAX_BODY_BYTES = 6 * 1024 * 1024;
 const MAX_REPLAY_BYTES = 3 * 1024 * 1024;
 const HIT_MATCH_WINDOW_MS = 200;
 const MAX_MATCH_OPS = 5_000_000; // circles * candidate presses, safety bound on the O(n*m) matcher below
-
-// osu!std's playfield is a fixed 512x384 osu!pixels regardless of the
-// player's actual screen resolution (the game itself letterboxes/scales to
-// it), so a density grid over that fixed box lines up with any replay.
-// 96x72 keeps the same 4:3 aspect at a resolution fine enough for a
-// legible heatmap once blurred client-side, while keeping the flattened
-// grid small enough (6,912 numbers) to ship as plain JSON.
-const PLAYFIELD_W = 512, PLAYFIELD_H = 384;
-const GRID_W = 96, GRID_H = 72;
 
 // Classic (stable) replay mod bitflags — the .osr header stores mods this
 // way regardless of ruleset. NC's bit already implies DT's, and PF's bit
@@ -84,63 +68,33 @@ function clockRateFor(raw) {
     return 1;
 }
 
-// Binary search for the cursor frame whose timestamp is closest to `t`
-// (cursorFrames is chronological, same order the replay records them in) —
-// used to approximate where the cursor was sitting at a missed note's
-// expected hit time, since the keypress-matching pass below only tells us
-// *that* no press paired with it, not *where* the cursor was.
-function nearestCursorFrame(cursorFrames, t) {
-    let lo = 0, hi = cursorFrames.length - 1;
-    if (t <= cursorFrames[0].t) return cursorFrames[0];
-    if (t >= cursorFrames[hi].t) return cursorFrames[hi];
-    while (lo < hi) {
-        const mid = (lo + hi) >> 1;
-        if (cursorFrames[mid].t < t) lo = mid + 1; else hi = mid;
-    }
-    const a = cursorFrames[Math.max(0, lo - 1)], b = cursorFrames[lo];
-    return Math.abs(a.t - t) <= Math.abs(b.t - t) ? a : b;
-}
-
-/* One pass over the replay's frames builds three things at once: the same
-   hit-timing deltas computeHitErrors used to compute (kept as its own
-   heuristic, see the file header comment), a density grid of every cursor
-   position for the heatmap, and — for notes the keypress matcher couldn't
-   pair with a press — an approximate miss location from the nearest cursor
-   frame in time. Returns null fields where there isn't enough data rather
-   than throwing, same as the original always did for hitErrors alone. */
+/* Matches each osu!std hit circle/slider head to the nearest not-yet-used
+   keypress within HIT_MATCH_WINDOW_MS, producing the "am I early/late"
+   timing deltas rendered as a histogram — see the file header comment for
+   what this heuristic does and doesn't model. Returns hitErrors: null when
+   there isn't enough data to match against, rather than throwing. */
 function computeReplayAnalysis(beatmap, replay, clockRate) {
     const circles = (beatmap.hitObjects || [])
         .filter(o => (o.hitType & 1) !== 0 || (o.hitType & 2) !== 0) // Normal or Slider (head only)
         .map(o => o.startTime)
         .sort((a, b) => a - b);
 
-    const cursorFrames = [];
-    const grid = new Array(GRID_W * GRID_H).fill(0);
     const presses = [];
     let wasPressed = false;
     for (const f of replay.frames || []) {
         if (!Number.isFinite(f.startTime)) continue;
         const t = f.startTime / clockRate;
-        const pos = f.position;
-        if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
-            cursorFrames.push({ t, x: pos.x, y: pos.y });
-            const gx = Math.min(GRID_W - 1, Math.max(0, Math.floor(pos.x / PLAYFIELD_W * GRID_W)));
-            const gy = Math.min(GRID_H - 1, Math.max(0, Math.floor(pos.y / PLAYFIELD_H * GRID_H)));
-            grid[gy * GRID_W + gx]++;
-        }
         const isPressed = (f.buttonState || 0) !== 0;
         if (isPressed && !wasPressed) presses.push(t);
         wasPressed = isPressed;
     }
 
-    const cursorHeatmap = cursorFrames.length ? { w: GRID_W, h: GRID_H, grid } : null;
     if (!circles.length || !presses.length || circles.length * presses.length > MAX_MATCH_OPS) {
-        return { hitErrors: null, missPositions: [], cursorHeatmap };
+        return { hitErrors: null };
     }
 
     const used = new Array(presses.length).fill(false);
     const errors = [];
-    const missPositions = [];
     for (const objTime of circles) {
         let bestIdx = -1, bestDelta = Infinity;
         for (let i = 0; i < presses.length; i++) {
@@ -152,12 +106,9 @@ function computeReplayAnalysis(beatmap, replay, clockRate) {
         if (bestIdx >= 0) {
             used[bestIdx] = true;
             errors.push(Math.round(bestDelta));
-        } else if (cursorFrames.length) {
-            const near = nearestCursorFrame(cursorFrames, objTime);
-            missPositions.push({ x: Math.round(near.x), y: Math.round(near.y) });
         }
     }
-    return { hitErrors: errors, missPositions, cursorHeatmap };
+    return { hitErrors: errors };
 }
 
 exports.handler = async (event) => {
@@ -224,10 +175,22 @@ exports.handler = async (event) => {
         // converted once here rather than at every call site.
         const accuracyPct = info.accuracy * 100;
 
+        // ScoreInfo.rank is a getter (osu-classes) that computes the letter
+        // grade from accuracy/mods/counts — but it always short-circuits to
+        // 'F' unless .passed is true first, and osu-parsers' ScoreDecoder
+        // never sets .passed itself (the legacy .osr format has no explicit
+        // pass/fail field), so it defaults to false and every replay came
+        // back 'F' regardless of the actual result. Approximate it from the
+        // life bar graph the .osr does carry instead: NF never actually
+        // fails a play, and otherwise dying is exactly hitting 0 health at
+        // the last recorded frame.
+        const lifeBar = (score.replay && score.replay.lifeBar) || [];
+        info.passed = mods.includes('NF') || !lifeBar.length || lifeBar[lifeBar.length - 1].health > 0;
+
         const result = {
             player: info.username || null,
             mods,
-            rank: info.passed ? info.rank : 'F',
+            rank: info.rank,
             accuracy: accuracyPct,
             maxCombo: info.maxCombo,
             counts: {
@@ -237,8 +200,6 @@ exports.handler = async (event) => {
             rulesetId: info.rulesetId,
             beatmap: null,
             hitErrors: null,
-            missPositions: [],
-            cursorHeatmap: null,
         };
 
         if (lookupRes.ok) {
@@ -271,8 +232,6 @@ exports.handler = async (event) => {
                         const parsedBeatmap = beatmapDecoder.decodeFromString(osuText, false);
                         const analysis = computeReplayAnalysis(parsedBeatmap, score.replay, clockRate);
                         result.hitErrors = analysis.hitErrors;
-                        result.missPositions = analysis.missPositions;
-                        result.cursorHeatmap = analysis.cursorHeatmap;
                     } catch (err) {
                         result.hitErrors = null;
                     }

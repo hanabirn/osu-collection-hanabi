@@ -246,6 +246,7 @@ I18N.en = {
     tracked_mappers_title: '🎨 Tracked Mappers', tracked_mappers_hint: "Enter a mapper's osu! username — you'll be notified when they rank a new map.",
     mapper_track_placeholder: "Enter mapper's username...", mapper_track_btn: 'Track',
     mapper_already_tracked: "You're already tracking this mapper", mapper_track_done: "Tracking added — you'll be notified about new maps",
+    mapper_not_found: "Couldn't find that osu! player — check the username",
     tracked_mappers_empty: "You're not tracking any mappers yet", notif_mapper_new_title: '{name} ranked a new map',
     notif_achievement_new_title: '{n} earned a new medal', notif_achievement_detail: '{count} new medal(s) — click to view',
     notif_mapper_graveyard_title: '{name} has a new graveyard map', notif_mapper_loved_title: "{name}'s map got Loved!",
@@ -276,7 +277,6 @@ I18N.en = {
     replay_stat_accuracy: 'Accuracy', replay_stat_combo: 'Max Combo', replay_stat_misses: 'Misses',
     replay_stat_mods: 'Mods', replay_stat_rank: 'Rank', replay_stat_player: 'Player',
     replay_approx_note: "Hit timing is estimated by matching key presses to nearby beatmap notes — it's not a full judgement replay, just a reference.",
-    replay_heatmap_title: 'Cursor heatmap', replay_heatmap_note: "Cursor position density overlaid on the map's cover art; red ✕ marks are estimated miss locations. The background is illustrative, not the actual in-game view.",
 
     fc_sim_btn: 'FC sim', fc_sim_btn_title: 'Estimate PP if this map were FC\'d',
     fc_sim_popover_title: 'PP if FC', fc_sim_loading: 'Calculating...', fc_sim_error: 'Calculation failed, please try again later',

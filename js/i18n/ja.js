@@ -248,6 +248,7 @@ I18N.ja = {
     tracked_mappers_title: '🎨 マッパーをフォロー', tracked_mappers_hint: 'マッパーの osu! ユーザー名を入力すると、新しい譜面が ranked になったときに通知します。',
     mapper_track_placeholder: 'マッパーのユーザー名を入力...', mapper_track_btn: 'フォロー',
     mapper_already_tracked: 'このマッパーはすでにフォロー中です', mapper_track_done: 'フォローに追加しました。新しい譜面が出たら通知します',
+    mapper_not_found: 'この osu! プレイヤーが見つかりません。ユーザー名をご確認ください',
     tracked_mappers_empty: 'まだ誰もフォローしていません', notif_mapper_new_title: '{name} が新しい譜面を公開しました',
     notif_achievement_new_title: '{n} が新しいメダルを獲得しました', notif_achievement_detail: '新しいメダル {count} 個 — クリックして確認',
     notif_mapper_graveyard_title: '{name} に新しい Graveyard 譜面があります', notif_mapper_loved_title: '{name} の譜面が Loved になりました！',

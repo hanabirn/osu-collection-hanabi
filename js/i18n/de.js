@@ -248,6 +248,7 @@ I18N.de = {
     tracked_mappers_title: '🎨 Beobachtete Mapper', tracked_mappers_hint: 'Gib den osu!-Benutzernamen eines Mappers ein — du wirst benachrichtigt, wenn er eine neue Map rankt.',
     mapper_track_placeholder: 'Benutzername des Mappers...', mapper_track_btn: 'Verfolgen',
     mapper_already_tracked: 'Du verfolgst diesen Mapper bereits', mapper_track_done: 'Zur Beobachtung hinzugefügt — du wirst über neue Maps benachrichtigt',
+    mapper_not_found: 'Dieser osu!-Spieler wurde nicht gefunden — bitte den Benutzernamen prüfen',
     tracked_mappers_empty: 'Du beobachtest noch keine Mapper', notif_mapper_new_title: '{name} hat eine neue Map gerankt',
     notif_achievement_new_title: '{n} hat ein neues Abzeichen erhalten', notif_achievement_detail: '{count} neue(s) Abzeichen — hier klicken',
     notif_mapper_graveyard_title: '{name} hat eine neue Graveyard-Map', notif_mapper_loved_title: 'Eine Map von {name} wurde zu Loved hinzugefügt!',

@@ -1965,6 +1965,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-size: 1.1rem;
     font-weight: bold;
     color: var(--text-pink);
+    overflow-wrap: anywhere;
 }
 .osu-stat-label {
     font-size: 0.72rem;
@@ -2664,8 +2665,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transition: all 0.2s;
 }
 .tracked-leaderboard-btn:hover { background: rgba(var(--accent-pink-rgb), 0.2); }
-.tracked-mapper-card { cursor: default; }
-.tracked-mapper-card:hover { transform: none; }
 
 /* ===== Leaderboard modal ===== */
 .leaderboard-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
@@ -2696,9 +2695,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 1.2rem;
-    max-width: 520px;
-    margin-left: auto;
-    margin-right: auto;
+}
+/* The mapper-tracking page (js/updates.js renderTrackedMappersList) reuses
+   this same panel/list markup but has no .tracked-players-title above it
+   (that's only rendered by the PP-lookup tracked-players list), so the chips
+   need their own top margin to not sit flush against the input row. */
+#tracked-mappers-panel .tracked-players-list,
+#tracked-mappers-panel .tracked-players-empty {
+    margin-top: 14px;
 }
 .tracked-player-card {
     display: flex;
@@ -3383,16 +3387,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .hit-error-chart-svg { width: 100%; height: auto; display: block; }
 .hit-error-bar { fill: var(--accent-light-purple); opacity: 0.75; }
 .hit-error-zero-line { stroke: var(--text-pink); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.6; }
-
-.replay-heatmap-canvas {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    border-radius: 12px;
-    border: 1px solid var(--border-card);
-    box-shadow: var(--shadow-card-inset);
-}
 
 /* ===== Stats card download button ===== */
 .stats-card-btn {

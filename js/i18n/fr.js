@@ -248,6 +248,7 @@ I18N.fr = {
     tracked_mappers_title: '🎨 Mappers suivis', tracked_mappers_hint: "Entrez le pseudo osu! d'un mapper — vous serez averti quand il classera une nouvelle carte.",
     mapper_track_placeholder: 'Pseudo du mapper...', mapper_track_btn: 'Suivre',
     mapper_already_tracked: 'Vous suivez déjà ce mapper', mapper_track_done: 'Ajouté au suivi — vous serez averti des nouvelles cartes',
+    mapper_not_found: "Joueur osu! introuvable — vérifiez le nom d'utilisateur",
     tracked_mappers_empty: "Vous ne suivez aucun mapper pour l'instant", notif_mapper_new_title: '{name} a classé une nouvelle carte',
     notif_achievement_new_title: '{n} a obtenu un nouveau médaillon', notif_achievement_detail: '{count} nouveau(x) médaillon(s) — cliquez pour voir',
     notif_mapper_graveyard_title: '{name} a une nouvelle carte en graveyard', notif_mapper_loved_title: 'Une carte de {name} est passée en Loved !',

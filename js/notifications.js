@@ -201,6 +201,25 @@ async function checkTrackedMappers() {
 
     let anyUpdated = false;
     for (const mapper of mappers) {
+        // Entries tracked before the avatar/flag/profile-link card existed
+        // have no id/country yet (js/updates.js trackMapperFromInput only
+        // started resolving those going forward) — backfill them lazily here
+        // since this loop already runs periodically over every tracked mapper.
+        if (!mapper.id) {
+            try {
+                const users = await osuFetch(`u=${encodeURIComponent(mapper.name)}&type=string`);
+                const u = Array.isArray(users) ? users[0] : null;
+                if (u) {
+                    mapper.id = u.user_id;
+                    mapper.country = u.country || null;
+                    mapper.name = u.username;
+                    anyUpdated = true;
+                }
+            } catch (e) {
+                console.error('Tracked mapper id backfill failed:', mapper.name, e);
+            }
+        }
+
         try {
             const beatmaps = await osuFetch(`mapper=${encodeURIComponent(mapper.name)}&mapper_type=string`);
             if (Array.isArray(beatmaps) && beatmaps.length > 0) {

@@ -248,6 +248,7 @@ I18N.es = {
     tracked_mappers_title: '🎨 Mappers Seguidos', tracked_mappers_hint: 'Introduce el nombre de usuario osu! de un mapper — te avisaremos cuando clasifique un mapa nuevo.',
     mapper_track_placeholder: 'Nombre de usuario del mapper...', mapper_track_btn: 'Seguir',
     mapper_already_tracked: 'Ya estás siguiendo a este mapper', mapper_track_done: 'Añadido al seguimiento — te avisaremos de mapas nuevos',
+    mapper_not_found: 'No se encontró ese jugador de osu! — comprueba el nombre de usuario',
     tracked_mappers_empty: 'Todavía no sigues a ningún mapper', notif_mapper_new_title: '{name} ha clasificado un mapa nuevo',
     notif_achievement_new_title: '{n} obtuvo una nueva medalla', notif_achievement_detail: '{count} medalla(s) nueva(s) — haz clic para ver',
     notif_mapper_graveyard_title: '{name} tiene un nuevo mapa en graveyard', notif_mapper_loved_title: '¡Un mapa de {name} pasó a Loved!',
