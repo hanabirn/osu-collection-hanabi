@@ -198,6 +198,7 @@
             <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
             <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_skin_screenshots">皮膚廣場</span></button>
             <button class="site-nav-btn" onclick="switchTab('chat', this)" data-icon="messageCircle" data-icon-gap><span data-i18n="nav_chat">聊天室</span></button>
+            <button class="site-nav-btn" onclick="switchTab('dm', this)" data-icon="mail" data-icon-gap><span data-i18n="nav_dm">私訊</span><span class="dm-nav-badge" id="dm-nav-badge" style="display:none;">0</span></button>
         </div>
         <div class="nav-drawer-group">
             <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
@@ -767,6 +768,39 @@
         </div>
     </section>
 
+    <section id="page-dm" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="dm_page_title">✦ 私訊 ✦</h2>
+        <p class="tournaments-hint" data-i18n="dm_page_hint">跟其他玩家一對一聊天。</p>
+
+        <div class="osu-add-card chat-card" id="dm-list-view">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div id="dm-login-required" class="chat-login-required" style="display:none;">
+                <span data-i18n="dm_login_required">登入 osu! 才能使用私訊</span>
+                <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
+            </div>
+            <div id="dm-new-row" class="input-group" style="display:none;">
+                <input type="text" id="dm-new-username" data-i18n-placeholder="dm_new_username_placeholder" placeholder="輸入用戶名開始對話..." onkeydown="if(event.key==='Enter'){event.preventDefault();startDmConversationFromInput();}">
+                <button onclick="startDmConversationFromInput()" data-i18n="dm_start_btn">開始對話</button>
+            </div>
+            <div id="dm-conversations-list" class="dm-conversations-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
+        </div>
+
+        <div class="osu-add-card chat-card" id="dm-thread-view" style="display:none;">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div class="dm-thread-header">
+                <button class="dm-back-btn" onclick="closeDmThread()" data-icon="arrowLeft" data-icon-gap><span data-i18n="dm_back_btn">返回</span></button>
+                <div id="dm-thread-partner" class="dm-thread-partner"></div>
+            </div>
+            <div id="dm-thread-messages" class="chat-messages-list"></div>
+            <div class="input-group">
+                <input type="text" id="dm-thread-input" maxlength="300" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDmMessage();}">
+                <button onclick="sendDmMessage()" data-i18n="chat_send_btn">送出</button>
+            </div>
+        </div>
+    </section>
+
     <section id="page-updates" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="updates_title">✦ 更新情報 ✦</h2>
         <div class="osu-add-card">
@@ -1080,6 +1114,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/skin-screenshots.js"></script>
 <script defer src="js/updates.js"></script>
 <script defer src="js/chat.js"></script>
+<script defer src="js/dm.js"></script>
 <script defer src="js/resources-data.js"></script>
 <script defer src="js/tournaments.js"></script>
 <script defer src="js/celebrate.js"></script>

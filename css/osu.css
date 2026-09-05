@@ -3535,3 +3535,90 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .chat-reply-banner button:hover { color: var(--accent-pink); }
 .chat-login-required .btn { padding: 6px 14px; font-size: 0.8rem; flex-shrink: 0; }
+
+/* ===== Direct messages (js/dm.js) =====
+   Reuses .chat-* building blocks (avatar-with-flag, .chat-message-name,
+   .chat-message-time, .osu-empty) throughout rather than a parallel style
+   set — the list/thread shell is new, the pieces inside it aren't. */
+.dm-nav-badge {
+    margin-left: auto;
+    background: var(--accent-pink);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 1px 7px;
+    border-radius: 999px;
+    line-height: 1.4;
+}
+.dm-conversations-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.dm-conversation-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s var(--ease-spring);
+}
+.dm-conversation-row:hover { border-color: rgba(var(--accent-pink-rgb), 0.5); transform: translateY(-2px); }
+.dm-conversation-row .tracked-player-avatar { width: 40px; height: 40px; }
+.dm-conversation-body { flex: 1; min-width: 0; }
+.dm-conversation-header { display: flex; align-items: center; gap: 8px; }
+.dm-conversation-snippet {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+.dm-conversation-unread { margin-left: 0; flex-shrink: 0; }
+
+.dm-thread-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-card);
+}
+.dm-back-btn {
+    display: flex;
+    align-items: center;
+    border: none;
+    background: var(--bg-stat);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.dm-back-btn:hover { color: var(--text); }
+.dm-thread-partner { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.dm-thread-partner .tracked-player-avatar { width: 32px; height: 32px; }
+.dm-thread-partner .chat-message-name { font-size: 0.92rem; }
+
+/* Chat-bubble alignment: partner's messages left, yours right — the one
+   piece of visual language that's actually new here rather than reused,
+   since it's the only thing that makes a 1:1 thread read differently from
+   the public room's uniform list. */
+.dm-message { display: flex; margin-bottom: 4px; }
+.dm-message .chat-message-body {
+    flex: 0 1 auto;
+    max-width: 75%;
+    background: var(--bg-stat);
+    border-radius: 14px 14px 14px 4px;
+    padding: 8px 12px;
+}
+.dm-message .chat-message-content { margin-top: 0; }
+.dm-message .chat-message-time { display: block; margin-top: 3px; }
+.dm-message-mine { justify-content: flex-end; }
+.dm-message-mine .chat-message-body {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    border-radius: 14px 14px 4px 14px;
+    color: #fff;
+}
+.dm-message-mine .chat-message-time { color: rgba(255,255,255,0.75); }

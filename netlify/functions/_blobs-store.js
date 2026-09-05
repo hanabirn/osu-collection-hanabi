@@ -83,4 +83,15 @@ function getChatStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore };
+// Direct messages (dm-conversations/dm-messages/dm-send/dm-read.js) —
+// per-conversation message arrays (conv:<minId>:<maxId>) plus each user's
+// own inbox summary (index:<userId>), same store as the send cooldown key.
+function getDmStore() {
+    return getStore({
+        name: 'osu-dm',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getDmStore };

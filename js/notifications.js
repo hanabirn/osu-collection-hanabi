@@ -301,7 +301,16 @@ async function checkForNotifications(force) {
     if (!force && Date.now() - last < NOTIF_CHECK_INTERVAL_MS) return;
     localStorage.setItem(NOTIF_LAST_CHECK_KEY, String(Date.now()));
 
-    await Promise.all([checkTrackedPlayers(), checkNewTournamentPosts(), checkTrackedMappers()]);
+    // DM unread badge is intentionally its own thing, not routed through
+    // addNotification()/getUnreadNotifCount() below — those track "read" in
+    // localStorage, which would fight with a DM conversation's unreadCount
+    // living server-side (see netlify/functions/dm-read.js). Piggybacks on
+    // this same 15-min cycle for whenever the visitor isn't on the DM tab
+    // itself (js/dm.js polls it directly, much faster, while that tab is open).
+    await Promise.all([
+        checkTrackedPlayers(), checkNewTournamentPosts(), checkTrackedMappers(),
+        typeof loadDmConversations === 'function' ? loadDmConversations() : Promise.resolve(),
+    ]);
     renderNotificationBell();
 }
 

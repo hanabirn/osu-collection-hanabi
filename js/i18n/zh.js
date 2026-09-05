@@ -289,6 +289,7 @@ I18N.zh = {
 
     nav_skin_screenshots: '皮膚廣場',
     nav_chat: '聊天室',
+    nav_dm: '私訊',
     ssc_page_title: '✦ 皮膚截圖廣場 ✦',
     ssc_page_hint: '分享你實際遊玩時的皮膚截圖給其他人參考——下載連結或 .osk 檔案至少擇一，這樣別人才能下載到這個皮膚。',
     ssc_upload_title: '✦ 分享我的皮膚截圖 ✦',
@@ -320,4 +321,12 @@ I18N.zh = {
     chat_delete_btn_title: '刪除這則訊息', chat_delete_confirm: '確定要刪除這則訊息嗎？', chat_delete_fail: '刪除失敗',
     chat_add_to_collection_btn: '加入收藏',
     chat_rate_limited: '傳送太快了，慢一點再試', chat_send_fail: '傳送失敗，稍後再試',
+
+    dm_page_title: '✦ 私訊 ✦', dm_page_hint: '跟其他玩家一對一聊天。',
+    dm_new_username_placeholder: '輸入用戶名開始對話...', dm_start_btn: '開始對話',
+    dm_login_required: '登入 osu! 才能使用私訊',
+    dm_empty: '還沒有任何對話，輸入用戶名開始第一則私訊吧！',
+    dm_thread_empty: '還沒有訊息，說聲哈囉吧！',
+    dm_back_btn: '返回',
+    dm_self_error: '不能傳私訊給自己',
 };

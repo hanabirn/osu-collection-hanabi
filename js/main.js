@@ -58,6 +58,11 @@ function switchTab(tab, el) {
     // should resume polling, not just load once per session.
     if (tab === 'chat' && typeof ensureChatLoaded === 'function') ensureChatLoaded();
     if (tab !== 'chat' && typeof stopChatPolling === 'function') stopChatPolling();
+    // Same start/stop-on-tab-switch reasoning as chat above — dm.js decides
+    // internally whether that means polling the conversation list or an
+    // open thread.
+    if (tab === 'dm' && typeof ensureDmLoaded === 'function') ensureDmLoaded();
+    if (tab !== 'dm' && typeof stopDmPolling === 'function') stopDmPolling();
     // Tab buttons now live in the slide-in drawer — picking one should also
     // dismiss it.
     if (typeof closeNavDrawer === 'function') closeNavDrawer();

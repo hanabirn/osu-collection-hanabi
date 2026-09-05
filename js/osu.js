@@ -4752,6 +4752,7 @@ function applyLoggedInOsuUser() {
     if (heroCta) heroCta.hidden = !!user;
     if (typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (typeof updateChatLoginUI === 'function') updateChatLoginUI();
+    if (typeof updateDmLoginUI === 'function') updateDmLoginUI();
     if (!user) return;
 
     document.getElementById('osu-logged-in-name').textContent = user.username || `#${user.id}`;
