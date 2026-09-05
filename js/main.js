@@ -193,8 +193,31 @@ function refreshDynamicContent() {
     if (typeof refreshMappoolsLocalized === 'function') refreshMappoolsLocalized();
 }
 
+/* ===== Keyboard shortcuts =====
+   `/` or Ctrl/Cmd+K opens the global search (js/global-search.js) from
+   anywhere, like GitHub/Slack/Notion's own search shortcut — a plain
+   document-level keydown listener, since there's nothing else on the page
+   competing for either binding. Ignored while typing in any input/
+   textarea/select/contenteditable (so `/` still types a literal slash in,
+   say, a chat message or the collection search box) and while a modal is
+   already open (its own Escape handler already owns the keyboard then). */
+function onGlobalShortcutKeydown(e) {
+    const isSlash = e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey;
+    const isCtrlK = e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey) && !e.altKey;
+    if (!isSlash && !isCtrlK) return;
+
+    const target = e.target;
+    const tag = target && target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (target && target.isContentEditable)) return;
+    if (document.querySelector('.pp-calc-modal-overlay[style*="flex"]')) return;
+
+    e.preventDefault();
+    if (typeof openGlobalSearch === 'function') openGlobalSearch();
+}
+
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('keydown', onGlobalShortcutKeydown);
     if (typeof renderStaticIcons === 'function') renderStaticIcons();
     if (typeof wireModalHowto === 'function') wireModalHowto();
     applyLang(siteLang);
