@@ -53,10 +53,10 @@ async function walk(dir) {
     return out;
 }
 
-async function minifyFile(absSrc, relPath) {
+async function minifyFile(absSrc, relPath, srcOverride) {
     const ext = extname(absSrc);
     const loader = ext === '.css' ? 'css' : 'js';
-    const src = await readFile(absSrc, 'utf8');
+    const src = srcOverride !== undefined ? srcOverride : await readFile(absSrc, 'utf8');
     const { code, warnings } = await transform(src, {
         loader,
         minify: true,
@@ -109,10 +109,20 @@ async function main() {
     }
     for (const f of MINIFY_ROOT_FILES) targets.push(join(ROOT, f));
 
+    // sw.js's BUILD_ID placeholder gets a real per-deploy value here so the
+    // file's bytes always differ from the previous deploy's — see its own
+    // comment for why that's what makes the "site updated" prompt reliable.
+    // Netlify sets COMMIT_REF during a real build; a local `npm run build`
+    // falls back to a timestamp.
+    const buildId = process.env.COMMIT_REF ? process.env.COMMIT_REF.slice(0, 8) : Date.now().toString(36);
+
     let totalBefore = 0, totalAfter = 0;
     for (const abs of targets) {
         const rel = abs.slice(ROOT.length).replace(/^[/\\]/, '');
-        const r = await minifyFile(abs, rel);
+        const srcOverride = rel === 'sw.js'
+            ? (await readFile(abs, 'utf8')).replace("const BUILD_ID = 'dev';", `const BUILD_ID = '${buildId}';`)
+            : undefined;
+        const r = await minifyFile(abs, rel, srcOverride);
         totalBefore += r.before;
         totalAfter += r.after;
     }

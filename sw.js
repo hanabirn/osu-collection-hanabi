@@ -15,6 +15,18 @@ const SHELL_CACHE = `osu-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `osu-images-${CACHE_VERSION}`;
 const KNOWN_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE]);
 
+/* scripts/build.mjs overwrites this with the deploy's commit ref (or a
+   timestamp for a local `npm run build`) before minifying into dist/. Never
+   read by the worker itself — it exists purely so this file's bytes differ
+   on every deploy, regardless of whether CACHE_VERSION/SHELL_ASSETS changed.
+   The browser's own SW update check is a byte-diff of this exact file, so
+   without this, a deploy that didn't happen to touch sw.js produced an
+   identical minified file and js/pwa.js's "site updated" prompt (which only
+   fires on a genuine SW updatefound event) silently never appeared, even
+   though the page's own JS/CSS/HTML — served network-first — had already
+   updated. */
+const BUILD_ID = 'dev';
+
 /* Only what the collection page needs to render offline in the default
    locale. install' used to addAll() ~45 entries — every feature script,
    all 8 locales, every icon asset — and those ~45 parallel fetches fired
