@@ -249,7 +249,7 @@
                     <div class="card-corner bl"></div><div class="card-corner br"></div>
                     <h3 data-i18n="osu_title">♫ 新增 Beatmap ♫</h3>
                     <div class="input-group">
-                        <input type="text" id="osuInput" data-i18n-placeholder="osu_placeholder" placeholder="輸入 ID 或貼上 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
+                        <input type="text" id="osuInput" autocomplete="off" data-i18n-placeholder="osu_placeholder" placeholder="輸入 ID 或貼上 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
                         <button onclick="addOsuBeatmap()" data-i18n="osu_add">新增</button>
                     </div>
                     <p id="osu-status" class="status"></p>
@@ -284,7 +284,7 @@
                 <div class="featured-beatmap-banner" id="featured-beatmap-banner" style="display:none;"></div>
 
                 <div class="osu-search-row">
-                    <input type="text" id="osu-search-input" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
+                    <input type="text" id="osu-search-input" autocomplete="off" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
                     <select id="osu-lang-filter" onchange="switchOsuLangFilter(this.value)">
                         <option value="all" data-i18n="osu_lang_filter_all">全部語言</option>
                     </select>
@@ -379,7 +379,7 @@
         </div>
 
         <div class="osu-search-row">
-            <input type="text" id="gallery-search-input" data-i18n-placeholder="gallery_search_placeholder" placeholder="搜尋玩家名稱或標籤..." oninput="searchPublicCollections(this.value)">
+            <input type="text" id="gallery-search-input" autocomplete="off" data-i18n-placeholder="gallery_search_placeholder" placeholder="搜尋玩家名稱或標籤..." oninput="searchPublicCollections(this.value)">
             <select id="gallery-sort-select" onchange="switchPublicCollectionsSort(this.value)">
                 <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
                 <option value="likes" data-i18n="gallery_sort_likes">❤ 最熱門</option>
@@ -420,7 +420,7 @@
         </div>
 
         <div class="osu-search-row">
-            <input type="text" id="farm-search-input" data-i18n-placeholder="farm_search_placeholder" placeholder="搜尋曲名或作者..." oninput="searchFarmMaps(this.value)">
+            <input type="text" id="farm-search-input" autocomplete="off" data-i18n-placeholder="farm_search_placeholder" placeholder="搜尋曲名或作者..." oninput="searchFarmMaps(this.value)">
             <select id="farm-sort-select" onchange="switchFarmSort(this.value)">
                 <option value="pp_desc" data-i18n="farm_sort_pp_desc">PP 高到低</option>
                 <option value="pp_asc" data-i18n="farm_sort_pp_asc">PP 低到高</option>
@@ -453,7 +453,7 @@
         <p class="tournaments-hint" data-i18n="catalog_hint">依歌手／語言／曲風／來源／feat. 瀏覽整個 ranked 曲庫，選定一個分類後可一鍵建立成收藏分類。資料由本站背景爬蟲持續建立，尚未涵蓋全部 ranked 圖。</p>
 
         <div class="osu-search-row">
-            <input type="text" id="catalog-search-input" data-i18n-placeholder="catalog_search_placeholder" placeholder="搜尋曲名／歌手／來源..." oninput="searchCatalog(this.value)">
+            <input type="text" id="catalog-search-input" autocomplete="off" data-i18n-placeholder="catalog_search_placeholder" placeholder="搜尋曲名／歌手／來源..." oninput="searchCatalog(this.value)">
             <select id="catalog-sort-select" onchange="switchCatalogSort(this.value)">
                 <option value="ranked_desc" data-i18n="catalog_sort_ranked_desc">上榜日期：新到舊</option>
                 <option value="ranked_asc" data-i18n="catalog_sort_ranked_asc">上榜日期：舊到新</option>
@@ -514,7 +514,7 @@
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="visitor_lookup_title">✦ 查詢你的 osu! PP ✦</h3>
             <div class="visitor-lookup-input-row">
-                <input type="text" id="visitor-lookup-input" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input" oninput="onVisitorLookupInputChange()" onkeydown="if(event.key==='Enter')lookupVisitorProfile()">
+                <input type="text" id="visitor-lookup-input" autocomplete="off" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input" oninput="onVisitorLookupInputChange()" onkeydown="if(event.key==='Enter')lookupVisitorProfile()">
                 <button class="btn" onclick="lookupVisitorProfile()" data-i18n="visitor_lookup_btn">查詢</button>
             </div>
             <div id="visitor-lookup-status" class="status"></div>
@@ -580,8 +580,8 @@
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <h3 data-i18n="pp_compare_title">⚔ 雙人 PP 對比</h3>
             <div class="pp-compare-input-row">
-                <input type="text" id="pp-compare-input-a" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
-                <input type="text" id="pp-compare-input-b" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
+                <input type="text" id="pp-compare-input-a" autocomplete="off" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
+                <input type="text" id="pp-compare-input-b" autocomplete="off" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
                 <button class="btn" onclick="comparePlayers()" data-i18n="pp_compare_btn">比較</button>
             </div>
             <div id="pp-compare-status" class="status"></div>
@@ -675,13 +675,13 @@
             <h3 data-i18n="ssc_upload_title">✦ 分享我的皮膚截圖 ✦</h3>
             <div class="ssc-upload-form">
                 <div class="input-group">
-                    <input type="text" id="ssc-upload-name" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
+                    <input type="text" id="ssc-upload-name" autocomplete="off" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
                 </div>
                 <div class="input-group">
-                    <input type="text" id="ssc-upload-author" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
+                    <input type="text" id="ssc-upload-author" autocomplete="off" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
                 </div>
                 <div class="input-group">
-                    <input type="text" id="ssc-upload-url" data-i18n-placeholder="ssc_upload_url_placeholder" placeholder="下載連結" maxlength="300">
+                    <input type="text" id="ssc-upload-url" autocomplete="off" data-i18n-placeholder="ssc_upload_url_placeholder" placeholder="下載連結" maxlength="300">
                 </div>
                 <p class="ssc-upload-hint" data-i18n="ssc_upload_link_or_file_hint">下載連結、或直接上傳 .osk 檔案，兩者至少擇一，這樣別人才能下載到這個皮膚（.osk 檔案上限 2.5MB，太大的皮膚建議改附連結）。</p>
                 <div class="skin-upload-row">
@@ -699,7 +699,7 @@
         </div>
 
         <div class="osu-search-row">
-            <input type="text" id="ssc-search-input" data-i18n-placeholder="ssc_search_placeholder" placeholder="搜尋皮膚名稱或作者..." oninput="searchSkinScreenshots(this.value)">
+            <input type="text" id="ssc-search-input" autocomplete="off" data-i18n-placeholder="ssc_search_placeholder" placeholder="搜尋皮膚名稱或作者..." oninput="searchSkinScreenshots(this.value)">
             <select id="ssc-sort-select" onchange="switchSkinScreenshotsSort(this.value)">
                 <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
                 <option value="likes" data-i18n="gallery_sort_likes">❤ 最熱門</option>
@@ -757,7 +757,7 @@
                 <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
             </div>
             <div id="dm-new-row" class="input-group" style="display:none;">
-                <input type="text" id="dm-new-username" data-i18n-placeholder="dm_new_username_placeholder" placeholder="輸入用戶名開始對話..." onkeydown="if(event.key==='Enter'){event.preventDefault();startDmConversationFromInput();}">
+                <input type="text" id="dm-new-username" autocomplete="off" data-i18n-placeholder="dm_new_username_placeholder" placeholder="輸入用戶名開始對話..." onkeydown="if(event.key==='Enter'){event.preventDefault();startDmConversationFromInput();}">
                 <button onclick="startDmConversationFromInput()" data-i18n="dm_start_btn">開始對話</button>
             </div>
             <div id="dm-conversations-list" class="dm-conversations-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
@@ -794,7 +794,7 @@
             <h3 data-i18n="tracked_mappers_title">🎨 追蹤 Mapper</h3>
             <p class="skins-hint" data-i18n="tracked_mappers_hint">輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。</p>
             <div class="input-group">
-                <input type="text" id="mapper-track-input" data-i18n-placeholder="mapper_track_placeholder" placeholder="輸入 mapper 用戶名..." onkeydown="if(event.key==='Enter')trackMapperFromInput()">
+                <input type="text" id="mapper-track-input" autocomplete="off" data-i18n-placeholder="mapper_track_placeholder" placeholder="輸入 mapper 用戶名..." onkeydown="if(event.key==='Enter')trackMapperFromInput()">
                 <button onclick="trackMapperFromInput()" data-i18n="mapper_track_btn">追蹤</button>
             </div>
             <div id="tracked-mappers-panel" class="tracked-players-panel"></div>
@@ -906,7 +906,7 @@
         <button class="pp-calc-close" onclick="closeCategoryManageModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="osu_category_manage_title">管理分類</h3>
         <div class="osu-category-manage-add-row">
-            <input type="text" id="osu-category-manage-input" data-i18n-placeholder="osu_category_add_prompt" placeholder="輸入新分類名稱..." onkeydown="if(event.key==='Enter')addOsuCategoryFromModal()">
+            <input type="text" id="osu-category-manage-input" autocomplete="off" data-i18n-placeholder="osu_category_add_prompt" placeholder="輸入新分類名稱..." onkeydown="if(event.key==='Enter')addOsuCategoryFromModal()">
             <button class="btn" onclick="addOsuCategoryFromModal()" data-i18n="osu_category_add_title">新增</button>
         </div>
         <div id="osu-category-manage-list"></div>
@@ -971,7 +971,7 @@
             <button class="btn" onclick="generateCollectionFor('recent')" data-i18n="ctools_gen_recent">最近遊玩</button>
         </div>
         <div class="ctools-mapper-row">
-            <input type="text" id="ctools-mapper-input" data-i18n-placeholder="ctools_mapper_ph" placeholder="mapper 名稱或 ID">
+            <input type="text" id="ctools-mapper-input" autocomplete="off" data-i18n-placeholder="ctools_mapper_ph" placeholder="mapper 名稱或 ID">
             <button class="btn" onclick="generateCollectionFromMapper()" data-i18n="ctools_gen_mapper">生成</button>
         </div>
         <div id="ctools-gen-status" class="status"></div>
@@ -1020,7 +1020,7 @@
 <div id="global-search-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeGlobalSearch()">
     <div class="pp-calc-modal global-search-modal">
         <button class="pp-calc-close" onclick="closeGlobalSearch()" data-icon="x"></button>
-        <input type="text" id="global-search-input" class="guestbook-input global-search-input" data-i18n-placeholder="global_search_placeholder" placeholder="搜尋歌曲、圖池、我的收藏..." oninput="onGlobalSearchInput(this.value)">
+        <input type="text" id="global-search-input" class="guestbook-input global-search-input" autocomplete="off" data-i18n-placeholder="global_search_placeholder" placeholder="搜尋歌曲、圖池、我的收藏..." oninput="onGlobalSearchInput(this.value)">
         <div id="global-search-results" class="global-search-results"></div>
     </div>
 </div>

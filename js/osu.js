@@ -4371,7 +4371,7 @@ function renderMedalsGallery() {
     el.innerHTML = `
         <div class="medals-gallery-header">
             <span class="medals-earned-count">${t('medals_earned_label', { n: earnedCount, total: allOsekaiMedals.length })}</span>
-            <input type="text" class="medals-search-input guestbook-input" data-i18n-placeholder="medals_search_placeholder" placeholder="${t('medals_search_placeholder')}" oninput="medalsSearchGallery(this.value)">
+            <input type="text" class="medals-search-input guestbook-input" autocomplete="off" data-i18n-placeholder="medals_search_placeholder" placeholder="${t('medals_search_placeholder')}" oninput="medalsSearchGallery(this.value)">
         </div>
         <div class="osu-mode-tabs medals-filter-tabs">
             <button class="osu-tab active" onclick="medalsFilterGallery('all', this)">${t('medals_filter_all')}</button>
