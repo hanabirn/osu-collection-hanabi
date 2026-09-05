@@ -30,10 +30,7 @@ I18N.en = {
     dm_back_btn: 'Back',
     dm_self_error: "You can't message yourself",
 
-    side_rail_activity_title: '✦ Latest Activity ✦', side_rail_stats_title: '✦ Site Stats ✦',
-    side_rail_published_collection: 'published a collection', side_rail_activity_empty: 'No activity yet',
-    side_rail_just_now: 'just now', side_rail_minutes_ago: '{n}m ago', side_rail_hours_ago: '{n}h ago', side_rail_days_ago: '{n}d ago',
-    side_rail_stat_catalog: 'Catalog beatmaps indexed', side_rail_stat_mappools: 'World Cup mappool maps', side_rail_stat_farm: 'Farm map database', side_rail_stat_gallery: 'Collections shared',
+    side_rail_tournaments_title: '✦ Tournament News ✦', side_rail_resources_title: '✦ More Resources ✦', side_rail_view_all: 'View all →',
     global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',

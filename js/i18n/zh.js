@@ -332,8 +332,5 @@ I18N.zh = {
     dm_back_btn: '返回',
     dm_self_error: '不能傳私訊給自己',
 
-    side_rail_activity_title: '✦ 最新動態 ✦', side_rail_stats_title: '✦ 本站數據 ✦',
-    side_rail_published_collection: '發布了收藏', side_rail_activity_empty: '還沒有任何動態',
-    side_rail_just_now: '剛剛', side_rail_minutes_ago: '{n} 分鐘前', side_rail_hours_ago: '{n} 小時前', side_rail_days_ago: '{n} 天前',
-    side_rail_stat_catalog: '曲庫分類已收錄', side_rail_stat_mappools: '世界盃圖池張數', side_rail_stat_farm: 'Farm 圖資料庫', side_rail_stat_gallery: '收藏廣場分享數',
+    side_rail_tournaments_title: '✦ 賽事快訊 ✦', side_rail_resources_title: '✦ 更多資源 ✦', side_rail_view_all: '查看全部 →',
 };

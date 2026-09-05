@@ -208,16 +208,19 @@
 
 <main class="site-main">
 
-<!-- Wide-screen-only side panels filling the empty gutters beside this
-     centered column with live content instead of pure decoration — see
-     css/base.css .side-rail and js/side-rails.js. Hidden below 1700px. -->
-<aside class="side-rail side-rail-left" id="side-rail-activity">
-    <div class="side-rail-title" data-i18n="side_rail_activity_title">✦ 最新動態 ✦</div>
-    <div class="side-rail-list" id="side-rail-activity-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
+<!-- Wide-screen-only mini previews filling the empty gutters beside this
+     centered column — compact versions of the 賽事/資源 tabs rather than
+     pure decoration. See css/base.css .side-rail and js/side-rails.js.
+     Hidden below 1700px. -->
+<aside class="side-rail side-rail-left" id="side-rail-tournaments">
+    <div class="side-rail-title" data-i18n="side_rail_tournaments_title">✦ 賽事快訊 ✦</div>
+    <div class="side-rail-list" id="side-rail-tournaments-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
+    <button class="side-rail-viewall-btn" onclick="switchTab('tournaments')" data-i18n="side_rail_view_all">查看全部 →</button>
 </aside>
-<aside class="side-rail side-rail-right" id="side-rail-stats">
-    <div class="side-rail-title" data-i18n="side_rail_stats_title">✦ 本站數據 ✦</div>
-    <div class="side-rail-stats-grid" id="side-rail-stats-grid"></div>
+<aside class="side-rail side-rail-right" id="side-rail-resources">
+    <div class="side-rail-title" data-i18n="side_rail_resources_title">✦ 更多資源 ✦</div>
+    <div class="side-rail-list" id="side-rail-resources-list"></div>
+    <button class="side-rail-viewall-btn" onclick="switchTab('resources')" data-i18n="side_rail_view_all">查看全部 →</button>
 </aside>
 
 <!-- Persistent horizontal nav for desktop — the ☰ drawer is the only nav
@@ -1102,9 +1105,9 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/updates.js"></script>
 <script defer src="js/chat.js"></script>
 <script defer src="js/dm.js"></script>
-<script defer src="js/side-rails.js"></script>
 <script defer src="js/resources-data.js"></script>
 <script defer src="js/tournaments.js"></script>
+<script defer src="js/side-rails.js"></script>
 <script defer src="js/celebrate.js"></script>
 <script defer src="js/notifications.js"></script>
 <script defer src="js/feedback.js"></script>

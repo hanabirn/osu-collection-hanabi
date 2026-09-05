@@ -30,10 +30,7 @@ I18N.es = {
     dm_back_btn: 'Volver',
     dm_self_error: 'No puedes enviarte un mensaje a ti mismo',
 
-    side_rail_activity_title: '✦ Actividad reciente ✦', side_rail_stats_title: '✦ Estadísticas del sitio ✦',
-    side_rail_published_collection: 'publicó una colección', side_rail_activity_empty: 'Todavía no hay actividad',
-    side_rail_just_now: 'justo ahora', side_rail_minutes_ago: 'hace {n} min', side_rail_hours_ago: 'hace {n} h', side_rail_days_ago: 'hace {n} d',
-    side_rail_stat_catalog: 'Beatmaps indexados en el catálogo', side_rail_stat_mappools: 'Mapas en los mappools de la Copa Mundial', side_rail_stat_farm: 'Mapas en la base de farm maps', side_rail_stat_gallery: 'Colecciones compartidas',
+    side_rail_tournaments_title: '✦ Noticias de torneos ✦', side_rail_resources_title: '✦ Más recursos ✦', side_rail_view_all: 'Ver todo →',
     global_search_title: 'Buscar en el sitio', global_search_placeholder: 'Buscar canciones, mappools, mi colección...',
     global_search_section_collection: 'Mi colección', global_search_section_catalog: 'Catálogo', global_search_section_mappools: 'Mappools de la Copa del Mundo',
     global_search_empty: 'Sin resultados coincidentes',

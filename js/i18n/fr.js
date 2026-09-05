@@ -30,10 +30,7 @@ I18N.fr = {
     dm_back_btn: 'Retour',
     dm_self_error: 'Vous ne pouvez pas vous envoyer un message à vous-même',
 
-    side_rail_activity_title: '✦ Activité récente ✦', side_rail_stats_title: '✦ Statistiques du site ✦',
-    side_rail_published_collection: 'a publié une collection', side_rail_activity_empty: "Aucune activité pour l'instant",
-    side_rail_just_now: "à l'instant", side_rail_minutes_ago: 'il y a {n} min', side_rail_hours_ago: 'il y a {n} h', side_rail_days_ago: 'il y a {n} j',
-    side_rail_stat_catalog: 'Beatmaps indexées au catalogue', side_rail_stat_mappools: 'Cartes des mappools de Coupe du monde', side_rail_stat_farm: 'Cartes dans la base Farm', side_rail_stat_gallery: 'Collections partagées',
+    side_rail_tournaments_title: '✦ Actualités tournois ✦', side_rail_resources_title: '✦ Plus de ressources ✦', side_rail_view_all: 'Tout voir →',
     global_search_title: 'Rechercher sur le site', global_search_placeholder: 'Rechercher des chansons, mappools, ma collection...',
     global_search_section_collection: 'Ma collection', global_search_section_catalog: 'Catalogue', global_search_section_mappools: 'Mappools de la Coupe du monde',
     global_search_empty: 'Aucun résultat correspondant',

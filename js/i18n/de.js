@@ -30,10 +30,7 @@ I18N.de = {
     dm_back_btn: 'Zurück',
     dm_self_error: 'Du kannst dir selbst keine Nachricht schicken',
 
-    side_rail_activity_title: '✦ Neueste Aktivität ✦', side_rail_stats_title: '✦ Website-Statistiken ✦',
-    side_rail_published_collection: 'hat eine Sammlung veröffentlicht', side_rail_activity_empty: 'Noch keine Aktivität',
-    side_rail_just_now: 'gerade eben', side_rail_minutes_ago: 'vor {n} Min.', side_rail_hours_ago: 'vor {n} Std.', side_rail_days_ago: 'vor {n} Tg.',
-    side_rail_stat_catalog: 'Erfasste Katalog-Beatmaps', side_rail_stat_mappools: 'Karten in World-Cup-Mappools', side_rail_stat_farm: 'Karten in der Farm-Datenbank', side_rail_stat_gallery: 'Geteilte Sammlungen',
+    side_rail_tournaments_title: '✦ Turnier-News ✦', side_rail_resources_title: '✦ Weitere Ressourcen ✦', side_rail_view_all: 'Alle anzeigen →',
     global_search_title: 'Gesamte Seite durchsuchen', global_search_placeholder: 'Songs, Mappools, meine Sammlung durchsuchen...',
     global_search_section_collection: 'Meine Sammlung', global_search_section_catalog: 'Katalog', global_search_section_mappools: 'World-Cup-Mappools',
     global_search_empty: 'Keine passenden Ergebnisse',

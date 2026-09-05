@@ -1544,13 +1544,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 /* ===== Side rails — fill the gutters beside .site-main on a wide monitor =====
    Positioned relative to .site-main itself (not the viewport) via
    right/left: calc(100% + gap), so they start exactly where the content
-   column starts (clearing the hero) rather than needing to be pinned to
-   the viewport and manually dodge it. Only shown once there's provably
-   enough room either side to clear the 1080px column without touching it
-   — at 1700px that's a (1700-1080)/2 = 310px gutter each side, comfortably
-   more than this rail's 260px + 32px gap. Replaced the old decorative
-   .world-globe (css/particles.css, removed) which sat in this same visual
-   area doing nothing but spin. */
+   column starts (clearing the hero) rather than needing separate math to
+   dodge it. Only shown once there's provably enough room either side to
+   clear the 1080px column without touching it — at 1700px that's a
+   (1700-1080)/2 = 310px gutter each side, comfortably more than this
+   rail's 260px + 32px gap. Mini previews of the 賽事/資源 tabs
+   (js/side-rails.js) rather than pure decoration — replaced the old
+   .world-globe (css/particles.css, removed) that sat in this same area. */
 .side-rail {
     position: absolute;
     top: 0;
@@ -1580,30 +1580,31 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     margin-bottom: 12px;
 }
 .side-rail-list { display: flex; flex-direction: column; gap: 8px; }
-.side-rail-item {
-    display: flex;
-    padding: 8px;
-    border-radius: 10px;
+/* Scaled-down variants of .news-item (tournaments) and .resource-link-card
+   (resources) — same components the full tabs use, just smaller to fit a
+   260px column instead of duplicating their markup/styling from scratch. */
+.side-rail .news-item { padding: 8px; gap: 8px; }
+.side-rail .news-thumb { width: 44px; height: 44px; }
+.side-rail .news-title { font-size: 0.78rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.side-rail .news-item-header { font-size: 0.68rem; margin-bottom: 2px; }
+.side-rail .resource-link-card { padding: 8px 10px; }
+.side-rail .resource-link-title { font-size: 0.82rem; }
+.side-rail .resource-link-desc { font-size: 0.72rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.side-rail-viewall-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 7px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(var(--accent-pink-rgb), 0.12);
+    color: var(--text-pink);
+    font-size: 0.78rem;
+    font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s var(--ease-out);
+    transition: background 0.2s;
 }
-.side-rail-item:hover { background: var(--bg-stat); }
-.side-rail-item-body { min-width: 0; flex: 1; }
-.side-rail-item-text {
-    font-size: 0.8rem;
-    color: var(--text);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.side-rail-item-text b { color: var(--text-pink); }
-.side-rail-item-text .icon-svg { color: var(--text-dim2); }
-.side-rail-item-time { font-size: 0.68rem; color: var(--text-dim2); margin-top: 3px; }
-.side-rail-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.side-rail-stats-grid .osu-stat { padding: 10px 6px; }
-.side-rail-stats-grid .osu-stat-value { font-size: 1rem; }
+.side-rail-viewall-btn:hover { background: rgba(var(--accent-pink-rgb), 0.22); }
 
 /* ===== Touch / phone: lighten the stacked frosted surfaces =====
    .site-header, .site-main and .site-page each carry their own

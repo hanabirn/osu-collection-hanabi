@@ -1,15 +1,21 @@
 /* ===== Side rails (desktop-only, >=1700px) =====
    The centered content column leaves big empty gutters on a wide monitor —
-   rather than pure decoration there (the old .world-globe), these two
-   panels show real, changing site content: a merged "what's happening"
-   feed (chat + gallery) on the left, a few honest site-wide numbers on the
-   right. Both reuse existing public read endpoints (chat-list.js,
-   collections-list.js, catalog-list.js, wc-mappools-list.js,
-   farm-maps-list.js) — no new backend needed. Only fetched once the rails
-   are actually visible (matchMedia-gated), so narrower viewports never pay
-   for these calls at all. See css/base.css .side-rail for the layout math
-   that keeps them clear of the content column at any width. */
+   rather than pure decoration there (the old .world-globe, removed), these
+   two panels are compact previews of two existing tabs: 賽事 (left) and
+   資源 (right). Both reuse that tab's own data/loader instead of duplicating
+   it:
+   - Tournaments: calls js/tournaments.js's own loadOsuTournaments() (skipped
+     if already loaded) and its normalize-fn / current-items globals, so
+     opening the real 賽事 tab afterward is instant rather than double-fetching.
+   - Resources: js/resources-data.js's OSU_RESOURCES is already a plain
+     array with no fetch involved, so this just re-renders a compact slice
+     of it with the same .resource-link-card markup the full tab uses.
+   Only loaded once the rails are actually visible (matchMedia-gated), so
+   narrower viewports never pay for the tournaments fetch at all. See
+   css/base.css .side-rail for the layout math that keeps both clear of the
+   content column at any width. */
 const SIDE_RAIL_MIN_WIDTH_MQ = window.matchMedia('(min-width: 1700px)');
+const SIDE_RAIL_TOURNAMENTS_LIMIT = 4;
 let sideRailsLoaded = false;
 
 function initSideRails() {
@@ -24,82 +30,52 @@ function initSideRails() {
 function loadSideRails() {
     if (sideRailsLoaded) return;
     sideRailsLoaded = true;
-    loadSideRailActivity();
-    loadSideRailStats();
+    loadSideRailTournaments();
+    renderSideRailResources();
 }
 
-function sideRailTimeAgo(iso) {
-    const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-    if (mins < 1) return t('side_rail_just_now');
-    if (mins < 60) return t('side_rail_minutes_ago', { n: mins });
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return t('side_rail_hours_ago', { n: hours });
-    return t('side_rail_days_ago', { n: Math.floor(hours / 24) });
-}
-
-async function loadSideRailActivity() {
-    const listEl = document.getElementById('side-rail-activity-list');
+async function loadSideRailTournaments() {
+    const listEl = document.getElementById('side-rail-tournaments-list');
     if (!listEl) return;
     try {
-        const [chatData, galleryData] = await Promise.all([
-            fetch('/.netlify/functions/chat-list').then(r => r.ok ? r.json() : { messages: [] }).catch(() => ({ messages: [] })),
-            fetch('/.netlify/functions/collections-list?sort=recent&page=0').then(r => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] })),
-        ]);
-
-        const chatItems = (chatData.messages || []).slice(-4).map(m => ({
-            time: m.createdAt,
-            html: `${icon('messageCircle', { extraClass: 'icon-label-gap' })}<b>${escapeHtmlOsu(m.authorUsername)}</b>：${escapeHtmlOsu(m.content)}`,
-            onclick: "switchTab('chat')",
-        }));
-        const galleryItems = (galleryData.items || []).slice(0, 3).map(c => ({
-            time: c.updatedAt,
-            html: `${icon('globe', { extraClass: 'icon-label-gap' })}<b>${escapeHtmlOsu(c.username || ('#' + c.id))}</b> ${t('side_rail_published_collection')}`,
-            onclick: `switchTab('public-collections');setTimeout(()=>openGalleryDetailModal(${c.id}),50)`,
-        }));
-
-        const merged = [...chatItems, ...galleryItems]
-            .sort((a, b) => new Date(b.time) - new Date(a.time))
-            .slice(0, 6);
-
-        listEl.innerHTML = merged.length ? merged.map(it => `
-            <div class="side-rail-item" onclick="${it.onclick}">
-                <div class="side-rail-item-body">
-                    <div class="side-rail-item-text">${it.html}</div>
-                    <div class="side-rail-item-time">${sideRailTimeAgo(it.time)}</div>
-                </div>
-            </div>`).join('') : `<p class="osu-empty">${t('side_rail_activity_empty')}</p>`;
+        if (typeof osuTournamentsLoaded !== 'undefined' && !osuTournamentsLoaded && typeof loadOsuTournaments === 'function') {
+            await loadOsuTournaments();
+        }
+        renderSideRailTournaments();
     } catch (e) {
-        console.error('Side rail activity load failed:', e);
+        console.error('Side rail tournaments load failed:', e);
+        listEl.innerHTML = `<p class="osu-empty">${t('updates_load_fail')}</p>`;
     }
 }
 
-async function loadSideRailStats() {
-    const gridEl = document.getElementById('side-rail-stats-grid');
-    if (!gridEl) return;
-    try {
-        const [catalogData, mappoolsData, farmData, galleryData] = await Promise.all([
-            fetch('/.netlify/functions/catalog-list?limit=1').then(r => r.ok ? r.json() : null).catch(() => null),
-            fetch('/.netlify/functions/wc-mappools-list').then(r => r.ok ? r.json() : null).catch(() => null),
-            fetch('/.netlify/functions/farm-maps-list?page=0').then(r => r.ok ? r.json() : null).catch(() => null),
-            fetch('/.netlify/functions/collections-list?sort=recent&page=0').then(r => r.ok ? r.json() : null).catch(() => null),
-        ]);
+function renderSideRailTournaments() {
+    const listEl = document.getElementById('side-rail-tournaments-list');
+    if (!listEl) return;
+    if (typeof normalizeWybinTournament !== 'function' || typeof normalizeForumTopic !== 'function') return;
 
-        const mappoolTotal = mappoolsData && Array.isArray(mappoolsData.editions)
-            ? mappoolsData.editions.reduce((sum, e) => sum + (e.mapCount || 0), 0)
-            : null;
+    const merged = [
+        ...(osuWybinTournamentsCurrentItems || []).map(normalizeWybinTournament),
+        ...(osuTournamentsCurrentItems || []).map(normalizeForumTopic),
+    ]
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+        .slice(0, SIDE_RAIL_TOURNAMENTS_LIMIT);
 
-        const stats = [
-            { value: catalogData && catalogData.total, label: t('side_rail_stat_catalog') },
-            { value: mappoolTotal, label: t('side_rail_stat_mappools') },
-            { value: farmData && farmData.total, label: t('side_rail_stat_farm') },
-            { value: galleryData && galleryData.total, label: t('side_rail_stat_gallery') },
-        ];
-        gridEl.innerHTML = stats.map(s => `
-            <div class="osu-stat">
-                <div class="osu-stat-value">${s.value != null ? s.value.toLocaleString() : '—'}</div>
-                <div class="osu-stat-label">${s.label}</div>
-            </div>`).join('');
-    } catch (e) {
-        console.error('Side rail stats load failed:', e);
-    }
+    listEl.innerHTML = merged.length ? merged.map(item => `
+        <a class="news-item" href="${item.url}" target="_blank" rel="noopener">
+            ${item.thumb ? `<img class="news-thumb" src="${item.thumb}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+            <div class="news-item-body">
+                <div class="news-item-header"><span class="news-date">${item.date}</span></div>
+                <span class="news-title">${escapeHtmlOsu(item.title)}</span>
+            </div>
+        </a>`).join('') : `<p class="osu-empty">${t('updates_empty')}</p>`;
+}
+
+function renderSideRailResources() {
+    const listEl = document.getElementById('side-rail-resources-list');
+    if (!listEl || typeof OSU_RESOURCES === 'undefined') return;
+    listEl.innerHTML = OSU_RESOURCES.map(r => `
+        <a class="resource-link-card" href="${r.url}" target="_blank" rel="noopener noreferrer">
+            <div class="resource-link-title">${escapeHtmlOsu(r.name)} ${icon('externalLink')}</div>
+            <div class="resource-link-desc">${escapeHtmlOsu(t(r.descKey))}</div>
+        </a>`).join('');
 }

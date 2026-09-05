@@ -30,10 +30,7 @@ I18N.ru = {
     dm_back_btn: 'Назад',
     dm_self_error: 'Нельзя отправить сообщение самому себе',
 
-    side_rail_activity_title: '✦ Последние события ✦', side_rail_stats_title: '✦ Статистика сайта ✦',
-    side_rail_published_collection: 'опубликовал(а) коллекцию', side_rail_activity_empty: 'Пока нет событий',
-    side_rail_just_now: 'только что', side_rail_minutes_ago: '{n} мин назад', side_rail_hours_ago: '{n} ч назад', side_rail_days_ago: '{n} дн назад',
-    side_rail_stat_catalog: 'Карт в каталоге', side_rail_stat_mappools: 'Карт в маппулах Кубка мира', side_rail_stat_farm: 'Карт в базе фарм-карт', side_rail_stat_gallery: 'Опубликовано коллекций',
+    side_rail_tournaments_title: '✦ Новости турниров ✦', side_rail_resources_title: '✦ Больше ресурсов ✦', side_rail_view_all: 'Смотреть все →',
     global_search_title: 'Поиск по сайту', global_search_placeholder: 'Поиск песен, маппулов, моей коллекции...',
     global_search_section_collection: 'Моя коллекция', global_search_section_catalog: 'Каталог', global_search_section_mappools: 'Маппулы Чемпионата мира',
     global_search_empty: 'Ничего не найдено',
