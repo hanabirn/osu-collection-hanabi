@@ -359,6 +359,10 @@ async function openGalleryDetailModal(id) {
     const shareBtn = document.getElementById('gallery-detail-share-btn');
     if (shareBtn) shareBtn.style.display = 'none';
     modal.style.display = 'flex';
+    // Independent of the collection fetch below — a comment thread on this
+    // user's gallery post should still work even if, say, their collection
+    // data itself failed to load.
+    if (typeof loadGalleryComments === 'function') loadGalleryComments(id);
 
     try {
         const res = await fetch(`/.netlify/functions/collections-get?id=${id}`);
@@ -486,6 +490,7 @@ function renderGalleryDetailGrid() {
 function closeGalleryDetailModal() {
     document.getElementById('gallery-detail-modal').style.display = 'none';
     galleryDetailData = null;
+    if (typeof resetGalleryComments === 'function') resetGalleryComments();
 }
 
 function downloadGalleryDetailCollection() {

@@ -891,6 +891,11 @@
             <button class="btn gallery-detail-download-btn" id="gallery-detail-download-btn" onclick="downloadGalleryDetailCollection()" data-icon="download" data-icon-gap><span data-i18n="gallery_download_btn_title">匯入這個收藏</span></button>
             <button class="btn" id="gallery-detail-share-btn" onclick="shareGalleryDetailLink()" data-icon="share2" data-icon-gap><span data-i18n="gallery_share_btn">分享連結</span></button>
         </div>
+        <div class="gallery-comments">
+            <div class="pp-calc-section-label" data-i18n="gallery_comments_title">留言</div>
+            <div class="gallery-comments-list" id="gallery-comments-list"></div>
+            <div class="gallery-comments-composer input-group" id="gallery-comments-composer"></div>
+        </div>
     </div>
 </div>
 
@@ -1081,6 +1086,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/osu.js"></script>
 <script defer src="js/replay-analyze.js"></script>
 <script defer src="js/public-collections.js"></script>
+<script defer src="js/gallery-comments.js"></script>
 <script defer src="js/farm-maps.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>

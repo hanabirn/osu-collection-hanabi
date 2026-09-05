@@ -94,4 +94,17 @@ function getDmStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getDmStore };
+// Comments on a published gallery collection (gallery-comments-*.js) — one
+// ring-buffered array per collection owner (comments:<ownerId>), plus each
+// commenter's own last-post-time key for the send cooldown. Separate from
+// getCollectionsStore() since this is a distinct, independently-growing
+// concern (moderation/spam surface) from the collection data itself.
+function getGalleryCommentsStore() {
+    return getStore({
+        name: 'osu-gallery-comments',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getDmStore, getGalleryCommentsStore };

@@ -3096,6 +3096,25 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .gallery-detail-download-btn { margin-top: 0; }
 @media (max-width: 480px) { .gallery-detail-actions { flex-direction: column; } }
 
+/* ===== Gallery comments (inside the detail modal) — reuses .chat-message
+   for each row, just in a shorter scroll box since it shares the modal
+   with the collection grid + action buttons above it. */
+.gallery-comments {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-card);
+}
+.gallery-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 4px 4px 8px;
+    margin: 10px 0;
+}
+.gallery-comment .tracked-player-avatar { width: 30px; height: 30px; }
+
 /* ===== Today's featured beatmap banner ===== */
 .featured-beatmap-banner {
     position: relative;
