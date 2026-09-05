@@ -119,14 +119,18 @@ function chatMessageHtml(m) {
     const replyHtml = m.replyToId && m.replyAuthorUsername ? `
         <div class="chat-reply-quote">${icon('cornerUpLeft', { extraClass: 'icon-label-gap' })}<b>${escapeHtmlOsu(m.replyAuthorUsername)}</b>：${escapeHtmlOsu(m.replyContent || '')}</div>` : '';
     const cardHtml = m.beatmapPreview ? chatBeatmapCardHtml(m.beatmapPreview) : '';
+    const profileUrl = `https://osu.ppy.sh/users/${m.authorId}`;
     return `
     <div class="chat-message" id="chat-msg-${m.id}">
-        <div class="avatar-with-flag">
-            <img class="tracked-player-avatar" src="${osuAvatarUrl(m.authorId)}" alt="" onerror="this.style.visibility='hidden';">
-        </div>
+        <a class="chat-message-author" href="${profileUrl}" target="_blank" rel="noopener noreferrer" title="${t('chat_view_profile_title')}">
+            <div class="avatar-with-flag">
+                <img class="tracked-player-avatar" src="${osuAvatarUrl(m.authorId)}" alt="" onerror="this.style.visibility='hidden';">
+                ${m.authorCountry ? `<img class="avatar-flag-badge" src="${flagUrl(m.authorCountry)}" alt="" onerror="this.style.display='none';">` : ''}
+            </div>
+        </a>
         <div class="chat-message-body">
             <div class="chat-message-header">
-                <span class="chat-message-name">${escapeHtmlOsu(m.authorUsername)}</span>
+                <a class="chat-message-name" href="${profileUrl}" target="_blank" rel="noopener noreferrer">${escapeHtmlOsu(m.authorUsername)}</a>
                 <span class="chat-message-time">${chatFormatTime(m.createdAt)}</span>
                 <button class="chat-reply-btn" onclick="setChatReplyTarget(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.authorUsername)}'), decodeURIComponent('${chatEncodeForOnclick(m.content)}'))" title="${t('chat_reply_btn_title')}">${icon('cornerUpLeft')}</button>
                 ${canDelete ? `<button class="chat-delete-btn" onclick="deleteChatMessage(${m.id})" title="${t('chat_delete_btn_title')}">${icon('x')}</button>` : ''}

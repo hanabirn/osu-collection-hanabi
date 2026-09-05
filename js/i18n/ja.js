@@ -13,6 +13,7 @@ I18N.ja = {
     chat_input_placeholder: 'メッセージを入力...', chat_send_btn: '送信',
     chat_login_required: 'osu! にログインするとチャットに参加できます',
     chat_reply_btn_title: 'このメッセージに返信', chat_reply_cancel_title: '返信をキャンセル',
+    chat_view_profile_title: 'このプレイヤーの osu! プロフィールを見る',
     chat_replying_to: '{name} に返信：{content}',
     chat_delete_btn_title: 'このメッセージを削除', chat_delete_confirm: 'このメッセージを削除しますか？', chat_delete_fail: '削除に失敗しました',
     chat_add_to_collection_btn: 'コレクションに追加',

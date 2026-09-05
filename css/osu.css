@@ -3404,9 +3404,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .chat-message { display: flex; gap: 10px; align-items: flex-start; }
 .chat-message .tracked-player-avatar { width: 34px; height: 34px; flex-shrink: 0; }
+.chat-message-author { flex-shrink: 0; }
 .chat-message-body { flex: 1; min-width: 0; }
 .chat-message-header { display: flex; align-items: center; gap: 8px; }
-.chat-message-name { font-weight: bold; color: var(--text); font-size: 0.88rem; }
+.chat-message-name { font-weight: bold; color: var(--text); font-size: 0.88rem; text-decoration: none; }
+.chat-message-name:hover { color: var(--accent-pink); text-decoration: underline; }
 .chat-message-time { font-size: 0.72rem; color: var(--text-dim2); }
 .chat-reply-btn, .chat-delete-btn {
     margin-left: auto;

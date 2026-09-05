@@ -13,6 +13,7 @@ I18N.en = {
     chat_input_placeholder: 'Type a message...', chat_send_btn: 'Send',
     chat_login_required: 'Log in with osu! to chat',
     chat_reply_btn_title: 'Reply to this message', chat_reply_cancel_title: 'Cancel reply',
+    chat_view_profile_title: "View this player's osu! profile",
     chat_replying_to: 'Replying to {name}: {content}',
     chat_delete_btn_title: 'Delete this message', chat_delete_confirm: 'Delete this message?', chat_delete_fail: 'Delete failed',
     chat_add_to_collection_btn: 'Add to collection',

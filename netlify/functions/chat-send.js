@@ -27,6 +27,21 @@ const REPLY_SNIPPET_LENGTH = 120;
 // reimplemented here since this runs in a different runtime.
 const BEATMAP_URL_RE = /osu\.ppy\.sh\/(?:beatmapsets|beatmaps|s)\/(\d+)/i;
 
+// Best-effort, same philosophy as the country lookup in publishMyCollection()
+// — the signed login token only carries {id, username} (see _auth-token.js),
+// so this is a fresh v1 get_user call per message. A failure just means the
+// chat card shows no flag, never blocks the send.
+async function resolveAuthorCountry(userId) {
+    try {
+        const params = new URLSearchParams({ k: process.env.OSU_API_KEY, u: userId, type: 'id' });
+        const res = await fetch(`https://osu.ppy.sh/api/get_user?${params.toString()}`);
+        const users = await res.json();
+        return Array.isArray(users) && users[0] ? (users[0].country || null) : null;
+    } catch {
+        return null;
+    }
+}
+
 async function resolveBeatmapPreview(content) {
     const match = content.match(BEATMAP_URL_RE);
     if (!match) return null;
@@ -125,12 +140,16 @@ exports.handler = async (event) => {
             }
         }
 
-        const beatmapPreview = await resolveBeatmapPreview(content);
+        const [beatmapPreview, authorCountry] = await Promise.all([
+            resolveBeatmapPreview(content),
+            resolveAuthorCountry(user.id),
+        ]);
 
         const message = {
             id: (messages.length ? messages[messages.length - 1].id : 0) + 1,
             authorId: user.id,
             authorUsername: user.username,
+            authorCountry,
             content,
             beatmapsetId: beatmapPreview ? beatmapPreview.beatmapsetId : null,
             beatmapPreview,

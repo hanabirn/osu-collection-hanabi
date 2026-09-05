@@ -315,6 +315,7 @@ I18N.zh = {
     chat_input_placeholder: '輸入訊息...', chat_send_btn: '送出',
     chat_login_required: '登入 osu! 才能在聊天室發言',
     chat_reply_btn_title: '回覆這則訊息', chat_reply_cancel_title: '取消回覆',
+    chat_view_profile_title: '前往這位玩家的 osu! 個人頁',
     chat_replying_to: '回覆 {name}：{content}',
     chat_delete_btn_title: '刪除這則訊息', chat_delete_confirm: '確定要刪除這則訊息嗎？', chat_delete_fail: '刪除失敗',
     chat_add_to_collection_btn: '加入收藏',

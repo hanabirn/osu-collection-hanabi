@@ -13,6 +13,7 @@ I18N.fr = {
     chat_input_placeholder: 'Écrire un message...', chat_send_btn: 'Envoyer',
     chat_login_required: 'Connectez-vous avec osu! pour discuter',
     chat_reply_btn_title: 'Répondre à ce message', chat_reply_cancel_title: 'Annuler la réponse',
+    chat_view_profile_title: 'Voir le profil osu! de ce joueur',
     chat_replying_to: 'Réponse à {name} : {content}',
     chat_delete_btn_title: 'Supprimer ce message', chat_delete_confirm: 'Supprimer ce message ?', chat_delete_fail: 'Échec de la suppression',
     chat_add_to_collection_btn: 'Ajouter à ma collection',

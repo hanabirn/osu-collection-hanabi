@@ -13,6 +13,7 @@ I18N.ru = {
     chat_input_placeholder: 'Введите сообщение...', chat_send_btn: 'Отправить',
     chat_login_required: 'Войдите через osu!, чтобы писать в чат',
     chat_reply_btn_title: 'Ответить на это сообщение', chat_reply_cancel_title: 'Отменить ответ',
+    chat_view_profile_title: 'Открыть профиль osu! этого игрока',
     chat_replying_to: 'Ответ {name}: {content}',
     chat_delete_btn_title: 'Удалить это сообщение', chat_delete_confirm: 'Удалить это сообщение?', chat_delete_fail: 'Не удалось удалить',
     chat_add_to_collection_btn: 'Добавить в коллекцию',

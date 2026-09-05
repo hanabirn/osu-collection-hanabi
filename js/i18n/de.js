@@ -13,6 +13,7 @@ I18N.de = {
     chat_input_placeholder: 'Nachricht eingeben...', chat_send_btn: 'Senden',
     chat_login_required: 'Melde dich mit osu! an, um zu chatten',
     chat_reply_btn_title: 'Auf diese Nachricht antworten', chat_reply_cancel_title: 'Antwort abbrechen',
+    chat_view_profile_title: 'osu!-Profil dieses Spielers ansehen',
     chat_replying_to: 'Antwort an {name}: {content}',
     chat_delete_btn_title: 'Diese Nachricht löschen', chat_delete_confirm: 'Diese Nachricht löschen?', chat_delete_fail: 'Löschen fehlgeschlagen',
     chat_add_to_collection_btn: 'Zur Sammlung hinzufügen',
