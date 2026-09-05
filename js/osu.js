@@ -2969,6 +2969,57 @@ function renderOsuStats() {
     `;
 }
 
+/* ===== Collection achievements — a small set of milestone badges, all
+   computable synchronously from data already in localStorage (collection,
+   favorites, tags, practice sets, the last-published flag) so this never
+   needs its own network call. Shown inside the stats dashboard modal
+   rather than as a separate page — it's a footnote to "how's my collection
+   doing", not a standalone feature. `check` takes the same `{allSets,
+   col, favs}` context computeUnlockedAchievements() builds once. */
+const COLLECTION_ACHIEVEMENTS = [
+    { id: 'starter', icon: 'play', check: ({ allSets }) => allSets.length >= 1 },
+    { id: 'collector_200', icon: 'star', check: ({ allSets }) => allSets.length >= 200 },
+    { id: 'collector_500', icon: 'trophy', check: ({ allSets }) => allSets.length >= 500 },
+    { id: 'all_modes', icon: 'sparkles', check: ({ col }) => OSU_MODES.every(m => col[m].length > 0) },
+    { id: 'favorites_10', icon: 'heart', check: ({ favs }) => favs.length >= 10 },
+    { id: 'polyglot', icon: 'globe', check: ({ allSets }) => new Set(allSets.map(s => s.language && s.language.id).filter(Boolean)).size >= 5 },
+    { id: 'practice', icon: 'target', check: () => Object.keys(getPracticeSets()).length >= 1 },
+    { id: 'sharer', icon: 'cloudUpload', check: () => !!getLastPublishedAt() },
+];
+
+function computeUnlockedAchievements() {
+    const col = getOsuCollection();
+    const seen = new Set();
+    const allSets = OSU_MODES.flatMap(m => col[m]).filter(s => {
+        if (seen.has(s.beatmapset_id)) return false;
+        seen.add(s.beatmapset_id);
+        return true;
+    });
+    const favs = getOsuFavorites();
+    const ctx = { allSets, col, favs };
+    return COLLECTION_ACHIEVEMENTS.map(a => {
+        let unlocked = false;
+        try { unlocked = !!a.check(ctx); } catch { /* treat as locked */ }
+        return { ...a, unlocked };
+    });
+}
+
+function renderAchievementsSection() {
+    const list = computeUnlockedAchievements();
+    const unlockedCount = list.filter(a => a.unlocked).length;
+    return `
+        <div class="stats-dashboard-card achievements-card">
+            <div class="pp-calc-section-label">${t('achievements_title')} (${unlockedCount}/${list.length})</div>
+            <div class="achievements-grid">
+                ${list.map(a => `
+                    <div class="achievement-badge ${a.unlocked ? 'unlocked' : 'locked'}" title="${escHtml(t('ach_' + a.id + '_desc'))}">
+                        <div class="achievement-icon">${icon(a.icon)}</div>
+                        <div class="achievement-name">${escHtml(t('ach_' + a.id + '_name'))}</div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+}
+
 /* ===== Collection stats dashboard — richer charts than the flat tiles
    above, all derived from data already in localStorage (no API calls).
    The growth chart is the one exception worth a note: sets added before
@@ -2994,6 +3045,7 @@ function openStatsDashboardModal() {
     }
 
     body.innerHTML = `
+        ${renderAchievementsSection()}
         <div class="stats-dashboard-grid">
             <div class="stats-dashboard-card">
                 <div class="pp-calc-section-label">${t('stats_dashboard_stars_title')}</div>

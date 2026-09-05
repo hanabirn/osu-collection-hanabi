@@ -2609,6 +2609,42 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 14px;
 }
 .stats-dashboard-card .trend-chart-wrap { height: 200px; }
+.achievements-card { margin-bottom: 16px; }
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+.achievement-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-align: center;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    transition: transform 0.15s;
+}
+.achievement-badge.unlocked:hover { transform: translateY(-2px); }
+.achievement-badge.unlocked .achievement-icon {
+    color: var(--text-pink);
+    background: rgba(var(--accent-pink-rgb), 0.15);
+}
+.achievement-badge.locked { opacity: 0.4; filter: grayscale(1); }
+.achievement-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 1.1rem;
+}
+.achievement-name { font-size: 0.72rem; line-height: 1.3; }
 .visitor-result-header {
     display: flex;
     align-items: center;

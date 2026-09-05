@@ -242,6 +242,15 @@ I18N.zh = {
     stats_dashboard_empty: '收藏是空的，還沒有統計資料', stats_dashboard_stars_title: '星數分布',
     stats_dashboard_modes_title: '模式佔比', stats_dashboard_mappers_title: 'Mapper 頻率 Top 10',
     stats_dashboard_growth_title: '收藏成長', stats_dashboard_growth_baseline: '已收藏',
+    achievements_title: '成就',
+    ach_starter_name: '初來乍到', ach_starter_desc: '收藏第一張圖',
+    ach_collector_200_name: '收藏達人', ach_collector_200_desc: '收藏滿 200 張圖',
+    ach_collector_500_name: '收藏大師', ach_collector_500_desc: '收藏滿 500 張圖',
+    ach_all_modes_name: '全模式玩家', ach_all_modes_desc: '四個模式都有收藏',
+    ach_favorites_10_name: '最愛藏家', ach_favorites_10_desc: '最愛滿 10 張',
+    ach_polyglot_name: '語言收藏家', ach_polyglot_desc: '收藏涵蓋 5 種以上語言',
+    ach_practice_name: '練習狂', ach_practice_desc: '建立過一個練習收藏',
+    ach_sharer_name: '分享家', ach_sharer_desc: '發布過收藏廣場',
 
     leaderboard_btn: '排行榜', leaderboard_title: '🏆 追蹤玩家排行榜',
 

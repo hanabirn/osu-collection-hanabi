@@ -268,6 +268,15 @@ I18N.ko = {
     stats_dashboard_empty: '컬렉션이 비어 있어 통계가 없습니다', stats_dashboard_stars_title: '별점 분포',
     stats_dashboard_modes_title: '모드 비율', stats_dashboard_mappers_title: '매퍼 빈도 Top 10',
     stats_dashboard_growth_title: '컬렉션 성장', stats_dashboard_growth_baseline: '기존 보유',
+    achievements_title: '업적',
+    ach_starter_name: '첫 걸음', ach_starter_desc: '첫 비트맵 추가하기',
+    ach_collector_200_name: '컬렉터', ach_collector_200_desc: '비트맵 200개 모으기',
+    ach_collector_500_name: '마스터 컬렉터', ach_collector_500_desc: '비트맵 500개 모으기',
+    ach_all_modes_name: '올라운더', ach_all_modes_desc: '모든 모드에 하나 이상 보유',
+    ach_favorites_10_name: '즐겨찾기 팬', ach_favorites_10_desc: '즐겨찾기 10개 등록',
+    ach_polyglot_name: '폴리글롯', ach_polyglot_desc: '5개 이상 언어의 맵 모으기',
+    ach_practice_name: '연습 덕후', ach_practice_desc: '연습용 컬렉션 만들기',
+    ach_sharer_name: '공유자', ach_sharer_desc: '갤러리에 발행하기',
 
     leaderboard_btn: '순위표', leaderboard_title: '🏆 추적 중인 플레이어 순위표',
 

@@ -268,6 +268,15 @@ I18N.es = {
     stats_dashboard_empty: 'Tu colección está vacía — nada que mostrar todavía', stats_dashboard_stars_title: 'Distribución de estrellas',
     stats_dashboard_modes_title: 'Distribución por modo', stats_dashboard_mappers_title: 'Top 10 de mappers',
     stats_dashboard_growth_title: 'Crecimiento de la colección', stats_dashboard_growth_baseline: 'Ya tenías',
+    achievements_title: 'Logros',
+    ach_starter_name: 'Primeros pasos', ach_starter_desc: 'Añade tu primer beatmap',
+    ach_collector_200_name: 'Coleccionista', ach_collector_200_desc: 'Alcanza 200 beatmaps',
+    ach_collector_500_name: 'Maestro coleccionista', ach_collector_500_desc: 'Alcanza 500 beatmaps',
+    ach_all_modes_name: 'Todoterreno', ach_all_modes_desc: 'Ten al menos un mapa en cada modo',
+    ach_favorites_10_name: 'Fan de favoritos', ach_favorites_10_desc: 'Marca 10 beatmaps como favoritos',
+    ach_polyglot_name: 'Políglota', ach_polyglot_desc: 'Colecciona mapas en 5+ idiomas',
+    ach_practice_name: 'Fanático de la práctica', ach_practice_desc: 'Crea una colección de práctica',
+    ach_sharer_name: 'Compartidor', ach_sharer_desc: 'Publica en la galería',
 
     leaderboard_btn: 'Clasificación', leaderboard_title: '🏆 Clasificación de Jugadores Seguidos',
 

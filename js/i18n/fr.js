@@ -268,6 +268,15 @@ I18N.fr = {
     stats_dashboard_empty: "Votre collection est vide — rien à afficher pour l'instant", stats_dashboard_stars_title: 'Répartition par étoiles',
     stats_dashboard_modes_title: 'Répartition par mode', stats_dashboard_mappers_title: 'Top 10 des mappers',
     stats_dashboard_growth_title: 'Croissance de la collection', stats_dashboard_growth_baseline: 'Déjà présent',
+    achievements_title: 'Succès',
+    ach_starter_name: 'Premiers pas', ach_starter_desc: 'Ajoute ta première beatmap',
+    ach_collector_200_name: 'Collectionneur', ach_collector_200_desc: 'Atteins 200 beatmaps',
+    ach_collector_500_name: 'Maître collectionneur', ach_collector_500_desc: 'Atteins 500 beatmaps',
+    ach_all_modes_name: 'Polyvalent', ach_all_modes_desc: 'Aie au moins une carte dans chaque mode',
+    ach_favorites_10_name: 'Fan des favoris', ach_favorites_10_desc: 'Mets 10 beatmaps en favori',
+    ach_polyglot_name: 'Polyglotte', ach_polyglot_desc: 'Collectionne des cartes en 5+ langues',
+    ach_practice_name: "Fan d'entraînement", ach_practice_desc: 'Crée une collection d\'entraînement',
+    ach_sharer_name: 'Partageur', ach_sharer_desc: 'Publie sur la galerie',
 
     leaderboard_btn: 'Classement', leaderboard_title: '🏆 Classement des joueurs suivis',
 

@@ -268,6 +268,15 @@ I18N.ja = {
     stats_dashboard_empty: 'コレクションが空です。まだ統計データがありません', stats_dashboard_stars_title: '☆数の分布',
     stats_dashboard_modes_title: 'モード別割合', stats_dashboard_mappers_title: 'マッパー頻度 Top 10',
     stats_dashboard_growth_title: 'コレクションの成長', stats_dashboard_growth_baseline: '既存分',
+    achievements_title: '実績',
+    ach_starter_name: 'はじめの一歩', ach_starter_desc: '最初のビートマップを追加',
+    ach_collector_200_name: 'コレクター', ach_collector_200_desc: '200枚のビートマップを収集',
+    ach_collector_500_name: 'マスターコレクター', ach_collector_500_desc: '500枚のビートマップを収集',
+    ach_all_modes_name: 'オールラウンダー', ach_all_modes_desc: '全モードで1枚以上収集',
+    ach_favorites_10_name: 'お気に入りファン', ach_favorites_10_desc: 'お気に入りを10枚登録',
+    ach_polyglot_name: 'ポリグロット', ach_polyglot_desc: '5言語以上のマップを収集',
+    ach_practice_name: '練習の虫', ach_practice_desc: '練習用コレクションを作成',
+    ach_sharer_name: 'シェアラー', ach_sharer_desc: 'ギャラリーに公開',
 
     leaderboard_btn: 'ランキング', leaderboard_title: '🏆 フォロー中プレイヤーのランキング',
 

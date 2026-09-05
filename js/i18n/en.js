@@ -266,6 +266,15 @@ I18N.en = {
     stats_dashboard_empty: 'Your collection is empty — nothing to show yet', stats_dashboard_stars_title: 'Star rating distribution',
     stats_dashboard_modes_title: 'Mode split', stats_dashboard_mappers_title: 'Top 10 mappers',
     stats_dashboard_growth_title: 'Collection growth', stats_dashboard_growth_baseline: 'Already had',
+    achievements_title: 'Achievements',
+    ach_starter_name: 'Getting Started', ach_starter_desc: 'Add your first beatmap',
+    ach_collector_200_name: 'Collector', ach_collector_200_desc: 'Reach 200 beatmaps',
+    ach_collector_500_name: 'Master Collector', ach_collector_500_desc: 'Reach 500 beatmaps',
+    ach_all_modes_name: 'All-Rounder', ach_all_modes_desc: 'Have at least one map in every mode',
+    ach_favorites_10_name: 'Favorite Fan', ach_favorites_10_desc: 'Favorite 10 beatmaps',
+    ach_polyglot_name: 'Polyglot', ach_polyglot_desc: 'Collect maps in 5+ languages',
+    ach_practice_name: 'Practice Nerd', ach_practice_desc: 'Create a practice collection',
+    ach_sharer_name: 'Sharer', ach_sharer_desc: 'Publish to the gallery',
 
     leaderboard_btn: 'Leaderboard', leaderboard_title: '🏆 Tracked Players Leaderboard',
 

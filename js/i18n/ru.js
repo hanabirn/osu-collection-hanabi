@@ -268,6 +268,15 @@ I18N.ru = {
     stats_dashboard_empty: 'Ваша коллекция пуста — пока нечего показать', stats_dashboard_stars_title: 'Распределение по звёздам',
     stats_dashboard_modes_title: 'Распределение по режимам', stats_dashboard_mappers_title: 'Топ-10 мапперов',
     stats_dashboard_growth_title: 'Рост коллекции', stats_dashboard_growth_baseline: 'Уже было',
+    achievements_title: 'Достижения',
+    ach_starter_name: 'Первые шаги', ach_starter_desc: 'Добавьте первую карту',
+    ach_collector_200_name: 'Коллекционер', ach_collector_200_desc: 'Соберите 200 карт',
+    ach_collector_500_name: 'Мастер-коллекционер', ach_collector_500_desc: 'Соберите 500 карт',
+    ach_all_modes_name: 'Универсал', ach_all_modes_desc: 'Имейте хотя бы одну карту в каждом режиме',
+    ach_favorites_10_name: 'Фанат избранного', ach_favorites_10_desc: 'Добавьте 10 карт в избранное',
+    ach_polyglot_name: 'Полиглот', ach_polyglot_desc: 'Соберите карты на 5+ языках',
+    ach_practice_name: 'Фанат тренировок', ach_practice_desc: 'Создайте тренировочную коллекцию',
+    ach_sharer_name: 'Делитель', ach_sharer_desc: 'Опубликуйте в галерее',
 
     leaderboard_btn: 'Таблица лидеров', leaderboard_title: '🏆 Таблица лидеров отслеживаемых игроков',
 
