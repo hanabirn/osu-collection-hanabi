@@ -3499,6 +3499,24 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .chat-message-name { font-weight: bold; color: var(--text); font-size: 0.88rem; text-decoration: none; }
 .chat-message-name:hover { color: var(--accent-pink); text-decoration: underline; }
 .chat-message-time { font-size: 0.72rem; color: var(--text-dim2); }
+/* Sits right beside the timestamp (not grouped with reply/delete below) —
+   a normal left margin here, not auto, so it doesn't fight reply's own
+   margin-left:auto for the row's free space (that used to split the free
+   space between the two, leaving this button stranded mid-row instead of
+   next to the time). Bigger than reply/delete since it's the one button
+   here that's actually useful to a non-Chinese-reading visitor, not just
+   the message's own author. */
+.chat-translate-btn {
+    margin-left: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim2);
+    cursor: pointer;
+    font-size: 1.05rem;
+    padding: 2px 4px;
+    line-height: 1;
+}
+.chat-translate-btn:hover { color: var(--accent-pink); }
 .chat-reply-btn, .chat-delete-btn {
     margin-left: auto;
     border: none;

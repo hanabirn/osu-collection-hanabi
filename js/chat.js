@@ -132,7 +132,7 @@ function chatMessageHtml(m) {
             <div class="chat-message-header">
                 <a class="chat-message-name" href="${profileUrl}" target="_blank" rel="noopener noreferrer">${escapeHtmlOsu(m.authorUsername)}</a>
                 <span class="chat-message-time">${chatFormatTime(m.createdAt)}</span>
-                <button class="chat-reply-btn" onclick="toggleChatTranslation(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.content)}'), this)" title="${t('chat_translate_btn_title')}">${icon('globe')}</button>
+                <button class="chat-translate-btn" onclick="toggleChatTranslation(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.content)}'), this)" title="${t('chat_translate_btn_title')}">${icon('globe', { size: '1.15em' })}</button>
                 <button class="chat-reply-btn" onclick="setChatReplyTarget(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.authorUsername)}'), decodeURIComponent('${chatEncodeForOnclick(m.content)}'))" title="${t('chat_reply_btn_title')}">${icon('cornerUpLeft')}</button>
                 ${canDelete ? `<button class="chat-delete-btn" onclick="deleteChatMessage(${m.id})" title="${t('chat_delete_btn_title')}">${icon('x')}</button>` : ''}
             </div>
