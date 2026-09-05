@@ -1570,6 +1570,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    that sat in this same area. */
 .side-rail {
     width: 260px;
+    /* min == max so the card is a consistent viewport-relative height
+       regardless of how much real content loaded — a short list (e.g. only
+       a couple tournament posts) would otherwise shrink-wrap and leave a
+       big empty gap of plain background beneath the card down to the
+       bottom of the gutter. overflow-y:auto is still the safety net for
+       the rare case content is taller than this. */
+    min-height: calc(100vh - 48px);
     max-height: calc(100vh - 48px);
     overflow-y: auto;
     padding: 14px;
@@ -1593,7 +1600,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     }
     .site-main-center { grid-column: 2; grid-row: 1; }
     .side-rail {
-        display: block;
+        /* Column layout so the "查看全部" button can be pinned to the
+           bottom of the (now viewport-height) card via margin-top:auto on
+           the button, instead of sitting right under a short list with a
+           dead gap below it. */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         position: sticky;
         top: 24px;
         grid-row: 1;
@@ -1623,7 +1636,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .side-rail-viewall-btn {
     display: block;
     width: 100%;
-    margin-top: 10px;
+    /* Pinned to the bottom of the now-fixed-height .side-rail (flex column)
+       instead of sitting right under the list — see .side-rail above. The
+       10px min-gap above it (even once pushed to the bottom) comes from
+       .side-rail's own `gap`, not a margin here. */
+    margin-top: auto;
     padding: 7px;
     border: none;
     border-radius: 999px;

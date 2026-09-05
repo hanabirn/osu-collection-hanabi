@@ -15,7 +15,7 @@
    css/base.css .side-rail for the layout math that keeps both clear of the
    content column at any width. */
 const SIDE_RAIL_MIN_WIDTH_MQ = window.matchMedia('(min-width: 1700px)');
-const SIDE_RAIL_TOURNAMENTS_LIMIT = 4;
+const SIDE_RAIL_TOURNAMENTS_LIMIT = 7;
 let sideRailsLoaded = false;
 
 function initSideRails() {
