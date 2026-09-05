@@ -3741,3 +3741,68 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: #fff;
 }
 .dm-message-mine .chat-message-time { color: rgba(255,255,255,0.75); }
+
+/* ===== 使用手冊 (howto page) =====
+   A single localized HTML blob (howto_manual_body, one key per locale —
+   same "long string, not per-line keys" approach as howto_ctools/howto_db)
+   rather than dozens of small data-i18n spans, since this is 17 tabs' worth
+   of reference content and per-line keys would multiply that across 8
+   locale files for no real benefit — nothing here needs updating
+   independently of the rest. */
+.howto-jumpnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 22px;
+}
+.howto-jumpnav a {
+    font-size: 0.78rem;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    color: var(--text-pink);
+    text-decoration: none;
+}
+.howto-jumpnav a:hover { background: rgba(var(--accent-pink-rgb), 0.15); }
+.howto-manual { display: flex; flex-direction: column; gap: 18px; }
+.howto-group {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    padding: 18px 20px;
+    scroll-margin-top: 16px;
+}
+.howto-group-title {
+    margin: 0 0 12px;
+    font-size: 1.02rem;
+    color: var(--text-pink);
+}
+.howto-tab { margin-bottom: 16px; }
+.howto-tab:last-child { margin-bottom: 0; }
+.howto-tab-title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 0.92rem;
+    margin-bottom: 4px;
+}
+.howto-tab-title small { font-weight: 500; font-size: 0.72rem; color: var(--text-dim2); }
+.howto-tab-desc { font-size: 0.84rem; color: var(--text-secondary); margin: 0 0 10px; }
+.howto-feat {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border-input);
+    font-size: 0.84rem;
+}
+.howto-feat:first-of-type { border-top: none; }
+.howto-feat b { font-weight: bold; }
+.howto-feat span { color: var(--text-secondary); }
+@media (max-width: 600px) {
+    .howto-feat { grid-template-columns: 1fr; gap: 3px; }
+}

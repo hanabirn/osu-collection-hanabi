@@ -320,4 +320,148 @@ I18N.ja = {
     replay_stat_accuracy: '精度', replay_stat_combo: '最大コンボ', replay_stat_misses: 'ミス数',
     replay_stat_mods: 'Mods', replay_stat_rank: 'ランク', replay_stat_player: 'プレイヤー',
     replay_approx_note: 'タイミング誤差はキー入力時間と譜面ノーツの照合による概算値であり、完全な判定再現ではありません。参考程度にご覧ください。',
+
+    site_howto_title: '各ページ・各ボタンの説明', site_howto_label: '使い方ガイド',
+    nav_howto: '使い方ガイド',
+    howto_page_title: '📖 使い方ガイド', howto_page_hint: 'サイトメニューと同じ分類で、各ページ・各ボタンの用途と使い方をまとめました。',
+    howto_group_global: 'サイト全体',
+    howto_manual_body: `
+        <div class="howto-group" id="howto-global">
+            <h3 class="howto-group-title">🌐 サイト全体</h3>
+            <p class="howto-tab-desc">どのページでも使えるコントロール類。ほとんどヘッダーの左右端に集まっています。</p>
+            <div class="howto-feat"><b>ダーク／ライト切替</b><span>左上。月／太陽アイコンをタップで切替、次回訪問時も記憶されます。</span></div>
+            <div class="howto-feat"><b>ホーム画面に追加</b><span>左上、対応ブラウザのみ表示。サイトをアプリアイコンとしてインストールし、オフラインでも基本画面を開けます。</span></div>
+            <div class="howto-feat"><b>サイト更新あり</b><span>左上／画面下部の浮動バー。新バージョンを検知した時だけ表示され、クリックで再読み込みします。</span></div>
+            <div class="howto-feat"><b>全サイト検索</b><span>右上の虫眼鏡、または <b>/</b> か <b>Ctrl+K</b>。「自分の収藏」「曲庫分類」「ワールドカップ図池」を同時に検索し、結果をクリックすると検索語入りでそのタブへ移動します。</span></div>
+            <div class="howto-feat"><b>通知ベル</b><span>右上。追跡中のプレイヤーの PP 変化、追跡中の mapper の新曲、未読メッセージなどがここに表示され、プッシュ通知をオンにしていればサイトを開いていなくても届きます。</span></div>
+            <div class="howto-feat"><b>osu! ログイン</b><span>右上。osu! アカウントでログイン——チャット発言、DM、収藏廣場への公開、皮膚のクラウドバックアップ、お気に入り/よく遊ぶ曲のワンクリック取り込みはすべてログインが必要です。</span></div>
+            <div class="howto-feat"><b>言語切替</b><span>右上の地球アイコン。9 言語対応、選んだ言語は記憶されます。</span></div>
+            <div class="howto-feat"><b>☰ メニュー</b><span>右上、モバイル版のメイン導線で全ページを一覧表示。デスクトップの広い画面ではよく使うタブが直接表示され、メニューを開く必要はありません。</span></div>
+            <div class="howto-feat"><b>音量調整</b><span>右下のスピーカーアイコン。収藏カードの「試聴プレビュー」音量を調整します。</span></div>
+            <div class="howto-feat"><b>再読み込み</b><span>右下。ページ全体を再読み込みします。</span></div>
+            <div class="howto-feat"><b>いいね／使い方ガイド／シェア</b><span>サイトタイトル直下の 3 つのボタン：「いいね」はサイトのいいね数を増やす、「使い方ガイド」はこのページ、「シェア」は友達に送れるリンクをコピーします。</span></div>
+        </div>
+
+        <div class="howto-group" id="howto-core">
+            <h3 class="howto-group-title">✦ コア機能</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">♫ 収藏 <small>デフォルトのホームページ</small></div>
+                <p class="howto-tab-desc">自分の osu! ライブラリを整理：追加、分類、ゲームへのエクスポート、古いバックアップとの差分比較など。</p>
+                <div class="howto-feat"><b>Beatmap を追加</b><span>ID または osu! の URL（beatmapsets/... でも /b/... でも可）を貼り付けて「新增」を押します。</span></div>
+                <div class="howto-feat"><b>収藏の入出力（6 個のボタン）</b><span>左から：JSON バックアップをダウンロード → JSON から復元 → 共有リンクをコピー → プレビュー画像 PNG をダウンロード → collection.db として書き出し、そのまま osu! に使用 → ⚔ 差分比較、古いバックアップをアップロードして追加/削除されたマップを確認。</span></div>
+                <div class="howto-feat"><b>ツール・設定（6 個のボタン）</b><span>全マップのデータを再取得 → 📊 統計ダッシュボード（8 個の実績バッジ付き）→ ✨ 収藏整理ウィザード（下記参照）→ プレイ済みマーク／お気に入り・よく遊ぶ曲のワンクリック取込（ログイン必要）→ 🔒 パスワード設定、以降の編集/公開操作に必要。</span></div>
+                <div class="howto-feat"><b>検索／絞り込み／並び替え</b><span>曲名やアーティストで検索、言語・ジャンル・出典・アーティストで絞り込み、星数で並び替え可能。</span></div>
+                <div class="howto-feat"><b>分類タブ</b><span>お気に入り／Standard／Taiko／Catch／Mania の固定タブに加え、歯車アイコンから「分類管理」で自分だけのタブを追加できます。</span></div>
+                <div class="howto-feat"><b>もっと見る</b><span>ページ最下部の 7 枚のショートカットカードから他のよく使うタブへ移動できます。</span></div>
+                <div class="howto-feat"><b>✨ 収藏整理ウィザード</b><span>実は 3 つのツールをまとめたもの：①アカウントから分類を生成（お気に入り／よく遊ぶ／ベストスコア／最近／特定の mapper）②成績から練習用収藏を生成（伸び代／目標プール／低精度やり直し／似た未プレイ曲／弱点）③健康診断（重複・削除済み・非 ranked・難易度数が変わったマップを検出）。3 つとも既存の収藏を上書きせず、マージするだけです。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 収藏廣場</div>
+                <p class="howto-tab-desc">整理した収藏を公開したり、他人の収藏をブラウズしてそのまま取り込んだりできます。osu! アカウントごとに公開できるのは 1 件だけです。</p>
+                <div class="howto-feat"><b>公開／公開停止</b><span>ログイン必要。「公開」で現在の収藏を廣場に送信；再度公開すると古いものが上書きされ、2 件にはなりません。</span></div>
+                <div class="howto-feat"><b>検索／並び替え／絞り込み</b><span>プレイヤー名やタグで検索、最新公開／❤人気順／収藏数／最高星数で並び替え、「いいねしたものだけ表示」も可能。</span></div>
+                <div class="howto-feat"><b>収藏詳細</b><span>カードをクリックして開くと、モード/分類タブ切替、ワンクリック取り込み、共有リンクコピーができ、下部にコメント欄があります——ログインすれば誰でもコメント可能で、削除はコメント投稿者本人かその収藏の公開者が行えます。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 皮膚廣場</div>
+                <p class="howto-tab-desc">実際のプレイ画面のスキンスクリーンショットを共有し、選ぶ前に実際の見た目を確認できるようにします。</p>
+                <div class="howto-feat"><b>スキンスクリーンショットを共有</b><span>名前・作者（任意）を入力、ダウンロードリンクか .osk ファイルのどちらか、対応モードを選び、スクリーンショットをアップロードして公開します。</span></div>
+                <div class="howto-feat"><b>閲覧／絞り込み</b><span>名前や作者で検索、モードで絞り込み、最新か人気順で並び替え、自分がいいねしたものやアップロードしたものだけ表示も可能。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ チャットルーム</div>
+                <p class="howto-tab-desc">全ての訪問者が共有する公開チャットルームです。</p>
+                <div class="howto-feat"><b>発言</b><span>ログイン必要。osu! のビートマップリンクを貼ると自動的にワンクリックで収藏に追加できるカードになります。</span></div>
+                <div class="howto-feat"><b>各メッセージでできること</b><span>アバター/名前をクリックでそのプレイヤーの osu! プロフィールへ、国旗を確認、🌐 をタップで現在の表示言語に翻訳、返信、削除（自分のメッセージ、またはサイト管理者なら全て）。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ ダイレクトメッセージ</div>
+                <p class="howto-tab-desc">1 人のプレイヤーとの非公開な 1 対 1 会話で、他の人には見えません。</p>
+                <div class="howto-feat"><b>新規会話を開始</b><span>ログイン必要。相手の osu! ユーザー名を入力し「開始対話」をクリックします。</span></div>
+                <div class="howto-feat"><b>会話一覧／未読</b><span>未読数は ☰ メニューの「私訊」の横にもバッジ表示されます。会話を開くとスレッドが表示され、「返回」で一覧に戻ります。</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-tools">
+            <h3 class="howto-group-title">✦ ツール集</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Farm 図</div>
+                <p class="howto-tab-desc">PP 効率の高い ranked マップのリスト——PP 数値は本サイトが SS スコアから実際に計算したもので、推定値ではありません。</p>
+                <div class="howto-feat"><b>モード／Mod タブ</b><span>Standard/Taiko/Catch/Mania それぞれに NM／DT／HD／HDDT／HR／HDHR の 6 つの Mod 組み合わせ。</span></div>
+                <div class="howto-feat"><b>🔥 農図のみ表示</b><span>デフォルトで有効。osu!／taiko は Top 50 成績中 DT 比率 ≥70%；catch／mania は 100% acc 比率 ≥70%（いずれもプレイ回数 ≥500 が条件）。</span></div>
+                <div class="howto-feat"><b>範囲絞り込み</b><span>PP・星数・BPM・長さはいずれも最小〜最大の範囲指定が可能。検索や複数の並び替え方法もあります。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 曲庫分類</div>
+                <p class="howto-tab-desc">ranked 曲庫全体を、アーティスト／言語／ジャンル／出典／feat. で切り口を変えて閲覧できるブラウザです。</p>
+                <div class="howto-feat"><b>絞り込みの組み合わせ</b><span>4 つのプルダウンは併用可能、モード絞り込みと「18+ タグを含む」トグル、4 種類の並び替え方法もあります。</span></div>
+                <div class="howto-feat"><b>➕ この分類で収藏を作成</b><span>絞り込み条件で結果が出て初めて有効になり、ワンクリックで絞り込み結果全体を収藏内の新しい分類にできます。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ ワールドカップ図池</div>
+                <p class="howto-tab-desc">歴代 OWC／TWC／MWC（4K・7K）／CWC の公式試合図池です。</p>
+                <div class="howto-feat"><b>大会／ラウンド選択</b><span>モードタブ→大会一覧→選んでラウンドごとに閲覧、各マップに Mod が表示されます。</span></div>
+                <div class="howto-feat"><b>➕ 収藏に追加</b><span>大会全体、またはラウンド単位で追加でき、全部を追加する必要はありません。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ PP 查詢</div>
+                <p class="howto-tab-desc">自分を含む任意のプレイヤーの PP 状況を調べたり、2 人を並べて比較したりできます。</p>
+                <div class="howto-feat"><b>osu! PP を検索</b><span>ユーザー名か ID を入力して検索。結果には全モードのデータ、PP 履歴グラフ、追跡ボタン、「戦績カード生成」が含まれ、下部タブは最近のプレイ／ベストスコア／PP 目標／メダル／成績履歴。</span></div>
+                <div class="howto-feat"><b>⚔ 2 人 PP 対比</b><span>2 つのユーザー名/ID を入力して「比較」：まず概要と重ね合わせた PP グラフ、下部「Top Play 対比」で両者のベストスコアを左右に並べて表示します。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Replay 分析</div>
+                <p class="howto-tab-desc">.osr ファイルをアップロードしてスコアの詳細を確認——完全にサーバー側でファイル自体を解析し、動画変換や外部サービスには依存しません。</p>
+                <div class="howto-feat"><b>アップロード</b><span>ドラッグ＆ドロップ、または「.osr ファイルを選択」をクリック。アップロード後、スコア概要と打鍵タイミング分布グラフが表示されます。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎨 Mapper 追跡</div>
+                <p class="howto-tab-desc">好きな mapper が新しい ranked マップを出した瞬間に通知を受け取れます。</p>
+                <div class="howto-feat"><b>追跡</b><span>mapper の osu! ユーザー名を入力して「追蹤」をクリック。リストは同じページに表示され、いつでも解除できます。</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-resources">
+            <h3 class="howto-group-title">✦ リソース</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎵 マイスキン <small>「皮膚廣場」とは別のタブです</small></div>
+                <p class="howto-tab-desc">非公開の個人用スキン保管庫——公開共有には「皮膚廣場」を使います。</p>
+                <div class="howto-feat"><b>アップロード／ダウンロード</b><span>アップロードした .osk ファイルはこのブラウザにのみ保存され、機種変更やブラウザデータ消去で失われます。いつでもダウンロードして取り戻せます。</span></div>
+                <div class="howto-feat"><b>☁️ クラウドバックアップ</b><span>ログイン時のみ表示。1 件 4MB 以下、最大 30 件まで、「還原到本機」で上のリストに戻します。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 更新情報</div>
+                <p class="howto-tab-desc">osu! 公式のアップデートログ一覧です。閲覧のみで操作は不要です。</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 大会情報</div>
+                <p class="howto-tab-desc">公式フォーラムの Tournaments 板と wyBin プラットフォームのコミュニティ大会情報を統合したものです（非公式主催のため、参加前に主催者のルールを必ずご自身で確認してください）。</p>
+                <div class="howto-feat"><b>モード絞り込み</b><span>タイトルのキーワードから自動でモードを判定し、判定できないものは「全部」タブにのみ表示されます。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ リソース</div>
+                <p class="howto-tab-desc">自作する必要はないけどおすすめのコミュニティツールのリンク集です。閲覧のみ。</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ ご意見・改善</div>
+                <p class="howto-tab-desc">フィードバックフォームです。意見を書いて送信するだけ——内容はサイト管理者だけが見られ、他の訪問者には見えません。</p>
+            </div>
+        </div>
+    `,
 };

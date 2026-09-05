@@ -347,4 +347,148 @@ I18N.zh = {
     dm_thread_empty: '還沒有訊息，說聲哈囉吧！',
     dm_back_btn: '返回',
     dm_self_error: '不能傳私訊給自己',
+
+    site_howto_title: '每個分頁跟按鈕的用途說明', site_howto_label: '使用手冊',
+    nav_howto: '使用手冊',
+    howto_page_title: '📖 使用手冊', howto_page_hint: '依網站選單分類，列出每個分頁跟按鈕的用途與操作方式。',
+    howto_group_global: '站台通用',
+    howto_manual_body: `
+        <div class="howto-group" id="howto-global">
+            <h3 class="howto-group-title">🌐 站台通用</h3>
+            <p class="howto-tab-desc">不管在哪個分頁都找得到的控制項，大多集中在頁首左右兩角。</p>
+            <div class="howto-feat"><b>深色 / 淺色切換</b><span>左上角，點一下月亮／太陽圖示即可切換，之後每次造訪都會記住你的選擇。</span></div>
+            <div class="howto-feat"><b>加到主畫面</b><span>左上角，僅支援的瀏覽器顯示。把網站安裝成一個 App 圖示，離線時仍可開啟基本畫面。</span></div>
+            <div class="howto-feat"><b>網站有更新</b><span>左上角／畫面下方浮動條，偵測到新版本時才會出現，點一下就重新載入拿到最新版本。</span></div>
+            <div class="howto-feat"><b>全站搜尋</b><span>右上角放大鏡，或按 <b>/</b>、<b>Ctrl+K</b>。同時查「個人收藏」「曲庫分類」「世界盃圖池」三個資料庫，點一個結果就直接跳到那個分頁並帶入搜尋字。</span></div>
+            <div class="howto-feat"><b>通知鈴鐺</b><span>右上角。追蹤的玩家 PP 變化、追蹤的 mapper 出新圖、私訊未讀等都會出現在這裡；有開啟推播的話，沒開網頁也收得到。</span></div>
+            <div class="howto-feat"><b>osu! 登入</b><span>右上角。用你的 osu! 帳號登入——聊天室發言、私訊、發布收藏到廣場、雲端備份皮膚、一鍵帶入最愛/常玩，這些都需要先登入。</span></div>
+            <div class="howto-feat"><b>語言切換</b><span>右上角地球圖示，支援繁中／简中／英／日／韓／俄／法／西／德，選了會記住。</span></div>
+            <div class="howto-feat"><b>☰ 選單</b><span>右上角，手機版主要導覽，列出全部分頁清單；桌面版寬螢幕會直接顯示常用分頁列，不用開選單。</span></div>
+            <div class="howto-feat"><b>音量調整</b><span>右下角喇叭，控制收藏卡片「播放預覽」試聽音量的大小。</span></div>
+            <div class="howto-feat"><b>重新整理</b><span>右下角，整頁重新載入。</span></div>
+            <div class="howto-feat"><b>讚 / 使用手冊 / 分享</b><span>網站標題正下方三顆按鈕：「讚」幫網站累積喜歡數；「使用手冊」就是這一頁；「分享」複製一個可以傳給朋友的網址。</span></div>
+        </div>
+
+        <div class="howto-group" id="howto-core">
+            <h3 class="howto-group-title">✦ 核心功能</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">♫ 收藏 <small>預設首頁</small></div>
+                <p class="howto-tab-desc">整理你自己的 osu! 圖庫：新增、分類、匯出回遊戲、跟別人比較差異。</p>
+                <div class="howto-feat"><b>新增 Beatmap</b><span>貼上圖的 ID 或 osu! 網址（beatmapsets/... 或 /b/... 都吃），按「新增」加進收藏。</span></div>
+                <div class="howto-feat"><b>收藏進出（6 個按鈕）</b><span>由左到右：匯出 JSON 下載整個收藏當備份 → 匯入 JSON 從備份還原 → 複製分享連結 → 下載收藏預覽圖 PNG → 匯出成 collection.db 直接複製到 osu! 資料夾使用 → ⚔ 差異比較，上傳舊備份看新增/移除了哪些圖。</span></div>
+                <div class="howto-feat"><b>工具・設定（6 個按鈕）</b><span>重新整理全部圖資料 → 📊 統計儀表板（含 8 個收藏成就徽章）→ ✨ 收藏整理精靈（見下方說明）→ 標記已玩過／一鍵帶入最愛常玩（需登入）→ 🔒 設定密碼，之後編輯/發布動作都要輸入這組密碼確認。</span></div>
+                <div class="howto-feat"><b>搜尋 / 篩選 / 排序</b><span>輸入框可搜曲名或作者；下拉選單可依語言、曲風、來源、歌手篩選，也能切換星數排序。</span></div>
+                <div class="howto-feat"><b>分類籤</b><span>最愛／Standard／Taiko／Catch／Mania 五個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
+                <div class="howto-feat"><b>探索更多</b><span>頁面最下方 7 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
+                <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是三組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 依成績生成練習收藏（突破分／目標圖池／低準度重練／相似圖／弱項）③ 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。三組都只會合併加入，不會覆蓋現有收藏。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 收藏廣場</div>
+                <p class="howto-tab-desc">把整理好的收藏公開分享，或逛逛別人的收藏直接匯入。每位 osu! 帳號只能發布一份。</p>
+                <div class="howto-feat"><b>發布 / 取消發布</b><span>需登入。發布會把目前的收藏送到廣場；重新發布會覆蓋舊的，不會變兩份。</span></div>
+                <div class="howto-feat"><b>搜尋 / 排序 / 篩選</b><span>依玩家名稱或標籤搜尋；排序有最新發布／❤最熱門／收藏數量／最高星數；也可「只看我按讚的」。</span></div>
+                <div class="howto-feat"><b>收藏詳情</b><span>點卡片打開：切換模式/分類籤瀏覽、一鍵匯入、複製分享連結，下方有留言區——登入後任何人都能留言，刪除權限是留言者本人或該收藏的發布者。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 皮膚廣場</div>
+                <p class="howto-tab-desc">分享實際遊玩截圖，讓別人挑皮膚前先看看實際效果。</p>
+                <div class="howto-feat"><b>分享我的皮膚截圖</b><span>填名稱、作者（選填），下載連結跟 .osk 檔至少擇一，選所屬模式，上傳截圖，按發布。</span></div>
+                <div class="howto-feat"><b>瀏覽 / 篩選</b><span>搜尋名稱或作者、依模式篩選、排序最新或最熱門，也可只看自己按讚過或上傳過的。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 聊天室</div>
+                <p class="howto-tab-desc">所有訪客共用的公開聊天室。</p>
+                <div class="howto-feat"><b>發言</b><span>需登入。貼上一個 osu! 圖面連結，訊息會自動變成一張可以一鍵加入收藏的卡片。</span></div>
+                <div class="howto-feat"><b>每則訊息可以</b><span>點頭像/名字跳去該玩家個人頁、看國旗、按 🌐 即時翻譯成你目前介面語言、回覆某一則、（自己的訊息或站長）刪除。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 私訊</div>
+                <p class="howto-tab-desc">跟單一玩家的一對一對話，其他人看不到內容。</p>
+                <div class="howto-feat"><b>開始新對話</b><span>需登入。輸入對方的 osu! 用戶名，按「開始對話」。</span></div>
+                <div class="howto-feat"><b>對話列表 / 未讀</b><span>未讀數字會同步顯示在 ☰ 選單「私訊」旁邊的紅點。點進去就是該對話串，上方「返回」回列表。</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-tools">
+            <h3 class="howto-group-title">✦ 工具庫</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Farm 圖</div>
+                <p class="howto-tab-desc">高 PP 效率的 ranked 圖清單——PP 數字是本站實際用 SS 成績算出來的，不是估算值。</p>
+                <div class="howto-feat"><b>模式 / Mod 籤</b><span>Standard/Taiko/Catch/Mania 各自搭配 NM／DT／HD／HDDT／HR／HDHR 六種 Mod 組合。</span></div>
+                <div class="howto-feat"><b>🔥 只看農圖</b><span>預設開啟。osu!／taiko 是 Top 50 成績裡 DT 佔比 ≥70%；catch／mania 是 100% acc 佔比 ≥70%（皆需遊玩次數 ≥500）。</span></div>
+                <div class="howto-feat"><b>區間篩選</b><span>PP、星等、BPM、長度都可設 min~max 區間，加上搜尋跟多種排序方式。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 曲庫分類</div>
+                <p class="howto-tab-desc">整個 ranked 曲庫的瀏覽器，用歌手／語言／曲風／來源／feat. 切角度找圖。</p>
+                <div class="howto-feat"><b>篩選組合</b><span>四個下拉可疊加使用，另有模式篩選跟「含 18+ 標記」開關，四種排序方式。</span></div>
+                <div class="howto-feat"><b>➕ 建立此分類的收藏</b><span>選好篩選條件、清單有結果之後才會亮起——一鍵把整個篩選結果變成收藏裡的新分類。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 世界盃圖池</div>
+                <p class="howto-tab-desc">歷屆 OWC／TWC／MWC（4K・7K）／CWC 的官方比賽圖池。</p>
+                <div class="howto-feat"><b>選屆數 / 輪次</b><span>模式籤 → 屆數列表 → 選定後依輪次瀏覽，每張圖都標了 mod。</span></div>
+                <div class="howto-feat"><b>➕ 加入收藏</b><span>整屆或只挑其中一輪加入，不用整屆都要。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ PP 查詢</div>
+                <p class="howto-tab-desc">查任何一位玩家（包括你自己）的 PP 狀況，或兩位玩家並排比較。</p>
+                <div class="howto-feat"><b>查詢你的 osu! PP</b><span>輸入用戶名或 ID → 查詢。結果含四模式數據、PP 歷史曲線、追蹤按鈕、「產生戰績卡」；下方分頁：最近遊玩／最佳成績／PP 目標／獎章／成績歷史。</span></div>
+                <div class="howto-feat"><b>⚔ 雙人 PP 對比</b><span>兩個用戶名/ID 填好按「比較」：先看總覽跟 PP 曲線疊圖，下方「Top Play 對比」左右兩欄並排列出兩人成績。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Replay 分析</div>
+                <p class="howto-tab-desc">上傳 .osr 檔看成績細節，純伺服器端解析檔案本身，不轉檔也不靠第三方服務。</p>
+                <div class="howto-feat"><b>上傳</b><span>拖曳或按「選擇 .osr 檔案」，上傳後顯示成績摘要與擊打時間分佈圖。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎨 追蹤 Mapper</div>
+                <p class="howto-tab-desc">喜歡的 mapper 出新 ranked 圖時第一時間收到通知。</p>
+                <div class="howto-feat"><b>追蹤</b><span>輸入 mapper 的 osu! 用戶名，按「追蹤」；清單顯示在同一頁，可隨時取消。</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-resources">
+            <h3 class="howto-group-title">✦ 資源區</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎵 我的皮膚 <small>跟「皮膚廣場」是不同分頁</small></div>
+                <p class="howto-tab-desc">私人皮膚儲藏室，不對外公開——公開分享用的是「皮膚廣場」。</p>
+                <div class="howto-feat"><b>上傳 / 下載</b><span>上傳 .osk 檔存在瀏覽器本機；換裝置或清瀏覽器資料會遺失，隨時可再下載回來。</span></div>
+                <div class="howto-feat"><b>☁️ 雲端備份</b><span>登入後才會出現。單檔 4MB 以下、最多 30 個，「還原到本機」會加回上方清單。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 更新情報</div>
+                <p class="howto-tab-desc">osu! 官方更新日誌列表，純瀏覽，不需要任何操作。</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 賽事</div>
+                <p class="howto-tab-desc">整合官方論壇 Tournaments 版貼文跟 wyBin 平台的社群賽事情報（非官方主辦，報名前請自行確認主辦方規則）。</p>
+                <div class="howto-feat"><b>模式篩選</b><span>依標題關鍵字自動判斷模式；辨識不出來的貼文只會出現在「全部」籤。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 資源</div>
+                <p class="howto-tab-desc">推薦但沒必要自己重做的社群工具連結清單，純瀏覽。</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 建議&改進</div>
+                <p class="howto-tab-desc">意見回饋表單。寫下想法按送出即可，只有站長看得到，其他訪客不會看見內容。</p>
+            </div>
+        </div>
+    `,
 };

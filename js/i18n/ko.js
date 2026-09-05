@@ -320,4 +320,148 @@ I18N.ko = {
     replay_stat_accuracy: '정확도', replay_stat_combo: '최대 콤보', replay_stat_misses: 'Miss 수',
     replay_stat_mods: 'Mods', replay_stat_rank: '랭크', replay_stat_player: '플레이어',
     replay_approx_note: '타이밍 오차는 키 입력 시간을 비트맵 노트와 비교해 추정한 값으로, 완전한 판정 재현이 아닌 참고용입니다.',
+
+    site_howto_title: '각 페이지와 버튼의 기능 설명', site_howto_label: '사용 설명서',
+    nav_howto: '사용 설명서',
+    howto_page_title: '📖 사용 설명서', howto_page_hint: '사이트 메뉴와 같은 분류로, 각 페이지와 버튼의 용도와 사용법을 정리했습니다.',
+    howto_group_global: '사이트 전체',
+    howto_manual_body: `
+        <div class="howto-group" id="howto-global">
+            <h3 class="howto-group-title">🌐 사이트 전체</h3>
+            <p class="howto-tab-desc">어느 페이지에서든 찾을 수 있는 컨트롤들로, 대부분 헤더 좌우 모서리에 모여 있습니다.</p>
+            <div class="howto-feat"><b>다크 / 라이트 전환</b><span>왼쪽 위. 달/해 아이콘을 클릭하면 전환되고, 다음 방문 때도 선택이 기억됩니다.</span></div>
+            <div class="howto-feat"><b>홈 화면에 추가</b><span>왼쪽 위, 지원하는 브라우저에서만 표시. 사이트를 앱 아이콘으로 설치해 오프라인에서도 기본 화면을 열 수 있습니다.</span></div>
+            <div class="howto-feat"><b>사이트 업데이트</b><span>왼쪽 위 / 화면 하단 플로팅 바. 새 버전이 감지될 때만 나타나며, 클릭하면 새로고침됩니다.</span></div>
+            <div class="howto-feat"><b>전체 검색</b><span>오른쪽 위 돋보기, 또는 <b>/</b> 나 <b>Ctrl+K</b>. 내 컬렉션·곡 분류·월드컵 맵풀을 동시에 검색하고, 결과를 클릭하면 검색어가 채워진 채로 해당 탭으로 이동합니다.</span></div>
+            <div class="howto-feat"><b>알림 벨</b><span>오른쪽 위. 추적 중인 플레이어의 PP 변화, 추적 중인 mapper의 신곡, 읽지 않은 DM 등이 여기 표시되며, 푸시 알림을 켜두면 사이트를 열지 않아도 받을 수 있습니다.</span></div>
+            <div class="howto-feat"><b>osu! 로그인</b><span>오른쪽 위. osu! 계정으로 로그인——채팅 발언, DM, 갤러리에 컬렉션 발행, 스킨 클라우드 백업, 즐겨찾기/자주 플레이 원클릭 가져오기는 모두 로그인이 필요합니다.</span></div>
+            <div class="howto-feat"><b>언어 전환</b><span>오른쪽 위 지구본 아이콘, 9개 언어 지원, 선택한 언어는 기억됩니다.</span></div>
+            <div class="howto-feat"><b>☰ 메뉴</b><span>오른쪽 위, 모바일의 메인 내비게이션으로 전체 탭 목록을 표시. 넓은 데스크톱 화면에서는 자주 쓰는 탭이 바로 표시되어 메뉴를 열 필요가 없습니다.</span></div>
+            <div class="howto-feat"><b>볼륨 조절</b><span>오른쪽 아래 스피커, 컬렉션 카드의 "미리듣기" 볼륨을 조절합니다.</span></div>
+            <div class="howto-feat"><b>새로고침</b><span>오른쪽 아래, 페이지 전체를 새로고침합니다.</span></div>
+            <div class="howto-feat"><b>좋아요 / 사용 설명서 / 공유</b><span>사이트 제목 바로 아래 세 개의 버튼: "좋아요"는 사이트 좋아요 수를 올리고, "사용 설명서"는 바로 이 페이지, "공유"는 친구에게 보낼 링크를 복사합니다.</span></div>
+        </div>
+
+        <div class="howto-group" id="howto-core">
+            <h3 class="howto-group-title">✦ 핵심 기능</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">♫ 컬렉션 <small>기본 홈페이지</small></div>
+                <p class="howto-tab-desc">자신의 osu! 라이브러리 정리: 추가, 분류, 게임으로 내보내기, 예전 백업과 비교 등.</p>
+                <div class="howto-feat"><b>비트맵 추가</b><span>맵의 ID나 osu! URL(beatmapsets/... 또는 /b/... 모두 가능)을 붙여넣고 "추가"를 누릅니다.</span></div>
+                <div class="howto-feat"><b>컬렉션 가져오기/내보내기 (버튼 6개)</b><span>왼쪽부터: JSON 백업 다운로드 → JSON으로 복원 → 공유 링크 복사 → 미리보기 PNG 카드 다운로드 → collection.db로 내보내 osu!에 바로 사용 → ⚔ 차이 비교, 예전 백업을 올려 추가/삭제된 맵 확인.</span></div>
+                <div class="howto-feat"><b>도구·설정 (버튼 6개)</b><span>모든 맵 데이터 새로고침 → 📊 통계 대시보드(업적 배지 8개 포함) → ✨ 컬렉션 정리 마법사(아래 설명 참고) → 플레이함 표시/즐겨찾기·자주 플레이 원클릭 가져오기(로그인 필요) → 🔒 비밀번호 설정, 이후 편집/발행 작업에 필요.</span></div>
+                <div class="howto-feat"><b>검색 / 필터 / 정렬</b><span>곡명이나 아티스트로 검색; 언어, 장르, 출처, 아티스트로 필터링; 별점으로 정렬 가능.</span></div>
+                <div class="howto-feat"><b>분류 탭</b><span>즐겨찾기/Standard/Taiko/Catch/Mania 고정 탭 외에, 톱니바퀴 아이콘으로 "분류 관리"에서 직접 탭을 추가할 수 있습니다.</span></div>
+                <div class="howto-feat"><b>더 둘러보기</b><span>페이지 맨 아래 7개의 바로가기 카드로 다른 자주 쓰는 탭으로 이동합니다.</span></div>
+                <div class="howto-feat"><b>✨ 컬렉션 정리 마법사</b><span>사실 세 가지 도구: ① 계정에서 분류 생성(즐겨찾기/자주 플레이/베스트 성적/최근/특정 mapper) ② 성적 기반 연습 컬렉션 생성(돌파 점수, 목표 맵풀, 저정확도 재도전, 안 쳐본 비슷한 맵, 약점) ③ 건강 검진(중복, 삭제됨, 비ranked, 난이도 수 변경된 맵 검출). 세 가지 모두 기존 컬렉션을 덮어쓰지 않고 병합만 합니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 컬렉션 갤러리</div>
+                <p class="howto-tab-desc">정리한 컬렉션을 공개하거나, 다른 사람의 컬렉션을 둘러보고 바로 가져올 수 있습니다. osu! 계정당 하나만 발행할 수 있습니다.</p>
+                <div class="howto-feat"><b>발행 / 발행 취소</b><span>로그인 필요. 발행하면 현재 컬렉션이 갤러리로 전송되고, 다시 발행하면 기존 것을 덮어쓰며 두 개가 되지 않습니다.</span></div>
+                <div class="howto-feat"><b>검색 / 정렬 / 필터</b><span>플레이어 이름이나 태그로 검색; 최신 발행/❤인기순/컬렉션 수/최고 별점으로 정렬; "좋아요한 것만 보기"도 가능.</span></div>
+                <div class="howto-feat"><b>컬렉션 상세</b><span>카드를 클릭해 열면 모드/분류 탭 전환, 원클릭 가져오기, 공유 링크 복사가 가능하고, 아래에 댓글란이 있습니다——로그인하면 누구나 댓글을 달 수 있고, 삭제는 댓글 작성자 본인이나 해당 컬렉션 발행자가 할 수 있습니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 스킨 갤러리</div>
+                <p class="howto-tab-desc">실제 플레이 화면의 스킨 스크린샷을 공유해, 고르기 전에 실제 효과를 미리 볼 수 있게 합니다.</p>
+                <div class="howto-feat"><b>내 스킨 스크린샷 공유</b><span>이름, 작성자(선택)를 입력하고, 다운로드 링크나 .osk 파일 중 하나 이상 업로드, 해당 모드 선택, 스크린샷 업로드 후 "발행"을 누릅니다.</span></div>
+                <div class="howto-feat"><b>둘러보기 / 필터</b><span>이름이나 작성자로 검색, 모드로 필터링, 최신순/인기순 정렬, 내가 좋아요하거나 업로드한 것만 보기도 가능.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 채팅방</div>
+                <p class="howto-tab-desc">모든 방문자가 함께 쓰는 공개 채팅방입니다.</p>
+                <div class="howto-feat"><b>발언</b><span>로그인 필요. osu! 비트맵 링크를 붙여넣으면 자동으로 원클릭 "컬렉션에 추가" 버튼이 있는 카드로 바뀝니다.</span></div>
+                <div class="howto-feat"><b>메시지별 기능</b><span>아바타/이름 클릭 시 해당 플레이어의 osu! 프로필로 이동, 국기 확인, 🌐로 현재 인터페이스 언어로 번역, 답장, 삭제(본인 메시지 또는 사이트 관리자는 전체 삭제 가능).</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 다이렉트 메시지</div>
+                <p class="howto-tab-desc">한 플레이어와의 1:1 비공개 대화로, 다른 사람에게는 보이지 않습니다.</p>
+                <div class="howto-feat"><b>새 대화 시작</b><span>로그인 필요. 상대방의 osu! 유저명을 입력하고 "대화 시작"을 누릅니다.</span></div>
+                <div class="howto-feat"><b>대화 목록 / 읽지 않음</b><span>읽지 않은 수는 ☰ 메뉴의 "DM" 옆 배지로도 표시됩니다. 대화를 열면 스레드가 보이고, "뒤로"로 목록으로 돌아갑니다.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-tools">
+            <h3 class="howto-group-title">✦ 도구 모음</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Farm 맵</div>
+                <p class="howto-tab-desc">PP 효율이 높은 ranked 맵 목록——PP 수치는 본 사이트가 SS 성적으로 실제 계산한 값이며 추정치가 아닙니다.</p>
+                <div class="howto-feat"><b>모드 / Mod 탭</b><span>Standard/Taiko/Catch/Mania 각각 NM／DT／HD／HDDT／HR／HDHR 6가지 Mod 조합.</span></div>
+                <div class="howto-feat"><b>🔥 농맵만 보기</b><span>기본 켜짐. osu!/taiko는 Top 50 성적 중 DT 비율 ≥70%; catch/mania는 100% acc 비율 ≥70%(둘 다 플레이 횟수 ≥500 필요).</span></div>
+                <div class="howto-feat"><b>구간 필터</b><span>PP, 별점, BPM, 길이 모두 최소~최대 구간 설정 가능, 검색과 여러 정렬 방식도 있습니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 곡 분류</div>
+                <p class="howto-tab-desc">전체 ranked 곡 라이브러리를 아티스트/언어/장르/출처/feat.로 살펴보는 브라우저입니다.</p>
+                <div class="howto-feat"><b>필터 조합</b><span>4개의 드롭다운을 동시에 사용 가능, 모드 필터와 "18+ 태그 포함" 스위치, 4가지 정렬 방식.</span></div>
+                <div class="howto-feat"><b>➕ 이 분류로 컬렉션 만들기</b><span>필터 조건에 결과가 있을 때만 활성화——클릭 한 번으로 필터링된 전체 결과를 컬렉션의 새 분류로 만듭니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 월드컵 맵풀</div>
+                <p class="howto-tab-desc">역대 OWC/TWC/MWC(4K・7K)/CWC 공식 대회 맵풀입니다.</p>
+                <div class="howto-feat"><b>대회 / 라운드 선택</b><span>모드 탭 → 대회 목록 → 선택 후 라운드별로 탐색, 각 맵에 mod가 표시됩니다.</span></div>
+                <div class="howto-feat"><b>➕ 컬렉션에 추가</b><span>대회 전체 또는 한 라운드만 추가 가능, 전체를 다 가져올 필요는 없습니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ PP 조회</div>
+                <p class="howto-tab-desc">자신을 포함한 어떤 플레이어의 PP 상태도 조회하거나, 두 명을 나란히 비교할 수 있습니다.</p>
+                <div class="howto-feat"><b>osu! PP 조회</b><span>유저명이나 ID를 입력해 조회. 결과에는 네 모드 데이터, PP 히스토리 차트, 추적 버튼, "전적 카드 생성"이 포함되며, 아래 탭: 최근 플레이/베스트 성적/PP 목표/메달/성적 히스토리.</span></div>
+                <div class="howto-feat"><b>⚔ 1:1 PP 비교</b><span>두 유저명/ID를 입력하고 "비교" 클릭: 먼저 개요와 겹친 PP 차트를 보고, 아래 "Top Play 비교"에서 두 사람의 베스트 성적을 좌우로 나란히 볼 수 있습니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Replay 분석</div>
+                <p class="howto-tab-desc">.osr 파일을 업로드해 성적 세부사항을 확인——완전히 서버 측에서 파일 자체를 분석하며, 영상 변환이나 외부 서비스에 의존하지 않습니다.</p>
+                <div class="howto-feat"><b>업로드</b><span>드래그 앤 드롭하거나 ".osr 파일 선택" 클릭. 업로드 후 성적 요약과 타격 타이밍 분포 차트가 표시됩니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎨 Mapper 추적</div>
+                <p class="howto-tab-desc">좋아하는 mapper가 새 ranked 맵을 낼 때 바로 알림을 받습니다.</p>
+                <div class="howto-feat"><b>추적</b><span>mapper의 osu! 유저명을 입력하고 "추적"을 누릅니다; 목록은 같은 페이지에 표시되며 언제든 해제할 수 있습니다.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-resources">
+            <h3 class="howto-group-title">✦ 리소스</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎵 내 스킨 <small>"스킨 갤러리"와는 다른 탭</small></div>
+                <p class="howto-tab-desc">공개되지 않는 개인 스킨 보관함——공개 공유는 "스킨 갤러리"를 사용합니다.</p>
+                <div class="howto-feat"><b>업로드 / 다운로드</b><span>업로드한 .osk 파일은 이 브라우저에만 저장되며, 기기를 바꾸거나 브라우저 데이터를 지우면 사라집니다. 언제든 다시 다운로드할 수 있습니다.</span></div>
+                <div class="howto-feat"><b>☁️ 클라우드 백업</b><span>로그인 시에만 표시. 파일당 4MB 이하, 최대 30개; "로컬로 복원"하면 위 목록에 다시 추가됩니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 업데이트 정보</div>
+                <p class="howto-tab-desc">osu! 공식 업데이트 로그 목록입니다. 열람만 가능하며 별도 조작은 필요 없습니다.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 대회</div>
+                <p class="howto-tab-desc">공식 포럼 Tournaments 게시판과 wyBin 플랫폼의 커뮤니티 대회 정보를 통합했습니다(비공식 주최이므로 참가 전 주최자의 규칙을 직접 확인하세요).</p>
+                <div class="howto-feat"><b>모드 필터</b><span>제목 키워드로 모드를 자동 판별하며, 판별할 수 없는 글은 "전체" 탭에만 표시됩니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 리소스</div>
+                <p class="howto-tab-desc">직접 만들 필요는 없지만 추천할 만한 커뮤니티 도구 링크 모음입니다. 열람만 가능합니다.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 제안 & 개선</div>
+                <p class="howto-tab-desc">의견 제출 양식입니다. 생각을 적고 제출하면 되며, 사이트 관리자만 볼 수 있고 다른 방문자에게는 보이지 않습니다.</p>
+            </div>
+        </div>
+    `,
 };

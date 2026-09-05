@@ -320,4 +320,148 @@ I18N.de = {
     replay_stat_accuracy: 'Genauigkeit', replay_stat_combo: 'Max. Combo', replay_stat_misses: 'Misses',
     replay_stat_mods: 'Mods', replay_stat_rank: 'Rang', replay_stat_player: 'Spieler',
     replay_approx_note: 'Die Trefferzeit wird geschätzt, indem Tastendrücke mit nahen Beatmap-Noten abgeglichen werden — keine vollständige Judgement-Nachbildung, nur ein Anhaltspunkt.',
+
+    site_howto_title: 'Was jede Seite und jeder Button macht', site_howto_label: 'Handbuch',
+    nav_howto: 'Handbuch',
+    howto_page_title: '📖 Handbuch', howto_page_hint: 'Nach dem Menü der Seite gruppiert — was jede Seite und jeder Button macht und wie man sie benutzt.',
+    howto_group_global: 'Website-weit',
+    howto_manual_body: `
+        <div class="howto-group" id="howto-global">
+            <h3 class="howto-group-title">🌐 Website-weit</h3>
+            <p class="howto-tab-desc">Steuerelemente, die auf jeder Seite verfügbar sind, meist in den beiden oberen Ecken.</p>
+            <div class="howto-feat"><b>Hell-/Dunkel-Umschalter</b><span>Oben links. Mond-/Sonnensymbol antippen zum Umschalten — die Wahl wird für künftige Besuche gespeichert.</span></div>
+            <div class="howto-feat"><b>Zum Startbildschirm hinzufügen</b><span>Oben links, nur bei unterstützten Browsern sichtbar. Installiert die Website als App-Symbol mit einfacher Offline-Ansicht.</span></div>
+            <div class="howto-feat"><b>Website-Update verfügbar</b><span>Oben links / eine schwebende Leiste unten, erscheint nur bei einer neuen Version — anklicken zum Neuladen.</span></div>
+            <div class="howto-feat"><b>Websiteweite Suche</b><span>Lupe oben rechts, oder <b>/</b> bzw. <b>Ctrl+K</b> drücken. Durchsucht gleichzeitig deine Sammlung, den Katalog und die Weltmeisterschafts-Mappools — ein Klick auf ein Ergebnis springt zu diesem Tab mit vorausgefüllter Suche.</span></div>
+            <div class="howto-feat"><b>Benachrichtigungsglocke</b><span>Oben rechts. PP-Änderungen verfolgter Spieler, neue Karten verfolgter Mapper, ungelesene Nachrichten usw. erscheinen hier — mit aktivierten Push-Benachrichtigungen auch ohne geöffnete Seite.</span></div>
+            <div class="howto-feat"><b>osu!-Login</b><span>Oben rechts. Mit deinem osu!-Konto anmelden — Chat, Nachrichten, Veröffentlichen in der Galerie, Cloud-Skin-Backup und One-Klick-Import von Favoriten/meistgespielten Karten benötigen das zuerst.</span></div>
+            <div class="howto-feat"><b>Sprachumschalter</b><span>Globus-Symbol oben rechts — 9 Sprachen verfügbar, die Wahl wird gespeichert.</span></div>
+            <div class="howto-feat"><b>☰ Menü</b><span>Oben rechts, die Hauptnavigation auf Mobilgeräten mit allen Tabs. Auf breiten Desktop-Bildschirmen werden die häufigen Tabs direkt angezeigt.</span></div>
+            <div class="howto-feat"><b>Lautstärke</b><span>Lautsprecher unten rechts — steuert die Vorschau-Lautstärke der Sammlungskarten.</span></div>
+            <div class="howto-feat"><b>Neu laden</b><span>Unten rechts — lädt die ganze Seite neu.</span></div>
+            <div class="howto-feat"><b>Gefällt mir / Handbuch / Teilen</b><span>Drei Buttons direkt unter dem Seitentitel: „Gefällt mir" erhöht den Like-Zähler; „Handbuch" ist diese Seite; „Teilen" kopiert einen Link zum Versenden an Freunde.</span></div>
+        </div>
+
+        <div class="howto-group" id="howto-core">
+            <h3 class="howto-group-title">✦ Kernfunktionen</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">♫ Sammlung <small>Standard-Startseite</small></div>
+                <p class="howto-tab-desc">Verwalte deine eigene osu!-Bibliothek: hinzufügen, kategorisieren, zurück ins Spiel exportieren oder mit einem alten Backup vergleichen.</p>
+                <div class="howto-feat"><b>Beatmap hinzufügen</b><span>ID oder osu!-URL der Karte einfügen (beatmapsets/... oder /b/... funktionieren beide) und Hinzufügen klicken.</span></div>
+                <div class="howto-feat"><b>Import/Export (6 Buttons)</b><span>Von links nach rechts: JSON-Backup exportieren → JSON importieren zum Wiederherstellen → Freigabelink kopieren → Vorschau-PNG-Karte herunterladen → Als collection.db exportieren, direkt für osu! → ⚔ Vergleich, altes Backup hochladen und sehen was hinzugefügt/entfernt wurde.</span></div>
+                <div class="howto-feat"><b>Werkzeuge & Einstellungen (6 Buttons)</b><span>Alle Kartendaten aktualisieren → 📊 Statistik-Dashboard (mit 8 Sammlungs-Erfolgsabzeichen) → ✨ Sammlungs-Assistent (siehe unten) → Als gespielt markieren / One-Klick-Import von Favoriten & meistgespielten (Login nötig) → 🔒 Passwort festlegen, für spätere Bearbeitungs-/Veröffentlichungsaktionen erforderlich.</span></div>
+                <div class="howto-feat"><b>Suche / Filter / Sortierung</b><span>Nach Titel oder Künstler suchen; nach Sprache, Genre, Quelle oder Künstler filtern; nach Sternebewertung sortieren.</span></div>
+                <div class="howto-feat"><b>Kategorie-Tabs</b><span>Neben den festen Tabs Favoriten/Standard/Taiko/Catch/Mania öffnet das Zahnrad-Symbol „Kategorien verwalten" für eigene Kategorien.</span></div>
+                <div class="howto-feat"><b>Mehr entdecken</b><span>7 Schnellzugriffskarten unten, die zu anderen häufigen Tabs springen.</span></div>
+                <div class="howto-feat"><b>✨ Sammlungs-Assistent</b><span>Eigentlich drei Werkzeuge in einem: ① Kategorien aus deinem Konto generieren (Favoriten/meistgespielt/beste/letzte/ein bestimmter Mapper) ② Übungssammlungen aus deinen Ergebnissen generieren (Push, Zielpool, Neuversuch bei niedriger Genauigkeit, ähnliche ungespielte Karten, Schwachstellen) ③ Gesundheitscheck (findet Duplikate, gelöschte, nicht-ranked oder in der Schwierigkeitsanzahl geänderte Karten). Alle drei fügen nur hinzu, überschreiben nie deine bestehende Sammlung.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Öffentliche Galerie</div>
+                <p class="howto-tab-desc">Veröffentliche deine organisierte Sammlung öffentlich oder durchsuche die anderer und importiere sie direkt. Jedes osu!-Konto kann nur eine veröffentlichen.</p>
+                <div class="howto-feat"><b>Veröffentlichen / zurückziehen</b><span>Login nötig. Veröffentlichen sendet deine aktuelle Sammlung an die Galerie; erneutes Veröffentlichen überschreibt die alte statt einen zweiten Eintrag zu erstellen.</span></div>
+                <div class="howto-feat"><b>Suche / Sortierung / Filter</b><span>Nach Spielername oder Tag suchen; sortieren nach neu/❤ beliebtesten/Kartenanzahl/höchster Bewertung; oder nur mit „Gefällt mir" markierte anzeigen.</span></div>
+                <div class="howto-feat"><b>Sammlungsdetails</b><span>Karte anklicken zum Öffnen: nach Modus/Kategorie-Tab durchsuchen, One-Klick-Import, Freigabelink kopieren, und darunter ein Kommentarbereich — jeder Angemeldete kann kommentieren, Löschen ist dem Kommentator oder dem Veröffentlicher der Sammlung erlaubt.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Skin-Galerie</div>
+                <p class="howto-tab-desc">Teile echte Ingame-Skin-Screenshots, damit andere sehen können wie ein Skin tatsächlich aussieht.</p>
+                <div class="howto-feat"><b>Meinen Skin-Screenshot teilen</b><span>Name und Autor (optional) ausfüllen, Download-Link oder .osk-Datei angeben (mindestens eins), Modus wählen, Screenshot hochladen und veröffentlichen.</span></div>
+                <div class="howto-feat"><b>Durchsuchen / Filtern</b><span>Nach Name oder Autor suchen, nach Modus filtern, nach neu oder beliebtesten sortieren, oder nur eigene/gelikte anzeigen.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Chatraum</div>
+                <p class="howto-tab-desc">Ein öffentlicher Chatraum für alle Besucher.</p>
+                <div class="howto-feat"><b>Schreiben</b><span>Login nötig. Ein osu!-Beatmap-Link wird automatisch zu einer Karte mit One-Klick „Zur Sammlung hinzufügen"-Button.</span></div>
+                <div class="howto-feat"><b>Pro Nachricht möglich</b><span>Avatar/Name anklicken öffnet das osu!-Profil, Länderflagge ansehen, 🌐 antippen zum Übersetzen in deine aktuelle Oberflächensprache, auf eine Nachricht antworten, oder löschen (eigene Nachrichten, oder alle als Seitenbetreiber).</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Direktnachrichten</div>
+                <p class="howto-tab-desc">Ein privates 1:1-Gespräch mit einem Spieler, für alle anderen unsichtbar.</p>
+                <div class="howto-feat"><b>Neues Gespräch starten</b><span>Login nötig. Den osu!-Benutzernamen eingeben und „Gespräch starten" klicken.</span></div>
+                <div class="howto-feat"><b>Gesprächsliste / ungelesen</b><span>Ungelesene Zahlen erscheinen auch als Abzeichen neben „Nachrichten" im ☰-Menü. Ein Gespräch öffnen zeigt den Verlauf; „Zurück" führt zur Liste zurück.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-tools">
+            <h3 class="howto-group-title">✦ Werkzeugkasten</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Farm-Karten</div>
+                <p class="howto-tab-desc">Eine Liste von ranked Karten mit hoher PP-Effizienz — die PP-Zahlen werden von dieser Seite tatsächlich aus SS-Ergebnissen berechnet, nicht geschätzt.</p>
+                <div class="howto-feat"><b>Modus-/Mod-Tabs</b><span>Standard/Taiko/Catch/Mania, jeweils mit NM/DT/HD/HDDT/HR/HDHR-Mod-Kombinationen.</span></div>
+                <div class="howto-feat"><b>🔥 Nur Farm-Karten</b><span>Standardmäßig an. Für osu!/taiko: ≥70% der Top-50-Ergebnisse sind DT; für catch/mania: ≥70% sind 100% Genauigkeit (beide benötigen ≥500 Spiele).</span></div>
+                <div class="howto-feat"><b>Bereichsfilter</b><span>PP, Sternebewertung, BPM und Länge unterstützen alle einen Min~Max-Bereich, plus Suche und mehrere Sortieroptionen.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Katalog</div>
+                <p class="howto-tab-desc">Ein Browser für den gesamten ranked-Katalog, aufgeteilt nach Künstler/Sprache/Genre/Quelle/Feat.</p>
+                <div class="howto-feat"><b>Filterkombinationen</b><span>Die vier Dropdowns können kombiniert werden, plus ein Modus-Filter und ein „18+ markiert einschließen"-Schalter, mit vier Sortieroptionen.</span></div>
+                <div class="howto-feat"><b>➕ Sammlung aus diesem Filter erstellen</b><span>Wird erst aktiv, wenn deine Filter Ergebnisse liefern — ein Klick macht das gesamte gefilterte Ergebnis zu einer neuen Kategorie in deiner Sammlung.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Weltmeisterschafts-Mappools</div>
+                <p class="howto-tab-desc">Offizielle Mappools jeder OWC/TWC/MWC (4K・7K)/CWC.</p>
+                <div class="howto-feat"><b>Ausgabe / Runde wählen</b><span>Modus-Tab → Ausgabenliste → eine wählen, um nach Runde zu durchsuchen, jede Karte mit ihrem Mod beschriftet.</span></div>
+                <div class="howto-feat"><b>➕ Zur Sammlung hinzufügen</b><span>Die ganze Ausgabe hinzufügen, oder nur eine Runde — man muss nicht alles nehmen.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ PP-Suche</div>
+                <p class="howto-tab-desc">Die PP eines beliebigen Spielers (auch deine eigene) nachschlagen, oder zwei nebeneinander vergleichen.</p>
+                <div class="howto-feat"><b>Deine osu!-PP nachschlagen</b><span>Benutzername oder ID eingeben und suchen. Ergebnisse enthalten Statistiken für alle Modi, ein PP-Verlaufsdiagramm, einen Verfolgen-Button und „Statistikkarte erstellen"; Tabs darunter: letzte Spiele / Top-Ergebnisse / PP-Ziel / Abzeichen / Notenverlauf.</span></div>
+                <div class="howto-feat"><b>⚔ Zwei-Spieler-Vergleich</b><span>Zwei Benutzernamen/IDs eingeben und Vergleichen klicken: zuerst Übersicht und überlagerte PP-Diagramme, dann darunter „Top-Play-Vergleich" mit den besten Ergebnissen beider Spieler nebeneinander.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Replay-Analyse</div>
+                <p class="howto-tab-desc">Eine .osr-Datei hochladen für Ergebnisdetails — komplett serverseitig geparst, keine Videokonvertierung oder Drittanbieter-Dienste.</p>
+                <div class="howto-feat"><b>Hochladen</b><span>Per Drag & Drop oder „.osr-Datei wählen" klicken — zeigt danach eine Ergebniszusammenfassung und ein Trefferzeit-Verteilungsdiagramm.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎨 Mapper verfolgen</div>
+                <p class="howto-tab-desc">Sofort benachrichtigt werden, sobald ein Mapper, den du magst, eine neue Karte rankt.</p>
+                <div class="howto-feat"><b>Verfolgen</b><span>Den osu!-Benutzernamen des Mappers eingeben und Verfolgen klicken; die Liste erscheint auf derselben Seite und kann jederzeit entfernt werden.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-resources">
+            <h3 class="howto-group-title">✦ Ressourcen</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎵 Meine Skins <small>ein anderer Tab als „Skin-Galerie"</small></div>
+                <p class="howto-tab-desc">Dein privater Skin-Speicher, nicht öffentlich sichtbar — dafür „Skin-Galerie" verwenden.</p>
+                <div class="howto-feat"><b>Hochladen / Herunterladen</b><span>Hochgeladene .osk-Dateien leben nur in diesem Browser — Gerätewechsel oder Browserdaten löschen verliert sie; jederzeit zum Zurückholen herunterladen.</span></div>
+                <div class="howto-feat"><b>☁️ Cloud-Backup</b><span>Erscheint nur bei Anmeldung. Bis zu 30 Dateien, je 4MB; „Lokal wiederherstellen" fügt sie oben zur Liste hinzu.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ News</div>
+                <p class="howto-tab-desc">Eine Liste offizieller osu!-Änderungsprotokolle — nur zum Durchsehen, keine Aktionen nötig.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Turniere</div>
+                <p class="howto-tab-desc">Kombiniert den offiziellen Foren-Bereich Tournaments mit wyBins Community-Auflistungen (inoffizielle Events — vor Anmeldung die Regeln des Veranstalters selbst prüfen).</p>
+                <div class="howto-feat"><b>Modus-Filter</b><span>Modus wird automatisch aus Schlüsselwörtern im Titel erkannt; nicht erkennbare Beiträge erscheinen nur unter „Alle".</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Ressourcen</div>
+                <p class="howto-tab-desc">Eine Liste empfohlener Community-Tools, die hier nicht nachgebaut werden mussten — nur zum Durchsehen.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Feedback</div>
+                <p class="howto-tab-desc">Ein Feedback-Formular. Gedanken aufschreiben und absenden — nur der Seitenbetreiber sieht es, andere Besucher nie.</p>
+            </div>
+        </div>
+    `,
 };

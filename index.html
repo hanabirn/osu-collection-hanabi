@@ -152,6 +152,9 @@
                     <span data-i18n="site_like_label">讚</span>
                     <span class="site-like-count" id="site-like-count" aria-hidden="true">–</span>
                 </button>
+                <button class="site-social-btn" type="button" onclick="switchTab('howto')" data-icon="bookOpen" data-i18n-title="site_howto_title" title="每個分頁跟按鈕的用途說明">
+                    <span data-i18n="site_howto_label">使用手冊</span>
+                </button>
                 <button class="site-social-btn site-share-btn" id="site-share-btn" type="button" onclick="shareSite()" data-icon="share2" data-i18n-title="site_share_title" title="把這個網站分享給朋友">
                     <span data-i18n="site_share_label">分享</span>
                 </button>
@@ -190,6 +193,7 @@
             <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
             <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
             <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources">資源</button>
+            <button class="site-nav-btn" onclick="switchTab('howto', this)" data-icon="bookOpen" data-icon-gap><span data-i18n="nav_howto">使用手冊</span></button>
             <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
         </div>
     </nav>
@@ -851,6 +855,18 @@
             <p class="resources-hint" data-i18n="resources_hint">一些沒必要自己做、但很推薦認識的社群工具：</p>
             <div class="resources-grid" id="resources-list"></div>
         </div>
+    </section>
+
+    <section id="page-howto" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="howto_page_title">📖 使用手冊</h2>
+        <p class="tournaments-hint" data-i18n="howto_page_hint">依網站選單分類，列出每個分頁跟按鈕的用途與操作方式。</p>
+        <div class="howto-jumpnav">
+            <a href="#howto-global" data-i18n="howto_group_global">站台通用</a>
+            <a href="#howto-core" data-i18n="nav_group_core">核心功能</a>
+            <a href="#howto-tools" data-i18n="nav_group_tools">工具庫</a>
+            <a href="#howto-resources" data-i18n="nav_group_resources">資源區</a>
+        </div>
+        <div class="howto-manual" data-i18n="howto_manual_body"></div>
     </section>
 
 </main>

@@ -30,6 +30,150 @@ I18N.en = {
     dm_back_btn: 'Back',
     dm_self_error: "You can't message yourself",
 
+    site_howto_title: 'What every page and button does', site_howto_label: 'User Guide',
+    nav_howto: 'User Guide',
+    howto_page_title: '📖 User Guide', howto_page_hint: 'Grouped the same way as the site menu — what every page and button does, and how to use it.',
+    howto_group_global: 'Site-wide',
+    howto_manual_body: `
+        <div class="howto-group" id="howto-global">
+            <h3 class="howto-group-title">🌐 Site-wide</h3>
+            <p class="howto-tab-desc">Controls available from any page, mostly clustered in the header's two corners.</p>
+            <div class="howto-feat"><b>Light / dark toggle</b><span>Top-left. Click the moon/sun icon to switch — your choice is remembered on future visits.</span></div>
+            <div class="howto-feat"><b>Add to home screen</b><span>Top-left, only shown where the browser supports it. Installs the site as an app icon with a basic offline screen.</span></div>
+            <div class="howto-feat"><b>Site update available</b><span>Top-left / a floating bar at the bottom, only appears when a new version is detected — click it to reload.</span></div>
+            <div class="howto-feat"><b>Global search</b><span>Top-right magnifier, or press <b>/</b> or <b>Ctrl+K</b>. Searches your collection, the catalog, and World Cup mappools at once — clicking a result jumps to that tab with the search prefilled.</span></div>
+            <div class="howto-feat"><b>Notification bell</b><span>Top-right. Tracked players' PP changes, tracked mappers' new maps, unread DMs, etc. show up here — with push notifications on, you'll get them even with the site closed.</span></div>
+            <div class="howto-feat"><b>osu! login</b><span>Top-right. Sign in with your osu! account — chatting, DMs, publishing to the gallery, cloud skin backup, and one-click favorites/most-played import all need this first.</span></div>
+            <div class="howto-feat"><b>Language switch</b><span>Top-right globe icon — 9 languages supported, remembered after you pick one.</span></div>
+            <div class="howto-feat"><b>☰ Menu</b><span>Top-right, the main nav on mobile, listing every tab. On a wide desktop screen the common tabs show directly, no need to open it.</span></div>
+            <div class="howto-feat"><b>Volume</b><span>Bottom-right speaker — controls the preview-playback volume on collection cards.</span></div>
+            <div class="howto-feat"><b>Refresh</b><span>Bottom-right — reloads the whole page.</span></div>
+            <div class="howto-feat"><b>Like / User Guide / Share</b><span>Three buttons right under the site title: Like adds to the site's like count; User Guide is this page; Share copies a link to send to friends.</span></div>
+        </div>
+
+        <div class="howto-group" id="howto-core">
+            <h3 class="howto-group-title">✦ Core features</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">♫ Collection <small>default home page</small></div>
+                <p class="howto-tab-desc">Manage your own osu! library: add, categorize, export back to the game, or diff against an old backup.</p>
+                <div class="howto-feat"><b>Add a beatmap</b><span>Paste the map's ID or osu! URL (beatmapsets/... or /b/... both work) and click Add.</span></div>
+                <div class="howto-feat"><b>Import/export (6 buttons)</b><span>Left to right: Export JSON backup → Import JSON to restore → Copy a share link → Download a preview PNG card → Export as collection.db to drop straight into osu! → ⚔ Diff, upload an old backup to see what was added/removed.</span></div>
+                <div class="howto-feat"><b>Tools & settings (6 buttons)</b><span>Refresh all maps' data → 📊 Stats dashboard (with 8 collection achievement badges) → ✨ Collection wizard (see below) → Mark as played / one-click import favorites & most-played (login required) → 🔒 Set a password, required for later edit/publish actions.</span></div>
+                <div class="howto-feat"><b>Search / filter / sort</b><span>Search by title or artist; filter by language, genre, source, or artist; sort by star rating.</span></div>
+                <div class="howto-feat"><b>Category tabs</b><span>Besides the fixed Favorites/Standard/Taiko/Catch/Mania tabs, the gear icon opens "Manage categories" to add your own.</span></div>
+                <div class="howto-feat"><b>Explore more</b><span>7 shortcut cards at the bottom, jumping to other common tabs.</span></div>
+                <div class="howto-feat"><b>✨ Collection wizard</b><span>Actually three tools in one: ① generate categories from your account (favorites/most-played/best/recent/a specific mapper) ② generate practice collections from your scores (push, goal pool, low-acc redo, similar untried maps, weak points) ③ health check (finds duplicates, deleted, unranked, or difficulty-count-changed maps). All three only merge in, never overwrite your existing collection.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Public Gallery</div>
+                <p class="howto-tab-desc">Publish your organized collection publicly, or browse others' and import them directly. Each osu! account can publish only one.</p>
+                <div class="howto-feat"><b>Publish / unpublish</b><span>Login required. Publishing sends your current collection to the gallery; publishing again overwrites the old one instead of creating a second entry.</span></div>
+                <div class="howto-feat"><b>Search / sort / filter</b><span>Search by player name or tag; sort by recent/❤ most liked/set count/highest rating; or show only ones you've liked.</span></div>
+                <div class="howto-feat"><b>Collection detail</b><span>Click a card to open it: browse by mode/category tab, one-click import, copy a share link, and a comments section below — anyone logged in can comment, and deletion is allowed for the commenter or that collection's publisher.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Skin Gallery</div>
+                <p class="howto-tab-desc">Share real in-game skin screenshots so others can see how a skin actually looks before picking it.</p>
+                <div class="howto-feat"><b>Share my skin screenshot</b><span>Fill in a name and author (optional), provide a download link or .osk file (at least one), pick the mode, upload a screenshot, and publish.</span></div>
+                <div class="howto-feat"><b>Browse / filter</b><span>Search by name or author, filter by mode, sort by recent or most liked, or show only ones you liked or uploaded.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Chat Room</div>
+                <p class="howto-tab-desc">A public chat room shared by every visitor.</p>
+                <div class="howto-feat"><b>Posting</b><span>Login required. Paste an osu! beatmap link and it automatically becomes a card with a one-click "add to collection" button.</span></div>
+                <div class="howto-feat"><b>Per-message actions</b><span>Click the avatar/name to open that player's osu! profile, see their country flag, tap 🌐 to translate into your current interface language, reply to a message, or delete (your own messages, or any if you're the site owner).</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Direct Messages</div>
+                <p class="howto-tab-desc">A private 1:1 conversation with one player, invisible to everyone else.</p>
+                <div class="howto-feat"><b>Start a conversation</b><span>Login required. Enter their osu! username and click "Start conversation".</span></div>
+                <div class="howto-feat"><b>Conversation list / unread</b><span>Unread counts also show as a badge next to "DM" in the ☰ menu. Opening a conversation shows the thread; "Back" returns to the list.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-tools">
+            <h3 class="howto-group-title">✦ Toolbox</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Farm Maps</div>
+                <p class="howto-tab-desc">A list of high-PP-efficiency ranked maps — the PP numbers are actually calculated by this site from SS scores, not estimated.</p>
+                <div class="howto-feat"><b>Mode / mod tabs</b><span>Standard/Taiko/Catch/Mania, each paired with NM/DT/HD/HDDT/HR/HDHR mod combinations.</span></div>
+                <div class="howto-feat"><b>🔥 Farm maps only</b><span>On by default. For osu!/taiko: ≥70% of Top 50 scores are DT; for catch/mania: ≥70% are 100% acc (both require ≥500 plays).</span></div>
+                <div class="howto-feat"><b>Range filters</b><span>PP, star rating, BPM, and length all support a min~max range, plus search and several sort options.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Catalog</div>
+                <p class="howto-tab-desc">A browser for the entire ranked catalog, sliced by artist/language/genre/source/feat.</p>
+                <div class="howto-feat"><b>Filter combos</b><span>The four dropdowns can be combined, plus a mode filter and an "include 18+ tagged" toggle, with four sort options.</span></div>
+                <div class="howto-feat"><b>➕ Create a collection from this filter</b><span>Only enables once your filters return results — one click turns the whole filtered result into a new category in your collection.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ World Cup Mappools</div>
+                <p class="howto-tab-desc">Official mappools from every OWC/TWC/MWC (4K・7K)/CWC.</p>
+                <div class="howto-feat"><b>Pick an edition / round</b><span>Mode tab → edition list → pick one to browse by round, each map labeled with its mod.</span></div>
+                <div class="howto-feat"><b>➕ Add to collection</b><span>Add the whole edition, or just one round — no need to take the whole thing.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ PP Lookup</div>
+                <p class="howto-tab-desc">Look up any player's (including your own) PP, or compare two side by side.</p>
+                <div class="howto-feat"><b>Look up your osu! PP</b><span>Enter a username or ID and search. Results include all-mode stats, a PP history chart, a track button, and "Generate stats card"; tabs below: recent plays / top plays / PP goal / medals / grade history.</span></div>
+                <div class="howto-feat"><b>⚔ Two-player comparison</b><span>Fill in two usernames/IDs and click Compare: see an overview and overlaid PP charts first, then "Top play comparison" lists both players' best scores side by side below.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Replay Analysis</div>
+                <p class="howto-tab-desc">Upload an .osr file to see score details — parsed entirely server-side, no video conversion or third-party service involved.</p>
+                <div class="howto-feat"><b>Upload</b><span>Drag and drop, or click "Choose .osr file" — shows a score summary and a hit-timing distribution chart afterward.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎨 Track Mappers</div>
+                <p class="howto-tab-desc">Get notified the moment a mapper you like ranks a new map.</p>
+                <div class="howto-feat"><b>Track</b><span>Enter the mapper's osu! username and click Track; the list shows on the same page and can be untracked anytime.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-resources">
+            <h3 class="howto-group-title">✦ Resources</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎵 My Skins <small>a different tab from "Skin Gallery"</small></div>
+                <p class="howto-tab-desc">Your private skin storage, not shown publicly — use "Skin Gallery" for that instead.</p>
+                <div class="howto-feat"><b>Upload / download</b><span>Uploaded .osk files live in this browser only — switching devices or clearing browser data loses them; download anytime to get them back.</span></div>
+                <div class="howto-feat"><b>☁️ Cloud backup</b><span>Only appears when logged in. Up to 30 files, 4MB each; "Restore locally" adds it back to the list above.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ News</div>
+                <p class="howto-tab-desc">A list of official osu! changelog posts — browse only, no actions needed.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Tournaments</div>
+                <p class="howto-tab-desc">Combines the official forum's Tournaments section with wyBin's community listings (unofficial events — confirm the organizer's own rules before signing up).</p>
+                <div class="howto-feat"><b>Mode filter</b><span>Mode is auto-detected from the title's keywords; posts it can't recognize only show up under "All".</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Resources</div>
+                <p class="howto-tab-desc">A list of recommended community tools that didn't need rebuilding here — browse only.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Feedback</div>
+                <p class="howto-tab-desc">A feedback form. Write your thoughts and submit — only the site owner sees it, other visitors never do.</p>
+            </div>
+        </div>
+    `,
+
     global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',

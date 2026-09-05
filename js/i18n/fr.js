@@ -320,4 +320,148 @@ I18N.fr = {
     replay_stat_accuracy: 'Précision', replay_stat_combo: 'Combo max', replay_stat_misses: 'Miss',
     replay_stat_mods: 'Mods', replay_stat_rank: 'Rang', replay_stat_player: 'Joueur',
     replay_approx_note: "Le timing des frappes est estimé en comparant les appuis de touches aux notes proches de la beatmap — ce n'est pas une reproduction complète du jugement, juste une référence.",
+
+    site_howto_title: 'Ce que fait chaque page et chaque bouton', site_howto_label: "Guide d'utilisation",
+    nav_howto: "Guide d'utilisation",
+    howto_page_title: "📖 Guide d'utilisation", howto_page_hint: 'Regroupé comme le menu du site — ce que fait chaque page et chaque bouton, et comment s’en servir.',
+    howto_group_global: 'Sur tout le site',
+    howto_manual_body: `
+        <div class="howto-group" id="howto-global">
+            <h3 class="howto-group-title">🌐 Sur tout le site</h3>
+            <p class="howto-tab-desc">Contrôles accessibles depuis n'importe quelle page, regroupés dans les deux coins de l'en-tête.</p>
+            <div class="howto-feat"><b>Bascule clair / sombre</b><span>En haut à gauche. Clique sur l'icône lune/soleil pour changer — ton choix est mémorisé.</span></div>
+            <div class="howto-feat"><b>Ajouter à l'écran d'accueil</b><span>En haut à gauche, visible seulement si le navigateur le permet. Installe le site comme une icône d'app avec un écran hors-ligne basique.</span></div>
+            <div class="howto-feat"><b>Mise à jour disponible</b><span>En haut à gauche / une barre flottante en bas, apparaît seulement quand une nouvelle version est détectée — clique pour recharger.</span></div>
+            <div class="howto-feat"><b>Recherche globale</b><span>Loupe en haut à droite, ou appuie sur <b>/</b> ou <b>Ctrl+K</b>. Cherche à la fois dans ta collection, le catalogue et les mappools de Coupe du monde — cliquer sur un résultat ouvre cet onglet avec la recherche déjà remplie.</span></div>
+            <div class="howto-feat"><b>Cloche de notifications</b><span>En haut à droite. Changements de PP des joueurs suivis, nouvelles cartes des mappers suivis, messages non lus, etc. apparaissent ici — avec les notifications push activées, tu les reçois même site fermé.</span></div>
+            <div class="howto-feat"><b>Connexion osu!</b><span>En haut à droite. Connecte-toi avec ton compte osu! — chat, messages privés, publication dans la galerie, sauvegarde cloud de skins, et import en un clic des favoris/plus joués nécessitent ça d'abord.</span></div>
+            <div class="howto-feat"><b>Changement de langue</b><span>Icône globe en haut à droite — 9 langues disponibles, mémorisées après le choix.</span></div>
+            <div class="howto-feat"><b>Menu ☰</b><span>En haut à droite, la navigation principale sur mobile listant tous les onglets. Sur un grand écran de bureau, les onglets courants s'affichent directement.</span></div>
+            <div class="howto-feat"><b>Volume</b><span>Haut-parleur en bas à droite — contrôle le volume de prévisualisation des cartes de collection.</span></div>
+            <div class="howto-feat"><b>Rafraîchir</b><span>En bas à droite — recharge toute la page.</span></div>
+            <div class="howto-feat"><b>J'aime / Guide / Partager</b><span>Trois boutons juste sous le titre du site : « J'aime » ajoute au compteur ; « Guide » c'est cette page ; « Partager » copie un lien à envoyer à des amis.</span></div>
+        </div>
+
+        <div class="howto-group" id="howto-core">
+            <h3 class="howto-group-title">✦ Fonctions principales</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">♫ Collection <small>page d'accueil par défaut</small></div>
+                <p class="howto-tab-desc">Gère ta propre bibliothèque osu! : ajoute, catégorise, exporte vers le jeu, ou compare avec une ancienne sauvegarde.</p>
+                <div class="howto-feat"><b>Ajouter une beatmap</b><span>Colle l'ID ou l'URL osu! de la carte (beatmapsets/... ou /b/... fonctionnent) et clique sur Ajouter.</span></div>
+                <div class="howto-feat"><b>Import/export (6 boutons)</b><span>De gauche à droite : Exporter en JSON → Importer un JSON pour restaurer → Copier un lien de partage → Télécharger une carte de prévisualisation PNG → Exporter en collection.db à glisser directement dans osu! → ⚔ Comparer, importe une ancienne sauvegarde pour voir ce qui a été ajouté/retiré.</span></div>
+                <div class="howto-feat"><b>Outils et réglages (6 boutons)</b><span>Actualiser toutes les données des cartes → 📊 Tableau de bord statistiques (avec 8 badges de succès) → ✨ Assistant de collection (voir ci-dessous) → Marquer comme joué / import en un clic des favoris et plus joués (connexion requise) → 🔒 Définir un mot de passe, requis pour les futures modifications/publications.</span></div>
+                <div class="howto-feat"><b>Recherche / filtre / tri</b><span>Cherche par titre ou artiste ; filtre par langue, genre, source ou artiste ; trie par note en étoiles.</span></div>
+                <div class="howto-feat"><b>Onglets de catégorie</b><span>En plus des onglets fixes Favoris/Standard/Taiko/Catch/Mania, l'icône d'engrenage ouvre « Gérer les catégories » pour en ajouter des tiennes.</span></div>
+                <div class="howto-feat"><b>Explorer plus</b><span>7 cartes de raccourci en bas, menant vers d'autres onglets courants.</span></div>
+                <div class="howto-feat"><b>✨ Assistant de collection</b><span>En fait trois outils en un : ① générer des catégories depuis ton compte (favoris/plus joués/meilleurs/récents/un mapper précis) ② générer des collections d'entraînement à partir de tes scores (push, pool objectif, reprise basse précision, cartes similaires jamais jouées, points faibles) ③ vérification de santé (trouve les doublons, supprimées, non-ranked, ou cartes dont le nombre de difficultés a changé). Les trois ne font que fusionner, jamais écraser ta collection existante.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Galerie Publique</div>
+                <p class="howto-tab-desc">Publie ta collection organisée publiquement, ou parcours celles des autres et importe-les directement. Chaque compte osu! ne peut en publier qu'une seule.</p>
+                <div class="howto-feat"><b>Publier / dépublier</b><span>Connexion requise. Publier envoie ta collection actuelle à la galerie ; republier écrase l'ancienne au lieu de créer une deuxième entrée.</span></div>
+                <div class="howto-feat"><b>Recherche / tri / filtre</b><span>Cherche par nom de joueur ou tag ; trie par récent/❤ plus aimés/nombre de cartes/meilleure note ; ou affiche seulement celles que tu as aimées.</span></div>
+                <div class="howto-feat"><b>Détail de la collection</b><span>Clique sur une carte pour l'ouvrir : navigue par onglet mode/catégorie, import en un clic, copie le lien de partage, et une section commentaires en dessous — tout utilisateur connecté peut commenter, et la suppression est permise à l'auteur du commentaire ou au publicateur de cette collection.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Galerie de Skins</div>
+                <p class="howto-tab-desc">Partage de vraies captures d'écran de skins en jeu pour que les autres voient à quoi ça ressemble vraiment avant de choisir.</p>
+                <div class="howto-feat"><b>Partager ma capture de skin</b><span>Remplis le nom et l'auteur (facultatif), fournis un lien de téléchargement ou un fichier .osk (au moins un), choisis le mode, upload une capture, et publie.</span></div>
+                <div class="howto-feat"><b>Parcourir / filtrer</b><span>Cherche par nom ou auteur, filtre par mode, trie par récent ou plus aimés, ou affiche seulement les tiens ou ceux que tu as aimés.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Salon de Chat</div>
+                <p class="howto-tab-desc">Un salon de chat public partagé par tous les visiteurs.</p>
+                <div class="howto-feat"><b>Écrire</b><span>Connexion requise. Colle un lien de beatmap osu! et ça devient automatiquement une carte avec un bouton « ajouter à la collection » en un clic.</span></div>
+                <div class="howto-feat"><b>Actions par message</b><span>Clique sur l'avatar/nom pour ouvrir le profil osu! de ce joueur, voir son drapeau, appuie sur 🌐 pour traduire dans ta langue d'interface actuelle, réponds à un message, ou supprime (tes propres messages, ou tous si tu es le propriétaire du site).</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Messages Privés</div>
+                <p class="howto-tab-desc">Une conversation privée 1 à 1 avec un joueur, invisible pour les autres.</p>
+                <div class="howto-feat"><b>Démarrer une conversation</b><span>Connexion requise. Entre son nom d'utilisateur osu! et clique sur « Démarrer la conversation ».</span></div>
+                <div class="howto-feat"><b>Liste des conversations / non lus</b><span>Les compteurs non lus s'affichent aussi comme badge à côté de « Messages » dans le menu ☰. Ouvrir une conversation affiche le fil ; « Retour » ramène à la liste.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-tools">
+            <h3 class="howto-group-title">✦ Boîte à Outils</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Cartes Farm</div>
+                <p class="howto-tab-desc">Une liste de cartes ranked à haute efficacité PP — les chiffres de PP sont réellement calculés par ce site à partir de scores SS, pas estimés.</p>
+                <div class="howto-feat"><b>Onglets mode / mod</b><span>Standard/Taiko/Catch/Mania, chacun avec des combinaisons de mods NM/DT/HD/HDDT/HR/HDHR.</span></div>
+                <div class="howto-feat"><b>🔥 Cartes farm uniquement</b><span>Activé par défaut. Pour osu!/taiko : ≥70% des Top 50 scores sont en DT ; pour catch/mania : ≥70% sont à 100% de précision (les deux nécessitent ≥500 parties).</span></div>
+                <div class="howto-feat"><b>Filtres de plage</b><span>PP, note en étoiles, BPM et durée supportent tous une plage min~max, plus la recherche et plusieurs options de tri.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Catalogue</div>
+                <p class="howto-tab-desc">Un navigateur pour tout le catalogue ranked, découpé par artiste/langue/genre/source/feat.</p>
+                <div class="howto-feat"><b>Combinaisons de filtres</b><span>Les quatre menus déroulants se combinent, plus un filtre de mode et un interrupteur « inclure les 18+ », avec quatre options de tri.</span></div>
+                <div class="howto-feat"><b>➕ Créer une collection depuis ce filtre</b><span>S'active seulement quand tes filtres donnent des résultats — un clic transforme tout le résultat filtré en une nouvelle catégorie dans ta collection.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Mappools de Coupe du Monde</div>
+                <p class="howto-tab-desc">Mappools officiels de chaque OWC/TWC/MWC (4K・7K)/CWC.</p>
+                <div class="howto-feat"><b>Choisir édition / round</b><span>Onglet mode → liste des éditions → choisis-en une pour naviguer par round, chaque carte étiquetée avec son mod.</span></div>
+                <div class="howto-feat"><b>➕ Ajouter à la collection</b><span>Ajoute l'édition entière, ou juste un round — pas besoin de tout prendre.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Recherche PP</div>
+                <p class="howto-tab-desc">Consulte le PP de n'importe quel joueur (y compris le tien), ou compare-en deux côte à côte.</p>
+                <div class="howto-feat"><b>Consulter ton PP osu!</b><span>Entre un nom d'utilisateur ou un ID et cherche. Les résultats incluent les stats de tous les modes, un graphique d'historique PP, un bouton de suivi et « Générer une carte de stats » ; onglets en dessous : récents / meilleurs scores / objectif PP / médailles / historique des rangs.</span></div>
+                <div class="howto-feat"><b>⚔ Comparaison à deux</b><span>Remplis deux noms d'utilisateur/ID et clique sur Comparer : d'abord un aperçu et des graphiques PP superposés, puis en dessous « Comparaison des top plays » liste les meilleurs scores des deux joueurs côte à côte.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Analyse de Replay</div>
+                <p class="howto-tab-desc">Importe un fichier .osr pour voir les détails du score — analysé entièrement côté serveur, sans conversion vidéo ni service tiers.</p>
+                <div class="howto-feat"><b>Importer</b><span>Glisse-dépose, ou clique sur « Choisir un fichier .osr » — affiche ensuite un résumé du score et un graphique de distribution du timing des frappes.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎨 Suivre des Mappers</div>
+                <p class="howto-tab-desc">Sois notifié dès qu'un mapper que tu aimes range une nouvelle carte.</p>
+                <div class="howto-feat"><b>Suivre</b><span>Entre le nom d'utilisateur osu! du mapper et clique sur Suivre ; la liste s'affiche sur la même page et peut être modifiée à tout moment.</span></div>
+            </div>
+        </div>
+
+        <div class="howto-group" id="howto-resources">
+            <h3 class="howto-group-title">✦ Ressources</h3>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">🎵 Mes Skins <small>un onglet différent de « Galerie de Skins »</small></div>
+                <p class="howto-tab-desc">Ton stockage privé de skins, non affiché publiquement — utilise « Galerie de Skins » pour ça.</p>
+                <div class="howto-feat"><b>Importer / télécharger</b><span>Les fichiers .osk importés vivent seulement dans ce navigateur — changer d'appareil ou effacer les données du navigateur les perd ; télécharge à tout moment pour les récupérer.</span></div>
+                <div class="howto-feat"><b>☁️ Sauvegarde cloud</b><span>N'apparaît qu'une fois connecté. Jusqu'à 30 fichiers, 4 Mo chacun ; « Restaurer localement » les rajoute à la liste ci-dessus.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Actualités</div>
+                <p class="howto-tab-desc">Une liste des notes de mise à jour officielles d'osu! — à parcourir seulement, aucune action nécessaire.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Tournois</div>
+                <p class="howto-tab-desc">Combine la section Tournaments du forum officiel et les annonces communautaires de wyBin (événements non-officiels — vérifie toi-même les règles de l'organisateur avant de t'inscrire).</p>
+                <div class="howto-feat"><b>Filtre de mode</b><span>Le mode est détecté automatiquement à partir des mots-clés du titre ; les posts non reconnus n'apparaissent que dans « Tous ».</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Ressources</div>
+                <p class="howto-tab-desc">Une liste d'outils communautaires recommandés qu'il n'était pas nécessaire de refaire ici — à parcourir seulement.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ Suggestions & Améliorations</div>
+                <p class="howto-tab-desc">Un formulaire de retour. Écris tes idées et envoie — seul le propriétaire du site le voit, jamais les autres visiteurs.</p>
+            </div>
+        </div>
+    `,
 };
