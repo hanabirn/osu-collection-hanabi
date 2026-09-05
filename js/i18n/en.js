@@ -30,7 +30,7 @@ I18N.en = {
     dm_back_btn: 'Back',
     dm_self_error: "You can't message yourself",
 
-    side_rail_tournaments_title: '✦ Tournament News ✦', side_rail_resources_title: '✦ More Resources ✦', side_rail_view_all: 'View all →',
+    side_rail_tournaments_title: 'Tournament News', side_rail_resources_title: 'More Resources', side_rail_view_all: 'View all →',
     global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',

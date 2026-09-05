@@ -30,7 +30,7 @@ I18N.ru = {
     dm_back_btn: 'Назад',
     dm_self_error: 'Нельзя отправить сообщение самому себе',
 
-    side_rail_tournaments_title: '✦ Новости турниров ✦', side_rail_resources_title: '✦ Больше ресурсов ✦', side_rail_view_all: 'Смотреть все →',
+    side_rail_tournaments_title: 'Новости турниров', side_rail_resources_title: 'Больше ресурсов', side_rail_view_all: 'Смотреть все →',
     global_search_title: 'Поиск по сайту', global_search_placeholder: 'Поиск песен, маппулов, моей коллекции...',
     global_search_section_collection: 'Моя коллекция', global_search_section_catalog: 'Каталог', global_search_section_mappools: 'Маппулы Чемпионата мира',
     global_search_empty: 'Ничего не найдено',

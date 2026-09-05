@@ -213,15 +213,24 @@
      pure decoration. See css/base.css .side-rail and js/side-rails.js.
      Hidden below 1700px. -->
 <aside class="side-rail side-rail-left" id="side-rail-tournaments">
-    <div class="side-rail-title" data-i18n="side_rail_tournaments_title">✦ 賽事快訊 ✦</div>
+    <div class="side-rail-title" data-i18n="side_rail_tournaments_title">賽事快訊</div>
     <div class="side-rail-list" id="side-rail-tournaments-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
     <button class="side-rail-viewall-btn" onclick="switchTab('tournaments')" data-i18n="side_rail_view_all">查看全部 →</button>
 </aside>
 <aside class="side-rail side-rail-right" id="side-rail-resources">
-    <div class="side-rail-title" data-i18n="side_rail_resources_title">✦ 更多資源 ✦</div>
+    <div class="side-rail-title" data-i18n="side_rail_resources_title">更多資源</div>
     <div class="side-rail-list" id="side-rail-resources-list"></div>
     <button class="side-rail-viewall-btn" onclick="switchTab('resources')" data-i18n="side_rail_view_all">查看全部 →</button>
 </aside>
+
+<!-- Everything below is the actual page column — wrapped so that at
+     >=1700px .site-main can become a 3-column grid (rail / this / rail)
+     with the frosted "tray" visuals living here instead of on .site-main
+     itself, and the two .side-rail asides can use real position:sticky
+     (grid items, not absolutely-positioned) so they track the scroll
+     instead of being a fixed-height island near the top. See css/base.css
+     .site-main / .site-main-center / .side-rail. -->
+<div class="site-main-center">
 
 <!-- Persistent horizontal nav for desktop — the ☰ drawer is the only nav
      on mobile, but on a wide screen the primary tabs should just be visible.
@@ -866,6 +875,7 @@
         </div>
     </section>
 
+</div>
 </main>
 
 <div id="pp-calc-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closePpCalcModal()">

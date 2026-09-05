@@ -1519,17 +1519,6 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
        as .site-header's padding-bottom (and kept ~6px shallower than it) so
        the title always keeps a little clearance above the panel. */
     margin-top: -114px;
-    padding: 14px 16px 60px;
-    /* Frosted "tray" the .site-page card sits on: a translucent glass base
-       so the header illustration bleeds faintly through where they overlap,
-       a blur, a rounded top, a hairline top keyline, and a lift shadow that
-       reads as the panel floating above the cover. */
-    background: var(--overlap-panel-bg);
-    -webkit-backdrop-filter: blur(12px) saturate(1.3);
-    backdrop-filter: blur(12px) saturate(1.3);
-    border-radius: 28px 28px 0 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 -16px 44px rgba(0, 0, 0, 0.34);
 }
 @media (max-width: 1100px) {
     .site-main { margin-top: -74px; }
@@ -1538,45 +1527,86 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-main { margin-top: -50px; }
 }
 @media (max-width: 600px) {
-    .site-main { margin-top: -32px; border-radius: 22px 22px 0 0; }
+    .site-main { margin-top: -32px; }
+}
+/* The actual frosted "tray" the .site-page card sits on lives here rather
+   than on .site-main itself, so that at >=1700px .site-main can turn into a
+   plain 3-column grid (rail / this / rail, see below) without its own
+   background painting behind the rails too — the two rails stay visually
+   separate floating cards, same as at every narrower width. */
+.site-main-center {
+    padding: 14px 16px 60px;
+    /* Translucent glass base so the header illustration bleeds faintly
+       through where they overlap, a blur, a rounded top, a hairline top
+       keyline, and a lift shadow that reads as the panel floating above
+       the cover. */
+    background: var(--overlap-panel-bg);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    backdrop-filter: blur(12px) saturate(1.3);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -16px 44px rgba(0, 0, 0, 0.34);
+}
+@media (max-width: 600px) {
+    .site-main-center { border-radius: 22px 22px 0 0; }
 }
 
 /* ===== Side rails — fill the gutters beside .site-main on a wide monitor =====
-   Positioned relative to .site-main itself (not the viewport) via
-   right/left: calc(100% + gap), so they start exactly where the content
-   column starts (clearing the hero) rather than needing separate math to
-   dodge it. Only shown once there's provably enough room either side to
-   clear the 1080px column without touching it — at 1700px that's a
-   (1700-1080)/2 = 310px gutter each side, comfortably more than this
-   rail's 260px + 32px gap. Mini previews of the 賽事/資源 tabs
-   (js/side-rails.js) rather than pure decoration — replaced the old
-   .world-globe (css/particles.css, removed) that sat in this same area. */
+   Below 1700px these stay display:none (no room to clear the 1080px
+   column without touching it — at 1700px that's a (1700-1080)/2 = 310px
+   gutter each side, comfortably more than this rail's 260px + 32px gap).
+   At >=1700px, .site-main itself becomes a 3-column grid (rail /
+   .site-main-center / rail) so the rails are real grid items rather than
+   absolutely-positioned overlays — that's what lets position:sticky below
+   actually work: a sticky element needs to stay in normal flow, and grid
+   placement keeps it there without disturbing .site-main-center's own
+   internal layout. Sticky (rather than a fixed top:0 island) matters
+   because .site-main-center is often much taller than these previews (a
+   long collection grid, say) — an absolutely-positioned rail would end
+   partway down and leave the rest of the gutter empty again below it;
+   sticky keeps the rail in view for as long as .site-main-center scrolls.
+   Mini previews of the 賽事/資源 tabs (js/side-rails.js) rather than pure
+   decoration — replaced the old .world-globe (css/particles.css, removed)
+   that sat in this same area. */
 .side-rail {
-    position: absolute;
-    top: 0;
     width: 260px;
-    max-height: 80vh;
+    max-height: calc(100vh - 48px);
     overflow-y: auto;
-    padding: 16px;
+    padding: 14px;
     border-radius: 16px;
+    /* Deliberately lower-contrast than .site-main-center/.news-item/
+       .resource-link-card (no border, no shadow, more transparent) — these
+       are secondary previews, not a third column competing on equal visual
+       footing with the actual page content. */
     background: var(--bg-card-alt);
-    border: 1px solid var(--border-card);
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    backdrop-filter: blur(var(--glass-blur));
-    box-shadow: var(--shadow-card), var(--shadow-card-inset);
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.6));
+    backdrop-filter: blur(calc(var(--glass-blur) * 0.6));
     display: none;
 }
-.side-rail-left { right: calc(100% + 32px); }
-.side-rail-right { left: calc(100% + 32px); }
 @media (min-width: 1700px) {
-    .side-rail { display: block; }
+    .site-main {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1080px) 260px;
+        column-gap: 32px;
+        align-items: start;
+        max-width: calc(1080px + 2 * (260px + 32px));
+    }
+    .site-main-center { grid-column: 2; grid-row: 1; }
+    .side-rail {
+        display: block;
+        position: sticky;
+        top: 24px;
+        grid-row: 1;
+    }
+    .side-rail-left { grid-column: 1; }
+    .side-rail-right { grid-column: 3; }
 }
 .side-rail-title {
     text-align: center;
-    font-size: 0.85rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-    color: var(--text-pink);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.6);
     margin-bottom: 12px;
 }
 .side-rail-list { display: flex; flex-direction: column; gap: 8px; }
@@ -1607,7 +1637,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .side-rail-viewall-btn:hover { background: rgba(var(--accent-pink-rgb), 0.22); }
 
 /* ===== Touch / phone: lighten the stacked frosted surfaces =====
-   .site-header, .site-main and .site-page each carry their own
+   .site-header, .site-main-center and .site-page each carry their own
    backdrop-filter and they nest, so every composite re-samples and
    re-blurs the layers below up to three times over — a big part of why
    the compositor stayed busy on a still page and phones heated up. On
@@ -1618,7 +1648,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    briefly. */
 @media (hover: none), (max-width: 700px) {
     .site-header { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-    .site-main { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .site-main-center { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
     .site-page { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 }
 

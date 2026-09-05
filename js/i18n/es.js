@@ -30,7 +30,7 @@ I18N.es = {
     dm_back_btn: 'Volver',
     dm_self_error: 'No puedes enviarte un mensaje a ti mismo',
 
-    side_rail_tournaments_title: '✦ Noticias de torneos ✦', side_rail_resources_title: '✦ Más recursos ✦', side_rail_view_all: 'Ver todo →',
+    side_rail_tournaments_title: 'Noticias de torneos', side_rail_resources_title: 'Más recursos', side_rail_view_all: 'Ver todo →',
     global_search_title: 'Buscar en el sitio', global_search_placeholder: 'Buscar canciones, mappools, mi colección...',
     global_search_section_collection: 'Mi colección', global_search_section_catalog: 'Catálogo', global_search_section_mappools: 'Mappools de la Copa del Mundo',
     global_search_empty: 'Sin resultados coincidentes',

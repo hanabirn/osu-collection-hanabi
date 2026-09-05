@@ -30,7 +30,7 @@ I18N.ko = {
     dm_back_btn: '뒤로',
     dm_self_error: '자신에게는 메시지를 보낼 수 없습니다',
 
-    side_rail_tournaments_title: '✦ 대회 소식 ✦', side_rail_resources_title: '✦ 추가 자료 ✦', side_rail_view_all: '전체 보기 →',
+    side_rail_tournaments_title: '대회 소식', side_rail_resources_title: '추가 자료', side_rail_view_all: '전체 보기 →',
 
     global_search_title: '전체 검색', global_search_placeholder: '곡, 매핑풀, 내 컬렉션 검색...',
     global_search_section_collection: '내 컬렉션', global_search_section_catalog: '곡 분류', global_search_section_mappools: '월드컵 매핑풀',

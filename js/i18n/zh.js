@@ -332,5 +332,5 @@ I18N.zh = {
     dm_back_btn: '返回',
     dm_self_error: '不能傳私訊給自己',
 
-    side_rail_tournaments_title: '✦ 賽事快訊 ✦', side_rail_resources_title: '✦ 更多資源 ✦', side_rail_view_all: '查看全部 →',
+    side_rail_tournaments_title: '賽事快訊', side_rail_resources_title: '更多資源', side_rail_view_all: '查看全部 →',
 };
