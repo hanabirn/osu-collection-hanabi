@@ -18,7 +18,7 @@ const { getOsuToken } = require('./_osu-auth');
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 
 const DAN_MODES = {
-    osu:      { m: 0, q: 'tapping dan course' },
+    osu:      { m: 0, q: 'dan course' },
     taiko:    { m: 1, q: 'dan-i dojo' },
     catch:    { m: 2, q: 'dan course' },
     mania4k:  { m: 3, q: '4k dan course' },
@@ -47,17 +47,21 @@ const DAN_CURATED = {
     ],
 };
 
-const JUNK_RE = /\b(sample|beta|outdated|preview|demo|wip|droid|placeholder|template|appeared!|deadly sins)\b/i;
+const JUNK_RE = /\b(sample|beta|outdated|preview|demo|wip|droid|placeholder|template)\b|appeared!|deadly sins/i;
 
 function looksLikeDanPack(s) {
     const diffs = Array.isArray(s.beatmaps) ? s.beatmaps.length : 0;
     if (diffs < 2) return false;
     const title = (s.title_unicode || s.title || '') + '';
     const artist = (s.artist_unicode || s.artist || '') + '';
-    if (JUNK_RE.test(title)) return false;
-    const titleOk = /\bdan[\s~._-]*(course|phase|dojo)|dan-?i\s*dojo|段位道場/i.test(title);
-    const artistOk = /various artist|dan[\s~._-]*course|dan-?i\s*dojo|段位/i.test(artist);
-    return titleOk && artistOk;
+    if (JUNK_RE.test(title) || JUNK_RE.test(artist)) return false;
+    const titleStrong = /\bdan[\s~._-]*(course|phase|dojo)|dan-?i\s*dojo|段位道場/i.test(title);
+    // Belongs to a dan-course "series" artist (e.g. "osu!mania 7K Dan Course",
+    // "osu!catch Dan Course") — then a looser title (a phase/level/dan name) counts.
+    const artistSeries = /dan[\s~._-]*course|dan-?i\s*dojo|段位/i.test(artist);
+    const titleLoose = /\b(dan|phase|kyu|level)\b|[段級]/i.test(title);
+    const artistGeneric = /various artist/i.test(artist);
+    return (titleStrong && (artistSeries || artistGeneric)) || (artistSeries && titleLoose);
 }
 
 function leanSet(s, extra) {
