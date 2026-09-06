@@ -17,12 +17,23 @@
    name. */
 const { signAuthToken } = require('./_auth-token');
 
+/* `stage` is echoed in the failure redirect (?osu_login_error=<stage>) and
+   logged, so an opaque login failure can be diagnosed without guessing:
+   no_code | env | token_exchange | me | sign. */
+function fail(stage, detail) {
+    console.error(`osu-callback failed at "${stage}": ${detail || ''}`);
+    return { statusCode: 302, headers: { Location: `/?osu_login_error=${encodeURIComponent(stage)}` }, body: '' };
+}
+
 exports.handler = async (event) => {
     const code = event.queryStringParameters && event.queryStringParameters.code;
-    if (!code) {
-        return { statusCode: 302, headers: { Location: '/?osu_login_error=1' }, body: '' };
+    if (!code) return fail('no_code');
+
+    for (const k of ['OSU_CLIENT_ID', 'OSU_CLIENT_SECRET', 'OSU_REDIRECT_URI', 'OSU_AUTH_SECRET']) {
+        if (!process.env[k]) return fail('env', `${k} is not set`);
     }
 
+    let tokenData;
     try {
         const tokenRes = await fetch('https://osu.ppy.sh/oauth/token', {
             method: 'POST',
@@ -35,22 +46,35 @@ exports.handler = async (event) => {
                 code,
             }),
         });
-        if (!tokenRes.ok) throw new Error('token exchange failed');
-        const tokenData = await tokenRes.json();
+        const text = await tokenRes.text();
+        if (!tokenRes.ok) return fail('token_exchange', `${tokenRes.status} ${text.slice(0, 200)}`);
+        tokenData = JSON.parse(text);
+    } catch (err) {
+        return fail('token_exchange', err.message);
+    }
 
+    let me;
+    try {
         const meRes = await fetch('https://osu.ppy.sh/api/v2/me', {
             headers: { Authorization: `Bearer ${tokenData.access_token}`, Accept: 'application/json' },
         });
-        if (!meRes.ok) throw new Error('/me request failed');
-        const me = await meRes.json();
-
-        const params = new URLSearchParams({
-            osu_login: me.id,
-            osu_login_name: me.username,
-            osu_login_token: signAuthToken({ id: me.id, username: me.username }),
-        });
-        return { statusCode: 302, headers: { Location: `/?${params.toString()}` }, body: '' };
+        if (!meRes.ok) return fail('me', `${meRes.status}`);
+        me = await meRes.json();
     } catch (err) {
-        return { statusCode: 302, headers: { Location: '/?osu_login_error=1' }, body: '' };
+        return fail('me', err.message);
     }
+
+    let token;
+    try {
+        token = signAuthToken({ id: me.id, username: me.username });
+    } catch (err) {
+        return fail('sign', err.message);
+    }
+
+    const params = new URLSearchParams({
+        osu_login: me.id,
+        osu_login_name: me.username,
+        osu_login_token: token,
+    });
+    return { statusCode: 302, headers: { Location: `/?${params.toString()}` }, body: '' };
 };
