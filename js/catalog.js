@@ -411,6 +411,19 @@ async function catalogCreateCollectionFromFacet() {
     const named = [{ name: label, entries: ids.map(id => ({ setId: id })) }];
     try {
         const report = await applyImportedCollections(named, (msg) => { if (btn) btn.textContent = msg; });
+        // Remember the facet on the category so it can pull in newly-ranked
+        // matches later (see refreshSmartCategory in osu.js).
+        const smartChk = document.getElementById('catalog-smart-checkbox');
+        if (smartChk && smartChk.checked && typeof setSmartCategory === 'function') {
+            const cat = getOsuCategories().find(c => c.name === label);
+            if (cat) setSmartCategory(cat.id, {
+                facet: { type: facet.type, value: String(facet.value) },
+                mode: catalogMode ? String(CATALOG_MODE_INT[catalogMode]) : '',
+                label,
+                lastSyncAt: new Date().toISOString(),
+                lastCount: ids.length,
+            });
+        }
         alert(t('catalog_create_collection_done', { name: label, n: report.addedSets, cat: report.touchedCats }));
     } catch (e) {
         console.error('Catalog import failed:', e);

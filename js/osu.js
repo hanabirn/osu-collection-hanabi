@@ -679,9 +679,101 @@ async function deleteOsuCategory(categoryId, event) {
     const members = getOsuCategoryMembers();
     delete members[categoryId];
     saveOsuCategoryMembers(members);
+    removeSmartCategory(categoryId);
     if (osuCurrentTab === categoryId) osuCurrentTab = 'standard';
     refreshCategoryManageModalIfOpen();
     renderOsuCollection();
+}
+
+/* ===== Smart (dynamic) categories =====
+   A category built from a Catalog facet (catalogCreateCollectionFromFacet)
+   can remember that facet so newly-ranked sets matching it get pulled in
+   later with one click, instead of the category being a frozen snapshot —
+   the "static vs live" gap vs osu!Collector's fixed collections. Purely
+   client-side: { [catId]: { facet:{type,value}, mode:'<int>'|'', label,
+   lastSyncAt, lastCount } } in localStorage; refresh re-runs the same
+   catalog-list query the create button used. */
+function getSmartCategories() {
+    try { return JSON.parse(localStorage.getItem('osu_smart_categories')) || {}; }
+    catch { return {}; }
+}
+function saveSmartCategories(map) {
+    try { localStorage.setItem('osu_smart_categories', JSON.stringify(map)); } catch (e) {}
+}
+function getSmartCategory(catId) { return getSmartCategories()[catId] || null; }
+function setSmartCategory(catId, data) {
+    const map = getSmartCategories();
+    map[catId] = { ...(map[catId] || {}), ...data };
+    saveSmartCategories(map);
+}
+function removeSmartCategory(catId) {
+    const map = getSmartCategories();
+    if (map[catId]) { delete map[catId]; saveSmartCategories(map); }
+}
+
+/* Banner shown at the top of a smart category's grid: what facet drives it,
+   when it last synced, and a one-click refresh. */
+function smartCategoryBannerHtml() {
+    if (OSU_MODES.includes(osuCurrentTab) || osuCurrentTab === 'favorites') return '';
+    const meta = getSmartCategory(osuCurrentTab);
+    if (!meta || !meta.facet) return '';
+    const when = meta.lastSyncAt ? new Date(meta.lastSyncAt).toLocaleDateString() : '—';
+    return `<div class="smart-cat-banner">
+        <span class="smart-cat-label">${icon('refreshCw')}<span>${t('smart_cat_badge')} · ${escHtml(meta.label || '')}</span></span>
+        <span class="smart-cat-when">${t('smart_cat_last_sync', { d: when })}</span>
+        <button class="btn btn-sm" id="smart-cat-refresh-btn" onclick="refreshSmartCategory('${osuCurrentTab}')">${t('smart_cat_refresh_btn')}</button>
+        <button class="smart-cat-detach" onclick="detachSmartCategory('${osuCurrentTab}')" title="${t('smart_cat_detach')}">${icon('x')}</button>
+    </div>`;
+}
+
+function detachSmartCategory(catId) {
+    if (!confirm(t('smart_cat_detach_confirm'))) return;
+    removeSmartCategory(catId);
+    renderOsuCollection();
+}
+
+/* Re-run the stored facet query and merge any set ids the category doesn't
+   already have. Reuses applyImportedCollections (fetches each new set, files
+   it under the same-named category). */
+async function refreshSmartCategory(catId) {
+    const meta = getSmartCategory(catId);
+    if (!meta || !meta.facet) return;
+    const cat = getOsuCategories().find(c => c.id === catId);
+    if (!cat) return;
+    const btn = document.getElementById('smart-cat-refresh-btn');
+    const setBtn = (txt, dis) => { if (btn) { btn.textContent = txt; btn.disabled = !!dis; } };
+
+    const params = new URLSearchParams({ limit: '300', sort: 'ranked_desc' });
+    params.set(meta.facet.type, meta.facet.value);
+    if (meta.mode) params.set('mode', String(meta.mode));
+
+    try {
+        setBtn(t('gallery_loading'), true);
+        const res = await fetch(`/.netlify/functions/catalog-list?${params}`);
+        if (!res.ok) throw new Error('bad response');
+        const data = await res.json();
+        const ids = (data.items || []).map(x => x.id).filter(Boolean);
+        const have = new Set(getCategoryMemberIds(catId));
+        const fresh = ids.filter(id => !have.has(id));
+
+        if (fresh.length === 0) {
+            setSmartCategory(catId, { lastSyncAt: new Date().toISOString(), lastCount: ids.length });
+            if (typeof showShareToast === 'function') showShareToast(t('smart_cat_no_new'));
+            renderOsuCollection();
+            return;
+        }
+        const report = await applyImportedCollections(
+            [{ name: cat.name, entries: fresh.map(id => ({ setId: id })) }],
+            (msg) => setBtn(msg, true),
+        );
+        setSmartCategory(catId, { lastSyncAt: new Date().toISOString(), lastCount: ids.length });
+        if (typeof showShareToast === 'function') showShareToast(t('smart_cat_synced', { n: report.addedSets }));
+    } catch (e) {
+        console.error('Smart category refresh failed:', e);
+        if (typeof showShareToast === 'function') showShareToast(t('catalog_load_fail'));
+    } finally {
+        renderOsuCollection();
+    }
 }
 
 /* ===== Category tabs row (between the mode-tabs row and the search bar) =====
@@ -3510,7 +3602,7 @@ function renderOsuCollection() {
                 : !OSU_MODES.includes(osuCurrentTab)
                     ? t('osu_empty_category')
                     : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span><br><span class="osu-empty-sub">${t('osu_empty_banner_hint')}</span>`;
-        container.innerHTML = `<div class="osu-empty">${msg}</div>`;
+        container.innerHTML = smartCategoryBannerHtml() + `<div class="osu-empty">${msg}</div>`;
         paginationEl.innerHTML = '';
         return;
     }
@@ -3576,6 +3668,9 @@ function renderOsuCollection() {
             </div>
         </div>`;
     }).join('');
+
+    const smartBanner = smartCategoryBannerHtml();
+    if (smartBanner) container.insertAdjacentHTML('afterbegin', smartBanner);
 
     if (totalPages <= 1) {
         paginationEl.innerHTML = '';

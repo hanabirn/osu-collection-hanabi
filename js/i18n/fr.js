@@ -233,6 +233,7 @@ I18N.fr = {
     catalog_empty: 'Aucun beatmapset ne correspond — essayez un autre filtre',
     catalog_load_fail: 'Échec du chargement du catalogue, réessayez plus tard',
     catalog_create_collection_btn: '➕ Créer une collection depuis ce critère',
+    catalog_smart_toggle: 'En faire une catégorie dynamique', smart_cat_badge: 'Dynamique', smart_cat_last_sync: 'Dernière synchro {d}', smart_cat_refresh_btn: 'Récupérer les maps nouvellement classées', smart_cat_detach: 'Rendre statique', smart_cat_detach_confirm: 'Arrêter de synchroniser cette catégorie ? (les maps collectées restent)', smart_cat_no_new: 'Aucune nouvelle map correspondante', smart_cat_synced: '{n} nouvelles maps ajoutées',
     catalog_create_collection_hint: 'Choisissez d\'abord un artiste / une langue / un genre / une source',
     catalog_create_collection_confirm: 'Ajouter les {n} beatmapsets de « {name} » à votre collection et créer une catégorie de ce nom ?',
     catalog_create_collection_done: '« {name} » ajouté à votre collection : {n} nouveaux beatmapsets, {cat} catégories',

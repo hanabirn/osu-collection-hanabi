@@ -375,6 +375,7 @@ I18N.en = {
     catalog_empty: 'No beatmapsets match — try a different filter',
     catalog_load_fail: 'Failed to load the catalog, try again later',
     catalog_create_collection_btn: '➕ Make a collection from this facet',
+    catalog_smart_toggle: 'Make it a dynamic category', smart_cat_badge: 'Dynamic', smart_cat_last_sync: 'Last synced {d}', smart_cat_refresh_btn: 'Pull in newly ranked maps', smart_cat_detach: 'Make static', smart_cat_detach_confirm: 'Stop keeping this category in sync? (collected maps stay)', smart_cat_no_new: 'No new matching maps', smart_cat_synced: 'Added {n} new maps',
     catalog_create_collection_hint: 'Pick one artist / language / genre / source first to build a matching collection category',
     catalog_create_collection_confirm: 'Add the {n} beatmapsets of "{name}" to your collection and create a category with that name?',
     catalog_create_collection_done: 'Added "{name}" to your collection: {n} new beatmapsets, {cat} categories',

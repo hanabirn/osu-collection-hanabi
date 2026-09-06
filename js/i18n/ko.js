@@ -233,6 +233,7 @@ I18N.ko = {
     catalog_empty: '조건에 맞는 비트맵셋이 없습니다. 다른 필터를 시도해 보세요',
     catalog_load_fail: '카탈로그를 불러오지 못했습니다. 나중에 다시 시도해 주세요',
     catalog_create_collection_btn: '➕ 이 분류로 컬렉션 만들기',
+    catalog_smart_toggle: '동적 분류로 설정', smart_cat_badge: '동적 분류', smart_cat_last_sync: '마지막 동기화 {d}', smart_cat_refresh_btn: '새로 랭크된 맵 가져오기', smart_cat_detach: '정적 분류로 전환', smart_cat_detach_confirm: '이 분류의 동적 동기화를 중지할까요? (이미 추가된 맵은 유지됩니다)', smart_cat_no_new: '조건에 맞는 새 맵이 없습니다', smart_cat_synced: '새 맵 {n}개를 추가했습니다',
     catalog_create_collection_hint: '먼저 아티스트／언어／장르／소스 하나를 선택하세요',
     catalog_create_collection_confirm: '"{name}"의 비트맵셋 {n}개를 컬렉션에 추가하고 같은 이름의 카테고리를 만들까요?',
     catalog_create_collection_done: '"{name}"을(를) 컬렉션에 추가: 신규 비트맵셋 {n}개, 카테고리 {cat}개',

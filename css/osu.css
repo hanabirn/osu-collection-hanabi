@@ -1477,6 +1477,42 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .packs-row { transition: none; }
 }
 
+/* Smart (dynamic) category banner — sits above the grid on a category that
+   remembers a Catalog facet. Spans the grid's full width. */
+.smart-cat-banner {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 9px 12px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    border: 1px solid rgba(var(--accent-cyan-rgb), 0.35);
+    background: rgba(var(--accent-cyan-rgb), 0.09);
+    font-size: 0.82rem;
+}
+.smart-cat-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--text-accent);
+}
+.smart-cat-label svg { width: 14px; height: 14px; }
+.smart-cat-when { color: var(--text-secondary); font-size: 0.76rem; }
+.smart-cat-banner .btn-sm { margin-left: auto; }
+.smart-cat-detach {
+    border: none;
+    background: none;
+    color: var(--text-label);
+    cursor: pointer;
+    padding: 2px;
+    display: inline-flex;
+}
+.smart-cat-detach svg { width: 13px; height: 13px; }
+.smart-cat-detach:hover { color: var(--text-primary); }
+
 /* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
    language / genre / source pills instead of pp/star/bpm. */
 #catalog-list.osu-collection {

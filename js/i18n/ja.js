@@ -233,6 +233,7 @@ I18N.ja = {
     catalog_empty: '条件に合うビートマップセットがありません。絞り込みを変えてみてください',
     catalog_load_fail: 'カタログの読み込みに失敗しました。後でもう一度お試しください',
     catalog_create_collection_btn: '➕ この分類でコレクションを作成',
+    catalog_smart_toggle: '動的分類にする', smart_cat_badge: '動的分類', smart_cat_last_sync: '最終同期 {d}', smart_cat_refresh_btn: '新しくランクされた譜面を取得', smart_cat_detach: '静的分類に戻す', smart_cat_detach_confirm: 'この分類の動的同期をやめますか？（追加済みの譜面は残ります）', smart_cat_no_new: '条件に合う新しい譜面はありません', smart_cat_synced: '{n} 件の新しい譜面を追加しました',
     catalog_create_collection_hint: 'まずアーティスト／言語／ジャンル／ソースを1つ選んでください',
     catalog_create_collection_confirm: '「{name}」の {n} 個のビートマップセットをコレクションに追加し、同名のカテゴリを作成しますか？',
     catalog_create_collection_done: '「{name}」をコレクションに追加：{n} 個の新規ビートマップセット、{cat} 個のカテゴリ',

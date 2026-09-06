@@ -207,6 +207,7 @@ I18N.zh = {
     catalog_empty: '沒有符合條件的譜面組，換個篩選條件試試',
     catalog_load_fail: '載入曲庫失敗，稍後再試',
     catalog_create_collection_btn: '➕ 建立此分類的收藏',
+    catalog_smart_toggle: '設為動態分類', smart_cat_badge: '動態分類', smart_cat_last_sync: '上次同步 {d}', smart_cat_refresh_btn: '拉取新上榜的圖', smart_cat_detach: '改為靜態分類', smart_cat_detach_confirm: '要取消這個分類的動態同步嗎？（已收藏的圖會保留）', smart_cat_no_new: '沒有符合條件的新圖', smart_cat_synced: '已加入 {n} 張新圖',
     catalog_create_collection_hint: '先選定一個歌手／語言／曲風／來源，才能建立對應的收藏分類',
     catalog_create_collection_confirm: '要把「{name}」的 {n} 個譜面組加進你的收藏、並建立同名分類嗎？',
     catalog_create_collection_done: '已把「{name}」加進收藏：新增 {n} 個譜面組、{cat} 個分類',
