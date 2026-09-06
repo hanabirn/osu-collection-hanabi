@@ -545,6 +545,16 @@ async function overlayGalleryDetailScores() {
     const targets = allTargets.slice(0, GALLERY_SCORES_CAP);
 
     galleryScoresOverlaid = true;
+    // The summary line lives above the grid; the grid was rendered before
+    // the overlay was turned on, so create the slot now if it's missing
+    // (a later grid re-render — e.g. tab switch — keeps it via the flag).
+    let summaryEl = document.getElementById('gallery-detail-score-summary');
+    if (!summaryEl) {
+        const body = document.getElementById('gallery-detail-body');
+        if (body) {
+            body.insertAdjacentHTML('afterbegin', '<div id="gallery-detail-score-summary" class="gallery-detail-score-summary"></div>');
+        }
+    }
     if (btn) { btn.disabled = true; btn.classList.add('checking'); }
     const label = btn && btn.querySelector('span');
 

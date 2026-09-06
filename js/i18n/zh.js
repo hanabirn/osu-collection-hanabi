@@ -400,7 +400,7 @@ I18N.zh = {
                 <p class="howto-tab-desc">把整理好的收藏公開分享，或逛逛別人的收藏直接匯入。每位 osu! 帳號只能發布一份。</p>
                 <div class="howto-feat"><b>發布 / 取消發布</b><span>需登入。發布會把目前的收藏送到廣場；重新發布會覆蓋舊的，不會變兩份。</span></div>
                 <div class="howto-feat"><b>搜尋 / 排序 / 篩選</b><span>依玩家名稱或標籤搜尋；排序有最新發布／❤最熱門／收藏數量／最高星數；也可「只看我按讚的」。</span></div>
-                <div class="howto-feat"><b>收藏詳情</b><span>點卡片打開：切換模式/分類籤瀏覽、一鍵匯入、複製分享連結，下方有留言區——登入後任何人都能留言，刪除權限是留言者本人或該收藏的發布者。</span></div>
+                <div class="howto-feat"><b>收藏詳情</b><span>點卡片打開：切換模式/分類籤瀏覽、一鍵匯入、複製分享連結，登入後還能「疊上我的成績」（每張圖標你自己的評級 + grade 統計）、「複製嵌入碼」拿一段 iframe 貼到論壇／部落格；下方有留言區——登入後任何人都能留言，刪除權限是留言者本人或該收藏的發布者。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -440,7 +440,7 @@ I18N.zh = {
                 <div class="howto-tab-title">✦ 曲庫分類</div>
                 <p class="howto-tab-desc">整個 ranked 曲庫的瀏覽器，用歌手／語言／曲風／來源／feat. 切角度找圖。</p>
                 <div class="howto-feat"><b>篩選組合</b><span>四個下拉可疊加使用，另有模式篩選跟「含 18+ 標記」開關，四種排序方式。</span></div>
-                <div class="howto-feat"><b>➕ 建立此分類的收藏</b><span>選好篩選條件、清單有結果之後才會亮起——一鍵把整個篩選結果變成收藏裡的新分類。</span></div>
+                <div class="howto-feat"><b>➕ 建立此分類的收藏</b><span>選好篩選條件、清單有結果之後才會亮起——一鍵把整個篩選結果變成收藏裡的新分類；勾「設為動態分類」的話，那個分類之後可以一鍵把新上榜、符合條件的圖再拉進來。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -448,6 +448,13 @@ I18N.zh = {
                 <p class="howto-tab-desc">歷屆 OWC／TWC／MWC（4K・7K）／CWC 的官方比賽圖池。</p>
                 <div class="howto-feat"><b>選屆數 / 輪次</b><span>模式籤 → 屆數列表 → 選定後依輪次瀏覽，每張圖都標了 mod。</span></div>
                 <div class="howto-feat"><b>➕ 加入收藏</b><span>整屆或只挑其中一輪加入，不用整屆都要。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">✦ 官方圖包</div>
+                <p class="howto-tab-desc">osu! 官方策劃的圖包：標準、精選藝術家、主題、賽事、Spotlight、Loved、藝術家／專輯。</p>
+                <div class="howto-feat"><b>類型籤</b><span>七種類型切換，往下捲用「載入更多」翻頁。</span></div>
+                <div class="howto-feat"><b>➕ 把整包加入收藏</b><span>點一列打開整包圖清單，一鍵把整包（或單張）加成收藏分類。資料即時取自 osu! API。</span></div>
             </div>
 
             <div class="howto-tab">
