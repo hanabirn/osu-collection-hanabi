@@ -30,7 +30,7 @@ I18N.ru = {
     dm_back_btn: 'Назад',
     dm_self_error: 'Нельзя отправить сообщение самому себе',
 
-    global_search_title: 'Поиск по сайту', global_search_placeholder: 'Поиск песен, маппулов, моей коллекции...',
+    global_search_title: 'Поиск по сайту', global_search_placeholder: 'Поиск песен, маппулов, моей коллекции...', select_language: 'Выбрать язык',
     global_search_section_collection: 'Моя коллекция', global_search_section_catalog: 'Каталог', global_search_section_mappools: 'Маппулы Чемпионата мира',
     global_search_empty: 'Ничего не найдено',
     track_player_btn: '+ Отслеживать', untrack_player_btn: 'Не отслеживать',

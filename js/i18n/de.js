@@ -30,7 +30,7 @@ I18N.de = {
     dm_back_btn: 'Zurück',
     dm_self_error: 'Du kannst dir selbst keine Nachricht schicken',
 
-    global_search_title: 'Gesamte Seite durchsuchen', global_search_placeholder: 'Songs, Mappools, meine Sammlung durchsuchen...',
+    global_search_title: 'Gesamte Seite durchsuchen', global_search_placeholder: 'Songs, Mappools, meine Sammlung durchsuchen...', select_language: 'Sprache wählen',
     global_search_section_collection: 'Meine Sammlung', global_search_section_catalog: 'Katalog', global_search_section_mappools: 'World-Cup-Mappools',
     global_search_empty: 'Keine passenden Ergebnisse',
     track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',

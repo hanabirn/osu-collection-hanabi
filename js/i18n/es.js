@@ -30,7 +30,7 @@ I18N.es = {
     dm_back_btn: 'Volver',
     dm_self_error: 'No puedes enviarte un mensaje a ti mismo',
 
-    global_search_title: 'Buscar en el sitio', global_search_placeholder: 'Buscar canciones, mappools, mi colección...',
+    global_search_title: 'Buscar en el sitio', global_search_placeholder: 'Buscar canciones, mappools, mi colección...', select_language: 'Seleccionar idioma',
     global_search_section_collection: 'Mi colección', global_search_section_catalog: 'Catálogo', global_search_section_mappools: 'Mappools de la Copa del Mundo',
     global_search_empty: 'Sin resultados coincidentes',
     track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',

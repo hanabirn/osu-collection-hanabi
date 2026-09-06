@@ -174,7 +174,7 @@ I18N.en = {
         </div>
     `,
 
-    global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...',
+    global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...', select_language: 'Select language',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',
     track_player_btn: '+ Track', untrack_player_btn: 'Untrack',

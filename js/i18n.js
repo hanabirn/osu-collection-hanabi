@@ -62,7 +62,11 @@ function applyLangDom(lang) {
     });
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
-        if (t[key]) el.title = t[key];
+        if (t[key]) {
+            el.title = t[key];
+            // Keep an accessible name in sync when the element carries one.
+            if (el.hasAttribute('aria-label')) el.setAttribute('aria-label', t[key]);
+        }
     });
     document.querySelectorAll('.lang-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);

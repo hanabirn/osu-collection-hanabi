@@ -30,7 +30,7 @@ I18N.fr = {
     dm_back_btn: 'Retour',
     dm_self_error: 'Vous ne pouvez pas vous envoyer un message à vous-même',
 
-    global_search_title: 'Rechercher sur le site', global_search_placeholder: 'Rechercher des chansons, mappools, ma collection...',
+    global_search_title: 'Rechercher sur le site', global_search_placeholder: 'Rechercher des chansons, mappools, ma collection...', select_language: 'Choisir la langue',
     global_search_section_collection: 'Ma collection', global_search_section_catalog: 'Catalogue', global_search_section_mappools: 'Mappools de la Coupe du monde',
     global_search_empty: 'Aucun résultat correspondant',
     track_player_btn: '+ Suivre', untrack_player_btn: 'Ne plus suivre',

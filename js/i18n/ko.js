@@ -30,7 +30,7 @@ I18N.ko = {
     dm_back_btn: '뒤로',
     dm_self_error: '자신에게는 메시지를 보낼 수 없습니다',
 
-    global_search_title: '전체 검색', global_search_placeholder: '곡, 매핑풀, 내 컬렉션 검색...',
+    global_search_title: '전체 검색', global_search_placeholder: '곡, 매핑풀, 내 컬렉션 검색...', select_language: '언어 선택',
     global_search_section_collection: '내 컬렉션', global_search_section_catalog: '곡 분류', global_search_section_mappools: '월드컵 매핑풀',
     global_search_empty: '일치하는 결과가 없습니다',
     track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',
