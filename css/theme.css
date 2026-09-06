@@ -1,123 +1,142 @@
 /* ===== Theme Variables =====
-   Ported verbatim from the main site's css/theme.css so the ported osu.css/
-   profile-card CSS (which reference these exact custom property names) needs
-   zero rewriting. */
+   2026 redesign: near-black, high-contrast, restrained pink.
+   See docs/visual-redesign-spec.md. Legacy token NAMES are kept (a lot of
+   ported osu.css/profile-card CSS references them) — only the VALUES moved,
+   plus new tokens (--bg / --surface-* / --border* / --pink* / --r-* / --dur)
+   added for the reworked shell/components. Purple is remapped onto pink so
+   any still-purple selector re-colors without a hunt. */
 :root {
-    /* Dark theme (default) */
-    --bg-body-1: #13091f;
-    --bg-body-2: #1a0d2e;
-    --bg-body-3: #24102f;
-    --bg-card: rgba(25, 15, 45, 0.88);
-    --bg-card-alt: rgba(255,255,255,0.06);
-    --bg-input: rgba(25, 15, 45, 0.9);
-    --bg-stat: rgba(255,255,255,0.06);
-    --text: #fff;
-    --text-secondary: rgba(255,255,255,0.7);
-    --text-label: rgba(255,255,255,0.6);
-    --text-accent: #c8a2e0;
+    /* --- new shell tokens --- */
+    --bg:            #0b0b10;
+    --bg-modal:      #121218;
+    --surface-1:     rgba(255,255,255,0.03);
+    --surface-2:     rgba(255,255,255,0.055);
+    --border:        rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text-dim:      rgba(244,242,247,0.62);
+    --text-faint:    rgba(244,242,247,0.42);
+    --pink:          #f472b6;
+    --pink-rgb:      244,114,182;
+    --pink-bright:   #ff5fa8;
+    --cyan:          #22d3ee;
+    --cyan-rgb:      34,211,238;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad:  #f87171;
+    --r-card:  12px;
+    --r-modal: 18px;
+    --r-pill:  999px;
+    --dur:  220ms;
+
+    /* --- legacy names, remapped --- */
+    --bg-body-1: #0b0b10;
+    --bg-body-2: #0b0b10;
+    --bg-body-3: #0c0c12;
+    --bg-card: #121218;
+    --bg-card-alt: rgba(255,255,255,0.035);
+    --bg-input: #16161d;
+    --bg-stat: rgba(255,255,255,0.035);
+    --text: #f4f2f7;
+    --text-secondary: rgba(244,242,247,0.62);
+    --text-label: rgba(244,242,247,0.45);
+    --text-accent: rgba(244,242,247,0.9);
     --text-pink: #f9a8d4;
-    --text-dim2: rgba(200,162,224,0.6);
-    --border-card: rgba(168,85,247,0.25);
-    --border-light: rgba(255,255,255,0.15);
-    --border-input: rgba(168,85,247,0.25);
+    --text-dim2: rgba(244,242,247,0.45);
+    --border-card: rgba(255,255,255,0.08);
+    --border-light: rgba(255,255,255,0.10);
+    --border-input: rgba(255,255,255,0.10);
     --accent-pink: #f472b6;
-    --accent-purple: #a855f7;
-    --accent-light-purple: #c084fc;
+    --accent-purple: #f472b6;
+    --accent-light-purple: #f9a8d4;
     --accent-yellow: #fbbf24;
-    --shadow-card: 0 0 25px rgba(168,85,247,0.08), 0 10px 34px rgba(0,0,0,0.25);
-    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.07);
-    --lang-pill-bg: rgba(255,255,255,0.08);
-    --lang-pill-border: rgba(255,255,255,0.15);
-    --lang-pill-text: rgba(255,255,255,0.6);
-    --osu-card-shadow: 0 8px 30px rgba(0,0,0,0.5);
-    --osu-overlay: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0.92) 100%);
-    --theme-toggle-bg: rgba(255,255,255,0.08);
-    --theme-toggle-border: rgba(255,255,255,0.15);
-    /* RGB triplets for building rgba() glows/shadows from the theme's own accents. */
+    --shadow-card: none;
+    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.04);
+    --lang-pill-bg: rgba(255,255,255,0.03);
+    --lang-pill-border: rgba(255,255,255,0.08);
+    --lang-pill-text: rgba(244,242,247,0.62);
+    --osu-card-shadow: none;
+    --osu-overlay: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.82) 80%, rgba(0,0,0,0.94) 100%);
+    --theme-toggle-bg: rgba(255,255,255,0.06);
+    --theme-toggle-border: rgba(255,255,255,0.12);
     --accent-pink-rgb: 244, 114, 182;
-    --accent-purple-rgb: 168, 85, 247;
+    --accent-purple-rgb: 244, 114, 182;
     --accent-cyan: #22d3ee;
     --accent-cyan-rgb: 34, 211, 238;
-    --glass-blur: 16px;
-    /* Frosted bases for the header-overlapping content: the .site-main tray
-       and the .site-page card sitting on it (each a bit more see-through
-       than the opaque --bg-card so the cover bleeds faintly through). */
-    --overlap-panel-bg: rgba(18, 12, 30, 0.5);
-    --site-page-bg: rgba(24, 15, 42, 0.8);
+    --glass-blur: 0px;
+    /* Frosted panels are gone in the redesign — transparent so the shell
+       reads as one flat near-black surface even before base.css catches up. */
+    --overlap-panel-bg: transparent;
+    --site-page-bg: transparent;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="light"] {
-    --bg-body-1: #fdf3fa;
-    --bg-body-2: #f7e6f2;
-    --bg-body-3: #fbeef7;
-    --bg-card: rgba(255, 255, 255, 0.92);
-    --bg-card-alt: rgba(168,85,247,0.06);
-    --bg-input: rgba(255, 255, 255, 0.95);
-    --bg-stat: rgba(168,85,247,0.06);
-    --text: #2d1b4e;
-    --text-secondary: rgba(45,27,78,0.7);
-    --text-label: rgba(45,27,78,0.6);
-    --text-accent: #7c3aed;
+:root[data-theme="light"] {
+    --bg:            #faf8fc;
+    --bg-modal:      #ffffff;
+    --surface-1:     rgba(20,16,28,0.03);
+    --surface-2:     rgba(20,16,28,0.06);
+    --border:        rgba(20,16,28,0.10);
+    --border-strong: rgba(20,16,28,0.16);
+    --text-dim:      rgba(26,21,35,0.66);
+    --text-faint:    rgba(26,21,35,0.45);
+    --pink:          #db2777;
+    --pink-rgb:      219,39,119;
+    --pink-bright:   #ec4899;
+
+    --bg-body-1: #faf8fc;
+    --bg-body-2: #faf8fc;
+    --bg-body-3: #f7f4fb;
+    --bg-card: #ffffff;
+    --bg-card-alt: rgba(20,16,28,0.03);
+    --bg-input: #ffffff;
+    --bg-stat: rgba(20,16,28,0.03);
+    --text: #1a1523;
+    --text-secondary: rgba(26,21,35,0.66);
+    --text-label: rgba(26,21,35,0.5);
+    --text-accent: rgba(26,21,35,0.9);
     --text-pink: #be185d;
-    --text-dim2: rgba(100,70,140,0.6);
-    --border-card: rgba(147,51,234,0.2);
-    --border-light: rgba(0,0,0,0.1);
-    --border-input: rgba(147,51,234,0.2);
+    --text-dim2: rgba(26,21,35,0.5);
+    --border-card: rgba(20,16,28,0.10);
+    --border-light: rgba(20,16,28,0.10);
+    --border-input: rgba(20,16,28,0.12);
     --accent-pink: #db2777;
-    --accent-purple: #9333ea;
-    --accent-light-purple: #a855f7;
+    --accent-purple: #db2777;
+    --accent-light-purple: #db2777;
     --accent-yellow: #d97706;
-    --shadow-card: 0 2px 15px rgba(147,51,234,0.08), 0 8px 26px rgba(45,27,78,0.08);
+    --shadow-card: none;
     --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.8);
-    --lang-pill-bg: rgba(147,51,234,0.06);
-    --lang-pill-border: rgba(147,51,234,0.15);
-    --lang-pill-text: rgba(45,27,78,0.6);
-    --osu-card-shadow: 0 8px 30px rgba(147,51,234,0.12);
-    --osu-overlay: linear-gradient(to bottom, rgba(147,51,234,0.05) 0%, rgba(147,51,234,0.1) 40%, rgba(45,27,78,0.7) 80%, rgba(45,27,78,0.85) 100%);
-    --theme-toggle-bg: rgba(147,51,234,0.06);
-    --theme-toggle-border: rgba(147,51,234,0.15);
+    --lang-pill-bg: rgba(20,16,28,0.03);
+    --lang-pill-border: rgba(20,16,28,0.10);
+    --lang-pill-text: rgba(26,21,35,0.5);
+    --osu-card-shadow: none;
+    --osu-overlay: linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.12) 40%, rgba(20,16,28,0.72) 80%, rgba(20,16,28,0.88) 100%);
+    --theme-toggle-bg: rgba(20,16,28,0.05);
+    --theme-toggle-border: rgba(20,16,28,0.12);
     --accent-pink-rgb: 219, 39, 119;
-    --accent-purple-rgb: 147, 51, 234;
+    --accent-purple-rgb: 219, 39, 119;
     --accent-cyan: #0891b2;
     --accent-cyan-rgb: 8, 145, 178;
-    --overlap-panel-bg: rgba(250, 244, 250, 0.58);
-    --site-page-bg: rgba(252, 246, 252, 0.82);
+    --glass-blur: 0px;
+    --overlap-panel-bg: transparent;
+    --site-page-bg: transparent;
 }
 
-/* Smooth transition */
+/* Theme-switch tween (kept narrow: colour props only). */
 *, *::before, *::after {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ===== Ambient background glow =====
-   Two faint radial blobs behind the content, in the theme's own
-   pink/purple accents — same "ambient light" pattern as the main site,
-   kept faint (0.08-0.12 opacity) so it reads as depth, not decoration.
-   Static on purpose: each is a 46vw element under `filter: blur(80px)`, so
-   animating position/scale re-ran a large GPU blur every frame and kept
-   the compositor from ever idling (phones ran hot). Rasterized once and
-   left still, they cost nothing. */
-body::before, body::after {
+/* ===== Ambient vignette =====
+   One faint, fixed, dim pink glow at the top — atmosphere, not decoration
+   (spec §5.1). Static: rasterised once, never animated (phones ran hot on
+   the old animated blobs). */
+body::before {
     content: '';
     position: fixed;
-    width: 46vw;
-    height: 46vw;
-    max-width: 560px;
-    max-height: 560px;
-    border-radius: 50%;
+    inset: 0;
     pointer-events: none;
     z-index: 0;
-    filter: blur(80px);
-}
-body::before {
-    top: -12%;
-    left: -10%;
-    background: radial-gradient(circle, rgba(var(--accent-pink-rgb), 0.12) 0%, transparent 70%);
-}
-body::after {
-    bottom: -14%;
-    right: -10%;
-    background: radial-gradient(circle, rgba(var(--accent-purple-rgb), 0.10) 0%, transparent 70%);
+    background: radial-gradient(120% 70% at 50% -12%, rgba(var(--pink-rgb), 0.06) 0%, transparent 55%);
 }
