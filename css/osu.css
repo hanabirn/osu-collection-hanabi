@@ -3398,6 +3398,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     box-shadow: 0 24px 80px rgba(0,0,0,0.5);
     padding: 24px;
 }
+:root[data-theme="light"] .pp-calc-modal { box-shadow: 0 20px 60px rgba(20,16,28,0.18); }
 .pp-calc-close {
     position: absolute;
     top: 12px;

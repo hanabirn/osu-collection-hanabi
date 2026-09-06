@@ -190,16 +190,11 @@ a:hover { text-decoration: underline; }
    individual rule — forces every descendant that reads them back to the
    light-on-dark values regardless of site theme, since the header's visual
    background is dark either way once a cover is showing. */
-.site-header.has-cover-banner {
-    --text: #fff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-dim2: rgba(200, 162, 224, 0.6);
-    --lang-pill-bg: rgba(255, 255, 255, 0.08);
-    --lang-pill-border: rgba(255, 255, 255, 0.15);
-    --lang-pill-text: rgba(255, 255, 255, 0.6);
-    --theme-toggle-bg: rgba(255, 255, 255, 0.08);
-    --theme-toggle-border: rgba(255, 255, 255, 0.15);
-}
+/* Redesign: no cover photo behind the header any more, so .has-cover-banner
+   must NOT force a light-on-dark palette (JS still adds the class when the
+   visitor has covers) — it would make header text invisible in light theme.
+   Left as a no-op rather than chasing the class out of js/osu.js. */
+.site-header.has-cover-banner { /* inert */ }
 /* ===== Title / tagline outline over the cover art =====
    The pink gradient-clipped title and the small tagline both lose contrast
    on a busy cover photo, and there's no dark scrim behind them anymore. So
@@ -315,42 +310,31 @@ a:hover { text-decoration: underline; }
    behind it: a dark, semi-opaque fill so white icons on it always clear
    WCAG AA whatever the art is, a hairline light keyline, a 10px blur, and
    a lift shadow. The per-button rules keep owning size/shape only. */
+/* Redesign: flat header, no cover — corner controls just use the base
+   theme-adaptive .header-ctl style; the .has-cover-banner overrides that
+   forced a dark frosted chip + white icons (wrong in light theme) are
+   reduced to a hairline border + a hover pink wash, blur-free. */
 .site-header.has-cover-banner .header-ctl {
-    background: rgba(18, 12, 30, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    color: #fff;
-    -webkit-backdrop-filter: blur(10px) saturate(140%);
-    backdrop-filter: blur(10px) saturate(140%);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
 }
-/* Hover / open — gentle grow, pink wash, and a glow that lifts the chip
-   off any busy background. Same treatment for the "menu is open" states so
-   the control stays lit while its dropdown is showing. */
 .site-header.has-cover-banner .header-ctl:hover,
 .site-header.has-cover-banner .contact-info.open .header-ctl,
 .site-header.has-cover-banner .notif-bell.open .header-ctl,
 .site-header.has-cover-banner .lang-globe.open .header-ctl {
-    background: rgba(var(--accent-pink-rgb), 0.30);
-    border-color: rgba(255, 255, 255, 0.42);
-    color: #fff;
-    transform: scale(1.05);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--accent-pink-rgb), 0.5);
+    background: rgba(var(--pink-rgb), 0.16);
+    border-color: rgba(var(--pink-rgb), 0.5);
+    color: var(--text);
+    box-shadow: none;
 }
 .site-header.has-cover-banner .header-ctl:active { transform: scale(0.95); }
-
-/* The theme switch already carries its own opaque track, but its light-theme
-   sky gradient can go soft on a pale cover — a white keyline + deeper drop
-   shadow pins its edge on any background. */
-.site-header.has-cover-banner .theme-switch {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 2px 12px rgba(0, 0, 0, 0.35);
-}
-/* The osu! login button / avatar pill is a solid gradient CTA — already
-   high-contrast anywhere, it just gets a matching lift shadow so it reads
-   as part of the same floating control set. */
+.site-header.has-cover-banner .theme-switch { box-shadow: none; }
 .site-header.has-cover-banner .osu-login-btn-large,
-.site-header.has-cover-banner .osu-logged-in-pill-large {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 12px rgba(var(--accent-pink-rgb), 0.4);
-}
+.site-header.has-cover-banner .osu-logged-in-pill-large { box-shadow: none; }
 .osu-login-btn-large:hover { transform: scale(1.04); }
 
 @media (max-width: 600px) {
@@ -1247,7 +1231,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border);
 }
 .nav-drawer-close {
     display: flex;
@@ -1256,13 +1240,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.7);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
     cursor: pointer;
     transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), transform 0.2s var(--ease-spring);
 }
-.nav-drawer-close:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.nav-drawer-close:hover { background: var(--surface-2); color: var(--text); }
 .nav-drawer-close:active { transform: scale(0.9); }
 
 .nav-drawer-body {
@@ -1649,6 +1633,9 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     box-shadow: 0 0 18px rgba(var(--pink-rgb), 0.3);
 }
 .input-group button:active, .btn:active { transform: scale(0.97); }
+/* Light theme: --pink is the deeper #db2777 — white text on it, not near-black. */
+:root[data-theme="light"] .input-group button,
+:root[data-theme="light"] .btn { color: #fff; }
 
 .guestbook-input {
     flex: 1;
