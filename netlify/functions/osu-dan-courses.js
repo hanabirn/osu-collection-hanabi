@@ -1,40 +1,66 @@
 /* ===== 段位認定 (dan course) browser — osu! API v2 =====
-   Dan courses are community skill-certification marathons, one per
-   beatmapset (mostly graveyard/loved). There is no official API or wiki
-   list, so this drives off osu!'s own beatmapset SEARCH ("dan course" per
-   mode, graveyard included) and prepends a small hand-picked set of the
-   well-known ones. osu!Collector has nothing like this.
+   Dan courses are community skill-certification marathons — one beatmapset
+   per dan, mostly graveyard/loved. No official API/wiki list, and osu!'s
+   raw beatmapset search for "dan course" pulls in a lot of noise (samples,
+   betas, practice packs, droid ports, joke sets), so this is CURATED:
 
-     ?mode=<osu|taiko|catch|mania4k|mania7k>[&cursor=<str>]
-        -> { sets: [...lean...], cursor_string }
+     ?mode=<osu|taiko|catch|mania4k|mania7k>
+        -> { groups: [{ group, sets: [...lean...] }], search: [...lean...],
+             cursor_string }              (curated list + a tight search page)
+     ?mode=<...>&more=1&cursor=<str>
+        -> { search: [...lean...], cursor_string }   (more of the search)
 
-   Uses the shared client_credentials token (OSU_CLIENT_ID/OSU_CLIENT_SECRET),
-   same as osu-news.js / osu-beatmapset.js. */
+   Curated ids come from each keymode's current project (Dan ~ REFORM ~ /
+   JinJin's 7K / Dan-i Dojo / Tapping Dan Course / …) — review ~yearly, the
+   scene shifts. Uses the shared client_credentials token. */
 const { getOsuToken } = require('./_osu-auth');
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 
-// mode key -> { ruleset int, search query, pinned beatmapset ids (well-known
-// dan-course sets, newest series first). Review the pins periodically — the
-// scene adds/replaces series over time; search covers the rest. }
 const DAN_MODES = {
-    osu:      { m: 0, q: 'dan course',    pins: [2316877, 2315888, 2315697, 2319170] },
-    taiko:    { m: 1, q: 'dan-i dojo',    pins: [1098825, 912120, 703200, 695759] },
-    catch:    { m: 2, q: 'dan course',    pins: [2170847, 2170864] },
-    mania4k:  { m: 3, q: '4k dan course', pins: [2288888, 2243057, 1550709, 373141] },
-    mania7k:  { m: 3, q: '7k dan course', pins: [450069, 451788, 930218, 1061136, 450649, 1220647] },
+    osu:      { m: 0, q: 'tapping dan course' },
+    taiko:    { m: 1, q: 'dan-i dojo' },
+    catch:    { m: 2, q: 'dan course' },
+    mania4k:  { m: 3, q: '4k dan course' },
+    mania7k:  { m: 3, q: '7k dan course' },
 };
 
-/* osu!'s search matches "dan"/"course" loosely (an artist named "Dan
-   Salvato", a title with "course" in it), so keep only search hits whose
-   title/artist actually reads like a dan course. Pins bypass this. */
-const DAN_RE = /\bdan[\s~._-]*(course|phase|dojo|i\b)|段位|dan-?i\s*dojo/i;
-function looksLikeDan(s) {
-    const txt = `${s.title_unicode || ''} ${s.title || ''} ${s.artist_unicode || ''} ${s.artist || ''}`;
-    return DAN_RE.test(txt);
+// Authoritative dan courses, grouped by project. REVIEW ~YEARLY.
+const DAN_CURATED = {
+    osu: [
+        { group: 'Osu!std Tapping Dan Course', ids: [2316877, 2315888, 2315697, 2319170] },
+    ],
+    taiko: [
+        { group: 'osu!Taiko 段位道場 (Dan-i Dojo)', ids: [695759, 703200, 912120, 1098825] },
+    ],
+    catch: [
+        { group: 'osu!catch Dan Course', ids: [2170847, 2170864] },
+    ],
+    mania4k: [
+        { group: 'Dan ~ REFORM ~', ids: [1079991, 1079998, 2297014, 2316976, 2316993, 2320002, 2317095] },
+        { group: "Signicial's Courses", ids: [1575457, 1575458, 1622471, 2341590] },
+        { group: '4K LN Dan Courses', ids: [2243057, 2340696] },
+    ],
+    mania7k: [
+        { group: 'Regular Dan Phase', ids: [450069, 451788, 930218, 1061136] },
+        { group: 'LN Dan Phase', ids: [450649, 1220647] },
+    ],
+};
+
+const JUNK_RE = /\b(sample|beta|outdated|preview|demo|wip|droid|placeholder|template|appeared!|deadly sins)\b/i;
+
+function looksLikeDanPack(s) {
+    const diffs = Array.isArray(s.beatmaps) ? s.beatmaps.length : 0;
+    if (diffs < 2) return false;
+    const title = (s.title_unicode || s.title || '') + '';
+    const artist = (s.artist_unicode || s.artist || '') + '';
+    if (JUNK_RE.test(title)) return false;
+    const titleOk = /\bdan[\s~._-]*(course|phase|dojo)|dan-?i\s*dojo|段位道場/i.test(title);
+    const artistOk = /various artist|dan[\s~._-]*course|dan-?i\s*dojo|段位/i.test(artist);
+    return titleOk && artistOk;
 }
 
-function leanSet(s, pinned) {
+function leanSet(s, extra) {
     const diffs = Array.isArray(s.beatmaps) ? s.beatmaps : [];
     return {
         id: s.id,
@@ -45,7 +71,7 @@ function leanSet(s, pinned) {
         diff_count: diffs.length || null,
         star_min: diffs.length ? Math.min(...diffs.map(b => b.difficulty_rating || 0)) : null,
         star_max: diffs.length ? Math.max(...diffs.map(b => b.difficulty_rating || 0)) : null,
-        pinned: !!pinned,
+        ...(extra || {}),
     };
 }
 
@@ -58,39 +84,54 @@ exports.handler = async (event) => {
     if (!cfg) {
         return { statusCode: 400, headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ error: 'invalid mode' }) };
     }
+    const more = qs.more === '1';
 
     try {
         const token = await getOsuToken();
         const auth = { Authorization: `Bearer ${token}`, Accept: 'application/json' };
-        const firstPage = !qs.cursor;
 
-        const params = new URLSearchParams({ q: cfg.q, m: String(cfg.m), s: 'any', sort: 'relevance_desc' });
-        if (qs.cursor) params.set('cursor_string', qs.cursor);
-        const searchP = fetch(`https://osu.ppy.sh/api/v2/beatmapsets/search?${params}`, { headers: auth })
+        const searchParams = new URLSearchParams({ q: cfg.q, m: String(cfg.m), s: 'any', sort: 'relevance_desc' });
+        if (qs.cursor) searchParams.set('cursor_string', qs.cursor);
+        const searchP = fetch(`https://osu.ppy.sh/api/v2/beatmapsets/search?${searchParams}`, { headers: auth })
             .then(r => r.ok ? r.json() : Promise.reject(new Error(`search ${r.status}`)));
 
-        // Pinned sets only on the first page.
-        const pinP = firstPage && cfg.pins.length
-            ? Promise.all(cfg.pins.map(id =>
+        // Curated groups only on the first (non-`more`) request.
+        const curatedCfg = (!more && DAN_CURATED[modeKey]) || [];
+        const curatedIds = curatedCfg.flatMap(g => g.ids);
+        const curatedP = curatedIds.length
+            ? Promise.all(curatedIds.map(id =>
                 fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, { headers: auth })
                     .then(r => r.ok ? r.json() : null).catch(() => null)))
             : Promise.resolve([]);
 
-        const [search, pins] = await Promise.all([searchP, pinP]);
+        const [search, curatedRaw] = await Promise.all([searchP, curatedP]);
 
-        const seen = new Set();
-        const out = [];
-        for (const p of pins) {
-            if (p && p.id && !seen.has(p.id)) { seen.add(p.id); out.push(leanSet(p, true)); }
-        }
+        const byId = new Map();
+        curatedRaw.forEach(s => { if (s && s.id) byId.set(s.id, s); });
+        const curatedSet = new Set(curatedIds);
+
+        const groups = curatedCfg.map(g => ({
+            group: g.group,
+            sets: g.ids.map(id => byId.get(id)).filter(Boolean).map(s => leanSet(s, { pinned: true })),
+        })).filter(g => g.sets.length);
+
+        const seen = new Set(curatedIds);
+        const searchOut = [];
         for (const s of (search.beatmapsets || [])) {
-            if (s && s.id && !seen.has(s.id) && looksLikeDan(s)) { seen.add(s.id); out.push(leanSet(s, false)); }
+            if (s && s.id && !seen.has(s.id) && !curatedSet.has(s.id) && looksLikeDanPack(s)) {
+                seen.add(s.id);
+                searchOut.push(leanSet(s, { pinned: false }));
+            }
         }
+
+        const body = more
+            ? { search: searchOut, cursor_string: search.cursor_string || null }
+            : { groups, search: searchOut, cursor_string: search.cursor_string || null };
 
         return {
             statusCode: 200,
             headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=1800' },
-            body: JSON.stringify({ sets: out, cursor_string: search.cursor_string || null }),
+            body: JSON.stringify(body),
         };
     } catch (err) {
         return { statusCode: 500, headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ error: err.message }) };

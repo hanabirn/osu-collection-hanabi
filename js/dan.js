@@ -1,9 +1,9 @@
 /* ===== 段位認定 tab: browse osu! dan courses =====
    Dan courses are community skill-certification marathons — one beatmapset
-   each, mostly graveyard/loved. No official API/wiki list exists, so the
-   backend (netlify/functions/osu-dan-courses.js) drives off osu!'s own
-   beatmapset search + a few hand-picked pins. osu!Collector has nothing
-   like this.
+   per dan, mostly graveyard/loved. The backend
+   (netlify/functions/osu-dan-courses.js) returns a CURATED, project-grouped
+   list per mode plus a tightly-filtered search page behind a "更多" toggle.
+   Per-mode passing standard + resource links live here.
 
    Reuses global helpers from osu.js: escHtml, icon, modeIconSvg,
    starRatingColor, applyImportedCollections, addOsuBeatmap,
@@ -19,14 +19,52 @@ const DAN_MODES = [
 const DAN_MODE_BY_KEY = Object.fromEntries(DAN_MODES.map(m => [m.key, m]));
 function danModeVars(dm) { return `--dan:${dm.color};--dan-rgb:${dm.rgb}`; }
 
+// Per-mode passing standard (i18n key) + external resource links.
+const DAN_META = {
+    osu: {
+        std: 'dan_std_osu',
+        links: [
+            ['osu!std Tapping Dan Course（論壇）', 'https://osu.ppy.sh/community/forums/topics/2034200'],
+        ],
+    },
+    taiko: {
+        std: 'dan_std_taiko',
+        links: [
+            ['osu!Taiko Dan-i Dojo（論壇）', 'https://osu.ppy.sh/community/forums/topics/771253'],
+        ],
+    },
+    catch: {
+        std: 'dan_std_catch',
+        links: [
+            ['osu!catch Dan ~ CTB ~ Project（論壇）', 'https://osu.ppy.sh/community/forums/topics/756127'],
+        ],
+    },
+    mania4k: {
+        std: 'dan_std_mania',
+        links: [
+            ['Dan ~ REFORM ~ 官網', 'https://sites.google.com/view/danreform/home'],
+            ["Signicial's Courses（論壇）", 'https://osu.ppy.sh/community/forums/topics/2135031'],
+            ['4K Dan Courses（論壇）', 'https://osu.ppy.sh/community/forums/topics/304816'],
+        ],
+    },
+    mania7k: {
+        std: 'dan_std_mania',
+        links: [
+            ['7K Dan Courses（論壇・更新版）', 'https://osu.ppy.sh/community/forums/topics/981680'],
+        ],
+    },
+};
+const DAN_LINKS_COMMON = [['Mania Tracker · Dan 等級估算', 'https://mania-tracker.com/dan-estimates']];
+
 let danLoaded = false;
 let danMode = 'mania4k';
+let danGroups = [];
+let danSearch = [];
 let danCursor = null;
-let danItems = [];
 let danBusy = false;
 
 function ensureDanLoaded() {
-    if (!danLoaded) { danLoaded = true; renderDanModePills(); loadDan(true); }
+    if (!danLoaded) { danLoaded = true; renderDanModePills(); loadDan(); }
 }
 
 function renderDanModePills() {
@@ -37,89 +75,117 @@ function renderDanModePills() {
     ).join('');
 }
 
+function renderDanMeta() {
+    const el = document.getElementById('dan-meta');
+    if (!el) return;
+    const meta = DAN_META[danMode];
+    if (!meta) { el.innerHTML = ''; return; }
+    const links = [...(meta.links || []), ...DAN_LINKS_COMMON]
+        .map(([label, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${escHtml(label)}</a>`)
+        .join('');
+    el.innerHTML = `
+        <div class="dan-standard">${icon('award')}<span>${t('dan_standard_label')}：${escHtml(t(meta.std))}</span></div>
+        <div class="dan-resources">${t('dan_resources_label')}：${links}</div>`;
+}
+
 function switchDanMode(key) {
     if (danBusy || key === danMode) return;
     danMode = key;
     danCursor = null;
-    danItems = [];
+    danGroups = [];
+    danSearch = [];
     renderDanModePills();
-    loadDan(true);
+    renderDanMeta();
+    loadDan();
 }
 
-async function loadDan(reset) {
+async function loadDan(more) {
     const listEl = document.getElementById('dan-list');
-    const moreEl = document.getElementById('dan-more');
     if (!listEl) return;
     danBusy = true;
-    if (reset) listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
-    if (moreEl) moreEl.innerHTML = '';
+    if (!more) listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
 
     try {
         const params = new URLSearchParams({ mode: danMode });
-        if (danCursor) params.set('cursor', danCursor);
+        if (more) { params.set('more', '1'); if (danCursor) params.set('cursor', danCursor); }
         const res = await fetch(`/.netlify/functions/osu-dan-courses?${params}`);
         if (!res.ok) throw new Error('bad response');
         const data = await res.json();
-        danItems = reset ? (data.sets || []) : danItems.concat(data.sets || []);
+        if (more) {
+            danSearch = danSearch.concat(data.search || []);
+        } else {
+            danGroups = data.groups || [];
+            danSearch = data.search || [];
+        }
         danCursor = data.cursor_string || null;
         renderDanList();
     } catch (e) {
         console.error('Dan list failed:', e);
-        if (reset) listEl.innerHTML = `<p class="osu-empty">${t('dan_load_fail')}</p>`;
+        if (!more) listEl.innerHTML = `<p class="osu-empty">${t('dan_load_fail')}</p>`;
     } finally {
         danBusy = false;
     }
 }
 
+function danCardHtml(s, dm, collectionSet) {
+    const coverUrl = `https://assets.ppy.sh/beatmaps/${s.id}/covers/card.jpg`;
+    const inCollection = collectionSet.has(s.id);
+    const stars = (s.star_min != null && s.star_max != null)
+        ? (s.star_min === s.star_max ? s.star_min.toFixed(2) : `${s.star_min.toFixed(2)}–${s.star_max.toFixed(2)}`)
+        : '';
+    const starColor = s.star_max != null && typeof starRatingColor === 'function' ? starRatingColor(s.star_max) : '';
+    const pinMark = s.pinned ? `<span class="dan-pin-star" title="${escHtml(t('dan_pinned'))}">${icon('star', { filled: true })}</span>` : '';
+    return `
+    <div class="osu-card dan-card${s.pinned ? ' dan-pinned' : ''}" style="${danModeVars(dm)}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${s.id}','_blank')">
+        <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="osu-card-overlay"></div>
+        <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addDanToCollection(${s.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
+        <button class="osu-copy-btn" onclick="copyBeatmapId(${s.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
+        <button class="osu-download-btn" onclick="downloadBeatmapset(${s.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
+        <button class="osu-play-btn" onclick="playOsuPreview(${s.id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+        <div class="osu-card-info">
+            <div class="osu-card-title">${pinMark}${escHtml(s.title || '')}</div>
+            <div class="osu-card-artist">${escHtml(s.artist || '')}</div>
+            <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(s.creator || '') })}</div>
+            <div class="catalog-card-meta">
+                ${stars ? `<span style="color:${starColor}">${stars}★${s.diff_count ? ` · ${s.diff_count}` : ''}</span>` : ''}
+                ${s.status ? `<span class="dan-status">${escHtml(s.status)}</span>` : ''}
+            </div>
+        </div>
+    </div>`;
+}
+
 function renderDanList() {
     const listEl = document.getElementById('dan-list');
-    const moreEl = document.getElementById('dan-more');
     if (!listEl) return;
-
-    if (danItems.length === 0) {
-        listEl.innerHTML = `<p class="osu-empty">${t('dan_empty')}</p>`;
-        if (moreEl) moreEl.innerHTML = '';
-        return;
-    }
-
     const dm = DAN_MODE_BY_KEY[danMode] || DAN_MODES[0];
     const collectionSet = new Set(
         OSU_MODES.flatMap(m => (getOsuCollection()[m] || []).map(s => s.beatmapset_id))
     );
 
-    listEl.innerHTML = danItems.map(s => {
-        const coverUrl = `https://assets.ppy.sh/beatmaps/${s.id}/covers/card.jpg`;
-        const inCollection = collectionSet.has(s.id);
-        const stars = (s.star_min != null && s.star_max != null)
-            ? (s.star_min === s.star_max ? s.star_min.toFixed(2) : `${s.star_min.toFixed(2)}–${s.star_max.toFixed(2)}`)
-            : '';
-        const starColor = s.star_max != null && typeof starRatingColor === 'function' ? starRatingColor(s.star_max) : '';
-        const pinMark = s.pinned ? `<span class="dan-pin-star" title="${escHtml(t('dan_pinned'))}">${icon('star', { filled: true })}</span>` : '';
-        return `
-        <div class="osu-card dan-card${s.pinned ? ' dan-pinned' : ''}" style="${danModeVars(dm)}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${s.id}','_blank')">
-            <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
-            <div class="osu-card-overlay"></div>
-            <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addDanToCollection(${s.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
-            <button class="osu-copy-btn" onclick="copyBeatmapId(${s.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
-            <button class="osu-download-btn" onclick="downloadBeatmapset(${s.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
-            <button class="osu-play-btn" onclick="playOsuPreview(${s.id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
-            <div class="osu-card-info">
-                <div class="osu-card-title">${pinMark}${escHtml(s.title || '')}</div>
-                <div class="osu-card-artist">${escHtml(s.artist || '')}</div>
-                <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(s.creator || '') })}</div>
-                <div class="catalog-card-meta">
-                    ${stars ? `<span style="color:${starColor}">${stars}★${s.diff_count ? ` · ${s.diff_count}` : ''}</span>` : ''}
-                    ${s.status ? `<span class="dan-status">${escHtml(s.status)}</span>` : ''}
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-
-    if (moreEl) {
-        moreEl.innerHTML = danCursor
-            ? `<button class="osu-page-btn dan-more-btn" onclick="loadDan(false)">${t('dan_load_more')}</button>`
-            : '';
+    if (danGroups.length === 0 && danSearch.length === 0) {
+        listEl.innerHTML = `<p class="osu-empty">${t('dan_empty')}</p>`;
+        return;
     }
+
+    let html = danGroups.map(g => `
+        <div class="dan-group">
+            <div class="dan-group-head">${escHtml(g.group)} <span>${g.sets.length}</span></div>
+            <div class="osu-collection">${g.sets.map(s => danCardHtml(s, dm, collectionSet)).join('')}</div>
+            <button class="btn btn-sm dan-group-add" onclick="addDanGroupToCollection(${JSON.stringify(g.group).replace(/"/g, '&quot;')}, [${g.sets.map(s => s.id).join(',')}])">${t('dan_add_group_btn', { name: escHtml(g.group) })}</button>
+        </div>`).join('');
+
+    if (danSearch.length || danCursor) {
+        html += `
+        <details class="dan-more-box">
+            <summary>${t('dan_more_summary', { n: danSearch.length })}</summary>
+            <p class="dan-more-note">${t('dan_more_note')}</p>
+            <div class="osu-collection">${danSearch.map(s => danCardHtml(s, dm, collectionSet)).join('')}</div>
+            ${danCursor ? `<button class="osu-page-btn dan-more-btn" onclick="loadDan(true)">${t('dan_load_more')}</button>` : ''}
+        </details>`;
+    }
+
+    listEl.innerHTML = html;
 }
 
 async function addDanToCollection(setId, event) {
@@ -128,25 +194,19 @@ async function addDanToCollection(setId, event) {
     renderDanList();
 }
 
-async function addDanPageToCollection() {
-    if (danItems.length === 0) return;
+async function addDanGroupToCollection(groupName, ids) {
+    if (!ids || !ids.length) return;
     const dm = DAN_MODE_BY_KEY[danMode] || DAN_MODES[0];
-    const name = t('dan_collection_name', { mode: dm.label });
-    const ids = danItems.map(s => s.id).filter(Boolean);
-    if (!confirm(t('dan_add_page_confirm', { name, n: ids.length }))) return;
-    const btn = document.getElementById('dan-add-page-btn');
-    const lbl = btn && btn.querySelector('span');
+    const name = t('dan_collection_name', { mode: `${dm.label} · ${groupName}` });
+    if (!confirm(t('dan_add_group_confirm', { name: groupName, n: ids.length }))) return;
     try {
-        if (btn) btn.disabled = true;
         const named = [{ name, entries: ids.map(id => ({ setId: id })) }];
-        const report = await applyImportedCollections(named, (msg) => { if (lbl) lbl.textContent = msg; });
+        const report = await applyImportedCollections(named);
         alert(t('catalog_create_collection_done', { name, n: report.addedSets, cat: report.touchedCats }));
     } catch (e) {
-        console.error('Dan import failed:', e);
+        console.error('Dan group import failed:', e);
         alert(t('dan_load_fail'));
     } finally {
-        if (btn) btn.disabled = false;
-        if (lbl) lbl.textContent = t('dan_add_page_btn');
         renderDanList();
     }
 }
@@ -155,7 +215,6 @@ async function addDanPageToCollection() {
 function refreshDanLocalized() {
     if (!danLoaded) return;
     renderDanModePills();
+    renderDanMeta();
     renderDanList();
-    const lbl = document.querySelector('#dan-add-page-btn span');
-    if (lbl) lbl.textContent = t('dan_add_page_btn');
 }
