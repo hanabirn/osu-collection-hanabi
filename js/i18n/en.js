@@ -324,6 +324,7 @@ I18N.en = {
 
     nav_public_collections: 'Gallery', gallery_page_title: '✦ Player Collection Gallery ✦',
     publish_btn: 'Publish My Collection', publish_update_btn: 'Update My Published Collection', publish_login_required: 'Log in with osu! first to publish your collection',
+    publish_relogin_prompt: 'Your osu! login has expired (it needs re-verifying every 30 days). Log in again now?',
     publish_confirm: 'Publish your collection ({n} beatmaps) publicly? You can republish or unpublish anytime',
     publish_done: 'Your collection has been published!', publish_fail: 'Failed to publish, please try again later',
     unpublish_btn: 'Unpublish', unpublish_confirm: 'Remove your collection from the gallery?', unpublish_done: 'Unpublished',

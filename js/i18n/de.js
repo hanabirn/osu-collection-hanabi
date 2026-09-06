@@ -182,6 +182,7 @@ I18N.de = {
 
     nav_public_collections: 'Galerie', gallery_page_title: '✦ Spieler-Sammlungsgalerie ✦',
     publish_btn: 'Meine Sammlung veröffentlichen', publish_update_btn: 'Veröffentlichte Sammlung aktualisieren', publish_login_required: 'Melde dich zuerst mit osu! an, um deine Sammlung zu veröffentlichen',
+    publish_relogin_prompt: 'Deine osu!-Anmeldung ist abgelaufen (alle 30 Tage neu zu bestätigen). Jetzt erneut anmelden?',
     publish_confirm: 'Deine Sammlung ({n} Beatmaps) öffentlich veröffentlichen? Du kannst sie jederzeit erneut veröffentlichen oder entfernen',
     publish_done: 'Deine Sammlung wurde veröffentlicht!', publish_fail: 'Veröffentlichung fehlgeschlagen, bitte später erneut versuchen',
     unpublish_btn: 'Veröffentlichung aufheben', unpublish_confirm: 'Deine Sammlung aus der Galerie entfernen?', unpublish_done: 'Veröffentlichung aufgehoben',

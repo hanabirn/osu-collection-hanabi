@@ -244,6 +244,10 @@ async function publishMyCollection() {
         showShareToast(t('publish_login_required'));
         return;
     }
+    if (typeof isOsuAuthTokenExpired === 'function' && isOsuAuthTokenExpired()) {
+        osuReloginPrompt();
+        return;
+    }
 
     const col = getOsuCollection();
     const seen = new Set();
@@ -272,7 +276,7 @@ async function publishMyCollection() {
             body: JSON.stringify({ collection: col, categories: getOsuCategories(), categoryMembers: getOsuCategoryMembers(), country }),
         });
         if (res.status === 401) {
-            showShareToast(t('publish_login_required'));
+            osuReloginPrompt();
             return;
         }
         if (!res.ok) throw new Error('publish failed');
@@ -292,6 +296,10 @@ async function unpublishMyCollection() {
         showShareToast(t('publish_login_required'));
         return;
     }
+    if (typeof isOsuAuthTokenExpired === 'function' && isOsuAuthTokenExpired()) {
+        osuReloginPrompt();
+        return;
+    }
     if (!confirm(t('unpublish_confirm'))) return;
 
     try {
@@ -299,6 +307,7 @@ async function unpublishMyCollection() {
             method: 'POST',
             headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401) { osuReloginPrompt(); return; }
         if (!res.ok) throw new Error('unpublish failed');
         localStorage.removeItem('osu_last_published_at');
         updatePublishButtonLabel();

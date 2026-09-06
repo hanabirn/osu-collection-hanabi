@@ -182,6 +182,7 @@ I18N.fr = {
 
     nav_public_collections: 'Galerie', gallery_page_title: '✦ Galerie des collections des joueurs ✦',
     publish_btn: 'Publier ma collection', publish_update_btn: 'Mettre à jour ma collection publiée', publish_login_required: "Connectez-vous d'abord avec osu! pour publier votre collection",
+    publish_relogin_prompt: 'Ta connexion osu! a expiré (à revérifier tous les 30 jours). Se reconnecter maintenant ?',
     publish_confirm: 'Publier votre collection ({n} beatmaps) publiquement ? Vous pouvez la republier ou la retirer à tout moment',
     publish_done: 'Votre collection a été publiée !', publish_fail: 'Échec de la publication, veuillez réessayer plus tard',
     unpublish_btn: 'Retirer la publication', unpublish_confirm: 'Retirer votre collection de la galerie ?', unpublish_done: 'Publication retirée',

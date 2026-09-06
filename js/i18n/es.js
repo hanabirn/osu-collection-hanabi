@@ -182,6 +182,7 @@ I18N.es = {
 
     nav_public_collections: 'Galería', gallery_page_title: '✦ Galería de colecciones de jugadores ✦',
     publish_btn: 'Publicar mi colección', publish_update_btn: 'Actualizar mi colección publicada', publish_login_required: 'Inicia sesión con osu! primero para publicar tu colección',
+    publish_relogin_prompt: 'Tu sesión de osu! ha caducado (hay que reverificarla cada 30 días). ¿Iniciar sesión de nuevo?',
     publish_confirm: '¿Publicar tu colección ({n} beatmaps) públicamente? Puedes volver a publicarla o retirarla en cualquier momento',
     publish_done: '¡Tu colección ha sido publicada!', publish_fail: 'Error al publicar, inténtalo de nuevo más tarde',
     unpublish_btn: 'Retirar publicación', unpublish_confirm: '¿Retirar tu colección de la galería?', unpublish_done: 'Publicación retirada',

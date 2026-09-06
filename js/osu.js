@@ -5261,6 +5261,27 @@ function getOsuAuthToken() {
     return user && user.token ? user.token : null;
 }
 
+/* The signed auth token (netlify/functions/_auth-token.js) has a 30-day TTL,
+   but the display login state (osu_logged_in_user) never expires — so a
+   long-lived visitor still looks "logged in" while publish/unpublish 401.
+   Decode the exp client-side so those flows can offer a re-login instead of
+   a dead-end error. Malformed / missing -> treat as expired. */
+function isOsuAuthTokenExpired() {
+    const tok = getOsuAuthToken();
+    if (!tok || tok.indexOf('.') < 0) return true;
+    try {
+        const b64 = tok.slice(0, tok.indexOf('.')).replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(b64));
+        return !payload.exp || Date.now() > payload.exp;
+    } catch { return true; }
+}
+
+function osuReloginPrompt() {
+    if (confirm(t('publish_relogin_prompt'))) {
+        window.location.href = '/.netlify/functions/osu-login';
+    }
+}
+
 /* ===== PP calculator + strain graph =====
    Recomputes stars/PP for arbitrary mods/accuracy and renders a difficulty-
    over-time curve, via the osu-pp function (rosu-pp-js parsing the raw .osu

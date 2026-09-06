@@ -156,6 +156,7 @@ I18N.zh = {
 
     nav_public_collections: '收藏廣場', gallery_page_title: '✦ 玩家收藏廣場 ✦',
     publish_btn: '發布我的收藏', publish_update_btn: '更新我的發布收藏', publish_login_required: '請先登入 osu! 才能發布收藏',
+    publish_relogin_prompt: '你的 osu! 登入已過期（每 30 天要重新驗證一次），要現在重新登入嗎？',
     publish_confirm: '要公開發布你的收藏（{n} 個 Beatmap）嗎？之後可以隨時重新發布或取消發布',
     publish_done: '已發布你的收藏！', publish_fail: '發布失敗，請稍後再試',
     unpublish_btn: '取消發布', unpublish_confirm: '確定要將你的收藏從廣場移除嗎？', unpublish_done: '已取消發布',

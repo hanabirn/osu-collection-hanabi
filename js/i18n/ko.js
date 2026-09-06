@@ -182,6 +182,7 @@ I18N.ko = {
 
     nav_public_collections: '컬렉션 광장', gallery_page_title: '✦ 플레이어 컬렉션 광장 ✦',
     publish_btn: '내 컬렉션 발행하기', publish_update_btn: '발행한 컬렉션 업데이트', publish_login_required: '발행하려면 먼저 osu! 로그인이 필요합니다',
+    publish_relogin_prompt: 'osu! 로그인이 만료되었습니다(30일마다 재인증 필요). 지금 다시 로그인할까요?',
     publish_confirm: '내 컬렉션({n}개의 비트맵)을 공개로 발행할까요? 언제든 다시 발행하거나 취소할 수 있어요',
     publish_done: '컬렉션이 발행되었습니다!', publish_fail: '발행에 실패했습니다. 잠시 후 다시 시도해주세요',
     unpublish_btn: '발행 취소', unpublish_confirm: '광장에서 내 컬렉션을 제거할까요?', unpublish_done: '발행이 취소되었습니다',
