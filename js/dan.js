@@ -64,7 +64,7 @@ let danCursor = null;
 let danBusy = false;
 
 function ensureDanLoaded() {
-    if (!danLoaded) { danLoaded = true; renderDanModePills(); loadDan(); }
+    if (!danLoaded) { danLoaded = true; renderDanModePills(); renderDanMeta(); loadDan(); }
 }
 
 function renderDanModePills() {

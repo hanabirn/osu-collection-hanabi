@@ -134,7 +134,7 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=1800' },
+            headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=300', 'Netlify-CDN-Cache-Control': 'public, max-age=1800' },
             body: JSON.stringify(body),
         };
     } catch (err) {
