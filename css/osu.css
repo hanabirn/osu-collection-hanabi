@@ -1,14 +1,18 @@
 /* ===== osu! Collection =====
    Ported verbatim from the main site's css/osu.css. */
+/* Redesign: per-tab heading uses the new bold/tight section-title look
+   instead of the centred pink gradient-clip. The literal "✦ … ✦" text
+   still comes from i18n; the flourishes just read as faint punctuation now. */
 .osu-page-title {
-    margin: 0 0 16px;
-    text-align: center;
-    font-size: 1.15rem;
-    background: linear-gradient(90deg, var(--text-pink), var(--accent-light-purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: 2px;
+    margin: 4px 0 clamp(16px, 3vw, 28px);
+    text-align: left;
+    font-size: clamp(1.35rem, 3vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--text);
+    background: none;
+    -webkit-text-fill-color: currentColor;
 }
 
 /* ===== Collection page two-column layout =====
