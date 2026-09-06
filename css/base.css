@@ -50,9 +50,19 @@ a:hover { text-decoration: underline; }
 /* ===== Redesign section rhythm (docs/visual-redesign-spec.md §5.4) =====
    Every major section: a tiny tracked uppercase eyebrow (pink) above a
    bold, tight-tracked title. Eyebrow labels are English, identical in
-   every locale, so they're hard-coded in the markup — no i18n key. */
+   every locale, so they're hard-coded in the markup — no i18n key.
+
+   --font-display upgrades Latin headings to a geometric face IF the
+   visitor has one installed (Space Grotesk / a system display face);
+   otherwise it falls straight through to system-ui — no web-font download
+   (spec §4.2 方案 A). CJK glyphs in a title fall through to --font-cjk. */
+:root {
+    --font-display: "Space Grotesk", "Segoe UI Variable Display", "SF Pro Display",
+        "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
 .eyebrow {
-    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    font-family: var(--font-mono);
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -61,6 +71,7 @@ a:hover { text-decoration: underline; }
     margin: 0 0 6px;
 }
 .section-title {
+    font-family: var(--font-display);
     font-size: clamp(1.3rem, 3vw, 1.85rem);
     font-weight: 800;
     letter-spacing: -0.02em;
@@ -104,70 +115,11 @@ a:hover { text-decoration: underline; }
     background: var(--bg);
     border-bottom: 1px solid var(--border);
 }
-/* ===== Beatmap-cover hero banner, behind the header's own content =====
-   #bg-carousel (its slides populated by js/osu.js's renderOsuBgCarousel,
-   same personalized "whatever's in the visitor's collection" carousel as
-   before) sits absolutely behind everything else in the header; the "0
-   height until populated" collapse this used to do doesn't apply here —
-   .site-header's own min-height/content already gives it a home. Sits
-   below .site-header-overlay (the readability wash) and every actual
-   header control, which all need z-index > 1 to stay above both. */
-#bg-carousel {
-    /* Redesign: the whole-header cover carousel is gone (a framed hero on
-       the collection page will carry cover art later — spec §7.4). */
-    display: none;
-}
-/* Pure bottom-only dissolve into the page background — no dark scrim.
-   Fully transparent across the top ~80% so the cover art shows clean with
-   no haze (the old version washed the whole header in rgba(10,6,24,...),
-   which read as a grey/black murk over the art, badly so in light theme).
-   The only stop with colour is --bg-body-1 itself at the very bottom, so
-   the header's lower edge melts into the page instead of ending on a hard
-   seam — and it's the theme's own background colour (light: #fdf3fa),
-   never black or grey. */
-.site-header-overlay { display: none; }
-/* Every text/pill color in the header (.site-tagline, .site-nav-btn,
-   .lang-globe-btn, ...) reads var(--text-secondary)/var(--lang-pill-bg)/etc,
-   which assume the usual page-colored background and flip dark in light
-   theme — wrong once a cover photo is actually filling the header (added
-   by js/osu.js's renderOsuBgCarousel, only once there's an image to show).
-   Redefining those custom properties here — rather than overriding each
-   individual rule — forces every descendant that reads them back to the
-   light-on-dark values regardless of site theme, since the header's visual
-   background is dark either way once a cover is showing. */
-/* Redesign: no cover photo behind the header any more, so .has-cover-banner
-   must NOT force a light-on-dark palette (JS still adds the class when the
-   visitor has covers) — it would make header text invisible in light theme.
-   Left as a no-op rather than chasing the class out of js/osu.js. */
-.site-header.has-cover-banner { /* inert */ }
-/* ===== Title / tagline outline over the cover art =====
-   The pink gradient-clipped title and the small tagline both lose contrast
-   on a busy cover photo, and there's no dark scrim behind them anymore. So
-   when a cover is showing (.has-cover-banner) give both a crisp outline:
-   -webkit-text-stroke draws the keyline and `paint-order: stroke fill`
-   paints it *behind* the glyphs so they aren't thinned; a layered
-   text-shadow is the cross-browser floor (it renders here because the fill
-   is a solid colour now, not the transparent gradient-clip). All of
-   -webkit-text-stroke + paint-order + text-shadow work in Chrome, Edge and
-   Safari. titleShimmer only animates background-position, which is a no-op
-   without the clipped gradient, so only the glow pulse is kept here. */
-.site-header.has-cover-banner .site-title-block h1 {
-    /* Redesign: no cover behind the header, so the base treatment applies. */
-    -webkit-text-fill-color: currentColor;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-    filter: none;
-}
-.site-header.has-cover-banner .site-tagline {
-    color: var(--text-dim);
-    text-shadow: none;
-}
-[data-theme="light"] .site-header.has-cover-banner .site-title-block h1 {
-    /* Light cover: white letters, dark keyline (per the brief). */
-    -webkit-text-fill-color: #fff;
-    -webkit-text-stroke: 2px rgba(22, 9, 34, 0.82);
-    text-shadow: 0 2px 12px rgba(22, 9, 34, 0.5);
-}
+/* (The 2026 redesign removed the whole-header cover carousel #bg-carousel,
+   its .site-header-overlay wash, and the .has-cover-banner light-on-dark
+   overrides — no cover behind the header any more. See
+   docs/visual-redesign-spec.md.) */
+
 /* The title-note float animation never needs to escape the header box, but
    the language dropdown and notification bell menus do — temporarily lift
    the clip while either is open instead of removing overflow:hidden outright. */
@@ -245,41 +197,6 @@ a:hover { text-decoration: underline; }
 }
 .nav-menu-btn:active { transform: scale(0.92); }
 
-/* ===== Glass-chip treatment for corner controls over cover art =====
-   Problem: with a cover photo behind the header (.has-cover-banner) the
-   plain theme pills — rgba(255,255,255,0.08) fill on rgba(255,255,255,0.6)
-   icons — disappear on a light illustration.
-   Fix: every corner control (contact, notification, hamburger, language,
-   and the hidden PWA / update buttons — all tagged .header-ctl in the
-   markup) gets one shared frosted chip that doesn't depend on what's
-   behind it: a dark, semi-opaque fill so white icons on it always clear
-   WCAG AA whatever the art is, a hairline light keyline, a 10px blur, and
-   a lift shadow. The per-button rules keep owning size/shape only. */
-/* Redesign: flat header, no cover — corner controls just use the base
-   theme-adaptive .header-ctl style; the .has-cover-banner overrides that
-   forced a dark frosted chip + white icons (wrong in light theme) are
-   reduced to a hairline border + a hover pink wash, blur-free. */
-.site-header.has-cover-banner .header-ctl {
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    box-shadow: none;
-}
-.site-header.has-cover-banner .header-ctl:hover,
-.site-header.has-cover-banner .contact-info.open .header-ctl,
-.site-header.has-cover-banner .notif-bell.open .header-ctl,
-.site-header.has-cover-banner .lang-globe.open .header-ctl {
-    background: rgba(var(--pink-rgb), 0.16);
-    border-color: rgba(var(--pink-rgb), 0.5);
-    color: var(--text);
-    box-shadow: none;
-}
-.site-header.has-cover-banner .header-ctl:active { transform: scale(0.95); }
-.site-header.has-cover-banner .theme-switch { box-shadow: none; }
-.site-header.has-cover-banner .osu-login-btn-large,
-.site-header.has-cover-banner .osu-logged-in-pill-large { box-shadow: none; }
 .osu-login-btn-large:hover { transform: scale(1.04); }
 
 @media (max-width: 600px) {
@@ -406,6 +323,7 @@ a:hover { text-decoration: underline; }
 .site-title-block h1 {
     /* Redesign: compact header wordmark. Sized to sit level with the
        flanking music notes (≈ .tn-3). Near-white, tight, no gradient-clip. */
+    font-family: var(--font-display);
     font-size: clamp(1.55rem, 4vw, 2.05rem);
     line-height: 1.1;
     font-weight: 800;
