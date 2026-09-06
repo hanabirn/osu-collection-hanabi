@@ -47,7 +47,7 @@ const DAN_CURATED = {
     ],
 };
 
-const JUNK_RE = /\b(sample|beta|outdated|preview|demo|wip|droid|placeholder|template)\b|appeared!|deadly sins/i;
+const JUNK_RE = /\b(sample|beta|outdated|preview|demo|wip|placeholder|template)\b|appeared!|deadly sins|droid/i;
 
 function looksLikeDanPack(s) {
     const diffs = Array.isArray(s.beatmaps) ? s.beatmaps.length : 0;
