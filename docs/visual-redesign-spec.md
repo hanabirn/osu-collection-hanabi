@@ -333,7 +333,7 @@ body {
 
 ## 12. 決定（2026-09）
 
-- 字體：**方案 A（零 web font）**。第一版看完再議 B。
+- 字體：先上**方案 A（零 web font）**，第一版看完後 **2026-09-06 升級到方案 B**（自 host Space Grotesk Latin subset，見進度 §13）。
 - eyebrow 標籤：**英文大寫**（`COLLECTION` / `TOOLS` / `GALLERY` …）。
 - 淺色主題：**做到位**。
 - 開工：照 §10 落地順序，先做到第 3 步給第一版看。
@@ -355,8 +355,9 @@ body {
 
 **Follow-ups 已做（`87e44cd`）：**
 - eyebrow 鋪到 gallery/catalog/world-cup tab 標題；`.pp-calc-section-label`（stats 儀表板、pp-calc modal、gallery 留言）改成 eyebrow 樣式
-- `--font-display` stack（Space Grotesk / 系統 display 字 → system-ui）套在 wordmark / section title / `.osu-page-title` / hero 行 / modal 標題 / 數字 tile——**不下載 web font**，有裝才升級，CJK 走 `--font-cjk`
+- `--font-display` stack 套在 wordmark / section title / `.osu-page-title` / hero 行 / modal 標題 / 數字 tile（當時還是 opportunistic，無 web font；`0b37c68` 之後 Space Grotesk 變成真的自 host——見下）
 - 刪掉 inert 的 `.has-cover-banner` / `#bg-carousel` / `.site-header-overlay` 死 CSS
 
-**還沒做**：真正打包一支 subset 過的 Latin woff2（方案 B，保證每個訪客一致、約 20KB）——現在是 opportunistic stack。
-- 另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
+**方案 B 已做（`0b37c68`）**：`assets/fonts/space-grotesk-latin.woff2`——variable 300–700、只 subset 拉丁、22 KB。`@font-face` 在 `base.css`（`font-display:swap` + 拉丁 unicode-range，CJK 仍走系統 CJK sans）、`index.html` `<link rel=preload>`、SW v33 precache。OFL 1.1，授權全文放 `assets/fonts/OFL.txt`。CJK web font 仍不載——這是唯一的例外，22 KB subset + preload 遠低於當初砍掉的 ~1 MB Google Fonts `<link>`。
+
+**還沒做**：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
