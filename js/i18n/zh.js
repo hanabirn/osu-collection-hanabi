@@ -14,6 +14,7 @@ I18N.zh = {
     packs_no_reduction: '禁用簡化 Mod', packs_load_fail: '圖包載入失敗', packs_empty: '目前沒有圖包', packs_load_more: '載入更多',
     packs_add_all_label: '把整包加入收藏', packs_add_all_btn: '把整包加入收藏（缺 {n} 張）', packs_add_all_done: '整包都在收藏裡了',
     packs_add_all_confirm: '要把「{name}」整包 {n} 張圖建立成收藏分類嗎？',
+    packs_by: '作者 {n}',
     global_search_section_collection: '我的收藏', global_search_section_catalog: '曲庫分類', global_search_section_mappools: '世界盃圖池',
     global_search_empty: '找不到符合的結果',
     track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',

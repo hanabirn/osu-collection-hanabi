@@ -38,6 +38,7 @@ I18N.fr = {
     packs_no_reduction: 'Sans mods de réduction', packs_load_fail: 'Échec du chargement des packs', packs_empty: 'Aucun pack ici', packs_load_more: 'Charger plus',
     packs_add_all_label: 'Ajouter tout le pack à la collection', packs_add_all_btn: 'Ajouter tout le pack ({n} manquants)', packs_add_all_done: 'Pack déjà entièrement collecté',
     packs_add_all_confirm: 'Créer une catégorie de collection à partir des {n} sets de « {name} » ?',
+    packs_by: 'par {n}',
     global_search_section_collection: 'Ma collection', global_search_section_catalog: 'Catalogue', global_search_section_mappools: 'Mappools de la Coupe du monde',
     global_search_empty: 'Aucun résultat correspondant',
     track_player_btn: '+ Suivre', untrack_player_btn: 'Ne plus suivre',

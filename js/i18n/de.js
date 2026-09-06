@@ -38,6 +38,7 @@ I18N.de = {
     packs_no_reduction: 'Keine Schwierigkeitsreduktion', packs_load_fail: 'Packs konnten nicht geladen werden', packs_empty: 'Keine Packs vorhanden', packs_load_more: 'Mehr laden',
     packs_add_all_label: 'Ganzes Pack zur Sammlung hinzufügen', packs_add_all_btn: 'Ganzes Pack hinzufügen ({n} fehlen)', packs_add_all_done: 'Ganzes Pack bereits gesammelt',
     packs_add_all_confirm: 'Aus allen {n} Sets in „{name}“ eine Sammlungskategorie erstellen?',
+    packs_by: 'von {n}',
     global_search_section_collection: 'Meine Sammlung', global_search_section_catalog: 'Katalog', global_search_section_mappools: 'World-Cup-Mappools',
     global_search_empty: 'Keine passenden Ergebnisse',
     track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',

@@ -38,6 +38,7 @@ I18N.es = {
     packs_no_reduction: 'Sin mods de reducción', packs_load_fail: 'Error al cargar los packs', packs_empty: 'No hay packs aquí', packs_load_more: 'Cargar más',
     packs_add_all_label: 'Añadir todo el pack a la colección', packs_add_all_btn: 'Añadir todo el pack (faltan {n})', packs_add_all_done: 'Pack ya coleccionado por completo',
     packs_add_all_confirm: '¿Crear una categoría de colección con los {n} sets de «{name}»?',
+    packs_by: 'por {n}',
     global_search_section_collection: 'Mi colección', global_search_section_catalog: 'Catálogo', global_search_section_mappools: 'Mappools de la Copa del Mundo',
     global_search_empty: 'Sin resultados coincidentes',
     track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',

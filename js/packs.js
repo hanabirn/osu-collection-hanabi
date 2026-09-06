@@ -7,15 +7,19 @@
    addOsuBeatmap, downloadBeatmapset, playOsuPreview, copyBeatmapId,
    getOsuCollection, OSU_MODES, buildPaginationPageButtons (not needed —
    packs paginate by opaque cursor, not page number). */
+/* Each type gets its own accent (fed to CSS as --pk on the pill and card) +
+   a Lucide icon from icons.js, so the grid reads at a glance by category. */
 const PACK_TYPES = [
-    { key: 'standard',   i18n: 'packs_type_standard' },
-    { key: 'featured',   i18n: 'packs_type_featured' },
-    { key: 'theme',      i18n: 'packs_type_theme' },
-    { key: 'tournament', i18n: 'packs_type_tournament' },
-    { key: 'chart',      i18n: 'packs_type_spotlight' },
-    { key: 'loved',      i18n: 'packs_type_loved' },
-    { key: 'artist',     i18n: 'packs_type_artist' },
+    { key: 'standard',   i18n: 'packs_type_standard',    color: '#8b93a7', rgb: '139,147,167', icon: 'package' },
+    { key: 'featured',   i18n: 'packs_type_featured',    color: '#34d399', rgb: '52,211,153',  icon: 'star' },
+    { key: 'theme',      i18n: 'packs_type_theme',       color: '#a855f7', rgb: '168,85,247',  icon: 'tag' },
+    { key: 'tournament', i18n: 'packs_type_tournament',  color: '#22d3ee', rgb: '34,211,238',  icon: 'swords' },
+    { key: 'chart',      i18n: 'packs_type_spotlight',   color: '#fbbf24', rgb: '251,191,36',  icon: 'sparkles' },
+    { key: 'loved',      i18n: 'packs_type_loved',       color: '#f472b6', rgb: '244,114,182', icon: 'heart' },
+    { key: 'artist',     i18n: 'packs_type_artist',      color: '#c084fc', rgb: '192,132,252', icon: 'palette' },
 ];
+const PACK_TYPE_BY_KEY = Object.fromEntries(PACK_TYPES.map(t => [t.key, t]));
+function packTypeVars(pt) { return `--pk:${pt.color};--pk-rgb:${pt.rgb}`; }
 const PACK_RULESET_LABEL = { 0: 'osu!', 1: 'osu!taiko', 2: 'osu!catch', 3: 'osu!mania' };
 
 let packsLoaded = false;
@@ -34,7 +38,7 @@ function renderPackTypePills() {
     const row = document.getElementById('packs-type-row');
     if (!row) return;
     row.innerHTML = PACK_TYPES.map(pt =>
-        `<button class="lang-pill${pt.key === packsType ? ' active' : ''}" onclick="switchPacksType('${pt.key}')">${escHtml(t(pt.i18n))}</button>`
+        `<button class="packs-type-pill${pt.key === packsType ? ' active' : ''}" style="${packTypeVars(pt)}" onclick="switchPacksType('${pt.key}')">${icon(pt.icon)}<span>${escHtml(t(pt.i18n))}</span></button>`
     ).join('');
 }
 
@@ -83,25 +87,30 @@ function renderPacksList() {
         return;
     }
 
-    listEl.innerHTML = packsItems.map(p => {
+    const typeMeta = PACK_TYPE_BY_KEY[packsType] || PACK_TYPES[0];
+    listEl.innerHTML = packsItems.map((p, i) => {
         const ruleset = p.ruleset_id != null ? PACK_RULESET_LABEL[p.ruleset_id] : '';
-        const date = p.date ? new Date(p.date).getFullYear() : '';
-        const meta = [ruleset, date, p.no_diff_reduction ? t('packs_no_reduction') : '']
-            .filter(Boolean).join(' · ');
+        const year = p.date ? new Date(p.date).getFullYear() : '';
+        const foot = [ruleset, year].filter(Boolean).join(' · ');
+        const challenge = p.no_diff_reduction
+            ? `<span class="packs-card-challenge">${escHtml(t('packs_no_reduction'))}</span>` : '';
         return `
-        <button class="packs-row" onclick="openPackDetail('${escHtml(p.tag)}')">
-            <span class="packs-row-tag">${escHtml(p.tag)}</span>
-            <span class="packs-row-main">
-                <span class="packs-row-name">${escHtml(p.name || p.tag)}</span>
-                <span class="packs-row-meta">${escHtml(p.author || '')}${meta ? ' — ' + escHtml(meta) : ''}</span>
+        <button class="packs-card" style="${packTypeVars(typeMeta)};--i:${i}" onclick="openPackDetail('${escHtml(p.tag)}')">
+            <span class="packs-card-top">
+                <span class="packs-card-tag">${escHtml(p.tag)}</span>
+                <span class="packs-card-type">${icon(typeMeta.icon)}</span>
             </span>
-            <span class="packs-row-go" aria-hidden="true">›</span>
+            <span class="packs-card-name">${escHtml(p.name || p.tag)}</span>
+            <span class="packs-card-foot">
+                ${p.author ? `<span class="packs-card-author">${escHtml(t('packs_by', { n: p.author }))}</span>` : '<span></span>'}
+                <span class="packs-card-tail">${challenge}${foot ? `<span class="packs-card-meta">${escHtml(foot)}</span>` : ''}</span>
+            </span>
         </button>`;
     }).join('');
 
     if (moreEl) {
         moreEl.innerHTML = packsCursor
-            ? `<button class="osu-page-btn" onclick="loadPacks(false)">${t('packs_load_more')}</button>`
+            ? `<button class="osu-page-btn packs-more-btn" onclick="loadPacks(false)">${t('packs_load_more')}</button>`
             : '';
     }
 }

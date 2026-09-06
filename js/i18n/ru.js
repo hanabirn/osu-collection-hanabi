@@ -38,6 +38,7 @@ I18N.ru = {
     packs_no_reduction: 'Без модов на упрощение', packs_load_fail: 'Не удалось загрузить паки', packs_empty: 'Паков нет', packs_load_more: 'Загрузить ещё',
     packs_add_all_label: 'Добавить весь пак в коллекцию', packs_add_all_btn: 'Добавить весь пак (не хватает {n})', packs_add_all_done: 'Весь пак уже в коллекции',
     packs_add_all_confirm: 'Создать категорию коллекции из всех {n} наборов в «{name}»?',
+    packs_by: 'автор: {n}',
     global_search_section_collection: 'Моя коллекция', global_search_section_catalog: 'Каталог', global_search_section_mappools: 'Маппулы Чемпионата мира',
     global_search_empty: 'Ничего не найдено',
     track_player_btn: '+ Отслеживать', untrack_player_btn: 'Не отслеживать',
