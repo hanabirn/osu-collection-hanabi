@@ -225,10 +225,24 @@ a:hover { text-decoration: underline; }
         gap: 6px;
         margin-top: 8px;
     }
+    /* The icon trio + avatar pill + language pill together are wider than a
+       phone. Dissolve the row wrapper so all its controls — plus the
+       hamburger — wrap together as one centred cluster instead of the row
+       overflowing and the username pill being clipped mid-word. */
+    .header-corner-row {
+        display: contents;
+    }
     .header-corner-left {
         position: static;
         justify-content: center;
         margin-top: 8px;
+    }
+    /* Desktop nudges the switch off its left edge into the header margin;
+       centred on mobile that origin + margin just looks lopsided. */
+    .header-corner-left .theme-switch {
+        transform: scale(1.25);
+        transform-origin: center;
+        margin-right: 0;
     }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -809,18 +823,29 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
     z-index: 210;
 }
-/* On a phone the menu drops out of the header, which has overflow:hidden
-   (for the cover carousel) and clips it — so pin it to the viewport's
-   top-right corner as a scrollable panel instead. */
+/* On a phone these header menus are anchored to a control that's now near
+   the middle of a wrapped row — left as position:absolute they spill off
+   the screen edge (the notif + contact menus were doing exactly that).
+   Pin all three to the viewport's top-right as a scrollable panel, width
+   clamped so nothing overflows. */
 @media (max-width: 600px) {
-    .lang-globe-menu {
+    .lang-globe-menu,
+    .notif-bell-menu,
+    .contact-info-menu {
         position: fixed;
         top: 12px;
         right: 12px;
         left: auto;
+        max-width: calc(100vw - 24px);
         max-height: calc(100dvh - 24px);
+        overflow-y: auto;
         z-index: 220;
     }
+    /* Language list is just flag + name — keep it narrow so it doesn't
+       black out the whole header while open. */
+    .lang-globe-menu { width: min(220px, calc(100vw - 24px)); }
+    .notif-bell-menu,
+    .contact-info-menu { width: min(340px, calc(100vw - 24px)); }
 }
 .lang-globe.open .lang-globe-menu {
     opacity: 1;
@@ -1590,6 +1615,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .app-tooltip[data-placement="bottom"] { transform: translateY(-4px); }
 .app-tooltip.visible { opacity: 1; transform: translateY(0); }
+/* Touch devices have no hover — tapping a header control to open its menu
+   also focuses it, which fired this tooltip on top of the menu it just
+   opened. No pointer that can hover means no tooltip. */
+@media (hover: none) {
+    .app-tooltip { display: none !important; }
+}
 .app-tooltip-body { display: flex; flex-direction: column; min-width: 0; }
 .app-tooltip-desc {
     margin-top: 3px;
