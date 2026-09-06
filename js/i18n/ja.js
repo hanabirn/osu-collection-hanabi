@@ -65,7 +65,7 @@ I18N.ja = {
     howto_ctools: '<ol><li>まず osu! でログイン（右上）</li><li>アカウントからカテゴリを生成：お気に入り／よくプレイ／ベストスコア／最近／特定のマッパー</li><li>練習コレクション：スコアから「何を練習すべきか」を生成（突破分・目標プール・弱点…）。「pp を精密計算」にチェックでより正確（ただし遅い）</li><li>状態チェック：重複・削除済み・非 ranked・難易度数の変化を検出</li><li>生成したカテゴリはコレクションに統合され、「osu! Collection にエクスポート」でゲームに戻せます</li></ol>',
     howto_db: '<ol><li>先に譜面をカテゴリ分けする（右側のタブ、または「コレクション整理」で自動生成）</li><li>（任意）PC にある既存のコレクションを残したい場合：下の「既存の collection.db をマージ」で osu! フォルダのファイルを選ぶ</li><li>「collection.db をエクスポート」でダウンロード</li><li>osu! を閉じ、ダウンロードした collection.db を osu! インストールフォルダにコピー（古いものと置き換え）</li><li>osu! を起動すると、ゲーム内の Collections に表示されます</li></ol><p>.osdb は beatmap ID を持つため Collection Manager／osu!Stats で使え、譜面ごとのハッシュは不要です。</p>',
     check_played_btn_title: 'このページのプレイ済み譜面を表示\nosu! ログインが必要。各譜面のベストスコアを確認します',
-    osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
+    osu_all_songs: 'すべての曲', osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
     hero_pitch: 'osu! のコレクションをまとめて整理：ゲームから取り込み、スコアからカテゴリを自動生成、ゲームへそのまま書き出し。',
     hero_feat_import: 'ゲームの collection.db／.osdb を取り込み', hero_feat_generate: 'osu! アカウントからカテゴリを生成', hero_feat_share: 'コレクションを共有（プレビューカード付き）',
     hero_stat_collections: '🌐 公開コレクション {n} 件', hero_stat_likes: '❤ {n}',

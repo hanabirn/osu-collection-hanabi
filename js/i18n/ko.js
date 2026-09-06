@@ -65,7 +65,7 @@ I18N.ko = {
     howto_ctools: '<ol><li>먼저 osu!로 로그인 (오른쪽 위)</li><li>계정에서 카테고리 생성: 즐겨찾기 / 자주 플레이 / 베스트 기록 / 최근 / 특정 매퍼</li><li>연습 컬렉션: 기록으로 "무엇을 연습할지" 생성 (pp 돌파, 목표 풀, 약점…). "pp 정밀 계산"을 체크하면 더 정확하지만 느립니다</li><li>상태 점검: 중복, 삭제됨, 비 ranked, 난이도 수 변경 맵 찾기</li><li>생성한 카테고리는 컬렉션에 병합되며, "osu! Collection으로 내보내기"로 게임에 되돌릴 수 있습니다</li></ol>',
     howto_db: '<ol><li>먼저 맵을 카테고리로 분류 (오른쪽 탭, 또는 "컬렉션 정리"로 자동 생성)</li><li>(선택) PC에 있는 기존 컬렉션을 유지하려면: 아래 "기존 collection.db 병합"에서 osu! 폴더의 파일 선택</li><li>"collection.db 내보내기"로 다운로드</li><li>osu!를 닫고, 받은 collection.db를 osu! 설치 폴더에 복사 (기존 파일 교체)</li><li>osu!를 켜면 게임의 Collections 목록에 나타납니다</li></ol><p>.osdb는 beatmap ID를 담고 있어 Collection Manager / osu!Stats에서 쓰며 맵별 해시가 필요 없습니다.</p>',
     check_played_btn_title: '이 페이지에서 플레이한 맵 표시\nosu! 로그인 필요; 각 맵의 베스트 기록을 확인합니다',
-    osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
+    osu_all_songs: '전체 곡', osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
     hero_pitch: 'osu! 컬렉션을 한곳에서 정리: 게임에서 가져오고, 점수로 카테고리를 자동 생성하고, 게임으로 바로 내보내기.',
     hero_feat_import: '게임의 collection.db / .osdb 가져오기', hero_feat_generate: 'osu! 계정에서 카테고리 생성', hero_feat_share: '컬렉션 공유 (미리보기 카드 포함)',
     hero_stat_collections: '🌐 공개 컬렉션 {n}개', hero_stat_likes: '❤ {n}',

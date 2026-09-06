@@ -40,7 +40,7 @@ I18N.zh = {
     howto_summary: '怎麼用？',
     howto_db: '<ol><li>先把圖分好分類（右側分類頁籤，或用「收藏整理」自動生成）</li><li>（選配）想保留電腦上現有的收藏：在下面「合併現有 collection.db」選你 osu! 資料夾裡的檔案</li><li>按「匯出 collection.db」下載</li><li>關掉 osu!，把下載的 collection.db 複製進 osu! 安裝資料夾（取代舊的那個）</li><li>開 osu!，收藏就在遊戲的 Collections 裡</li></ol><p>.osdb 帶 beatmap ID，給 Collection Manager／osu!Stats 用，不需要每張圖的雜湊。</p>',
     howto_ctools: '<ol><li>先用 osu! 登入（右上角）</li><li>從帳號生成分類：最愛／常玩／最佳成績／最近／某位 mapper</li><li>練習收藏：依你的成績生成「該練什麼」的收藏（突破分、目標圖池、弱項…），勾「精算 pp」更準但較慢</li><li>健康檢查：掃出重複、已被刪、非 ranked、難度數有變的圖</li><li>產生的分類都會併進你的收藏，之後可用「匯出成 collection.db」帶回遊戲</li></ol>',
-    osu_fav: '最愛', osu_empty_collection: '還沒有收藏的 Beatmap', osu_empty_hint: '在上方輸入 Beatmap ID 開始收藏！', osu_empty_banner_hint: '收藏圖譜後，頁首橫幅與整頁背景會換成你收藏的封面圖 🎆',
+    osu_all_songs: '全部歌曲', osu_fav: '最愛', osu_empty_collection: '還沒有收藏的 Beatmap', osu_empty_hint: '在上方輸入 Beatmap ID 開始收藏！', osu_empty_banner_hint: '收藏圖譜後，頁首橫幅與整頁背景會換成你收藏的封面圖 🎆',
     hero_pitch: '一站整理你的 osu! 收藏：從遊戲匯入、依成績自動生成分類、一鍵匯出回遊戲。',
     hero_feat_import: '匯入遊戲的 collection.db／.osdb', hero_feat_generate: '從 osu! 帳號生成分類', hero_feat_share: '分享收藏（含預覽卡片）',
     hero_stat_collections: '🌐 {n} 個公開收藏', hero_stat_likes: '❤ {n}',

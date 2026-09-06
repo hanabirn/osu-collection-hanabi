@@ -714,7 +714,7 @@ function removeSmartCategory(catId) {
 /* Banner shown at the top of a smart category's grid: what facet drives it,
    when it last synced, and a one-click refresh. */
 function smartCategoryBannerHtml() {
-    if (OSU_MODES.includes(osuCurrentTab) || osuCurrentTab === 'favorites') return '';
+    if (OSU_MODES.includes(osuCurrentTab) || osuCurrentTab === 'favorites' || osuCurrentTab === 'all') return '';
     const meta = getSmartCategory(osuCurrentTab);
     if (!meta || !meta.facet) return '';
     const when = meta.lastSyncAt ? new Date(meta.lastSyncAt).toLocaleDateString() : '—';
@@ -3588,7 +3588,14 @@ function renderOsuCollection() {
     const col = getOsuCollection();
     let sets;
 
-    if (!OSU_MODES.includes(osuCurrentTab)) {
+    if (osuCurrentTab === 'all') {
+        // Every set across all four mode arrays, deduped — one flat list so
+        // you don't have to click through Standard/Taiko/Catch/Mania to see
+        // the whole collection. Difficulties aren't filtered by mode here.
+        const seen = new Set();
+        sets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __mode: m })))
+            .filter(s => !seen.has(s.beatmapset_id) && seen.add(s.beatmapset_id));
+    } else if (!OSU_MODES.includes(osuCurrentTab)) {
         const memberIds = osuCurrentTab === 'favorites' ? getOsuFavorites() : getCategoryMemberIds(osuCurrentTab);
         const allSets = OSU_MODES.flatMap(m => col[m].map(s => ({ ...s, __mode: m })));
         const seen = new Set();
@@ -3662,7 +3669,7 @@ function renderOsuCollection() {
             ? t('osu_search_empty')
             : osuCurrentTab === 'favorites'
                 ? `${t('osu_empty_fav')}<br><span>${t('osu_empty_fav_hint')}</span>`
-                : !OSU_MODES.includes(osuCurrentTab)
+                : (osuCurrentTab !== 'all' && !OSU_MODES.includes(osuCurrentTab))
                     ? t('osu_empty_category')
                     : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span><br><span class="osu-empty-sub">${t('osu_empty_banner_hint')}</span>`;
         container.innerHTML = smartCategoryBannerHtml() + `<div class="osu-empty">${msg}</div>`;
