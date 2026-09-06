@@ -19,11 +19,20 @@ const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'appl
 // scene adds/replaces series over time; search covers the rest. }
 const DAN_MODES = {
     osu:      { m: 0, q: 'dan course',    pins: [2316877, 2315888, 2315697, 2319170] },
-    taiko:    { m: 1, q: 'dan course',    pins: [] },
+    taiko:    { m: 1, q: 'dan-i dojo',    pins: [1098825, 912120, 703200, 695759] },
     catch:    { m: 2, q: 'dan course',    pins: [2170847, 2170864] },
     mania4k:  { m: 3, q: '4k dan course', pins: [2288888, 2243057, 1550709, 373141] },
     mania7k:  { m: 3, q: '7k dan course', pins: [450069, 451788, 930218, 1061136, 450649, 1220647] },
 };
+
+/* osu!'s search matches "dan"/"course" loosely (an artist named "Dan
+   Salvato", a title with "course" in it), so keep only search hits whose
+   title/artist actually reads like a dan course. Pins bypass this. */
+const DAN_RE = /\bdan[\s~._-]*(course|phase|dojo|i\b)|段位|dan-?i\s*dojo/i;
+function looksLikeDan(s) {
+    const txt = `${s.title_unicode || ''} ${s.title || ''} ${s.artist_unicode || ''} ${s.artist || ''}`;
+    return DAN_RE.test(txt);
+}
 
 function leanSet(s, pinned) {
     const diffs = Array.isArray(s.beatmaps) ? s.beatmaps : [];
@@ -75,7 +84,7 @@ exports.handler = async (event) => {
             if (p && p.id && !seen.has(p.id)) { seen.add(p.id); out.push(leanSet(p, true)); }
         }
         for (const s of (search.beatmapsets || [])) {
-            if (s && s.id && !seen.has(s.id)) { seen.add(s.id); out.push(leanSet(s, false)); }
+            if (s && s.id && !seen.has(s.id) && looksLikeDan(s)) { seen.add(s.id); out.push(leanSet(s, false)); }
         }
 
         return {
