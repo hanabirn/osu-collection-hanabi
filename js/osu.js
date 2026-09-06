@@ -3515,8 +3515,56 @@ function initCollectionHero() {
 }
 
 /* Redesign: framed cover-art hero at the top of the collection page
-   (docs/visual-redesign-spec.md §7.4). One deterministic cover per day
-   from the visitor's own collection; empty collection -> flat card. */
+   (docs/visual-redesign-spec.md §7.4). Two stacked layers cross-fade
+   through the visitor's own covers — but only on a real pointer with
+   motion allowed, and only while on-screen + tab visible (the old
+   full-page carousel was killed for heating phones; this one is a small
+   contained element, opacity-only, and pauses aggressively). Touch /
+   reduced-motion / single cover -> one static cover. */
+const heroCover = { urls: [], idx: 0, timer: null, io: null };
+
+function heroCoverAllowed() {
+    return heroCover.urls.length > 1
+        && window.matchMedia('(hover: hover)').matches
+        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function stopHeroCover() {
+    clearTimeout(heroCover.timer);
+    heroCover.timer = null;
+    if (heroCover.io) { heroCover.io.disconnect(); heroCover.io = null; }
+}
+
+function heroCoverTick(layers) {
+    heroCover.timer = setTimeout(() => {
+        const curI = layers[0].classList.contains('active') ? 0 : 1;
+        const nxtI = curI ? 0 : 1;
+        heroCover.idx = (heroCover.idx + 1) % heroCover.urls.length;
+        const url = heroCover.urls[heroCover.idx];
+        const pre = new Image();
+        pre.onload = () => {
+            layers[nxtI].style.backgroundImage = `url("${url}")`;
+            layers[nxtI].classList.add('active');
+            layers[curI].classList.remove('active');
+        };
+        pre.src = url;
+        heroCoverTick(layers);
+    }, 7000);
+}
+
+function armHeroCover(hero, layers) {
+    if (heroCover.io) return;   // already armed
+    heroCover.io = new IntersectionObserver(es => {
+        const onScreen = es[0].isIntersecting && !document.hidden;
+        if (onScreen && !heroCover.timer) heroCoverTick(layers);
+        else if (!onScreen) { clearTimeout(heroCover.timer); heroCover.timer = null; }
+    }, { threshold: 0.1 });
+    heroCover.io.observe(hero);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { clearTimeout(heroCover.timer); heroCover.timer = null; }
+    });
+}
+
 function updateCollectionHeroV2() {
     const hero = document.getElementById('collection-hero-v2');
     if (!hero) return;
@@ -3526,14 +3574,30 @@ function updateCollectionHeroV2() {
     const cats = typeof getOsuCategories === 'function' ? getOsuCategories().length : 0;
     const statEl = document.getElementById('collection-hero-v2-stat');
     if (statEl) statEl.textContent = sets.length ? t('hero_v2_stat', { n: sets.length.toLocaleString(), c: cats }) : '';
-    if (sets.length) {
-        const pick = sets[Math.floor(Date.now() / 864e5) % sets.length];
-        hero.style.setProperty('--hero-cover', `url("https://assets.ppy.sh/beatmaps/${pick.beatmapset_id}/covers/cover@2x.jpg")`);
-        hero.classList.add('has-cover');
-    } else {
-        hero.style.removeProperty('--hero-cover');
+
+    const layers = hero.querySelectorAll('.hero-cover');
+    if (!sets.length) {
         hero.classList.remove('has-cover');
+        stopHeroCover();
+        heroCover.urls = [];
+        layers.forEach(l => { l.style.backgroundImage = ''; l.classList.remove('active'); });
+        return;
     }
+    hero.classList.add('has-cover');
+
+    if (heroCover.urls.length !== sets.length) {
+        const ids = sets.map(s => s.beatmapset_id);
+        for (let i = ids.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [ids[i], ids[j]] = [ids[j], ids[i]]; }
+        heroCover.urls = ids.map(id => `https://assets.ppy.sh/beatmaps/${id}/covers/cover@2x.jpg`);
+        heroCover.idx = 0;
+        stopHeroCover();
+        if (layers[0]) {
+            layers[0].style.backgroundImage = `url("${heroCover.urls[0]}")`;
+            layers[0].classList.add('active');
+            if (layers[1]) layers[1].classList.remove('active');
+        }
+    }
+    if (heroCoverAllowed()) armHeroCover(hero, layers);
 }
 
 function renderOsuCollection() {

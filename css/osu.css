@@ -176,19 +176,33 @@
     --pink: #ff7ac2;
     min-height: 220px;
 }
-.collection-hero-v2.has-cover::before {
-    content: "";
+/* Two stacked cover layers that cross-fade (js/osu.js updateCollectionHeroV2).
+   opacity-only transition = compositor-only; JS pauses it off-screen. */
+.collection-hero-v2 .hero-cover {
     position: absolute;
     inset: 0;
-    background: var(--hero-cover) center 30% / cover;
+    z-index: 0;
+    background-position: center 30%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 900ms var(--ease);
 }
+.collection-hero-v2 .hero-cover.active { opacity: 1; }
+.collection-hero-v2:not(.has-cover) .hero-cover { display: none; }
 .collection-hero-v2.has-cover::after {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 1;
     background: linear-gradient(180deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.80) 70%, var(--bg) 100%);
 }
-.collection-hero-v2 > * { position: relative; z-index: 1; margin: 0; }
+.collection-hero-v2 > .eyebrow,
+.collection-hero-v2 > .collection-hero-v2-line,
+.collection-hero-v2 > .collection-hero-v2-stat { position: relative; z-index: 2; margin: 0; }
+@media (prefers-reduced-motion: reduce) {
+    .collection-hero-v2 .hero-cover { transition: none; }
+}
 .collection-hero-v2-line {
     font-size: clamp(1.1rem, 2.8vw, 1.6rem);
     font-weight: 800;
