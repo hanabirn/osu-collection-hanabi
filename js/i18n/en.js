@@ -213,6 +213,7 @@ I18N.en = {
     hero_feat_import: "Import the game's collection.db / .osdb", hero_feat_generate: 'Build categories from your osu! account', hero_feat_share: 'Share collections (with preview cards)',
     hero_stat_collections: '🌐 {n} public collections', hero_stat_likes: '❤ {n}',
     hero_stat_farm: '🎵 {n}+ maps in the farm database',
+    hero_v2_stat: '{n} sets · {c} categories',
     hero_login_cta: 'Log in with osu! to pull in your favourites',
     digest_title: 'Since you were away', digest_pp: 'PP {d} (since {from})', digest_notifs: '{n} new updates',
     digest_practice: '{name} {d}pp · {hits}/{total} in your top 100',

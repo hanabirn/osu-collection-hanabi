@@ -3514,11 +3514,34 @@ function initCollectionHero() {
     });
 }
 
+/* Redesign: framed cover-art hero at the top of the collection page
+   (docs/visual-redesign-spec.md §7.4). One deterministic cover per day
+   from the visitor's own collection; empty collection -> flat card. */
+function updateCollectionHeroV2() {
+    const hero = document.getElementById('collection-hero-v2');
+    if (!hero) return;
+    const col = getOsuCollection();
+    const seen = new Set();
+    const sets = OSU_MODES.flatMap(m => col[m]).filter(s => !seen.has(s.beatmapset_id) && seen.add(s.beatmapset_id));
+    const cats = typeof getOsuCategories === 'function' ? getOsuCategories().length : 0;
+    const statEl = document.getElementById('collection-hero-v2-stat');
+    if (statEl) statEl.textContent = sets.length ? t('hero_v2_stat', { n: sets.length.toLocaleString(), c: cats }) : '';
+    if (sets.length) {
+        const pick = sets[Math.floor(Date.now() / 864e5) % sets.length];
+        hero.style.setProperty('--hero-cover', `url("https://assets.ppy.sh/beatmaps/${pick.beatmapset_id}/covers/cover@2x.jpg")`);
+        hero.classList.add('has-cover');
+    } else {
+        hero.style.removeProperty('--hero-cover');
+        hero.classList.remove('has-cover');
+    }
+}
+
 function renderOsuCollection() {
     const container = document.getElementById('osu-collection');
     const paginationEl = document.getElementById('osu-pagination');
     if (!container || !paginationEl) return;
     updateCollectionHeroVisibility();
+    updateCollectionHeroV2();
     renderOsuStats();
     renderFeaturedBeatmap();
     renderOsuCategoryTabsRow();

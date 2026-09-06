@@ -45,6 +45,7 @@ I18N.zh = {
     hero_feat_import: '匯入遊戲的 collection.db／.osdb', hero_feat_generate: '從 osu! 帳號生成分類', hero_feat_share: '分享收藏（含預覽卡片）',
     hero_stat_collections: '🌐 {n} 個公開收藏', hero_stat_likes: '❤ {n}',
     hero_stat_farm: '🎵 farm 資料庫 {n}+ 張圖',
+    hero_v2_stat: '{n} 張圖 · {c} 個分類',
     hero_login_cta: '用 osu! 登入，自動帶入你的最愛',
     digest_title: '為你更新', digest_pp: 'PP {d}（自 {from}）', digest_notifs: '{n} 則新消息',
     digest_practice: '{name} {d}pp · {hits}/{total} 進 top 100',

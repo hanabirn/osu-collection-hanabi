@@ -70,6 +70,7 @@ I18N.ru = {
     hero_feat_import: 'Импорт игрового collection.db / .osdb', hero_feat_generate: 'Категории из вашего аккаунта osu!', hero_feat_share: 'Делитесь коллекциями (с карточками-превью)',
     hero_stat_collections: '🌐 публичных коллекций: {n}', hero_stat_likes: '❤ {n}',
     hero_stat_farm: '🎵 {n}+ карт в базе farm',
+    hero_v2_stat: '{n} наборов · {c} категорий',
     hero_login_cta: 'Войдите через osu!, чтобы подтянуть избранное',
     digest_title: 'Пока вас не было',
     digest_pp: 'PP {d} (с {from})',

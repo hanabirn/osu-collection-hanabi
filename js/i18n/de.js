@@ -70,6 +70,7 @@ I18N.de = {
     hero_feat_import: 'collection.db / .osdb aus dem Spiel importieren', hero_feat_generate: 'Kategorien aus deinem osu!-Konto erzeugen', hero_feat_share: 'Sammlungen teilen (mit Vorschaukarten)',
     hero_stat_collections: '🌐 {n} öffentliche Sammlungen', hero_stat_likes: '❤ {n}',
     hero_stat_farm: '🎵 {n}+ Maps in der Farm-Datenbank',
+    hero_v2_stat: '{n} Sets · {c} Kategorien',
     hero_login_cta: 'Mit osu! anmelden und Favoriten übernehmen',
     digest_title: 'Seit deinem letzten Besuch',
     digest_pp: 'PP {d} (seit {from})',
