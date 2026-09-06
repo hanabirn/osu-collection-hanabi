@@ -347,6 +347,9 @@ body {
 - [x] 步驟 5 — 巡視殘留：osu.css ~11 處 `rgba(168,85,247,*)` 硬粉→pink var、`.pp-calc-title` 去漸層裁切；base.css FAB 去玻璃、mobile blur media query 歸零（`87521ab`）
 - [x] 步驟 6 — 淺色 parity：`.has-cover-banner` 強制白字 + 深色玻璃 chip 覆寫中性化、nav drawer 硬白 → token、`.btn` 淺色白字、modal 淺色淺陰影（`af738c2`）
 - [x] 步驟 7 — 刪掉整個 ambient 背景層：`css/particles.css` + `js/particles.js`（星點 canvas、3 顆光暈、脈動 hit-circle）、`.bg-layer`/`#bg-carousel`/`.site-header-overlay` markup、dead `initOsuBgCarousel` 系列（含一個永動 setInterval）；SW `CACHE_VERSION` v32。保留：`body::before` 淡粉 vignette + logo 環光暈（`6734b2a`）
-- [x] 步驟 8 — `.site-header`/`.site-main`/`.site-page` 重寫乾淨（去掉全部過渡 `!important` + 舊 breakpoint 覆寫 + `.site-page::before` 彗星邊框）；空收藏時 `#collection-hero-v2` 設 `[hidden]`，不再與 pitch box 疊兩塊（`129a26d`）。QA 進行中。
-- 已知殘留（低優先，之後清）：`.has-cover-banner` / `#bg-carousel` / `.site-header-overlay` 的 CSS 規則還在但已無對應 DOM（inert dead CSS）。
+- [x] 步驟 8 — 清 `!important` + 舊 breakpoint 覆寫 + 彗星邊框（`129a26d`）；空收藏 hero 不再疊兩塊；QA `3a34b3d`：`.osu-lang-badge` 最後一處 grid blur 拿掉。
+  QA 結果：平塗近黑、框住 hero + cross-fade、扁平粉按鈕、實色無 blur modal、6 個抽查 tab 都正常、**淺色主題正常翻**（body #faf8fc、卡片淺 surface、按鈕深粉+白字）。
+- 已知殘留（低優先）：`.has-cover-banner` / `#bg-carousel` / `.site-header-overlay` CSS 規則還在但已無 DOM（inert）。行動版 Lighthouse 數字沒單獨跑（少了粒子層 + 3 層 backdrop-filter + 整頁封面，理論上只會更好）。
+
+**視覺改版步驟 1–8 全部完成。** 之後若要：加一支拉丁 display 字（方案 B）、eyebrow 鋪到 gallery/stats 各區塊、清 inert dead CSS。
 - 另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
