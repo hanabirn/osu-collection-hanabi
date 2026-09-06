@@ -255,6 +255,7 @@ I18N.zh = {
     stats_dashboard_empty: '收藏是空的，還沒有統計資料', stats_dashboard_stars_title: '星數分布',
     stats_dashboard_modes_title: '模式佔比', stats_dashboard_mappers_title: 'Mapper 頻率 Top 10',
     stats_dashboard_growth_title: '收藏成長', stats_dashboard_growth_baseline: '已收藏',
+    stats_dashboard_genre_title: '曲風分布', stats_dashboard_bpm_title: 'BPM 分布', stats_dashboard_length_title: '長度分布',
     achievements_title: '成就',
     ach_starter_name: '初來乍到', ach_starter_desc: '收藏第一張圖',
     ach_collector_200_name: '收藏達人', ach_collector_200_desc: '收藏滿 200 張圖',

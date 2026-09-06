@@ -281,6 +281,7 @@ I18N.ja = {
     stats_dashboard_empty: 'コレクションが空です。まだ統計データがありません', stats_dashboard_stars_title: '☆数の分布',
     stats_dashboard_modes_title: 'モード別割合', stats_dashboard_mappers_title: 'マッパー頻度 Top 10',
     stats_dashboard_growth_title: 'コレクションの成長', stats_dashboard_growth_baseline: '既存分',
+    stats_dashboard_genre_title: 'ジャンル内訳', stats_dashboard_bpm_title: 'BPM 分布', stats_dashboard_length_title: '長さの分布',
     achievements_title: '実績',
     ach_starter_name: 'はじめの一歩', ach_starter_desc: '最初のビートマップを追加',
     ach_collector_200_name: 'コレクター', ach_collector_200_desc: '200枚のビートマップを収集',

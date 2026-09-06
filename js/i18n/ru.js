@@ -281,6 +281,7 @@ I18N.ru = {
     stats_dashboard_empty: 'Ваша коллекция пуста — пока нечего показать', stats_dashboard_stars_title: 'Распределение по звёздам',
     stats_dashboard_modes_title: 'Распределение по режимам', stats_dashboard_mappers_title: 'Топ-10 мапперов',
     stats_dashboard_growth_title: 'Рост коллекции', stats_dashboard_growth_baseline: 'Уже было',
+    stats_dashboard_genre_title: 'Жанры', stats_dashboard_bpm_title: 'Распределение BPM', stats_dashboard_length_title: 'Распределение длительности',
     achievements_title: 'Достижения',
     ach_starter_name: 'Первые шаги', ach_starter_desc: 'Добавьте первую карту',
     ach_collector_200_name: 'Коллекционер', ach_collector_200_desc: 'Соберите 200 карт',

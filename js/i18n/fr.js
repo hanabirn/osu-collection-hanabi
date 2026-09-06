@@ -281,6 +281,7 @@ I18N.fr = {
     stats_dashboard_empty: "Votre collection est vide — rien à afficher pour l'instant", stats_dashboard_stars_title: 'Répartition par étoiles',
     stats_dashboard_modes_title: 'Répartition par mode', stats_dashboard_mappers_title: 'Top 10 des mappers',
     stats_dashboard_growth_title: 'Croissance de la collection', stats_dashboard_growth_baseline: 'Déjà présent',
+    stats_dashboard_genre_title: 'Genres', stats_dashboard_bpm_title: 'Répartition BPM', stats_dashboard_length_title: 'Répartition des durées',
     achievements_title: 'Succès',
     ach_starter_name: 'Premiers pas', ach_starter_desc: 'Ajoute ta première beatmap',
     ach_collector_200_name: 'Collectionneur', ach_collector_200_desc: 'Atteins 200 beatmaps',

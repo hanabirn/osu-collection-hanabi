@@ -281,6 +281,7 @@ I18N.es = {
     stats_dashboard_empty: 'Tu colección está vacía — nada que mostrar todavía', stats_dashboard_stars_title: 'Distribución de estrellas',
     stats_dashboard_modes_title: 'Distribución por modo', stats_dashboard_mappers_title: 'Top 10 de mappers',
     stats_dashboard_growth_title: 'Crecimiento de la colección', stats_dashboard_growth_baseline: 'Ya tenías',
+    stats_dashboard_genre_title: 'Géneros', stats_dashboard_bpm_title: 'Distribución de BPM', stats_dashboard_length_title: 'Distribución de duración',
     achievements_title: 'Logros',
     ach_starter_name: 'Primeros pasos', ach_starter_desc: 'Añade tu primer beatmap',
     ach_collector_200_name: 'Coleccionista', ach_collector_200_desc: 'Alcanza 200 beatmaps',

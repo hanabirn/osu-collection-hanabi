@@ -281,6 +281,7 @@ I18N.ko = {
     stats_dashboard_empty: '컬렉션이 비어 있어 통계가 없습니다', stats_dashboard_stars_title: '별점 분포',
     stats_dashboard_modes_title: '모드 비율', stats_dashboard_mappers_title: '매퍼 빈도 Top 10',
     stats_dashboard_growth_title: '컬렉션 성장', stats_dashboard_growth_baseline: '기존 보유',
+    stats_dashboard_genre_title: '장르 분포', stats_dashboard_bpm_title: 'BPM 분포', stats_dashboard_length_title: '길이 분포',
     achievements_title: '업적',
     ach_starter_name: '첫 걸음', ach_starter_desc: '첫 비트맵 추가하기',
     ach_collector_200_name: '컬렉터', ach_collector_200_desc: '비트맵 200개 모으기',

@@ -423,6 +423,7 @@ I18N.en = {
     stats_dashboard_empty: 'Your collection is empty — nothing to show yet', stats_dashboard_stars_title: 'Star rating distribution',
     stats_dashboard_modes_title: 'Mode split', stats_dashboard_mappers_title: 'Top 10 mappers',
     stats_dashboard_growth_title: 'Collection growth', stats_dashboard_growth_baseline: 'Already had',
+    stats_dashboard_genre_title: 'Genre mix', stats_dashboard_bpm_title: 'BPM spread', stats_dashboard_length_title: 'Length spread',
     achievements_title: 'Achievements',
     ach_starter_name: 'Getting Started', ach_starter_desc: 'Add your first beatmap',
     ach_collector_200_name: 'Collector', ach_collector_200_desc: 'Reach 200 beatmaps',

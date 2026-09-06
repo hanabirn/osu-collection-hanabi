@@ -3138,6 +3138,18 @@ function openStatsDashboardModal() {
                 <div class="trend-chart-wrap"><canvas id="stats-chart-langs"></canvas></div>
             </div>
             <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_genre_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-genre"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_bpm_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-bpm"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
+                <div class="pp-calc-section-label">${t('stats_dashboard_length_title')}</div>
+                <div class="trend-chart-wrap"><canvas id="stats-chart-length"></canvas></div>
+            </div>
+            <div class="stats-dashboard-card">
                 <div class="pp-calc-section-label">${t('stats_dashboard_growth_title')}</div>
                 <div class="trend-chart-wrap"><canvas id="stats-chart-growth"></canvas></div>
             </div>
@@ -3227,6 +3239,74 @@ async function renderStatsDashboardCharts(col, allSets) {
             scales: {
                 x: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 10 }, precision: 0 } },
                 y: { grid: { display: false }, ticks: { color: colors.label, font: { size: 10 } } },
+            },
+        },
+    }));
+
+    // Genre mix — set-level v2 genre id, missing -> "unspecified" bucket.
+    const genreTally = new Map();
+    allSets.forEach(s => {
+        const key = s.genre && s.genre.id ? s.genre.id : 'unknown';
+        genreTally.set(key, (genreTally.get(key) || 0) + 1);
+    });
+    const genreEntries = [...genreTally.entries()].sort((a, b) => b[1] - a[1]);
+    const genrePalette = ['#a855f7', '#22d3ee', '#f472b6', '#34d399', '#f59e0b', '#60a5fa', '#f87171', '#c084fc', '#4ade80', '#fbbf24', '#e879f9', '#2dd4bf'];
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-genre'), {
+        type: 'doughnut',
+        data: {
+            labels: genreEntries.map(([k]) => k === 'unknown'
+                ? t('genre_unspecified')
+                : (OSU_GENRES[k] ? t(OSU_GENRES[k]) : String(k))),
+            datasets: [{ data: genreEntries.map(([, n]) => n), backgroundColor: genreEntries.map((_, i) => genrePalette[i % genrePalette.length]) }],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: colors.text, font: { size: 10 }, boxWidth: 10 } } },
+        },
+    }));
+
+    // BPM spread — one tally per difficulty (a set can span multiple BPMs).
+    const bpmEdges = [120, 150, 170, 190, 210, 240];
+    const bpmLabels = ['<120', '120-150', '150-170', '170-190', '190-210', '210-240', '240+'];
+    const bpmBuckets = new Array(bpmLabels.length).fill(0);
+    allSets.forEach(s => s.beatmaps.forEach(b => {
+        const v = b.bpm || 0;
+        let idx = bpmEdges.findIndex(e => v < e);
+        if (idx === -1) idx = bpmLabels.length - 1;
+        bpmBuckets[idx]++;
+    }));
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-bpm'), {
+        type: 'bar',
+        data: { labels: bpmLabels, datasets: [{ data: bpmBuckets, backgroundColor: colors.accent, borderRadius: 4 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: colors.label, font: { size: 9 }, maxRotation: 0, autoSkip: false } },
+                y: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 10 }, precision: 0 } },
+            },
+        },
+    }));
+
+    // Drain-length spread — total_length (seconds) per difficulty.
+    const lenEdges = [90, 150, 210, 300];
+    const lenLabels = ['<1:30', '1:30-2:30', '2:30-3:30', '3:30-5:00', '5:00+'];
+    const lenBuckets = new Array(lenLabels.length).fill(0);
+    allSets.forEach(s => s.beatmaps.forEach(b => {
+        const v = b.total_length || 0;
+        let idx = lenEdges.findIndex(e => v < e);
+        if (idx === -1) idx = lenLabels.length - 1;
+        lenBuckets[idx]++;
+    }));
+    statsDashboardCharts.push(new Chart(document.getElementById('stats-chart-length'), {
+        type: 'bar',
+        data: { labels: lenLabels, datasets: [{ data: lenBuckets, backgroundColor: purple, borderRadius: 4 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: colors.label, font: { size: 9 }, maxRotation: 0, autoSkip: false } },
+                y: { grid: { color: colors.grid }, ticks: { color: colors.label, font: { size: 10 }, precision: 0 } },
             },
         },
     }));
