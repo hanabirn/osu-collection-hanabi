@@ -1376,12 +1376,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: rgba(30, 20, 50, 0.55);
-    border: 1px solid rgba(var(--accent-purple-rgb), 0.4);
+    background: var(--bg-modal);
+    border: 1px solid var(--border-strong);
     color: var(--text-secondary);
     cursor: pointer;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: 0 0 18px rgba(var(--accent-purple-rgb), 0.35), 0 6px 20px rgba(0, 0, 0, 0.35);
     transition: transform 0.2s var(--ease-spring), box-shadow 0.25s var(--ease-out), color 0.2s var(--ease-out);
 }
@@ -1411,11 +1411,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     height: 52px;
     padding: 0 16px;
     border-radius: 999px;
-    background: rgba(30, 20, 50, 0.55);
-    border: 1px solid rgba(var(--accent-purple-rgb), 0.4);
+    background: var(--bg-modal);
+    border: 1px solid var(--border-strong);
     color: var(--text-secondary);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: 0 0 18px rgba(var(--accent-purple-rgb), 0.35), 0 6px 20px rgba(0, 0, 0, 0.35);
     transition: box-shadow 0.25s var(--ease-out), color 0.2s var(--ease-out);
 }
@@ -1498,10 +1498,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    so there's nothing moving behind these anyway. Modals, the nav drawer
    and the refresh FAB keep their full blur — they're only on screen
    briefly. */
+/* Redesign: these three are transparent now — no blur to tune. */
 @media (hover: none), (max-width: 700px) {
-    .site-header { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-    .site-main { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-    .site-page { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .site-header, .site-main, .site-page {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
 }
 
 /* ===== Per-tab gradient border =====
