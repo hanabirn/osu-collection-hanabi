@@ -35,19 +35,24 @@ exports.handler = async (event) => {
 
     let tokenData;
     try {
+        // OAuth2 spec: the token endpoint takes application/x-www-form-urlencoded.
+        const form = new URLSearchParams({
+            client_id: process.env.OSU_CLIENT_ID,
+            client_secret: process.env.OSU_CLIENT_SECRET,
+            redirect_uri: process.env.OSU_REDIRECT_URI,
+            grant_type: 'authorization_code',
+            code: String(code),
+        });
         const tokenRes = await fetch('https://osu.ppy.sh/oauth/token', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({
-                client_id: process.env.OSU_CLIENT_ID,
-                client_secret: process.env.OSU_CLIENT_SECRET,
-                redirect_uri: process.env.OSU_REDIRECT_URI,
-                grant_type: 'authorization_code',
-                code,
-            }),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+            body: form.toString(),
         });
         const text = await tokenRes.text();
-        if (!tokenRes.ok) return fail('token_exchange', `${tokenRes.status} ${text.slice(0, 200)}`);
+        if (!tokenRes.ok) {
+            return fail('token_exchange',
+                `${tokenRes.status} ${text.slice(0, 500)} | sent redirect_uri=${JSON.stringify(process.env.OSU_REDIRECT_URI)} client_id=${JSON.stringify(process.env.OSU_CLIENT_ID)} codeLen=${String(code).length}`);
+        }
         tokenData = JSON.parse(text);
     } catch (err) {
         return fail('token_exchange', err.message);
