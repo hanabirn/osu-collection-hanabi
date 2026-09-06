@@ -39,6 +39,7 @@ I18N.ja = {
     packs_add_all_label: 'パックをまるごとコレクションに追加', packs_add_all_btn: 'まるごと追加（未所持 {n} 件）', packs_add_all_done: 'すべてコレクション済み',
     packs_add_all_confirm: '「{name}」のセット {n} 件すべてでコレクション分類を作成しますか？',
     packs_by: '作者 {n}',
+    packs_set_count: '{n} 曲',
     global_search_section_collection: '自分のコレクション', global_search_section_catalog: '曲庫分類', global_search_section_mappools: 'ワールドカップ図池',
     global_search_empty: '該当する結果がありません',
     track_player_btn: '+ フォロー', untrack_player_btn: 'フォロー解除',

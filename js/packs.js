@@ -29,6 +29,7 @@ let packsItems = [];
 let packsBusy = false;
 let packsDetailSets = [];   // lean sets of the pack currently open in the modal
 let packsDetailName = '';
+let packsDetailTag = '';
 
 function ensurePacksLoaded() {
     if (!packsLoaded) { packsLoaded = true; renderPackTypePills(); loadPacks(true); }
@@ -123,6 +124,7 @@ async function openPackDetail(tag) {
 
     packsDetailSets = [];
     packsDetailName = tag;
+    packsDetailTag = tag;
     titleEl.textContent = tag;
     bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     modal.style.display = 'flex';
@@ -153,7 +155,13 @@ function renderPackDetailBody() {
     const collectionSet = new Set(
         OSU_MODES.flatMap(m => (getOsuCollection()[m] || []).map(s => s.beatmapset_id))
     );
-    bodyEl.innerHTML = `<div class="osu-collection">` + packsDetailSets.map(s => {
+    const typeMeta = PACK_TYPE_BY_KEY[packsType] || PACK_TYPES[0];
+    const meta = `<div class="packs-detail-meta" style="${packTypeVars(typeMeta)}">
+        <span class="packs-card-tag">${escHtml(packsDetailTag)}</span>
+        <span class="packs-detail-type">${icon(typeMeta.icon)}<span>${escHtml(t(typeMeta.i18n))}</span></span>
+        <span class="packs-detail-count">${t('packs_set_count', { n: packsDetailSets.length })}</span>
+    </div>`;
+    bodyEl.innerHTML = meta + `<div class="osu-collection">` + packsDetailSets.map(s => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${s.id}/covers/card.jpg`;
         const inCollection = collectionSet.has(s.id);
         const stars = (s.star_min != null && s.star_max != null)

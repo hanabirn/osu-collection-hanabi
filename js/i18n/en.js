@@ -183,6 +183,7 @@ I18N.en = {
     packs_add_all_label: 'Add whole pack to collection', packs_add_all_btn: 'Add whole pack ({n} missing)', packs_add_all_done: 'Whole pack already collected',
     packs_add_all_confirm: 'Create a collection category from all {n} sets in "{name}"?',
     packs_by: 'by {n}',
+    packs_set_count: '{n} sets',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',
     track_player_btn: '+ Track', untrack_player_btn: 'Untrack',

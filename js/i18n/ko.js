@@ -39,6 +39,7 @@ I18N.ko = {
     packs_add_all_label: '팩 전체를 컬렉션에 추가', packs_add_all_btn: '전체 추가 (미보유 {n}개)', packs_add_all_done: '팩 전체가 이미 컬렉션에 있음',
     packs_add_all_confirm: '"{name}" 팩의 세트 {n}개 전체로 컬렉션 분류를 만들까요?',
     packs_by: '제작 {n}',
+    packs_set_count: '{n}개',
     global_search_section_collection: '내 컬렉션', global_search_section_catalog: '곡 분류', global_search_section_mappools: '월드컵 매핑풀',
     global_search_empty: '일치하는 결과가 없습니다',
     track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',

@@ -15,6 +15,7 @@ I18N.zh = {
     packs_add_all_label: '把整包加入收藏', packs_add_all_btn: '把整包加入收藏（缺 {n} 張）', packs_add_all_done: '整包都在收藏裡了',
     packs_add_all_confirm: '要把「{name}」整包 {n} 張圖建立成收藏分類嗎？',
     packs_by: '作者 {n}',
+    packs_set_count: '{n} 張圖',
     global_search_section_collection: '我的收藏', global_search_section_catalog: '曲庫分類', global_search_section_mappools: '世界盃圖池',
     global_search_empty: '找不到符合的結果',
     track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',
