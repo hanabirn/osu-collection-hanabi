@@ -147,7 +147,17 @@ self.addEventListener('fetch', event => {
 
     // The osu! API proxy (Netlify Functions) is never cached — PP, gallery
     // and lookup data must always be live-or-nothing, never a stale replay.
-    if (url.pathname.startsWith('/.netlify/functions/')) return;
+    if (url.pathname.startsWith('/.netlify/functions/')) {
+        // BUT: navigation preload has ALREADY fired one network request for
+        // a navigation here (e.g. /.netlify/functions/osu-callback?code=…).
+        // Just `return`ing makes the browser send a SECOND request, which is
+        // fatal for a single-use OAuth code ("Authorization code has been
+        // revoked"). Serve the preload response so there's exactly one hit.
+        if (request.mode === 'navigate') {
+            event.respondWith((async () => (await event.preloadResponse) || fetch(request))());
+        }
+        return;
+    }
 
     if (request.destination === 'image') {
         event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));
