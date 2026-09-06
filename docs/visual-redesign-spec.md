@@ -351,5 +351,12 @@ body {
   QA 結果：平塗近黑、框住 hero + cross-fade、扁平粉按鈕、實色無 blur modal、6 個抽查 tab 都正常、**淺色主題正常翻**（body #faf8fc、卡片淺 surface、按鈕深粉+白字）。
 - 已知殘留（低優先）：`.has-cover-banner` / `#bg-carousel` / `.site-header-overlay` CSS 規則還在但已無 DOM（inert）。行動版 Lighthouse 數字沒單獨跑（少了粒子層 + 3 層 backdrop-filter + 整頁封面，理論上只會更好）。
 
-**視覺改版步驟 1–8 全部完成。** 之後若要：加一支拉丁 display 字（方案 B）、eyebrow 鋪到 gallery/stats 各區塊、清 inert dead CSS。
+**視覺改版步驟 1–8 全部完成。**
+
+**Follow-ups 已做（`87e44cd`）：**
+- eyebrow 鋪到 gallery/catalog/world-cup tab 標題；`.pp-calc-section-label`（stats 儀表板、pp-calc modal、gallery 留言）改成 eyebrow 樣式
+- `--font-display` stack（Space Grotesk / 系統 display 字 → system-ui）套在 wordmark / section title / `.osu-page-title` / hero 行 / modal 標題 / 數字 tile——**不下載 web font**，有裝才升級，CJK 走 `--font-cjk`
+- 刪掉 inert 的 `.has-cover-banner` / `#bg-carousel` / `.site-header-overlay` 死 CSS
+
+**還沒做**：真正打包一支 subset 過的 Latin woff2（方案 B，保證每個訪客一致、約 20KB）——現在是 opportunistic stack。
 - 另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
