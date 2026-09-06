@@ -31,6 +31,13 @@ I18N.es = {
     dm_self_error: 'No puedes enviarte un mensaje a ti mismo',
 
     global_search_title: 'Buscar en el sitio', global_search_placeholder: 'Buscar canciones, mappools, mi colección...', select_language: 'Seleccionar idioma',
+    nav_packs: 'Packs de mapas',
+    packs_page_title: '✦ Packs de mapas oficiales ✦',
+    packs_hint: 'Packs seleccionados por osu!: Tema, Featured Artist, Torneo, Spotlights, Project Loved. Elige un pack y conviértelo entero en una categoría de colección con un clic. Obtenido en vivo desde la API de osu!.',
+    packs_type_standard: 'Estándar', packs_type_featured: 'Featured Artist', packs_type_theme: 'Tema', packs_type_tournament: 'Torneo', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: 'Artista/Álbum',
+    packs_no_reduction: 'Sin mods de reducción', packs_load_fail: 'Error al cargar los packs', packs_empty: 'No hay packs aquí', packs_load_more: 'Cargar más',
+    packs_add_all_label: 'Añadir todo el pack a la colección', packs_add_all_btn: 'Añadir todo el pack (faltan {n})', packs_add_all_done: 'Pack ya coleccionado por completo',
+    packs_add_all_confirm: '¿Crear una categoría de colección con los {n} sets de «{name}»?',
     global_search_section_collection: 'Mi colección', global_search_section_catalog: 'Catálogo', global_search_section_mappools: 'Mappools de la Copa del Mundo',
     global_search_empty: 'Sin resultados coincidentes',
     track_player_btn: '+ Seguir', untrack_player_btn: 'Dejar de seguir',

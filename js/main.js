@@ -50,6 +50,7 @@ function switchTab(tab, el) {
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'farm-maps') ensureFarmMapsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
+    if (tab === 'packs' && typeof ensurePacksLoaded === 'function') ensurePacksLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();
     if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
     // Chat polls on a timer only while its own tab is visible — started/
@@ -190,6 +191,7 @@ function refreshDynamicContent() {
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
     if (typeof renderFarmMapsList === 'function') renderFarmMapsList();
     if (typeof refreshCatalogLocalized === 'function') refreshCatalogLocalized();
+    if (typeof refreshPacksLocalized === 'function') refreshPacksLocalized();
     if (typeof refreshMappoolsLocalized === 'function') refreshMappoolsLocalized();
 }
 

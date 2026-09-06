@@ -1404,6 +1404,79 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .catalog-completion-bar > span { transition: none; }
 }
 
+/* 官方圖包 tab — type pills reuse .lang-pill; the pack listing is a stack of
+   full-width rows (a pack is metadata, not a cover), each opening a modal
+   with the pack's beatmapset grid. */
+.packs-type-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.packs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.packs-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.packs-row:hover {
+    background: rgba(var(--accent-purple-rgb), 0.12);
+    border-color: rgba(var(--accent-purple-rgb), 0.4);
+}
+.packs-row:active { transform: scale(0.995); }
+.packs-row-tag {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(var(--accent-cyan-rgb), 0.16);
+    color: var(--text-accent);
+}
+.packs-row-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.packs-row-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.packs-row-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.packs-row-go {
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    color: var(--text-label);
+}
+@media (prefers-reduced-motion: reduce) {
+    .packs-row { transition: none; }
+}
+
 /* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
    language / genre / source pills instead of pp/star/bpm. */
 #catalog-list.osu-collection {

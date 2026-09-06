@@ -175,6 +175,13 @@ I18N.en = {
     `,
 
     global_search_title: 'Search everything', global_search_placeholder: 'Search songs, mappools, my collection...', select_language: 'Select language',
+    nav_packs: 'Beatmap Packs',
+    packs_page_title: '✦ Official Beatmap Packs ✦',
+    packs_hint: "osu!'s own curated packs: Theme, Featured Artist, Tournament, Spotlights, Project Loved. Pick a pack and turn the whole thing into a collection category in one click. Pulled live from the osu! API.",
+    packs_type_standard: 'Standard', packs_type_featured: 'Featured Artist', packs_type_theme: 'Theme', packs_type_tournament: 'Tournament', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: 'Artist/Album',
+    packs_no_reduction: 'No difficulty reduction', packs_load_fail: 'Failed to load packs', packs_empty: 'No packs here', packs_load_more: 'Load more',
+    packs_add_all_label: 'Add whole pack to collection', packs_add_all_btn: 'Add whole pack ({n} missing)', packs_add_all_done: 'Whole pack already collected',
+    packs_add_all_confirm: 'Create a collection category from all {n} sets in "{name}"?',
     global_search_section_collection: 'My Collection', global_search_section_catalog: 'Catalog', global_search_section_mappools: 'World Cup Mappools',
     global_search_empty: 'No matching results',
     track_player_btn: '+ Track', untrack_player_btn: 'Untrack',

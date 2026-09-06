@@ -31,6 +31,13 @@ I18N.ru = {
     dm_self_error: 'Нельзя отправить сообщение самому себе',
 
     global_search_title: 'Поиск по сайту', global_search_placeholder: 'Поиск песен, маппулов, моей коллекции...', select_language: 'Выбрать язык',
+    nav_packs: 'Паки карт',
+    packs_page_title: '✦ Официальные паки карт ✦',
+    packs_hint: 'Подборки от osu!: тематические, Featured Artist, турнирные, Spotlights, Project Loved. Выберите пак и одним кликом превратите его целиком в категорию коллекции. Данные берутся напрямую из osu! API.',
+    packs_type_standard: 'Стандарт', packs_type_featured: 'Featured Artist', packs_type_theme: 'Тема', packs_type_tournament: 'Турнир', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: 'Исполнитель/альбом',
+    packs_no_reduction: 'Без модов на упрощение', packs_load_fail: 'Не удалось загрузить паки', packs_empty: 'Паков нет', packs_load_more: 'Загрузить ещё',
+    packs_add_all_label: 'Добавить весь пак в коллекцию', packs_add_all_btn: 'Добавить весь пак (не хватает {n})', packs_add_all_done: 'Весь пак уже в коллекции',
+    packs_add_all_confirm: 'Создать категорию коллекции из всех {n} наборов в «{name}»?',
     global_search_section_collection: 'Моя коллекция', global_search_section_catalog: 'Каталог', global_search_section_mappools: 'Маппулы Чемпионата мира',
     global_search_empty: 'Ничего не найдено',
     track_player_btn: '+ Отслеживать', untrack_player_btn: 'Не отслеживать',

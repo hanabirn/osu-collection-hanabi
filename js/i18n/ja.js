@@ -31,6 +31,13 @@ I18N.ja = {
     dm_self_error: '自分にはメッセージを送れません',
 
     global_search_title: 'サイト内検索', global_search_placeholder: '曲・図池・自分のコレクションを検索...', select_language: '言語を選択',
+    nav_packs: '公式パック',
+    packs_page_title: '✦ 公式ビートマップパック ✦',
+    packs_hint: 'osu! 公式のビートマップパック：テーマ、Featured Artist、大会、Spotlights、Project Loved。パックを選べば、まるごと1クリックでコレクション分類に追加できます。データは osu! API からリアルタイム取得。',
+    packs_type_standard: '標準', packs_type_featured: 'Featured Artist', packs_type_theme: 'テーマ', packs_type_tournament: '大会', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: 'アーティスト／アルバム',
+    packs_no_reduction: '難易度低下Mod禁止', packs_load_fail: 'パックの読み込みに失敗しました', packs_empty: 'パックがありません', packs_load_more: 'もっと読み込む',
+    packs_add_all_label: 'パックをまるごとコレクションに追加', packs_add_all_btn: 'まるごと追加（未所持 {n} 件）', packs_add_all_done: 'すべてコレクション済み',
+    packs_add_all_confirm: '「{name}」のセット {n} 件すべてでコレクション分類を作成しますか？',
     global_search_section_collection: '自分のコレクション', global_search_section_catalog: '曲庫分類', global_search_section_mappools: 'ワールドカップ図池',
     global_search_empty: '該当する結果がありません',
     track_player_btn: '+ フォロー', untrack_player_btn: 'フォロー解除',

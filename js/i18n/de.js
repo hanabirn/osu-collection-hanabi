@@ -31,6 +31,13 @@ I18N.de = {
     dm_self_error: 'Du kannst dir selbst keine Nachricht schicken',
 
     global_search_title: 'Gesamte Seite durchsuchen', global_search_placeholder: 'Songs, Mappools, meine Sammlung durchsuchen...', select_language: 'Sprache wählen',
+    nav_packs: 'Beatmap-Packs',
+    packs_page_title: '✦ Offizielle Beatmap-Packs ✦',
+    packs_hint: 'Von osu! kuratierte Packs: Thema, Featured Artist, Turnier, Spotlights, Project Loved. Wähle ein Pack und mach mit einem Klick eine ganze Sammlungskategorie daraus. Live aus der osu!-API geladen.',
+    packs_type_standard: 'Standard', packs_type_featured: 'Featured Artist', packs_type_theme: 'Thema', packs_type_tournament: 'Turnier', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: 'Künstler/Album',
+    packs_no_reduction: 'Keine Schwierigkeitsreduktion', packs_load_fail: 'Packs konnten nicht geladen werden', packs_empty: 'Keine Packs vorhanden', packs_load_more: 'Mehr laden',
+    packs_add_all_label: 'Ganzes Pack zur Sammlung hinzufügen', packs_add_all_btn: 'Ganzes Pack hinzufügen ({n} fehlen)', packs_add_all_done: 'Ganzes Pack bereits gesammelt',
+    packs_add_all_confirm: 'Aus allen {n} Sets in „{name}“ eine Sammlungskategorie erstellen?',
     global_search_section_collection: 'Meine Sammlung', global_search_section_catalog: 'Katalog', global_search_section_mappools: 'World-Cup-Mappools',
     global_search_empty: 'Keine passenden Ergebnisse',
     track_player_btn: '+ Verfolgen', untrack_player_btn: 'Nicht mehr verfolgen',

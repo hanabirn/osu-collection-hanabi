@@ -31,6 +31,13 @@ I18N.fr = {
     dm_self_error: 'Vous ne pouvez pas vous envoyer un message à vous-même',
 
     global_search_title: 'Rechercher sur le site', global_search_placeholder: 'Rechercher des chansons, mappools, ma collection...', select_language: 'Choisir la langue',
+    nav_packs: 'Packs de beatmaps',
+    packs_page_title: '✦ Packs de beatmaps officiels ✦',
+    packs_hint: "Les packs sélectionnés par osu! : Thème, Featured Artist, Tournoi, Spotlights, Project Loved. Choisis un pack et transforme-le entièrement en catégorie de collection en un clic. Récupéré en direct depuis l'API osu!.",
+    packs_type_standard: 'Standard', packs_type_featured: 'Featured Artist', packs_type_theme: 'Thème', packs_type_tournament: 'Tournoi', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: 'Artiste/Album',
+    packs_no_reduction: 'Sans mods de réduction', packs_load_fail: 'Échec du chargement des packs', packs_empty: 'Aucun pack ici', packs_load_more: 'Charger plus',
+    packs_add_all_label: 'Ajouter tout le pack à la collection', packs_add_all_btn: 'Ajouter tout le pack ({n} manquants)', packs_add_all_done: 'Pack déjà entièrement collecté',
+    packs_add_all_confirm: 'Créer une catégorie de collection à partir des {n} sets de « {name} » ?',
     global_search_section_collection: 'Ma collection', global_search_section_catalog: 'Catalogue', global_search_section_mappools: 'Mappools de la Coupe du monde',
     global_search_empty: 'Aucun résultat correspondant',
     track_player_btn: '+ Suivre', untrack_player_btn: 'Ne plus suivre',

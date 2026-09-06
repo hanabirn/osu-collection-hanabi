@@ -31,6 +31,13 @@ I18N.ko = {
     dm_self_error: '자신에게는 메시지를 보낼 수 없습니다',
 
     global_search_title: '전체 검색', global_search_placeholder: '곡, 매핑풀, 내 컬렉션 검색...', select_language: '언어 선택',
+    nav_packs: '공식 팩',
+    packs_page_title: '✦ 공식 비트맵 팩 ✦',
+    packs_hint: 'osu! 공식 큐레이션 팩: 테마, Featured Artist, 토너먼트, Spotlights, Project Loved. 팩을 고르면 클릭 한 번으로 통째로 컬렉션 분류에 추가됩니다. osu! API에서 실시간으로 가져옵니다.',
+    packs_type_standard: '표준', packs_type_featured: 'Featured Artist', packs_type_theme: '테마', packs_type_tournament: '토너먼트', packs_type_spotlight: 'Spotlights', packs_type_loved: 'Project Loved', packs_type_artist: '아티스트/앨범',
+    packs_no_reduction: '난이도 감소 모드 불가', packs_load_fail: '팩을 불러오지 못했습니다', packs_empty: '팩이 없습니다', packs_load_more: '더 보기',
+    packs_add_all_label: '팩 전체를 컬렉션에 추가', packs_add_all_btn: '전체 추가 (미보유 {n}개)', packs_add_all_done: '팩 전체가 이미 컬렉션에 있음',
+    packs_add_all_confirm: '"{name}" 팩의 세트 {n}개 전체로 컬렉션 분류를 만들까요?',
     global_search_section_collection: '내 컬렉션', global_search_section_catalog: '곡 분류', global_search_section_mappools: '월드컵 매핑풀',
     global_search_empty: '일치하는 결과가 없습니다',
     track_player_btn: '+ 추적', untrack_player_btn: '추적 해제',
