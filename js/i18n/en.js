@@ -310,6 +310,7 @@ I18N.en = {
     batch_dl_btn: 'Batch-download this list\'s files', batch_dl_empty: 'This list is empty — nothing to download',
     batch_dl_confirm: 'Download all {n} beatmapsets in this list? This triggers {n} browser downloads one after another — it\'ll take a while, so keep this tab open',
     batch_dl_progress: 'Downloading... {done}/{total}',
+    batch_dl_pause_btn: 'Pause download', batch_dl_resume_btn: 'Resume download', batch_dl_paused: 'Paused, {done}/{total}',
     batch_dl_done: 'Done! {done} files saved to your Downloads folder',
     batch_dl_done_errors: 'Done: {done} files, {failed} failed (maybe removed from osu! or a connection issue)',
     batch_dl_hint: 'Downloading several files usually makes the browser show a "allow this site to download multiple files" prompt — click Allow, or every file after the first gets blocked.',

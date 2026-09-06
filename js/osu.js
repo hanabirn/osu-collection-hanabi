@@ -581,18 +581,40 @@ async function fetchBeatmapsetBlob(setId, filenameBase, retriesLeft = 2) {
 
 let osuBatchDownloadActive = false;
 
+let osuBatchDownloadPaused = false;
+// Set while paused to the resolver of the in-loop wait promise, so the same
+// button's "resume" click can wake the loop back up.
+let osuBatchDownloadResumeResolve = null;
+
 /* Downloads every .osz set currently visible in the collection grid — same
    tab + search + filters the user is looking at (osuCurrentViewSets, set by
    renderOsuCollection() before pagination so this covers every page, not
    just the one on screen). Sequential on purpose: osu.direct's own mirror
    caps bursts at 10 req/2s and 120/min, and each file already takes a couple
    seconds to fetch, so one-at-a-time naturally stays under that without extra
-   throttling logic — a 429 still gets one retry via fetchBeatmapsetBlob(). */
+   throttling logic — a 429 still gets one retry via fetchBeatmapsetBlob().
+
+   The same button drives all three states (start / pause / resume) — while
+   a run is active this function is re-entered by the button's own onclick,
+   so it toggles the pause flag instead of starting a second run. Pausing
+   only holds the loop *between* files (checked before each fetch starts),
+   it never aborts a file that's already downloading. */
 async function batchDownloadCollectionView() {
-    if (osuBatchDownloadActive) return;
-    const sets = osuCurrentViewSets || [];
     const status = document.getElementById('osu-batch-dl-status');
     const btn = document.getElementById('osu-batch-dl-btn');
+
+    if (osuBatchDownloadActive) {
+        osuBatchDownloadPaused = !osuBatchDownloadPaused;
+        if (osuBatchDownloadPaused) {
+            if (btn) btn.textContent = t('batch_dl_resume_btn');
+        } else {
+            if (btn) btn.textContent = t('batch_dl_pause_btn');
+            if (osuBatchDownloadResumeResolve) { osuBatchDownloadResumeResolve(); osuBatchDownloadResumeResolve = null; }
+        }
+        return;
+    }
+
+    const sets = osuCurrentViewSets || [];
     if (!sets.length) {
         if (status) { status.innerText = t('batch_dl_empty'); status.style.color = '#ff5252'; }
         return;
@@ -600,9 +622,16 @@ async function batchDownloadCollectionView() {
     if (!confirm(t('batch_dl_confirm', { n: sets.length }))) return;
 
     osuBatchDownloadActive = true;
-    if (btn) btn.disabled = true;
+    osuBatchDownloadPaused = false;
+    const originalLabel = btn ? btn.textContent : '';
+    if (btn) btn.textContent = t('batch_dl_pause_btn');
+
     let done = 0, failed = 0;
     for (const set of sets) {
+        if (osuBatchDownloadPaused) {
+            if (status) { status.innerText = t('batch_dl_paused', { done, total: sets.length }); status.style.color = '#f5a623'; }
+            await new Promise(resolve => { osuBatchDownloadResumeResolve = resolve; });
+        }
         if (status) { status.innerText = t('batch_dl_progress', { done, total: sets.length }); status.style.color = '#c8a2e0'; }
         const name = `${set.artist} - ${set.title}`.replace(/[\\/:*?"<>|]/g, '_').slice(0, 150);
         try {
@@ -616,8 +645,9 @@ async function batchDownloadCollectionView() {
         status.innerText = failed ? t('batch_dl_done_errors', { done, failed }) : t('batch_dl_done', { done });
         status.style.color = failed ? '#ff5252' : '#34d399';
     }
-    if (btn) btn.disabled = false;
+    if (btn) btn.textContent = originalLabel;
     osuBatchDownloadActive = false;
+    osuBatchDownloadPaused = false;
 }
 
 function osuSetVolume(val) {

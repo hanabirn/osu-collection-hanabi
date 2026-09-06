@@ -142,6 +142,7 @@ I18N.zh = {
     batch_dl_btn: '批量下載此清單圖檔', batch_dl_empty: '這個清單是空的，沒有東西可以下載',
     batch_dl_confirm: '要下載目前清單的 {n} 個圖檔嗎？會依序觸發 {n} 次瀏覽器下載，需要一段時間，請勿關閉分頁',
     batch_dl_progress: '下載中... {done}/{total}',
+    batch_dl_pause_btn: '暫停下載', batch_dl_resume_btn: '繼續下載', batch_dl_paused: '已暫停，{done}/{total}',
     batch_dl_done: '下載完成！共 {done} 個檔案，已存到你的下載資料夾',
     batch_dl_done_errors: '下載完成：{done} 個，其中 {failed} 個失敗（可能已下架或連線問題）',
     batch_dl_hint: '下載多個檔案時，瀏覽器通常會跳出「允許這個網站下載多個檔案」的提示——請按允許，否則第二個檔案開始會被瀏覽器擋下。',

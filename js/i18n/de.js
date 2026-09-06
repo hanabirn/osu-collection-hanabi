@@ -169,6 +169,7 @@ I18N.de = {
     batch_dl_btn: 'Diese Liste als Dateien herunterladen', batch_dl_empty: 'Diese Liste ist leer — nichts zum Herunterladen',
     batch_dl_confirm: 'Alle {n} Beatmapsets dieser Liste herunterladen? Das löst {n} Browser-Downloads nacheinander aus und dauert eine Weile — Tab bitte offen lassen',
     batch_dl_progress: 'Wird heruntergeladen... {done}/{total}',
+    batch_dl_pause_btn: 'Download pausieren', batch_dl_resume_btn: 'Download fortsetzen', batch_dl_paused: 'Pausiert, {done}/{total}',
     batch_dl_done: 'Fertig! {done} Dateien im Download-Ordner gespeichert',
     batch_dl_done_errors: 'Fertig: {done} Dateien, {failed} fehlgeschlagen (evtl. entfernt oder Verbindungsproblem)',
     batch_dl_hint: 'Beim Herunterladen mehrerer Dateien fragt der Browser meist "Mehrere Downloads von dieser Website zulassen?" — bitte zulassen, sonst wird ab der zweiten Datei blockiert.',

@@ -169,6 +169,7 @@ I18N.ja = {
     batch_dl_btn: 'このリストの譜面を一括ダウンロード', batch_dl_empty: 'このリストは空です。ダウンロードできるものがありません',
     batch_dl_confirm: 'このリストの {n} 個の譜面をダウンロードしますか？ブラウザのダウンロードを {n} 回連続で実行します。時間がかかるのでタブを閉じないでください',
     batch_dl_progress: 'ダウンロード中... {done}/{total}',
+    batch_dl_pause_btn: '一時停止', batch_dl_resume_btn: '再開', batch_dl_paused: '一時停止中 {done}/{total}',
     batch_dl_done: '完了！{done} 個のファイルをダウンロードフォルダに保存しました',
     batch_dl_done_errors: '完了：{done} 個、うち {failed} 個失敗（削除済みか通信エラーの可能性）',
     batch_dl_hint: '複数ファイルをダウンロードすると、ブラウザが「このサイトに複数ファイルのダウンロードを許可しますか」と表示することがあります。許可を押してください。押さないと2つ目以降がブロックされます。',

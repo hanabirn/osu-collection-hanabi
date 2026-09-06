@@ -169,6 +169,7 @@ I18N.fr = {
     batch_dl_btn: 'Télécharger toute cette liste', batch_dl_empty: 'Cette liste est vide, rien à télécharger',
     batch_dl_confirm: 'Télécharger les {n} beatmapsets de cette liste ? Cela déclenche {n} téléchargements du navigateur à la suite — ça prendra un moment, laissez cet onglet ouvert',
     batch_dl_progress: 'Téléchargement... {done}/{total}',
+    batch_dl_pause_btn: 'Mettre en pause', batch_dl_resume_btn: 'Reprendre', batch_dl_paused: 'En pause, {done}/{total}',
     batch_dl_done: 'Terminé ! {done} fichiers enregistrés dans votre dossier de téléchargements',
     batch_dl_done_errors: 'Terminé : {done} fichiers, {failed} échoué(s) (peut-être retiré ou problème de connexion)',
     batch_dl_hint: 'En téléchargeant plusieurs fichiers, le navigateur affiche souvent « Autoriser ce site à télécharger plusieurs fichiers ? » — cliquez sur Autoriser, sinon tout fichier après le premier sera bloqué.',

@@ -169,6 +169,7 @@ I18N.ko = {
     batch_dl_btn: '이 목록 전체 다운로드', batch_dl_empty: '이 목록은 비어 있어 다운로드할 것이 없습니다',
     batch_dl_confirm: '이 목록의 {n}개 비트맵셋을 다운로드할까요? 브라우저 다운로드가 {n}번 연속으로 실행되어 시간이 걸리니 탭을 닫지 마세요',
     batch_dl_progress: '다운로드 중... {done}/{total}',
+    batch_dl_pause_btn: '일시정지', batch_dl_resume_btn: '이어서 다운로드', batch_dl_paused: '일시정지됨, {done}/{total}',
     batch_dl_done: '완료! {done}개 파일을 다운로드 폴더에 저장했습니다',
     batch_dl_done_errors: '완료: {done}개 중 {failed}개 실패(삭제되었거나 연결 문제일 수 있음)',
     batch_dl_hint: '여러 파일을 다운로드하면 브라우저가 "이 사이트가 여러 파일을 다운로드하도록 허용하시겠습니까?"라는 알림을 띄울 수 있습니다. 허용을 누르지 않으면 두 번째 파일부터 차단됩니다.',
