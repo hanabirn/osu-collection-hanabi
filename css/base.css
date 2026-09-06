@@ -52,10 +52,23 @@ a:hover { text-decoration: underline; }
    bold, tight-tracked title. Eyebrow labels are English, identical in
    every locale, so they're hard-coded in the markup — no i18n key.
 
-   --font-display upgrades Latin headings to a geometric face IF the
-   visitor has one installed (Space Grotesk / a system display face);
-   otherwise it falls straight through to system-ui — no web-font download
-   (spec §4.2 方案 A). CJK glyphs in a title fall through to --font-cjk. */
+   --font-display puts a real geometric face on every Latin heading. One
+   self-hosted file: Space Grotesk variable (300–700), Latin subset only,
+   22 KB woff2, font-display:swap, <link rel=preload> in index.html
+   (spec §4.2 方案 B). CJK glyphs in a title still fall through the stack
+   to the system CJK sans — the subset has no CJK, so no swap flash there.
+   Font © 2020 The Space Grotesk Project Authors, SIL Open Font License 1.1
+   (full text: assets/fonts/OFL.txt). */
+@font-face {
+    font-family: "Space Grotesk";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("../assets/fonts/space-grotesk-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+        U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 :root {
     --font-display: "Space Grotesk", "Segoe UI Variable Display", "SF Pro Display",
         "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;

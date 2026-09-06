@@ -33,6 +33,11 @@
      straight through to the platform CJK font otherwise, so text paints
      instantly with no swap and no CLS. Re-add a <link> here to bring the
      web font back. -->
+<!-- The one exception: Space Grotesk for Latin display type (headings /
+     eyebrows). Self-hosted, Latin subset only, 22 KB, font-display:swap —
+     preloaded so it lands before first paint of the headings. CJK is
+     untouched (see above). @font-face lives in css/base.css. -->
+<link rel="preload" href="assets/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/osu.css">
