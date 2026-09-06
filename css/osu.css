@@ -1287,7 +1287,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    so download lands at right:48 — clear of the centred play button even on
    the narrowest ~246px card in this grid. */
 #farm-maps-list .osu-play-btn,
-#catalog-list .osu-play-btn {
+#catalog-list .osu-play-btn,
+#dan-list .osu-play-btn {
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -1442,18 +1443,33 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 .dan-toolbar { margin-bottom: 12px; }
 
+/* Same card metrics as the Catalog grid — the base .osu-card is too flat
+   (4/1.6) for a title + artist + mapper + meta line. */
 #dan-list.osu-collection {
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
     gap: 10px;
 }
+#dan-list .osu-card { aspect-ratio: 4 / 1.4; border-radius: 10px; }
+#dan-list .osu-card-info { padding: 8px 40px 6px 10px; }
+#dan-list .osu-card-title { font-size: 0.85rem; }
+#dan-list .osu-card-artist { font-size: 0.7rem; }
+#dan-list .osu-card-mapper {
+    font-size: 0.62rem;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#dan-list .osu-copy-btn { right: 8px; }
+#dan-list .osu-download-btn { right: 48px; }
 .dan-card:hover {
     border-color: rgba(var(--dan-rgb), 0.5);
     box-shadow: var(--osu-card-shadow), 0 0 20px rgba(var(--dan-rgb), 0.22);
 }
 .dan-pin-badge {
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 7px;
+    left: 7px;
     z-index: 3;
     display: inline-flex;
     align-items: center;
