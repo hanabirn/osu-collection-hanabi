@@ -1404,20 +1404,21 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .catalog-completion-bar > span { transition: none; }
 }
 
-/* 官方圖包 tab — a pack is metadata, not a cover, so each is a compact card
-   accented by its type colour (--pk, set inline per card/pill in packs.js).
-   Grid of cards + colour-coded type filter pills. */
-.packs-type-row {
+/* 段位認定 tab — mode filter pills (colour-coded per ruleset via --dan /
+   --dan-rgb, set inline in dan.js) + a grid of cover-art beatmapset cards
+   reusing .osu-card, with a mode-tinted hover glow and a 精選 ribbon on the
+   hand-picked ones. */
+.dan-mode-row {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
-.packs-type-pill {
+.dan-mode-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 13px 6px 11px;
+    gap: 7px;
+    padding: 6px 14px 6px 12px;
     border-radius: 999px;
     font: inherit;
     font-size: 0.82rem;
@@ -1428,149 +1429,49 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: 1px solid var(--lang-pill-border);
     transition: color 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
 }
-.packs-type-pill svg { width: 14px; height: 14px; opacity: 0.85; }
-.packs-type-pill:hover {
-    color: var(--text);
-    border-color: rgba(var(--pk-rgb), 0.55);
-}
-.packs-type-pill:active { transform: scale(0.94); }
-.packs-type-pill.active {
+.dan-mode-pill svg { width: 15px; height: 15px; opacity: 0.8; }
+.dan-mode-pill:hover { color: var(--text); border-color: rgba(var(--dan-rgb), 0.55); }
+.dan-mode-pill:active { transform: scale(0.94); }
+.dan-mode-pill.active {
     color: #fff;
-    background: rgba(var(--pk-rgb), 0.22);
-    border-color: rgba(var(--pk-rgb), 0.65);
-    box-shadow: 0 0 16px rgba(var(--pk-rgb), 0.3);
+    background: rgba(var(--dan-rgb), 0.22);
+    border-color: rgba(var(--dan-rgb), 0.65);
+    box-shadow: 0 0 16px rgba(var(--dan-rgb), 0.3);
 }
-.packs-type-pill.active svg { opacity: 1; color: var(--pk); }
+.dan-mode-pill.active svg { opacity: 1; color: var(--dan); }
 
-.packs-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
-    gap: 12px;
-}
-.packs-list .osu-empty { grid-column: 1 / -1; }
-.packs-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+.dan-toolbar { margin-bottom: 12px; }
+
+#dan-list.osu-collection {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 10px;
-    min-height: 128px;
-    text-align: left;
-    padding: 13px 15px 13px 18px;
-    border-radius: 14px;
-    font: inherit;
-    color: var(--text);
-    background:
-        radial-gradient(120% 90% at 100% 0%, rgba(var(--pk-rgb), 0.13) 0%, transparent 60%),
-        var(--bg-card-alt);
-    border: 1px solid var(--border-light);
-    cursor: pointer;
-    overflow: hidden;
-    transition: transform 0.18s var(--ease-out), border-color 0.18s, box-shadow 0.18s;
 }
-.packs-card::before {
-    content: "";
+.dan-card:hover {
+    border-color: rgba(var(--dan-rgb), 0.5);
+    box-shadow: var(--osu-card-shadow), 0 0 20px rgba(var(--dan-rgb), 0.22);
+}
+.dan-pin-badge {
     position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: var(--pk);
-    opacity: 0.9;
-}
-.packs-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(var(--pk-rgb), 0.55);
-    box-shadow: var(--osu-card-shadow), 0 0 22px rgba(var(--pk-rgb), 0.22);
-}
-.packs-card:active { transform: translateY(-1px) scale(0.995); }
-.packs-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.packs-card-tag {
-    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 3px 9px;
-    border-radius: 7px;
-    color: var(--pk);
-    background: rgba(var(--pk-rgb), 0.16);
-    border: 1px solid rgba(var(--pk-rgb), 0.32);
-}
-.packs-card-type { display: inline-flex; color: var(--pk); opacity: 0.55; }
-.packs-card-type svg { width: 18px; height: 18px; }
-.packs-card-name {
-    flex: 1;
-    font-size: 0.92rem;
-    font-weight: 650;
-    line-height: 1.35;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.packs-card-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 0.72rem;
-    color: var(--text-label);
-}
-.packs-card-author {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 62%;
-}
-.packs-card-tail { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.packs-card-meta { white-space: nowrap; }
-.packs-card-challenge {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 5px;
-    color: var(--accent-yellow);
-    background: rgba(251, 191, 36, 0.14);
-    border: 1px solid rgba(251, 191, 36, 0.35);
-}
-.packs-more-btn { margin: 4px auto 0; }
-
-/* Pack detail modal — meta strip above the beatmapset grid. */
-.packs-detail-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 2px 0 14px;
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-}
-.packs-detail-type {
+    top: 8px;
+    left: 8px;
+    z-index: 3;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-weight: 600;
-    color: var(--pk);
+    gap: 4px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 2px 7px 2px 6px;
+    border-radius: 999px;
+    color: #1a1523;
+    background: rgba(var(--dan-rgb), 0.92);
 }
-.packs-detail-type svg { width: 14px; height: 14px; }
-.packs-detail-count { color: var(--text-label); }
-@media (prefers-reduced-motion: no-preference) {
-    .packs-card {
-        animation: packsCardIn 0.32s var(--ease-out) both;
-        animation-delay: calc(min(var(--i), 11) * 28ms);
-    }
-    @keyframes packsCardIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: none; }
-    }
+.dan-pin-badge svg { width: 11px; height: 11px; }
+.dan-status {
+    text-transform: capitalize;
+    color: var(--text-label);
 }
-@media (prefers-reduced-motion: reduce) {
-    .packs-card, .packs-type-pill { transition: none; }
-}
+.dan-more-btn { margin: 4px auto 0; }
 
 /* Smart (dynamic) category banner — sits above the grid on a category that
    remembers a Catalog facet. Spans the grid's full width. */

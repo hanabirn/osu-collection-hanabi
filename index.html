@@ -183,7 +183,7 @@
             <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
             <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
             <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
-            <button class="site-nav-btn" onclick="switchTab('packs', this)" data-i18n="nav_packs">官方圖包</button>
+            <button class="site-nav-btn" onclick="switchTab('dan', this)" data-i18n="nav_dan">段位認定</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
             <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
             <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
@@ -493,12 +493,15 @@
         <div id="catalog-pagination" class="osu-pagination"></div>
     </section>
 
-    <section id="page-packs" class="site-page" style="display:none;">
-        <h2 class="osu-page-title" data-i18n="packs_page_title">✦ 官方圖包 ✦</h2>
-        <p class="tournaments-hint" data-i18n="packs_hint">osu! 官方策劃的圖包：主題包、精選藝術家、賽事包、Spotlight、Loved。選一個包，把整包一鍵加成收藏分類。資料即時取自 osu! API。</p>
-        <div class="packs-type-row" id="packs-type-row"></div>
-        <div id="packs-list" class="packs-list"></div>
-        <div id="packs-more" class="osu-pagination"></div>
+    <section id="page-dan" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="dan_page_title">✦ 段位認定 ✦</h2>
+        <p class="tournaments-hint" data-i18n="dan_hint">各模式的段位認定（dan course）——社群製作的實力認定馬拉松圖，一段一張圖。清單以 osu! 圖譜搜尋為主、加上少量精選置頂；mania 只收 4K／7K。點卡片開 osu! 頁面，或用 ＋ 加進收藏。</p>
+        <div class="dan-mode-row" id="dan-mode-row"></div>
+        <div class="dan-toolbar">
+            <button class="btn btn-sm" id="dan-add-page-btn" onclick="addDanPageToCollection()" data-icon="plus" data-icon-gap><span data-i18n="dan_add_page_btn">把這頁加入收藏</span></button>
+        </div>
+        <div id="dan-list" class="osu-collection"></div>
+        <div id="dan-more" class="osu-pagination"></div>
     </section>
 
     <section id="page-mappools" class="site-page" style="display:none;">
@@ -1065,17 +1068,6 @@
     </div>
 </div>
 
-<div id="packs-detail-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closePacksDetailModal()">
-    <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closePacksDetailModal()" data-icon="x"></button>
-        <h3 class="pp-calc-title" id="packs-detail-title"></h3>
-        <div id="packs-detail-body"></div>
-        <div class="gallery-detail-actions">
-            <button class="btn" id="packs-detail-add-btn" onclick="addWholePackToCollection()" data-icon="plus" data-icon-gap><span data-i18n="packs_add_all_label">把整包加入收藏</span></button>
-        </div>
-    </div>
-</div>
-
 <footer class="site-footer">
     <p>osu! 歌曲收藏 ✦ osu! is a trademark of ppy Pty Ltd</p>
     <a class="footer-support-link" href="https://ko-fi.com/hanabirn" target="_blank" rel="noopener noreferrer" data-icon="heart" data-icon-gap><span>Support</span></a>
@@ -1143,7 +1135,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/gallery-comments.js"></script>
 <script defer src="js/farm-maps.js"></script>
 <script defer src="js/catalog.js"></script>
-<script defer src="js/packs.js"></script>
+<script defer src="js/dan.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/global-search.js"></script>
 <script defer src="js/skins.js"></script>

@@ -7,15 +7,13 @@ I18N.zh = {
     page_refresh_btn_title: '重新整理頁面',
     volume_fab_title: '調整預覽音量',
     global_search_title: '搜尋全站', global_search_placeholder: '搜尋歌曲、圖池、我的收藏...', select_language: '選擇語言',
-    nav_packs: '官方圖包',
-    packs_page_title: '✦ 官方圖包 ✦',
-    packs_hint: 'osu! 官方策劃的圖包：主題包、精選藝術家、賽事包、Spotlight、Loved。選一個包，把整包一鍵加成收藏分類。資料即時取自 osu! API。',
-    packs_type_standard: '標準包', packs_type_featured: '精選藝術家', packs_type_theme: '主題', packs_type_tournament: '賽事', packs_type_spotlight: 'Spotlight', packs_type_loved: 'Loved', packs_type_artist: '藝術家／專輯',
-    packs_no_reduction: '禁用簡化 Mod', packs_load_fail: '圖包載入失敗', packs_empty: '目前沒有圖包', packs_load_more: '載入更多',
-    packs_add_all_label: '把整包加入收藏', packs_add_all_btn: '把整包加入收藏（缺 {n} 張）', packs_add_all_done: '整包都在收藏裡了',
-    packs_add_all_confirm: '要把「{name}」整包 {n} 張圖建立成收藏分類嗎？',
-    packs_by: '作者 {n}',
-    packs_set_count: '{n} 張圖',
+    nav_dan: '段位認定',
+    dan_page_title: '✦ 段位認定 ✦',
+    dan_hint: '各模式的段位認定（dan course）——社群製作的實力認定馬拉松圖，一段一張圖。清單以 osu! 圖譜搜尋為主、加上少量精選置頂；mania 只收 4K／7K。點卡片開 osu! 頁面，或用 ＋ 加進收藏。',
+    dan_load_fail: '段位清單載入失敗', dan_empty: '找不到這個模式的段位圖', dan_load_more: '載入更多',
+    dan_pinned: '精選',
+    dan_add_page_btn: '把這頁加入收藏', dan_add_page_confirm: '要把「{name}」這頁 {n} 張圖建立成收藏分類嗎？',
+    dan_collection_name: '段位認定 - {mode}',
     global_search_section_collection: '我的收藏', global_search_section_catalog: '曲庫分類', global_search_section_mappools: '世界盃圖池',
     global_search_empty: '找不到符合的結果',
     track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',
@@ -453,10 +451,10 @@ I18N.zh = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 官方圖包</div>
-                <p class="howto-tab-desc">osu! 官方策劃的圖包：標準、精選藝術家、主題、賽事、Spotlight、Loved、藝術家／專輯。</p>
-                <div class="howto-feat"><b>類型籤</b><span>七種類型切換，往下捲用「載入更多」翻頁。</span></div>
-                <div class="howto-feat"><b>➕ 把整包加入收藏</b><span>點一列打開整包圖清單，一鍵把整包（或單張）加成收藏分類。資料即時取自 osu! API。</span></div>
+                <div class="howto-tab-title">✦ 段位認定</div>
+                <p class="howto-tab-desc">各模式的段位認定（dan course）——社群做的實力認定馬拉松圖，一段一張圖。</p>
+                <div class="howto-feat"><b>模式籤</b><span>osu!／taiko／catch／mania 4K／mania 7K 切換。清單以 osu! 圖譜搜尋「dan course」為主，加上少量精選置頂（卡片左上有「精選」標）。</span></div>
+                <div class="howto-feat"><b>加入收藏</b><span>點卡片開 osu! 頁面；卡片上的 ＋ 把該圖加進收藏，或上方「把這頁加入收藏」整頁建成一個分類。</span></div>
             </div>
 
             <div class="howto-tab">
