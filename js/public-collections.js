@@ -352,6 +352,14 @@ async function downloadPublicCollection(id) {
 let galleryDetailData = null;
 let galleryDetailMode = 'standard';
 let galleryScoresOverlaid = false;
+/* The map grid pages 12 at a time (3 cols × 4 rows) so the comment box
+   below it stays reachable without scrolling past a whole collection. */
+let galleryDetailPage = 0;
+const GALLERY_DETAIL_PAGE_SIZE = 12;
+/* setId -> { cls, text, title } from "疊上我的成績", so the badges survive
+   a page turn without re-hitting the score API for every set again. */
+const galleryDetailScoreCache = new Map();
+let galleryDetailScoreTally = null;
 
 async function openGalleryDetailModal(id) {
     const item = publicCollectionsItems.find(i => String(i.id) === String(id));
@@ -363,6 +371,9 @@ async function openGalleryDetailModal(id) {
 
     galleryDetailData = null;
     galleryScoresOverlaid = false;
+    galleryDetailPage = 0;
+    galleryDetailScoreCache.clear();
+    galleryDetailScoreTally = null;
     titleEl.textContent = (item && item.username) || `#${id}`;
     tabsEl.innerHTML = '';
     bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
@@ -473,10 +484,21 @@ function checkGalleryDeepLink() {
 
 function switchGalleryDetailMode(mode) {
     galleryDetailMode = mode;
+    galleryDetailPage = 0;
+    galleryDetailScoreTally = null;   // per-view aggregate; the per-set cache still stands
     document.querySelectorAll('#gallery-detail-mode-tabs .osu-mode-tab').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.mode === mode);
     });
     renderGalleryDetailGrid();
+}
+
+function gotoGalleryDetailPage(page) {
+    const total = Math.max(1, Math.ceil(galleryDetailVisibleSets().length / GALLERY_DETAIL_PAGE_SIZE));
+    galleryDetailPage = Math.min(Math.max(0, page | 0), total - 1);
+    renderGalleryDetailGrid();
+    // Land back at the top of the grid, not wherever the last page's scroll was.
+    const anchor = document.getElementById('gallery-detail-mode-tabs');
+    if (anchor) anchor.scrollIntoView({ block: 'nearest' });
 }
 
 /* The sets shown by the current mode/category tab — shared by the grid
@@ -499,8 +521,13 @@ function renderGalleryDetailGrid() {
     if (!galleryDetailData) return;
 
     const sets = galleryDetailVisibleSets();
+    const totalPages = Math.max(1, Math.ceil(sets.length / GALLERY_DETAIL_PAGE_SIZE));
+    if (galleryDetailPage >= totalPages) galleryDetailPage = totalPages - 1;
+    if (galleryDetailPage < 0) galleryDetailPage = 0;
+    const start = galleryDetailPage * GALLERY_DETAIL_PAGE_SIZE;
+    const pageSets = sets.slice(start, start + GALLERY_DETAIL_PAGE_SIZE);
 
-    const cards = sets.map(set => {
+    const cards = pageSets.map(set => {
         const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         // A category can mix modes, so the badge reads each set's own mode
@@ -524,10 +551,40 @@ function renderGalleryDetailGrid() {
     }).join('');
 
     const summary = galleryScoresOverlaid ? '<div id="gallery-detail-score-summary" class="gallery-detail-score-summary"></div>' : '';
-    bodyEl.innerHTML = `${summary}<div class="gallery-detail-grid">${cards}</div>`;
-    // A tab switch re-renders the grid: re-run the overlay for the new tab's
-    // sets if the viewer had turned it on.
-    if (galleryScoresOverlaid) overlayGalleryDetailScores();
+
+    let pager = '';
+    if (totalPages > 1) {
+        const p = galleryDetailPage;
+        pager = '<div class="osu-pagination gallery-detail-pager">'
+            + `<button class="osu-page-btn" onclick="gotoGalleryDetailPage(0)" ${p === 0 ? 'disabled' : ''}>«</button>`
+            + `<button class="osu-page-btn" onclick="gotoGalleryDetailPage(${p - 1})" ${p === 0 ? 'disabled' : ''}>‹</button>`
+            + buildPaginationPageButtons(p, totalPages, (i) => `gotoGalleryDetailPage(${i})`)
+            + `<button class="osu-page-btn" onclick="gotoGalleryDetailPage(${p + 1})" ${p >= totalPages - 1 ? 'disabled' : ''}>›</button>`
+            + `<button class="osu-page-btn" onclick="gotoGalleryDetailPage(${totalPages - 1})" ${p >= totalPages - 1 ? 'disabled' : ''}>»</button>`
+            + '</div>';
+    }
+
+    bodyEl.innerHTML = `${summary}<div class="gallery-detail-grid">${cards}</div>${pager}`;
+
+    // Score overlay is on (viewer hit "疊上我的成績"): re-paint badges for the
+    // cards on this page from the cache, and only fetch the ones not seen yet
+    // (a page past the initial run's 100-set cap, or the very first render).
+    if (galleryScoresOverlaid) {
+        pageSets.forEach(set => applyGalleryScoreBadge(set.beatmapset_id));
+        if (galleryDetailScoreTally) renderGalleryScoreSummary(galleryDetailScoreTally);
+        if (pageSets.some(s => !galleryDetailScoreCache.has(s.beatmapset_id))) overlayGalleryDetailScores();
+    }
+}
+
+/* Push one cached score result onto its card, if both exist. */
+function applyGalleryScoreBadge(setId) {
+    const entry = galleryDetailScoreCache.get(setId);
+    const el = document.getElementById(`gd-score-${setId}`);
+    if (!entry || !el) return;
+    el.className = entry.cls;
+    el.textContent = entry.text;
+    if (entry.title) el.title = entry.title;
+    el.style.display = 'flex';
 }
 
 /* "疊上我的成績": for each visible set, look up the logged-in viewer's best
@@ -551,51 +608,62 @@ async function overlayGalleryDetailScores() {
     }).filter(x => x.beatmapId != null && x.mode >= 0);
     if (!allTargets.length) return;
     const truncated = allTargets.length > GALLERY_SCORES_CAP;
-    const targets = allTargets.slice(0, GALLERY_SCORES_CAP);
+    const capped = allTargets.slice(0, GALLERY_SCORES_CAP);
 
     galleryScoresOverlaid = true;
     // The summary line lives above the grid; the grid was rendered before
     // the overlay was turned on, so create the slot now if it's missing
     // (a later grid re-render — e.g. tab switch — keeps it via the flag).
-    let summaryEl = document.getElementById('gallery-detail-score-summary');
-    if (!summaryEl) {
+    if (!document.getElementById('gallery-detail-score-summary')) {
         const body = document.getElementById('gallery-detail-body');
-        if (body) {
-            body.insertAdjacentHTML('afterbegin', '<div id="gallery-detail-score-summary" class="gallery-detail-score-summary"></div>');
-        }
+        if (body) body.insertAdjacentHTML('afterbegin', '<div id="gallery-detail-score-summary" class="gallery-detail-score-summary"></div>');
     }
     if (btn) { btn.disabled = true; btn.classList.add('checking'); }
     const label = btn && btn.querySelector('span');
 
-    const tally = { total: targets.length, have: 0, ranks: {}, truncated, grandTotal: allTargets.length };
+    // Only look up the sets on the current page that aren't cached yet — a
+    // page turn re-enters here for the newly shown 12. Cache keeps badges
+    // and the running tally alive across pages without re-hitting the API.
+    const pageStart = galleryDetailPage * GALLERY_DETAIL_PAGE_SIZE;
+    const pageIds = new Set(sets.slice(pageStart, pageStart + GALLERY_DETAIL_PAGE_SIZE).map(s => s.beatmapset_id));
+    const todo = capped.filter(x => pageIds.has(x.setId) && !galleryDetailScoreCache.has(x.setId));
     const CH = 6;
-    for (let i = 0; i < targets.length; i += CH) {
-        if (label) label.textContent = t('gallery_scores_checking', { done: i, total: targets.length });
-        await Promise.all(targets.slice(i, i + CH).map(async ({ setId, beatmapId, mode }) => {
-            const el = document.getElementById(`gd-score-${setId}`);
-            if (!el) return;
+    for (let i = 0; i < todo.length; i += CH) {
+        if (label) label.textContent = t('gallery_scores_checking', { done: i, total: todo.length });
+        await Promise.all(todo.slice(i, i + CH).map(async ({ setId, beatmapId, mode }) => {
             try {
                 const scores = await osuFetch(`scoreBeatmap=${beatmapId}&scoreUser=${user.id}&m=${mode}`);
                 const score = Array.isArray(scores) ? scores[0] : null;
+                let entry;
                 if (!score) {
-                    el.className = 'gallery-detail-item-score osu-play-status unplayed';
-                    el.textContent = '–';
+                    entry = { cls: 'gallery-detail-item-score osu-play-status unplayed', text: '–', title: '', rank: null };
                 } else {
-                    tally.have++;
-                    tally.ranks[score.rank] = (tally.ranks[score.rank] || 0) + 1;
                     const rankClass = OSU_RANK_CLASS[score.rank] || 'f';
                     const isFc = (parseInt(score.countmiss) || 0) === 0;
-                    el.className = `gallery-detail-item-score osu-play-status rank-${rankClass}`;
-                    el.textContent = score.rank || '?';
-                    el.title = `${t(isFc ? 'play_status_fc_title' : 'play_status_played_title', { rank: score.rank || '?' })} · ${(parseFloat(score.pp) || 0).toFixed(0)}pp`;
+                    entry = {
+                        cls: `gallery-detail-item-score osu-play-status rank-${rankClass}`,
+                        text: score.rank || '?',
+                        title: `${t(isFc ? 'play_status_fc_title' : 'play_status_played_title', { rank: score.rank || '?' })} · ${(parseFloat(score.pp) || 0).toFixed(0)}pp`,
+                        rank: score.rank || null,
+                    };
                 }
-                el.style.display = 'flex';
+                galleryDetailScoreCache.set(setId, entry);
+                applyGalleryScoreBadge(setId);
             } catch (e) {
                 console.error('Gallery score check failed for beatmap', beatmapId, e);
             }
         }));
     }
 
+    // Tally over every set checked so far (grows as the viewer pages through).
+    const tally = { total: 0, have: 0, ranks: {}, truncated, grandTotal: allTargets.length };
+    capped.forEach(x => {
+        const e = galleryDetailScoreCache.get(x.setId);
+        if (!e) return;
+        tally.total++;
+        if (e.rank) { tally.have++; tally.ranks[e.rank] = (tally.ranks[e.rank] || 0) + 1; }
+    });
+    galleryDetailScoreTally = tally;
     renderGalleryScoreSummary(tally);
     if (btn) { btn.disabled = false; btn.classList.remove('checking'); }
     if (label) label.textContent = t('gallery_scores_btn');
