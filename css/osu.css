@@ -1351,7 +1351,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    handful per screen. Scoped to #farm-maps-list so the main collection
    grid (#osu-collection) and gallery cards keep their own proportions. */
 #farm-maps-list.osu-collection {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    /* Wider than the base collection grid's 240px — these cards pack the
+       title + [difficulty name] on one line (farm-maps.js), which needs
+       more room before text-overflow:ellipsis starts eating it. */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 10px;
 }
 #farm-maps-list .osu-card {
@@ -1519,7 +1522,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
    language / genre / source pills instead of pp/star/bpm. */
 #catalog-list.osu-collection {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    /* Wider than the base collection grid's 240px — long titles + feat.
+       names were getting truncated too aggressively at that width. */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 10px;
 }
 #catalog-list .osu-card {
