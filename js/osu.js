@@ -3552,17 +3552,26 @@ function heroCoverTick(layers) {
     }, 7000);
 }
 
+function heroOnScreen(el) {
+    const r = el.getBoundingClientRect();
+    return r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+}
+
 function armHeroCover(hero, layers) {
     if (heroCover.io) return;   // already armed
     heroCover.io = new IntersectionObserver(es => {
-        const onScreen = es[0].isIntersecting && !document.hidden;
-        if (onScreen && !heroCover.timer) heroCoverTick(layers);
-        else if (!onScreen) { clearTimeout(heroCover.timer); heroCover.timer = null; }
+        const onScreen = es[es.length - 1].isIntersecting && !document.hidden;
+        if (onScreen) { if (!heroCover.timer) heroCoverTick(layers); }
+        else { clearTimeout(heroCover.timer); heroCover.timer = null; }
     }, { threshold: 0.1 });
     heroCover.io.observe(hero);
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) { clearTimeout(heroCover.timer); heroCover.timer = null; }
+        else if (!heroCover.timer && heroOnScreen(hero)) heroCoverTick(layers);
     });
+    // IO's first callback can miss a display:none -> block transition, so
+    // start it here if the hero is already visible.
+    if (!heroCover.timer && heroOnScreen(hero) && !document.hidden) heroCoverTick(layers);
 }
 
 function updateCollectionHeroV2() {
