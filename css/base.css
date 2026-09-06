@@ -617,17 +617,17 @@ a:hover { text-decoration: underline; }
 .flag--es { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Cpath fill='%23AA151B' d='M0 0h3v2H0z'/%3E%3Cpath fill='%23F1BF00' d='M0 .5h3v1H0z'/%3E%3C/svg%3E"); }
 .flag--de { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Cpath d='M0 0h3v2H0z'/%3E%3Cpath fill='%23D00' d='M0 .667h3v1.333H0z'/%3E%3Cpath fill='%23FFCE00' d='M0 1.333h3v.667H0z'/%3E%3C/svg%3E"); }
 .lang-pill:hover {
-    border-color: var(--accent-pink);
-    color: var(--text-pink);
-    box-shadow: 0 0 10px rgba(var(--accent-pink-rgb), 0.25);
-    transform: translateY(-1px);
+    border-color: rgba(var(--pink-rgb), 0.5);
+    color: var(--text);
+    box-shadow: none;
 }
 .lang-pill:active { transform: scale(0.94); }
 .lang-pill.active {
-    background: var(--accent-purple);
-    color: #fff;
-    font-weight: bold;
-    box-shadow: 0 0 14px rgba(var(--accent-purple-rgb), 0.35);
+    background: rgba(var(--pink-rgb), 0.16);
+    border-color: rgba(var(--pink-rgb), 0.55);
+    color: var(--text);
+    font-weight: 700;
+    box-shadow: none;
 }
 
 .notif-bell {
@@ -1227,12 +1227,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     z-index: 81;
     display: flex;
     flex-direction: column;
-    background: rgba(16, 10, 32, 0.92);
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    color: #fff;
+    background: var(--bg-modal);
+    border-left: 1px solid var(--border-strong);
+    box-shadow: -16px 0 48px rgba(0, 0, 0, 0.5);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: var(--text);
     transform: translateX(100%);
     transition: transform 0.32s var(--ease-out);
 }
@@ -1625,38 +1625,28 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border-color: var(--accent-light-purple);
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
+/* Redesign (spec §6.2): flat pink primary, near-black text, no shimmer. */
 .input-group button, .btn {
     position: relative;
-    overflow: hidden;
     flex-shrink: 0;
-    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-    color: #fff;
+    background: var(--pink);
+    color: #14101c;
     border: none;
-    padding: 11px 18px;
+    padding: 10px 18px;
     border-radius: 10px;
     font-size: 0.9rem;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 4px 14px rgba(var(--accent-pink-rgb), 0.25);
-    transition: filter 0.25s var(--ease-out), transform 0.2s var(--ease-spring), box-shadow 0.25s var(--ease-out);
+    box-shadow: none;
+    transition: background 0.18s var(--ease-out), transform 0.12s var(--ease-out), box-shadow 0.18s var(--ease-out);
 }
-.input-group button::after, .btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.6s ease;
-    pointer-events: none;
-}
-.input-group button:hover::after, .btn:hover::after { transform: translateX(100%); }
+.input-group button::after, .btn::after { content: none; }
 .input-group button:hover, .btn:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(var(--accent-pink-rgb), 0.4);
+    background: var(--pink-bright);
+    box-shadow: 0 0 18px rgba(var(--pink-rgb), 0.3);
 }
-.input-group button:active, .btn:active { transform: translateY(0) scale(0.97); }
+.input-group button:active, .btn:active { transform: scale(0.97); }
 
 .guestbook-input {
     flex: 1;
@@ -1669,7 +1659,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-family: inherit;
 }
 
-.card-corner {
+.card-corner { display: none; }
+.card-corner-legacy-unused {
     position: absolute;
     width: 14px;
     height: 14px;
