@@ -213,7 +213,7 @@
 
 
     <section id="page-collection" class="site-page">
-        <div id="collection-hero-v2" class="collection-hero-v2">
+        <div id="collection-hero-v2" class="collection-hero-v2" hidden>
             <span class="hero-cover" aria-hidden="true"></span>
             <span class="hero-cover" aria-hidden="true"></span>
             <p class="eyebrow">MY COLLECTION</p>
@@ -239,6 +239,29 @@
                 <a class="collection-hero-cta" id="collection-hero-cta" href="/.netlify/functions/osu-login" hidden data-i18n="hero_login_cta">用 osu! 登入，自動帶入你的最愛</a>
             </div>
         </div>
+        <!-- CLS guard: the collection lives in localStorage, so pick which hero
+             shows (and whether the login CTA shows) BEFORE first paint, instead
+             of letting the async renderOsuCollection() toggle it after — that
+             post-paint collapse of #collection-hero-v2 was the whole desktop
+             CLS. Mirrors updateCollectionHeroVisibility() + updateCollectionHeroV2(). -->
+        <script>
+        (function () {
+            try {
+                var c = JSON.parse(localStorage.getItem('osu_collection')) || {};
+                var empty = !['standard', 'taiko', 'catch', 'mania'].some(function (m) { return (c[m] || []).length; });
+                var v2 = document.getElementById('collection-hero-v2');
+                var v1 = document.getElementById('collection-hero');
+                var cta = document.getElementById('collection-hero-cta');
+                if (v2) { v2.hidden = empty; if (!empty) v2.classList.add('has-cover'); }
+                if (v1) v1.hidden = !empty;
+                if (cta) {
+                    var li = false;
+                    try { li = !!(JSON.parse(localStorage.getItem('osu_logged_in_user')) || {}).id; } catch (e) {}
+                    cta.hidden = !empty || li;
+                }
+            } catch (e) {}
+        })();
+        </script>
         <div class="collection-layout">
             <div class="collection-layout-left">
                 <div class="osu-add-card">

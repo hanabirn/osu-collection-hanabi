@@ -218,8 +218,10 @@
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     color: var(--text-dim);
+    /* Reserve the line even before JS fills it, so the async stat text
+       doesn't nudge the eyebrow/title (flex justify-end) after paint. */
+    min-height: 1.1em;
 }
-.collection-hero-v2-stat:empty { display: none; }
 
 .collection-hero {
     max-width: 760px;
