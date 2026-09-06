@@ -347,5 +347,6 @@ body {
 - [x] 步驟 5 — 巡視殘留：osu.css ~11 處 `rgba(168,85,247,*)` 硬粉→pink var、`.pp-calc-title` 去漸層裁切；base.css FAB 去玻璃、mobile blur media query 歸零（`87521ab`）
 - [x] 步驟 6 — 淺色 parity：`.has-cover-banner` 強制白字 + 深色玻璃 chip 覆寫中性化、nav drawer 硬白 → token、`.btn` 淺色白字、modal 淺色淺陰影（`af738c2`）
 - [x] 步驟 7 — 刪掉整個 ambient 背景層：`css/particles.css` + `js/particles.js`（星點 canvas、3 顆光暈、脈動 hit-circle）、`.bg-layer`/`#bg-carousel`/`.site-header-overlay` markup、dead `initOsuBgCarousel` 系列（含一個永動 setInterval）；SW `CACHE_VERSION` v32。保留：`body::before` 淡粉 vignette + logo 環光暈（`6734b2a`）
-- [ ] 步驟 8 — 清 `!important` 過渡標記、正式站效能+視覺 QA（另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊要合併）
+- [x] 步驟 8 — `.site-header`/`.site-main`/`.site-page` 重寫乾淨（去掉全部過渡 `!important` + 舊 breakpoint 覆寫 + `.site-page::before` 彗星邊框）；空收藏時 `#collection-hero-v2` 設 `[hidden]`，不再與 pitch box 疊兩塊（`129a26d`）。QA 進行中。
+- 已知殘留（低優先，之後清）：`.has-cover-banner` / `#bg-carousel` / `.site-header-overlay` 的 CSS 規則還在但已無對應 DOM（inert dead CSS）。
 - 另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
