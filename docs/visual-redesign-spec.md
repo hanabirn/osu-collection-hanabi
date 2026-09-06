@@ -343,5 +343,9 @@ body {
 - [x] 步驟 1 — `theme.css` token 換色（`a60eb54`）
 - [x] 步驟 2 — `base.css` 外殼：header 縮成一條、去封面輪播+毛玻璃雙層+彗星邊框、標題緊湊化、logo 環無限動畫拿掉、`.eyebrow`/`.section-title`/`.block` utility、`.osu-page-title` 換新樣（`491911c` + `86e70dd` 標題/音符比例微調）
 - [x] 步驟 3 — 收藏首頁 `#collection-hero-v2` 框住封面 hero（每日一張、eyebrow + 大標題 + mono 統計；空收藏 → 平面卡）（`0e61e1f`）
-- [ ] 步驟 4 — `osu.css` 元件 pass（`.osu-card` hover、`.btn`、`.lang-pill`、modal 去 blur）
-- [ ] 步驟 5–8 — 見 §10。另：`!important` 過渡標記待步驟 8 清；空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
+- [x] 步驟 4 — 元件 pass：`.btn` 扁平粉、`.osu-card` hover 收斂、`.lang-pill.active` 改 tint、`.pp-calc-modal*`/`.nav-drawer` 去 blur 改實色、`.osu-stat`/`.osu-add-card` 去玻璃、角落括號隱藏（`a052d65`）
+- [ ] 步驟 5 — 其他 tab 巡視（chat/dm/skins/mappools/catalog/gallery/pp 各頁殘留的玻璃/漸層/舊粉標籤）
+- [ ] 步驟 6 — 淺色主題 parity
+- [ ] 步驟 7 — 粒子/地球 gated 或刪、清永動動畫殘留
+- [ ] 步驟 8 — 清 `!important` 過渡標記、正式站效能+視覺 QA
+- 另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
