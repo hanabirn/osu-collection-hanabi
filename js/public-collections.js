@@ -342,6 +342,7 @@ async function downloadPublicCollection(id) {
    plays switcher), rather than stacking all four modes in one long list. ===== */
 let galleryDetailData = null;
 let galleryDetailMode = 'standard';
+let galleryScoresOverlaid = false;
 
 async function openGalleryDetailModal(id) {
     const item = publicCollectionsItems.find(i => String(i.id) === String(id));
@@ -352,6 +353,7 @@ async function openGalleryDetailModal(id) {
     const downloadBtn = document.getElementById('gallery-detail-download-btn');
 
     galleryDetailData = null;
+    galleryScoresOverlaid = false;
     titleEl.textContent = (item && item.username) || `#${id}`;
     tabsEl.innerHTML = '';
     bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
@@ -401,6 +403,13 @@ async function openGalleryDetailModal(id) {
         renderGalleryDetailGrid();
         downloadBtn.style.display = '';
         if (shareBtn) shareBtn.style.display = '';
+        const scoresBtn = document.getElementById('gallery-detail-scores-btn');
+        if (scoresBtn) {
+            const loggedIn = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
+            scoresBtn.style.display = loggedIn ? '' : 'none';
+            const lbl = scoresBtn.querySelector('span');
+            if (lbl) lbl.textContent = t('gallery_scores_btn');
+        }
     } catch (e) {
         console.error('Gallery detail load failed:', e);
         bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_load_fail')}</p>`;
@@ -446,21 +455,26 @@ function switchGalleryDetailMode(mode) {
     renderGalleryDetailGrid();
 }
 
+/* The sets shown by the current mode/category tab — shared by the grid
+   renderer and the "疊上我的成績" overlay so both see the same list. */
+function galleryDetailVisibleSets() {
+    if (!galleryDetailData) return [];
+    if (OSU_MODES.includes(galleryDetailMode)) {
+        return galleryDetailData.collection[galleryDetailMode] || [];
+    }
+    // A category id — cross-mode, deduped, same pattern as
+    // renderOsuCollection()'s own favorites/category filter branch.
+    const memberIds = (galleryDetailData.categoryMembers && galleryDetailData.categoryMembers[galleryDetailMode]) || [];
+    const seen = new Set();
+    return OSU_MODES.flatMap(m => galleryDetailData.collection[m] || [])
+        .filter(s => memberIds.includes(s.beatmapset_id) && !seen.has(s.beatmapset_id) && seen.add(s.beatmapset_id));
+}
+
 function renderGalleryDetailGrid() {
     const bodyEl = document.getElementById('gallery-detail-body');
     if (!galleryDetailData) return;
 
-    let sets;
-    if (OSU_MODES.includes(galleryDetailMode)) {
-        sets = galleryDetailData.collection[galleryDetailMode] || [];
-    } else {
-        // A category id — cross-mode, deduped, same pattern as
-        // renderOsuCollection()'s own favorites/category filter branch.
-        const memberIds = (galleryDetailData.categoryMembers && galleryDetailData.categoryMembers[galleryDetailMode]) || [];
-        const seen = new Set();
-        sets = OSU_MODES.flatMap(m => galleryDetailData.collection[m] || [])
-            .filter(s => memberIds.includes(s.beatmapset_id) && !seen.has(s.beatmapset_id) && seen.add(s.beatmapset_id));
-    }
+    const sets = galleryDetailVisibleSets();
 
     const cards = sets.map(set => {
         const maxDiff = (set.beatmaps || []).reduce((m, b) => Math.max(m, b.difficulty_rating || 0), 0);
@@ -476,6 +490,7 @@ function renderGalleryDetailGrid() {
             <img class="gallery-detail-item-bg" src="${coverUrl}" alt="" loading="lazy" onerror="this.style.visibility='hidden';">
             <div class="gallery-detail-item-overlay"></div>
             ${modeBadge}
+            <span class="gallery-detail-item-score" id="gd-score-${set.beatmapset_id}" style="display:none;"></span>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event); event.preventDefault();" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
             <div class="gallery-detail-item-info">
                 <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
@@ -484,7 +499,78 @@ function renderGalleryDetailGrid() {
         </a>`;
     }).join('');
 
-    bodyEl.innerHTML = `<div class="gallery-detail-grid">${cards}</div>`;
+    const summary = galleryScoresOverlaid ? '<div id="gallery-detail-score-summary" class="gallery-detail-score-summary"></div>' : '';
+    bodyEl.innerHTML = `${summary}<div class="gallery-detail-grid">${cards}</div>`;
+    // A tab switch re-renders the grid: re-run the overlay for the new tab's
+    // sets if the viewer had turned it on.
+    if (galleryScoresOverlaid) overlayGalleryDetailScores();
+}
+
+/* "疊上我的成績": for each visible set, look up the logged-in viewer's best
+   score on that set's hardest difficulty (v1, chunked — same call the
+   collection page's own played-status button uses) and badge each card with
+   the rank, plus a grade-breakdown summary line above the grid. */
+async function overlayGalleryDetailScores() {
+    const user = typeof getLoggedInOsuUser === 'function' ? getLoggedInOsuUser() : null;
+    const btn = document.getElementById('gallery-detail-scores-btn');
+    if (!user || !user.id || !galleryDetailData) return;
+
+    const sets = galleryDetailVisibleSets();
+    const targets = sets.map(s => {
+        const hardest = (s.beatmaps || []).reduce((a, b) =>
+            (b.difficulty_rating || 0) > ((a && a.difficulty_rating) || 0) ? b : a, null);
+        return { setId: s.beatmapset_id, beatmapId: hardest && hardest.beatmap_id, mode: s.mode };
+    }).filter(x => x.beatmapId != null && x.mode >= 0);
+    if (!targets.length) return;
+
+    galleryScoresOverlaid = true;
+    if (btn) { btn.disabled = true; btn.classList.add('checking'); }
+    const label = btn && btn.querySelector('span');
+
+    const tally = { total: targets.length, have: 0, ranks: {} };
+    const CH = 6;
+    for (let i = 0; i < targets.length; i += CH) {
+        if (label) label.textContent = t('gallery_scores_checking', { done: i, total: targets.length });
+        await Promise.all(targets.slice(i, i + CH).map(async ({ setId, beatmapId, mode }) => {
+            const el = document.getElementById(`gd-score-${setId}`);
+            if (!el) return;
+            try {
+                const scores = await osuFetch(`scoreBeatmap=${beatmapId}&scoreUser=${user.id}&m=${mode}`);
+                const score = Array.isArray(scores) ? scores[0] : null;
+                if (!score) {
+                    el.className = 'gallery-detail-item-score osu-play-status unplayed';
+                    el.textContent = '–';
+                } else {
+                    tally.have++;
+                    tally.ranks[score.rank] = (tally.ranks[score.rank] || 0) + 1;
+                    const rankClass = OSU_RANK_CLASS[score.rank] || 'f';
+                    const isFc = (parseInt(score.countmiss) || 0) === 0;
+                    el.className = `gallery-detail-item-score osu-play-status rank-${rankClass}`;
+                    el.textContent = score.rank || '?';
+                    el.title = `${t(isFc ? 'play_status_fc_title' : 'play_status_played_title', { rank: score.rank || '?' })} · ${(parseFloat(score.pp) || 0).toFixed(0)}pp`;
+                }
+                el.style.display = 'flex';
+            } catch (e) {
+                console.error('Gallery score check failed for beatmap', beatmapId, e);
+            }
+        }));
+    }
+
+    renderGalleryScoreSummary(tally);
+    if (btn) { btn.disabled = false; btn.classList.remove('checking'); }
+    if (label) label.textContent = t('gallery_scores_btn');
+}
+
+function renderGalleryScoreSummary(tally) {
+    const el = document.getElementById('gallery-detail-score-summary');
+    if (!el) return;
+    const order = ['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D'];
+    const disp = { XH: 'SS', X: 'SS', SH: 'S', S: 'S', A: 'A', B: 'B', C: 'C', D: 'D' };
+    const merged = {};
+    order.forEach(r => { if (tally.ranks[r]) merged[disp[r]] = (merged[disp[r]] || 0) + tally.ranks[r]; });
+    const parts = Object.entries(merged).map(([g, n]) =>
+        `<span class="gds-grade rank-${(g === 'SS' ? 'ss' : g.toLowerCase())}">${g} ${n}</span>`);
+    el.innerHTML = `<span class="gds-have">${t('gallery_scores_summary', { have: tally.have, total: tally.total })}</span>${parts.join('')}`;
 }
 
 function closeGalleryDetailModal() {

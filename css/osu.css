@@ -3203,6 +3203,36 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .gallery-detail-download-btn { margin-top: 0; }
 @media (max-width: 480px) { .gallery-detail-actions { flex-direction: column; } }
 
+/* "疊上我的成績" — per-card rank badge (top-right; mode badge owns top-left)
+   plus a grade-breakdown line above the grid. */
+.gallery-detail-item-score {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    bottom: auto;
+    left: auto;
+    width: 24px;
+    height: 24px;
+    font-size: 0.62rem;
+}
+.gallery-detail-score-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.gallery-detail-score-summary .gds-have { font-weight: 700; color: var(--text-primary); }
+.gallery-detail-score-summary .gds-grade { font-weight: 700; }
+.gds-grade.rank-ss { color: #ffd966; }
+.gds-grade.rank-s  { color: #9be7ff; }
+.gds-grade.rank-a  { color: #77dd77; }
+.gds-grade.rank-b  { color: #c9a0ff; }
+.gds-grade.rank-c  { color: #ff9f6b; }
+.gds-grade.rank-d  { color: #ff6b6b; }
+
 /* ===== Gallery comments (inside the detail modal) — reuses .chat-message
    for each row, just in a shorter scroll box since it shares the modal
    with the collection grid + action buttons above it. */

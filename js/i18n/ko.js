@@ -196,6 +196,7 @@ I18N.ko = {
     gallery_sort_recent: '최신 발행순', gallery_sort_sets: '비트맵 많은순', gallery_sort_rating: '최고 별점순',
     gallery_import_confirm: '{name}님의 컬렉션({n}개의 비트맵)입니다. 내 컬렉션으로 가져올까요? (기존 항목은 덮어쓰지 않고, 없는 것만 추가됩니다)',
     gallery_download_btn_title: '이 컬렉션 가져오기', gallery_share_btn: '링크 공유', gallery_share_copied: '공유 링크를 복사했습니다!', gallery_view_btn_title: '목록 보기',
+    gallery_scores_btn: '내 성적 표시', gallery_scores_checking: '확인 중 {done}/{total}', gallery_scores_summary: '보유 {have}/{total}',
     gallery_comments_title: '댓글', gallery_comments_loading: '댓글 불러오는 중...', gallery_comments_load_fail: '댓글을 불러오지 못했습니다',
     gallery_comments_empty: '아직 댓글이 없어요 — 첫 댓글을 남겨보세요!', gallery_comments_placeholder: '댓글을 입력하세요...',
     gallery_comments_send: '전송', gallery_comments_send_fail: '댓글 전송에 실패했습니다. 나중에 다시 시도해 주세요',
