@@ -1249,6 +1249,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: #fff;
     background: rgba(52,211,153,0.5);
 }
+.osu-download-btn.local-downloaded {
+    color: #34d399;
+    background: rgba(52,211,153,0.18);
+    opacity: 1;
+}
 
 .osu-play-btn {
     position: absolute;

@@ -314,6 +314,12 @@ I18N.zh = {
     check_played_btn_title: '標出這頁已遊玩的圖\n需要先用 osu! 登入；會逐張查你在該圖的最佳成績', play_status_unplayed_title: '你還沒玩過這張圖（最高難度）',
     play_status_played_title: '你打過這張圖，評級 {rank}', play_status_fc_title: '你 FC 過這張圖，評級 {rank}',
 
+    local_scan_btn_title: '選擇本機 osu! Songs 資料夾，比對哪些圖已經下載\n只支援 Chrome / Edge，且只認得 osu! stable',
+    local_scan_unsupported: '你的瀏覽器不支援這個功能，請用 Chrome 或 Edge',
+    local_scan_fail: '讀取資料夾失敗，請確認選的是 osu! 的 Songs 資料夾',
+    local_scan_done: '已比對本機資料夾，共 {n} 個譜面組',
+    local_downloaded_title: '這張圖已經在你的本機 Songs 資料夾裡',
+
     pp_race_title: 'PP 賽跑',
 
     nav_skin_screenshots: '皮膚廣場',

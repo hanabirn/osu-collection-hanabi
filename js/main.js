@@ -219,6 +219,11 @@ function onGlobalShortcutKeydown(e) {
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', onGlobalShortcutKeydown);
     if (typeof renderStaticIcons === 'function') renderStaticIcons();
+    // Local Songs-folder scan needs the File System Access API — Chromium
+    // only, so hide the button entirely on browsers that lack it rather
+    // than showing a control that would always fail.
+    const localScanBtn = document.getElementById('osu-local-scan-btn');
+    if (localScanBtn) localScanBtn.style.display = window.showDirectoryPicker ? '' : 'none';
     if (typeof wireModalHowto === 'function') wireModalHowto();
     applyLang(siteLang);
     initMaintenanceBanner();

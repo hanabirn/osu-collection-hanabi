@@ -650,6 +650,50 @@ async function batchDownloadCollectionView() {
     osuBatchDownloadPaused = false;
 }
 
+// Set<beatmapset_id> once scanLocalSongsFolder() has scanned a folder this
+// page load; null means "never scanned" (renderOsuCollection() falls back
+// to the plain download button for every card until then).
+let osuLocalDownloadedIds = null;
+
+/* Cross-references the collection against what's actually sitting in the
+   user's own osu! Songs folder — no server round-trip, no account needed.
+   Chromium-only (File System Access API; no Firefox/Safari fallback) and
+   osu! *stable* only: it works by reading directory NAMES, not contents,
+   relying on stable's own "<beatmapset_id> <artist> - <title>" folder
+   naming convention. osu!lazer stores songs in a completely different
+   layout (hashed files + a Realm database) so this can't see a lazer
+   install at all — same ceiling as the collection.db export already has. */
+async function scanLocalSongsFolder() {
+    if (!window.showDirectoryPicker) {
+        alert(t('local_scan_unsupported'));
+        return;
+    }
+    let dirHandle;
+    try {
+        dirHandle = await window.showDirectoryPicker();
+    } catch (e) {
+        return; // user cancelled the native folder picker
+    }
+
+    const ids = new Set();
+    try {
+        for await (const [name, handle] of dirHandle.entries()) {
+            if (handle.kind !== 'directory') continue;
+            const m = name.match(/^(\d+)\s/);
+            if (m) ids.add(Number(m[1]));
+        }
+    } catch (e) {
+        console.error('Local Songs folder scan failed:', e);
+        alert(t('local_scan_fail'));
+        return;
+    }
+
+    osuLocalDownloadedIds = ids;
+    renderOsuCollection();
+    const status = document.getElementById('osu-status');
+    if (status) { status.innerText = t('local_scan_done', { n: ids.size }); status.style.color = '#34d399'; }
+}
+
 function osuSetVolume(val) {
     osuVolume = parseFloat(val);
     localStorage.setItem(OSU_VOLUME_KEY, String(osuVolume));
@@ -3817,12 +3861,16 @@ function renderOsuCollection() {
         // hasn't been backfilled yet shows 🌐 未標記 until it fills in.
         const langLabel = osuLangName(set) || t('lang_unknown');
         const langBadge = `<span class="osu-lang-badge" data-tip="${escHtml(langLabel)}">${set.language ? osuLangFlag(set) : '🌐'} ${escHtml(langLabel)}</span>`;
+        // Once osuLocalDownloadedIds is populated (scanLocalSongsFolder()),
+        // re-skin this same button rather than adding a separate badge — the
+        // download button's own job is moot for a set already on disk.
+        const isLocalDl = osuLocalDownloadedIds && osuLocalDownloadedIds.has(set.beatmapset_id);
         return `
         <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
-            <button class="osu-download-btn" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
+            <button class="osu-download-btn ${isLocalDl ? 'local-downloaded' : ''}" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}">${icon(isLocalDl ? 'check' : 'download')}</button>
             <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
             <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}">${icon('heart', { filled: isFav })}</button>

@@ -480,6 +480,12 @@ I18N.en = {
     fc_sim_popover_title: 'PP if FC', fc_sim_loading: 'Calculating...', fc_sim_error: 'Calculation failed, please try again later',
 
     check_played_btn_title: "Mark which maps on this page you've played\nNeeds osu! login; checks your best score on each map", play_status_unplayed_title: "You haven't played this map yet (hardest difficulty)",
+
+    local_scan_btn_title: 'Pick your local osu! Songs folder to mark which maps you already have\nChrome/Edge only, and only detects osu! stable',
+    local_scan_unsupported: "Your browser doesn't support this — try Chrome or Edge",
+    local_scan_fail: "Couldn't read that folder — make sure you picked osu!'s Songs folder",
+    local_scan_done: 'Matched against your local folder: {n} beatmapsets found',
+    local_downloaded_title: 'Already in your local Songs folder',
     play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
 
     pp_race_title: 'PP Race',
