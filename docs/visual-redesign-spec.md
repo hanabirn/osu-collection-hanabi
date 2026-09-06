@@ -340,7 +340,8 @@ body {
 
 ## 13. 進度
 
-- [x] 步驟 1 — `theme.css` token 換色（commit `a60eb54`）
-- [ ] 步驟 2 — `base.css` 外殼（header 縮小、去玻璃雙層、`.eyebrow`/`.section-title`、lockup）
-- [ ] 步驟 3 — 收藏首頁框住 hero + eyebrow/title
-- [ ] 步驟 4–8 — 見 §10
+- [x] 步驟 1 — `theme.css` token 換色（`a60eb54`）
+- [x] 步驟 2 — `base.css` 外殼：header 縮成一條、去封面輪播+毛玻璃雙層+彗星邊框、標題緊湊化、logo 環無限動畫拿掉、`.eyebrow`/`.section-title`/`.block` utility、`.osu-page-title` 換新樣（`491911c` + `86e70dd` 標題/音符比例微調）
+- [x] 步驟 3 — 收藏首頁 `#collection-hero-v2` 框住封面 hero（每日一張、eyebrow + 大標題 + mono 統計；空收藏 → 平面卡）（`0e61e1f`）
+- [ ] 步驟 4 — `osu.css` 元件 pass（`.osu-card` hover、`.btn`、`.lang-pill`、modal 去 blur）
+- [ ] 步驟 5–8 — 見 §10。另：`!important` 過渡標記待步驟 8 清；空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
