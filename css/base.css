@@ -89,75 +89,20 @@ a:hover { text-decoration: underline; }
     vertical-align: -0.5em;
 }
 
+/* Redesign: a plain near-black header bar. The old cover-banner box
+   (aspect-ratio 3.6/1, min/max-height, backdrop blur) and the .site-main
+   overlap it fed are gone — docs/visual-redesign-spec.md §5.2. */
 .site-header {
     position: relative;
     z-index: 5;
     overflow: visible;
-    /* Redesign: flat near-black bar. The old giant aspect-ratio cover-banner
-       box + .site-main overlap are gone (docs/visual-redesign-spec.md §5.2). */
-    aspect-ratio: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    background: var(--bg) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 14px !important;
-    /* Top padding trimmed hard (was 40px) so more song data clears the
-       fold. The tall bottom padding is the landing strip the overlapping
-       .site-main slides up into — kept a touch deeper than that overlap
-       (see the breakpoints below) so the centred title always has a little
-       clearance above the panel. Because aspect-ratio fixes the total
-       height, this bottom padding only floats the title/controls up out of
-       the overlap zone, it doesn't add height. */
-    padding: 16px 24px 120px;
-    /* Match the aspect ratio of osu!'s own cover@2x.jpg (1800x500 = 3.6:1),
-       the image renderOsuBgCarousel feeds #bg-carousel — so background-size:
-       cover ends up showing the whole cover with no crop, instead of the
-       old full-width/min-height-only box (~8:1 on a wide screen) slicing
-       out a thin horizontal band. min-height stays as a floor for narrow
-       viewports where 3.6:1 would be shorter than the header's own content;
-       max-height (lowered to 50vh) keeps a big screen's header from eating
-       the fold. */
-    /* width must be pinned: with aspect-ratio set, once max-height clamps
-       the height the browser will otherwise shrink the *width* to keep the
-       3.6:1 ratio (e.g. 569px tall -> only 2048px wide), leaving a bare
-       strip down the side of the viewport. Pinning width to 100% makes
-       height the only flexible dimension, so max-height just crops the
-       cover vertically as intended. */
     width: 100%;
-    aspect-ratio: 3.6 / 1;
-    min-height: 220px;
-    max-height: 50vh;
+    padding: 14px clamp(16px, 4vw, 24px);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-card);
-    backdrop-filter: blur(var(--glass-blur));
-}
-/* The overlap depth eases off as the header gets shorter, so a phone / tablet
-   header (which is close to just the title's own height) never has the panel
-   ride up over the title. Each step keeps padding-bottom a little deeper than
-   the matching .site-main margin-top below. */
-@media (max-width: 1100px) {
-    .site-header { padding-bottom: 80px; }
-}
-@media (max-width: 820px) {
-    .site-header { padding-bottom: 56px; }
-    .logo-icon svg { width: 60px; height: 60px; }
-}
-@media (max-width: 600px) {
-    /* Let the header grow to fit its content on a phone — the fixed
-       aspect-ratio (3.6:1 ≈ 108px at 390px wide) plus a min-height was
-       shorter than the stacked controls + title, so overflow:hidden +
-       justify-content:center clipped the top row of controls off. */
-    .site-header {
-        padding: 10px 16px 42px;
-        aspect-ratio: auto;
-        min-height: 0;
-        max-height: none;
-    }
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
 }
 /* ===== Beatmap-cover hero banner, behind the header's own content =====
    #bg-carousel (its slides populated by js/osu.js's renderOsuBgCarousel,
@@ -439,7 +384,7 @@ a:hover { text-decoration: underline; }
     filter: drop-shadow(0 0 8px rgba(var(--pink-rgb), 0.5));
     animation: none;
 }
-.logo-icon svg { width: 38px !important; height: 38px !important; display: block; }
+.logo-icon svg { width: 38px; height: 38px; display: block; }
 .logo-icon::after { display: none; }
 /* Amplitude roughly doubled (0.8–1.3 vs the old 0.86–1.14) and more
    ring-down steps for an elastic, on-the-beat feel. */
@@ -1462,32 +1407,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     position: relative;
     z-index: 6;
     max-width: 1120px;
-    margin: 0 auto !important;
+    margin: 0 auto;
     padding: clamp(20px, 4vw, 36px) clamp(16px, 4vw, 32px) 80px;
-    background: transparent !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
+    background: transparent;
     border-radius: 0;
     border-top: none;
     box-shadow: none;
-}
-
-/* ===== Touch / phone: lighten the stacked frosted surfaces =====
-   .site-header, .site-main and .site-page each carry their own
-   backdrop-filter and they nest, so every composite re-samples and
-   re-blurs the layers below up to three times over — a big part of why
-   the compositor stayed busy on a still page and phones heated up. On
-   touch / small screens, halve the blur and drop the saturate() so each
-   pass is cheap. The header cover no longer slow-zooms (css/particles.css)
-   so there's nothing moving behind these anyway. Modals, the nav drawer
-   and the refresh FAB keep their full blur — they're only on screen
-   briefly. */
-/* Redesign: these three are transparent now — no blur to tune. */
-@media (hover: none), (max-width: 700px) {
-    .site-header, .site-main, .site-page {
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-    }
 }
 
 /* ===== Per-tab gradient border =====
@@ -1509,59 +1434,16 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    feels alive. */
 /* Redesign: content sits directly on the near-black page — no card shell,
    no glass, no animated comet border (spec §5.3). */
+/* Redesign: content sits straight on the near-black page — no card shell,
+   no glass, no animated conic "comet" border. */
 .site-page {
     position: relative;
     border-radius: 0;
     border: none;
-    padding: 0 !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    padding: 0;
+    background: transparent;
     box-shadow: none;
 }
-.site-page::before {
-    display: none;
-    content: '';
-    position: absolute;
-    inset: -1.5px;
-    border-radius: inherit;
-    padding: 1.5px;
-    pointer-events: none;
-    /* Three comets, evenly spaced 120deg apart, rather than one lone light
-       chasing all the way around a big card before it's seen again. */
-    background: conic-gradient(from 0deg,
-        transparent 0deg,
-        transparent 80deg,
-        var(--accent-light-purple) 95deg,
-        #fff 105deg,
-        var(--accent-pink) 115deg,
-        transparent 120deg,
-        transparent 200deg,
-        var(--accent-light-purple) 215deg,
-        #fff 225deg,
-        var(--accent-pink) 235deg,
-        transparent 240deg,
-        transparent 320deg,
-        var(--accent-light-purple) 335deg,
-        #fff 345deg,
-        var(--accent-pink) 355deg,
-        transparent 360deg);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: sitePageBorderBreathe 5s ease-in-out infinite;
-}
-@keyframes sitePageBorderBreathe {
-    0%, 100% { opacity: 0.55; }
-    50% { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .site-page::before { animation: none; opacity: 0; }
-}
-@media (max-width: 600px) {
-    .site-page { padding: 16px 10px 22px; border-radius: 16px; }
-}
-
 .site-footer {
     position: relative;
     z-index: 1;

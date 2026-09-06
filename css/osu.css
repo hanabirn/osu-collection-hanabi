@@ -156,6 +156,7 @@
    The collection page's heading. A rounded band with one of the visitor's
    own covers behind a dark scrim; empty collection -> flat surface card.
    Cover children always render light-on-dark (own --text overrides). */
+.collection-hero-v2[hidden] { display: none; }
 .collection-hero-v2 {
     position: relative;
     overflow: hidden;

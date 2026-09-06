@@ -3548,12 +3548,17 @@ function updateCollectionHeroV2() {
 
     const layers = hero.querySelectorAll('.hero-cover');
     if (!sets.length) {
+        // Empty collection: the #collection-hero pitch box is the hero
+        // instead (updateCollectionHeroVisibility shows it) — don't stack a
+        // second one.
+        hero.hidden = true;
         hero.classList.remove('has-cover');
         stopHeroCover();
         heroCover.urls = [];
         layers.forEach(l => { l.style.backgroundImage = ''; l.classList.remove('active'); });
         return;
     }
+    hero.hidden = false;
     hero.classList.add('has-cover');
 
     if (heroCover.urls.length !== sets.length) {
