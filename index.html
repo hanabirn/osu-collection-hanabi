@@ -32,33 +32,14 @@
      "Noto Sans TC" first (used if the visitor has it installed) and fall
      straight through to the platform CJK font otherwise, so text paints
      instantly with no swap and no CLS. Re-add a <link> here to bring the
-     web font back.
-     particles.css stays blocking on purpose — it carries .bg-layer's
-     position:fixed, and deferring it flashes that layer into document flow. -->
+     web font back. -->
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/theme.css">
-<link rel="stylesheet" href="css/particles.css">
 <link rel="stylesheet" href="css/osu.css">
 </head>
 <body>
 
-<div class="bg-layer" aria-hidden="true">
-    <canvas id="particles-canvas"></canvas>
-    <div class="bg-glow glow-1"></div>
-    <div class="bg-glow glow-2"></div>
-    <div class="bg-glow glow-3"></div>
-    <div class="hit-circles">
-        <div class="hit-circle hc-1"></div>
-        <div class="hit-circle hc-2"></div>
-        <div class="hit-circle hc-3"></div>
-        <div class="hit-circle hc-4"></div>
-        <div class="hit-circle hc-5"></div>
-    </div>
-</div>
-
 <header class="site-header">
-    <div id="bg-carousel" aria-hidden="true"></div>
-    <div class="site-header-overlay" aria-hidden="true"></div>
     <div class="header-corner-left">
         <button id="theme-toggle" class="theme-switch" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
         <button id="pwa-install-btn" class="theme-toggle-btn header-ctl" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
@@ -1083,7 +1064,6 @@
 <script>renderStaticIcons();</script>
 <script defer src="js/lazylib.js"></script>
 <script defer src="js/theme.js"></script>
-<script defer src="js/particles.js"></script>
 <script defer src="js/pwa.js"></script>
 <!-- i18n.js is NOT deferred: it must define `I18N` + applyLang*() before the
      inline bootstrap below injects the active-locale dict (which does

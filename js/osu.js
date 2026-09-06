@@ -946,48 +946,10 @@ function saveOsuCollection(col) {
     localStorage.setItem('osu_collection', JSON.stringify(col));
 }
 
-/* ===== Background carousel from the visitor's own collected beatmap covers =====
-   osu! has no character roster to draw on (unlike the pjsekai/wuwa sibling
-   sites), so this fades between covers of whatever is actually in the
-   visitor's collection instead — personalized, no art curation needed. */
-function initOsuBgCarousel() {
-    const col = getOsuCollection();
-    const ids = [...new Set(OSU_MODES.flatMap(mode => col[mode].map(s => s.beatmapset_id)))];
-    if (ids.length === 0) return;
-    const shuffled = ids.slice().sort(() => Math.random() - 0.5);
-    // cover.jpg is only 900x250 — visibly blurry stretched across a full-page
-    // background. cover@2x.jpg is the same crop at double resolution.
-    const urls = shuffled.map(id => `https://assets.ppy.sh/beatmaps/${id}/covers/cover@2x.jpg`);
-    renderOsuBgCarousel(urls);
-}
-
-function renderOsuBgCarousel(urls) {
-    const container = document.getElementById('bg-carousel');
-    if (!container || !urls.length) return;
-    container.innerHTML = urls.map(u => `<div class="bg-slide" style="background-image:url('${u}')"></div>`).join('');
-    // Header text/pill colors are theme-adaptive (dark text in light theme,
-    // assuming the usual light page background) — but with a cover photo
-    // filling the header they need to stay light-on-dark regardless of site
-    // theme, or light-theme visitors get near-invisible text (see
-    // .site-header.has-cover-banner in css/base.css). Only added once
-    // there's actually an image, so a visitor with no collection yet still
-    // gets the normal theme-correct header.
-    const header = document.querySelector('.site-header');
-    if (header) header.classList.add('has-cover-banner');
-    runOsuBgSlideCarousel(7000);
-}
-
-function runOsuBgSlideCarousel(intervalMs) {
-    const slides = document.querySelectorAll('#bg-carousel .bg-slide');
-    if (!slides.length) return;
-    let idx = 0;
-    slides[0].classList.add('active');
-    setInterval(() => {
-        slides[idx].classList.remove('active');
-        idx = (idx + 1) % slides.length;
-        slides[idx].classList.add('active');
-    }, intervalMs);
-}
+/* The old whole-header cover carousel + the ambient particle/glow layer
+   were removed in the 2026 visual redesign (docs/visual-redesign-spec.md
+   §6.5/§7). The collection page's framed hero (updateCollectionHeroV2) is
+   the only place cover art appears now. */
 
 // Bumped whenever the exported shape changes in a way that matters for
 // import-time compatibility decisions — not enforced as a hard gate (older
