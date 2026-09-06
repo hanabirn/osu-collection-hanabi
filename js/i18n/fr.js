@@ -166,6 +166,12 @@ I18N.fr = {
     osu_import_fail_json: "Échec de l'import : ce fichier n'est pas un JSON valide", osu_import_fail_format: "Échec de l'import : le fichier ne contient pas de données de collection (champ « collection »)",
 
     osu_download_btn_title: 'Téléchargement direct (miroir sans connexion)',
+    batch_dl_btn: 'Télécharger toute cette liste', batch_dl_empty: 'Cette liste est vide, rien à télécharger',
+    batch_dl_confirm: 'Télécharger les {n} beatmapsets de cette liste ? Cela déclenche {n} téléchargements du navigateur à la suite — ça prendra un moment, laissez cet onglet ouvert',
+    batch_dl_progress: 'Téléchargement... {done}/{total}',
+    batch_dl_done: 'Terminé ! {done} fichiers enregistrés dans votre dossier de téléchargements',
+    batch_dl_done_errors: 'Terminé : {done} fichiers, {failed} échoué(s) (peut-être retiré ou problème de connexion)',
+    batch_dl_hint: 'En téléchargeant plusieurs fichiers, le navigateur affiche souvent « Autoriser ce site à télécharger plusieurs fichiers ? » — cliquez sur Autoriser, sinon tout fichier après le premier sera bloqué.',
     pp_calc_btn_title: 'Calculateur de PP et courbe de difficulté', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Précision', pp_calc_run: 'Calculer',
     pp_calc_calculating: 'Calcul en cours...', pp_calc_error: 'Échec du calcul, veuillez réessayer plus tard', pp_calc_stars_label: 'Étoiles',
     pp_calc_strain_title: 'Courbe de difficulté', pp_calc_strain_unsupported: 'Aucune donnée de difficulté disponible pour cette carte', pp_calc_acc_invalid: 'Entrez une précision entre 0 et 100',

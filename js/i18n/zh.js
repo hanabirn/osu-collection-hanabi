@@ -139,6 +139,12 @@ I18N.zh = {
     osu_import_fail_json: '匯入失敗，這個檔案不是有效的 JSON', osu_import_fail_format: '匯入失敗，檔案內缺少收藏資料（collection 欄位）',
 
     osu_download_btn_title: '直接下載（免登入鏡像站）',
+    batch_dl_btn: '批量下載此清單圖檔', batch_dl_empty: '這個清單是空的，沒有東西可以下載',
+    batch_dl_confirm: '要下載目前清單的 {n} 個圖檔嗎？會依序觸發 {n} 次瀏覽器下載，需要一段時間，請勿關閉分頁',
+    batch_dl_progress: '下載中... {done}/{total}',
+    batch_dl_done: '下載完成！共 {done} 個檔案，已存到你的下載資料夾',
+    batch_dl_done_errors: '下載完成：{done} 個，其中 {failed} 個失敗（可能已下架或連線問題）',
+    batch_dl_hint: '下載多個檔案時，瀏覽器通常會跳出「允許這個網站下載多個檔案」的提示——請按允許，否則第二個檔案開始會被瀏覽器擋下。',
     pp_calc_btn_title: 'PP 試算與難度曲線', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '準確率', pp_calc_run: '計算',
     pp_calc_calculating: '計算中...', pp_calc_error: '計算失敗，請稍後再試', pp_calc_stars_label: '星數',
     pp_calc_strain_title: '難度曲線', pp_calc_strain_unsupported: '此譜面暫無難度曲線資料', pp_calc_acc_invalid: '請輸入 0～100 之間的準確率',
@@ -385,6 +391,7 @@ I18N.zh = {
                 <div class="howto-feat"><b>收藏進出（6 個按鈕）</b><span>由左到右：匯出 JSON 下載整個收藏當備份 → 匯入 JSON 從備份還原 → 複製分享連結 → 下載收藏預覽圖 PNG → 匯出成 collection.db 直接複製到 osu! 資料夾使用 → ⚔ 差異比較，上傳舊備份看新增/移除了哪些圖。</span></div>
                 <div class="howto-feat"><b>工具・設定（6 個按鈕）</b><span>重新整理全部圖資料 → 📊 統計儀表板（含 8 個收藏成就徽章）→ ✨ 收藏整理精靈（見下方說明）→ 標記已玩過／一鍵帶入最愛常玩（需登入）→ 🔒 設定密碼，之後編輯/發布動作都要輸入這組密碼確認。</span></div>
                 <div class="howto-feat"><b>搜尋 / 篩選 / 排序</b><span>輸入框可搜曲名或作者；下拉選單可依語言、曲風、來源、歌手篩選，也能切換星數排序。</span></div>
+                <div class="howto-feat"><b>批量下載此清單圖檔</b><span>把目前分頁（含搜尋/篩選結果、跨所有分頁）的每張圖依序下載成 .osz，免登入鏡像站直連、無需安裝任何 App。下載完在檔案總管全選，一次拖進 osu! 視窗即可批量匯入遊戲。</span></div>
                 <div class="howto-feat"><b>分類籤</b><span>最愛／Standard／Taiko／Catch／Mania 五個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
                 <div class="howto-feat"><b>探索更多</b><span>頁面最下方 7 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
                 <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是三組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 依成績生成練習收藏（突破分／目標圖池／低準度重練／相似圖／弱項）③ 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。三組都只會合併加入，不會覆蓋現有收藏。</span></div>

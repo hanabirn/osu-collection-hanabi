@@ -166,6 +166,12 @@ I18N.es = {
     osu_import_fail_json: 'Error al importar: el archivo no es un JSON válido', osu_import_fail_format: 'Error al importar: al archivo le faltan los datos de la colección (campo "collection")',
 
     osu_download_btn_title: 'Descarga directa (mirror sin inicio de sesión)',
+    batch_dl_btn: 'Descargar todos los archivos de esta lista', batch_dl_empty: 'Esta lista está vacía, no hay nada que descargar',
+    batch_dl_confirm: '¿Descargar los {n} beatmapsets de esta lista? Esto inicia {n} descargas del navegador una tras otra — tardará un rato, no cierres esta pestaña',
+    batch_dl_progress: 'Descargando... {done}/{total}',
+    batch_dl_done: '¡Listo! Se guardaron {done} archivos en tu carpeta de descargas',
+    batch_dl_done_errors: 'Listo: {done} archivos, {failed} fallaron (quizá eliminados o problema de conexión)',
+    batch_dl_hint: 'Al descargar varios archivos, el navegador suele mostrar "¿Permitir que este sitio descargue varios archivos?" — pulsa Permitir, o los archivos a partir del segundo quedarán bloqueados.',
     pp_calc_btn_title: 'Calculadora de PP y curva de dificultad', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Precisión', pp_calc_run: 'Calcular',
     pp_calc_calculating: 'Calculando...', pp_calc_error: 'Error en el cálculo, inténtalo de nuevo más tarde', pp_calc_stars_label: 'Estrellas',
     pp_calc_strain_title: 'Curva de dificultad', pp_calc_strain_unsupported: 'No hay datos de dificultad disponibles para este mapa', pp_calc_acc_invalid: 'Introduce una precisión entre 0 y 100',

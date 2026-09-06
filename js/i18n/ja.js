@@ -166,6 +166,12 @@ I18N.ja = {
     osu_import_fail_json: 'インポート失敗：このファイルは有効な JSON ではありません', osu_import_fail_format: 'インポート失敗：ファイルにコレクションデータ（collection フィールド）がありません',
 
     osu_download_btn_title: '直接ダウンロード（ログイン不要ミラー）',
+    batch_dl_btn: 'このリストの譜面を一括ダウンロード', batch_dl_empty: 'このリストは空です。ダウンロードできるものがありません',
+    batch_dl_confirm: 'このリストの {n} 個の譜面をダウンロードしますか？ブラウザのダウンロードを {n} 回連続で実行します。時間がかかるのでタブを閉じないでください',
+    batch_dl_progress: 'ダウンロード中... {done}/{total}',
+    batch_dl_done: '完了！{done} 個のファイルをダウンロードフォルダに保存しました',
+    batch_dl_done_errors: '完了：{done} 個、うち {failed} 個失敗（削除済みか通信エラーの可能性）',
+    batch_dl_hint: '複数ファイルをダウンロードすると、ブラウザが「このサイトに複数ファイルのダウンロードを許可しますか」と表示することがあります。許可を押してください。押さないと2つ目以降がブロックされます。',
     pp_calc_btn_title: 'PP試算・難易度カーブ', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '正確率', pp_calc_run: '計算',
     pp_calc_calculating: '計算中...', pp_calc_error: '計算に失敗しました。しばらくしてから再試行してください', pp_calc_stars_label: '☆数',
     pp_calc_strain_title: '難易度カーブ', pp_calc_strain_unsupported: 'この譜面には難易度カーブのデータがありません', pp_calc_acc_invalid: '0～100の範囲で正確率を入力してください',

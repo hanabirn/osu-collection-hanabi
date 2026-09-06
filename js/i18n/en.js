@@ -307,6 +307,12 @@ I18N.en = {
     osu_import_fail_json: 'Import failed: this file is not valid JSON.', osu_import_fail_format: 'Import failed: the file is missing collection data (the "collection" field).',
 
     osu_download_btn_title: 'Direct download (no-login mirror)',
+    batch_dl_btn: 'Batch-download this list\'s files', batch_dl_empty: 'This list is empty — nothing to download',
+    batch_dl_confirm: 'Download all {n} beatmapsets in this list? This triggers {n} browser downloads one after another — it\'ll take a while, so keep this tab open',
+    batch_dl_progress: 'Downloading... {done}/{total}',
+    batch_dl_done: 'Done! {done} files saved to your Downloads folder',
+    batch_dl_done_errors: 'Done: {done} files, {failed} failed (maybe removed from osu! or a connection issue)',
+    batch_dl_hint: 'Downloading several files usually makes the browser show a "allow this site to download multiple files" prompt — click Allow, or every file after the first gets blocked.',
     pp_calc_btn_title: 'PP Calculator & Strain Graph', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Accuracy', pp_calc_run: 'Calculate',
     pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
     pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',

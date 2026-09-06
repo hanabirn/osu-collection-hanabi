@@ -166,6 +166,12 @@ I18N.ko = {
     osu_import_fail_json: '가져오기 실패: 유효한 JSON 파일이 아닙니다', osu_import_fail_format: '가져오기 실패: 파일에 컬렉션 데이터(collection 필드)가 없습니다',
 
     osu_download_btn_title: '직접 다운로드 (로그인 불필요 미러)',
+    batch_dl_btn: '이 목록 전체 다운로드', batch_dl_empty: '이 목록은 비어 있어 다운로드할 것이 없습니다',
+    batch_dl_confirm: '이 목록의 {n}개 비트맵셋을 다운로드할까요? 브라우저 다운로드가 {n}번 연속으로 실행되어 시간이 걸리니 탭을 닫지 마세요',
+    batch_dl_progress: '다운로드 중... {done}/{total}',
+    batch_dl_done: '완료! {done}개 파일을 다운로드 폴더에 저장했습니다',
+    batch_dl_done_errors: '완료: {done}개 중 {failed}개 실패(삭제되었거나 연결 문제일 수 있음)',
+    batch_dl_hint: '여러 파일을 다운로드하면 브라우저가 "이 사이트가 여러 파일을 다운로드하도록 허용하시겠습니까?"라는 알림을 띄울 수 있습니다. 허용을 누르지 않으면 두 번째 파일부터 차단됩니다.',
     pp_calc_btn_title: 'PP 계산 & 난이도 곡선', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '정확도', pp_calc_run: '계산',
     pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
     pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',

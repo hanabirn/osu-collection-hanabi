@@ -166,6 +166,12 @@ I18N.de = {
     osu_import_fail_json: 'Import fehlgeschlagen: Diese Datei ist kein gültiges JSON', osu_import_fail_format: 'Import fehlgeschlagen: Der Datei fehlen die Sammlungsdaten (Feld "collection")',
 
     osu_download_btn_title: 'Direkter Download (Mirror ohne Login)',
+    batch_dl_btn: 'Diese Liste als Dateien herunterladen', batch_dl_empty: 'Diese Liste ist leer — nichts zum Herunterladen',
+    batch_dl_confirm: 'Alle {n} Beatmapsets dieser Liste herunterladen? Das löst {n} Browser-Downloads nacheinander aus und dauert eine Weile — Tab bitte offen lassen',
+    batch_dl_progress: 'Wird heruntergeladen... {done}/{total}',
+    batch_dl_done: 'Fertig! {done} Dateien im Download-Ordner gespeichert',
+    batch_dl_done_errors: 'Fertig: {done} Dateien, {failed} fehlgeschlagen (evtl. entfernt oder Verbindungsproblem)',
+    batch_dl_hint: 'Beim Herunterladen mehrerer Dateien fragt der Browser meist "Mehrere Downloads von dieser Website zulassen?" — bitte zulassen, sonst wird ab der zweiten Datei blockiert.',
     pp_calc_btn_title: 'PP-Rechner & Schwierigkeitskurve', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Genauigkeit', pp_calc_run: 'Berechnen',
     pp_calc_calculating: 'Berechnung läuft...', pp_calc_error: 'Berechnung fehlgeschlagen, bitte später erneut versuchen', pp_calc_stars_label: 'Sterne',
     pp_calc_strain_title: 'Schwierigkeitskurve', pp_calc_strain_unsupported: 'Für diese Beatmap sind keine Schwierigkeitsdaten verfügbar', pp_calc_acc_invalid: 'Bitte eine Genauigkeit zwischen 0 und 100 eingeben',

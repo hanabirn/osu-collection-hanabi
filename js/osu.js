@@ -225,6 +225,9 @@ const OSU_PAGE_SIZE = 8;
 // each, for checkCollectionPlayedStatus() to check against. See its own
 // comment at the assignment site for why it's per-set, not per-difficulty.
 let osuPageCheckTargets = [];
+// The current tab+search+filter's full set list (every page, pre-pagination)
+// — batchDownloadCollectionView() downloads this, not just the visible page.
+let osuCurrentViewSets = [];
 
 function osuAvatarUrl(userId) {
     return `/.netlify/functions/osu-avatar?id=${userId}`;
@@ -548,6 +551,73 @@ function copyBeatmapId(setId, event) {
 function downloadBeatmapset(setId, event) {
     event.stopPropagation();
     window.open(`https://mirror.hinamizawa.ai/d/${setId}?no_video=true&redirect=true`, '_blank');
+}
+
+/* Same mirror as downloadBeatmapset(), but fetched as a blob and saved via a
+   named <a download> instead of window.open — used by the batch downloader
+   below so files land with a readable name and errors/429s can be caught
+   instead of silently opening a blocked popup. mirror.hinamizawa.ai sends
+   Access-Control-Allow-Origin: * through its whole redirect chain (verified
+   against osu.direct and the final S3 host), so this fetch works cross-origin
+   with no server-side proxy. */
+async function fetchBeatmapsetBlob(setId, filenameBase, retriesLeft = 2) {
+    const res = await fetch(`https://mirror.hinamizawa.ai/d/${setId}?no_video=true&redirect=true`);
+    if (res.status === 429 && retriesLeft > 0) {
+        const wait = Math.min(parseInt(res.headers.get('retry-after') || '3', 10), 15);
+        await new Promise(r => setTimeout(r, wait * 1000));
+        return fetchBeatmapsetBlob(setId, filenameBase, retriesLeft - 1);
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filenameBase}.osz`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+let osuBatchDownloadActive = false;
+
+/* Downloads every .osz set currently visible in the collection grid — same
+   tab + search + filters the user is looking at (osuCurrentViewSets, set by
+   renderOsuCollection() before pagination so this covers every page, not
+   just the one on screen). Sequential on purpose: osu.direct's own mirror
+   caps bursts at 10 req/2s and 120/min, and each file already takes a couple
+   seconds to fetch, so one-at-a-time naturally stays under that without extra
+   throttling logic — a 429 still gets one retry via fetchBeatmapsetBlob(). */
+async function batchDownloadCollectionView() {
+    if (osuBatchDownloadActive) return;
+    const sets = osuCurrentViewSets || [];
+    const status = document.getElementById('osu-batch-dl-status');
+    const btn = document.getElementById('osu-batch-dl-btn');
+    if (!sets.length) {
+        if (status) { status.innerText = t('batch_dl_empty'); status.style.color = '#ff5252'; }
+        return;
+    }
+    if (!confirm(t('batch_dl_confirm', { n: sets.length }))) return;
+
+    osuBatchDownloadActive = true;
+    if (btn) btn.disabled = true;
+    let done = 0, failed = 0;
+    for (const set of sets) {
+        if (status) { status.innerText = t('batch_dl_progress', { done, total: sets.length }); status.style.color = '#c8a2e0'; }
+        const name = `${set.artist} - ${set.title}`.replace(/[\\/:*?"<>|]/g, '_').slice(0, 150);
+        try {
+            await fetchBeatmapsetBlob(set.beatmapset_id, name);
+        } catch (e) {
+            failed++;
+        }
+        done++;
+    }
+    if (status) {
+        status.innerText = failed ? t('batch_dl_done_errors', { done, failed }) : t('batch_dl_done', { done });
+        status.style.color = failed ? '#ff5252' : '#34d399';
+    }
+    if (btn) btn.disabled = false;
+    osuBatchDownloadActive = false;
 }
 
 function osuSetVolume(val) {
@@ -3663,6 +3733,7 @@ function renderOsuCollection() {
     }
 
     sets = sortOsuSets(sets);
+    osuCurrentViewSets = sets;
 
     if (sets.length === 0) {
         const msg = osuSearchQuery
