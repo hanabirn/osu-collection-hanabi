@@ -183,7 +183,6 @@
             <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
             <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
             <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
-            <button class="site-nav-btn" onclick="switchTab('dan', this)" data-i18n="nav_dan">段位認定</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
             <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
             <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
@@ -491,14 +490,6 @@
         <div id="catalog-completion" class="catalog-completion" hidden></div>
         <div id="catalog-list" class="osu-collection"></div>
         <div id="catalog-pagination" class="osu-pagination"></div>
-    </section>
-
-    <section id="page-dan" class="site-page" style="display:none;">
-        <h2 class="osu-page-title" data-i18n="dan_page_title">✦ 段位認定 ✦</h2>
-        <p class="tournaments-hint" data-i18n="dan_hint">各模式的段位認定（dan course）——社群製作的實力認定馬拉松圖，一段一張圖。以各 keymode 現行專案的權威課程為主，另有搜尋到的其他 dan course 收在「更多」；mania 只收 4K／7K。點卡片開 osu! 頁面，＋ 加進收藏。</p>
-        <div class="dan-mode-row" id="dan-mode-row"></div>
-        <div id="dan-meta" class="dan-meta"></div>
-        <div id="dan-list"></div>
     </section>
 
     <section id="page-mappools" class="site-page" style="display:none;">
@@ -1132,7 +1123,6 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/gallery-comments.js"></script>
 <script defer src="js/farm-maps.js"></script>
 <script defer src="js/catalog.js"></script>
-<script defer src="js/dan.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/global-search.js"></script>
 <script defer src="js/skins.js"></script>

@@ -7,19 +7,6 @@ I18N.zh = {
     page_refresh_btn_title: '重新整理頁面',
     volume_fab_title: '調整預覽音量',
     global_search_title: '搜尋全站', global_search_placeholder: '搜尋歌曲、圖池、我的收藏...', select_language: '選擇語言',
-    nav_dan: '段位認定',
-    dan_page_title: '✦ 段位認定 ✦',
-    dan_hint: '各模式的段位認定（dan course）——社群製作的實力認定馬拉松圖，一段一張圖。以各 keymode 現行專案的權威課程為主，另有搜尋到的其他 dan course 收在「更多」；mania 只收 4K／7K。點卡片開 osu! 頁面，＋ 加進收藏。',
-    dan_load_fail: '段位清單載入失敗', dan_empty: '找不到這個模式的段位圖', dan_load_more: '載入更多',
-    dan_pinned: '權威課程',
-    dan_add_group_btn: '把「{name}」整組加入收藏', dan_add_group_confirm: '要把「{name}」的 {n} 張圖建立成收藏分類嗎？',
-    dan_collection_name: '段位認定 - {mode}',
-    dan_more_summary: '更多 dan course（搜尋結果，{n}）', dan_more_note: '以下是從 osu! 圖譜搜尋撈到、標題／作者符合 dan course 樣式的其他圖包，未經人工篩選。',
-    dan_standard_label: '通過標準', dan_resources_label: '資源',
-    dan_std_mania: '整段馬拉松一次連續打完，準度 ≥ 96%（部分入門段 95%）；中途暫停即失敗，僅允許 Mirror／HD／FI／FL／HR／DT／NC。',
-    dan_std_osu: '整段一次連續打完，準度 ≥ 96%（Tapping Dan Course 規則）；中途暫停即失敗。',
-    dan_std_taiko: '以太鼓段位的魂ゲージ判定，整段結束時魂量需達該段門檻（各段不同），大致等於高準度且全程不中斷。',
-    dan_std_catch: '完整清過整段馬拉松（HP 不歸零），部分段另有準度門檻——詳見論壇串。',
     global_search_section_collection: '我的收藏', global_search_section_catalog: '曲庫分類', global_search_section_mappools: '世界盃圖池',
     global_search_empty: '找不到符合的結果',
     track_player_btn: '+ 追蹤', untrack_player_btn: '取消追蹤',
@@ -456,12 +443,6 @@ I18N.zh = {
                 <div class="howto-feat"><b>➕ 加入收藏</b><span>整屆或只挑其中一輪加入，不用整屆都要。</span></div>
             </div>
 
-            <div class="howto-tab">
-                <div class="howto-tab-title">✦ 段位認定</div>
-                <p class="howto-tab-desc">各模式的段位認定（dan course）——社群做的實力認定馬拉松圖，一段一張圖。</p>
-                <div class="howto-feat"><b>模式籤</b><span>osu!／taiko／catch／mania 4K／mania 7K 切換。清單以 osu! 圖譜搜尋「dan course」為主，加上少量精選置頂（卡片左上有「精選」標）。</span></div>
-                <div class="howto-feat"><b>加入收藏</b><span>點卡片開 osu! 頁面；卡片上的 ＋ 把該圖加進收藏，或上方「把這頁加入收藏」整頁建成一個分類。</span></div>
-            </div>
 
             <div class="howto-tab">
                 <div class="howto-tab-title">✦ PP 查詢</div>
