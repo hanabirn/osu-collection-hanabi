@@ -917,6 +917,7 @@
         <div class="gallery-detail-actions">
             <button class="btn gallery-detail-download-btn" id="gallery-detail-download-btn" onclick="downloadGalleryDetailCollection()" data-icon="download" data-icon-gap><span data-i18n="gallery_download_btn_title">匯入這個收藏</span></button>
             <button class="btn" id="gallery-detail-share-btn" onclick="shareGalleryDetailLink()" data-icon="share2" data-icon-gap><span data-i18n="gallery_share_btn">分享連結</span></button>
+            <button class="btn" id="gallery-detail-embed-btn" onclick="embedGalleryDetailCollection()" data-icon="link2" data-icon-gap><span data-i18n="gallery_embed_btn">複製嵌入碼</span></button>
             <button class="btn" id="gallery-detail-scores-btn" onclick="overlayGalleryDetailScores()" style="display:none;" data-icon="target" data-icon-gap><span data-i18n="gallery_scores_btn">疊上我的成績</span></button>
         </div>
         <div class="gallery-comments">
@@ -1074,6 +1075,7 @@
 <footer class="site-footer">
     <p>osu! 歌曲收藏 ✦ osu! is a trademark of ppy Pty Ltd</p>
     <a class="footer-support-link" href="https://ko-fi.com/hanabirn" target="_blank" rel="noopener noreferrer" data-icon="heart" data-icon-gap><span>Support</span></a>
+    <a class="footer-support-link" href="/gallery.xml" target="_blank" rel="noopener noreferrer"><span>Gallery RSS</span></a>
 </footer>
 
 <div id="site-update-toast" class="share-toast share-toast-clickable" onclick="applySiteUpdate()"></div>

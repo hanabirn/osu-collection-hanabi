@@ -339,6 +339,7 @@ I18N.en = {
     gallery_import_confirm: "This is {name}'s collection with {n} beatmaps. Import into your collection? (Won't overwrite existing entries, only adds ones you don't have)",
     gallery_download_btn_title: 'Import this collection', gallery_share_btn: 'Share link', gallery_share_copied: 'Share link copied!', gallery_view_btn_title: 'View beatmap list',
     gallery_scores_btn: 'Overlay my scores', gallery_scores_checking: 'Checking {done}/{total}', gallery_scores_summary: 'You have {have}/{total}',
+    gallery_scores_truncated: '(first {n} of {all})', gallery_embed_btn: 'Copy embed code', gallery_embed_copied: 'Embed code copied!',
     gallery_comments_title: 'Comments', gallery_comments_loading: 'Loading comments...', gallery_comments_load_fail: 'Failed to load comments',
     gallery_comments_empty: 'No comments yet — be the first!', gallery_comments_placeholder: 'Write a comment...',
     gallery_comments_send: 'Send', gallery_comments_send_fail: 'Failed to post comment, please try again later',

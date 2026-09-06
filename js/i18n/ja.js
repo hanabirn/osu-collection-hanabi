@@ -197,6 +197,7 @@ I18N.ja = {
     gallery_import_confirm: 'これは {name} さんのコレクション（{n} 個の Beatmap）です。あなたのコレクションに取り込みますか？（既存のものは上書きせず、持っていないものだけ追加されます）',
     gallery_download_btn_title: 'このコレクションを取り込む', gallery_share_btn: 'リンクを共有', gallery_share_copied: '共有リンクをコピーしました！', gallery_view_btn_title: '曲目一覧を見る',
     gallery_scores_btn: '自分のスコアを表示', gallery_scores_checking: '確認中 {done}/{total}', gallery_scores_summary: '所持 {have}/{total}',
+    gallery_scores_truncated: '（先頭 {n} 件／全 {all}）', gallery_embed_btn: '埋め込みコードをコピー', gallery_embed_copied: '埋め込みコードをコピーしました！',
     gallery_comments_title: 'コメント', gallery_comments_loading: 'コメントを読み込み中...', gallery_comments_load_fail: 'コメントの読み込みに失敗しました',
     gallery_comments_empty: 'まだコメントがありません。最初のコメントを書いてみましょう！', gallery_comments_placeholder: 'コメントを書く...',
     gallery_comments_send: '送信', gallery_comments_send_fail: 'コメントの送信に失敗しました。後でもう一度お試しください',

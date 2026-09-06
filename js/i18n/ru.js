@@ -197,6 +197,7 @@ I18N.ru = {
     gallery_import_confirm: 'Это коллекция {name} ({n} карт). Импортировать в вашу коллекцию? (Существующие записи не будут перезаписаны, добавятся только те, которых у вас нет)',
     gallery_download_btn_title: 'Импортировать эту коллекцию', gallery_share_btn: 'Поделиться ссылкой', gallery_share_copied: 'Ссылка скопирована!', gallery_view_btn_title: 'Посмотреть список карт',
     gallery_scores_btn: 'Показать мои результаты', gallery_scores_checking: 'Проверка {done}/{total}', gallery_scores_summary: 'У вас {have}/{total}',
+    gallery_scores_truncated: '(первые {n} из {all})', gallery_embed_btn: 'Скопировать код вставки', gallery_embed_copied: 'Код вставки скопирован!',
     gallery_comments_title: 'Комментарии', gallery_comments_loading: 'Загрузка комментариев...', gallery_comments_load_fail: 'Не удалось загрузить комментарии',
     gallery_comments_empty: 'Пока нет комментариев — станьте первым!', gallery_comments_placeholder: 'Напишите комментарий...',
     gallery_comments_send: 'Отправить', gallery_comments_send_fail: 'Не удалось отправить комментарий, попробуйте позже',

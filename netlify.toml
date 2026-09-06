@@ -45,3 +45,9 @@
   from = "/c/:id"
   to = "/.netlify/functions/collection-share-page?id=:id"
   status = 200
+
+# Pretty path for the gallery RSS feed (netlify/functions/gallery-feed.js).
+[[redirects]]
+  from = "/gallery.xml"
+  to = "/.netlify/functions/gallery-feed"
+  status = 200

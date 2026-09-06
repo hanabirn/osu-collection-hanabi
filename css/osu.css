@@ -3226,6 +3226,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .gallery-detail-score-summary .gds-have { font-weight: 700; color: var(--text-primary); }
 .gallery-detail-score-summary .gds-grade { font-weight: 700; }
+.gallery-detail-score-summary .gds-note { color: var(--text-label); font-size: 0.72rem; }
 .gds-grade.rank-ss { color: #ffd966; }
 .gds-grade.rank-s  { color: #9be7ff; }
 .gds-grade.rank-a  { color: #77dd77; }

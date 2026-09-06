@@ -360,6 +360,8 @@ async function openGalleryDetailModal(id) {
     downloadBtn.style.display = 'none';
     const shareBtn = document.getElementById('gallery-detail-share-btn');
     if (shareBtn) shareBtn.style.display = 'none';
+    const embedBtn = document.getElementById('gallery-detail-embed-btn');
+    if (embedBtn) embedBtn.style.display = 'none';
     modal.style.display = 'flex';
     // Independent of the collection fetch below — a comment thread on this
     // user's gallery post should still work even if, say, their collection
@@ -403,6 +405,7 @@ async function openGalleryDetailModal(id) {
         renderGalleryDetailGrid();
         downloadBtn.style.display = '';
         if (shareBtn) shareBtn.style.display = '';
+        if (embedBtn) embedBtn.style.display = '';
         const scoresBtn = document.getElementById('gallery-detail-scores-btn');
         if (scoresBtn) {
             const loggedIn = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
@@ -430,6 +433,18 @@ function shareCollectionLink(id, event) {
 }
 function shareGalleryDetailLink() {
     if (galleryDetailData) shareCollectionLink(galleryDetailData.id);
+}
+
+/* Copy an <iframe> snippet for the open collection — a card to embed on a
+   forum post / blog / tournament sheet (served by
+   netlify/functions/embed-collection.js). */
+function embedGalleryDetailCollection() {
+    if (!galleryDetailData) return;
+    const src = `${location.origin}/.netlify/functions/embed-collection?id=${galleryDetailData.id}`;
+    const snippet = `<iframe src="${src}" width="480" height="220" style="border:0;border-radius:14px;max-width:100%" loading="lazy" title="osu! collection"></iframe>`;
+    const done = () => { if (typeof showShareToast === 'function') showShareToast(t('gallery_embed_copied')); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(snippet).then(done, done);
+    else done();
 }
 
 /* Deep link: /c/<id> rewrites to the share page which bounces here as
@@ -516,18 +531,24 @@ async function overlayGalleryDetailScores() {
     if (!user || !user.id || !galleryDetailData) return;
 
     const sets = galleryDetailVisibleSets();
-    const targets = sets.map(s => {
+    // One score lookup per set, one HTTP request each — cap it so a huge
+    // all-of-a-mode tab (hundreds of sets) can't fire hundreds of proxy
+    // calls. A curated category / mappool-sized tab is well under this.
+    const GALLERY_SCORES_CAP = 100;
+    const allTargets = sets.map(s => {
         const hardest = (s.beatmaps || []).reduce((a, b) =>
             (b.difficulty_rating || 0) > ((a && a.difficulty_rating) || 0) ? b : a, null);
         return { setId: s.beatmapset_id, beatmapId: hardest && hardest.beatmap_id, mode: s.mode };
     }).filter(x => x.beatmapId != null && x.mode >= 0);
-    if (!targets.length) return;
+    if (!allTargets.length) return;
+    const truncated = allTargets.length > GALLERY_SCORES_CAP;
+    const targets = allTargets.slice(0, GALLERY_SCORES_CAP);
 
     galleryScoresOverlaid = true;
     if (btn) { btn.disabled = true; btn.classList.add('checking'); }
     const label = btn && btn.querySelector('span');
 
-    const tally = { total: targets.length, have: 0, ranks: {} };
+    const tally = { total: targets.length, have: 0, ranks: {}, truncated, grandTotal: allTargets.length };
     const CH = 6;
     for (let i = 0; i < targets.length; i += CH) {
         if (label) label.textContent = t('gallery_scores_checking', { done: i, total: targets.length });
@@ -570,7 +591,10 @@ function renderGalleryScoreSummary(tally) {
     order.forEach(r => { if (tally.ranks[r]) merged[disp[r]] = (merged[disp[r]] || 0) + tally.ranks[r]; });
     const parts = Object.entries(merged).map(([g, n]) =>
         `<span class="gds-grade rank-${(g === 'SS' ? 'ss' : g.toLowerCase())}">${g} ${n}</span>`);
-    el.innerHTML = `<span class="gds-have">${t('gallery_scores_summary', { have: tally.have, total: tally.total })}</span>${parts.join('')}`;
+    const note = tally.truncated
+        ? `<span class="gds-note">${t('gallery_scores_truncated', { n: tally.total, all: tally.grandTotal })}</span>`
+        : '';
+    el.innerHTML = `<span class="gds-have">${t('gallery_scores_summary', { have: tally.have, total: tally.total })}</span>${parts.join('')}${note}`;
 }
 
 function closeGalleryDetailModal() {

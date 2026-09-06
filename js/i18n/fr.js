@@ -197,6 +197,7 @@ I18N.fr = {
     gallery_import_confirm: "Voici la collection de {name} ({n} beatmaps). L'importer dans votre collection ? (N'écrase pas les entrées existantes, ajoute seulement celles que vous n'avez pas)",
     gallery_download_btn_title: 'Importer cette collection', gallery_share_btn: 'Partager le lien', gallery_share_copied: 'Lien de partage copié !', gallery_view_btn_title: 'Voir la liste des beatmaps',
     gallery_scores_btn: 'Afficher mes scores', gallery_scores_checking: 'Vérification {done}/{total}', gallery_scores_summary: 'Tu as {have}/{total}',
+    gallery_scores_truncated: '(les {n} premiers sur {all})', gallery_embed_btn: "Copier le code d'intégration", gallery_embed_copied: "Code d'intégration copié !",
     gallery_comments_title: 'Commentaires', gallery_comments_loading: 'Chargement des commentaires...', gallery_comments_load_fail: 'Échec du chargement des commentaires',
     gallery_comments_empty: 'Aucun commentaire pour l\'instant — sois le premier !', gallery_comments_placeholder: 'Écris un commentaire...',
     gallery_comments_send: 'Envoyer', gallery_comments_send_fail: 'Échec de l\'envoi du commentaire, réessaie plus tard',
