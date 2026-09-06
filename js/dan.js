@@ -94,17 +94,17 @@ function renderDanList() {
             ? (s.star_min === s.star_max ? s.star_min.toFixed(2) : `${s.star_min.toFixed(2)}–${s.star_max.toFixed(2)}`)
             : '';
         const starColor = s.star_max != null && typeof starRatingColor === 'function' ? starRatingColor(s.star_max) : '';
+        const pinMark = s.pinned ? `<span class="dan-pin-star" title="${escHtml(t('dan_pinned'))}">${icon('star', { filled: true })}</span>` : '';
         return `
-        <div class="osu-card dan-card" style="${danModeVars(dm)}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${s.id}','_blank')">
+        <div class="osu-card dan-card${s.pinned ? ' dan-pinned' : ''}" style="${danModeVars(dm)}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${s.id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
-            ${s.pinned ? `<span class="dan-pin-badge">${icon('star', { filled: true })} ${escHtml(t('dan_pinned'))}</span>` : ''}
             <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addDanToCollection(${s.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${s.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
             <button class="osu-download-btn" onclick="downloadBeatmapset(${s.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${s.id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
             <div class="osu-card-info">
-                <div class="osu-card-title">${escHtml(s.title || '')}</div>
+                <div class="osu-card-title">${pinMark}${escHtml(s.title || '')}</div>
                 <div class="osu-card-artist">${escHtml(s.artist || '')}</div>
                 <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(s.creator || '') })}</div>
                 <div class="catalog-card-meta">

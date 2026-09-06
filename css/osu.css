@@ -1466,23 +1466,25 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border-color: rgba(var(--dan-rgb), 0.5);
     box-shadow: var(--osu-card-shadow), 0 0 20px rgba(var(--dan-rgb), 0.22);
 }
-.dan-pin-badge {
+/* Pinned (hand-picked) courses: a mode-colour left stripe + a ★ before the
+   title. Kept off the top-left corner so it never fights the overflowing
+   .osu-card-info title (same overflow behaviour as the Catalog grid). */
+.dan-card.dan-pinned { border-color: rgba(var(--dan-rgb), 0.5); }
+.dan-card.dan-pinned::after {
+    content: "";
     position: absolute;
-    top: 7px;
-    left: 7px;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
     z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    padding: 2px 7px 2px 6px;
-    border-radius: 999px;
-    color: #1a1523;
-    background: rgba(var(--dan-rgb), 0.92);
+    background: var(--dan);
 }
-.dan-pin-badge svg { width: 11px; height: 11px; }
+.dan-pin-star {
+    display: inline-flex;
+    vertical-align: -1px;
+    margin-right: 3px;
+    color: var(--dan);
+}
+.dan-pin-star svg { width: 11px; height: 11px; }
 .dan-status {
     text-transform: capitalize;
     color: var(--text-label);
