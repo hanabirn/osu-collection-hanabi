@@ -331,8 +331,16 @@ body {
 
 ---
 
-## 12. 待你決定
+## 12. 決定（2026-09）
 
-- 字體：先方案 A（零 web font）；第一版看完再決定要不要上 B。
-- eyebrow 標籤要中文還是英文大寫？（參考站用英文大寫 `LIVE PULSE`；中文也可以但視覺重量不同）
-- 淺色主題：要花多少力氣做到位，還是「能用就好」？
+- 字體：**方案 A（零 web font）**。第一版看完再議 B。
+- eyebrow 標籤：**英文大寫**（`COLLECTION` / `TOOLS` / `GALLERY` …）。
+- 淺色主題：**做到位**。
+- 開工：照 §10 落地順序，先做到第 3 步給第一版看。
+
+## 13. 進度
+
+- [x] 步驟 1 — `theme.css` token 換色（commit `a60eb54`）
+- [ ] 步驟 2 — `base.css` 外殼（header 縮小、去玻璃雙層、`.eyebrow`/`.section-title`、lockup）
+- [ ] 步驟 3 — 收藏首頁框住 hero + eyebrow/title
+- [ ] 步驟 4–8 — 見 §10
