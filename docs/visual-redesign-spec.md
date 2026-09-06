@@ -345,7 +345,7 @@ body {
 - [x] 步驟 3 — 收藏首頁 `#collection-hero-v2` 框住封面 hero（每日一張、eyebrow + 大標題 + mono 統計；空收藏 → 平面卡）（`0e61e1f`）
 - [x] 步驟 4 — 元件 pass：`.btn` 扁平粉、`.osu-card` hover 收斂、`.lang-pill.active` 改 tint、`.pp-calc-modal*`/`.nav-drawer` 去 blur 改實色、`.osu-stat`/`.osu-add-card` 去玻璃、角落括號隱藏（`a052d65`）
 - [x] 步驟 5 — 巡視殘留：osu.css ~11 處 `rgba(168,85,247,*)` 硬粉→pink var、`.pp-calc-title` 去漸層裁切；base.css FAB 去玻璃、mobile blur media query 歸零（`87521ab`）
-- [ ] 步驟 6 — 淺色主題 parity
+- [x] 步驟 6 — 淺色 parity：`.has-cover-banner` 強制白字 + 深色玻璃 chip 覆寫中性化、nav drawer 硬白 → token、`.btn` 淺色白字、modal 淺色淺陰影（`af738c2`）
 - [ ] 步驟 7 — 粒子/地球 gated 或刪、清永動動畫殘留
 - [ ] 步驟 8 — 清 `!important` 過渡標記、正式站效能+視覺 QA
 - 另：空收藏時 v2 hero 與舊 `.collection-hero` pitch 疊兩塊，之後合併。
