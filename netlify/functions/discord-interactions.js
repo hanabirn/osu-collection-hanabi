@@ -121,7 +121,7 @@ async function cmdPp(options, interaction) {
             { name: t('f_level'), value: s.level && s.level.current != null ? String(s.level.current) : '—', inline: true },
             { name: t('f_max_combo'), value: L.fmtNum(s.maximum_combo), inline: true },
             { name: t('f_playtime'), value: playHours, inline: true },
-            { name: t('f_grades'), value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
+            { name: t('f_grades'), value: `${L.GRADE_EMOJI.SS}${L.fmtNum(g.ss || 0)} ${L.GRADE_EMOJI.SSH}${L.fmtNum(g.ssh || 0)} ${L.GRADE_EMOJI.S}${L.fmtNum(g.s || 0)} ${L.GRADE_EMOJI.SH}${L.fmtNum(g.sh || 0)} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
         ],
         footer: L.siteFooter(rankChart ? t('footer_rank_trend') : t('api_v2')),
     });
