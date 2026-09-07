@@ -475,8 +475,24 @@ async function cmdMap(options, origin) {
 /* --- /mappool ----------------------------------------------------------- */
 
 async function autocompleteMappool(options, origin) {
-    const focused = (options || []).find(o => o.focused) || {};
+    const opts = options || [];
+    const focused = opts.find(o => o.focused) || {};
     const q = String(focused.value || '').toLowerCase().trim();
+
+    // Typing in round: — suggest the picked edition's actual round names.
+    if (focused.name === 'round') {
+        const folder = String((opts.find(o => o.name === 'edition') || {}).value || '').trim();
+        if (!folder) return L.autocomplete([]);
+        let rounds = [];
+        try {
+            const r = await fetch(`${origin}/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(folder)}`);
+            if (r.ok) rounds = (await r.json()).rounds || [];
+        } catch { /* none */ }
+        let names = rounds.map(rd => rd.name).filter(Boolean);
+        if (q) names = names.filter(n => n.toLowerCase().includes(q));
+        return L.autocomplete(names.slice(0, 25).map(n => ({ name: n.slice(0, 100), value: n.slice(0, 100) })));
+    }
+
     let editions = [];
     try {
         const r = await fetch(`${origin}/.netlify/functions/wc-mappools-list`);

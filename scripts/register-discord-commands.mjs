@@ -106,7 +106,7 @@ const commands = [
         name: 'mappool', ...d('cmd_mappool'),
         options: [
             { type: 3, name: 'edition', required: true, autocomplete: true, ...d('opt_mappool_edition') },
-            { type: 3, name: 'round', required: false, ...d('opt_mappool_round') },
+            { type: 3, name: 'round', required: false, autocomplete: true, ...d('opt_mappool_round') },
         ],
     },
     {
