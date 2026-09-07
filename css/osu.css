@@ -3919,7 +3919,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .input-group .chat-emoji-btn:hover { background: var(--bg-stat); color: var(--text); box-shadow: none; }
 .chat-emoji-panel {
     position: absolute;
-    left: 0;
+    right: 0;
     bottom: calc(100% + 8px);
     z-index: 30;
     width: min(340px, 92vw);

@@ -776,10 +776,10 @@
             </div>
             <div id="chat-input-row" class="input-group chat-input-row" style="display:none;">
                 <div id="chat-emoji-panel" class="chat-emoji-panel" hidden></div>
+                <input type="text" id="chat-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
                 <button type="button" id="chat-emoji-btn" class="chat-emoji-btn" onclick="toggleChatEmojiPicker()" data-i18n-title="chat_emoji_btn_title" title="表情符號">😊</button>
                 <button type="button" id="chat-attach-btn" class="chat-emoji-btn" onclick="document.getElementById('chat-file-input').click()" data-i18n-title="chat_attach_btn_title" title="附加圖片／GIF">📎</button>
                 <input type="file" id="chat-file-input" accept="image/png,image/jpeg,image/gif,image/webp" hidden onchange="onChatFilePicked(this.files[0]); this.value='';">
-                <input type="text" id="chat-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
                 <button onclick="sendChatMessage()" data-i18n="chat_send_btn">送出</button>
             </div>
         </div>
