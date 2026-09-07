@@ -110,10 +110,11 @@ const commands = [
         ],
     },
     {
+        // All optional, so registration order = the order Discord shows them.
+        // Filters first (pick mode, then the tournament list is already
+        // narrowed), then the specific pickers.
         name: 'tourneypool', ...d('cmd_tourneypool'),
         options: [
-            { type: 3, name: 'tournament', required: false, autocomplete: true, ...d('opt_tourneypool_name') },
-            { type: 3, name: 'round', required: false, autocomplete: true, ...d('opt_tourneypool_round') },
             {
                 type: 3, name: 'mode', required: false, ...d('opt_tourneypool_mode'),
                 choices: [
@@ -132,6 +133,8 @@ const commands = [
                     { name: 'Custom', value: 'custom' },
                 ],
             },
+            { type: 3, name: 'tournament', required: false, autocomplete: true, ...d('opt_tourneypool_name') },
+            { type: 3, name: 'round', required: false, autocomplete: true, ...d('opt_tourneypool_round') },
         ],
     },
     { name: 'skin', ...d('cmd_skin'), options: [{ type: 3, name: 'query', required: true, ...d('opt_skin_query') }] },
