@@ -660,6 +660,23 @@ async function cmdTourneypool(options, origin) {
         return L.message(view.embeds, view.components);
     }
 
+    // Community pools are usually one round ("Grand finals" holding every
+    // bracket) — show its maps straight away rather than a one-line index.
+    if (rounds.length === 1) {
+        const view = mappoolRoundView(pool, 0, 0, origin, 'community');
+        return L.message(view.embeds, view.components);
+    }
+
+    // Multi-round: the rounds index + a button per round (≤10) that opens it
+    // in place, plus a whole-pool .osdb export — no need to type round:<name>.
+    const roundBtns = rounds.slice(0, 10).map((rd, ri) => ({
+        type: 2, style: 2, label: String(rd.name || `#${ri + 1}`).slice(0, 80),
+        custom_id: `cmp|${pool.folder}|${ri}|0`,
+    }));
+    const rows = [];
+    for (let i = 0; i < roundBtns.length; i += 5) rows.push({ type: 1, components: roundBtns.slice(i, i + 5) });
+    rows.push({ type: 1, components: [{ type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `cmpx|${pool.folder}|*` }] });
+
     return L.message({
         title: t('tpool_rounds_title', { label: pool.label, mode: tpoolModeShort(pool.mode), n: rounds.length }),
         url: pool.url || `${origin}/?cmpool=${encodeURIComponent(pool.folder)}`,
@@ -669,11 +686,8 @@ async function cmdTourneypool(options, origin) {
             return `**${rd.name}** — ${t('n_sets', { n })}`;
         }).join('\n') || t('mappool_no_data'),
         color: PINK,
-        footer: L.siteFooter(t('tpool_round_hint')),
-    }, [{
-        type: 1,
-        components: [{ type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `cmpx|${pool.folder}|*` }],
-    }]);
+        footer: L.siteFooter(t('tpool_pick_round')),
+    }, rows);
 }
 
 /* --- /skin ------------------------------------------------------------ */
