@@ -53,10 +53,12 @@
   status = 200
 
 # Chat room image/GIF attachments — /chat-media/<uuid> streams the stored
-# bytes (netlify/functions/chat-media.js).
+# bytes. status=200 rewrite keeps the original path in event.path, and the
+# function reads the id from its last segment (the :id -> ?id= query
+# substitution was unreliable on this path).
 [[redirects]]
   from = "/chat-media/:id"
-  to = "/.netlify/functions/chat-media?id=:id"
+  to = "/.netlify/functions/chat-media"
   status = 200
 
 # Clean Interactions Endpoint URL for the Discord bot — set this as the
