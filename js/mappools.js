@@ -175,7 +175,10 @@ function mappoolBracketHead(label) {
     const badge = b
         ? `<span class="mod-badge mod-badge--${b.slug}" aria-hidden="true">${b.ab}</span>`
         : '';
-    return `<div class="mappool-bracket-label">${badge}<span>${escHtml(label)}</span></div>`;
+    // Don't repeat the acronym as text when the badge already is it (the
+    // community editor labels brackets "NM", the WC wiki "No Mod").
+    const text = b && b.ab === String(label).trim().toUpperCase() ? '' : `<span>${escHtml(label)}</span>`;
+    return `<div class="mappool-bracket-label">${badge}${text}</div>`;
 }
 
 function renderMappoolCard(mp, inCollection) {
