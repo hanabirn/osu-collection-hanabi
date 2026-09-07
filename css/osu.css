@@ -1826,15 +1826,16 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .cmpool-btn-ghost { background: var(--bg-stat); color: var(--text-secondary); }
 .cmpool-create {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
     margin: 0 0 16px;
-    padding: 12px;
+    padding: 14px;
     border-radius: 12px;
     border: 1px solid var(--border-card);
     background: var(--bg-card);
 }
+.cmpool-create-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cmpool-create-row > .cmpool-add-label { flex-shrink: 0; }
 .cmpool-create input {
     flex: 1;
     min-width: 220px;
@@ -1846,9 +1847,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font: inherit;
 }
 .cmpool-create select {
-    flex: 1;
     min-width: 200px;
-    max-width: 320px;
+    max-width: 340px;
     padding: 9px 12px;
     border-radius: 10px;
     border: 1px solid var(--border-input);
@@ -1856,10 +1856,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: var(--text);
     font: inherit;
 }
-/* Mode tabs + the action buttons each take their own full-width row below
-   the tournament select + name input. */
-.cmpool-create #cmpool-create-mode { flex-basis: 100%; }
-.cmpool-create-actions { display: flex; gap: 8px; flex-basis: 100%; }
+.cmpool-create-actions { display: flex; gap: 8px; }
+.cmpool-create-status { margin: 0; font-size: 0.8rem; color: var(--text-dim); }
 .cmpool-row {
     display: flex;
     align-items: center;

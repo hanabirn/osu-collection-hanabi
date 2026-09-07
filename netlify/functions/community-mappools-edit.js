@@ -20,6 +20,7 @@ const { getCommunityMappoolsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const {
     MODES, PRESET_BRACKETS, slugify, poolId, parseBeatmapRef, resolveBeatmap,
+    resolveBeatmapsBatch, importWybinPool,
     MAX_ROUNDS, MAX_BRACKETS_PER_ROUND, MAX_MAPS_PER_BRACKET,
     MAX_LABEL_LEN, MAX_NAME_LEN, EDIT_COOLDOWN_MS,
 } = require('./_community-mappools-shared');
@@ -96,23 +97,42 @@ exports.handler = async (event) => {
 
             const now = new Date().toISOString();
             const rawUrl = typeof (body.tournament || {}).url === 'string' ? body.tournament.url.trim().slice(0, 300) : '';
+            const source = ['wybin', 'forum', 'custom'].includes((body.tournament || {}).source) ? body.tournament.source : 'custom';
             const pool = {
                 id, mode,
-                tournament: {
-                    name, slug,
-                    source: ['wybin', 'forum', 'custom'].includes((body.tournament || {}).source) ? body.tournament.source : 'custom',
-                    url: /^https?:\/\//i.test(rawUrl) ? rawUrl : null,
-                },
+                tournament: { name, slug, source, url: /^https?:\/\//i.test(rawUrl) ? rawUrl : null },
                 rounds: [],
                 contributors: [user.id],
                 createdBy: user.id,
                 createdAt: now,
                 updatedAt: now,
             };
+
+            // Best-effort auto-import from wyBin's own mappool data. Usually
+            // finds nothing (hosts fill pools late / use Google Sheets), in
+            // which case the pool is created empty for manual entry.
+            let imported = 0;
+            if (source === 'wybin' && (body.tournament || {}).slug) {
+                try {
+                    const imp = await importWybinPool(String(body.tournament.slug), mode);
+                    if (imp.count > 0) {
+                        const ids = [...new Set(imp.rounds.flatMap((r) => r.brackets.flatMap((b) => b.maps.map((m) => m.beatmapId))))];
+                        const resolved = await resolveBeatmapsBatch(ids);
+                        if (Object.keys(resolved).length) {
+                            const cache = (await store.get('beatmaps:cache', { type: 'json' })) || {};
+                            Object.assign(cache, resolved);
+                            await store.setJSON('beatmaps:cache', cache);
+                        }
+                        pool.rounds = imp.rounds;
+                        imported = imp.count;
+                    }
+                } catch { /* fall through to an empty pool */ }
+            }
+
             await store.setJSON(`pool:${id}`, pool);
             await writeIndex(store, pool);
             await store.set(`lastEditAt:${user.id}`, String(Date.now()));
-            return ok(pool);
+            return { statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ pool, imported }) };
         }
 
         // ---- everything else needs an existing pool -------------------

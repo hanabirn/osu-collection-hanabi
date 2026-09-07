@@ -550,15 +550,25 @@
         </div>
 
         <div id="cmpool-create" class="cmpool-create" hidden>
-            <select id="cmpool-tourney-select" onchange="onCmpoolTourneyPicked(this)">
-                <option value="" data-i18n="cmpool_pick_from_list">從清單選賽事…</option>
-            </select>
-            <input type="text" id="cmpool-create-name" autocomplete="off" data-i18n-placeholder="cmpool_create_name_ph" placeholder="賽事名稱（可從清單選，或自己打）">
-            <div class="osu-mode-tabs" id="cmpool-create-mode"></div>
+            <div class="cmpool-create-row">
+                <span class="cmpool-add-label" data-i18n="cmpool_source_label">來源</span>
+                <div class="osu-mode-tabs" id="cmpool-source-tabs"></div>
+            </div>
+            <div class="cmpool-create-row" id="cmpool-select-row">
+                <select id="cmpool-tourney-select" onchange="onCmpoolTourneyPicked(this)">
+                    <option value="" data-i18n="cmpool_pick_from_list">從清單選賽事…</option>
+                </select>
+                <input type="text" id="cmpool-create-name" autocomplete="off" data-i18n-placeholder="cmpool_create_name_ph" placeholder="賽事名稱（可從清單選，或自己打）">
+            </div>
+            <div class="cmpool-create-row">
+                <span class="cmpool-add-label" data-i18n="cmpool_mode_label">模式</span>
+                <div class="osu-mode-tabs" id="cmpool-create-mode"></div>
+            </div>
             <div class="cmpool-create-actions">
                 <button class="btn" id="cmpool-create-go" onclick="submitCommunityPoolCreate()" data-i18n="cmpool_create_go">建立</button>
                 <button class="btn cmpool-btn-ghost" onclick="closeCommunityPoolCreate()" data-i18n="cmpool_create_cancel">取消</button>
             </div>
+            <p class="cmpool-create-status" id="cmpool-create-status" hidden></p>
         </div>
 
         <div id="cmpool-list"></div>
