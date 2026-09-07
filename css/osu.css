@@ -386,6 +386,43 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .news-title { display: block; color: var(--text); font-size: 0.85rem; line-height: 1.4; }
 .news-loading, .news-empty { color: var(--text-secondary); font-size: 0.85rem; padding: 12px 0; }
 
+/* Parsed rank bracket on a tournament card (see js/tournaments.js
+   detectTournamentRankTier) — sits opposite the date in .news-item-header. */
+.tournament-rank-badge {
+    flex: none;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--accent-pink);
+    background: rgba(var(--accent-pink-rgb), 0.12);
+    border: 1px solid rgba(var(--accent-pink-rgb), 0.3);
+}
+.tournament-rank-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+.tournament-rank-filter-row select {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.tournament-rank-filter-row select:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 15px rgba(192,132,252,0.25);
+}
+
 /* Official news feed only (#osu-news-list) — a big top banner image with
    the title + excerpt below, instead of the small side-thumbnail row every
    other .news-item consumer (tournaments columns, mapper... ) still uses.

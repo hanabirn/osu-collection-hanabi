@@ -22,7 +22,7 @@ I18N.zh = {
     osu_genre_filter_all: '全部曲風', osu_source_filter_all: '全部來源', osu_source_filter_none: '（無來源）', genre_unspecified: '未指定', genre_video_game: '電子遊戲', genre_anime: '動畫', genre_rock: '搖滾', genre_pop: '流行', genre_other: '其他', genre_novelty: '惡搞', genre_hiphop: '嘻哈', genre_electronic: '電子', genre_metal: '金屬', genre_classical: '古典', genre_folk: '民謠', genre_jazz: '爵士',
     osu_artist_filter_all: '全部歌手',
     updates_title: '✦ 更新情報 ✦', updates_loading: '載入更新資訊中...', updates_empty: '目前沒有更新資訊', updates_load_fail: '更新資訊載入失敗，稍後再試',
-    tournaments_title: '✦ 賽事 ✦', tournaments_hint: '整合官方論壇「Tournaments」版貼文與 wyBin 平台的社群賽事，非官方主辦活動，報名前請自行確認主辦方規則。', tournaments_filter_hint: '遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。', osu_filter_all: '全部', tournament_source_forum: '論壇',
+    tournaments_title: '✦ 賽事 ✦', tournaments_hint: '整合官方論壇「Tournaments」版貼文與 wyBin 平台的社群賽事，非官方主辦活動，報名前請自行確認主辦方規則。', tournaments_filter_hint: '遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。', osu_filter_all: '全部', tournament_source_forum: '論壇', tournament_rank_label: '參賽排名', tournament_rank_all: '全部排名', tournament_rank_open: 'Open Rank', tournament_rank_worldcup: '世界盃', tournament_rank_digit: '{n} 位數', tournament_rank_unknown: '未標示',
     feedback_title: '✦ 建議&改進 ✦', feedback_hint: '覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。', feedback_placeholder: '寫下你的建議...', feedback_submit: '送出', feedback_success: '您的回覆訊息已傳送，感謝您的回饋！',
     skins_title: '🎵 我的皮膚 🎵', skins_hint: '上傳你想收藏的 osu! 皮膚檔案（.osk），之後隨時可以下載回來。檔案只存在你目前這個瀏覽器裡，不會上傳到任何伺服器，換裝置或清除瀏覽器資料就會遺失。登入 osu! 帳號後可以選擇性把 4MB 以下的皮膚備份到雲端。', skins_list_title: '💾 已收藏的皮膚',
     skins_empty: '還沒有收藏的皮膚', skins_download: '下載', skins_delete: '刪除', skins_delete_confirm: '確定要刪除這個皮膚檔案嗎？',

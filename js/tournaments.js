@@ -36,6 +36,74 @@ let osuTournamentsLoaded = false;
 let osuTournamentsCurrentItems = [];
 let osuWybinTournamentsCurrentItems = [];
 let osuTournamentsModeFilter = 'all';
+let osuTournamentsRankFilter = 'all';
+
+/* Best-effort rank-bracket detection from a tournament's title/acronym —
+   like detectTournamentMode(), there's no structured field for it (wyBin
+   has minimumRankToJoin/maximumRankToJoin but hosts leave them null, and the
+   forum API has nothing), so this parses the conventional ways hosts write
+   it: "4 Digit ...", "4DWC" style acronyms, "(#10,000 - #50,000)", "Open
+   Rank", "World Cup". Returns 'open' | 'worldcup' | 'digit1'..'digit7' |
+   null (unstated). */
+function detectTournamentRankTier(text) {
+    const s = String(text || '');
+    let m = s.match(/\b([1-7])\s*-?\s*digit/i)
+        || s.match(/\bdigit\s*([1-7])\b/i)
+        // acronym forms: "4DWC25", "2DPP", "1DT", "4DCI26"
+        || s.match(/\b([1-7])D[A-Z]{1,5}\d*\b/i)
+        // "3CWC5", "5WC", "4TWC2024" — an N-digit (optionally mode-lettered) World Cup
+        || s.match(/\b([1-7])(?:C|T|M|S)?WC\d*\b/i);
+    if (m) return 'digit' + m[1];
+    // explicit "#lo - #hi" range -> digit tier of the lower bound
+    m = s.match(/#?\s*(\d[\d,]*)\s*(k?)\s*[-–~]\s*#?\s*\d[\d,]*\s*k?/i);
+    if (m) {
+        let lo = parseInt(m[1].replace(/,/g, ''), 10);
+        if (m[2]) lo *= 1000;
+        if (lo >= 1) return 'digit' + Math.min(7, String(lo).length);
+    }
+    if (/\bopen(\s*rank)?\b/i.test(s) || /\(\s*open\s*\)/i.test(s)) return 'open';
+    // spelled out, or the official acronyms (OWC / TWC / CWC / MWC[47K]),
+    // with or without a trailing year / key-count
+    if (/\b(world|nations?)\s*cup\b/i.test(s) || /\b[otmc]wc\d*\b/i.test(s) || /\bmwc\s*[47]k\b/i.test(s)) return 'worldcup';
+    return null;
+}
+
+// wyBin: honour the structured bounds if a host ever fills them in, else
+// fall back to parsing the name + acronym.
+function wybinRankTier(item) {
+    const lo = item.minimumRankToJoin;
+    if (typeof lo === 'number' && lo >= 1) return 'digit' + Math.min(7, String(lo).length);
+    return detectTournamentRankTier(`${item.name || ''} ${item.acronym || ''}`);
+}
+
+function rankTierLabel(tier) {
+    if (tier === 'open') return t('tournament_rank_open');
+    if (tier === 'worldcup') return t('tournament_rank_worldcup');
+    const m = /^digit([1-7])$/.exec(tier || '');
+    return m ? t('tournament_rank_digit', { n: m[1] }) : '';
+}
+
+// Build the rank-filter <select> in JS (its <option>s carry templated /
+// per-tier text data-i18n can't reach), same pattern as the catalog facets.
+function populateTournamentRankFilter() {
+    const sel = document.getElementById('tournament-rank-filter');
+    if (!sel || sel.dataset.built) return;
+    const opts = [
+        ['all', t('tournament_rank_all')],
+        ['open', t('tournament_rank_open')],
+        ['worldcup', t('tournament_rank_worldcup')],
+        ...['1', '2', '3', '4', '5', '6', '7'].map(n => ['digit' + n, t('tournament_rank_digit', { n })]),
+        ['none', t('tournament_rank_unknown')],
+    ];
+    sel.innerHTML = opts.map(([v, label]) => `<option value="${v}">${escapeHtmlOsu(label)}</option>`).join('');
+    sel.value = osuTournamentsRankFilter;
+    sel.dataset.built = '1';
+}
+
+function filterOsuTournamentsByRank(tier) {
+    osuTournamentsRankFilter = tier || 'all';
+    renderOsuTournaments();
+}
 
 /* Best-effort mode detection from the topic title — the forum API gives us
    no structured mode field, so this looks for the bracket tags tournament
@@ -66,6 +134,7 @@ function normalizeForumTopic(topic) {
     return {
         source: 'forum',
         mode: detectTournamentMode(topic.title),
+        rankTier: detectTournamentRankTier(topic.title),
         date: (topic.updated_at || topic.created_at || '').slice(0, 10),
         title: topic.title || '',
         url: OSU_TOURNAMENTS_TOPIC_BASE + topic.id,
@@ -82,6 +151,7 @@ function normalizeWybinTournament(item) {
     return {
         source: 'wybin',
         mode: WYBIN_GAMEMODE_TO_KEY[item.gamemode] || null,
+        rankTier: wybinRankTier(item),
         date: item.releaseDate ? new Date(item.releaseDate).toISOString().slice(0, 10) : '',
         title: item.name || '',
         url: WYBIN_TOURNAMENT_BASE + item.slug,
@@ -91,6 +161,7 @@ function normalizeWybinTournament(item) {
 }
 
 function ensureTournamentsLoaded() {
+    populateTournamentRankFilter();
     if (!osuTournamentsLoaded) loadOsuTournaments();
 }
 
@@ -158,9 +229,12 @@ function renderOsuTournaments() {
 }
 
 function renderTournamentColumn(container, sourceItems) {
-    const filtered = osuTournamentsModeFilter === 'all'
-        ? sourceItems
-        : sourceItems.filter(item => item.mode === osuTournamentsModeFilter);
+    const filtered = sourceItems.filter(item => {
+        if (osuTournamentsModeFilter !== 'all' && item.mode !== osuTournamentsModeFilter) return false;
+        if (osuTournamentsRankFilter === 'all') return true;
+        if (osuTournamentsRankFilter === 'none') return !item.rankTier;
+        return item.rankTier === osuTournamentsRankFilter;
+    });
     const items = filtered
         .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
         .slice(0, MERGED_TOURNAMENTS_LIMIT);
@@ -175,6 +249,7 @@ function renderTournamentColumn(container, sourceItems) {
             <div class="news-item-body">
                 <div class="news-item-header">
                     <span class="news-date">${item.date}</span>
+                    ${item.rankTier ? `<span class="tournament-rank-badge">${escapeHtmlOsu(rankTierLabel(item.rankTier))}</span>` : ''}
                 </div>
                 <span class="news-title">${escapeHtmlOsu(item.title)}</span>
                 ${item.meta ? `<span class="news-item-meta">${item.meta}</span>` : ''}

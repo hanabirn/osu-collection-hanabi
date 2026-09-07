@@ -32,6 +32,12 @@ exports.handler = async (event) => {
                 releaseDate: t.releaseDate,
                 tags: t.tags,
                 headerImageThumb: t.headerImageThumb,
+                // Rank-bracket bounds — hosts almost always leave these null
+                // and put the range in the name instead (js/tournaments.js
+                // wybinRankTier falls back to parsing that), but pass them
+                // through for the cases where they are set.
+                minimumRankToJoin: t.minimumRankToJoin,
+                maximumRankToJoin: t.maximumRankToJoin,
             }))
             .sort((a, b) => (b.releaseDate || 0) - (a.releaseDate || 0));
 
