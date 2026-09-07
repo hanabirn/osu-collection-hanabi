@@ -202,7 +202,7 @@ I18N.ko = {
     publish_btn: '내 컬렉션 발행하기', publish_update_btn: '발행한 컬렉션 업데이트', publish_login_required: '발행하려면 먼저 osu! 로그인이 필요합니다',
     publish_relogin_prompt: 'osu! 로그인이 만료되었습니다(30일마다 재인증 필요). 지금 다시 로그인할까요?',
     publish_confirm: '내 컬렉션({n}개의 비트맵)을 공개로 발행할까요? 언제든 다시 발행하거나 취소할 수 있어요',
-    publish_done: '컬렉션이 발행되었습니다!', publish_fail: '발행에 실패했습니다. 잠시 후 다시 시도해주세요',
+    publish_done: '컬렉션이 발행되었습니다!', publish_fail: '발행에 실패했습니다. 잠시 후 다시 시도해주세요', publish_too_large: '컬렉션이 너무 커서 발행할 수 없습니다. 맵을 줄이거나 나눠 주세요.',
     unpublish_btn: '발행 취소', unpublish_confirm: '광장에서 내 컬렉션을 제거할까요?', unpublish_done: '발행이 취소되었습니다',
     gallery_loading: '광장을 불러오는 중...', gallery_load_fail: '광장을 불러오지 못했습니다. 잠시 후 다시 시도해주세요',
     gallery_empty: '아직 발행된 컬렉션이 없습니다. 첫 번째가 되어보세요!', gallery_new_badge: '신규',

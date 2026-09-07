@@ -202,7 +202,7 @@ I18N.fr = {
     publish_btn: 'Publier ma collection', publish_update_btn: 'Mettre à jour ma collection publiée', publish_login_required: "Connectez-vous d'abord avec osu! pour publier votre collection",
     publish_relogin_prompt: 'Ta connexion osu! a expiré (à revérifier tous les 30 jours). Se reconnecter maintenant ?',
     publish_confirm: 'Publier votre collection ({n} beatmaps) publiquement ? Vous pouvez la republier ou la retirer à tout moment',
-    publish_done: 'Votre collection a été publiée !', publish_fail: 'Échec de la publication, veuillez réessayer plus tard',
+    publish_done: 'Votre collection a été publiée !', publish_fail: 'Échec de la publication, veuillez réessayer plus tard', publish_too_large: 'Votre collection est trop volumineuse pour être publiée. Retirez des maps ou divisez-la.',
     unpublish_btn: 'Retirer la publication', unpublish_confirm: 'Retirer votre collection de la galerie ?', unpublish_done: 'Publication retirée',
     gallery_loading: 'Chargement de la galerie...', gallery_load_fail: 'Échec du chargement de la galerie, veuillez réessayer plus tard',
     gallery_empty: "Personne n'a encore publié de collection — soyez le premier !", gallery_new_badge: 'NOUVEAU',

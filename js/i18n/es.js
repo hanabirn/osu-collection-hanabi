@@ -202,7 +202,7 @@ I18N.es = {
     publish_btn: 'Publicar mi colección', publish_update_btn: 'Actualizar mi colección publicada', publish_login_required: 'Inicia sesión con osu! primero para publicar tu colección',
     publish_relogin_prompt: 'Tu sesión de osu! ha caducado (hay que reverificarla cada 30 días). ¿Iniciar sesión de nuevo?',
     publish_confirm: '¿Publicar tu colección ({n} beatmaps) públicamente? Puedes volver a publicarla o retirarla en cualquier momento',
-    publish_done: '¡Tu colección ha sido publicada!', publish_fail: 'Error al publicar, inténtalo de nuevo más tarde',
+    publish_done: '¡Tu colección ha sido publicada!', publish_fail: 'Error al publicar, inténtalo de nuevo más tarde', publish_too_large: 'Tu colección es demasiado grande para publicar. Quita algunos mapas o divídela.',
     unpublish_btn: 'Retirar publicación', unpublish_confirm: '¿Retirar tu colección de la galería?', unpublish_done: 'Publicación retirada',
     gallery_loading: 'Cargando galería...', gallery_load_fail: 'Error al cargar la galería, inténtalo de nuevo más tarde',
     gallery_empty: 'Nadie ha publicado una colección todavía — ¡sé el primero!', gallery_new_badge: 'NUEVO',

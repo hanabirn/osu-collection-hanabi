@@ -279,6 +279,10 @@ async function publishMyCollection() {
             osuReloginPrompt();
             return;
         }
+        if (res.status === 413) {
+            showShareToast(t('publish_too_large'));
+            return;
+        }
         if (!res.ok) throw new Error('publish failed');
         localStorage.setItem('osu_last_published_at', new Date().toISOString());
         updatePublishButtonLabel();

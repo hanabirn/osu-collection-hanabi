@@ -340,7 +340,7 @@ I18N.en = {
     publish_btn: 'Publish My Collection', publish_update_btn: 'Update My Published Collection', publish_login_required: 'Log in with osu! first to publish your collection',
     publish_relogin_prompt: 'Your osu! login has expired (it needs re-verifying every 30 days). Log in again now?',
     publish_confirm: 'Publish your collection ({n} beatmaps) publicly? You can republish or unpublish anytime',
-    publish_done: 'Your collection has been published!', publish_fail: 'Failed to publish, please try again later',
+    publish_done: 'Your collection has been published!', publish_fail: 'Failed to publish, please try again later', publish_too_large: 'Your collection is too large to publish. Trim some maps or split it up.',
     unpublish_btn: 'Unpublish', unpublish_confirm: 'Remove your collection from the gallery?', unpublish_done: 'Unpublished',
     gallery_loading: 'Loading gallery...', gallery_load_fail: 'Failed to load the gallery, please try again later',
     gallery_empty: 'No one has published a collection yet — be the first!', gallery_new_badge: 'NEW',

@@ -165,7 +165,7 @@ I18N.zh = {
     publish_btn: '發布我的收藏', publish_update_btn: '更新我的發布收藏', publish_login_required: '請先登入 osu! 才能發布收藏',
     publish_relogin_prompt: '你的 osu! 登入已過期（每 30 天要重新驗證一次），要現在重新登入嗎？',
     publish_confirm: '要公開發布你的收藏（{n} 個 Beatmap）嗎？之後可以隨時重新發布或取消發布',
-    publish_done: '已發布你的收藏！', publish_fail: '發布失敗，請稍後再試',
+    publish_done: '已發布你的收藏！', publish_fail: '發布失敗，請稍後再試', publish_too_large: '收藏太大，無法發布。刪掉一些圖或拆成兩份再試。',
     unpublish_btn: '取消發布', unpublish_confirm: '確定要將你的收藏從廣場移除嗎？', unpublish_done: '已取消發布',
     gallery_loading: '載入收藏廣場中...', gallery_load_fail: '載入收藏廣場失敗，稍後再試',
     gallery_empty: '目前還沒有人發布收藏，成為第一個吧！', gallery_new_badge: '新',

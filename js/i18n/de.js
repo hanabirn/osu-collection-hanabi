@@ -202,7 +202,7 @@ I18N.de = {
     publish_btn: 'Meine Sammlung veröffentlichen', publish_update_btn: 'Veröffentlichte Sammlung aktualisieren', publish_login_required: 'Melde dich zuerst mit osu! an, um deine Sammlung zu veröffentlichen',
     publish_relogin_prompt: 'Deine osu!-Anmeldung ist abgelaufen (alle 30 Tage neu zu bestätigen). Jetzt erneut anmelden?',
     publish_confirm: 'Deine Sammlung ({n} Beatmaps) öffentlich veröffentlichen? Du kannst sie jederzeit erneut veröffentlichen oder entfernen',
-    publish_done: 'Deine Sammlung wurde veröffentlicht!', publish_fail: 'Veröffentlichung fehlgeschlagen, bitte später erneut versuchen',
+    publish_done: 'Deine Sammlung wurde veröffentlicht!', publish_fail: 'Veröffentlichung fehlgeschlagen, bitte später erneut versuchen', publish_too_large: 'Deine Sammlung ist zu groß zum Veröffentlichen. Entferne einige Maps oder teile sie auf.',
     unpublish_btn: 'Veröffentlichung aufheben', unpublish_confirm: 'Deine Sammlung aus der Galerie entfernen?', unpublish_done: 'Veröffentlichung aufgehoben',
     gallery_loading: 'Galerie wird geladen...', gallery_load_fail: 'Galerie konnte nicht geladen werden, bitte später erneut versuchen',
     gallery_empty: 'Noch niemand hat eine Sammlung veröffentlicht — sei der Erste!', gallery_new_badge: 'NEU',

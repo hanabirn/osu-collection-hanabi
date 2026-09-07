@@ -94,7 +94,11 @@ async function dmFollowers(entry, origin) {
 }
 const MAX_SETS = 3000;
 const MAX_CATEGORIES = 100;
-const MAX_BODY_BYTES = 1.5 * 1024 * 1024;
+// Netlify's synchronous-function request body ceiling is ~6 MB; keep well
+// under it. 1.5 MB was too tight — a power user's ~1.4k-set collection
+// (lean shape, but the JSON key names repeat per beatmap) plus its
+// categoryMembers can run 2-3 MB.
+const MAX_BODY_BYTES = 5 * 1024 * 1024;
 // The full index array is read/written on every publish and every gallery
 // list request, so each entry's `tags` is capped well below MAX_CATEGORIES
 // to keep that array cheap regardless of how many categories a publisher has.

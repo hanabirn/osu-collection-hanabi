@@ -202,7 +202,7 @@ I18N.ja = {
     publish_btn: '自分のコレクションを公開', publish_update_btn: '公開中のコレクションを更新', publish_login_required: '公開するには先に osu! でログインしてください',
     publish_relogin_prompt: 'osu! のログインが期限切れです（30 日ごとに再認証が必要）。今すぐ再ログインしますか？',
     publish_confirm: 'あなたのコレクション（{n} 個の Beatmap）を公開しますか？いつでも再公開や公開停止ができます',
-    publish_done: 'コレクションを公開しました！', publish_fail: '公開に失敗しました。後でもう一度お試しください',
+    publish_done: 'コレクションを公開しました！', publish_fail: '公開に失敗しました。後でもう一度お試しください', publish_too_large: 'コレクションが大きすぎて公開できません。譜面を減らすか分割してください。',
     unpublish_btn: '公開を停止', unpublish_confirm: 'コレクションを広場から削除しますか？', unpublish_done: '公開を停止しました',
     gallery_loading: '広場を読み込み中...', gallery_load_fail: '広場の読み込みに失敗しました。後でもう一度お試しください',
     gallery_empty: 'まだ誰もコレクションを公開していません。最初の一人になりましょう！', gallery_new_badge: '新着',
