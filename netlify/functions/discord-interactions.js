@@ -496,39 +496,58 @@ async function cmdGallery(options, origin) {
 }
 
 async function cmdFarm(options, origin) {
-    const mode = L.optVal(options, 'mode') || 'osu';
-    const ppMin = Number(L.optVal(options, 'pp_min'));
-    const build = (page) => {
-        const p = new URLSearchParams({ mode, sort: 'pp_desc', farmOnly: '1', page: String(page) });
-        if (Number.isFinite(ppMin) && ppMin > 0) p.set('ppMin', String(ppMin));
-        return `${origin}/.netlify/functions/farm-maps-list?${p}`;
-    };
-    let res = await fetch(build(Math.floor(Math.random() * 5)));
-    let items = res.ok ? ((await res.json()).items || []) : [];
-    if (!items.length) {
-        res = await fetch(build(0));
-        items = res.ok ? ((await res.json()).items || []) : [];
+    // farm-maps-list keys datasets by the API ruleset name (osu/taiko/fruits/
+    // mania). API_MODE maps both "catch" and "fruits" -> "fruits", so an old
+    // "catch" value still resolves instead of silently falling back to osu.
+    const mode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
+    let ppMin = Math.max(0, Number(L.optVal(options, 'pp_min')) || 0);
+    let ppMax = Math.max(0, Number(L.optVal(options, 'pp_max')) || 0);
+    if (ppMin && ppMax && ppMax < ppMin) [ppMin, ppMax] = [ppMax, ppMin];
+    // A lone lower bound would otherwise just hand back the very top of the
+    // pp list; cap it to a band.
+    if (ppMin && !ppMax) ppMax = Math.round(ppMin * 1.4);
+
+    const qs = new URLSearchParams({ mode, sort: 'pp_desc', farmOnly: '1' });
+    if (ppMin) qs.set('ppMin', String(ppMin));
+    if (ppMax) qs.set('ppMax', String(ppMax));
+
+    const first = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=0`);
+    if (!first.ok) return L.ephemeral('農分圖資料庫查詢失敗，稍後再試。');
+    const d0 = await first.json();
+    const total = d0.total || 0;
+    const band = `${ppMin || '不限'}–${ppMax || '不限'} PP`;
+    if (!total) return L.ephemeral(`${L.MODE_LABEL[mode]} 在 ${band} 這個區間沒有農分圖，放寬看看。`);
+
+    // Sample uniformly across every matching page, not just the first few.
+    const pageSize = d0.pageSize || 20;
+    const page = Math.floor(Math.random() * Math.ceil(total / pageSize));
+    let items = d0.items || [];
+    if (page > 0) {
+        const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=${page}`);
+        if (r.ok) items = (await r.json()).items || items;
     }
-    if (!items.length) return L.ephemeral('農分圖資料庫目前沒有符合條件的圖。');
+    if (!items.length) return L.ephemeral('抽取失敗，再試一次。');
 
     const m = items[Math.floor(Math.random() * items.length)];
-    const setId = m.beatmapset_id || m.beatmapsetId || null;
-    const mapId = m.beatmap_id || m.beatmapId || m.id || null;
-    const fields = [
-        { name: 'PP', value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
-        { name: '星數', value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
-        { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
-    ];
-    if (m.total_length) fields.push({ name: '長度', value: L.fmtLen(m.total_length), inline: true });
+    const setId = m.beatmapset_id || null;
+    const mapId = m.beatmap_id || null;
+    const mt = L.modeTag(mode);
     const name = `${m.artist || ''} - ${m.title || ''}`.trim() || `Beatmapset ${setId || ''}`.trim();
     return L.message({
-        title: (name + (m.version ? ` [${m.version}]` : '')).slice(0, 250),
+        title: `${mt ? mt + ' ' : ''}${name}${m.version ? ` [${m.version}]` : ''}`.slice(0, 250),
         url: mapId ? `https://osu.ppy.sh/b/${mapId}` : (setId ? `https://osu.ppy.sh/s/${setId}` : `${origin}/`),
         description: m.creator ? `mapper：${m.creator}` : undefined,
         color: L.srColor(m.star),
         image: setId ? { url: `https://assets.ppy.sh/beatmaps/${setId}/covers/cover.jpg` } : undefined,
-        fields,
-        footer: L.siteFooter('Farm Maps'),
+        fields: [
+            { name: 'PP', value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
+            { name: '星數', value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
+            { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
+            { name: '長度', value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
+            { name: 'AR / OD / CS', value: `${m.ar ?? '—'} / ${m.od ?? '—'} / ${m.cs ?? '—'}`, inline: true },
+            { name: '符合數', value: `${L.fmtNum(total)} 張`, inline: true },
+        ],
+        footer: L.siteFooter(`Farm Maps · ${band}`),
     });
 }
 

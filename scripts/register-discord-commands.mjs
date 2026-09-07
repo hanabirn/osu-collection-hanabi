@@ -89,11 +89,9 @@ const commands = [
         name: 'farm',
         description: '從農分圖資料庫抽一張圖',
         options: [
-            { type: 3, name: 'mode', required: false, description: '遊戲模式（預設 osu!）', choices: [
-                { name: 'osu!', value: 'osu' }, { name: 'osu!taiko', value: 'taiko' },
-                { name: 'osu!catch', value: 'catch' }, { name: 'osu!mania', value: 'mania' },
-            ] },
+            modeOpt,
             { type: 4, name: 'pp_min', required: false, description: '最低 PP' },
+            { type: 4, name: 'pp_max', required: false, description: '最高 PP（只給 min 時自動抓 min ~ min×1.4）' },
         ],
     },
     {
