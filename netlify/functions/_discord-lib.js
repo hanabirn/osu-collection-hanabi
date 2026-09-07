@@ -40,6 +40,40 @@ const GRADE_EMOJI = {
 };
 const gradeTag = (rank) => GRADE_EMOJI[rank] || `**${rank || '?'}**`;
 
+const MODE_EMOJI = {
+    osu: '<:mode_osu:1546378621315452978>',
+    taiko: '<:mode_taiko:1546378629938942052>',
+    fruits: '<:mode_catch:1546378637916373045>',
+    mania: '<:mode_mania:1546378646498054169>',
+};
+const modeTag = (apiMode) => MODE_EMOJI[apiMode] || '';
+
+const MOD_EMOJI = {
+    NM: '<:mod_nm:1546378674310348863>', NF: '<:mod_nf:1546378682954940439>',
+    EZ: '<:mod_ez:1546378692203249734>', HT: '<:mod_ht:1546378702034829374>',
+    DC: '<:mod_dc:1546378711387996291>', HD: '<:mod_hd:1546378722263699566>',
+    HR: '<:mod_hr:1546378731344367656>', SD: '<:mod_sd:1546378741691981864>',
+    PF: '<:mod_pf:1546378750692696198>', DT: '<:mod_dt:1546378759614111805>',
+    NC: '<:mod_nc:1546378768711426128>', FL: '<:mod_fl:1546378778060791888>',
+    BL: '<:mod_bl:1546378787480932405>', SO: '<:mod_so:1546378796683235348>',
+    RX: '<:mod_rx:1546378806246506566>', AP: '<:mod_ap:1546378815432036413>',
+    MR: '<:mod_mr:1546378824235622470>', RD: '<:mod_rd:1546378834113462404>',
+    FI: '<:mod_fi:1546378843059781673>', CL: '<:mod_cl:1546378855051173939>',
+    '4K': '<:mod_4k:1546378864467378286>', '5K': '<:mod_5k:1546378874173132870>',
+    '6K': '<:mod_6k:1546378882922582106>', '7K': '<:mod_7k:1546378891571241000>',
+    '8K': '<:mod_8k:1546378901863800855>', '9K': '<:mod_9k:1546378911351308318>',
+};
+
+// osu! score `mods` (array of strings or {acronym}) -> a run of mod emojis.
+// "CL" (classic) is dropped as noise; unknown mods fall back to "+XX".
+function modsTag(mods) {
+    const arr = (mods || [])
+        .map(m => (typeof m === 'string' ? m : m && m.acronym))
+        .filter(x => x && x !== 'CL')
+        .map(x => String(x).toUpperCase());
+    return arr.map(m => MOD_EMOJI[m] || `+${m}`).join('');
+}
+
 /* --- signature --------------------------------------------------------- */
 
 const ED25519_SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex');
@@ -117,6 +151,21 @@ function ago(iso) {
     if (s < 2592000) return `${Math.floor(s / 86400)} 天前`;
     if (s < 31536000) return `${Math.floor(s / 2592000)} 個月前`;
     return `${Math.floor(s / 31536000)} 年前`;
+}
+
+// A block-character sparkline. `higherIsBetter=false` (the default) inverts
+// the mapping so a series where smaller = better (e.g. global rank) still
+// trends visually upward as it improves.
+function sparkline(vals, higherIsBetter = false) {
+    const nums = (vals || []).map(Number).filter(n => Number.isFinite(n) && n > 0);
+    if (nums.length < 2) return '';
+    const min = Math.min(...nums), max = Math.max(...nums);
+    const blocks = '▁▂▃▄▅▆▇█';
+    return nums.map(n => {
+        let t = max === min ? 0.5 : (n - min) / (max - min);
+        if (!higherIsBetter) t = 1 - t;
+        return blocks[Math.round(t * (blocks.length - 1))];
+    }).join('');
 }
 
 // Two-letter ISO country code -> regional-indicator flag emoji.
@@ -203,9 +252,9 @@ async function resolveOsuUser(token, nameOrId, apiMode) {
 
 module.exports = {
     PINK, SITE_ORIGIN, SITE_FOOTER, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
-    GRADE_EMOJI, gradeTag,
+    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
     optsOf, optVal, invokerId,
-    fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor,
+    fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor, sparkline,
     osuAuthor, siteFooter, originOf, resolveOsuUser,
 };

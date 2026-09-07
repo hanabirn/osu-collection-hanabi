@@ -69,10 +69,12 @@ async function cmdPp(options, interaction) {
     const s = u.statistics || {};
     const g = s.grade_counts || {};
     const playHours = s.play_time != null ? `${Math.round(s.play_time / 3600).toLocaleString('en-US')} 小時` : '—';
+    const rankHist = (u.rank_history && u.rank_history.data) || (u.rankHistory && u.rankHistory.data) || [];
+    const spark = L.sparkline(rankHist.slice(-30));
 
     return L.message({
         author: L.osuAuthor(u, apiMode),
-        title: `${u.username} — ${L.MODE_LABEL[apiMode]}`,
+        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${u.username} — ${L.MODE_LABEL[apiMode]}`,
         url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`,
         color: L.rankColor(s.global_rank),
         thumbnail: u.avatar_url ? { url: u.avatar_url } : undefined,
@@ -86,6 +88,7 @@ async function cmdPp(options, interaction) {
             { name: '最大連擊', value: L.fmtNum(s.maximum_combo), inline: true },
             { name: '遊玩時間', value: playHours, inline: true },
             { name: '成績', value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
+            ...(spark ? [{ name: '近 30 天排名走勢', value: `\`${spark}\``, inline: false }] : []),
         ],
         footer: L.siteFooter('osu! API v2'),
     });
@@ -93,25 +96,21 @@ async function cmdPp(options, interaction) {
 
 /* --- /recent & /top ------------------------------------------------------- */
 
-const modList = (mods) => (mods || [])
-    .map(m => (typeof m === 'string' ? m : m && m.acronym))
-    .filter(x => x && x !== 'CL');
-
 function scoreEmbed(score, user, apiMode) {
     const bs = score.beatmapset || {};
     const bm = score.beatmap || {};
-    const mods = modList(score.mods);
-    const modStr = mods.length ? ` +${mods.join('')}` : '';
+    const modStr = L.modsTag(score.mods);
     const acc = score.accuracy != null ? `${(score.accuracy * 100).toFixed(2)}%` : '—';
     const pp = score.pp != null ? `${Math.round(score.pp)}pp` : (score.passed === false ? '未通過' : '—');
     const combo = `${L.fmtNum(score.max_combo)}x${bm.max_combo ? ` / ${L.fmtNum(bm.max_combo)}x` : ''}`;
     const covers = bs.covers || {};
+    const mTag = L.modeTag(L.API_MODE[bm.mode] || apiMode);
     return {
         author: L.osuAuthor(user, apiMode),
-        title: `${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+        title: `${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
         url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
         description: [
-            `${L.gradeTag(score.rank)}${modStr} · ${acc} · **${pp}**`,
+            `${L.gradeTag(score.rank)}${modStr ? ' ' + modStr : ''} · ${acc} · **${pp}**`,
             `${L.fmtNum(score.score)} · ${combo}`,
             `★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(score.created_at)}`,
         ].join('\n'),
@@ -168,19 +167,22 @@ async function cmdTop(options, interaction) {
 
     const scores = await fetchScores(token, u.id, 'best', apiMode, 5, false);
     if (!scores.length) return L.ephemeral(`${u.username} 沒有 ${L.MODE_LABEL[apiMode]} 的最佳成績。`);
+    // A description block, not fields — fields box each entry into a narrow
+    // column and wrap the trailing "N 年前" mid-word.
+    const body = scores.map((s, i) => {
+        const bs = s.beatmapset || {}; const bm = s.beatmap || {};
+        const modStr = L.modsTag(s.mods);
+        const head = `**#${i + 1}** ${L.gradeTag(s.rank)}${modStr ? ' ' + modStr : ''} · **${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}**`;
+        const line = `[${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id})`;
+        const meta = `${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`;
+        return `${head}\n${line}\n${meta}`;
+    }).join('\n\n');
     return L.message({
         author: L.osuAuthor(u, apiMode),
-        title: `${u.username} — ${L.MODE_LABEL[apiMode]} 最佳 ${scores.length} 名`,
+        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${u.username} — ${L.MODE_LABEL[apiMode]} 最佳 ${scores.length} 名`,
         url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`,
         color: L.srColor(scores[0].beatmap && scores[0].beatmap.difficulty_rating),
-        fields: scores.map((s, i) => {
-            const bs = s.beatmapset || {}; const bm = s.beatmap || {};
-            const mods = modList(s.mods);
-            return {
-                name: `#${i + 1} · ${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}${mods.length ? ' +' + mods.join('') : ''}`,
-                value: `${L.gradeTag(s.rank)} [${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id}) · ${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`.slice(0, 1024),
-            };
-        }),
+        description: body.slice(0, 4096),
         footer: L.siteFooter('osu! API v2'),
     });
 }
@@ -232,8 +234,9 @@ async function cmdMap(options, origin) {
         }
     } catch { /* pp is a nice-to-have */ }
 
+    const mTag = L.modeTag(L.API_MODE[bm.mode]);
     return L.message({
-        title: `${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+        title: `${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
         url: bm.url || `https://osu.ppy.sh/b/${bm.id}`,
         description: bs.creator ? `mapper：${bs.creator}` : undefined,
         color: L.srColor(bm.difficulty_rating),
@@ -288,9 +291,10 @@ async function cmdMappool(options, origin) {
         for (const b of round.brackets || []) {
             for (const m of b.maps || []) {
                 const tag = b.label ? `\`${b.label}\` ` : '';
+                const mt = L.modeTag(L.API_MODE[m.mode]);
                 const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
                 const sr = m.stars != null ? ` ★${Number(m.stars).toFixed(2)}` : '';
-                lines.push(`${tag}[${name}](https://osu.ppy.sh/b/${m.beatmapId})${sr}`);
+                lines.push(`${mt ? mt + ' ' : ''}${tag}[${name}](https://osu.ppy.sh/b/${m.beatmapId})${sr}`);
                 if (lines.length >= 24) break;
             }
         }
