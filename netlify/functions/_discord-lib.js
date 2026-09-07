@@ -28,6 +28,18 @@ const EPHEMERAL = 64;
 const API_MODE = { osu: 'osu', taiko: 'taiko', fruits: 'fruits', catch: 'fruits', mania: 'mania' };
 const MODE_LABEL = { osu: 'osu!', taiko: 'osu!taiko', fruits: 'osu!catch', mania: 'osu!mania' };
 
+// Application emojis (uploaded by scripts/upload-discord-emojis.mjs — osu!web
+// legacy score-rank PNGs). Usable by this app in any server. Keyed by the
+// osu! API `rank` value; falls back to bold text if an id is missing.
+const GRADE_EMOJI = {
+    X: '<:grade_ss:1546376385117814784>', SS: '<:grade_ss:1546376385117814784>',
+    XH: '<:grade_ssh:1546376388062224427>', SSH: '<:grade_ssh:1546376388062224427>',
+    S: '<:grade_s:1546376391585693699>', SH: '<:grade_sh:1546376394961846272>',
+    A: '<:grade_a:1546376398283870228>', B: '<:grade_b:1546376402914254938>',
+    C: '<:grade_c:1546376406123155577>', D: '<:grade_d:1546376409717547019>', F: '',
+};
+const gradeTag = (rank) => GRADE_EMOJI[rank] || `**${rank || '?'}**`;
+
 /* --- signature --------------------------------------------------------- */
 
 const ED25519_SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex');
@@ -191,6 +203,7 @@ async function resolveOsuUser(token, nameOrId, apiMode) {
 
 module.exports = {
     PINK, SITE_ORIGIN, SITE_FOOTER, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
+    GRADE_EMOJI, gradeTag,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
     optsOf, optVal, invokerId,
     fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor,

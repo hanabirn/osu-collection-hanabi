@@ -83,9 +83,9 @@ async function cmdPp(options, interaction) {
             { name: '準度', value: s.hit_accuracy != null ? `${s.hit_accuracy.toFixed(2)}%` : '—', inline: true },
             { name: '遊玩次數', value: L.fmtNum(s.play_count), inline: true },
             { name: '等級', value: s.level && s.level.current != null ? String(s.level.current) : '—', inline: true },
-            { name: 'SS / S / A', value: `${L.fmtNum((g.ss || 0) + (g.ssh || 0))} / ${L.fmtNum((g.s || 0) + (g.sh || 0))} / ${L.fmtNum(g.a || 0)}`, inline: true },
             { name: '最大連擊', value: L.fmtNum(s.maximum_combo), inline: true },
             { name: '遊玩時間', value: playHours, inline: true },
+            { name: '成績', value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
         ],
         footer: L.siteFooter('osu! API v2'),
     });
@@ -93,7 +93,6 @@ async function cmdPp(options, interaction) {
 
 /* --- /recent & /top ------------------------------------------------------- */
 
-const GRADE = { X: 'SS', XH: 'SS', SS: 'SS', SSH: 'SS', S: 'S', SH: 'S', A: 'A', B: 'B', C: 'C', D: 'D', F: 'F' };
 const modList = (mods) => (mods || [])
     .map(m => (typeof m === 'string' ? m : m && m.acronym))
     .filter(x => x && x !== 'CL');
@@ -112,7 +111,7 @@ function scoreEmbed(score, user, apiMode) {
         title: `${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
         url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
         description: [
-            `**${GRADE[score.rank] || score.rank || '?'}**${modStr} · ${acc} · **${pp}**`,
+            `${L.gradeTag(score.rank)}${modStr} · ${acc} · **${pp}**`,
             `${L.fmtNum(score.score)} · ${combo}`,
             `★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(score.created_at)}`,
         ].join('\n'),
@@ -178,8 +177,8 @@ async function cmdTop(options, interaction) {
             const bs = s.beatmapset || {}; const bm = s.beatmap || {};
             const mods = modList(s.mods);
             return {
-                name: `#${i + 1} · ${GRADE[s.rank] || s.rank || '?'}${mods.length ? ' +' + mods.join('') : ''} · ${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}`,
-                value: `[${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id}) · ${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`.slice(0, 1024),
+                name: `#${i + 1} · ${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}${mods.length ? ' +' + mods.join('') : ''}`,
+                value: `${L.gradeTag(s.rank)} [${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id}) · ${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`.slice(0, 1024),
             };
         }),
         footer: L.siteFooter('osu! API v2'),
