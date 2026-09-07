@@ -1813,6 +1813,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     margin: 12px 0 16px;
     flex-wrap: wrap;
 }
+.cmpool-bar[hidden] { display: none; }
 .cmpool-bar input {
     flex: 1;
     min-width: 180px;
@@ -1834,6 +1835,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: 1px solid var(--border-card);
     background: var(--bg-card);
 }
+/* The class rule's display:flex would otherwise beat the UA [hidden] rule,
+   leaving the form permanently visible in its un-rendered state. */
+.cmpool-create[hidden] { display: none; }
 .cmpool-create-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .cmpool-create-row > .cmpool-add-label { flex-shrink: 0; }
 .cmpool-create input {
