@@ -5,34 +5,40 @@
    else's name no matter what they put in the body. */
 const { getCollectionsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
+const { setLocale, t } = require('./_discord-i18n');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 
 /* Fire a "new collection published" embed into the Discord channel the bot
    watches. Best-effort only: guarded by a short timeout and always caught by
    the caller, so a Discord outage / permission change can never fail or
-   noticeably slow a publish. Inert unless both env vars are set. */
+   noticeably slow a publish. Inert unless both env vars are set.
+   It's a channel broadcast (no per-user locale), so the language comes from
+   DISCORD_ANNOUNCE_LOCALE (a Discord locale code like zh-TW / en-US / ja),
+   default zh-TW. */
 async function announceNewCollection(entry, categoryNames, origin) {
     const token = process.env.DISCORD_BOT_TOKEN;
     const channelId = process.env.DISCORD_GALLERY_CHANNEL_ID;
     if (!token || !channelId) return;
 
-    const bits = [`${entry.totalSets} 圖組`];
-    if (entry.maxRating) bits.push(`最高 ${Number(entry.maxRating).toFixed(2)}★`);
-    if (entry.avgRating) bits.push(`平均 ${Number(entry.avgRating).toFixed(2)}★`);
+    setLocale(process.env.DISCORD_ANNOUNCE_LOCALE || 'zh-TW');
+
+    const bits = [t('n_sets', { n: entry.totalSets })];
+    if (entry.maxRating) bits.push(t('sr_max', { x: Number(entry.maxRating).toFixed(2) }));
+    if (entry.avgRating) bits.push(t('sr_avg', { x: Number(entry.avgRating).toFixed(2) }));
 
     const embed = {
-        title: `🎉 新收藏發佈：${entry.username || ('#' + entry.id)}`,
+        title: t('announce_title', { name: entry.username || ('#' + entry.id) }),
         url: `${origin}/c/${entry.id}`,
         description: bits.join(' · '),
         color: 0xff66aa,
         image: { url: `${origin}/.netlify/functions/og-collection?id=${entry.id}` },
-        footer: { text: 'osu! 歌曲收藏' },
+        footer: { text: t('site_footer') },
         timestamp: entry.updatedAt,
     };
     if (categoryNames && categoryNames.length) {
         embed.fields = [{
-            name: `分類 (${categoryNames.length})`,
+            name: t('f_categories', { n: categoryNames.length }),
             value: categoryNames.join(', ').slice(0, 1024),
         }];
     }

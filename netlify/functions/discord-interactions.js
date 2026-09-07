@@ -5,6 +5,11 @@
    two blob reads / internal fetches, comfortably under budget, so there is
    no deferred-response dance.
 
+   Response text is localized to the invoker's client locale — the handler
+   calls setLocale(interaction.locale) once, then t(key, params) is used
+   everywhere (see _discord-i18n.js). Command-picker text is localized
+   separately via Discord's description_localizations (register script).
+
    Endpoint URL (set in the Discord developer portal):
      https://osu-collection-hanabi.netlify.app/discord
    (netlify.toml rewrites /discord -> here.)
@@ -15,6 +20,7 @@
    `npm run discord:register` after changing them. */
 const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { getOsuToken } = require('./_osu-auth');
+const { setLocale, t } = require('./_discord-i18n');
 const L = require('./_discord-lib');
 
 const { PINK } = L;
@@ -32,19 +38,19 @@ async function getLink(discordId) {
 
 async function cmdLink(options, interaction) {
     const name = String(L.optVal(options, 'username') || '').trim();
-    if (!name) return L.ephemeral('請提供 osu! 使用者名稱或 ID。');
+    if (!name) return L.ephemeral(t('link_need_name'));
     const token = await getOsuToken();
     const u = await L.resolveOsuUser(token, name, '');
-    if (!u) return L.ephemeral(`找不到玩家「${name}」。`);
+    if (!u) return L.ephemeral(t('user_not_found', { name }));
     await getDiscordBotStore().setJSON(`link:${L.invokerId(interaction)}`, {
         osuUserId: u.id, osuUsername: u.username, linkedAt: new Date().toISOString(),
     });
-    return L.ephemeral(`已綁定 **${u.username}**（#${u.id}）。現在 \`/pp\`、\`/recent\`、\`/top\` 可以不帶名稱。`);
+    return L.ephemeral(t('link_done', { name: u.username, id: u.id }));
 }
 
 async function cmdUnlink(interaction) {
     await getDiscordBotStore().delete(`link:${L.invokerId(interaction)}`);
-    return L.ephemeral('已解除綁定。');
+    return L.ephemeral(t('unlink_done'));
 }
 
 // The osu! identity a /pp|/recent|/top call should act on: explicit arg wins,
@@ -60,15 +66,15 @@ async function resolveWho(options, interaction) {
 
 async function cmdPp(options, interaction) {
     const who = await resolveWho(options, interaction);
-    if (!who) return L.ephemeral('請帶上 osu! 名稱，或先用 `/link` 綁定你的帳號。');
+    if (!who) return L.ephemeral(t('need_name_or_link'));
     const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
 
     const token = await getOsuToken();
     const u = await L.resolveOsuUser(token, who, apiMode);
-    if (!u) return L.ephemeral(`找不到玩家「${who}」。`);
+    if (!u) return L.ephemeral(t('user_not_found', { name: who }));
     const s = u.statistics || {};
     const g = s.grade_counts || {};
-    const playHours = s.play_time != null ? `${Math.round(s.play_time / 3600).toLocaleString('en-US')} 小時` : '—';
+    const playHours = s.play_time != null ? t('hours', { n: Math.round(s.play_time / 3600).toLocaleString('en-US') }) : '—';
     const rankHist = (u.rank_history && u.rank_history.data) || (u.rankHistory && u.rankHistory.data) || [];
     const rankChart = L.rankChartUrl(rankHist);
 
@@ -80,17 +86,17 @@ async function cmdPp(options, interaction) {
         thumbnail: u.avatar_url ? { url: u.avatar_url } : undefined,
         image: rankChart ? { url: rankChart } : undefined,
         fields: [
-            { name: 'PP', value: s.pp != null ? `${Math.round(s.pp).toLocaleString('en-US')}pp` : '—', inline: true },
-            { name: '全球排名', value: s.global_rank ? `#${L.fmtNum(s.global_rank)}` : '—', inline: true },
-            { name: `${u.country_code || '國內'} 排名`, value: s.country_rank ? `#${L.fmtNum(s.country_rank)}` : '—', inline: true },
-            { name: '準度', value: s.hit_accuracy != null ? `${s.hit_accuracy.toFixed(2)}%` : '—', inline: true },
-            { name: '遊玩次數', value: L.fmtNum(s.play_count), inline: true },
-            { name: '等級', value: s.level && s.level.current != null ? String(s.level.current) : '—', inline: true },
-            { name: '最大連擊', value: L.fmtNum(s.maximum_combo), inline: true },
-            { name: '遊玩時間', value: playHours, inline: true },
-            { name: '成績', value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
+            { name: t('f_pp'), value: s.pp != null ? `${Math.round(s.pp).toLocaleString('en-US')}pp` : '—', inline: true },
+            { name: t('f_global_rank'), value: s.global_rank ? `#${L.fmtNum(s.global_rank)}` : '—', inline: true },
+            { name: t('f_country_rank', { cc: u.country_code || t('country_word') }), value: s.country_rank ? `#${L.fmtNum(s.country_rank)}` : '—', inline: true },
+            { name: t('f_acc'), value: s.hit_accuracy != null ? `${s.hit_accuracy.toFixed(2)}%` : '—', inline: true },
+            { name: t('f_playcount'), value: L.fmtNum(s.play_count), inline: true },
+            { name: t('f_level'), value: s.level && s.level.current != null ? String(s.level.current) : '—', inline: true },
+            { name: t('f_max_combo'), value: L.fmtNum(s.maximum_combo), inline: true },
+            { name: t('f_playtime'), value: playHours, inline: true },
+            { name: t('f_grades'), value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
         ],
-        footer: L.siteFooter(rankChart ? '排名走勢：近 90 天 · osu! API v2' : 'osu! API v2'),
+        footer: L.siteFooter(rankChart ? t('footer_rank_trend') : t('api_v2')),
     });
 }
 
@@ -101,7 +107,7 @@ function scoreEmbed(score, user, apiMode) {
     const bm = score.beatmap || {};
     const modStr = L.modsTag(score.mods);
     const acc = score.accuracy != null ? `${(score.accuracy * 100).toFixed(2)}%` : '—';
-    const pp = score.pp != null ? `${Math.round(score.pp)}pp` : (score.passed === false ? '未通過' : '—');
+    const pp = score.pp != null ? `${Math.round(score.pp)}pp` : (score.passed === false ? t('not_passed') : '—');
     const combo = `${L.fmtNum(score.max_combo)}x${bm.max_combo ? ` / ${L.fmtNum(bm.max_combo)}x` : ''}`;
     const covers = bs.covers || {};
     const mTag = L.modeTag(L.API_MODE[bm.mode] || apiMode);
@@ -132,45 +138,41 @@ async function fetchScores(token, userId, type, apiMode, limit, includeFails) {
 
 async function cmdRecent(options, interaction) {
     const who = await resolveWho(options, interaction);
-    if (!who) return L.ephemeral('請帶上 osu! 名稱，或先用 `/link` 綁定你的帳號。');
+    if (!who) return L.ephemeral(t('need_name_or_link'));
     const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
     const idx = Math.max(1, Math.min(50, Number(L.optVal(options, 'index')) || 1));
 
     const token = await getOsuToken();
     const u = await L.resolveOsuUser(token, who, apiMode);
-    if (!u) return L.ephemeral(`找不到玩家「${who}」。`);
+    if (!u) return L.ephemeral(t('user_not_found', { name: who }));
 
     const scores = await fetchScores(token, u.id, 'recent', apiMode, idx, true);
-    if (!scores.length) return L.ephemeral(`${u.username} 最近沒有 ${L.MODE_LABEL[apiMode]} 成績（osu! 只保留最近 24 小時內的遊玩）。`);
+    if (!scores.length) return L.ephemeral(t('recent_none', { name: u.username, mode: L.MODE_LABEL[apiMode] }));
     const score = scores[Math.min(idx, scores.length) - 1];
     return L.message(scoreEmbed(score, u, apiMode));
 }
 
 async function cmdTop(options, interaction) {
     const who = await resolveWho(options, interaction);
-    if (!who) return L.ephemeral('請帶上 osu! 名稱，或先用 `/link` 綁定你的帳號。');
+    if (!who) return L.ephemeral(t('need_name_or_link'));
     const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
     const idxOpt = L.optVal(options, 'index');
 
     const token = await getOsuToken();
     const u = await L.resolveOsuUser(token, who, apiMode);
-    if (!u) return L.ephemeral(`找不到玩家「${who}」。`);
+    if (!u) return L.ephemeral(t('user_not_found', { name: who }));
 
     if (idxOpt != null) {
         const idx = Math.max(1, Math.min(100, Number(idxOpt) || 1));
         const scores = await fetchScores(token, u.id, 'best', apiMode, idx, false);
-        if (scores.length < idx) return L.ephemeral(`${u.username} 沒有第 ${idx} 名的 ${L.MODE_LABEL[apiMode]} 成績。`);
+        if (scores.length < idx) return L.ephemeral(t('top_no_nth', { name: u.username, idx, mode: L.MODE_LABEL[apiMode] }));
         const e = scoreEmbed(scores[idx - 1], u, apiMode);
         e.title = `#${idx} · ${e.title}`;
         return L.message(e);
     }
 
     const scores = await fetchScores(token, u.id, 'best', apiMode, 5, false);
-    if (!scores.length) return L.ephemeral(`${u.username} 沒有 ${L.MODE_LABEL[apiMode]} 的最佳成績。`);
-    // A compact description block. (Tried one embed per play with the mod
-    // hexagon as a thumbnail — Discord blows small non-square PNGs up to fill
-    // the box, so the grade badges looked huge and the mod glyphs
-    // unreadable. Inline emoji it is; the acronym text carries the detail.)
+    if (!scores.length) return L.ephemeral(t('top_none', { name: u.username, mode: L.MODE_LABEL[apiMode] }));
     const body = scores.map((s, i) => {
         const bs = s.beatmapset || {}; const bm = s.beatmap || {};
         const mods = L.modsList(s.mods);
@@ -183,11 +185,11 @@ async function cmdTop(options, interaction) {
     }).join('\n\n');
     return L.message({
         author: L.osuAuthor(u, apiMode),
-        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${u.username} — ${L.MODE_LABEL[apiMode]} 最佳 ${scores.length} 名`,
+        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${t('top_title', { name: u.username, mode: L.MODE_LABEL[apiMode], n: scores.length })}`,
         url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`,
         color: L.srColor(scores[0].beatmap && scores[0].beatmap.difficulty_rating),
         description: body.slice(0, 4096),
-        footer: L.siteFooter('osu! API v2'),
+        footer: L.siteFooter(t('api_v2')),
     });
 }
 
@@ -212,18 +214,18 @@ async function cmdMap(options, origin) {
     let bm;
     if (beatmapId) {
         const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps/${beatmapId}`, { headers: { Authorization: `Bearer ${token}` } });
-        if (r.status === 404) return L.ephemeral('找不到這張圖。');
-        if (!r.ok) return L.ephemeral('osu! API 查詢失敗，稍後再試。');
+        if (r.status === 404) return L.ephemeral(t('map_not_found'));
+        if (!r.ok) return L.ephemeral(t('api_fail'));
         bm = await r.json();
     } else if (setId) {
         const r = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${setId}`, { headers: { Authorization: `Bearer ${token}` } });
-        if (!r.ok) return L.ephemeral('找不到這個圖組。');
+        if (!r.ok) return L.ephemeral(t('map_set_not_found'));
         const set = await r.json();
         bm = (set.beatmaps || []).slice().sort((a, b) => b.difficulty_rating - a.difficulty_rating)[0];
         if (bm) bm.beatmapset = set;
-        if (!bm) return L.ephemeral('這個圖組沒有難度資料。');
+        if (!bm) return L.ephemeral(t('map_set_no_diffs'));
     } else {
-        return L.ephemeral('請貼 osu! 圖譜連結或 ID。');
+        return L.ephemeral(t('map_need_link'));
     }
 
     const bs = bm.beatmapset || {};
@@ -242,17 +244,17 @@ async function cmdMap(options, origin) {
     return L.message({
         title: `${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
         url: bm.url || `https://osu.ppy.sh/b/${bm.id}`,
-        description: bs.creator ? `mapper：${bs.creator}` : undefined,
+        description: bs.creator ? t('mapper', { n: bs.creator }) : undefined,
         color: L.srColor(bm.difficulty_rating),
         image: bs.covers ? { url: bs.covers.cover || bs.covers['cover@2x'] } : undefined,
         fields: [
-            { name: '難度', value: `★${Number(bm.difficulty_rating).toFixed(2)}`, inline: true },
+            { name: t('f_difficulty'), value: `★${Number(bm.difficulty_rating).toFixed(2)}`, inline: true },
             { name: 'BPM', value: bm.bpm != null ? String(Math.round(bm.bpm)) : '—', inline: true },
-            { name: '長度', value: L.fmtLen(bm.total_length), inline: true },
+            { name: t('f_length'), value: L.fmtLen(bm.total_length), inline: true },
             { name: 'AR / OD / CS / HP', value: `${bm.ar ?? '—'} / ${bm.accuracy ?? '—'} / ${bm.cs ?? '—'} / ${bm.drain ?? '—'}`, inline: true },
-            { name: '最大連擊', value: bm.max_combo != null ? `${L.fmtNum(bm.max_combo)}x` : '—', inline: true },
-            { name: '狀態', value: bm.status || '—', inline: true },
-            ...(ppLine ? [{ name: 'PP（FC）', value: ppLine, inline: false }] : []),
+            { name: t('f_max_combo'), value: bm.max_combo != null ? `${L.fmtNum(bm.max_combo)}x` : '—', inline: true },
+            { name: t('f_status'), value: bm.status || '—', inline: true },
+            ...(ppLine ? [{ name: t('f_pp_fc'), value: ppLine, inline: false }] : []),
         ],
         footer: L.siteFooter(bm.mode ? L.MODE_LABEL[L.API_MODE[bm.mode]] || bm.mode : undefined),
     });
@@ -272,7 +274,7 @@ async function autocompleteMappool(options, origin) {
     if (q) pool = editions.filter(e => (e.label || '').toLowerCase().includes(q) || (e.folder || '').toLowerCase().includes(q));
     pool = pool.sort((a, b) => (b.year || 0) - (a.year || 0)).slice(0, 25);
     return L.autocomplete(pool.map(e => ({
-        name: `${e.label} · ${e.roundCount} 輪 / ${e.mapCount} 圖`.slice(0, 100),
+        name: `${e.label} · ${t('mappool_ac_meta', { r: e.roundCount, m: e.mapCount })}`.slice(0, 100),
         value: e.folder,
     })));
 }
@@ -296,10 +298,6 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
     const embeds = slice.map((m, i) => {
         const mt = L.modeTag(L.API_MODE[m.mode]);
         const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
-        // The mod hexagon rides as the embed thumbnail (top-right, ~80 px) so
-        // it's actually visible — an inline custom emoji is tiny. Its text
-        // form (HD2 / FM / TB) still leads the description for clarity; the
-        // ruleset emoji stays inline there.
         const mod = L.bracketMod(m.bracket);
         const modIconUrl = L.emojiImageUrl(L.MOD_EMOJI[mod], 128);
         const slotLabel = mod ? `**${mod}${m.slot || ''}**` : '';
@@ -308,7 +306,7 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
             m.stars != null ? `★${Number(m.stars).toFixed(2)}` : null,
             m.bpm != null ? `${Math.round(m.bpm)} BPM` : null,
             m.length != null ? L.fmtLen(m.length) : null,
-            m.creator ? `mapper：${m.creator}` : null,
+            m.creator ? t('mapper', { n: m.creator }) : null,
         ].filter(Boolean).join(' · ');
         return {
             author: i === 0 ? { name: `${pool.label} — ${round.name}` } : undefined,
@@ -319,17 +317,17 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
             thumbnail: modIconUrl ? { url: modIconUrl } : undefined,
             image: m.setId ? { url: `https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover.jpg` } : undefined,
             footer: i === slice.length - 1
-                ? L.siteFooter(`${round.name} · 第 ${p + 1}/${pages} 頁 · 共 ${maps.length} 圖`)
+                ? L.siteFooter(t('mappool_page_footer', { round: round.name, p: p + 1, pages, n: maps.length }))
                 : undefined,
         };
     });
-    if (!embeds.length) embeds.push({ title: `${pool.label} — ${round.name}`, description: '（這一輪還沒有解析好的圖）', color: PINK });
+    if (!embeds.length) embeds.push({ title: `${pool.label} — ${round.name}`, description: t('mappool_round_empty'), color: PINK });
 
     const components = pages > 1 ? [{
         type: 1,
         components: [
-            { type: 2, style: 2, label: '◀ 上一頁', custom_id: `mp|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 },
-            { type: 2, style: 2, label: '下一頁 ▶', custom_id: `mp|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 },
+            { type: 2, style: 2, label: t('btn_prev'), custom_id: `mp|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 },
+            { type: 2, style: 2, label: t('btn_next'), custom_id: `mp|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 },
         ],
     }] : [];
     return { embeds, components };
@@ -338,31 +336,31 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
 async function cmdMappool(options, origin) {
     const folder = String(L.optVal(options, 'edition') || '').trim();
     const roundQ = String(L.optVal(options, 'round') || '').trim().toLowerCase();
-    if (!folder) return L.ephemeral('請選一個賽事版本（例如 OWC/2024）。');
+    if (!folder) return L.ephemeral(t('mappool_need_edition'));
 
     const r = await fetch(`${origin}/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(folder)}`);
-    if (r.status === 404) return L.ephemeral('找不到這個賽事版本。用自動補完選一個。');
-    if (!r.ok) return L.ephemeral('世界盃圖池查詢失敗，稍後再試。');
+    if (r.status === 404) return L.ephemeral(t('mappool_not_found'));
+    if (!r.ok) return L.ephemeral(t('mappool_fail'));
     const pool = await r.json();
     const rounds = pool.rounds || [];
 
     if (roundQ) {
         const roundIdx = rounds.findIndex(rd => (rd.name || '').toLowerCase().includes(roundQ));
-        if (roundIdx < 0) return L.ephemeral(`「${pool.label}」沒有符合「${roundQ}」的輪次。`);
+        if (roundIdx < 0) return L.ephemeral(t('mappool_round_not_found', { label: pool.label, q: roundQ }));
         const view = mappoolRoundView(pool, roundIdx, 0, origin);
         return L.message(view.embeds, view.components);
     }
 
     return L.message({
-        title: `${pool.label} — ${rounds.length} 輪`,
+        title: t('mappool_rounds_title', { label: pool.label, n: rounds.length }),
         url: `${origin}/`,
         description: rounds.map(rd => {
             let n = 0;
             for (const b of rd.brackets || []) n += (b.maps || []).length;
-            return `**${rd.name}** — ${n} 圖`;
-        }).join('\n') || '（尚無資料）',
+            return `**${rd.name}** — ${t('n_sets', { n })}`;
+        }).join('\n') || t('mappool_no_data'),
         color: PINK,
-        footer: L.siteFooter('用 /mappool round:<輪次> 看單輪圖池'),
+        footer: L.siteFooter(t('mappool_round_hint')),
     });
 }
 
@@ -370,11 +368,11 @@ async function cmdMappool(options, origin) {
 
 async function cmdSkin(options, origin) {
     const q = String(L.optVal(options, 'query') || '').trim();
-    if (!q) return L.ephemeral('請輸入皮膚名稱或作者。');
+    if (!q) return L.ephemeral(t('skin_need_query'));
     const r = await fetch(`${origin}/.netlify/functions/skin-screenshots-list?sort=likes&q=${encodeURIComponent(q)}`);
-    if (!r.ok) return L.ephemeral('皮膚庫查詢失敗，稍後再試。');
+    if (!r.ok) return L.ephemeral(t('skin_fail'));
     const items = (await r.json()).items || [];
-    if (!items.length) return L.ephemeral(`找不到符合「${q}」的皮膚。`);
+    if (!items.length) return L.ephemeral(t('skin_not_found', { q }));
 
     const top = items[0];
     const more = items.slice(1, 5).map(s => `• **${s.skinName}** — ${s.author || '?'}（♥${s.likeCount || 0}）`);
@@ -382,32 +380,42 @@ async function cmdSkin(options, origin) {
         title: top.skinName,
         url: `${origin}/`,
         description: [
-            top.author ? `作者：${top.author}` : null,
-            top.username ? `分享者：${top.username}` : null,
-            more.length ? `\n其他結果：\n${more.join('\n')}` : null,
+            top.author ? t('skin_author', { n: top.author }) : null,
+            top.username ? t('skin_sharer', { n: top.username }) : null,
+            more.length ? `\n${t('skin_more')}\n${more.join('\n')}` : null,
         ].filter(Boolean).join('\n'),
         color: PINK,
         image: { url: `${origin}/.netlify/functions/skin-screenshots-image?id=${top.id}` },
-        footer: L.siteFooter('皮膚庫'),
+        footer: L.siteFooter(t('skin_footer')),
     });
 }
 
 /* --- /collection & /gallery ------------------------------------------------ */
 
+// The publisher-facing bits shared by /collection, /gallery and the
+// publish announcement (collections-publish.js reimplements its own).
+function collectionDescBits(entry) {
+    const bits = [t('n_sets', { n: entry.totalSets || 0 })];
+    if (entry.maxRating) bits.push(t('sr_max', { x: Number(entry.maxRating).toFixed(2) }));
+    if (entry.avgRating) bits.push(t('sr_avg', { x: Number(entry.avgRating).toFixed(2) }));
+    if (entry.likeCount) bits.push(`♥ ${entry.likeCount}`);
+    return bits;
+}
+
 function collectionButtons(entry, origin) {
     return [{
         type: 1,
         components: [
-            { type: 2, style: 1, label: '🎲 隨機一張圖', custom_id: `col:rand:${entry.id}` },
-            { type: 2, style: 5, label: '開啟收藏', url: `${origin}/c/${entry.id}` },
-            { type: 2, style: 5, label: '發佈者主頁', url: `https://osu.ppy.sh/users/${entry.id}` },
+            { type: 2, style: 1, label: t('btn_random_map'), custom_id: `col:rand:${entry.id}` },
+            { type: 2, style: 5, label: t('btn_open_collection'), url: `${origin}/c/${entry.id}` },
+            { type: 2, style: 5, label: t('btn_owner_profile'), url: `https://osu.ppy.sh/users/${entry.id}` },
         ],
     }];
 }
 
 async function cmdCollection(options, origin) {
     const query = String(L.optVal(options, 'query') || '').trim();
-    if (!query) return L.ephemeral('請輸入發佈者名稱、收藏 ID 或分類關鍵字。');
+    if (!query) return L.ephemeral(t('collection_need_query'));
 
     const store = getCollectionsStore();
     const index = (await store.get('index', { type: 'json' })) || [];
@@ -418,10 +426,10 @@ async function cmdCollection(options, origin) {
         const q = query.toLowerCase();
         entry = index.find(e => (e.username || '').toLowerCase() === q)
             || index.find(e => (e.username || '').toLowerCase().includes(q))
-            || index.find(e => (e.tags || []).some(t => t.toLowerCase().includes(q)))
+            || index.find(e => (e.tags || []).some(tag => tag.toLowerCase().includes(q)))
             || null;
     }
-    if (!entry) return L.ephemeral(`找不到符合「${query}」的已發佈收藏。試試 \`/gallery\`。`);
+    if (!entry) return L.ephemeral(t('collection_not_found', { q: query }));
 
     const full = await store.get(`full:${entry.id}`, { type: 'json' });
     const modeBits = [];
@@ -432,23 +440,19 @@ async function cmdCollection(options, origin) {
         }
     }
     const catNames = ((full && full.categories) || []).map(c => c && c.name).filter(Boolean);
-    const descBits = [`${entry.totalSets || 0} 圖組`];
-    if (entry.maxRating) descBits.push(`最高 ${Number(entry.maxRating).toFixed(2)}★`);
-    if (entry.avgRating) descBits.push(`平均 ${Number(entry.avgRating).toFixed(2)}★`);
-    if (entry.likeCount) descBits.push(`♥ ${entry.likeCount}`);
 
     const embed = {
-        title: `${entry.username || ('#' + entry.id)} 的 osu! 收藏`,
+        title: t('collection_title', { name: entry.username || ('#' + entry.id) }),
         url: `${origin}/c/${entry.id}`,
-        description: descBits.join(' · '),
+        description: collectionDescBits(entry).join(' · '),
         color: entry.maxRating ? L.srColor(entry.maxRating) : PINK,
         image: { url: `${origin}/.netlify/functions/og-collection?id=${entry.id}` },
         fields: [],
         footer: L.siteFooter(),
         timestamp: entry.updatedAt || undefined,
     };
-    if (modeBits.length) embed.fields.push({ name: '模式分佈', value: modeBits.join(' · ') });
-    if (catNames.length) embed.fields.push({ name: `分類 (${catNames.length})`, value: catNames.join(', ').slice(0, 1024) });
+    if (modeBits.length) embed.fields.push({ name: t('f_mode_split'), value: modeBits.join(' · ') });
+    if (catNames.length) embed.fields.push({ name: t('f_categories', { n: catNames.length }), value: catNames.join(', ').slice(0, 1024) });
 
     return L.message(embed, collectionButtons(entry, origin));
 }
@@ -462,11 +466,11 @@ async function autocompleteCollection(options) {
         pool = index.filter(e =>
             (e.username || '').toLowerCase().includes(q) ||
             String(e.id).includes(q) ||
-            (e.tags || []).some(t => t.toLowerCase().includes(q)));
+            (e.tags || []).some(tag => tag.toLowerCase().includes(q)));
     }
     pool = pool.sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))).slice(0, 25);
     return L.autocomplete(pool.map(e => ({
-        name: `${e.username || ('#' + e.id)} · ${e.totalSets || 0} 圖組`.slice(0, 100),
+        name: `${e.username || ('#' + e.id)} · ${t('n_sets', { n: e.totalSets || 0 })}`.slice(0, 100),
         value: String(e.id),
     })));
 }
@@ -474,24 +478,24 @@ async function autocompleteCollection(options) {
 async function cmdGallery(options, origin) {
     const page = Math.max(0, Math.min(50, (Number(L.optVal(options, 'page')) || 1) - 1));
     const res = await fetch(`${origin}/.netlify/functions/collections-list?page=${page}&sort=recent`);
-    if (!res.ok) return L.ephemeral('讀取收藏廣場失敗，稍後再試。');
+    if (!res.ok) return L.ephemeral(t('gallery_fail'));
     const data = await res.json();
     const items = data.items || [];
-    if (!items.length) return L.ephemeral('這一頁沒有收藏。');
+    if (!items.length) return L.ephemeral(t('gallery_empty'));
 
     const lines = items.slice(0, 12).map((e, i) => {
-        const bits = [`${e.totalSets || 0} 圖組`];
+        const bits = [t('n_sets', { n: e.totalSets || 0 })];
         if (e.maxRating) bits.push(`${Number(e.maxRating).toFixed(1)}★`);
         if (e.likeCount) bits.push(`♥${e.likeCount}`);
         const n = String(page * 20 + i + 1).padStart(2, ' ');
-        return `\`${n}\` **${e.username || ('#' + e.id)}** — ${bits.join(' · ')} · [開啟](${origin}/c/${e.id})`;
+        return `\`${n}\` **${e.username || ('#' + e.id)}** — ${bits.join(' · ')} · [${t('gallery_open')}](${origin}/c/${e.id})`;
     });
     return L.message({
-        title: '收藏廣場 — 最新發佈',
+        title: t('gallery_title'),
         url: `${origin}/`,
         description: lines.join('\n'),
         color: PINK,
-        footer: L.siteFooter(`第 ${page + 1} 頁 · 共 ${data.total || items.length} 份`),
+        footer: L.siteFooter(t('gallery_footer', { p: page + 1, total: data.total || items.length })),
     });
 }
 
@@ -508,13 +512,14 @@ async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
     const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
     if (ppMin) qs.set('ppMin', String(ppMin));
     if (ppMax) qs.set('ppMax', String(ppMax));
-    const band = `${ppMin || '不限'}–${ppMax || '不限'} PP`;
+    const any = t('farm_unlimited');
+    const band = t('pp_band', { lo: ppMin || any, hi: ppMax || any });
 
     const probe = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=0`);
-    if (!probe.ok) return { error: '農分圖資料庫查詢失敗，稍後再試。' };
+    if (!probe.ok) return { error: t('farm_query_fail') };
     const d0 = await probe.json();
     const total = d0.total || 0;
-    if (!total) return { error: `${L.MODE_LABEL[mode]} · ${mods} 在 ${band} 沒有農分圖，放寬條件看看。` };
+    if (!total) return { error: t('farm_none', { mode: L.MODE_LABEL[mode], mods, band }) };
 
     const pageSize = d0.pageSize || 20;
     const idx = index < 0 ? Math.floor(Math.random() * total) : (((index % total) + total) % total);
@@ -525,7 +530,7 @@ async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
         if (r.ok) items = (await r.json()).items || [];
     }
     const m = items[idx % pageSize];
-    if (!m) return { error: '抽取失敗，再試一次。' };
+    if (!m) return { error: t('farm_pick_fail') };
 
     const setId = m.beatmapset_id || null;
     const mapId = m.beatmap_id || null;
@@ -538,25 +543,25 @@ async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
         embed: {
             title: `${mt ? mt + ' ' : ''}${name}${m.version ? ` [${m.version}]` : ''}`.slice(0, 250),
             url: mapId ? `https://osu.ppy.sh/b/${mapId}` : (setId ? `https://osu.ppy.sh/s/${setId}` : `${origin}/`),
-            description: [modChips, m.creator ? `mapper：${m.creator}` : null].filter(Boolean).join('\n') || undefined,
+            description: [modChips, m.creator ? t('mapper', { n: m.creator }) : null].filter(Boolean).join('\n') || undefined,
             color: L.srColor(m.star),
             image: setId ? { url: `https://assets.ppy.sh/beatmaps/${setId}/covers/cover.jpg` } : undefined,
             fields: [
-                { name: `PP（${mods}）`, value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
-                { name: '星數', value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
+                { name: t('farm_f_pp', { mods }), value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
+                { name: t('f_stars'), value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
                 { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
-                { name: '長度', value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
+                { name: t('f_length'), value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
                 { name: 'AR / OD / CS', value: `${m.ar ?? '—'} / ${m.od ?? '—'} / ${m.cs ?? '—'}`, inline: true },
-                { name: '排名', value: `${idx + 1} / ${L.fmtNum(total)}`, inline: true },
+                { name: t('f_position'), value: `${idx + 1} / ${L.fmtNum(total)}`, inline: true },
             ],
-            footer: L.siteFooter(`Farm Maps · ${band}`),
+            footer: L.siteFooter(t('farm_footer', { band })),
         },
         components: [{
             type: 1,
             components: [
-                { type: 2, style: 2, label: '◀ 上一張', custom_id: cid(idx - 1) },
-                { type: 2, style: 1, label: '🎲 隨機', custom_id: cid(-1) },
-                { type: 2, style: 2, label: '下一張 ▶', custom_id: cid(idx + 1) },
+                { type: 2, style: 2, label: t('farm_btn_prev'), custom_id: cid(idx - 1) },
+                { type: 2, style: 1, label: t('farm_btn_random'), custom_id: cid(-1) },
+                { type: 2, style: 2, label: t('farm_btn_next'), custom_id: cid(idx + 1) },
             ],
         }],
     };
@@ -598,9 +603,9 @@ async function handleComponent(interaction, origin) {
     if (id.startsWith('mp|')) {
         const [, folder, roundIdxStr, pageStr] = id.split('|');
         const r = await fetch(`${origin}/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(folder)}`);
-        if (!r.ok) return L.updateMessage({ title: '世界盃圖池查詢失敗', color: PINK });
+        if (!r.ok) return L.updateMessage({ title: t('mappool_fail_short'), color: PINK });
         const view = mappoolRoundView(await r.json(), Number(roundIdxStr), Number(pageStr), origin);
-        if (!view) return L.updateMessage({ title: '找不到輪次', color: PINK });
+        if (!view) return L.updateMessage({ title: t('mappool_round_not_found2'), color: PINK });
         return L.updateMessage(view.embeds, view.components);
     }
 
@@ -609,7 +614,7 @@ async function handleComponent(interaction, origin) {
     if (ns === 'col' && action === 'rand') {
         const store = getCollectionsStore();
         const full = await store.get(`full:${arg}`, { type: 'json' });
-        if (!full || !full.collection) return L.updateMessage({ title: '這份收藏已不存在', color: PINK });
+        if (!full || !full.collection) return L.updateMessage({ title: t('collection_gone'), color: PINK });
 
         const seen = new Map();
         for (const mode of ['standard', 'taiko', 'catch', 'mania']) {
@@ -618,23 +623,23 @@ async function handleComponent(interaction, origin) {
             }
         }
         const sets = [...seen.values()];
-        if (!sets.length) return L.updateMessage({ title: '這份收藏是空的', color: PINK });
+        if (!sets.length) return L.updateMessage({ title: t('collection_empty'), color: PINK });
         const s = sets[Math.floor(Math.random() * sets.length)];
         const sid = s.beatmapset_id;
 
         return L.updateMessage({
-            author: { name: `來自 ${full.username || ('#' + arg)} 的收藏`, url: `${origin}/c/${arg}` },
+            author: { name: t('collection_from', { name: full.username || ('#' + arg) }), url: `${origin}/c/${arg}` },
             title: `${s.artist || ''} - ${s.title || ''}`.trim() || `Beatmapset #${sid}`,
             url: `https://osu.ppy.sh/s/${sid}`,
-            description: s.creator ? `mapper：${s.creator}` : undefined,
+            description: s.creator ? t('mapper', { n: s.creator }) : undefined,
             color: PINK,
             image: { url: `https://assets.ppy.sh/beatmaps/${sid}/covers/cover.jpg` },
-            footer: L.siteFooter(`共 ${sets.length} 圖組`),
+            footer: L.siteFooter(t('n_sets_total', { n: sets.length })),
         }, [{
             type: 1,
             components: [
-                { type: 2, style: 1, label: '🎲 再抽一張', custom_id: `col:rand:${arg}` },
-                { type: 2, style: 5, label: '開啟收藏', url: `${origin}/c/${arg}` },
+                { type: 2, style: 1, label: t('btn_reroll'), custom_id: `col:rand:${arg}` },
+                { type: 2, style: 5, label: t('btn_open_collection'), url: `${origin}/c/${arg}` },
             ],
         }]);
     }
@@ -669,6 +674,10 @@ exports.handler = async (event) => {
 
     if (interaction.type === L.T.PING) return L.json({ type: L.R.PONG });
 
+    // Localize responses to the invoker's client language for the rest of
+    // this request (module-scoped in _discord-i18n; one request per invoke).
+    setLocale(interaction.locale);
+
     const origin = L.originOf(event);
     const name = interaction.data && interaction.data.name;
     const options = L.optsOf(interaction);
@@ -697,12 +706,12 @@ exports.handler = async (event) => {
                 case 'skin': return await cmdSkin(options, origin);
                 case 'link': return await cmdLink(options, interaction);
                 case 'unlink': return await cmdUnlink(interaction);
-                default: return L.ephemeral('未知指令。');
+                default: return L.ephemeral(t('unknown_command'));
             }
         }
 
         return L.json({ type: L.R.PONG });
     } catch (err) {
-        return L.ephemeral(`發生錯誤：${String((err && err.message) || err).slice(0, 200)}`);
+        return L.ephemeral(t('error_generic', { msg: String((err && err.message) || err).slice(0, 200) }));
     }
 };

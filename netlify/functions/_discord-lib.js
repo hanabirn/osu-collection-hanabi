@@ -4,10 +4,10 @@
    presentational helpers are also reused by collections-publish.js's
    "new collection" announcement. */
 const crypto = require('crypto');
+const { t } = require('./_discord-i18n');
 
 const PINK = 0xff66aa;
 const SITE_ORIGIN = 'https://osu-collection-hanabi.netlify.app';
-const SITE_FOOTER = 'osu! 歌曲收藏';
 const SITE_ICON = `${SITE_ORIGIN}/assets/icons/icon-192.png`;
 
 // Interaction / response type numbers.
@@ -186,12 +186,12 @@ function ago(iso) {
     const then = Date.parse(iso);
     if (!Number.isFinite(then)) return '';
     const s = Math.max(0, Math.round((Date.now() - then) / 1000));
-    if (s < 60) return `${s} 秒前`;
-    if (s < 3600) return `${Math.floor(s / 60)} 分鐘前`;
-    if (s < 86400) return `${Math.floor(s / 3600)} 小時前`;
-    if (s < 2592000) return `${Math.floor(s / 86400)} 天前`;
-    if (s < 31536000) return `${Math.floor(s / 2592000)} 個月前`;
-    return `${Math.floor(s / 31536000)} 年前`;
+    if (s < 60) return t('ago_s', { n: s });
+    if (s < 3600) return t('ago_m', { n: Math.floor(s / 60) });
+    if (s < 86400) return t('ago_h', { n: Math.floor(s / 3600) });
+    if (s < 2592000) return t('ago_d', { n: Math.floor(s / 86400) });
+    if (s < 31536000) return t('ago_mo', { n: Math.floor(s / 2592000) });
+    return t('ago_y', { n: Math.floor(s / 31536000) });
 }
 
 // A block-character sparkline. `higherIsBetter=false` (the default) inverts
@@ -302,10 +302,10 @@ function osuAuthor(u, mode) {
     };
 }
 
-const siteFooter = (extra) => ({
-    text: extra ? `${SITE_FOOTER} · ${extra}` : SITE_FOOTER,
-    icon_url: SITE_ICON,
-});
+const siteFooter = (extra) => {
+    const base = t('site_footer');
+    return { text: extra ? `${base} · ${extra}` : base, icon_url: SITE_ICON };
+};
 
 function originOf(event) {
     const proto = (event.headers && event.headers['x-forwarded-proto']) || 'https';
@@ -328,7 +328,7 @@ async function resolveOsuUser(token, nameOrId, apiMode) {
 }
 
 module.exports = {
-    PINK, SITE_ORIGIN, SITE_FOOTER, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
+    PINK, SITE_ORIGIN, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
     GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag, modsList,
     bracketMod, bracketBadge, emojiImageUrl,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
