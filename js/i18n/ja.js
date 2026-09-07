@@ -280,6 +280,7 @@ I18N.ja = {
     cmpool_contributors: '{n} 人が貢献',
     cmpool_open_tournament: '大会ページ',
     cmpool_delete_pool: 'プールを削除',
+    cmpool_reset_wybin: 'wyBin から再同期', cmpool_reset_wybin_hint: 'wyBin から再インポートし、クローラーの管理下に戻します', cmpool_reset_wybin_confirm: 'このプールを wyBin から再インポートしますか？手動編集は破棄され、以降はクローラーが管理します。',
     cmpool_delete_confirm: 'この大会プールをすべて削除しますか？元に戻せません。',
     cmpool_login_to_fill: 'ログインするとラウンドと譜面を追加できます。',
     cmpool_add_round: 'ラウンド追加：',

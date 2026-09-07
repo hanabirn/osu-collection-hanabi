@@ -280,6 +280,7 @@ I18N.es = {
     cmpool_contributors: '{n} colaboradores',
     cmpool_open_tournament: 'Página del torneo',
     cmpool_delete_pool: 'Eliminar pool',
+    cmpool_reset_wybin: 'Re-sincronizar desde wyBin', cmpool_reset_wybin_hint: 'Reimportar desde wyBin y dejar que el rastreador gestione este pool de nuevo', cmpool_reset_wybin_confirm: '¿Reimportar este pool desde wyBin? Se descartan las ediciones manuales y el rastreador vuelve a encargarse.',
     cmpool_delete_confirm: '¿Eliminar todo este pool de torneo? No se puede deshacer.',
     cmpool_login_to_fill: 'Inicia sesión para añadir rondas y mapas.',
     cmpool_add_round: 'Añadir ronda:',

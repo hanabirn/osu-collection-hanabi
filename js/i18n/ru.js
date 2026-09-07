@@ -280,6 +280,7 @@ I18N.ru = {
     cmpool_contributors: 'участников: {n}',
     cmpool_open_tournament: 'Страница турнира',
     cmpool_delete_pool: 'Удалить маппул',
+    cmpool_reset_wybin: 'Пересинхронизировать с wyBin', cmpool_reset_wybin_hint: 'Переимпортировать из wyBin и вернуть маппул под управление краулера', cmpool_reset_wybin_confirm: 'Переимпортировать этот маппул из wyBin? Ручные правки будут отброшены, краулер снова возьмёт управление.',
     cmpool_delete_confirm: 'Удалить весь этот маппул турнира? Отменить нельзя.',
     cmpool_login_to_fill: 'Войдите, чтобы добавлять раунды и карты.',
     cmpool_add_round: 'Добавить раунд:',

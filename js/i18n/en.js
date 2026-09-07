@@ -419,6 +419,7 @@ I18N.en = {
     cmpool_contributors: '{n} contributors',
     cmpool_open_tournament: 'Tournament page',
     cmpool_delete_pool: 'Delete pool',
+    cmpool_reset_wybin: 'Re-sync from wyBin', cmpool_reset_wybin_hint: 'Re-import from wyBin and let the crawler maintain this pool again', cmpool_reset_wybin_confirm: 'Re-import this pool from wyBin? Any manual edits to it are discarded and the crawler takes over again.',
     cmpool_delete_confirm: 'Delete this whole tournament pool? This cannot be undone.',
     cmpool_login_to_fill: 'Sign in to add rounds and maps.',
     cmpool_add_round: 'Add round:',

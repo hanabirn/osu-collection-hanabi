@@ -131,6 +131,33 @@ exports.handler = async (event) => {
             return { statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ ok: true }) };
         }
 
+        // Owner-only recovery: someone edited a wyBin-sourced pool (maybe by
+        // accident) so the crawler stopped maintaining it. This re-imports
+        // from wyBin now and resets contributors to ['wybin'] so the 6h
+        // crawl re-adopts it. Discards any manual edits on this pool.
+        if (action === 'reset-wybin') {
+            if (!isOwner) return err(403, 'Owner only');
+            const slug = (pool.tournament && pool.tournament.slug) || '';
+            if (!slug || pool.tournament.source !== 'wybin') return err(422, 'Not a wyBin pool');
+            const imp = await importWybinPool(slug, pool.mode);
+            if (imp.count) {
+                const ids = [...new Set(imp.rounds.flatMap((r) => r.brackets.flatMap((b) => b.maps.map((m) => m.beatmapId))))];
+                const resolved = await resolveBeatmapsBatch(ids);
+                if (Object.keys(resolved).length) {
+                    const cache = (await store.get('beatmaps:cache', { type: 'json' })) || {};
+                    Object.assign(cache, resolved);
+                    await store.setJSON('beatmaps:cache', cache);
+                }
+            }
+            pool.rounds = imp.rounds;
+            pool.contributors = ['wybin'];
+            pool.updatedAt = new Date().toISOString();
+            await store.setJSON(`pool:${id}`, pool);
+            await writeIndex(store, pool);
+            await store.set(`lastEditAt:${user.id}`, String(Date.now()));
+            return { statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ pool, imported: imp.count }) };
+        }
+
         if (action === 'add-round') {
             const name = String(body.name || '').trim().slice(0, MAX_NAME_LEN);
             if (!name) return err(422, 'Missing round name');

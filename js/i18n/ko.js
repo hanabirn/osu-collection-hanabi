@@ -280,6 +280,7 @@ I18N.ko = {
     cmpool_contributors: '{n}명 기여',
     cmpool_open_tournament: '대회 페이지',
     cmpool_delete_pool: '맵풀 삭제',
+    cmpool_reset_wybin: 'wyBin에서 다시 동기화', cmpool_reset_wybin_hint: 'wyBin에서 다시 가져와 크롤러가 다시 관리하도록 합니다', cmpool_reset_wybin_confirm: '이 맵풀을 wyBin에서 다시 가져올까요? 수동 편집은 삭제되고 크롤러가 다시 관리합니다.',
     cmpool_delete_confirm: '이 대회 맵풀 전체를 삭제할까요? 되돌릴 수 없습니다.',
     cmpool_login_to_fill: '로그인하면 라운드와 맵을 추가할 수 있습니다.',
     cmpool_add_round: '라운드 추가:',

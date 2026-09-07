@@ -280,6 +280,7 @@ I18N.fr = {
     cmpool_contributors: '{n} contributeurs',
     cmpool_open_tournament: 'Page du tournoi',
     cmpool_delete_pool: 'Supprimer la pool',
+    cmpool_reset_wybin: 'Re-synchroniser depuis wyBin', cmpool_reset_wybin_hint: 'Réimporter depuis wyBin et laisser le crawler gérer cette pool à nouveau', cmpool_reset_wybin_confirm: 'Réimporter cette pool depuis wyBin ? Les modifications manuelles sont supprimées et le crawler reprend la main.',
     cmpool_delete_confirm: 'Supprimer toute cette pool de tournoi ? Irréversible.',
     cmpool_login_to_fill: 'Connecte-toi pour ajouter des rounds et des maps.',
     cmpool_add_round: 'Ajouter un round :',

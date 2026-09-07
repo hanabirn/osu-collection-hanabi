@@ -243,6 +243,7 @@ I18N.zh = {
     cmpool_contributors: '{n} 人貢獻',
     cmpool_open_tournament: '賽事頁面',
     cmpool_delete_pool: '刪除此圖池',
+    cmpool_reset_wybin: '重新交給 wyBin 同步', cmpool_reset_wybin_hint: '從 wyBin 重新匯入，並讓爬蟲重新接管這個圖池', cmpool_reset_wybin_confirm: '要從 wyBin 重新匯入這個圖池嗎？上面的手動編輯會被捨棄，之後改由爬蟲維護。',
     cmpool_delete_confirm: '要刪掉整個賽事圖池嗎？無法復原。',
     cmpool_login_to_fill: '登入後即可新增輪次與賽圖。',
     cmpool_add_round: '新增輪次：',

@@ -407,6 +407,7 @@ function renderCommunityPoolDetail() {
         <div class="cmpool-detail-actions">
             ${p.tournament.url ? `<a class="cmpool-tourney-link" href="${escHtml(p.tournament.url)}" target="_blank" rel="noopener">${icon('externalLink', { size: '0.95em' })} ${t('cmpool_open_tournament')}</a>` : ''}
             ${mapCount ? `<button class="mappool-round-add" onclick="cmpoolImportEvent()">${t('mappools_add_event_btn')}</button>` : ''}
+            ${owner && p.tournament.source === 'wybin' ? `<button class="cmpool-tourney-link" onclick="cmpoolResetWybin('${escHtml(p.id)}')" title="${t('cmpool_reset_wybin_hint')}">${icon('refreshCw', { size: '0.95em' })} ${t('cmpool_reset_wybin')}</button>` : ''}
             ${owner ? `<button class="cmpool-delete" onclick="cmpoolDeletePool('${escHtml(p.id)}')">${icon('trash2', { size: '0.95em' })} ${t('cmpool_delete_pool')}</button>` : ''}
         </div>
         ${editable ? cmpoolAddRoundBar(p) : (p.rounds.length ? '' : `<p class="osu-empty">${t('cmpool_login_to_fill')}</p>`)}
@@ -493,6 +494,32 @@ async function cmpoolDeletePool(id) {
         loadCommunityPoolIndex(true);
     } catch (e) {
         console.error('Community pool delete failed:', e);
+        showShareToast(t('mappools_load_fail'));
+    }
+}
+
+async function cmpoolResetWybin(id) {
+    if (!confirm(t('cmpool_reset_wybin_confirm'))) return;
+    const token = getOsuAuthToken();
+    if (!token) return;
+    try {
+        const res = await fetch('/.netlify/functions/community-mappools-edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ action: 'reset-wybin', poolId: id }),
+        });
+        if (!res.ok) {
+            let msg = t('mappools_load_fail');
+            try { msg = (await res.json()).error || msg; } catch { /* keep default */ }
+            showShareToast(msg);
+            return;
+        }
+        const data = await res.json();
+        showShareToast(data.imported > 0 ? t('cmpool_imported_n', { n: data.imported }) : t('cmpool_import_none'));
+        await openCommunityPool(id, true);
+        cmpoolIndexLoaded = false;
+    } catch (e) {
+        console.error('Community pool reset-wybin failed:', e);
         showShareToast(t('mappools_load_fail'));
     }
 }
