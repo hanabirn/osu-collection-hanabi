@@ -319,6 +319,7 @@ I18N.ja = {
     notif_mapper_graveyard_title: '{name} に新しい Graveyard 譜面があります', notif_mapper_loved_title: '{name} の譜面が Loved になりました！',
     resources_title: '✦ その他の osu! リソース ✦', resources_hint: '自作する必要のない、知っておくと便利なコミュニティツール：',
     resource_osusearch_desc: '☆数、BPM、長さなどで絞り込める高度な譜面検索エンジン', resource_osupps_desc: '別の farm 譜面トラッカー、比較に便利',
+    resource_maniatracker_desc: 'osu!mania のランキング・スコア追跡・段位（dan）推定',
     resource_collectionmanager_desc: 'デスクトップ版コレクション編集ツール、このサイトの collection.db 書き出しと互換', resource_osuskinner_desc: 'オンライン skin 作成ツール',
     resource_mappersguild_desc: '注目アーティストの譜面制作を促すギルド制度', resource_osuskills_desc: '非公式のプレイヤー能力別評価（aim / speed / acc）',
     nav_medals: 'メダル', medals_title: '✦ メダル図鑑 ✦',

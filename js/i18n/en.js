@@ -457,6 +457,7 @@ I18N.en = {
     notif_mapper_graveyard_title: '{name} has a new graveyard map', notif_mapper_loved_title: "{name}'s map got Loved!",
     resources_title: '✦ More osu! Resources ✦', resources_hint: "A few community tools worth knowing about — no need to reinvent them here:",
     resource_osusearch_desc: 'Advanced beatmap search by star rating, BPM, length, and more', resource_osupps_desc: 'Another farm-map tracker — a good point of comparison',
+    resource_maniatracker_desc: 'osu!mania rankings, score tracking and a dan-level estimator',
     resource_collectionmanager_desc: "Desktop collection editor, compatible with this site's collection.db export", resource_osuskinner_desc: 'Online skin builder',
     resource_mappersguild_desc: 'Guild system encouraging mapping of featured artists', resource_osuskills_desc: 'Unofficial per-skill player rating (aim / speed / acc)',
     nav_medals: 'Medals', medals_title: '✦ Medal Gallery ✦',

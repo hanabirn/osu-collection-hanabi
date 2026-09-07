@@ -6,6 +6,7 @@
 const OSU_RESOURCES = [
     { url: 'https://osusearch.com', name: 'osu!search', descKey: 'resource_osusearch_desc' },
     { url: 'https://osu-pps.com/#/osu/maps', name: 'osu-pps', descKey: 'resource_osupps_desc' },
+    { url: 'https://mania-tracker.com', name: 'Mania Tracker', descKey: 'resource_maniatracker_desc' },
     { url: 'https://github.com/Piotrekol/CollectionManager', name: 'CollectionManager', descKey: 'resource_collectionmanager_desc' },
     { url: 'https://osuskinner.com', name: 'osuskinner', descKey: 'resource_osuskinner_desc' },
     { url: 'https://mappersguild.com', name: "Mappers' Guild", descKey: 'resource_mappersguild_desc' },

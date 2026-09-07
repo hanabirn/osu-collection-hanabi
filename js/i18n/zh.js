@@ -282,6 +282,7 @@ I18N.zh = {
     notif_mapper_graveyard_title: '{name} 有新的 Graveyard 圖', notif_mapper_loved_title: '{name} 的圖被加入 Loved！',
     resources_title: '✦ 更多 osu! 資源 ✦', resources_hint: '一些沒必要自己做、但很推薦認識的社群工具：',
     resource_osusearch_desc: '進階圖譜搜尋引擎，可依星數、BPM、長度等條件篩選', resource_osupps_desc: '另一個 farm 圖追蹤網站，可以互相比較',
+    resource_maniatracker_desc: 'osu!mania 排名、分數追蹤與段位（dan）估算',
     resource_collectionmanager_desc: '桌面版收藏編輯工具，可匯入本站匯出的收藏', resource_osuskinner_desc: '線上 skin 製作工具',
     resource_mappersguild_desc: '公會制度，鼓勵大家一起製圖精選歌曲', resource_osuskills_desc: '非官方的玩家能力分項評分（aim / speed / acc）',
     nav_medals: '獎章', medals_title: '✦ 獎章圖鑑 ✦',

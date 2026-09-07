@@ -319,6 +319,7 @@ I18N.fr = {
     notif_mapper_graveyard_title: '{name} a une nouvelle carte en graveyard', notif_mapper_loved_title: 'Une carte de {name} est passée en Loved !',
     resources_title: '✦ Plus de ressources osu! ✦', resources_hint: "Quelques outils communautaires utiles, pas besoin de les refaire ici :",
     resource_osusearch_desc: 'Recherche avancée de beatmaps par étoiles, BPM, durée, etc.', resource_osupps_desc: 'Un autre tracker de farm maps — utile pour comparer',
+    resource_maniatracker_desc: 'Classements osu!mania, suivi des scores et un estimateur de niveau dan',
     resource_collectionmanager_desc: "Éditeur de collection sur PC, compatible avec l'export collection.db de ce site", resource_osuskinner_desc: 'Créateur de skin en ligne',
     resource_mappersguild_desc: 'Système de guilde encourageant le mapping des artistes en vedette', resource_osuskills_desc: 'Évaluation non officielle des compétences (aim / speed / acc)',
     nav_medals: 'Médailles', medals_title: '✦ Galerie de médailles ✦',

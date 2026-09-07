@@ -319,6 +319,7 @@ I18N.ru = {
     notif_mapper_graveyard_title: 'У {name} новая карта в graveyard', notif_mapper_loved_title: 'Карта {name} попала в Loved!',
     resources_title: '✦ Больше ресурсов osu! ✦', resources_hint: 'Полезные инструменты сообщества, которые незачем повторять здесь:',
     resource_osusearch_desc: 'Продвинутый поиск карт по звёздам, BPM, длине и т.д.', resource_osupps_desc: 'Ещё один трекер farm-карт — удобно для сравнения',
+    resource_maniatracker_desc: 'Рейтинги osu!mania, отслеживание скоров и оценка дана',
     resource_collectionmanager_desc: 'Десктопный редактор коллекций, совместим с экспортом collection.db этого сайта', resource_osuskinner_desc: 'Онлайн-конструктор скинов',
     resource_mappersguild_desc: 'Гильдия, поощряющая маппинг популярных треков', resource_osuskills_desc: 'Неофициальный рейтинг по навыкам (aim / speed / acc)',
     nav_medals: 'Медали', medals_title: '✦ Галерея медалей ✦',

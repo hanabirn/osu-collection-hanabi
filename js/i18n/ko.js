@@ -319,6 +319,7 @@ I18N.ko = {
     notif_mapper_graveyard_title: '{name} 님의 새 Graveyard 맵', notif_mapper_loved_title: '{name} 님의 맵이 Loved에 등록되었습니다!',
     resources_title: '✦ 더 많은 osu! 자료 ✦', resources_hint: '직접 만들 필요 없는, 알아두면 좋은 커뮤니티 도구들:',
     resource_osusearch_desc: '별점, BPM, 길이 등으로 필터링하는 고급 비트맵 검색 엔진', resource_osupps_desc: '또 다른 farm 맵 트래커, 비교하기 좋음',
+    resource_maniatracker_desc: 'osu!mania 랭킹, 점수 추적, 단(dan) 레벨 추정',
     resource_collectionmanager_desc: '데스크톱 컬렉션 편집 도구, 이 사이트의 collection.db 내보내기와 호환', resource_osuskinner_desc: '온라인 skin 제작 도구',
     resource_mappersguild_desc: '주목받는 아티스트의 매핑을 장려하는 길드 시스템', resource_osuskills_desc: '비공식 플레이어 능력별 평가 (aim / speed / acc)',
     nav_medals: '메달', medals_title: '✦ 메달 도감 ✦',

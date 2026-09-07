@@ -319,6 +319,7 @@ I18N.es = {
     notif_mapper_graveyard_title: '{name} tiene un nuevo mapa en graveyard', notif_mapper_loved_title: '¡Un mapa de {name} pasó a Loved!',
     resources_title: '✦ Más recursos de osu! ✦', resources_hint: 'Algunas herramientas de la comunidad que vale la pena conocer:',
     resource_osusearch_desc: 'Búsqueda avanzada de beatmaps por estrellas, BPM, duración, etc.', resource_osupps_desc: 'Otro rastreador de farm maps, útil para comparar',
+    resource_maniatracker_desc: 'Rankings de osu!mania, seguimiento de scores y un estimador de nivel dan',
     resource_collectionmanager_desc: 'Editor de colecciones de escritorio, compatible con la exportación collection.db de este sitio', resource_osuskinner_desc: 'Creador de skins en línea',
     resource_mappersguild_desc: 'Sistema de gremio que fomenta el mapeo de artistas destacados', resource_osuskills_desc: 'Puntuación de habilidad no oficial (aim / speed / acc)',
     nav_medals: 'Medallas', medals_title: '✦ Galería de medallas ✦',
