@@ -1,5 +1,7 @@
 # osu! 歌曲收藏 · osu! Collection (Hanabi)
 
+**English** · [繁體中文](README.zh-Hant.md)
+
 A fan-made companion site for [osu!](https://osu.ppy.sh) built around **song
 collections** — browse and assemble `.db` / `.osdb` collections, look up pp,
 generate practice pools from your own scores, browse the ranked catalogue and
