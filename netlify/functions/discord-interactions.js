@@ -494,10 +494,14 @@ async function autocompleteMappool(options, origin) {
 const MAPPOOL_PAGE = 9; // maps per message (Discord caps at 10 embeds; one slot spare)
 
 // One embed per map (cover + mods + stats), a page at a time, with prev/next
-// buttons for rounds longer than MAPPOOL_PAGE.
-function mappoolRoundView(pool, roundIdx, page, origin) {
+// buttons for rounds longer than MAPPOOL_PAGE. `kind` picks the button
+// namespace so the WC ('mp'/'mpx') and community ('cmp'/'cmpx') pools route
+// their pagination / export clicks to their own handlers.
+function mappoolRoundView(pool, roundIdx, page, origin, kind = 'wc') {
     const round = (pool.rounds || [])[roundIdx];
     if (!round) return null;
+    const pfxPage = kind === 'community' ? 'cmp' : 'mp';
+    const pfxExport = kind === 'community' ? 'cmpx' : 'mpx';
 
     const maps = [];
     for (const b of round.brackets || []) {
@@ -535,10 +539,10 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
     });
     if (!embeds.length) embeds.push({ title: `${pool.label} — ${round.name}`, description: t('mappool_round_empty'), color: PINK });
 
-    const row = [{ type: 2, style: 2, label: t('btn_export_round'), custom_id: `mpx|${pool.folder}|${roundIdx}` }];
+    const row = [{ type: 2, style: 2, label: t('btn_export_round'), custom_id: `${pfxExport}|${pool.folder}|${roundIdx}` }];
     if (pages > 1) {
-        row.unshift({ type: 2, style: 2, label: t('btn_prev'), custom_id: `mp|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 });
-        row.push({ type: 2, style: 2, label: t('btn_next'), custom_id: `mp|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 });
+        row.unshift({ type: 2, style: 2, label: t('btn_prev'), custom_id: `${pfxPage}|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 });
+        row.push({ type: 2, style: 2, label: t('btn_next'), custom_id: `${pfxPage}|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 });
     }
     return { embeds, components: [{ type: 1, components: row }] };
 }
@@ -594,6 +598,81 @@ async function cmdMappool(options, origin) {
     }, [{
         type: 1,
         components: [{ type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `mpx|${pool.folder}|*` }],
+    }]);
+}
+
+/* --- /tourneypool (community-authored tournament pools) --------------- */
+
+// Give a community pool a `.label` / `.folder` so mappoolRoundView() and
+// wcPoolToCollections() — written for the WC shape — render it unchanged.
+// Per-map `.mode` is left in osu! API form ('osu'/'fruits'/…) as the list
+// endpoint returns it: both L.API_MODE[…] and MODE_INT[…] accept that form.
+function communityPoolNormalize(raw) {
+    return {
+        label: (raw.tournament && raw.tournament.name) || raw.id,
+        folder: raw.id,
+        mode: raw.mode,
+        url: raw.tournament && raw.tournament.url,
+        source: raw.tournament && raw.tournament.source,
+        rounds: raw.rounds || [],
+    };
+}
+const SITE2API_MODE = { standard: 'osu', taiko: 'taiko', catch: 'fruits', mania: 'mania' };
+function tpoolModeShort(mode) {
+    if (mode === 'all') return t('tpool_mode_all');
+    return L.MODE_LABEL[SITE2API_MODE[mode]] || mode;
+}
+
+async function autocompleteTourneypool(options, origin) {
+    const focused = (options || []).find(o => o.focused) || {};
+    const q = String(focused.value || '').toLowerCase().trim();
+    let pools = [];
+    try {
+        const r = await fetch(`${origin}/.netlify/functions/community-mappools-list`);
+        if (r.ok) pools = (await r.json()).pools || [];
+    } catch { /* empty */ }
+    if (q) pools = pools.filter(p => (p.tournamentName || '').toLowerCase().includes(q));
+    pools = pools
+        .sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')))
+        .slice(0, 25);
+    return L.autocomplete(pools.map(p => ({
+        name: `${p.tournamentName} · ${tpoolModeShort(p.mode)} · ${t('mappool_ac_meta', { r: p.roundCount, m: p.mapCount })}`.slice(0, 100),
+        value: String(p.id).slice(0, 100),
+    })));
+}
+
+async function cmdTourneypool(options, origin) {
+    const id = String(L.optVal(options, 'tournament') || '').trim();
+    const roundQ = String(L.optVal(options, 'round') || '').trim().toLowerCase();
+    if (!id) return L.ephemeral(t('tpool_need_name'));
+
+    const r = await fetch(`${origin}/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}`);
+    if (r.status === 404) return L.ephemeral(t('tpool_not_found'));
+    if (!r.ok) return L.ephemeral(t('tpool_fail'));
+    const pool = communityPoolNormalize(await r.json());
+    const rounds = pool.rounds || [];
+    if (!rounds.length) return L.ephemeral(t('tpool_empty', { name: pool.label }));
+
+    if (roundQ) {
+        const roundIdx = rounds.findIndex(rd => (rd.name || '').toLowerCase().includes(roundQ));
+        if (roundIdx < 0) return L.ephemeral(t('mappool_round_not_found', { label: pool.label, q: roundQ }));
+        const view = mappoolRoundView(pool, roundIdx, 0, origin, 'community');
+        return L.message(view.embeds, view.components);
+    }
+
+    return L.message({
+        title: t('tpool_rounds_title', { label: pool.label, mode: tpoolModeShort(pool.mode), n: rounds.length }),
+        url: pool.url || `${origin}/?cmpool=${encodeURIComponent(pool.folder)}`,
+        description: rounds.map(rd => {
+            let n = 0;
+            for (const b of rd.brackets || []) n += (b.maps || []).length;
+            return `**${rd.name}** — ${t('n_sets', { n })}`;
+        }).join('\n') || t('mappool_no_data'),
+        color: PINK,
+        footer: L.siteFooter(t('tpool_round_hint')),
+    }, [{
+        type: 1,
+        components: [{ type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `cmpx|${pool.folder}|*` }],
     }]);
 }
 
@@ -919,6 +998,29 @@ async function handleComponent(interaction, origin) {
         return L.updateMessage(view.embeds, view.components);
     }
 
+    // /tourneypool round pagination: cmp|<poolId>|<roundIdx>|<page>
+    if (id.startsWith('cmp|')) {
+        const [, poolId, roundIdxStr, pageStr] = id.split('|');
+        const r = await fetch(`${origin}/.netlify/functions/community-mappools-list?id=${encodeURIComponent(poolId)}`);
+        if (!r.ok) return L.updateMessage({ title: t('mappool_fail_short'), color: PINK });
+        const view = mappoolRoundView(communityPoolNormalize(await r.json()), Number(roundIdxStr), Number(pageStr), origin, 'community');
+        if (!view) return L.updateMessage({ title: t('mappool_round_not_found2'), color: PINK });
+        return L.updateMessage(view.embeds, view.components);
+    }
+
+    // .osdb export of a community pool / one round: cmpx|<poolId>|<roundIdx|'*'>
+    if (id.startsWith('cmpx|')) {
+        const [, poolId, roundSel] = id.split('|');
+        const r = await fetch(`${origin}/.netlify/functions/community-mappools-list?id=${encodeURIComponent(poolId)}`);
+        if (!r.ok) return L.updateMessage({ title: t('export_fail'), color: PINK });
+        const pool = communityPoolNormalize(await r.json());
+        const onlyIdx = roundSel === '*' ? null : Number(roundSel);
+        const cols = wcPoolToCollections(pool, onlyIdx);
+        const base = onlyIdx != null && pool.rounds && pool.rounds[onlyIdx]
+            ? `${pool.label} ${pool.rounds[onlyIdx].name}` : pool.label;
+        return osdbResponse(cols, base);
+    }
+
     const [ns, action, arg] = id.split(':');
 
     if (ns === 'col' && action === 'rand') {
@@ -998,6 +1100,7 @@ exports.handler = async (event) => {
         if (interaction.type === L.T.AUTOCOMPLETE) {
             if (name === 'collection' || name === 'follow' || name === 'unfollow') return await autocompleteCollection(options);
             if (name === 'mappool') return await autocompleteMappool(options, origin);
+            if (name === 'tourneypool') return await autocompleteTourneypool(options, origin);
             return L.autocomplete([]);
         }
 
@@ -1020,6 +1123,7 @@ exports.handler = async (event) => {
                 case 'unfollow': return await cmdUnfollow(options, interaction);
                 case 'following': return await cmdFollowing(interaction);
                 case 'mappool': return await cmdMappool(options, origin);
+                case 'tourneypool': return await cmdTourneypool(options, origin);
                 case 'skin': return await cmdSkin(options, origin);
                 case 'link': return await cmdLink(options, interaction);
                 case 'unlink': return await cmdUnlink(interaction);

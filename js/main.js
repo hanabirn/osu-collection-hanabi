@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkImportFromHash();
     checkOsuLoginFromUrl();
     if (typeof checkGalleryDeepLink === 'function') checkGalleryDeepLink();
+    if (typeof checkCmpoolDeepLink === 'function') checkCmpoolDeepLink();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof initNotifications === 'function') initNotifications();
     // "為你更新" digest — runs after notifications so it can count what just

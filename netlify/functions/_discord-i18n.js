@@ -189,6 +189,18 @@ const S = {
 
     // --- publish announcement (collections-publish.js) ---
     announce_title: { en: '🎉 New collection published: {name}', zh: '🎉 新收藏發佈：{name}', zhs: '🎉 新收藏发布：{name}', ja: '🎉 新しいコレクションが公開されました：{name}', fr: '🎉 Nouvelle collection publiée : {name}', de: '🎉 Neue Sammlung veröffentlicht: {name}', ru: '🎉 Опубликована новая коллекция: {name}', es: '🎉 Nueva colección publicada: {name}', ko: '🎉 새 컬렉션이 공개되었습니다: {name}' },
+
+    // --- /tourneypool (community-authored tournament pools) ---
+    tpool_need_name: { en: 'Pick a tournament.', zh: '請選一個賽事。', zhs: '请选一个赛事。', ja: '大会を選んでください。', fr: 'Choisissez un tournoi.', de: 'Wähle ein Turnier.', ru: 'Выберите турнир.', es: 'Elige un torneo.', ko: '토너먼트를 선택하세요.' },
+    tpool_not_found: { en: 'No community pool for that tournament yet.', zh: '這個賽事還沒有社群圖池。', zhs: '这个赛事还没有社群图池。', ja: 'その大会のコミュニティプールはまだありません。', fr: 'Pas encore de mappool communautaire pour ce tournoi.', de: 'Noch kein Community-Pool für dieses Turnier.', ru: 'Для этого турнира ещё нет общего маппула.', es: 'Aún no hay pool comunitario para ese torneo.', ko: '해당 토너먼트의 커뮤니티 풀이 아직 없습니다.' },
+    tpool_fail: { en: 'Community pool lookup failed, try again later.', zh: '社群圖池查詢失敗，稍後再試。', zhs: '社群图池查询失败，稍后再试。', ja: 'コミュニティプールの取得に失敗しました。後で再試行してください。', fr: 'Échec de la récupération du mappool communautaire, réessayez plus tard.', de: 'Abruf des Community-Pools fehlgeschlagen, später erneut versuchen.', ru: 'Не удалось загрузить общий маппул, попробуйте позже.', es: 'Fallo al obtener el pool comunitario, inténtalo más tarde.', ko: '커뮤니티 풀 조회에 실패했습니다. 나중에 다시 시도하세요.' },
+    tpool_empty: { en: '"{name}" has no rounds yet.', zh: '「{name}」還沒有任何輪次。', zhs: '「{name}」还没有任何轮次。', ja: '「{name}」にはまだラウンドがありません。', fr: '« {name} » n\'a encore aucun round.', de: '„{name}" hat noch keine Runden.', ru: 'В «{name}» пока нет раундов.', es: '"{name}" aún no tiene rondas.', ko: '"{name}" 에 아직 라운드가 없습니다.' },
+    tpool_rounds_title: { en: '{label} · {mode} — {n} rounds', zh: '{label} · {mode} — {n} 輪', zhs: '{label} · {mode} — {n} 轮', ja: '{label} · {mode} — {n} ラウンド', fr: '{label} · {mode} — {n} rounds', de: '{label} · {mode} — {n} Runden', ru: '{label} · {mode} — {n} раундов', es: '{label} · {mode} — {n} rondas', ko: '{label} · {mode} — {n} 라운드' },
+    tpool_mode_all: { en: 'All modes', zh: '全模式', zhs: '全模式', ja: '全モード', fr: 'Tous les modes', de: 'Alle Modi', ru: 'Все режимы', es: 'Todos los modos', ko: '전체 모드' },
+    tpool_round_hint: { en: 'Use /tourneypool round:<name> for one round', zh: '用 /tourneypool round:<輪次> 看單輪圖池', zhs: '用 /tourneypool round:<轮次> 看单轮图池', ja: '単一ラウンドは /tourneypool round:<ラウンド名> で表示', fr: 'Utilisez /tourneypool round:<nom> pour un seul round', de: '/tourneypool round:<Name> für eine einzelne Runde', ru: '/tourneypool round:<название> — для одного раунда', es: 'Usa /tourneypool round:<nombre> para una sola ronda', ko: '단일 라운드는 /tourneypool round:<이름>' },
+    tpool_announce_title: { en: '🎯 New tournament pool: {name}', zh: '🎯 新賽事圖池：{name}', zhs: '🎯 新赛事图池：{name}', ja: '🎯 新しい大会プール：{name}', fr: '🎯 Nouveau mappool de tournoi : {name}', de: '🎯 Neuer Turnier-Pool: {name}', ru: '🎯 Новый турнирный маппул: {name}', es: '🎯 Nuevo pool de torneo: {name}', ko: '🎯 새 토너먼트 풀: {name}' },
+    tpool_announce_meta: { en: '{rounds} rounds · {maps} maps', zh: '{rounds} 輪 · {maps} 圖', zhs: '{rounds} 轮 · {maps} 图', ja: '{rounds} ラウンド · {maps} 譜面', fr: '{rounds} rounds · {maps} maps', de: '{rounds} Runden · {maps} Maps', ru: '{rounds} раундов · {maps} карт', es: '{rounds} rondas · {maps} mapas', ko: '{rounds} 라운드 · {maps} 맵' },
+    tpool_announce_src: { en: 'Source', zh: '來源', zhs: '来源', ja: 'ソース', fr: 'Source', de: 'Quelle', ru: 'Источник', es: 'Fuente', ko: '출처' },
 };
 
 function t(key, params) {

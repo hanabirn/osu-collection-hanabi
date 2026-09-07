@@ -603,6 +603,22 @@ function cmpoolImportEvent() {
     mappoolImport(cmpoolCur.tournament.name, cmpoolEventSetIds());
 }
 
+/* Deep link from the Discord announce embed / a shared URL:
+   ?cmpool=<poolId> → open the 社群賽圖分享 tab straight into that pool.
+   Mirrors checkGalleryDeepLink() in public-collections.js. */
+function checkCmpoolDeepLink() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('cmpool');
+    if (!id) return;
+    params.delete('cmpool');
+    const qs = params.toString();
+    history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+    if (typeof switchTab === 'function') switchTab('cmpool');
+    setTimeout(() => {
+        if (typeof openCommunityPool === 'function') openCommunityPool(id, true);
+    }, 200);
+}
+
 /* language switch — the tab content is JS-built */
 function refreshCommunityMappoolsLocalized() {
     if (!cmpoolIndexLoaded) return;

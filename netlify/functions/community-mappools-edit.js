@@ -19,6 +19,7 @@
    { pool }. */
 const { getCommunityMappoolsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
+const { setLocale, t: dt } = require('./_discord-i18n');
 const {
     MODES, PRESET_BRACKETS, slugify, poolId, parseBeatmapRef, parseBeatmapRefs, resolveBeatmap,
     resolveBeatmapsBatch, importWybinPool, writeIndex, removeFromIndex,
@@ -28,6 +29,47 @@ const {
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 const OWNER_OSU_ID = process.env.CHAT_OWNER_OSU_ID || '26696007';
+
+/* Best-effort "new tournament pool" embed into the channel the Discord bot
+   watches. Mirrors collections-publish.js's announceNewCollection: time-boxed,
+   always caught, inert unless DISCORD_BOT_TOKEN + DISCORD_CMPOOL_CHANNEL_ID
+   are both set. Only fired for human `create`s — the wyBin crawler writes
+   blobs directly and never reaches this function. */
+async function announceNewPool(pool, origin, imported) {
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const channelId = process.env.DISCORD_CMPOOL_CHANNEL_ID;
+    if (!token || !channelId) return;
+    setLocale(process.env.DISCORD_ANNOUNCE_LOCALE || 'zh-TW');
+
+    let maps = 0;
+    for (const r of pool.rounds || []) for (const b of r.brackets || []) maps += (b.maps || []).length;
+    const MODE_LABEL = { standard: 'osu!', taiko: 'osu!taiko', catch: 'osu!catch', mania: 'osu!mania', all: dt('tpool_mode_all') };
+    const modeLabel = MODE_LABEL[pool.mode] || pool.mode;
+    const embed = {
+        title: dt('tpool_announce_title', { name: pool.tournament.name }).slice(0, 250),
+        url: `${origin}/?cmpool=${encodeURIComponent(pool.id)}`,
+        description: `${modeLabel} · ${dt('tpool_announce_meta', { rounds: (pool.rounds || []).length, maps })}`,
+        color: 0xff66aa,
+        footer: { text: dt('site_footer') },
+        timestamp: pool.createdAt,
+    };
+    if (pool.tournament.url) {
+        embed.fields = [{ name: dt('tpool_announce_src'), value: String(pool.tournament.url).slice(0, 1024) }];
+    }
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    try {
+        await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+            method: 'POST',
+            headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ embeds: [embed], allowed_mentions: { parse: [] } }),
+            signal: ctrl.signal,
+        });
+    } catch { /* Discord outage / perms — never fail a create over this */ } finally {
+        clearTimeout(timer);
+    }
+}
 
 const err = (code, message) => ({ statusCode: code, headers: CORS, body: JSON.stringify({ error: message }) });
 const ok = (pool) => ({ statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ pool }) });
@@ -103,6 +145,11 @@ exports.handler = async (event) => {
             await store.setJSON(`pool:${id}`, pool);
             await writeIndex(store, pool);
             await store.set(`lastEditAt:${user.id}`, String(Date.now()));
+
+            const proto = event.headers['x-forwarded-proto'] || 'https';
+            const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+            await announceNewPool(pool, `${proto}://${host}`, imported);
+
             return { statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ pool, imported }) };
         }
 
