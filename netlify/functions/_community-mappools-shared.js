@@ -244,11 +244,18 @@ async function crawlWybinMappools(store, { budgetMs = 25000, perRun = 10 } = {})
             if (!mode) continue;
 
             const id = poolId(slugify(t.slug || t.name), mode);
-            if (await store.get(`pool:${id}`, { type: 'json' })) continue; // never clobber
+            const existing = await store.get(`pool:${id}`, { type: 'json' });
+            // Skip anything a human has touched (a contributor other than the
+            // 'wybin' bot). A pool that's still purely wybin-sourced gets
+            // re-imported so it tracks wyBin as more rounds get filled in.
+            if (existing && (existing.contributors || []).some((c) => String(c) !== 'wybin')) continue;
 
             let imp;
             try { imp = await importWybinPool(String(t.slug), mode); } catch { continue; }
             if (!imp.count) continue;
+            // Don't rewrite an identical import (avoids a pointless blob write
+            // + updatedAt churn every 6h).
+            if (existing && JSON.stringify(existing.rounds) === JSON.stringify(imp.rounds)) continue;
 
             const ids = [...new Set(imp.rounds.flatMap((r) => r.brackets.flatMap((b) => b.maps.map((m) => m.beatmapId))))];
             const resolved = await resolveBeatmapsBatch(ids);
@@ -270,7 +277,7 @@ async function crawlWybinMappools(store, { budgetMs = 25000, perRun = 10 } = {})
                 rounds: imp.rounds,
                 contributors: ['wybin'],
                 createdBy: 'wybin',
-                createdAt: now,
+                createdAt: existing ? existing.createdAt : now,
                 updatedAt: now,
             };
             await store.setJSON(`pool:${id}`, pool);
