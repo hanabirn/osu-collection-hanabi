@@ -8,7 +8,7 @@
 const { getFarmMapsStore } = require('./_blobs-store');
 const {
     MOD_COMBOS, MODE_NUM,
-    FARM_MIN_SAMPLE, FARM_PLAYCOUNT_THRESHOLD, farmThresholdForStars,
+    FARM_MIN_SAMPLE, farmThresholdForStars, farmPlaycountFloor,
 } = require('./_farm-constants');
 
 const PAGE_SIZE = 20;
@@ -29,7 +29,7 @@ function isFarmMap(mode, r) {
     const nmStars = Number.isFinite(fs.nmStars) ? fs.nmStars
         : (r.stars && Number.isFinite(r.stars.NM) ? r.stars.NM : null);
     return (fs.sampleSize || 0) >= FARM_MIN_SAMPLE
-        && (fs.playcount || 0) >= FARM_PLAYCOUNT_THRESHOLD
+        && (fs.playcount || 0) >= farmPlaycountFloor(mode)
         && fs.farmFraction >= farmThresholdForStars(mode, nmStars);
 }
 

@@ -28,7 +28,7 @@ const { getOsuToken } = require('./_osu-auth');
 const { getFarmMapsStore } = require('./_blobs-store');
 const {
     STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES,
-    FARM_PLAYCOUNT_THRESHOLD, FARM_MIN_SAMPLE, farmThresholdForStars,
+    FARM_MIN_SAMPLE, farmThresholdForStars, farmPlaycountFloor,
 } = require('./_farm-constants');
 
 function stateKey(mode) { return `crawl-state:${mode}`; }
@@ -156,19 +156,21 @@ function easeWeight(mode, s, nmStars) {
 
     if (mode === 'mania') {
         // mania: mods don't multiply score/pp, so mod composition carries no
-        // farm signal here (unlike every other mode) — ignore it entirely.
-        // A mania farm map is one whose star rating is inflated vs its real
-        // difficulty: the board fills with clears — often FCs — that AREN'T
-        // SS, because people chase the pp number without the accuracy (Kloc:
-        // "farm maps aren't the SS-able ones"). So the tell is FC-but-well-
-        // below-SS; a board topped out by 99.5%+ near-SS plays reads as a
-        // legit hard map and scores low.
+        // farm signal here — ignore it. A mania farm map (site owner's
+        // definition, from examples like Cryptarithm [4K RE:MASTER], New
+        // World [7K Black Another], Hana no Tou bootleg [4K Flower of Love]):
+        // high star rating + huge playcount + the ENTIRE top-50 SSes it. The
+        // SR is inflated vs real difficulty, so it's free pp. So measure
+        // pure "SS-ness" of the board. Deliberately close to the old v3
+        // 100%-acc rule, but the threshold is SR-sloped (see the mania curve
+        // in _farm-constants.js): an easy low-SR map everyone SSes is just
+        // easy; a hard high-SR one everyone SSes is the tell.
         const a = acc(s);
-        if (fc && a < 0.985) return 0.9;    // FC, clearly not SS territory
-        if (fc && a < 0.995) return 0.55;   // FC, near-SS
-        if (a >= 0.97 && a < 0.985) return 0.5;   // strong clear, no FC, no SS
-        if (fc) return 0.2;                 // FC at 99.5%+: probably just skill
-        if (ss) return 0.25;
+        if (ss) return 1.0;
+        if (fc && a >= 0.995) return 0.9;   // effectively an SS, a few notes off
+        if (fc && a >= 0.985) return 0.4;
+        if (fc) return 0.15;
+        if (a >= 0.99) return 0.5;          // non-FC but near-perfect acc
         return 0;
     }
 
@@ -217,7 +219,7 @@ async function fetchFarmSignal(beatmapId, mode, token, nmStars) {
     // FARM_THRESHOLD_CURVE, so retuning the curve doesn't need a recompute.
     const threshold = farmThresholdForStars(mode, nmStars);
     const isFarm = sampleSize >= FARM_MIN_SAMPLE
-        && playcount >= FARM_PLAYCOUNT_THRESHOLD
+        && playcount >= farmPlaycountFloor(mode)
         && farmFraction >= threshold;
 
     return {

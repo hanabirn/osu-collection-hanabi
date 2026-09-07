@@ -47,18 +47,25 @@ const MODES = Object.keys(MODE_NUM);
    --------------------------------------------------------------------------- */
 const FARM_PLAYCOUNT_THRESHOLD = 500;   // min beatmap playcount for any farm call
 const FARM_MIN_SAMPLE = 15;             // min top-50 scores before we trust a ratio
+// mania only: a near-100%-SS board is common on any popular easy map, so the
+// SS-fraction signal alone flags a sea of mid-tier Insanes. A real mania
+// farm map is one the masses actually farm — gate it on a much higher
+// playcount. Owner's anchors sit at 105k-220k; the false positives at 8k-22k.
+const FARM_MANIA_PLAYCOUNT = 35000;
 
 // threshold(stars) = clamp(base - slope * (stars - pivot), min, max)
-// mania sits far lower than the rest: its top-50 boards are near-universally
-// SS/near-SS even on farm maps (it's an accuracy game), so the ease fractions
-// compress into a narrow ~0.1-0.3 band. Calibrated 2026-09-07 against the
-// real recomputed distribution (median frac ~0.20, farm-ish outliers ~0.30+)
-// so the curve sits at roughly its 80th percentile instead of way above it.
+// mania measures "SS-ness" of the board, not DT/ease like the others (its
+// easeWeight() ignores mods — they don't multiply score there). Its farm
+// maps have a near-100%-SS top-50, so the curve runs HIGH and loosens with
+// star rating: an easy low-SR map everyone SSes is just easy, a hard
+// high-SR one everyone SSes is SR-inflated free pp. Anchored 2026-09-07 to
+// owner-supplied farm maps (Cryptarithm 6.5*, New World 6.2*, Hana no Tou
+// bootleg 6.2* — all ~0.97 SS-fraction).
 const FARM_THRESHOLD_CURVE = {
     osu:    { base: 0.66, slope: 0.11, pivot: 4.5, min: 0.20, max: 0.72 },
     taiko:  { base: 0.66, slope: 0.11, pivot: 4.0, min: 0.20, max: 0.72 },
     fruits: { base: 0.58, slope: 0.10, pivot: 4.0, min: 0.18, max: 0.66 },
-    mania:  { base: 0.30, slope: 0.05, pivot: 4.0, min: 0.18, max: 0.34 },
+    mania:  { base: 0.78, slope: 0.06, pivot: 5.0, min: 0.55, max: 0.95 },
 };
 
 function farmThresholdForStars(mode, stars) {
@@ -67,8 +74,13 @@ function farmThresholdForStars(mode, stars) {
     return Math.min(c.max, Math.max(c.min, c.base - c.slope * (s - c.pivot)));
 }
 
+// mania needs a much higher playcount floor than the shared one (see above).
+function farmPlaycountFloor(mode) {
+    return mode === 'mania' ? FARM_MANIA_PLAYCOUNT : FARM_PLAYCOUNT_THRESHOLD;
+}
+
 module.exports = {
     STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES,
-    FARM_PLAYCOUNT_THRESHOLD, FARM_MIN_SAMPLE,
-    FARM_THRESHOLD_CURVE, farmThresholdForStars,
+    FARM_PLAYCOUNT_THRESHOLD, FARM_MANIA_PLAYCOUNT, FARM_MIN_SAMPLE,
+    FARM_THRESHOLD_CURVE, farmThresholdForStars, farmPlaycountFloor,
 };
