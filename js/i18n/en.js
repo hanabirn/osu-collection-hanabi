@@ -414,7 +414,7 @@ I18N.en = {
     cmpool_need_name: 'Enter a tournament name',
     cmpool_empty: 'No tournament pools yet — be the first to start one.',
     cmpool_no_match: 'No pool matches that search.',
-    cmpool_row_meta: '{r} rounds · {n} maps',
+    cmpool_row_meta: '{r} rounds · {n} maps', cmpool_card_rounds: '{n} rounds', cmpool_card_maps: '{n} maps',
     cmpool_back: 'All tournaments',
     cmpool_contributors: '{n} contributors',
     cmpool_open_tournament: 'Tournament page',

@@ -275,7 +275,7 @@ I18N.fr = {
     cmpool_need_name: 'Saisis un nom de tournoi',
     cmpool_empty: 'Aucune pool de tournoi pour l\'instant — sois la première personne à en créer une.',
     cmpool_no_match: 'Aucune pool ne correspond à cette recherche.',
-    cmpool_row_meta: '{r} rounds · {n} maps',
+    cmpool_row_meta: '{r} rounds · {n} maps', cmpool_card_rounds: '{n} rounds', cmpool_card_maps: '{n} maps',
     cmpool_back: 'Tous les tournois',
     cmpool_contributors: '{n} contributeurs',
     cmpool_open_tournament: 'Page du tournoi',

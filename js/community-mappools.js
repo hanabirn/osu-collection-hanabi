@@ -38,6 +38,9 @@ let cmpoolWybinOptions = [];   // { name, slug, url, source:'wybin', gamemode }
 let cmpoolForumOptions = [];   // { name, url, source:'forum' }
 let cmpoolWybinLoading = false, cmpoolForumLoading = false;
 let cmpoolPickedTourney = null; // the { name, slug, url, source } chosen from the <select>, if any
+let cmpoolPage = 0;
+const CMPOOL_PAGE_SIZE = 12;
+const CMPOOL_SOURCE_TAG = { wybin: 'wyBin', forum: '論壇', custom: '自訂' };
 
 // Called from switchTab('cmpool') — lazy-load the pool index once.
 function ensureCmpoolLoaded() {
@@ -47,7 +50,7 @@ function ensureCmpoolLoaded() {
 async function loadCommunityPoolIndex(fresh) {
     cmpoolIndexLoaded = true;
     const listEl = document.getElementById('cmpool-list');
-    if (listEl && !cmpoolCur) listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    if (listEl && !cmpoolCur) { listEl.classList.remove('cmpool-grid'); listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`; }
     try {
         // `fresh` bypasses the CDN cache right after a write, so the list
         // reflects the change immediately instead of after max-age.
@@ -62,23 +65,60 @@ async function loadCommunityPoolIndex(fresh) {
     renderCommunityPoolList();
 }
 
+function cmpoolModeIcon(mode) {
+    return mode === 'all'
+        ? icon('sparkles', { size: '0.95em' })
+        : (typeof modeIconSvg === 'function' ? modeIconSvg(mode) : '');
+}
+
 function renderCommunityPoolList() {
     const listEl = document.getElementById('cmpool-list');
+    const pagerEl = document.getElementById('cmpool-pagination');
     if (!listEl) return;
+    if (pagerEl) pagerEl.innerHTML = '';
+
     const q = (document.getElementById('cmpool-search') || {}).value || '';
     const needle = q.trim().toLowerCase();
     const rows = cmpoolIndex.filter(p => !needle || (p.tournamentName || '').toLowerCase().includes(needle));
+
     if (!rows.length) {
+        listEl.classList.remove('cmpool-grid');
         listEl.innerHTML = `<p class="osu-empty">${t(cmpoolIndex.length ? 'cmpool_no_match' : 'cmpool_empty')}</p>`;
         return;
     }
-    listEl.innerHTML = rows.map(p => {
-        const ico = p.mode === 'all' ? icon('sparkles', { size: '0.9em' }) : (typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '');
-        return `<button class="cmpool-row" onclick="openCommunityPool('${escHtml(p.id)}')">
-            <span class="cmpool-row-name">${ico}<span>${escHtml(p.tournamentName)}</span></span>
-            <span class="cmpool-row-meta">${t('cmpool_row_meta', { r: p.roundCount, n: p.mapCount })}</span>
+    listEl.classList.add('cmpool-grid');
+
+    const totalPages = Math.ceil(rows.length / CMPOOL_PAGE_SIZE);
+    if (cmpoolPage >= totalPages) cmpoolPage = 0;
+    const pageRows = rows.slice(cmpoolPage * CMPOOL_PAGE_SIZE, (cmpoolPage + 1) * CMPOOL_PAGE_SIZE);
+
+    listEl.innerHTML = pageRows.map(p => {
+        const tag = CMPOOL_SOURCE_TAG[p.source] || p.source || '';
+        return `<button class="cmpool-card" onclick="openCommunityPool('${escHtml(p.id)}')">
+            <span class="cmpool-card-name">${cmpoolModeIcon(p.mode)}<span>${escHtml(p.tournamentName)}</span></span>
+            <span class="cmpool-card-meta">
+                <span class="cmpool-card-stat">${t('cmpool_card_rounds', { n: p.roundCount })}</span>
+                <span class="cmpool-card-stat">${t('cmpool_card_maps', { n: p.mapCount.toLocaleString() })}</span>
+                ${p.contributorCount ? `<span class="cmpool-card-stat">${icon('sparkles', { size: '0.8em' })}${p.contributorCount}</span>` : ''}
+                ${tag ? `<span class="cmpool-card-source cmpool-src-${escHtml(p.source || 'custom')}">${escHtml(tag)}</span>` : ''}
+            </span>
         </button>`;
     }).join('');
+
+    if (pagerEl && totalPages > 1) {
+        let h = `<button class="osu-page-btn" onclick="cmpoolGoPage(0)" ${cmpoolPage === 0 ? 'disabled' : ''}>«</button>`;
+        h += `<button class="osu-page-btn" onclick="cmpoolGoPage(${cmpoolPage - 1})" ${cmpoolPage === 0 ? 'disabled' : ''}>‹</button>`;
+        h += buildPaginationPageButtons(cmpoolPage, totalPages, (i) => `cmpoolGoPage(${i})`);
+        h += `<button class="osu-page-btn" onclick="cmpoolGoPage(${cmpoolPage + 1})" ${cmpoolPage >= totalPages - 1 ? 'disabled' : ''}>›</button>`;
+        h += `<button class="osu-page-btn" onclick="cmpoolGoPage(${totalPages - 1})" ${cmpoolPage >= totalPages - 1 ? 'disabled' : ''}>»</button>`;
+        pagerEl.innerHTML = h;
+    }
+}
+
+function cmpoolGoPage(i) {
+    cmpoolPage = Math.max(0, i);
+    renderCommunityPoolList();
+    document.getElementById('cmpool-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ── create / join ── */
@@ -266,6 +306,8 @@ async function openCommunityPool(id, fresh) {
     if (!fresh || !cmpoolCur || cmpoolCur.id !== id) detail.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     if (listEl) listEl.hidden = true;
     document.getElementById('cmpool-bar').hidden = true;
+    const pagerEl = document.getElementById('cmpool-pagination');
+    if (pagerEl) pagerEl.hidden = true;
     try {
         // `fresh` bypasses the CDN cache so a just-made edit shows at once.
         const res = await fetch(`/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}` + (fresh ? `&_=${Date.now()}` : ''));
@@ -285,9 +327,12 @@ function closeCommunityPoolDetail() {
     if (detail) { detail.hidden = true; detail.innerHTML = ''; }
     if (listEl) listEl.hidden = false;
     document.getElementById('cmpool-bar').hidden = false;
+    const pagerEl = document.getElementById('cmpool-pagination');
+    if (pagerEl) pagerEl.hidden = false;
     // Edits inside the detail view mark the list stale — refresh it now so
     // the counts / new pool are right when we land back on it.
     if (!cmpoolIndexLoaded) loadCommunityPoolIndex(true);
+    else renderCommunityPoolList();
 }
 
 function cmpoolCanEdit() {

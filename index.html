@@ -545,7 +545,7 @@
         <p class="tournaments-hint" data-i18n="cmpool_hint">大家一起填的賽事圖池 —— 選你參加過的賽事、加輪次與 mod、把 beatmap ID 填進去，站台會自動抓圖資。登入才能編輯。</p>
 
         <div class="cmpool-bar" id="cmpool-bar">
-            <input type="text" id="cmpool-search" autocomplete="off" data-i18n-placeholder="cmpool_search_ph" placeholder="搜尋已建立的賽事圖池…" oninput="renderCommunityPoolList()">
+            <input type="text" id="cmpool-search" autocomplete="off" data-i18n-placeholder="cmpool_search_ph" placeholder="搜尋已建立的賽事圖池…" oninput="cmpoolPage=0;renderCommunityPoolList()">
             <button class="btn" id="cmpool-new-btn" onclick="openCommunityPoolCreate()" data-i18n="cmpool_new_btn">＋ 建立／加入賽事</button>
         </div>
 
@@ -571,7 +571,8 @@
             <p class="cmpool-create-status" id="cmpool-create-status" hidden></p>
         </div>
 
-        <div id="cmpool-list"></div>
+        <div id="cmpool-list" class="cmpool-grid"></div>
+        <div id="cmpool-pagination" class="osu-pagination"></div>
         <div id="cmpool-detail" hidden></div>
     </section>
 

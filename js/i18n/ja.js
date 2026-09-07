@@ -275,7 +275,7 @@ I18N.ja = {
     cmpool_need_name: '大会名を入力してください',
     cmpool_empty: 'まだ大会プールがありません。最初の一人になりましょう。',
     cmpool_no_match: '検索に一致するプールがありません。',
-    cmpool_row_meta: '{r} ラウンド · {n} 譜面',
+    cmpool_row_meta: '{r} ラウンド · {n} 譜面', cmpool_card_rounds: '{n} ラウンド', cmpool_card_maps: '{n} 譜面',
     cmpool_back: 'すべての大会',
     cmpool_contributors: '{n} 人が貢献',
     cmpool_open_tournament: '大会ページ',

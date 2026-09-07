@@ -275,7 +275,7 @@ I18N.ko = {
     cmpool_need_name: '대회 이름을 입력하세요',
     cmpool_empty: '아직 대회 맵풀이 없습니다 — 첫 번째로 만들어 보세요.',
     cmpool_no_match: '검색과 일치하는 맵풀이 없습니다.',
-    cmpool_row_meta: '{r} 라운드 · {n} 맵',
+    cmpool_row_meta: '{r} 라운드 · {n} 맵', cmpool_card_rounds: '{n} 라운드', cmpool_card_maps: '{n} 맵',
     cmpool_back: '모든 대회',
     cmpool_contributors: '{n}명 기여',
     cmpool_open_tournament: '대회 페이지',

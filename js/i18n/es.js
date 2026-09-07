@@ -275,7 +275,7 @@ I18N.es = {
     cmpool_need_name: 'Escribe un nombre de torneo',
     cmpool_empty: 'Aún no hay pools de torneos: sé quien cree el primero.',
     cmpool_no_match: 'Ningún pool coincide con esa búsqueda.',
-    cmpool_row_meta: '{r} rondas · {n} mapas',
+    cmpool_row_meta: '{r} rondas · {n} mapas', cmpool_card_rounds: '{n} rondas', cmpool_card_maps: '{n} mapas',
     cmpool_back: 'Todos los torneos',
     cmpool_contributors: '{n} colaboradores',
     cmpool_open_tournament: 'Página del torneo',

@@ -275,7 +275,7 @@ I18N.ru = {
     cmpool_need_name: 'Введите название турнира',
     cmpool_empty: 'Маппулов турниров ещё нет — создайте первый.',
     cmpool_no_match: 'Ни один маппул не подходит под запрос.',
-    cmpool_row_meta: '{r} раундов · {n} карт',
+    cmpool_row_meta: '{r} раундов · {n} карт', cmpool_card_rounds: '{n} раунд.', cmpool_card_maps: '{n} карт',
     cmpool_back: 'Все турниры',
     cmpool_contributors: 'участников: {n}',
     cmpool_open_tournament: 'Страница турнира',

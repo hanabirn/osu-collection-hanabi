@@ -238,7 +238,7 @@ I18N.zh = {
     cmpool_need_name: '請輸入賽事名稱',
     cmpool_empty: '還沒有人建立賽事圖池，來當第一個。',
     cmpool_no_match: '沒有符合的賽事圖池。',
-    cmpool_row_meta: '{r} 輪 · {n} 張圖',
+    cmpool_row_meta: '{r} 輪 · {n} 張圖', cmpool_card_rounds: '{n} 輪', cmpool_card_maps: '{n} 圖',
     cmpool_back: '所有賽事',
     cmpool_contributors: '{n} 人貢獻',
     cmpool_open_tournament: '賽事頁面',
