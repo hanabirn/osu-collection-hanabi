@@ -1856,7 +1856,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: var(--text);
     font: inherit;
 }
-.cmpool-create-actions { display: flex; gap: 8px; }
+/* Mode tabs + the action buttons each take their own full-width row below
+   the tournament select + name input. */
+.cmpool-create #cmpool-create-mode { flex-basis: 100%; }
+.cmpool-create-actions { display: flex; gap: 8px; flex-basis: 100%; }
 .cmpool-row {
     display: flex;
     align-items: center;
