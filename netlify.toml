@@ -51,3 +51,11 @@
   from = "/gallery.xml"
   to = "/.netlify/functions/gallery-feed"
   status = 200
+
+# Clean Interactions Endpoint URL for the Discord bot — set this as the
+# app's endpoint in the Discord developer portal (discord-interactions.js).
+# The rewrite preserves the POST body Discord needs for signature checking.
+[[redirects]]
+  from = "/discord"
+  to = "/.netlify/functions/discord-interactions"
+  status = 200

@@ -2,7 +2,8 @@
   "name": "osu-collection-hanabi",
   "private": true,
   "scripts": {
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "discord:register": "node scripts/register-discord-commands.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
