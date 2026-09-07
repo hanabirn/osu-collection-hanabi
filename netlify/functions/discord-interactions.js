@@ -70,7 +70,7 @@ async function cmdPp(options, interaction) {
     const g = s.grade_counts || {};
     const playHours = s.play_time != null ? `${Math.round(s.play_time / 3600).toLocaleString('en-US')} 小時` : '—';
     const rankHist = (u.rank_history && u.rank_history.data) || (u.rankHistory && u.rankHistory.data) || [];
-    const spark = L.sparkline(rankHist.slice(-90));
+    const rankChart = L.rankChartUrl(rankHist);
 
     return L.message({
         author: L.osuAuthor(u, apiMode),
@@ -78,6 +78,7 @@ async function cmdPp(options, interaction) {
         url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`,
         color: L.rankColor(s.global_rank),
         thumbnail: u.avatar_url ? { url: u.avatar_url } : undefined,
+        image: rankChart ? { url: rankChart } : undefined,
         fields: [
             { name: 'PP', value: s.pp != null ? `${Math.round(s.pp).toLocaleString('en-US')}pp` : '—', inline: true },
             { name: '全球排名', value: s.global_rank ? `#${L.fmtNum(s.global_rank)}` : '—', inline: true },
@@ -88,9 +89,8 @@ async function cmdPp(options, interaction) {
             { name: '最大連擊', value: L.fmtNum(s.maximum_combo), inline: true },
             { name: '遊玩時間', value: playHours, inline: true },
             { name: '成績', value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
-            ...(spark ? [{ name: '近 90 天排名走勢', value: `\`${spark}\``, inline: false }] : []),
         ],
-        footer: L.siteFooter('osu! API v2'),
+        footer: L.siteFooter(rankChart ? '排名走勢：近 90 天 · osu! API v2' : 'osu! API v2'),
     });
 }
 

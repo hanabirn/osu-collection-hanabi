@@ -170,6 +170,39 @@ function sparkline(vals, higherIsBetter = false) {
     }).join('');
 }
 
+// A smooth line chart of a global-rank history, as a QuickChart image URL
+// for an embed's `image`. Y is reversed so an improving (falling) rank rises
+// on the chart; transparent background, pink line, minimal chrome — reads on
+// both Discord themes. null if there isn't enough data.
+function rankChartUrl(vals) {
+    const nums = (vals || []).map(Number).filter(n => Number.isFinite(n) && n > 0);
+    if (nums.length < 4) return null;
+    const step = Math.ceil(nums.length / 45);
+    const pts = nums.filter((_, i) => i % step === 0);
+    const cfg = {
+        type: 'line',
+        data: { labels: pts.map((_, i) => i), datasets: [{
+            label: 'rank', data: pts,
+            borderColor: '#ff5aa0', backgroundColor: 'rgba(255,102,170,0.18)',
+            fill: true, pointRadius: 0, borderWidth: 3, tension: 0.4,
+        }] },
+        options: {
+            plugins: { legend: { display: false } },
+            layout: { padding: 8 },
+            scales: {
+                x: { display: false },
+                y: {
+                    reverse: true, position: 'right',
+                    ticks: { color: '#9aa0a6', maxTicksLimit: 4, font: { size: 15 } },
+                    grid: { color: 'rgba(154,160,166,0.15)' },
+                    border: { display: false },
+                },
+            },
+        },
+    };
+    return `https://quickchart.io/chart?bkg=transparent&v=4&w=520&h=170&c=${encodeURIComponent(JSON.stringify(cfg))}`;
+}
+
 // Two-letter ISO country code -> regional-indicator flag emoji.
 function flagEmoji(code) {
     if (!code || !/^[A-Za-z]{2}$/.test(code)) return '';
@@ -257,6 +290,6 @@ module.exports = {
     GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
     optsOf, optVal, invokerId,
-    fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor, sparkline,
+    fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor, sparkline, rankChartUrl,
     osuAuthor, siteFooter, originOf, resolveOsuUser,
 };
