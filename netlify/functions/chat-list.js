@@ -33,12 +33,21 @@ exports.handler = async (event) => {
             ? all.filter(m => m.id > after)
             : all.slice(-FIRST_LOAD_COUNT);
 
+        // On a polling request (`after` set), also hand back any recently-
+        // edited messages the client may already be showing but wouldn't
+        // otherwise re-fetch (its cursor only pulls id > after). The client
+        // repaints a message whose editedAt changed. Bounded to the tail
+        // that's plausibly still in the DOM.
+        const edited = after != null
+            ? all.slice(-FIRST_LOAD_COUNT).filter(m => m.editedAt && m.id <= after)
+            : [];
+
         return {
             statusCode: 200,
             // Short public cache: cheap to poll, but a repeat's poll interval
             // (4s) is well above this, so it's mostly just absorbing bursts.
             headers: { ...headers, 'Cache-Control': 'public, max-age=2' },
-            body: JSON.stringify({ messages }),
+            body: JSON.stringify({ messages, edited }),
         };
     } catch (err) {
         return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
