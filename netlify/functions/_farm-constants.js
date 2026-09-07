@@ -3,7 +3,12 @@
    query, no PP computation) doesn't have to pull in rosu-pp-js — and its
    WASM binary's included_files bundling requirement — just to read a couple
    of arrays. Only _farm-crawl-core.js needs the actual rosu-pp-js engine. */
-const STAR_FLOOR = 5.5;
+// Lowest difficulty the crawler indexes. Dropped 5.5 -> 4.5 (2026-09-07) so
+// the dataset covers lower-pp "farm" territory (~100-150pp NM) that beginners
+// actually play, not just the intermediate+ band. Widening this means a
+// bigger dataset and a full re-sweep of the search cursor (reset to null on
+// the same change) before coverage is complete.
+const STAR_FLOOR = 4.5;
 const MOD_COMBOS = ['', 'DT', 'HD', 'HDDT', 'HR', 'HDHR'];
 const COMPUTE_ACCURACY = 100;
 const MODE_NUM = { osu: 0, taiko: 1, fruits: 2, mania: 3 };
