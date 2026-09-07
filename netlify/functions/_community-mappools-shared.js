@@ -33,7 +33,7 @@ const MAX_BRACKETS_PER_ROUND = 30;
 const MAX_MAPS_PER_BRACKET = 20;
 const MAX_LABEL_LEN = 24;
 const MAX_NAME_LEN = 80;
-const EDIT_COOLDOWN_MS = 2000;
+const EDIT_COOLDOWN_MS = 800;   // loose enough to add several maps in a row
 
 function slugify(s) {
     return String(s || '')

@@ -44,12 +44,14 @@ function ensureCmpoolLoaded() {
     if (!cmpoolIndexLoaded) loadCommunityPoolIndex();
 }
 
-async function loadCommunityPoolIndex() {
+async function loadCommunityPoolIndex(fresh) {
     cmpoolIndexLoaded = true;
     const listEl = document.getElementById('cmpool-list');
-    if (listEl) listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    if (listEl && !cmpoolCur) listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     try {
-        const res = await fetch('/.netlify/functions/community-mappools-list');
+        // `fresh` bypasses the CDN cache right after a write, so the list
+        // reflects the change immediately instead of after max-age.
+        const res = await fetch('/.netlify/functions/community-mappools-list' + (fresh ? `?_=${Date.now()}` : ''));
         if (!res.ok) throw new Error('bad response');
         cmpoolIndex = (await res.json()).pools || [];
     } catch (e) {
@@ -242,8 +244,8 @@ async function submitCommunityPoolCreate() {
         else if (tournament.source === 'wybin') showShareToast(t('cmpool_import_none'));
         closeCommunityPoolCreate();
         cmpoolIndexLoaded = false;
-        await loadCommunityPoolIndex();
-        openCommunityPool(pool.id);
+        await loadCommunityPoolIndex(true);
+        openCommunityPool(pool.id, true);
     } catch (e) {
         console.error('Community pool create failed:', e);
         showShareToast(t('mappools_load_fail'));
@@ -254,16 +256,19 @@ async function submitCommunityPoolCreate() {
 }
 
 /* ── open + render one pool ── */
-async function openCommunityPool(id) {
+async function openCommunityPool(id, fresh) {
     const detail = document.getElementById('cmpool-detail');
     const listEl = document.getElementById('cmpool-list');
     if (!detail) return;
     detail.hidden = false;
-    detail.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    // Only show the full-page spinner on a first open, not on the silent
+    // re-fetch after an edit (that would flash the whole pool away).
+    if (!fresh || !cmpoolCur || cmpoolCur.id !== id) detail.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     if (listEl) listEl.hidden = true;
     document.getElementById('cmpool-bar').hidden = true;
     try {
-        const res = await fetch(`/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}`);
+        // `fresh` bypasses the CDN cache so a just-made edit shows at once.
+        const res = await fetch(`/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}` + (fresh ? `&_=${Date.now()}` : ''));
         if (!res.ok) throw new Error('bad response');
         cmpoolCur = await res.json();
         renderCommunityPoolDetail();
@@ -280,6 +285,9 @@ function closeCommunityPoolDetail() {
     if (detail) { detail.hidden = true; detail.innerHTML = ''; }
     if (listEl) listEl.hidden = false;
     document.getElementById('cmpool-bar').hidden = false;
+    // Edits inside the detail view mark the list stale — refresh it now so
+    // the counts / new pool are right when we land back on it.
+    if (!cmpoolIndexLoaded) loadCommunityPoolIndex(true);
 }
 
 function cmpoolCanEdit() {
@@ -347,13 +355,13 @@ function renderCommunityPoolDetail() {
     detail.innerHTML = `
         <button class="cmpool-back" onclick="closeCommunityPoolDetail()">${icon('arrowLeft')} ${t('cmpool_back')}</button>
         <div class="cmpool-detail-head">
-            <div class="mappool-summary-title">${ico}<span>${escHtml(p.tournament.name)}</span></div>
-            <span class="mappool-summary-stats">${t('mappools_stats', { r: p.rounds.length, n: mapCount.toLocaleString() })} · ${t('cmpool_contributors', { n: (p.contributors || []).length })}</span>
+            <div class="cmpool-detail-title">${ico}<span>${escHtml(p.tournament.name)}</span></div>
+            <span class="cmpool-detail-stats">${t('mappools_stats', { r: p.rounds.length, n: mapCount.toLocaleString() })} · ${t('cmpool_contributors', { n: (p.contributors || []).length })}</span>
         </div>
         <div class="cmpool-detail-actions">
-            ${p.tournament.url ? `<a class="mappool-round-link" href="${escHtml(p.tournament.url)}" target="_blank" rel="noopener">${icon('externalLink')} ${t('cmpool_open_tournament')}</a>` : ''}
-            ${mapCount ? `<button class="mappool-add-event" onclick="cmpoolImportEvent()">${t('mappools_add_event_btn')}</button>` : ''}
-            ${owner ? `<button class="cmpool-delete" onclick="cmpoolDeletePool('${escHtml(p.id)}')">${icon('trash2')} ${t('cmpool_delete_pool')}</button>` : ''}
+            ${p.tournament.url ? `<a class="cmpool-tourney-link" href="${escHtml(p.tournament.url)}" target="_blank" rel="noopener">${icon('externalLink', { size: '0.95em' })} ${t('cmpool_open_tournament')}</a>` : ''}
+            ${mapCount ? `<button class="mappool-round-add" onclick="cmpoolImportEvent()">${t('mappools_add_event_btn')}</button>` : ''}
+            ${owner ? `<button class="cmpool-delete" onclick="cmpoolDeletePool('${escHtml(p.id)}')">${icon('trash2', { size: '0.95em' })} ${t('cmpool_delete_pool')}</button>` : ''}
         </div>
         ${editable ? cmpoolAddRoundBar(p) : (p.rounds.length ? '' : `<p class="osu-empty">${t('cmpool_login_to_fill')}</p>`)}
         ${roundsHtml}`;
@@ -411,8 +419,9 @@ async function cmpoolEdit(action, params, event) {
             showShareToast(msg);
             return false;
         }
-        // Re-fetch the resolved view (edit fn returns the raw pool).
-        await openCommunityPool(params.poolId || (cmpoolCur && cmpoolCur.id));
+        // Re-fetch the resolved view, cache-busted so the change shows now
+        // (edit fn returns the raw, unresolved pool).
+        await openCommunityPool(params.poolId || (cmpoolCur && cmpoolCur.id), true);
         cmpoolIndexLoaded = false; // list counts changed
         return true;
     } catch (e) {
@@ -435,7 +444,7 @@ async function cmpoolDeletePool(id) {
         if (!res.ok) throw new Error('delete failed');
         closeCommunityPoolDetail();
         cmpoolIndexLoaded = false;
-        loadCommunityPoolIndex();
+        loadCommunityPoolIndex(true);
     } catch (e) {
         console.error('Community pool delete failed:', e);
         showShareToast(t('mappools_load_fail'));

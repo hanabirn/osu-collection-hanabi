@@ -34,7 +34,7 @@ exports.handler = async (event) => {
             index.sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
             return {
                 statusCode: 200,
-                headers: { ...headers, 'Cache-Control': 'public, max-age=30' },
+                headers: { ...headers, 'Cache-Control': 'public, max-age=10' },
                 body: JSON.stringify({ pools: index, count: index.length }),
             };
         }
@@ -73,7 +73,7 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            headers: { ...headers, 'Cache-Control': 'public, max-age=15' },
+            headers: { ...headers, 'Cache-Control': 'public, max-age=5' },
             body: JSON.stringify({
                 id: pool.id,
                 tournament: pool.tournament,
