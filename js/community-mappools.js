@@ -90,9 +90,11 @@ function openCommunityPoolCreate() {
     const nameEl = document.getElementById('cmpool-create-name');
     if (nameEl) nameEl.value = '';
     cmpoolCreateStatus('');
-    renderCmpoolSourceTabs();
-    renderCmpoolCreateModeTabs();
-    applyCmpoolSource();          // loads + renders the right dropdown
+    // Render each piece independently — one failing shouldn't leave the
+    // whole form half-built.
+    try { renderCmpoolSourceTabs(); } catch (e) { console.error('cmpool source tabs:', e); }
+    try { renderCmpoolCreateModeTabs(); } catch (e) { console.error('cmpool mode tabs:', e); }
+    try { applyCmpoolSource(); } catch (e) { console.error('cmpool source apply:', e); }
     nameEl?.focus();
 }
 function closeCommunityPoolCreate() {
