@@ -95,6 +95,19 @@ function getChatMediaStore() {
     });
 }
 
+// Community-authored tournament mappools (community-mappools-*.js) — the
+// crowd-sourced counterpart to the auto-crawled getWcMappoolsStore(). One
+// `pool:<tournamentSlug>--<mode>` doc per tournament+mode (deterministic id
+// = automatic dedup), plus an `index` array for browsing, a shared
+// `beatmaps:cache`, and per-user `lastEditAt:` cooldown keys.
+function getCommunityMappoolsStore() {
+    return getStore({
+        name: 'osu-community-mappools',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
 // Direct messages (dm-conversations/dm-messages/dm-send/dm-read.js) —
 // per-conversation message arrays (conv:<minId>:<maxId>) plus each user's
 // own inbox summary (index:<userId>), same store as the send cooldown key.
@@ -130,4 +143,4 @@ function getDiscordBotStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getChatMediaStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore };
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getCommunityMappoolsStore, getChatStore, getChatMediaStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore };

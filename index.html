@@ -516,26 +516,56 @@
     </section>
 
     <section id="page-mappools" class="site-page" style="display:none;">
-        <p class="eyebrow">WORLD CUP</p>
-        <h2 class="osu-page-title" data-i18n="mappools_page_title">✦ 世界盃圖池 ✦</h2>
-        <p class="tournaments-hint" data-i18n="mappools_hint">歷屆 osu! 世界盃（OWC／TWC／MWC 4K・7K／CWC）的官方圖池，資料取自 osu! wiki。選一屆比賽，把整屆或某一輪一鍵加成收藏分類。</p>
+        <p class="eyebrow">MAPPOOLS</p>
+        <h2 class="osu-page-title" data-i18n="mappools_page_title">✦ 賽事圖池 ✦</h2>
 
-        <div class="mappool-picker">
-            <div class="osu-mode-tabs" id="mappool-tourney-tabs"></div>
-            <div class="mappool-edition-strip" id="mappool-edition-strip" role="tablist" aria-label="Edition"></div>
+        <div class="osu-mode-tabs mappool-scope-tabs">
+            <button class="osu-mode-tab active" id="mappool-scope-wc" onclick="switchMappoolScope('wc')" data-i18n="mappools_scope_wc">官方世界盃</button>
+            <button class="osu-mode-tab" id="mappool-scope-community" onclick="switchMappoolScope('community')" data-i18n="mappools_scope_community">社群賽事</button>
         </div>
 
-        <div class="mappool-summary" id="mappool-summary" hidden>
-            <div class="mappool-summary-main">
-                <span class="mappool-summary-title" id="mappool-summary-title"></span>
-                <span class="mappool-summary-stats" id="mappool-summary-stats"></span>
+        <div id="mappool-scope-wc-body">
+            <p class="tournaments-hint" data-i18n="mappools_hint">歷屆 osu! 世界盃（OWC／TWC／MWC 4K・7K／CWC）的官方圖池，資料取自 osu! wiki。選一屆比賽，把整屆或某一輪一鍵加成收藏分類。</p>
+
+            <div class="mappool-picker">
+                <div class="osu-mode-tabs" id="mappool-tourney-tabs"></div>
+                <div class="mappool-edition-strip" id="mappool-edition-strip" role="tablist" aria-label="Edition"></div>
             </div>
-            <button id="mappool-add-event-btn" class="mappool-add-event" onclick="addMappoolEventToCollection()" disabled data-i18n="mappools_add_event_btn">➕ 整屆加入收藏</button>
+
+            <div class="mappool-summary" id="mappool-summary" hidden>
+                <div class="mappool-summary-main">
+                    <span class="mappool-summary-title" id="mappool-summary-title"></span>
+                    <span class="mappool-summary-stats" id="mappool-summary-stats"></span>
+                </div>
+                <button id="mappool-add-event-btn" class="mappool-add-event" onclick="addMappoolEventToCollection()" disabled data-i18n="mappools_add_event_btn">➕ 整屆加入收藏</button>
+            </div>
+
+            <div class="mappool-round-nav" id="mappool-round-nav"></div>
+            <div id="mappool-rounds"></div>
+            <p class="mappool-coverage-foot" id="mappool-coverage"></p>
         </div>
 
-        <div class="mappool-round-nav" id="mappool-round-nav"></div>
-        <div id="mappool-rounds"></div>
-        <p class="mappool-coverage-foot" id="mappool-coverage"></p>
+        <div id="mappool-scope-community-body" hidden>
+            <p class="tournaments-hint" data-i18n="cmpool_hint">大家一起填的賽事圖池 —— 選你參加過的賽事、加輪次與 mod、把 beatmap ID 填進去，站台會自動抓圖資。登入才能編輯。</p>
+
+            <div class="cmpool-bar" id="cmpool-bar">
+                <input type="text" id="cmpool-search" autocomplete="off" data-i18n-placeholder="cmpool_search_ph" placeholder="搜尋已建立的賽事圖池…" oninput="renderCommunityPoolList()">
+                <button class="btn" id="cmpool-new-btn" onclick="openCommunityPoolCreate()" data-i18n="cmpool_new_btn">＋ 建立／加入賽事</button>
+            </div>
+
+            <div id="cmpool-create" class="cmpool-create" hidden>
+                <input type="text" id="cmpool-create-name" autocomplete="off" list="cmpool-tourney-list" data-i18n-placeholder="cmpool_create_name_ph" placeholder="賽事名稱（可從清單選，或自己打）">
+                <datalist id="cmpool-tourney-list"></datalist>
+                <div class="osu-mode-tabs" id="cmpool-create-mode"></div>
+                <div class="cmpool-create-actions">
+                    <button class="btn" id="cmpool-create-go" onclick="submitCommunityPoolCreate()" data-i18n="cmpool_create_go">建立</button>
+                    <button class="btn cmpool-btn-ghost" onclick="closeCommunityPoolCreate()" data-i18n="cmpool_create_cancel">取消</button>
+                </div>
+            </div>
+
+            <div id="cmpool-list"></div>
+            <div id="cmpool-detail" hidden></div>
+        </div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -1159,6 +1189,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/farm-maps.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
+<script defer src="js/community-mappools.js"></script>
 <script defer src="js/global-search.js"></script>
 <script defer src="js/skins.js"></script>
 <script defer src="js/skin-screenshots.js"></script>

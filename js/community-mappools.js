@@ -1,0 +1,358 @@
+/* ===== 賽事圖池 · 社群賽事 sub-tab =====
+   The crowd-sourced counterpart to the auto-crawled World Cup pools
+   (js/mappools.js). Visitors pick a tournament + mode, add rounds and mod
+   brackets, and drop beatmap ids in; community-mappools-edit.js resolves the
+   metadata. One pool per tournament+mode (server dedups on a slug id), so
+   whoever fills OWC 2025's std pool first, everyone else just opens it.
+
+   Reuses js/mappools.js globals: renderMappoolCard, mappoolBracketHead,
+   mappoolImport, mappoolModeApi. And osu.js: escHtml, icon, t,
+   getOsuAuthToken, getLoggedInOsuUser, showShareToast, modeIconSvg,
+   getOsuCollection, OSU_MODES. */
+
+const CMPOOL_MODES = ['standard', 'taiko', 'catch', 'mania'];
+const CMPOOL_MODE_LABEL = { standard: 'osu!std', taiko: 'taiko', catch: 'catch', mania: 'mania' };
+const CMPOOL_PRESET_ROUNDS = ['Qualifiers', 'Round of 64', 'Round of 32', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Finals', 'Grand Finals'];
+const CMPOOL_PRESET_BRACKETS = {
+    standard: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
+    taiko: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
+    catch: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
+    mania: ['RC', 'LN', 'HB', 'TB'],
+};
+
+// Safe to drop into a double-quoted onclick="" as decodeURIComponent('…') —
+// encodeURIComponent leaves ' alone, so also swap it (same trick as
+// chat.js's chatEncodeForOnclick). Round/bracket labels can be user text.
+function cmEnc(s) { return encodeURIComponent(String(s)).replace(/'/g, '%27'); }
+
+let cmpoolScope = 'wc';
+let cmpoolIndexLoaded = false;
+let cmpoolIndex = [];          // [{ id, tournamentName, mode, roundCount, mapCount, contributorCount, updatedAt, ... }]
+let cmpoolCur = null;          // resolved pool currently open in #cmpool-detail
+let cmpoolCreateMode = 'standard';
+let cmpoolTourneyOptions = []; // { name, slug, url, source }
+
+function switchMappoolScope(scope) {
+    cmpoolScope = scope;
+    document.getElementById('mappool-scope-wc').classList.toggle('active', scope === 'wc');
+    document.getElementById('mappool-scope-community').classList.toggle('active', scope === 'community');
+    document.getElementById('mappool-scope-wc-body').hidden = scope !== 'wc';
+    document.getElementById('mappool-scope-community-body').hidden = scope !== 'community';
+    if (scope === 'community' && !cmpoolIndexLoaded) loadCommunityPoolIndex();
+}
+
+async function loadCommunityPoolIndex() {
+    cmpoolIndexLoaded = true;
+    const listEl = document.getElementById('cmpool-list');
+    if (listEl) listEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    try {
+        const res = await fetch('/.netlify/functions/community-mappools-list');
+        if (!res.ok) throw new Error('bad response');
+        cmpoolIndex = (await res.json()).pools || [];
+    } catch (e) {
+        console.error('Community mappool index failed:', e);
+        if (listEl) listEl.innerHTML = `<p class="osu-empty">${t('mappools_load_fail')}</p>`;
+        return;
+    }
+    renderCommunityPoolList();
+}
+
+function renderCommunityPoolList() {
+    const listEl = document.getElementById('cmpool-list');
+    if (!listEl) return;
+    const q = (document.getElementById('cmpool-search') || {}).value || '';
+    const needle = q.trim().toLowerCase();
+    const rows = cmpoolIndex.filter(p => !needle || (p.tournamentName || '').toLowerCase().includes(needle));
+    if (!rows.length) {
+        listEl.innerHTML = `<p class="osu-empty">${t(cmpoolIndex.length ? 'cmpool_no_match' : 'cmpool_empty')}</p>`;
+        return;
+    }
+    listEl.innerHTML = rows.map(p => {
+        const ico = typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '';
+        return `<button class="cmpool-row" onclick="openCommunityPool('${escHtml(p.id)}')">
+            <span class="cmpool-row-name">${ico}<span>${escHtml(p.tournamentName)}</span></span>
+            <span class="cmpool-row-meta">${t('cmpool_row_meta', { r: p.roundCount, n: p.mapCount })}</span>
+        </button>`;
+    }).join('');
+}
+
+/* ── create / join ── */
+async function openCommunityPoolCreate() {
+    const box = document.getElementById('cmpool-create');
+    if (!box) return;
+    box.hidden = false;
+    cmpoolCreateMode = 'standard';
+    renderCmpoolCreateModeTabs();
+    if (!cmpoolTourneyOptions.length) loadCmpoolTourneyOptions();
+    document.getElementById('cmpool-create-name')?.focus();
+}
+function closeCommunityPoolCreate() {
+    const box = document.getElementById('cmpool-create');
+    if (box) box.hidden = true;
+}
+function renderCmpoolCreateModeTabs() {
+    const el = document.getElementById('cmpool-create-mode');
+    if (!el) return;
+    el.innerHTML = CMPOOL_MODES.map(m => {
+        const ico = typeof modeIconSvg === 'function' ? modeIconSvg(m) : '';
+        return `<button class="osu-mode-tab${m === cmpoolCreateMode ? ' active' : ''}" onclick="cmpoolCreateMode='${m}';renderCmpoolCreateModeTabs()">${ico} ${CMPOOL_MODE_LABEL[m]}</button>`;
+    }).join('');
+}
+async function loadCmpoolTourneyOptions() {
+    try {
+        const res = await fetch('/.netlify/functions/wybin-tournaments');
+        const data = res.ok ? await res.json() : [];
+        const arr = Array.isArray(data) ? data : (data.tournaments || data.items || []);
+        cmpoolTourneyOptions = arr.map(x => ({
+            name: x.name || x.title || '',
+            slug: x.slug || '',
+            url: x.slug ? `https://wybin.xyz/tournaments/${x.slug}` : '',
+            source: 'wybin',
+        })).filter(o => o.name);
+    } catch { cmpoolTourneyOptions = []; }
+    const dl = document.getElementById('cmpool-tourney-list');
+    if (dl) dl.innerHTML = cmpoolTourneyOptions.slice(0, 400).map(o => `<option value="${escHtml(o.name)}">`).join('');
+}
+async function submitCommunityPoolCreate() {
+    const name = (document.getElementById('cmpool-create-name') || {}).value.trim();
+    if (!name) { showShareToast(t('cmpool_need_name')); return; }
+    const token = getOsuAuthToken();
+    if (!token) { showShareToast(t('chat_login_required')); return; }
+    const match = cmpoolTourneyOptions.find(o => o.name.toLowerCase() === name.toLowerCase());
+    const tournament = match
+        ? { name: match.name, slug: match.slug, source: match.source, url: match.url }
+        : { name, source: 'custom' };
+    try {
+        const res = await fetch('/.netlify/functions/community-mappools-edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ action: 'create', tournament, mode: cmpoolCreateMode }),
+        });
+        if (res.status === 401) { showShareToast(t('osu_login_fail')); return; }
+        if (!res.ok) throw new Error('create failed');
+        const { pool } = await res.json();
+        closeCommunityPoolCreate();
+        cmpoolIndexLoaded = false;
+        await loadCommunityPoolIndex();
+        openCommunityPool(pool.id);
+    } catch (e) {
+        console.error('Community pool create failed:', e);
+        showShareToast(t('mappools_load_fail'));
+    }
+}
+
+/* ── open + render one pool ── */
+async function openCommunityPool(id) {
+    const detail = document.getElementById('cmpool-detail');
+    const listEl = document.getElementById('cmpool-list');
+    if (!detail) return;
+    detail.hidden = false;
+    detail.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    if (listEl) listEl.hidden = true;
+    document.getElementById('cmpool-bar').hidden = true;
+    try {
+        const res = await fetch(`/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('bad response');
+        cmpoolCur = await res.json();
+        renderCommunityPoolDetail();
+    } catch (e) {
+        console.error('Community pool load failed:', e);
+        detail.innerHTML = `<p class="osu-empty">${t('mappools_load_fail')}</p>`;
+    }
+}
+
+function closeCommunityPoolDetail() {
+    cmpoolCur = null;
+    const detail = document.getElementById('cmpool-detail');
+    const listEl = document.getElementById('cmpool-list');
+    if (detail) { detail.hidden = true; detail.innerHTML = ''; }
+    if (listEl) listEl.hidden = false;
+    document.getElementById('cmpool-bar').hidden = false;
+}
+
+function cmpoolCanEdit() {
+    return !!(typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser());
+}
+function cmpoolIsOwner() {
+    const u = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
+    return !!(u && String(u.id) === (typeof CHAT_OWNER_OSU_ID_HINT !== 'undefined' ? CHAT_OWNER_OSU_ID_HINT : '26696007'));
+}
+
+function renderCommunityPoolDetail() {
+    const detail = document.getElementById('cmpool-detail');
+    if (!detail || !cmpoolCur) return;
+    const p = cmpoolCur;
+    const editable = cmpoolCanEdit();
+    const owner = cmpoolIsOwner();
+    const me = (typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser()) || {};
+    const collected = new Set(OSU_MODES.flatMap(m => (getOsuCollection()[m] || []).map(s => s.beatmapset_id)));
+    const ico = typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '';
+    let mapCount = 0;
+    for (const r of p.rounds) for (const b of r.brackets) mapCount += b.maps.length;
+
+    const roundsHtml = p.rounds.map((r, ri) => {
+        const bracketsHtml = r.brackets.map(b => {
+            const pid = cmEnc(p.id), rid = cmEnc(r.id), lbl = cmEnc(b.label);
+            const cards = b.maps.map(mp => {
+                const base = renderMappoolCard(mp, mp.setId ? collected.has(mp.setId) : false);
+                if (!editable) return base;
+                const canRemove = owner || String(mp.addedBy) === String(me.id);
+                const rm = canRemove
+                    ? `<button class="cmpool-map-rm" title="${t('cmpool_remove_map')}" onclick="cmpoolEdit('remove-map',{poolId:decodeURIComponent('${pid}'),roundId:decodeURIComponent('${rid}'),label:decodeURIComponent('${lbl}'),beatmapId:${mp.beatmapId}},event)">${icon('x')}</button>`
+                    : '';
+                return `<div class="cmpool-map-wrap">${base}${rm}</div>`;
+            }).join('');
+            const addInput = editable && b.maps.length < 20
+                ? `<div class="cmpool-add-map">
+                     <input type="text" placeholder="${t('cmpool_add_map_ph')}" onkeydown="if(event.key==='Enter'){cmpoolAddMapFromInput(this,decodeURIComponent('${pid}'),decodeURIComponent('${rid}'),decodeURIComponent('${lbl}'))}">
+                     <button onclick="cmpoolAddMapFromInput(this.previousElementSibling,decodeURIComponent('${pid}'),decodeURIComponent('${rid}'),decodeURIComponent('${lbl}'))">${icon('plus')}</button>
+                   </div>`
+                : '';
+            const rmBracket = editable && (owner || !b.maps.length)
+                ? `<button class="cmpool-bracket-rm" title="${t('cmpool_remove_bracket')}" onclick="cmpoolEdit('remove-bracket',{poolId:decodeURIComponent('${pid}'),roundId:decodeURIComponent('${rid}'),label:decodeURIComponent('${lbl}')})">${icon('x')}</button>`
+                : '';
+            return `<div class="cmpool-bracket">
+                <div class="cmpool-bracket-head">${mappoolBracketHead(b.label)}${rmBracket}</div>
+                <div class="osu-collection mappool-list">${cards}</div>
+                ${addInput}
+            </div>`;
+        }).join('');
+        const addBracket = editable ? cmpoolAddBracketBar(p, r) : '';
+        const rmRound = editable && (owner || !r.brackets.some(b => b.maps.length))
+            ? `<button class="cmpool-round-rm" title="${t('cmpool_remove_round')}" onclick="cmpoolEdit('remove-round',{poolId:decodeURIComponent('${cmEnc(p.id)}'),roundId:decodeURIComponent('${cmEnc(r.id)}')})">${icon('x')}</button>`
+            : '';
+        return `<div class="mappool-round">
+            <div class="mappool-round-head">
+                <h3>${escHtml(r.name)}</h3>
+                ${rmRound}
+                <button class="mappool-round-add" onclick="cmpoolImportRound(${ri})">${t('mappools_round_add_btn')}</button>
+            </div>
+            ${bracketsHtml}
+            ${addBracket}
+        </div>`;
+    }).join('');
+
+    detail.innerHTML = `
+        <button class="cmpool-back" onclick="closeCommunityPoolDetail()">${icon('arrowLeft')} ${t('cmpool_back')}</button>
+        <div class="cmpool-detail-head">
+            <div class="mappool-summary-title">${ico}<span>${escHtml(p.tournament.name)}</span></div>
+            <span class="mappool-summary-stats">${t('mappools_stats', { r: p.rounds.length, n: mapCount.toLocaleString() })} · ${t('cmpool_contributors', { n: (p.contributors || []).length })}</span>
+        </div>
+        <div class="cmpool-detail-actions">
+            ${p.tournament.url ? `<a class="mappool-round-link" href="${escHtml(p.tournament.url)}" target="_blank" rel="noopener">${icon('externalLink')} ${t('cmpool_open_tournament')}</a>` : ''}
+            ${mapCount ? `<button class="mappool-add-event" onclick="cmpoolImportEvent()">${t('mappools_add_event_btn')}</button>` : ''}
+            ${owner ? `<button class="cmpool-delete" onclick="cmpoolDeletePool('${escHtml(p.id)}')">${icon('trash2')} ${t('cmpool_delete_pool')}</button>` : ''}
+        </div>
+        ${editable ? cmpoolAddRoundBar(p) : (p.rounds.length ? '' : `<p class="osu-empty">${t('cmpool_login_to_fill')}</p>`)}
+        ${roundsHtml}`;
+}
+
+function cmpoolAddRoundBar(p) {
+    const pid = cmEnc(p.id);
+    const chips = CMPOOL_PRESET_ROUNDS
+        .filter(n => !p.rounds.some(r => r.name.toLowerCase() === n.toLowerCase()))
+        .map(n => `<button class="cmpool-chip" onclick="cmpoolEdit('add-round',{poolId:decodeURIComponent('${pid}'),name:decodeURIComponent('${cmEnc(n)}')})">${escHtml(n)}</button>`).join('');
+    return `<div class="cmpool-add-round">
+        <span class="cmpool-add-label">${t('cmpool_add_round')}</span>
+        ${chips}
+        <input type="text" placeholder="${t('cmpool_custom_round_ph')}" onkeydown="if(event.key==='Enter'&&this.value.trim()){cmpoolEdit('add-round',{poolId:decodeURIComponent('${pid}'),name:this.value.trim()})}">
+    </div>`;
+}
+function cmpoolAddBracketBar(p, r) {
+    const pid = cmEnc(p.id), rid = cmEnc(r.id);
+    const have = new Set(r.brackets.map(b => b.label.toLowerCase()));
+    const chips = (CMPOOL_PRESET_BRACKETS[p.mode] || [])
+        .filter(l => !have.has(l.toLowerCase()))
+        .map(l => `<button class="cmpool-chip" onclick="cmpoolEdit('add-bracket',{poolId:decodeURIComponent('${pid}'),roundId:decodeURIComponent('${rid}'),label:decodeURIComponent('${cmEnc(l)}')})">${escHtml(l)}</button>`).join('');
+    return `<div class="cmpool-add-bracket">
+        <span class="cmpool-add-label">${t('cmpool_add_bracket')}</span>
+        ${chips}
+        <input type="text" maxlength="24" placeholder="${t('cmpool_custom_bracket_ph')}" onkeydown="if(event.key==='Enter'&&this.value.trim()){cmpoolEdit('add-bracket',{poolId:decodeURIComponent('${pid}'),roundId:decodeURIComponent('${rid}'),label:this.value.trim()})}">
+    </div>`;
+}
+
+async function cmpoolAddMapFromInput(inputEl, poolId, roundId, label) {
+    const ref = (inputEl.value || '').trim();
+    if (!ref) return;
+    inputEl.disabled = true;
+    const okDone = await cmpoolEdit('add-map', { poolId, roundId, label, ref });
+    if (okDone) inputEl.value = '';
+    inputEl.disabled = false;
+    inputEl.focus();
+}
+
+async function cmpoolEdit(action, params, event) {
+    if (event) event.stopPropagation();
+    const token = getOsuAuthToken();
+    if (!token) { showShareToast(t('chat_login_required')); return false; }
+    try {
+        const res = await fetch('/.netlify/functions/community-mappools-edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ action, ...params }),
+        });
+        if (res.status === 401) { showShareToast(t('osu_login_fail')); return false; }
+        if (res.status === 429) { showShareToast(t('chat_rate_limited')); return false; }
+        if (!res.ok) {
+            let msg = t('mappools_load_fail');
+            try { msg = (await res.json()).error || msg; } catch { /* keep default */ }
+            showShareToast(msg);
+            return false;
+        }
+        // Re-fetch the resolved view (edit fn returns the raw pool).
+        await openCommunityPool(params.poolId || (cmpoolCur && cmpoolCur.id));
+        cmpoolIndexLoaded = false; // list counts changed
+        return true;
+    } catch (e) {
+        console.error(`Community pool ${action} failed:`, e);
+        showShareToast(t('mappools_load_fail'));
+        return false;
+    }
+}
+
+async function cmpoolDeletePool(id) {
+    if (!confirm(t('cmpool_delete_confirm'))) return;
+    const token = getOsuAuthToken();
+    if (!token) return;
+    try {
+        const res = await fetch('/.netlify/functions/community-mappools-edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ action: 'delete-pool', poolId: id }),
+        });
+        if (!res.ok) throw new Error('delete failed');
+        closeCommunityPoolDetail();
+        cmpoolIndexLoaded = false;
+        loadCommunityPoolIndex();
+    } catch (e) {
+        console.error('Community pool delete failed:', e);
+        showShareToast(t('mappools_load_fail'));
+    }
+}
+
+/* ── add-to-collection (reuse mappools.js mappoolImport) ── */
+function cmpoolRoundSetIds(ri) {
+    const r = cmpoolCur && cmpoolCur.rounds[ri];
+    if (!r) return [];
+    return [...new Set(r.brackets.flatMap(b => b.maps.map(m => m.setId)).filter(Boolean))];
+}
+function cmpoolEventSetIds() {
+    if (!cmpoolCur) return [];
+    return [...new Set(cmpoolCur.rounds.flatMap(r => r.brackets.flatMap(b => b.maps.map(m => m.setId))).filter(Boolean))];
+}
+function cmpoolImportRound(ri) {
+    const r = cmpoolCur && cmpoolCur.rounds[ri];
+    if (!r) return;
+    mappoolImport(`${cmpoolCur.tournament.name} · ${r.name}`, cmpoolRoundSetIds(ri));
+}
+function cmpoolImportEvent() {
+    if (!cmpoolCur) return;
+    mappoolImport(cmpoolCur.tournament.name, cmpoolEventSetIds());
+}
+
+/* language switch — the sub-tab content is JS-built */
+function refreshCommunityMappoolsLocalized() {
+    if (cmpoolScope !== 'community') return;
+    if (cmpoolCur) renderCommunityPoolDetail();
+    else renderCommunityPoolList();
+}

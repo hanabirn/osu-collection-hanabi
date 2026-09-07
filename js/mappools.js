@@ -327,6 +327,7 @@ async function mappoolImport(label, ids) {
 /* Called from refreshDynamicContent() on a site-language switch — the
    tourney tabs / edition strip / summary / cards are built in JS. */
 function refreshMappoolsLocalized() {
+    if (typeof refreshCommunityMappoolsLocalized === 'function') refreshCommunityMappoolsLocalized();
     if (!mappoolsLoaded) return;
     renderMappoolTourneyTabs();
     renderMappoolEditionStrip();

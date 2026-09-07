@@ -1805,6 +1805,166 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     text-align: center;
 }
 
+/* ===== 社群賽事 sub-tab (js/community-mappools.js) ===== */
+.mappool-scope-tabs { margin-bottom: 14px; }
+.cmpool-bar {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+}
+.cmpool-bar input {
+    flex: 1;
+    min-width: 180px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-input);
+    color: var(--text);
+    font: inherit;
+}
+.cmpool-btn-ghost { background: var(--bg-stat); color: var(--text-secondary); }
+.cmpool-create {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 16px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+}
+.cmpool-create input {
+    flex: 1;
+    min-width: 220px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-input);
+    color: var(--text);
+    font: inherit;
+}
+.cmpool-create-actions { display: flex; gap: 8px; }
+.cmpool-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    color: var(--text);
+    cursor: pointer;
+    font: inherit;
+}
+.cmpool-row:hover { border-color: rgba(var(--pink-rgb), 0.5); }
+.cmpool-row-name { display: flex; align-items: center; gap: 8px; font-weight: 700; min-width: 0; }
+.cmpool-row-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmpool-row-meta { font-size: 0.78rem; color: var(--text-dim); flex-shrink: 0; }
+.cmpool-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font: inherit;
+    padding: 4px 0;
+    margin-bottom: 8px;
+}
+.cmpool-back:hover { color: var(--accent-pink); }
+.cmpool-detail-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.cmpool-detail-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.cmpool-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(255,90,90,0.4);
+    background: transparent;
+    color: #ff7676;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+.cmpool-add-round, .cmpool-add-bracket {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+}
+.cmpool-add-bracket { margin: 6px 0 4px; }
+.cmpool-add-label { font-size: 0.74rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+.cmpool-chip {
+    border: 1px solid var(--border-card);
+    background: var(--bg-stat);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 3px 11px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.cmpool-chip:hover { color: var(--text); border-color: rgba(var(--pink-rgb), 0.5); }
+.cmpool-add-round input, .cmpool-add-bracket input, .cmpool-add-map input {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-input);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.8rem;
+    max-width: 180px;
+}
+.cmpool-bracket { margin-bottom: 6px; }
+.cmpool-bracket-head { display: flex; align-items: center; gap: 6px; }
+.cmpool-bracket-rm, .cmpool-round-rm {
+    border: none;
+    background: transparent;
+    color: var(--text-dim2);
+    cursor: pointer;
+    padding: 2px;
+    line-height: 1;
+}
+.cmpool-bracket-rm:hover, .cmpool-round-rm:hover { color: #ff7676; }
+.cmpool-round-rm { margin-left: 4px; }
+.cmpool-map-wrap { position: relative; }
+.cmpool-map-rm {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 3;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 999px;
+    background: rgba(20,16,28,0.8);
+    color: #ff9a9a;
+    cursor: pointer;
+}
+.cmpool-add-map { display: flex; gap: 6px; margin: 8px 0 4px; }
+.cmpool-add-map button {
+    border: none;
+    border-radius: 8px;
+    background: var(--pink);
+    color: #14101c;
+    padding: 0 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+:root[data-theme="light"] .cmpool-add-map button { color: #fff; }
+
 /* Tournament-style mod icon: a flat-topped hexagon with bold 2-letter text
    in the mod's colour, on a near-black chip (matches the NM/HD/HR/DT/FM/TB
    pool icons). */
