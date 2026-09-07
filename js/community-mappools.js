@@ -372,6 +372,14 @@ function renderCommunityPoolDetail() {
                 ? `<div class="cmpool-add-map">
                      <input type="text" placeholder="${t('cmpool_add_map_ph')}" onkeydown="if(event.key==='Enter'){cmpoolAddMapFromInput(this,decodeURIComponent('${pid}'),decodeURIComponent('${rid}'),decodeURIComponent('${lbl}'))}">
                      <button onclick="cmpoolAddMapFromInput(this.previousElementSibling,decodeURIComponent('${pid}'),decodeURIComponent('${rid}'),decodeURIComponent('${lbl}'))">${icon('plus')}</button>
+                     <button class="cmpool-bulk-btn" title="${t('cmpool_bulk_hint')}" onclick="cmpoolToggleBulk(this)">${icon('clipboardList', { size: '0.95em' })}</button>
+                   </div>
+                   <div class="cmpool-bulk" hidden>
+                     <textarea rows="4" placeholder="${t('cmpool_bulk_ph')}"></textarea>
+                     <div class="cmpool-bulk-actions">
+                       <button onclick="cmpoolBulkAdd(this,decodeURIComponent('${pid}'),decodeURIComponent('${rid}'),decodeURIComponent('${lbl}'))">${t('cmpool_bulk_add')}</button>
+                       <span class="cmpool-bulk-status"></span>
+                     </div>
                    </div>`
                 : '';
             const rmBracket = editable && (owner || !b.maps.length)
@@ -446,6 +454,57 @@ async function cmpoolAddMapFromInput(inputEl, poolId, roundId, label) {
     if (okDone) inputEl.value = '';
     inputEl.disabled = false;
     inputEl.focus();
+}
+
+/* Bulk paste — reveal the textarea, then ship the whole blob to add-maps in
+   one request. The backend scrapes every id out of it (a Sheet column, a
+   list of forum links, "NM1: <link>" lines) and reports how many landed. */
+function cmpoolToggleBulk(btn) {
+    const wrap = btn.closest('.cmpool-bracket');
+    const box = wrap && wrap.querySelector('.cmpool-bulk');
+    if (!box) return;
+    box.hidden = !box.hidden;
+    btn.classList.toggle('is-open', !box.hidden);
+    if (!box.hidden) { const ta = box.querySelector('textarea'); if (ta) ta.focus(); }
+}
+
+async function cmpoolBulkAdd(btn, poolId, roundId, label) {
+    const box = btn.closest('.cmpool-bulk');
+    const ta = box && box.querySelector('textarea');
+    const statusEl = box && box.querySelector('.cmpool-bulk-status');
+    const text = ((ta && ta.value) || '').trim();
+    if (!text) { ta && ta.focus(); return; }
+    const token = getOsuAuthToken();
+    if (!token) { showShareToast(t('chat_login_required')); return; }
+    btn.disabled = true;
+    if (statusEl) statusEl.textContent = t('cmpool_bulk_working');
+    try {
+        const res = await fetch('/.netlify/functions/community-mappools-edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ action: 'add-maps', poolId, roundId, label, text }),
+        });
+        if (!res.ok) {
+            let msg = t('mappools_load_fail');
+            try { msg = (await res.json()).error || msg; } catch { /* keep default */ }
+            if (statusEl) statusEl.textContent = '';
+            showShareToast(msg);
+            btn.disabled = false;
+            return;
+        }
+        const data = await res.json();
+        const parts = [t('cmpool_bulk_added', { n: data.added })];
+        if (data.dupes) parts.push(t('cmpool_bulk_dupes', { n: data.dupes }));
+        if (data.unresolved) parts.push(t('cmpool_bulk_unresolved', { n: data.unresolved }));
+        if (data.overflow) parts.push(t('cmpool_bulk_overflow', { n: data.overflow }));
+        showShareToast(parts.join(' · '));
+        cmpoolIndexLoaded = false;
+        await openCommunityPool(poolId, true);
+    } catch (e) {
+        console.error('Community pool bulk add failed:', e);
+        showShareToast(t('mappools_load_fail'));
+        btn.disabled = false;
+    }
 }
 
 async function cmpoolEdit(action, params, event) {

@@ -12,6 +12,7 @@
      add-bracket   { poolId, roundId, label }
      remove-bracket{ poolId, roundId, label }     (owner, or empty bracket)
      add-map       { poolId, roundId, label, ref }  ref = id or any osu! URL
+     add-maps      { poolId, roundId, label, text }  paste a blob of links/ids
      remove-map    { poolId, roundId, label, beatmapId }  (adder, or owner)
      delete-pool   { poolId }                     (owner only)
    Every mutating action returns the updated pool doc (raw, unresolved) as
@@ -19,7 +20,7 @@
 const { getCommunityMappoolsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const {
-    MODES, PRESET_BRACKETS, slugify, poolId, parseBeatmapRef, resolveBeatmap,
+    MODES, PRESET_BRACKETS, slugify, poolId, parseBeatmapRef, parseBeatmapRefs, resolveBeatmap,
     resolveBeatmapsBatch, importWybinPool, writeIndex, removeFromIndex,
     MAX_ROUNDS, MAX_BRACKETS_PER_ROUND, MAX_MAPS_PER_BRACKET,
     MAX_LABEL_LEN, MAX_NAME_LEN, EDIT_COOLDOWN_MS,
@@ -227,6 +228,59 @@ exports.handler = async (event) => {
             b.maps.push({ beatmapId, addedBy: user.id, addedAt: new Date().toISOString() });
             touch();
             return save();
+        }
+
+        // Bulk paste: scrape every id out of a pasted blob (a Sheet column, a
+        // list of forum links, "NM1: <link>" lines) and add what fits. One
+        // blob write, one batched osu! lookup. Reports counts so the caller
+        // can say "added N, M already there, K unrecognised".
+        if (action === 'add-maps') {
+            const r = round();
+            if (!r) return err(404, 'Round not found');
+            const b = r.brackets.find((x) => x.label.toLowerCase() === String(body.label || '').toLowerCase());
+            if (!b) return err(404, 'Bracket not found');
+
+            const refs = parseBeatmapRefs(body.text);
+            if (!refs.length) return err(422, 'No beatmap links or ids found in that text');
+            const have = new Set(b.maps.map((m) => m.beatmapId));
+            const room = MAX_MAPS_PER_BRACKET - b.maps.length;
+            if (room <= 0) return err(422, 'Bracket is full');
+
+            const notHere = refs.filter((x) => !have.has(x));
+            const dupes = refs.length - notHere.length;
+            const overflow = Math.max(0, notHere.length - room);
+            const take = notHere.slice(0, room);
+
+            const cache = (await store.get('beatmaps:cache', { type: 'json' })) || {};
+            const need = take.filter((x) => !cache[x]);
+            if (need.length) {
+                const resolved = await resolveBeatmapsBatch(need);
+                if (Object.keys(resolved).length) {
+                    Object.assign(cache, resolved);
+                    await store.setJSON('beatmaps:cache', cache);
+                }
+            }
+
+            const now = new Date().toISOString();
+            let added = 0;
+            let unresolved = 0;
+            for (const bid of take) {
+                const meta = cache[bid];
+                if (!meta || meta.unresolvable) { unresolved++; continue; }
+                b.maps.push({ beatmapId: bid, addedBy: user.id, addedAt: now });
+                added++;
+            }
+            if (!added) return err(422, 'None of those ids matched a beatmap');
+
+            touch();
+            await store.setJSON(`pool:${id}`, pool);
+            await writeIndex(store, pool);
+            await store.set(`lastEditAt:${user.id}`, String(Date.now()));
+            return {
+                statusCode: 200,
+                headers: { ...CORS, 'Cache-Control': 'no-store' },
+                body: JSON.stringify({ pool, added, dupes, unresolved, overflow }),
+            };
         }
 
         if (action === 'remove-map') {

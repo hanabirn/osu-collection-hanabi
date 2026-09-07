@@ -2068,6 +2068,44 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     align-items: center;
 }
 :root[data-theme="light"] .cmpool-add-map button { color: #fff; }
+/* secondary "paste many" toggle sitting next to the solid + button */
+.cmpool-add-map .cmpool-bulk-btn {
+    background: transparent;
+    border: 1px solid var(--border-input);
+    color: var(--text-dim);
+}
+.cmpool-add-map .cmpool-bulk-btn:hover,
+.cmpool-add-map .cmpool-bulk-btn.is-open { color: var(--text); border-color: rgba(var(--pink-rgb), 0.5); }
+.cmpool-bulk { margin: 2px 0 10px; }
+.cmpool-bulk[hidden] { display: none; }
+.cmpool-bulk textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-input);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 72px;
+}
+.cmpool-bulk textarea:focus { outline: none; border-color: rgba(var(--pink-rgb), 0.5); }
+.cmpool-bulk-actions { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.cmpool-bulk-actions button {
+    border: none;
+    border-radius: 8px;
+    background: var(--pink);
+    color: #14101c;
+    padding: 6px 14px;
+    font: inherit;
+    cursor: pointer;
+}
+.cmpool-bulk-actions button:disabled { opacity: 0.6; cursor: default; }
+:root[data-theme="light"] .cmpool-bulk-actions button { color: #fff; }
+.cmpool-bulk-status { font-size: 0.78rem; color: var(--text-dim); }
 
 /* Tournament-style mod icon: a flat-topped hexagon with bold 2-letter text
    in the mod's colour, on a near-black chip (matches the NM/HD/HR/DT/FM/TB

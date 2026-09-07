@@ -59,6 +59,34 @@ function parseBeatmapRef(raw) {
     return null;                                                     // set-only URLs give no diff id
 }
 
+/* Best-effort scrape of many beatmap ids out of a pasted blob — a column of
+   ids from a Google Sheet, a list of difficulty links from a forum post, or
+   lines like "NM1: <link>". One line at a time so a stray number in prose
+   (a BPM, a year) is far less likely to be mistaken for an id:
+     - a line that is just digits            -> that id
+     - a line with osu! diff-link shapes     -> every id in it
+     - otherwise a lone 4-12 digit run       -> that id  (covers "NM1  123456")
+   Set-only URLs (beatmapsets/123 with no #mode/diff) carry no diff id and are
+   skipped. Returns an ordered, de-duped array. */
+function parseBeatmapRefs(text) {
+    const ids = [];
+    const seen = new Set();
+    const push = (id) => { if (id > 0 && id < 1e12 && !seen.has(id)) { seen.add(id); ids.push(id); } };
+    for (const rawLine of String(text || '').split(/[\r\n]+/)) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        if (/^\d{1,12}$/.test(line)) { push(parseInt(line, 10)); continue; }
+        const re = /#(?:osu|taiko|fruits|mania)\/(\d+)|\/beatmaps\/(\d+)|\/b\/(\d+)/g;
+        let m, found = false;
+        while ((m = re.exec(line))) { push(parseInt(m[1] || m[2] || m[3], 10)); found = true; }
+        if (!found) {
+            const n = line.match(/(?:^|[^\d/])(\d{4,12})(?:[^\d]|$)/);
+            if (n) push(parseInt(n[1], 10));
+        }
+    }
+    return ids;
+}
+
 // Resolve one beatmap id -> { setId, mode, artist, title, creator, version,
 // stars, bpm, length, status } via osu! API v2, or { unresolvable: true }.
 async function resolveBeatmap(beatmapId) {
@@ -299,7 +327,7 @@ module.exports = {
     MODES, API_MODE, PRESET_BRACKETS, PRESET_ROUNDS,
     MAX_ROUNDS, MAX_BRACKETS_PER_ROUND, MAX_MAPS_PER_BRACKET,
     MAX_LABEL_LEN, MAX_NAME_LEN, EDIT_COOLDOWN_MS,
-    slugify, poolId, parseBeatmapRef, resolveBeatmap,
+    slugify, poolId, parseBeatmapRef, parseBeatmapRefs, resolveBeatmap,
     resolveBeatmapsBatch, importWybinPool,
     indexEntry, writeIndex, removeFromIndex, crawlWybinMappools,
 };
