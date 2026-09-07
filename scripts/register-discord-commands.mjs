@@ -90,7 +90,11 @@ const commands = [
         description: '從農分圖資料庫抽一張圖',
         options: [
             modeOpt,
-            { type: 4, name: 'pp_min', required: false, description: '最低 PP' },
+            {
+                type: 3, name: 'mods', required: false, description: 'mod 組合（預設 NM）',
+                choices: ['NM', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'].map(m => ({ name: m, value: m })),
+            },
+            { type: 4, name: 'pp_min', required: false, description: '最低 PP（依所選 mod 計算）' },
             { type: 4, name: 'pp_max', required: false, description: '最高 PP（只給 min 時自動抓 min ~ min×1.4）' },
         ],
     },

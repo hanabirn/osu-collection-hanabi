@@ -495,66 +495,100 @@ async function cmdGallery(options, origin) {
     });
 }
 
+// The precomputed mod combos the farm dataset carries pp/stars for.
+const FARM_MODS = ['NM', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'];
+
+// One farm pick at position `index` (pp-desc) within a mode/mods/pp-band
+// filter, plus ◀ 🎲 ▶ buttons that re-run this via a component interaction.
+// index < 0 = pick a random position. Returns { error } or { embed, components }.
+async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
+    const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
+    if (ppMin) qs.set('ppMin', String(ppMin));
+    if (ppMax) qs.set('ppMax', String(ppMax));
+    const band = `${ppMin || '不限'}–${ppMax || '不限'} PP`;
+
+    const probe = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=0`);
+    if (!probe.ok) return { error: '農分圖資料庫查詢失敗，稍後再試。' };
+    const d0 = await probe.json();
+    const total = d0.total || 0;
+    if (!total) return { error: `${L.MODE_LABEL[mode]} · ${mods} 在 ${band} 沒有農分圖，放寬條件看看。` };
+
+    const pageSize = d0.pageSize || 20;
+    const idx = index < 0 ? Math.floor(Math.random() * total) : (((index % total) + total) % total);
+    const pg = Math.floor(idx / pageSize);
+    let items = d0.items || [];
+    if (pg > 0) {
+        const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=${pg}`);
+        if (r.ok) items = (await r.json()).items || [];
+    }
+    const m = items[idx % pageSize];
+    if (!m) return { error: '抽取失敗，再試一次。' };
+
+    const setId = m.beatmapset_id || null;
+    const mapId = m.beatmap_id || null;
+    const mt = L.modeTag(mode);
+    const modChips = mods !== 'NM' ? L.modsTag(mods.match(/../g)) : '';
+    const name = `${m.artist || ''} - ${m.title || ''}`.trim() || `Beatmapset ${setId || ''}`.trim();
+    const cid = (i) => `farm|${mode}|${mods}|${ppMin}|${ppMax}|${i}`;
+
+    return {
+        embed: {
+            title: `${mt ? mt + ' ' : ''}${name}${m.version ? ` [${m.version}]` : ''}`.slice(0, 250),
+            url: mapId ? `https://osu.ppy.sh/b/${mapId}` : (setId ? `https://osu.ppy.sh/s/${setId}` : `${origin}/`),
+            description: [modChips, m.creator ? `mapper：${m.creator}` : null].filter(Boolean).join('\n') || undefined,
+            color: L.srColor(m.star),
+            image: setId ? { url: `https://assets.ppy.sh/beatmaps/${setId}/covers/cover.jpg` } : undefined,
+            fields: [
+                { name: `PP（${mods}）`, value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
+                { name: '星數', value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
+                { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
+                { name: '長度', value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
+                { name: 'AR / OD / CS', value: `${m.ar ?? '—'} / ${m.od ?? '—'} / ${m.cs ?? '—'}`, inline: true },
+                { name: '排名', value: `${idx + 1} / ${L.fmtNum(total)}`, inline: true },
+            ],
+            footer: L.siteFooter(`Farm Maps · ${band}`),
+        },
+        components: [{
+            type: 1,
+            components: [
+                { type: 2, style: 2, label: '◀ 上一張', custom_id: cid(idx - 1) },
+                { type: 2, style: 1, label: '🎲 隨機', custom_id: cid(-1) },
+                { type: 2, style: 2, label: '下一張 ▶', custom_id: cid(idx + 1) },
+            ],
+        }],
+    };
+}
+
 async function cmdFarm(options, origin) {
     // farm-maps-list keys datasets by the API ruleset name (osu/taiko/fruits/
     // mania). API_MODE maps both "catch" and "fruits" -> "fruits", so an old
     // "catch" value still resolves instead of silently falling back to osu.
     const mode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
+    const mods = FARM_MODS.includes(L.optVal(options, 'mods')) ? L.optVal(options, 'mods') : 'NM';
     let ppMin = Math.max(0, Number(L.optVal(options, 'pp_min')) || 0);
     let ppMax = Math.max(0, Number(L.optVal(options, 'pp_max')) || 0);
     if (ppMin && ppMax && ppMax < ppMin) [ppMin, ppMax] = [ppMax, ppMin];
-    // A lone lower bound would otherwise just hand back the very top of the
-    // pp list; cap it to a band.
     if (ppMin && !ppMax) ppMax = Math.round(ppMin * 1.4);
 
-    const qs = new URLSearchParams({ mode, sort: 'pp_desc', farmOnly: '1' });
-    if (ppMin) qs.set('ppMin', String(ppMin));
-    if (ppMax) qs.set('ppMax', String(ppMax));
-
-    const first = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=0`);
-    if (!first.ok) return L.ephemeral('農分圖資料庫查詢失敗，稍後再試。');
-    const d0 = await first.json();
-    const total = d0.total || 0;
-    const band = `${ppMin || '不限'}–${ppMax || '不限'} PP`;
-    if (!total) return L.ephemeral(`${L.MODE_LABEL[mode]} 在 ${band} 這個區間沒有農分圖，放寬看看。`);
-
-    // Sample uniformly across every matching page, not just the first few.
-    const pageSize = d0.pageSize || 20;
-    const page = Math.floor(Math.random() * Math.ceil(total / pageSize));
-    let items = d0.items || [];
-    if (page > 0) {
-        const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=${page}`);
-        if (r.ok) items = (await r.json()).items || items;
-    }
-    if (!items.length) return L.ephemeral('抽取失敗，再試一次。');
-
-    const m = items[Math.floor(Math.random() * items.length)];
-    const setId = m.beatmapset_id || null;
-    const mapId = m.beatmap_id || null;
-    const mt = L.modeTag(mode);
-    const name = `${m.artist || ''} - ${m.title || ''}`.trim() || `Beatmapset ${setId || ''}`.trim();
-    return L.message({
-        title: `${mt ? mt + ' ' : ''}${name}${m.version ? ` [${m.version}]` : ''}`.slice(0, 250),
-        url: mapId ? `https://osu.ppy.sh/b/${mapId}` : (setId ? `https://osu.ppy.sh/s/${setId}` : `${origin}/`),
-        description: m.creator ? `mapper：${m.creator}` : undefined,
-        color: L.srColor(m.star),
-        image: setId ? { url: `https://assets.ppy.sh/beatmaps/${setId}/covers/cover.jpg` } : undefined,
-        fields: [
-            { name: 'PP', value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
-            { name: '星數', value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
-            { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
-            { name: '長度', value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
-            { name: 'AR / OD / CS', value: `${m.ar ?? '—'} / ${m.od ?? '—'} / ${m.cs ?? '—'}`, inline: true },
-            { name: '符合數', value: `${L.fmtNum(total)} 張`, inline: true },
-        ],
-        footer: L.siteFooter(`Farm Maps · ${band}`),
-    });
+    const v = await farmView({ mode, mods, ppMin, ppMax, index: -1 }, origin);
+    if (v.error) return L.ephemeral(v.error);
+    return L.message(v.embed, v.components);
 }
 
 /* --- message component (buttons) --------------------------------------- */
 
 async function handleComponent(interaction, origin) {
     const id = (interaction.data && interaction.data.custom_id) || '';
+
+    // /farm browse: farm|<mode>|<mods>|<ppMin>|<ppMax>|<index>  (index -1 = random)
+    if (id.startsWith('farm|')) {
+        const [, mode, mods, ppMinS, ppMaxS, idxS] = id.split('|');
+        const v = await farmView({
+            mode, mods, ppMin: Number(ppMinS) || 0, ppMax: Number(ppMaxS) || 0, index: Number(idxS),
+        }, origin);
+        if (v.error) return L.updateMessage({ title: v.error, color: PINK });
+        return L.updateMessage(v.embed, v.components);
+    }
 
     // /mappool round pagination: mp|<folder>|<roundIdx>|<page>  (folder can
     // contain "/", so "|" is the delimiter here rather than ":").
