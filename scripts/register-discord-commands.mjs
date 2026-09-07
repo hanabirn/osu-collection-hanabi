@@ -40,8 +40,10 @@ const LOC = {
     opt_practice_target: { en: 'Target total PP (given = goal pool; omitted = break into your top 100)', 'zh-TW': '目標總 PP（有填 = 目標圖池；不填 = 突破你的 top 100）', 'zh-CN': '目标总 PP（有填 = 目标图池；不填 = 突破你的 top 100）', ja: '目標合計 PP（指定 = 目標プール、省略 = トップ100 突破）', fr: 'PP total visé (rempli = pool objectif ; vide = entrer dans ton top 100)', de: 'Ziel-Gesamt-PP (angegeben = Ziel-Pool; leer = in deine Top 100)', ru: 'Целевой суммарный PP (задан = пул под цель; пусто = попасть в топ-100)', 'es-ES': 'PP total objetivo (con valor = pool objetivo; vacío = entrar en tu top 100)', ko: '목표 총 PP (입력 시 목표 풀; 생략 시 상위 100 진입)' },
     cmd_mappool: { en: 'Browse official World Cup mappools', 'zh-TW': '瀏覽官方世界盃圖池', 'zh-CN': '浏览官方世界杯图池', ja: '公式ワールドカップのマッププールを閲覧', fr: 'Parcourir les mappools officiels des World Cup', de: 'Offizielle World-Cup-Mappools durchsuchen', ru: 'Просмотр официальных маппулов World Cup', 'es-ES': 'Explorar los mappools oficiales de la World Cup', ko: '공식 월드컵 맵풀 둘러보기' },
     cmd_tourneypool: { en: 'Browse community-shared tournament mappools', 'zh-TW': '瀏覽社群共享的賽事圖池', 'zh-CN': '浏览社群共享的赛事图池', ja: 'コミュニティ共有の大会マッププールを閲覧', fr: 'Parcourir les mappools de tournoi partagés par la communauté', de: 'Von der Community geteilte Turnier-Mappools durchsuchen', ru: 'Просмотр турнирных маппулов от сообщества', 'es-ES': 'Explorar los mappools de torneo compartidos por la comunidad', ko: '커뮤니티가 공유한 토너먼트 맵풀 둘러보기' },
-    opt_tourneypool_name: { en: 'Tournament (start typing to search)', 'zh-TW': '賽事（開始輸入以搜尋）', 'zh-CN': '赛事（开始输入以搜索）', ja: '大会（入力して検索）', fr: 'Tournoi (commencez à taper pour rechercher)', de: 'Turnier (zum Suchen tippen)', ru: 'Турнир (начните вводить для поиска)', 'es-ES': 'Torneo (empieza a escribir para buscar)', ko: '토너먼트 (입력하여 검색)' },
+    opt_tourneypool_name: { en: 'Tournament (start typing to search; omit to browse the list)', 'zh-TW': '賽事（開始輸入以搜尋；省略則瀏覽清單）', 'zh-CN': '赛事（开始输入以搜索；省略则浏览列表）', ja: '大会（入力して検索、省略で一覧を閲覧）', fr: 'Tournoi (tapez pour chercher ; vide = parcourir la liste)', de: 'Turnier (tippen zum Suchen; leer = Liste durchsuchen)', ru: 'Турнир (вводите для поиска; пусто — список)', 'es-ES': 'Torneo (escribe para buscar; vacío = ver la lista)', ko: '토너먼트 (입력하여 검색; 생략 시 목록 보기)' },
     opt_tourneypool_round: { en: 'Round name (omit to list all rounds)', 'zh-TW': '輪次名稱（省略則列出所有輪次）', 'zh-CN': '轮次名称（省略则列出所有轮次）', ja: 'ラウンド名（省略で全ラウンド一覧）', fr: 'Nom du round (vide = tous les rounds)', de: 'Rundenname (leer = alle Runden)', ru: 'Название раунда (пусто = все раунды)', 'es-ES': 'Nombre de la ronda (vacío = todas)', ko: '라운드 이름 (생략 시 전체 목록)' },
+    opt_tourneypool_mode: { en: 'Filter the list by game mode', 'zh-TW': '依遊戲模式篩選清單', 'zh-CN': '按游戏模式筛选列表', ja: 'ゲームモードで一覧を絞り込む', fr: 'Filtrer la liste par mode de jeu', de: 'Liste nach Spielmodus filtern', ru: 'Фильтр списка по режиму игры', 'es-ES': 'Filtrar la lista por modo de juego', ko: '게임 모드로 목록 필터' },
+    opt_tourneypool_source: { en: 'Filter the list by where the pool came from', 'zh-TW': '依圖池來源篩選清單', 'zh-CN': '按图池来源筛选列表', ja: 'プールの出所で一覧を絞り込む', fr: 'Filtrer la liste par provenance du pool', de: 'Liste nach Pool-Herkunft filtern', ru: 'Фильтр списка по источнику маппула', 'es-ES': 'Filtrar la lista por origen del pool', ko: '풀 출처로 목록 필터' },
     cmd_skin: { en: "Search the site's skin library", 'zh-TW': '搜尋站內皮膚庫', 'zh-CN': '搜索站内皮肤库', ja: 'サイトのスキンライブラリを検索', fr: 'Rechercher dans la bibliothèque de skins du site', de: 'Die Skin-Bibliothek der Seite durchsuchen', ru: 'Поиск в библиотеке скинов сайта', 'es-ES': 'Buscar en la biblioteca de skins del sitio', ko: '사이트의 스킨 라이브러리 검색' },
     cmd_farm: { en: 'Draw a map from the farm-maps database', 'zh-TW': '從農分圖資料庫抽一張圖', 'zh-CN': '从农分图数据库抽一张图', ja: '効率譜面データベースから1譜面を抽選', fr: 'Tirer une map dans la base de farm maps', de: 'Eine Map aus der Farm-Maps-Datenbank ziehen', ru: 'Выбрать карту из базы фарм-карт', 'es-ES': 'Sacar un mapa de la base de farm maps', ko: '파밍 맵 데이터베이스에서 맵 뽑기' },
     cmd_link: { en: 'Link your Discord account to an osu! account', 'zh-TW': '把你的 Discord 帳號綁定一個 osu! 帳號', 'zh-CN': '把你的 Discord 账号绑定一个 osu! 账号', ja: 'Discord アカウントと osu! アカウントを連携', fr: 'Lier votre compte Discord à un compte osu!', de: 'Dein Discord-Konto mit einem osu!-Konto verknüpfen', ru: 'Привязать аккаунт Discord к аккаунту osu!', 'es-ES': 'Vincular tu cuenta de Discord a una cuenta de osu!', ko: 'Discord 계정을 osu! 계정과 연동' },
@@ -110,8 +112,26 @@ const commands = [
     {
         name: 'tourneypool', ...d('cmd_tourneypool'),
         options: [
-            { type: 3, name: 'tournament', required: true, autocomplete: true, ...d('opt_tourneypool_name') },
+            { type: 3, name: 'tournament', required: false, autocomplete: true, ...d('opt_tourneypool_name') },
             { type: 3, name: 'round', required: false, autocomplete: true, ...d('opt_tourneypool_round') },
+            {
+                type: 3, name: 'mode', required: false, ...d('opt_tourneypool_mode'),
+                choices: [
+                    { name: 'osu!', value: 'standard' },
+                    { name: 'osu!taiko', value: 'taiko' },
+                    { name: 'osu!catch', value: 'catch' },
+                    { name: 'osu!mania', value: 'mania' },
+                    { name: 'All modes', value: 'all' },
+                ],
+            },
+            {
+                type: 3, name: 'source', required: false, ...d('opt_tourneypool_source'),
+                choices: [
+                    { name: 'wyBin', value: 'wybin' },
+                    { name: 'Forum', value: 'forum' },
+                    { name: 'Custom', value: 'custom' },
+                ],
+            },
         ],
     },
     { name: 'skin', ...d('cmd_skin'), options: [{ type: 3, name: 'query', required: true, ...d('opt_skin_query') }] },

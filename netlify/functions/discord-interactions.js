@@ -642,12 +642,16 @@ async function autocompleteTourneypool(options, origin) {
         return L.autocomplete(names.slice(0, 25).map(n => ({ name: n.slice(0, 100), value: n.slice(0, 100) })));
     }
 
-    // Typing in tournament: — the pool list.
+    // Typing in tournament: — the pool list, narrowed by mode:/source: if set.
     let pools = [];
     try {
         const r = await fetch(`${origin}/.netlify/functions/community-mappools-list`);
         if (r.ok) pools = (await r.json()).pools || [];
     } catch { /* empty */ }
+    const modeF = String((opts.find(o => o.name === 'mode') || {}).value || '');
+    const sourceF = String((opts.find(o => o.name === 'source') || {}).value || '');
+    if (modeF) pools = pools.filter(p => p.mode === modeF);
+    if (sourceF) pools = pools.filter(p => (p.source || 'custom') === sourceF);
     if (q) pools = pools.filter(p => (p.tournamentName || '').toLowerCase().includes(q));
     pools = pools
         .sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')))
@@ -658,30 +662,30 @@ async function autocompleteTourneypool(options, origin) {
     })));
 }
 
-async function cmdTourneypool(options, origin) {
-    const id = String(L.optVal(options, 'tournament') || '').trim();
-    const roundQ = String(L.optVal(options, 'round') || '').trim().toLowerCase();
-    if (!id) return L.ephemeral(t('tpool_need_name'));
+const TPOOL_SRC_LABEL = { wybin: 'wyBin', forum: 'Forum', custom: 'Custom' };
 
+// Render one community pool (or one of its rounds) -> { embeds, components }
+// or { error }. Shared by the /tourneypool command and the tp|<id> button.
+async function tourneyPoolRender(id, roundQ, origin) {
     const r = await fetch(`${origin}/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}`);
-    if (r.status === 404) return L.ephemeral(t('tpool_not_found'));
-    if (!r.ok) return L.ephemeral(t('tpool_fail'));
+    if (r.status === 404) return { error: t('tpool_not_found') };
+    if (!r.ok) return { error: t('tpool_fail') };
     const pool = communityPoolNormalize(await r.json());
     const rounds = pool.rounds || [];
-    if (!rounds.length) return L.ephemeral(t('tpool_empty', { name: pool.label }));
+    if (!rounds.length) return { error: t('tpool_empty', { name: pool.label }) };
 
     if (roundQ) {
         const roundIdx = rounds.findIndex(rd => (rd.name || '').toLowerCase().includes(roundQ));
-        if (roundIdx < 0) return L.ephemeral(t('mappool_round_not_found', { label: pool.label, q: roundQ }));
+        if (roundIdx < 0) return { error: t('mappool_round_not_found', { label: pool.label, q: roundQ }) };
         const view = mappoolRoundView(pool, roundIdx, 0, origin, 'community');
-        return L.message(view.embeds, view.components);
+        return { embeds: view.embeds, components: view.components };
     }
 
     // Community pools are usually one round ("Grand finals" holding every
     // bracket) — show its maps straight away rather than a one-line index.
     if (rounds.length === 1) {
         const view = mappoolRoundView(pool, 0, 0, origin, 'community');
-        return L.message(view.embeds, view.components);
+        return { embeds: view.embeds, components: view.components };
     }
 
     // Multi-round: the rounds index + a button per round (≤10) that opens it
@@ -694,17 +698,61 @@ async function cmdTourneypool(options, origin) {
     for (let i = 0; i < roundBtns.length; i += 5) rows.push({ type: 1, components: roundBtns.slice(i, i + 5) });
     rows.push({ type: 1, components: [{ type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `cmpx|${pool.folder}|*` }] });
 
+    return {
+        embeds: [{
+            title: t('tpool_rounds_title', { label: pool.label, mode: tpoolModeShort(pool.mode), n: rounds.length }),
+            url: pool.url || `${origin}/?cmpool=${encodeURIComponent(pool.folder)}`,
+            description: rounds.map(rd => {
+                let n = 0;
+                for (const b of rd.brackets || []) n += (b.maps || []).length;
+                return `**${rd.name}** — ${t('n_sets', { n })}`;
+            }).join('\n') || t('mappool_no_data'),
+            color: PINK,
+            footer: L.siteFooter(t('tpool_pick_round')),
+        }],
+        components: rows,
+    };
+}
+
+// No tournament given -> browse the pool list, filtered by mode / source.
+async function tourneyPoolList(modeF, sourceF, origin) {
+    let pools = [];
+    try {
+        const r = await fetch(`${origin}/.netlify/functions/community-mappools-list`);
+        if (r.ok) pools = (await r.json()).pools || [];
+    } catch { /* empty */ }
+    if (modeF) pools = pools.filter(p => p.mode === modeF);
+    if (sourceF) pools = pools.filter(p => (p.source || 'custom') === sourceF);
+    pools.sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
+    if (!pools.length) return L.ephemeral(t('tpool_list_empty'));
+
+    const top = pools.slice(0, 10);
+    const desc = top.map(p => `**${p.tournamentName}** · ${tpoolModeShort(p.mode)} · ${t('mappool_ac_meta', { r: p.roundCount, m: p.mapCount })}`).join('\n');
+    const btns = top.map(p => ({ type: 2, style: 2, label: String(p.tournamentName).slice(0, 78), custom_id: `tp|${p.id}` }));
+    const rows = [];
+    for (let i = 0; i < btns.length; i += 5) rows.push({ type: 1, components: btns.slice(i, i + 5) });
+
+    const filt = [modeF && tpoolModeShort(modeF), sourceF && (TPOOL_SRC_LABEL[sourceF] || sourceF)].filter(Boolean).join(' · ');
+    const more = pools.length > top.length ? ' · ' + t('tpool_list_more', { n: pools.length - top.length }) : '';
     return L.message({
-        title: t('tpool_rounds_title', { label: pool.label, mode: tpoolModeShort(pool.mode), n: rounds.length }),
-        url: pool.url || `${origin}/?cmpool=${encodeURIComponent(pool.folder)}`,
-        description: rounds.map(rd => {
-            let n = 0;
-            for (const b of rd.brackets || []) n += (b.maps || []).length;
-            return `**${rd.name}** — ${t('n_sets', { n })}`;
-        }).join('\n') || t('mappool_no_data'),
+        title: filt ? t('tpool_list_title_f', { filt, n: pools.length }) : t('tpool_list_title', { n: pools.length }),
+        description: desc.slice(0, 4000),
         color: PINK,
-        footer: L.siteFooter(t('tpool_pick_round')),
+        footer: L.siteFooter(t('tpool_list_hint') + more),
     }, rows);
+}
+
+async function cmdTourneypool(options, origin) {
+    const id = String(L.optVal(options, 'tournament') || '').trim();
+    const roundQ = String(L.optVal(options, 'round') || '').trim().toLowerCase();
+    const modeF = String(L.optVal(options, 'mode') || '').trim();
+    const sourceF = String(L.optVal(options, 'source') || '').trim();
+
+    if (!id) return await tourneyPoolList(modeF, sourceF, origin);
+
+    const v = await tourneyPoolRender(id, roundQ, origin);
+    if (v.error) return L.ephemeral(v.error);
+    return L.message(v.embeds, v.components);
 }
 
 /* --- /skin ------------------------------------------------------------ */
@@ -1027,6 +1075,13 @@ async function handleComponent(interaction, origin) {
         const view = mappoolRoundView(await r.json(), Number(roundIdxStr), Number(pageStr), origin);
         if (!view) return L.updateMessage({ title: t('mappool_round_not_found2'), color: PINK });
         return L.updateMessage(view.embeds, view.components);
+    }
+
+    // /tourneypool: open one pool from the browse list — tp|<poolId>
+    if (id.startsWith('tp|')) {
+        const v = await tourneyPoolRender(id.slice(3), '', origin);
+        if (v.error) return L.updateMessage({ title: v.error, color: PINK });
+        return L.updateMessage(v.embeds, v.components);
     }
 
     // /tourneypool round pagination: cmp|<poolId>|<roundIdx>|<page>
