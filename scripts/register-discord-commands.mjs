@@ -126,11 +126,11 @@ const commands = [
                 ],
             },
             {
+                // Only wyBin for now — re-add Forum / Custom once there are
+                // enough hand-added pools of those kinds to be worth filtering.
                 type: 3, name: 'source', required: false, ...d('opt_tourneypool_source'),
                 choices: [
                     { name: 'wyBin', value: 'wybin' },
-                    { name: 'Forum', value: 'forum' },
-                    { name: 'Custom', value: 'custom' },
                 ],
             },
             { type: 3, name: 'tournament', required: false, autocomplete: true, ...d('opt_tourneypool_name') },
