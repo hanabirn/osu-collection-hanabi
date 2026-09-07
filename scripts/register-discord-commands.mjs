@@ -41,6 +41,8 @@ const LOC = {
     cmd_farm: { en: 'Draw a map from the farm-maps database', 'zh-TW': '從農分圖資料庫抽一張圖', 'zh-CN': '从农分图数据库抽一张图', ja: '効率譜面データベースから1譜面を抽選', fr: 'Tirer une map dans la base de farm maps', de: 'Eine Map aus der Farm-Maps-Datenbank ziehen', ru: 'Выбрать карту из базы фарм-карт', 'es-ES': 'Sacar un mapa de la base de farm maps', ko: '파밍 맵 데이터베이스에서 맵 뽑기' },
     cmd_link: { en: 'Link your Discord account to an osu! account', 'zh-TW': '把你的 Discord 帳號綁定一個 osu! 帳號', 'zh-CN': '把你的 Discord 账号绑定一个 osu! 账号', ja: 'Discord アカウントと osu! アカウントを連携', fr: 'Lier votre compte Discord à un compte osu!', de: 'Dein Discord-Konto mit einem osu!-Konto verknüpfen', ru: 'Привязать аккаунт Discord к аккаунту osu!', 'es-ES': 'Vincular tu cuenta de Discord a una cuenta de osu!', ko: 'Discord 계정을 osu! 계정과 연동' },
     cmd_unlink: { en: 'Unlink your osu! account', 'zh-TW': '解除 osu! 帳號綁定', 'zh-CN': '解除 osu! 账号绑定', ja: 'osu! アカウントの連携を解除', fr: 'Dissocier votre compte osu!', de: 'Verknüpfung deines osu!-Kontos aufheben', ru: 'Отвязать аккаунт osu!', 'es-ES': 'Desvincular tu cuenta de osu!', ko: 'osu! 계정 연동 해제' },
+    cmd_language: { en: 'Choose the language the bot replies to you in', 'zh-TW': '選擇 bot 回覆你時使用的語言', 'zh-CN': '选择 bot 回复你时使用的语言', ja: 'ボットの返信言語を選ぶ', fr: 'Choisir la langue des réponses du bot', de: 'Sprache wählen, in der der Bot dir antwortet', ru: 'Выбрать язык ответов бота', 'es-ES': 'Elegir el idioma de las respuestas del bot', ko: '봇이 답할 언어 선택' },
+    opt_language_lang: { en: 'Language ("Auto" = follow your Discord client)', 'zh-TW': '語言（「Auto」= 跟隨你的 Discord 介面）', 'zh-CN': '语言（「Auto」= 跟随你的 Discord 界面）', ja: '言語（「Auto」= Discord の設定に従う）', fr: 'Langue (« Auto » = suit votre client Discord)', de: 'Sprache („Auto" = folgt deinem Discord-Client)', ru: 'Язык («Auto» = как в клиенте Discord)', 'es-ES': 'Idioma ("Auto" = sigue tu cliente de Discord)', ko: '언어 ("Auto" = Discord 클라이언트 설정)' },
 
     opt_username: { en: 'osu! name or ID (omit to use your linked account)', 'zh-TW': 'osu! 名稱或 ID（省略則用 /link 綁定的帳號）', 'zh-CN': 'osu! 名称或 ID（省略则用 /link 绑定的账号）', ja: 'osu! 名または ID（省略で /link 連携済みアカウント）', fr: 'Nom ou ID osu! (vide = compte lié)', de: 'osu!-Name oder ID (leer = verknüpftes Konto)', ru: 'Имя или ID osu! (пусто — привязанный аккаунт)', 'es-ES': 'Nombre o ID de osu! (vacío = cuenta vinculada)', ko: 'osu! 이름 또는 ID (생략 시 연동된 계정)' },
     opt_mode: { en: 'Game mode (default osu!)', 'zh-TW': '遊戲模式（預設 osu!）', 'zh-CN': '游戏模式（默认 osu!）', ja: 'ゲームモード（既定 osu!）', fr: 'Mode de jeu (défaut osu!)', de: 'Spielmodus (Standard osu!)', ru: 'Режим игры (по умолчанию osu!)', 'es-ES': 'Modo de juego (por defecto osu!)', ko: '게임 모드 (기본 osu!)' },
@@ -101,6 +103,24 @@ const commands = [
     },
     { name: 'link', ...d('cmd_link'), options: [{ type: 3, name: 'username', required: true, ...d('opt_link_username') }] },
     { name: 'unlink', ...d('cmd_unlink') },
+    {
+        name: 'language', ...d('cmd_language'),
+        options: [{
+            type: 3, name: 'lang', required: true, ...d('opt_language_lang'),
+            choices: [
+                { name: 'Auto (Discord client)', value: 'auto' },
+                { name: 'English', value: 'en' },
+                { name: '繁體中文', value: 'zh' },
+                { name: '简体中文', value: 'zhs' },
+                { name: '日本語', value: 'ja' },
+                { name: 'Français', value: 'fr' },
+                { name: 'Deutsch', value: 'de' },
+                { name: 'Русский', value: 'ru' },
+                { name: 'Español', value: 'es' },
+                { name: '한국어', value: 'ko' },
+            ],
+        }],
+    },
 ];
 
 async function main() {

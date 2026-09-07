@@ -18,10 +18,18 @@ const LOCALE_MAP = {
     ja: 'ja', fr: 'fr', de: 'de', ru: 'ru', ko: 'ko',
     'es-ES': 'es', 'es-419': 'es',
 };
+// Our keys + how they present in a /language picker (native name).
+const LANG_NAMES = {
+    en: 'English', zh: '繁體中文', zhs: '简体中文', ja: '日本語',
+    fr: 'Français', de: 'Deutsch', ru: 'Русский', es: 'Español', ko: '한국어',
+};
+const KNOWN_KEYS = new Set(Object.keys(LANG_NAMES));
 
 let current = 'en';
-function setLocale(discordLocale) {
-    current = LOCALE_MAP[discordLocale] || 'en';
+// Accepts either one of our keys ("zh", "en", …) as stored by /language, or
+// a raw Discord locale code ("zh-TW", "en-US", …) from interaction.locale.
+function setLocale(x) {
+    current = KNOWN_KEYS.has(x) ? x : (LOCALE_MAP[x] || 'en');
 }
 function getLocale() { return current; }
 
@@ -147,6 +155,10 @@ const S = {
     farm_unlimited: { en: 'any', zh: '不限', zhs: '不限', ja: '制限なし', fr: 'illimité', de: 'beliebig', ru: 'любой', es: 'sin límite', ko: '제한 없음' },
     pp_band: { en: '{lo}–{hi} pp', zh: '{lo}–{hi} PP', zhs: '{lo}–{hi} PP', ja: '{lo}–{hi} pp', fr: '{lo}–{hi} pp', de: '{lo}–{hi} pp', ru: '{lo}–{hi} pp', es: '{lo}–{hi} pp', ko: '{lo}–{hi} pp' },
 
+    // --- /language ---
+    lang_set: { en: 'Language set to **{lang}**. This is remembered for you.', zh: '語言已設為 **{lang}**，會記住你的選擇。', zhs: '语言已设为 **{lang}**，会记住你的选择。', ja: '言語を **{lang}** に設定しました。この設定は保存されます。', fr: 'Langue réglée sur **{lang}**. Ce choix est mémorisé.', de: 'Sprache auf **{lang}** gesetzt. Wird für dich gemerkt.', ru: 'Язык изменён на **{lang}**. Выбор сохранён.', es: 'Idioma establecido en **{lang}**. Se recordará.', ko: '언어가 **{lang}** (으)로 설정되었습니다. 저장됩니다.' },
+    lang_auto: { en: 'Language will follow your Discord client.', zh: '語言將跟隨你的 Discord 介面語言。', zhs: '语言将跟随你的 Discord 界面语言。', ja: '言語は Discord クライアントの設定に従います。', fr: 'La langue suivra celle de votre client Discord.', de: 'Die Sprache richtet sich nach deinem Discord-Client.', ru: 'Язык будет следовать за клиентом Discord.', es: 'El idioma seguirá al de tu cliente de Discord.', ko: '언어는 Discord 클라이언트 설정을 따릅니다.' },
+
     // --- publish announcement (collections-publish.js) ---
     announce_title: { en: '🎉 New collection published: {name}', zh: '🎉 新收藏發佈：{name}', zhs: '🎉 新收藏发布：{name}', ja: '🎉 新しいコレクションが公開されました：{name}', fr: '🎉 Nouvelle collection publiée : {name}', de: '🎉 Neue Sammlung veröffentlicht: {name}', ru: '🎉 Опубликована новая коллекция: {name}', es: '🎉 Nueva colección publicada: {name}', ko: '🎉 새 컬렉션이 공개되었습니다: {name}' },
 };
@@ -162,4 +174,4 @@ function t(key, params) {
     return str;
 }
 
-module.exports = { setLocale, getLocale, t, LOCALE_MAP };
+module.exports = { setLocale, getLocale, t, LOCALE_MAP, LANG_NAMES, KNOWN_KEYS };

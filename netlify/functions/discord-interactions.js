@@ -20,7 +20,7 @@
    `npm run discord:register` after changing them. */
 const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { getOsuToken } = require('./_osu-auth');
-const { setLocale, t } = require('./_discord-i18n');
+const { setLocale, t, LANG_NAMES, KNOWN_KEYS } = require('./_discord-i18n');
 const L = require('./_discord-lib');
 
 const { PINK } = L;
@@ -34,6 +34,31 @@ async function getLink(discordId) {
     } catch {
         return null;
     }
+}
+
+// The language a user picked with /language, if any (a bare key string).
+async function getUserLang(discordId) {
+    if (!discordId) return null;
+    try {
+        const v = await getDiscordBotStore().get(`lang:${discordId}`, { type: 'json' });
+        return typeof v === 'string' && KNOWN_KEYS.has(v) ? v : null;
+    } catch {
+        return null;
+    }
+}
+
+async function cmdLanguage(options, interaction) {
+    const uid = L.invokerId(interaction);
+    const choice = String(L.optVal(options, 'lang') || '');
+    const store = getDiscordBotStore();
+    if (choice === 'auto' || !KNOWN_KEYS.has(choice)) {
+        try { await store.delete(`lang:${uid}`); } catch { /* ignore */ }
+        setLocale(interaction.locale);
+        return L.ephemeral(t('lang_auto'));
+    }
+    await store.setJSON(`lang:${uid}`, choice);
+    setLocale(choice); // answer in the just-chosen language
+    return L.ephemeral(t('lang_set', { lang: LANG_NAMES[choice] }));
 }
 
 async function cmdLink(options, interaction) {
@@ -674,9 +699,11 @@ exports.handler = async (event) => {
 
     if (interaction.type === L.T.PING) return L.json({ type: L.R.PONG });
 
-    // Localize responses to the invoker's client language for the rest of
-    // this request (module-scoped in _discord-i18n; one request per invoke).
-    setLocale(interaction.locale);
+    // Localize responses for the rest of this request (module-scoped in
+    // _discord-i18n; one request per invoke): the user's saved /language
+    // choice wins, else their Discord client locale.
+    const savedLang = await getUserLang(L.invokerId(interaction));
+    setLocale(savedLang || interaction.locale);
 
     const origin = L.originOf(event);
     const name = interaction.data && interaction.data.name;
@@ -706,6 +733,7 @@ exports.handler = async (event) => {
                 case 'skin': return await cmdSkin(options, origin);
                 case 'link': return await cmdLink(options, interaction);
                 case 'unlink': return await cmdUnlink(interaction);
+                case 'language': return await cmdLanguage(options, interaction);
                 default: return L.ephemeral(t('unknown_command'));
             }
         }
