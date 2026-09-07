@@ -60,6 +60,13 @@ const LOC = {
     opt_pp_min: { en: 'Minimum PP (for the chosen mods)', 'zh-TW': '最低 PP（依所選 mod 計算）', 'zh-CN': '最低 PP（按所选 mod 计算）', ja: '最低 PP（選択した mod 基準）', fr: 'PP minimum (pour les mods choisis)', de: 'Minimum-PP (für die gewählten Mods)', ru: 'Минимальный PP (для выбранных модов)', 'es-ES': 'PP mínimo (para los mods elegidos)', ko: '최소 PP (선택한 mod 기준)' },
     opt_pp_max: { en: 'Maximum PP (with only min given, auto = min-min×1.4)', 'zh-TW': '最高 PP（只給 min 時自動抓 min ~ min×1.4）', 'zh-CN': '最高 PP（只给 min 时自动取 min ~ min×1.4）', ja: '最高 PP（min のみ指定で自動 min ~ min×1.4）', fr: 'PP maximum (avec seul min : auto min-min×1.4)', de: 'Maximum-PP (nur min: auto min-min×1.4)', ru: 'Максимальный PP (только min: авто min-min×1.4)', 'es-ES': 'PP máximo (solo con min: auto min-min×1.4)', ko: '최대 PP (min 만 입력 시 자동 min ~ min×1.4)' },
     opt_link_username: { en: 'osu! name or ID', 'zh-TW': 'osu! 名稱或 ID', 'zh-CN': 'osu! 名称或 ID', ja: 'osu! 名または ID', fr: 'Nom ou ID osu!', de: 'osu!-Name oder ID', ru: 'Имя или ID osu!', 'es-ES': 'Nombre o ID de osu!', ko: 'osu! 이름 또는 ID' },
+
+    cmd_collect_channel: { en: 'Build a .osdb collection from osu! links posted in this channel', 'zh-TW': '從這個頻道貼過的 osu! 連結組成一份 .osdb 收藏', 'zh-CN': '从这个频道贴过的 osu! 链接组成一份 .osdb 收藏', ja: 'このチャンネルの osu! リンクから .osdb コレクションを作成', fr: 'Créer une collection .osdb à partir des liens osu! de ce salon', de: 'Aus den osu!-Links in diesem Kanal eine .osdb-Sammlung bauen', ru: 'Собрать .osdb-коллекцию из ссылок osu! в этом канале', 'es-ES': 'Crear una colección .osdb con los enlaces de osu! de este canal', ko: '이 채널의 osu! 링크로 .osdb 컬렉션 만들기' },
+    opt_collect_count: { en: 'How many recent messages to scan (default 100, max 300)', 'zh-TW': '掃描最近幾則訊息（預設 100，最多 300）', 'zh-CN': '扫描最近几条消息（默认 100，最多 300）', ja: 'スキャンする直近メッセージ数（既定 100、最大 300）', fr: 'Nombre de messages récents à scanner (défaut 100, max 300)', de: 'Wie viele letzte Nachrichten scannen (Standard 100, max 300)', ru: 'Сколько последних сообщений сканировать (по умолч. 100, макс 300)', 'es-ES': 'Cuántos mensajes recientes escanear (por defecto 100, máx 300)', ko: '스캔할 최근 메시지 수 (기본 100, 최대 300)' },
+    cmd_follow: { en: 'Get a DM when someone updates their published collection', 'zh-TW': '有人更新已發佈的收藏時私訊通知你', 'zh-CN': '有人更新已发布的收藏时私信通知你', ja: '公開コレクションの更新時に DM で通知', fr: 'Recevoir un MP quand quelqu\'un met à jour sa collection', de: 'DM erhalten, wenn jemand seine Sammlung aktualisiert', ru: 'Получать ЛС при обновлении чужой опубликованной коллекции', 'es-ES': 'Recibir un MD cuando alguien actualice su colección publicada', ko: '누군가 공개 컬렉션을 업데이트하면 DM 받기' },
+    cmd_unfollow: { en: 'Stop following a publisher', 'zh-TW': '取消追蹤某位發佈者', 'zh-CN': '取消关注某位发布者', ja: '発行者のフォローを解除', fr: 'Ne plus suivre un auteur', de: 'Einem Ersteller nicht mehr folgen', ru: 'Отписаться от автора', 'es-ES': 'Dejar de seguir a un autor', ko: '게시자 팔로우 해제' },
+    cmd_following: { en: 'List the publishers you follow', 'zh-TW': '列出你追蹤中的發佈者', 'zh-CN': '列出你关注中的发布者', ja: 'フォロー中の発行者一覧', fr: 'Lister les auteurs que tu suis', de: 'Ersteller auflisten, denen du folgst', ru: 'Список авторов, на которых вы подписаны', 'es-ES': 'Listar los autores que sigues', ko: '팔로우 중인 게시자 목록' },
+    opt_follow_query: { en: 'Publisher name or collection ID', 'zh-TW': '發佈者名稱或收藏 ID', 'zh-CN': '发布者名称或收藏 ID', ja: '発行者名またはコレクション ID', fr: "Nom d'auteur ou ID de collection", de: 'Name oder Sammlungs-ID des Erstellers', ru: 'Имя автора или ID коллекции', 'es-ES': 'Nombre del autor o ID de la colección', ko: '게시자 이름 또는 컬렉션 ID' },
 };
 
 // -> { description, description_localizations }
@@ -107,6 +114,10 @@ const commands = [
             { type: 4, name: 'pp_max', required: false, ...d('opt_pp_max') },
         ],
     },
+    { name: 'collect-channel', ...d('cmd_collect_channel'), options: [{ type: 4, name: 'count', required: false, ...d('opt_collect_count') }] },
+    { name: 'follow', ...d('cmd_follow'), options: [{ type: 3, name: 'query', required: true, autocomplete: true, ...d('opt_follow_query') }] },
+    { name: 'unfollow', ...d('cmd_unfollow'), options: [{ type: 3, name: 'query', required: true, autocomplete: true, ...d('opt_follow_query') }] },
+    { name: 'following', ...d('cmd_following') },
     { name: 'link', ...d('cmd_link'), options: [{ type: 3, name: 'username', required: true, ...d('opt_link_username') }] },
     { name: 'unlink', ...d('cmd_unlink') },
     {

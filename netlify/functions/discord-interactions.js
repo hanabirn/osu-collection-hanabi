@@ -220,6 +220,150 @@ async function cmdTop(options, interaction) {
     });
 }
 
+/* --- /collect-channel: build a collection from links in this channel --- */
+
+function extractBeatmapRefs(text) {
+    const beatmapIds = new Set();
+    const setIds = new Set();
+    const re = /osu\.ppy\.sh\/(beatmapsets\/(\d+)(?:#\w+\/(\d+))?|beatmaps\/(\d+)|b\/(\d+)|s\/(\d+))/gi;
+    let m;
+    while ((m = re.exec(text || ''))) {
+        if (m[3]) beatmapIds.add(m[3]);            // beatmapsets/123#osu/456
+        else if (m[2]) setIds.add(m[2]);           // beatmapsets/123 (no diff)
+        else if (m[4] || m[5]) beatmapIds.add(m[4] || m[5]); // beatmaps/456 or b/456
+        else if (m[6]) setIds.add(m[6]);           // s/123
+    }
+    return { beatmapIds: [...beatmapIds], setIds: [...setIds] };
+}
+
+async function cmdCollectChannel(options, interaction, origin) {
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    const channelId = interaction.channel_id || (interaction.channel && interaction.channel.id);
+    const count = Math.max(20, Math.min(300, Number(L.optVal(options, 'count')) || 100));
+    if (!botToken || !channelId) return L.ephemeral(t('export_fail'));
+
+    // Read channel history (Discord caps at 100/call).
+    const messages = [];
+    let before = null;
+    for (let i = 0; i < 3 && messages.length < count; i++) {
+        const q = new URLSearchParams({ limit: String(Math.min(100, count - messages.length)) });
+        if (before) q.set('before', before);
+        const r = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages?${q}`, {
+            headers: { Authorization: `Bot ${botToken}` },
+        });
+        if (r.status === 403) return L.ephemeral(t('collect_need_perm'));
+        if (!r.ok) return L.ephemeral(t('export_fail'));
+        const batch = await r.json();
+        if (!batch.length) break;
+        messages.push(...batch);
+        before = batch[batch.length - 1].id;
+    }
+
+    const all = { beatmapIds: new Set(), setIds: new Set() };
+    for (const msg of messages) {
+        const refs = extractBeatmapRefs(msg.content);
+        refs.beatmapIds.forEach(x => all.beatmapIds.add(x));
+        refs.setIds.forEach(x => all.setIds.add(x));
+    }
+    if (!all.beatmapIds.size && !all.setIds.size) return L.ephemeral(t('collect_no_links', { n: messages.length }));
+
+    const token = await getOsuToken();
+    const auth = { headers: { Authorization: `Bearer ${token}` } };
+    const beatmaps = [];
+    const seen = new Set();
+    const push = (bm, bs) => {
+        if (!bm || seen.has(bm.id)) return;
+        seen.add(bm.id);
+        beatmaps.push({
+            mapId: bm.id, mapSetId: bm.beatmapset_id || (bs && bs.id) || 0,
+            artist: (bs && bs.artist) || (bm.beatmapset && bm.beatmapset.artist) || '',
+            title: (bs && bs.title) || (bm.beatmapset && bm.beatmapset.title) || '',
+            diff: bm.version || '', md5: bm.checksum || '', mode: bm.mode_int || 0, stars: bm.difficulty_rating || 0,
+        });
+    };
+
+    const bmIds = [...all.beatmapIds];
+    for (let i = 0; i < bmIds.length; i += 50) {
+        const q = new URLSearchParams();
+        bmIds.slice(i, i + 50).forEach(id => q.append('ids[]', id));
+        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps?${q}`, auth);
+        if (r.ok) for (const bm of (await r.json()).beatmaps || []) push(bm, bm.beatmapset);
+    }
+    for (const sid of [...all.setIds].slice(0, 15)) {
+        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${sid}`, auth);
+        if (!r.ok) continue;
+        const set = await r.json();
+        const hardest = (set.beatmaps || []).slice().sort((a, b) => b.difficulty_rating - a.difficulty_rating)[0];
+        push(hardest, set);
+    }
+    if (!beatmaps.length) return L.ephemeral(t('collect_no_links', { n: messages.length }));
+
+    const chName = (interaction.channel && interaction.channel.name) || 'channel';
+    const cols = [{ name: `#${chName}`, beatmaps }];
+    return osdbResponse(cols, `channel-${chName}`);
+}
+
+/* --- /follow /unfollow /following ------------------------------------- */
+
+async function getFollowing(discordId) {
+    if (!discordId) return [];
+    try {
+        const v = await getDiscordBotStore().get(`following:${discordId}`, { type: 'json' });
+        return Array.isArray(v) ? v : [];
+    } catch { return []; }
+}
+
+async function resolvePublisher(query) {
+    const index = (await getCollectionsStore().get('index', { type: 'json' })) || [];
+    const q = String(query || '').toLowerCase().trim();
+    if (/^\d+$/.test(q)) return index.find(e => String(e.id) === q) || null;
+    return index.find(e => (e.username || '').toLowerCase() === q)
+        || index.find(e => (e.username || '').toLowerCase().includes(q)) || null;
+}
+
+async function cmdFollow(options, interaction) {
+    const uid = L.invokerId(interaction);
+    const entry = await resolvePublisher(L.optVal(options, 'query'));
+    if (!entry) return L.ephemeral(t('collection_not_found', { q: String(L.optVal(options, 'query') || '') }));
+
+    const store = getDiscordBotStore();
+    const mine = await getFollowing(uid);
+    if (mine.includes(String(entry.id))) return L.ephemeral(t('follow_already', { name: entry.username }));
+    mine.push(String(entry.id));
+    await store.setJSON(`following:${uid}`, mine);
+
+    const watchers = await store.get(`followers:${entry.id}`, { type: 'json' }).catch(() => null) || [];
+    if (!watchers.includes(String(uid))) { watchers.push(String(uid)); await store.setJSON(`followers:${entry.id}`, watchers); }
+
+    return L.ephemeral(t('follow_done', { name: entry.username }));
+}
+
+async function cmdUnfollow(options, interaction) {
+    const uid = L.invokerId(interaction);
+    const entry = await resolvePublisher(L.optVal(options, 'query'));
+    const store = getDiscordBotStore();
+    const mine = await getFollowing(uid);
+    const id = entry ? String(entry.id) : null;
+    const name = entry ? entry.username : String(L.optVal(options, 'query') || '');
+    if (!id || !mine.includes(id)) return L.ephemeral(t('unfollow_not', { name }));
+
+    await store.setJSON(`following:${uid}`, mine.filter(x => x !== id));
+    const watchers = (await store.get(`followers:${id}`, { type: 'json' }).catch(() => null)) || [];
+    await store.setJSON(`followers:${id}`, watchers.filter(x => x !== String(uid)));
+    return L.ephemeral(t('unfollow_done', { name }));
+}
+
+async function cmdFollowing(interaction) {
+    const mine = await getFollowing(L.invokerId(interaction));
+    if (!mine.length) return L.ephemeral(t('following_empty'));
+    const index = (await getCollectionsStore().get('index', { type: 'json' })) || [];
+    const names = mine.map(id => {
+        const e = index.find(x => String(x.id) === id);
+        return e ? e.username : `#${id}`;
+    });
+    return L.ephemeral(t('following_list', { names: names.join(', ') }));
+}
+
 /* --- /practice ------------------------------------------------------------ */
 
 async function cmdPractice(options, interaction, origin) {
@@ -834,7 +978,7 @@ exports.handler = async (event) => {
 
     try {
         if (interaction.type === L.T.AUTOCOMPLETE) {
-            if (name === 'collection') return await autocompleteCollection(options);
+            if (name === 'collection' || name === 'follow' || name === 'unfollow') return await autocompleteCollection(options);
             if (name === 'mappool') return await autocompleteMappool(options, origin);
             return L.autocomplete([]);
         }
@@ -853,6 +997,10 @@ exports.handler = async (event) => {
                 case 'top': return await cmdTop(options, interaction);
                 case 'map': return await cmdMap(options, origin);
                 case 'practice': return await cmdPractice(options, interaction, origin);
+                case 'collect-channel': return await cmdCollectChannel(options, interaction, origin);
+                case 'follow': return await cmdFollow(options, interaction);
+                case 'unfollow': return await cmdUnfollow(options, interaction);
+                case 'following': return await cmdFollowing(interaction);
                 case 'mappool': return await cmdMappool(options, origin);
                 case 'skin': return await cmdSkin(options, origin);
                 case 'link': return await cmdLink(options, interaction);

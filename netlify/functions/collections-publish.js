@@ -3,7 +3,7 @@
    id; id/username always come from the verified auth token (_auth-token.js),
    never from the request body, so a caller can't publish under someone
    else's name no matter what they put in the body. */
-const { getCollectionsStore } = require('./_blobs-store');
+const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const { setLocale, t } = require('./_discord-i18n');
 
@@ -54,6 +54,42 @@ async function announceNewCollection(entry, categoryNames, origin) {
         });
     } finally {
         clearTimeout(timer);
+    }
+}
+
+/* DM everyone who ran /follow on this publisher. Best-effort, time-boxed:
+   `followers:<osuId>` (array of Discord user ids) is maintained by the bot's
+   /follow /unfollow. One extra blob read on a publish with no followers. */
+async function dmFollowers(entry, origin) {
+    const token = process.env.DISCORD_BOT_TOKEN;
+    if (!token) return;
+    const followers = await getDiscordBotStore().get(`followers:${entry.id}`, { type: 'json' }).catch(() => null);
+    if (!Array.isArray(followers) || !followers.length) return;
+
+    setLocale(process.env.DISCORD_ANNOUNCE_LOCALE || 'zh-TW');
+    const body = t('follow_dm', {
+        name: entry.username || ('#' + entry.id),
+        sets: entry.totalSets || 0,
+        url: `${origin}/c/${entry.id}`,
+    });
+
+    const deadline = Date.now() + 4000;
+    for (const uid of followers.slice(0, 25)) {
+        if (Date.now() > deadline) break;
+        try {
+            const dc = await fetch('https://discord.com/api/v10/users/@me/channels', {
+                method: 'POST',
+                headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipient_id: uid }),
+            });
+            if (!dc.ok) continue;
+            const chan = await dc.json();
+            await fetch(`https://discord.com/api/v10/channels/${chan.id}/messages`, {
+                method: 'POST',
+                headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: body, allowed_mentions: { parse: [] } }),
+            });
+        } catch { /* one failed DM shouldn't stop the rest */ }
     }
 }
 const MAX_SETS = 3000;
@@ -204,15 +240,19 @@ exports.handler = async (event) => {
         });
         await store.setJSON('index', filtered);
 
-        // Only the first time this osu! id publishes — republishes (an editor
-        // tweaking their collection) must not spam the channel.
+        const proto = event.headers['x-forwarded-proto'] || 'https';
+        const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+        const origin = `${proto}://${host}`;
+        const newEntry = filtered[filtered.length - 1];
+
+        // First publish -> the channel announcement (republishes must not spam it).
         if (!existing) {
-            const proto = event.headers['x-forwarded-proto'] || 'https';
-            const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
-            try {
-                await announceNewCollection(filtered[filtered.length - 1], tags, `${proto}://${host}`);
-            } catch { /* Discord is best-effort; never fail a publish over it */ }
+            try { await announceNewCollection(newEntry, tags, origin); }
+            catch { /* Discord is best-effort; never fail a publish over it */ }
         }
+        // Every publish -> DM the people who /follow'd this publisher.
+        try { await dmFollowers(newEntry, origin); }
+        catch { /* best-effort */ }
 
         return { statusCode: 200, headers, body: JSON.stringify({ ok: true, updatedAt }) };
     } catch (err) {
