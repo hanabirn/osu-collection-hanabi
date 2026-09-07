@@ -292,10 +292,14 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
     const embeds = slice.map((m, i) => {
         const mt = L.modeTag(L.API_MODE[m.mode]);
         const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
-        // Badges (mod hexagon + slot number + ruleset) go in the description
-        // — custom emoji don't render in an embed title.
-        const bb = L.bracketBadge(m.bracket);
-        const badges = [bb ? `${bb}${m.slot ? ' ' + m.slot : ''}` : '', mt].filter(Boolean).join('  ');
+        // The mod hexagon rides as the embed thumbnail (top-right, ~80 px) so
+        // it's actually visible — an inline custom emoji is tiny. Its text
+        // form (HD2 / FM / TB) still leads the description for clarity; the
+        // ruleset emoji stays inline there.
+        const mod = L.bracketMod(m.bracket);
+        const modIconUrl = L.emojiImageUrl(L.MOD_EMOJI[mod], 128);
+        const slotLabel = mod ? `**${mod}${m.slot || ''}**` : '';
+        const badges = [slotLabel, mt].filter(Boolean).join('  ');
         const meta = [
             m.stars != null ? `★${Number(m.stars).toFixed(2)}` : null,
             m.bpm != null ? `${Math.round(m.bpm)} BPM` : null,
@@ -308,6 +312,7 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
             url: `https://osu.ppy.sh/b/${m.beatmapId}`,
             description: [badges, meta].filter(Boolean).join('\n') || undefined,
             color: m.stars != null ? L.srColor(m.stars) : PINK,
+            thumbnail: modIconUrl ? { url: modIconUrl } : undefined,
             image: m.setId ? { url: `https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover.jpg` } : undefined,
             footer: i === slice.length - 1
                 ? L.siteFooter(`${round.name} · 第 ${p + 1}/${pages} 頁 · 共 ${maps.length} 圖`)

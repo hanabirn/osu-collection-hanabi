@@ -80,12 +80,23 @@ const BRACKET_MOD = {
     'free mod': 'FM', freemod: 'FM',
     tiebreaker: 'TB', 'tie breaker': 'TB',
 };
-function bracketBadge(label) {
+// -> the mod acronym ("NM", "HD", "FM", "TB", ...) or the raw label.
+function bracketMod(label) {
     if (!label) return '';
     const norm = String(label).toLowerCase().replace(/\s*\d+$/, '').trim();
-    const mod = BRACKET_MOD[norm] || (/^[a-z]{2}$/.test(norm) ? norm.toUpperCase() : '');
-    if (mod && MOD_EMOJI[mod]) return MOD_EMOJI[mod];
-    return `\`${mod || label}\``;
+    return BRACKET_MOD[norm] || (/^[a-z]{2,4}$/.test(norm) ? norm.toUpperCase() : String(label));
+}
+function bracketBadge(label) {
+    const mod = bracketMod(label);
+    return MOD_EMOJI[mod] || (mod ? `\`${mod}\`` : '');
+}
+
+// A custom-emoji tag "<:name:12345>" -> its CDN PNG url, for use as an embed
+// image / thumbnail / author icon (where emoji markup can't go, and where it
+// renders far larger than an inline emoji).
+function emojiImageUrl(tag, size = 96) {
+    const m = /^<a?:\w+:(\d+)>$/.exec(String(tag || ''));
+    return m ? `https://cdn.discordapp.com/emojis/${m[1]}.${tag[1] === 'a' ? 'gif' : 'png'}?size=${size}` : null;
 }
 
 // osu! score `mods` (array of strings or {acronym}) -> a run of mod emojis.
@@ -314,7 +325,8 @@ async function resolveOsuUser(token, nameOrId, apiMode) {
 
 module.exports = {
     PINK, SITE_ORIGIN, SITE_FOOTER, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
-    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag, bracketBadge,
+    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag,
+    bracketMod, bracketBadge, emojiImageUrl,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
     optsOf, optVal, invokerId,
     fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor, sparkline, rankChartUrl,
