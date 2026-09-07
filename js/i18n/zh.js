@@ -193,7 +193,7 @@ I18N.zh = {
     farm_coverage_pending: '資料庫尚在準備中，稍後再回來看看',
     farm_coverage: '已收錄 {n} 張圖・上次更新於 {t}（資料庫持續擴充中，尚未涵蓋全部 ranked 圖）',
     farm_only_toggle: '🔥 只看農圖',
-    farm_only_toggle_title: 'osu!／taiko：Top 50 中 DT 佔比 ≥ 70%；catch／mania：Top 50 中 100% acc 佔比 ≥ 70%（皆需遊玩次數 ≥ 500）',
+    farm_only_toggle_title: '依 Top 50 榜的「輕鬆／吃 pp 通關佔比」判定農圖：osu!／taiko 看 DT，水果看 DT 與 HR，mania 看 DT 與非 SS 的滿連；門檻隨星數升高而放寬（需遊玩次數 ≥ 500）',
     farm_coverage_farm: '（符合農圖標準：{n} 張，已分類 {c} 張）',
 
     cdn_lib_fail: '外部元件載入失敗，請檢查網路後重試',

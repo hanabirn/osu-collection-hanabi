@@ -224,7 +224,7 @@ I18N.ja = {
     farm_coverage_pending: 'データベースを準備中です。しばらくしてからまた確認してください',
     farm_coverage: '{n} 件の譜面を収録・最終更新 {t}（データベースは構築中で、まだすべての ranked 譜面を網羅していません）',
     farm_only_toggle: '🔥 農圖のみ表示',
-    farm_only_toggle_title: 'osu!／taiko：Top 50 中の DT 割合 ≥ 70%；catch／mania：Top 50 中の 100% acc 割合 ≥ 70%（いずれもプレイ回数 500 回以上が必要）',
+    farm_only_toggle_title: 'Top 50 の「楽な／pp 稼ぎクリアの割合」で農譜面を判定：osu!／taiko は DT、catch は DT・HR、mania は DT と非 SS のフルコンボ。星が高いほど基準は緩くなる（プレイ回数 500 回以上が必要）',
     farm_coverage_farm: '（農圖基準を満たす譜面：{n} 件 / 判定済み {c} 件）',
 
     cdn_lib_fail: '外部コンポーネントの読み込みに失敗しました。接続を確認して再試行してください',

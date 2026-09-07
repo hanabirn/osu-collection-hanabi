@@ -224,7 +224,7 @@ I18N.fr = {
     farm_coverage_pending: 'La base de données est encore en préparation, revenez bientôt',
     farm_coverage: '{n} maps indexées · mise à jour {t} (base encore en croissance, ne couvre pas encore toutes les maps ranked)',
     farm_only_toggle: '🔥 Farm maps uniquement',
-    farm_only_toggle_title: 'osu!／taiko : part de DT dans le Top 50 ≥ 70 % ; catch／mania : part de 100 % de précision dans le Top 50 ≥ 70 % (nécessite ≥ 500 parties)',
+    farm_only_toggle_title: 'Classement farm selon la part de clears faciles/pp dans le Top 50 — DT pour osu!/taiko, DT et HR pour catch, DT et full combos sans SS pour mania ; le seuil s\'assouplit quand la difficulté en étoiles augmente (nécessite ≥ 500 parties)',
     farm_coverage_farm: '({n} classées farm map sur {c} évaluées)',
 
     cdn_lib_fail: 'Échec du chargement d\'un composant externe — vérifiez votre connexion et réessayez',

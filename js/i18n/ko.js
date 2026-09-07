@@ -224,7 +224,7 @@ I18N.ko = {
     farm_coverage_pending: '데이터베이스를 아직 준비 중입니다. 잠시 후 다시 확인해주세요',
     farm_coverage: '{n}개 맵 수집됨 · 마지막 업데이트 {t} (데이터베이스가 계속 늘어나는 중이며 아직 모든 ranked 맵을 다루지 못합니다)',
     farm_only_toggle: '🔥 파밍맵만 보기',
-    farm_only_toggle_title: 'osu!／taiko: Top 50 중 DT 비율 ≥ 70%; catch／mania: Top 50 중 100% acc 비율 ≥ 70%(모두 플레이 횟수 ≥ 500 필요)',
+    farm_only_toggle_title: 'Top 50 순위표의 "쉬운/pp 파밍 클리어 비율"로 파밍맵 판정 — osu!／taiko는 DT, catch는 DT·HR, mania는 DT와 SS 아닌 풀콤보; 별 난이도가 높을수록 기준이 완화됨(플레이 횟수 ≥ 500 필요)',
     farm_coverage_farm: '(파밍맵 기준 충족: {n}개 / 분류 완료 {c}개)',
 
     cdn_lib_fail: '외부 구성요소를 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도하세요',

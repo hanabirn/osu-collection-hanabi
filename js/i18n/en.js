@@ -362,7 +362,7 @@ I18N.en = {
     farm_coverage_pending: 'The dataset is still being built, check back soon',
     farm_coverage: '{n} maps indexed · last updated {t} (dataset still growing, not yet covering every ranked map)',
     farm_only_toggle: '🔥 Farm maps only',
-    farm_only_toggle_title: 'osu!/taiko: DT share of Top 50 ≥ 70%; catch/mania: 100%-acc share of Top 50 ≥ 70% (both require ≥ 500 plays)',
+    farm_only_toggle_title: 'Farm call from the Top 50 board by share of easy/pp-cheese clears — DT for osu!/taiko, DT & HR for catch, DT & non-SS full combos for mania; the bar loosens as star rating rises (needs ≥ 500 plays)',
     farm_coverage_farm: '({n} classified as farm maps out of {c} scored so far)',
 
     cdn_lib_fail: 'A required component failed to load — check your connection and retry',
