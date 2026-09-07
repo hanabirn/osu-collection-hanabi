@@ -502,6 +502,9 @@ const FARM_MODS = ['NM', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'];
 // filter, plus ◀ 🎲 ▶ buttons that re-run this via a component interaction.
 // index < 0 = pick a random position. Returns { error } or { embed, components }.
 async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
+    // mania pp doesn't scale with mods (and HR/EZ aren't mania mods at all),
+    // so the mods filter is meaningless there — pin it to NM.
+    if (mode === 'mania') mods = 'NM';
     const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
     if (ppMin) qs.set('ppMin', String(ppMin));
     if (ppMax) qs.set('ppMax', String(ppMax));

@@ -91,7 +91,7 @@ const commands = [
         options: [
             modeOpt,
             {
-                type: 3, name: 'mods', required: false, description: 'mod 組合（預設 NM）',
+                type: 3, name: 'mods', required: false, description: 'mod 組合（預設 NM；mania 無 mod 加成，此選項會被忽略）',
                 choices: ['NM', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'].map(m => ({ name: m, value: m })),
             },
             { type: 4, name: 'pp_min', required: false, description: '最低 PP（依所選 mod 計算）' },
