@@ -624,8 +624,25 @@ function tpoolModeShort(mode) {
 }
 
 async function autocompleteTourneypool(options, origin) {
-    const focused = (options || []).find(o => o.focused) || {};
+    const opts = options || [];
+    const focused = opts.find(o => o.focused) || {};
     const q = String(focused.value || '').toLowerCase().trim();
+
+    // Typing in round: — suggest the picked tournament's actual round names.
+    if (focused.name === 'round') {
+        const tid = String((opts.find(o => o.name === 'tournament') || {}).value || '').trim();
+        if (!tid) return L.autocomplete([]);
+        let rounds = [];
+        try {
+            const r = await fetch(`${origin}/.netlify/functions/community-mappools-list?id=${encodeURIComponent(tid)}`);
+            if (r.ok) rounds = (await r.json()).rounds || [];
+        } catch { /* none */ }
+        let names = rounds.map(rd => rd.name).filter(Boolean);
+        if (q) names = names.filter(n => n.toLowerCase().includes(q));
+        return L.autocomplete(names.slice(0, 25).map(n => ({ name: n.slice(0, 100), value: n.slice(0, 100) })));
+    }
+
+    // Typing in tournament: — the pool list.
     let pools = [];
     try {
         const r = await fetch(`${origin}/.netlify/functions/community-mappools-list`);

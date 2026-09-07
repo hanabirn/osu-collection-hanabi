@@ -111,7 +111,7 @@ const commands = [
         name: 'tourneypool', ...d('cmd_tourneypool'),
         options: [
             { type: 3, name: 'tournament', required: true, autocomplete: true, ...d('opt_tourneypool_name') },
-            { type: 3, name: 'round', required: false, ...d('opt_tourneypool_round') },
+            { type: 3, name: 'round', required: false, autocomplete: true, ...d('opt_tourneypool_round') },
         ],
     },
     { name: 'skin', ...d('cmd_skin'), options: [{ type: 3, name: 'query', required: true, ...d('opt_skin_query') }] },
