@@ -20,46 +20,16 @@ const { getCommunityMappoolsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const {
     MODES, PRESET_BRACKETS, slugify, poolId, parseBeatmapRef, resolveBeatmap,
-    resolveBeatmapsBatch, importWybinPool,
+    resolveBeatmapsBatch, importWybinPool, writeIndex, removeFromIndex,
     MAX_ROUNDS, MAX_BRACKETS_PER_ROUND, MAX_MAPS_PER_BRACKET,
     MAX_LABEL_LEN, MAX_NAME_LEN, EDIT_COOLDOWN_MS,
 } = require('./_community-mappools-shared');
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 const OWNER_OSU_ID = process.env.CHAT_OWNER_OSU_ID || '26696007';
-const MAX_INDEX = 2000;
 
 const err = (code, message) => ({ statusCode: code, headers: CORS, body: JSON.stringify({ error: message }) });
 const ok = (pool) => ({ statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ pool }) });
-
-function indexEntry(pool) {
-    let maps = 0;
-    for (const r of pool.rounds) for (const b of r.brackets) maps += b.maps.length;
-    return {
-        id: pool.id,
-        tournamentName: pool.tournament.name,
-        tournamentUrl: pool.tournament.url || null,
-        source: pool.tournament.source || 'custom',
-        mode: pool.mode,
-        roundCount: pool.rounds.length,
-        mapCount: maps,
-        contributorCount: (pool.contributors || []).length,
-        updatedAt: pool.updatedAt,
-    };
-}
-
-async function writeIndex(store, pool) {
-    const index = (await store.get('index', { type: 'json' })) || [];
-    const i = index.findIndex((e) => e.id === pool.id);
-    const entry = indexEntry(pool);
-    if (i === -1) index.push(entry); else index[i] = entry;
-    await store.setJSON('index', index.slice(-MAX_INDEX));
-}
-
-async function removeFromIndex(store, id) {
-    const index = (await store.get('index', { type: 'json' })) || [];
-    await store.setJSON('index', index.filter((e) => e.id !== id));
-}
 
 exports.handler = async (event) => {
     if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };

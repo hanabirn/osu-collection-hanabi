@@ -401,7 +401,7 @@ I18N.en = {
     cmpool_page_title: '✦ Community Mappools ✦',
     cmpool_hint: 'Community-filled tournament mappools — pick a tournament you played, add rounds and mod brackets, drop in beatmap ids and the site pulls the metadata. Sign in to edit.',
     cmpool_pick_from_list: 'Pick a tournament from the list…',
-    cmpool_source_label: 'Source', cmpool_mode_label: 'Mode',
+    cmpool_source_label: 'Source', cmpool_mode_label: 'Mode', cmpool_mode_all: 'All modes',
     cmpool_source_wybin: 'wyBin', cmpool_source_forum: 'Forum', cmpool_source_custom: 'Custom',
     cmpool_importing: 'Importing the pool from wyBin…',
     cmpool_imported_n: 'Imported {n} maps from wyBin',

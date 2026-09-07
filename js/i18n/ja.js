@@ -262,7 +262,7 @@ I18N.ja = {
     cmpool_page_title: '✦ コミュニティ譜面プール ✦',
     cmpool_hint: 'みんなで埋める大会譜面プール —— 参加した大会を選び、ラウンドと mod を追加し、beatmap ID を入れるとサイトが情報を取得します。編集にはログインが必要です。',
     cmpool_pick_from_list: 'リストから大会を選択…',
-    cmpool_source_label: 'ソース', cmpool_mode_label: 'モード',
+    cmpool_source_label: 'ソース', cmpool_mode_label: 'モード', cmpool_mode_all: '全モード',
     cmpool_source_wybin: 'wyBin', cmpool_source_forum: 'フォーラム', cmpool_source_custom: 'カスタム',
     cmpool_importing: 'wyBin から譜面プールを取得中…',
     cmpool_imported_n: 'wyBin から {n} 譜面を取り込みました',

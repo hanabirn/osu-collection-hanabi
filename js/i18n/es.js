@@ -262,7 +262,7 @@ I18N.es = {
     cmpool_page_title: '✦ Mappools de la comunidad ✦',
     cmpool_hint: 'Mappools de torneos rellenados por la comunidad: elige un torneo que jugaste, añade rondas y brackets de mod, pon ids de beatmap y la web obtiene los datos. Inicia sesión para editar.',
     cmpool_pick_from_list: 'Elige un torneo de la lista…',
-    cmpool_source_label: 'Fuente', cmpool_mode_label: 'Modo',
+    cmpool_source_label: 'Fuente', cmpool_mode_label: 'Modo', cmpool_mode_all: 'Todos los modos',
     cmpool_source_wybin: 'wyBin', cmpool_source_forum: 'Foro', cmpool_source_custom: 'Personalizado',
     cmpool_importing: 'Importando el pool desde wyBin…',
     cmpool_imported_n: 'Se importaron {n} mapas de wyBin',

@@ -10,14 +10,16 @@
    getOsuAuthToken, getLoggedInOsuUser, showShareToast, modeIconSvg,
    getOsuCollection, OSU_MODES. */
 
-const CMPOOL_MODES = ['standard', 'taiko', 'catch', 'mania'];
+const CMPOOL_MODES = ['standard', 'taiko', 'catch', 'mania', 'all'];
 const CMPOOL_MODE_LABEL = { standard: 'osu!std', taiko: 'taiko', catch: 'catch', mania: 'mania' };
+function cmpoolModeLabel(m) { return m === 'all' ? t('cmpool_mode_all') : CMPOOL_MODE_LABEL[m]; }
 const CMPOOL_PRESET_ROUNDS = ['Qualifiers', 'Round of 64', 'Round of 32', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Finals', 'Grand Finals'];
 const CMPOOL_PRESET_BRACKETS = {
     standard: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
     taiko: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
     catch: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
     mania: ['RC', 'LN', 'HB', 'TB'],
+    all: ['NM', 'HD', 'HR', 'DT', 'FM', 'RC', 'LN', 'HB', 'TB'],
 };
 
 // Safe to drop into a double-quoted onclick="" as decodeURIComponent('…') —
@@ -69,7 +71,7 @@ function renderCommunityPoolList() {
         return;
     }
     listEl.innerHTML = rows.map(p => {
-        const ico = typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '';
+        const ico = p.mode === 'all' ? icon('sparkles', { size: '0.9em' }) : (typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '');
         return `<button class="cmpool-row" onclick="openCommunityPool('${escHtml(p.id)}')">
             <span class="cmpool-row-name">${ico}<span>${escHtml(p.tournamentName)}</span></span>
             <span class="cmpool-row-meta">${t('cmpool_row_meta', { r: p.roundCount, n: p.mapCount })}</span>
@@ -78,7 +80,7 @@ function renderCommunityPoolList() {
 }
 
 /* ── create / join ── */
-const CMPOOL_WYBIN_GM = { standard: 0, taiko: 1, catch: 2, mania: 3 };
+const CMPOOL_WYBIN_GM = { standard: 0, taiko: 1, catch: 2, mania: 3, all: 4 };
 
 function openCommunityPoolCreate() {
     const box = document.getElementById('cmpool-create');
@@ -126,8 +128,8 @@ function renderCmpoolCreateModeTabs() {
     const el = document.getElementById('cmpool-create-mode');
     if (!el) return;
     el.innerHTML = CMPOOL_MODES.map(m => {
-        const ico = typeof modeIconSvg === 'function' ? modeIconSvg(m) : '';
-        return `<button class="osu-mode-tab${m === cmpoolCreateMode ? ' active' : ''}" onclick="cmpoolSetCreateMode('${m}')">${ico} ${CMPOOL_MODE_LABEL[m]}</button>`;
+        const ico = m === 'all' ? icon('sparkles', { size: '0.9em' }) : (typeof modeIconSvg === 'function' ? modeIconSvg(m) : '');
+        return `<button class="osu-mode-tab${m === cmpoolCreateMode ? ' active' : ''}" onclick="cmpoolSetCreateMode('${m}')">${ico} ${cmpoolModeLabel(m)}</button>`;
     }).join('');
 }
 function cmpoolSetCreateMode(m) {
@@ -296,7 +298,7 @@ function renderCommunityPoolDetail() {
     const owner = cmpoolIsOwner();
     const me = (typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser()) || {};
     const collected = new Set(OSU_MODES.flatMap(m => (getOsuCollection()[m] || []).map(s => s.beatmapset_id)));
-    const ico = typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '';
+    const ico = p.mode === 'all' ? icon('sparkles', { size: '0.9em' }) : (typeof modeIconSvg === 'function' ? modeIconSvg(p.mode) : '');
     let mapCount = 0;
     for (const r of p.rounds) for (const b of r.brackets) mapCount += b.maps.length;
 

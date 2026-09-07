@@ -262,7 +262,7 @@ I18N.ko = {
     cmpool_page_title: '✦ 커뮤니티 맵풀 ✦',
     cmpool_hint: '다 같이 채우는 대회 맵풀 — 참가한 대회를 고르고 라운드와 모드를 추가한 뒤 beatmap ID를 넣으면 사이트가 정보를 가져옵니다. 편집하려면 로그인하세요.',
     cmpool_pick_from_list: '목록에서 대회 선택…',
-    cmpool_source_label: '출처', cmpool_mode_label: '모드',
+    cmpool_source_label: '출처', cmpool_mode_label: '모드', cmpool_mode_all: '전체 모드',
     cmpool_source_wybin: 'wyBin', cmpool_source_forum: '포럼', cmpool_source_custom: '직접 입력',
     cmpool_importing: 'wyBin에서 맵풀 가져오는 중…',
     cmpool_imported_n: 'wyBin에서 {n}개 맵을 가져왔습니다',

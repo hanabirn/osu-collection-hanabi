@@ -6,17 +6,21 @@
    resolves each id's metadata + cover the same way the WC pools do. */
 const { getOsuToken } = require('./_osu-auth');
 
-const MODES = ['standard', 'taiko', 'catch', 'mania'];
+// 'all' = a multi-mode tournament (O!EMMT, Fin's All Mode Event, …): one
+// pool whose brackets/maps can be any ruleset; each map keeps its own mode.
+const MODES = ['standard', 'taiko', 'catch', 'mania', 'all'];
 // API mode string per site mode key (osu! v2 uses "osu"/"fruits").
 const API_MODE = { standard: 'osu', taiko: 'taiko', catch: 'fruits', mania: 'mania' };
 
 // Preset bracket labels offered in the editor (the server still accepts any
-// custom string). std/taiko/catch share one set; mania has its own.
+// custom string). std/taiko/catch share one set; mania has its own; 'all'
+// offers the union.
 const PRESET_BRACKETS = {
     standard: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
     taiko: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
     catch: ['NM', 'HD', 'HR', 'DT', 'FM', 'TB'],
     mania: ['RC', 'LN', 'HB', 'TB'],
+    all: ['NM', 'HD', 'HR', 'DT', 'FM', 'RC', 'LN', 'HB', 'TB'],
 };
 const PRESET_ROUNDS = [
     'Qualifiers', 'Round of 128', 'Round of 64', 'Round of 32', 'Round of 16',
@@ -145,6 +149,7 @@ async function importWybinPool(slug, mode) {
         return { rounds: [], count: 0 };
     }
     const wantGm = { standard: 0, taiko: 1, catch: 2, mania: 3 }[mode];
+    const takeAll = mode === 'all';
     const presetSet = new Set((PRESET_BRACKETS[mode] || []).map((x) => x.toLowerCase()));
     const rounds = [];
     let count = 0;
@@ -153,7 +158,7 @@ async function importWybinPool(slug, mode) {
         const brackets = [];
         for (const mb of (st.modBrackets || [])) {
             const ids = (mb.beatmaps || [])
-                .filter((m) => (m.beatmapId || 0) > 0 && (m.gamemodeId == null || m.gamemodeId === wantGm))
+                .filter((m) => (m.beatmapId || 0) > 0 && (takeAll || m.gamemodeId == null || m.gamemodeId === wantGm))
                 .map((m) => parseInt(m.beatmapId, 10));
             if (!ids.length) continue;
             const label = (WYBIN_MOD_LABEL[mb.name] || String(mb.name || 'NM')).slice(0, MAX_LABEL_LEN);
@@ -169,10 +174,125 @@ async function importWybinPool(slug, mode) {
     return { rounds, count };
 }
 
+const MAX_INDEX = 2000;
+
+function indexEntry(pool) {
+    let maps = 0;
+    for (const r of (pool.rounds || [])) for (const b of r.brackets) maps += b.maps.length;
+    return {
+        id: pool.id,
+        tournamentName: pool.tournament.name,
+        tournamentUrl: pool.tournament.url || null,
+        source: pool.tournament.source || 'custom',
+        mode: pool.mode,
+        roundCount: (pool.rounds || []).length,
+        mapCount: maps,
+        contributorCount: (pool.contributors || []).length,
+        updatedAt: pool.updatedAt,
+    };
+}
+async function writeIndex(store, pool) {
+    const index = (await store.get('index', { type: 'json' })) || [];
+    const i = index.findIndex((e) => e.id === pool.id);
+    const entry = indexEntry(pool);
+    if (i === -1) index.push(entry); else index[i] = entry;
+    await store.setJSON('index', index.slice(-MAX_INDEX));
+}
+async function removeFromIndex(store, id) {
+    const index = (await store.get('index', { type: 'json' })) || [];
+    await store.setJSON('index', index.filter((e) => e.id !== id));
+}
+
+/* Scheduled crawl: walk wyBin's tournament list, and for any tournament that
+   has actually filled its mappool in wyBin's own system, auto-create the
+   matching community pool(s) — but NEVER touch a pool that already exists,
+   so manual edits are safe. Time-boxed + cursor-paged (state under
+   `wybin-crawl-state`) so a run fits Netlify's scheduled-function window.
+   `store` is a getCommunityMappoolsStore(). */
+async function crawlWybinMappools(store, { budgetMs = 25000, perRun = 10 } = {}) {
+    const start = Date.now();
+    const state = (await store.get('wybin-crawl-state', { type: 'json' })) || { cursor: 0, createdTotal: 0 };
+
+    let list;
+    try {
+        const res = await fetch('https://wybin.xyz/api/v1/tournament', { headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(`wybin list ${res.status}`);
+        const data = await res.json();
+        list = (Array.isArray(data) ? data : (data.data || data.tournaments || data.items || []))
+            .filter((t) => t && t.slug);
+    } catch (e) {
+        state.lastRunAt = new Date().toISOString();
+        state.lastError = e.message;
+        await store.setJSON('wybin-crawl-state', state);
+        return { checked: 0, created: 0, error: e.message };
+    }
+
+    if (state.cursor >= list.length) state.cursor = 0;
+    let checked = 0, created = 0, error = null;
+
+    try {
+        for (let n = 0; n < perRun && checked < list.length; n++) {
+            if (Date.now() - start > budgetMs) break;
+            const t = list[state.cursor % list.length];
+            state.cursor = (state.cursor + 1) % list.length;
+            checked++;
+
+            // Which mode(s) this tournament's pool maps to. wyBin gamemode
+            // 4 = "all modes" -> our 'all' pool; otherwise the single mode.
+            const gm2mode = { 0: 'standard', 1: 'taiko', 2: 'catch', 3: 'mania', 4: 'all' };
+            const mode = gm2mode[t.gamemode];
+            if (!mode) continue;
+
+            const id = poolId(slugify(t.slug || t.name), mode);
+            if (await store.get(`pool:${id}`, { type: 'json' })) continue; // never clobber
+
+            let imp;
+            try { imp = await importWybinPool(String(t.slug), mode); } catch { continue; }
+            if (!imp.count) continue;
+
+            const ids = [...new Set(imp.rounds.flatMap((r) => r.brackets.flatMap((b) => b.maps.map((m) => m.beatmapId))))];
+            const resolved = await resolveBeatmapsBatch(ids);
+            if (Object.keys(resolved).length) {
+                const cache = (await store.get('beatmaps:cache', { type: 'json' })) || {};
+                Object.assign(cache, resolved);
+                await store.setJSON('beatmaps:cache', cache);
+            }
+
+            const now = new Date().toISOString();
+            const pool = {
+                id, mode,
+                tournament: {
+                    name: String(t.name || t.slug).slice(0, MAX_NAME_LEN),
+                    slug: slugify(t.slug || t.name),
+                    source: 'wybin',
+                    url: t.slug ? `https://wybin.xyz/tournaments/${t.slug}` : null,
+                },
+                rounds: imp.rounds,
+                contributors: ['wybin'],
+                createdBy: 'wybin',
+                createdAt: now,
+                updatedAt: now,
+            };
+            await store.setJSON(`pool:${id}`, pool);
+            await writeIndex(store, pool);
+            created++;
+        }
+    } catch (e) {
+        error = e.message;
+    }
+
+    state.lastRunAt = new Date().toISOString();
+    state.lastError = error;
+    state.createdTotal = (state.createdTotal || 0) + created;
+    await store.setJSON('wybin-crawl-state', state);
+    return { checked, created, cursor: state.cursor, listSize: list.length, error };
+}
+
 module.exports = {
     MODES, API_MODE, PRESET_BRACKETS, PRESET_ROUNDS,
     MAX_ROUNDS, MAX_BRACKETS_PER_ROUND, MAX_MAPS_PER_BRACKET,
     MAX_LABEL_LEN, MAX_NAME_LEN, EDIT_COOLDOWN_MS,
     slugify, poolId, parseBeatmapRef, resolveBeatmap,
     resolveBeatmapsBatch, importWybinPool,
+    indexEntry, writeIndex, removeFromIndex, crawlWybinMappools,
 };

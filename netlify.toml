@@ -32,6 +32,15 @@
 [functions."wc-mappool-crawl-cron"]
   schedule = "0 6 * * 1"
 
+# 社群賽圖分享: auto-create community pools from wyBin tournaments that have
+# filled their pool in wyBin's own system — see crawlWybinMappools() in
+# _community-mappools-shared.js. Cursor-paged over wyBin's ~110-tournament
+# list, ~12/run, every 6h => a full sweep in roughly a day. Never touches an
+# existing pool. Kick a faster sweep via community-mappools-crawl-run.js
+# (WYBIN_MAPPOOL_CRAWL_SECRET).
+[functions."community-mappools-crawl-cron"]
+  schedule = "0 */6 * * *"
+
 [functions."farm-crawl-run"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
 

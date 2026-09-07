@@ -262,7 +262,7 @@ I18N.ru = {
     cmpool_page_title: '✦ Маппулы сообщества ✦',
     cmpool_hint: 'Маппулы турниров, которые заполняет сообщество — выберите турнир, добавьте раунды и мод-брекеты, впишите id карт, а сайт подтянет данные. Для редактирования нужен вход.',
     cmpool_pick_from_list: 'Выберите турнир из списка…',
-    cmpool_source_label: 'Источник', cmpool_mode_label: 'Режим',
+    cmpool_source_label: 'Источник', cmpool_mode_label: 'Режим', cmpool_mode_all: 'Все режимы',
     cmpool_source_wybin: 'wyBin', cmpool_source_forum: 'Форум', cmpool_source_custom: 'Своё',
     cmpool_importing: 'Импорт маппула из wyBin…',
     cmpool_imported_n: 'Импортировано карт из wyBin: {n}',

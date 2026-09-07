@@ -225,7 +225,7 @@ I18N.zh = {
     cmpool_page_title: '✦ 社群賽圖分享 ✦',
     cmpool_hint: '大家一起填的賽事圖池 —— 選你參加過的賽事、加輪次與 mod、把 beatmap ID 填進去，站台會自動抓圖資。登入才能編輯。',
     cmpool_pick_from_list: '從清單選賽事…',
-    cmpool_source_label: '來源', cmpool_mode_label: '模式',
+    cmpool_source_label: '來源', cmpool_mode_label: '模式', cmpool_mode_all: '全模式',
     cmpool_source_wybin: 'wyBin', cmpool_source_forum: '論壇', cmpool_source_custom: '自訂',
     cmpool_importing: '正在從 wyBin 匯入圖池…',
     cmpool_imported_n: '從 wyBin 匯入了 {n} 張圖',
