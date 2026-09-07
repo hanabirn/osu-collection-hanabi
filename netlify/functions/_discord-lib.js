@@ -184,7 +184,10 @@ function rankChartUrl(vals) {
         data: { labels: pts.map((_, i) => i), datasets: [{
             label: 'rank', data: pts,
             borderColor: '#ff5aa0', backgroundColor: 'rgba(255,102,170,0.18)',
-            fill: true, pointRadius: 0, borderWidth: 3, tension: 0.4,
+            // 'start' (not true/'origin') so the area fills *below* the line
+            // toward the bottom edge — with the reversed y-axis, 'origin'
+            // would fill upward.
+            fill: 'start', pointRadius: 0, borderWidth: 3, tension: 0.4,
         }] },
         options: {
             plugins: { legend: { display: false } },
