@@ -70,7 +70,7 @@ async function cmdPp(options, interaction) {
     const g = s.grade_counts || {};
     const playHours = s.play_time != null ? `${Math.round(s.play_time / 3600).toLocaleString('en-US')} 小時` : '—';
     const rankHist = (u.rank_history && u.rank_history.data) || (u.rankHistory && u.rankHistory.data) || [];
-    const spark = L.sparkline(rankHist.slice(-30));
+    const spark = L.sparkline(rankHist.slice(-90));
 
     return L.message({
         author: L.osuAuthor(u, apiMode),
@@ -88,7 +88,7 @@ async function cmdPp(options, interaction) {
             { name: '最大連擊', value: L.fmtNum(s.maximum_combo), inline: true },
             { name: '遊玩時間', value: playHours, inline: true },
             { name: '成績', value: `${L.GRADE_EMOJI.SS}${L.fmtNum((g.ss || 0) + (g.ssh || 0))} ${L.GRADE_EMOJI.S}${L.fmtNum((g.s || 0) + (g.sh || 0))} ${L.GRADE_EMOJI.A}${L.fmtNum(g.a || 0)}`, inline: false },
-            ...(spark ? [{ name: '近 30 天排名走勢', value: `\`${spark}\``, inline: false }] : []),
+            ...(spark ? [{ name: '近 90 天排名走勢', value: `\`${spark}\``, inline: false }] : []),
         ],
         footer: L.siteFooter('osu! API v2'),
     });
@@ -288,8 +288,10 @@ async function cmdMappool(options, origin) {
         const round = rounds.find(rd => (rd.name || '').toLowerCase().includes(roundQ));
         if (!round) return L.ephemeral(`「${pool.label}」沒有符合「${roundQ}」的輪次。`);
         const lines = [];
+        let heroSetId = null;   // tiebreaker cover if there is one, else the first map's
         for (const b of round.brackets || []) {
             for (const m of b.maps || []) {
+                if (m.setId && (heroSetId === null || m.isTiebreaker)) heroSetId = m.setId;
                 const tag = b.label ? `\`${b.label}\` ` : '';
                 const mt = L.modeTag(L.API_MODE[m.mode]);
                 const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
@@ -303,6 +305,7 @@ async function cmdMappool(options, origin) {
             url: round.mappackUrl || `${origin}/`,
             description: lines.join('\n') || '（這一輪還沒有解析好的圖）',
             color: PINK,
+            image: heroSetId ? { url: `https://assets.ppy.sh/beatmaps/${heroSetId}/covers/cover.jpg` } : undefined,
             footer: L.siteFooter('世界盃圖池'),
         });
     }
