@@ -15,9 +15,13 @@ exports.handler = async (event) => {
         return { statusCode: 405, headers: { ...cors, 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Method not allowed' }) };
     }
 
-    const id = (event.queryStringParameters || {}).id;
-    if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
-        return { statusCode: 400, headers: { ...cors, 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Bad id' }) };
+    let id = (event.queryStringParameters || {}).id || '';
+    try { id = decodeURIComponent(id); } catch { /* use as-is */ }
+    id = id.trim();
+    // UUID-ish: hex + dashes, 32-40 chars. The real gate is the blob lookup
+    // (the id is an unguessable randomUUID), this is just input hygiene.
+    if (!/^[0-9a-f-]{32,40}$/i.test(id)) {
+        return { statusCode: 400, headers: { ...cors, 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Bad id', got: id, qsp: event.queryStringParameters, path: event.path }) };
     }
 
     try {
