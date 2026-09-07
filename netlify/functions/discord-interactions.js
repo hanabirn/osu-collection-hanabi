@@ -21,6 +21,8 @@
 const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { getOsuToken } = require('./_osu-auth');
 const { setLocale, t, LANG_NAMES, KNOWN_KEYS } = require('./_discord-i18n');
+const { buildOsdb, MODE_INT } = require('./_osdb');
+const { messageWithFile } = require('./_discord-attach');
 const L = require('./_discord-lib');
 
 const { PINK } = L;
@@ -348,14 +350,32 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
     });
     if (!embeds.length) embeds.push({ title: `${pool.label} — ${round.name}`, description: t('mappool_round_empty'), color: PINK });
 
-    const components = pages > 1 ? [{
-        type: 1,
-        components: [
-            { type: 2, style: 2, label: t('btn_prev'), custom_id: `mp|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 },
-            { type: 2, style: 2, label: t('btn_next'), custom_id: `mp|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 },
-        ],
-    }] : [];
-    return { embeds, components };
+    const row = [{ type: 2, style: 2, label: t('btn_export_round'), custom_id: `mpx|${pool.folder}|${roundIdx}` }];
+    if (pages > 1) {
+        row.unshift({ type: 2, style: 2, label: t('btn_prev'), custom_id: `mp|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 });
+        row.push({ type: 2, style: 2, label: t('btn_next'), custom_id: `mp|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 });
+    }
+    return { embeds, components: [{ type: 1, components: row }] };
+}
+
+// A WC edition (or one round of it) -> [{ name, beatmaps }] for .osdb.
+function wcPoolToCollections(pool, onlyRoundIdx) {
+    const out = [];
+    (pool.rounds || []).forEach((round, ri) => {
+        if (onlyRoundIdx != null && ri !== onlyRoundIdx) return;
+        const beatmaps = [];
+        for (const b of round.brackets || []) {
+            for (const m of b.maps || []) {
+                beatmaps.push({
+                    mapId: m.beatmapId, mapSetId: m.setId || 0,
+                    artist: m.artist || '', title: m.title || '', diff: m.version || '',
+                    md5: '', mode: MODE_INT[m.mode] || 0, stars: m.stars || 0,
+                });
+            }
+        }
+        if (beatmaps.length) out.push({ name: `${pool.label} — ${round.name}`, beatmaps });
+    });
+    return out;
 }
 
 async function cmdMappool(options, origin) {
@@ -386,7 +406,10 @@ async function cmdMappool(options, origin) {
         }).join('\n') || t('mappool_no_data'),
         color: PINK,
         footer: L.siteFooter(t('mappool_round_hint')),
-    });
+    }, [{
+        type: 1,
+        components: [{ type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `mpx|${pool.folder}|*` }],
+    }]);
 }
 
 /* --- /skin ------------------------------------------------------------ */
@@ -587,9 +610,36 @@ async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
                 { type: 2, style: 2, label: t('farm_btn_prev'), custom_id: cid(idx - 1) },
                 { type: 2, style: 1, label: t('farm_btn_random'), custom_id: cid(-1) },
                 { type: 2, style: 2, label: t('farm_btn_next'), custom_id: cid(idx + 1) },
+                { type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `farmx|${mode}|${mods}|${ppMin}|${ppMax}` },
             ],
         }],
     };
+}
+
+// Pull up to `cap` maps of a farm filter across pages -> one .osdb collection.
+async function farmBandToCollection(mode, mods, ppMin, ppMax, origin, cap = 120) {
+    if (mode === 'mania') mods = 'NM';
+    const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
+    if (ppMin) qs.set('ppMin', String(ppMin));
+    if (ppMax) qs.set('ppMax', String(ppMax));
+    const beatmaps = [];
+    for (let page = 0; beatmaps.length < cap && page < 8; page++) {
+        const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=${page}`);
+        if (!r.ok) break;
+        const items = (await r.json()).items || [];
+        if (!items.length) break;
+        for (const m of items) {
+            beatmaps.push({
+                mapId: m.beatmap_id, mapSetId: m.beatmapset_id || 0,
+                artist: m.artist || '', title: m.title || '', diff: m.version || '',
+                md5: '', mode: MODE_INT[mode] || 0, stars: m.star || 0,
+            });
+            if (beatmaps.length >= cap) break;
+        }
+    }
+    const any = t('farm_unlimited');
+    const band = t('pp_band', { lo: ppMin || any, hi: ppMax || any });
+    return beatmaps.length ? [{ name: `Farm ${mods} ${band}`, beatmaps }] : [];
 }
 
 async function cmdFarm(options, origin) {
@@ -608,10 +658,44 @@ async function cmdFarm(options, origin) {
     return L.message(v.embed, v.components);
 }
 
+/* --- .osdb export response -------------------------------------------- */
+
+function osdbResponse(collections, baseName) {
+    const nonEmpty = (collections || []).filter(c => (c.beatmaps || []).length);
+    if (!nonEmpty.length) return L.ephemeral(t('export_empty'));
+    const filename = `${baseName.replace(/[^\w.\- ]+/g, '').trim().slice(0, 60) || 'collection'}.osdb`;
+    const bytes = buildOsdb(nonEmpty, 'osu! Collection bot');
+    const total = nonEmpty.reduce((s, c) => s + c.beatmaps.length, 0);
+    return messageWithFile(
+        { color: PINK, description: t('export_done', { name: filename }), footer: L.siteFooter(`${total} · ${nonEmpty.length}`) },
+        { filename, body: bytes, contentType: 'application/octet-stream' },
+    );
+}
+
 /* --- message component (buttons) --------------------------------------- */
 
 async function handleComponent(interaction, origin) {
     const id = (interaction.data && interaction.data.custom_id) || '';
+
+    // .osdb export of a WC edition / one round: mpx|<folder>|<roundIdx|'*'>
+    if (id.startsWith('mpx|')) {
+        const [, folder, roundSel] = id.split('|');
+        const r = await fetch(`${origin}/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(folder)}`);
+        if (!r.ok) return L.updateMessage({ title: t('export_fail'), color: PINK });
+        const pool = await r.json();
+        const onlyIdx = roundSel === '*' ? null : Number(roundSel);
+        const cols = wcPoolToCollections(pool, onlyIdx);
+        const base = onlyIdx != null && pool.rounds && pool.rounds[onlyIdx]
+            ? `${pool.label} ${pool.rounds[onlyIdx].name}` : pool.label;
+        return osdbResponse(cols, base);
+    }
+
+    // .osdb export of a farm filter band: farmx|<mode>|<mods>|<ppMin>|<ppMax>
+    if (id.startsWith('farmx|')) {
+        const [, mode, mods, ppMinS, ppMaxS] = id.split('|');
+        const cols = await farmBandToCollection(mode, mods, Number(ppMinS) || 0, Number(ppMaxS) || 0, origin);
+        return osdbResponse(cols, `Farm ${mode} ${mods}`);
+    }
 
     // /farm browse: farm|<mode>|<mods>|<ppMin>|<ppMax>|<index>  (index -1 = random)
     if (id.startsWith('farm|')) {
