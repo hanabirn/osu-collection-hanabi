@@ -922,7 +922,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     gap: 10px;
     margin-bottom: 16px;
 }
-#osu-search-input {
+/* Styled generically off .osu-search-row so every tab that reuses it
+   (collection / gallery / farm / catalog / skin plaza) gets the same input
+   look — before, only the collection page's #osu-* ids were covered and the
+   catalog row fell back to browser-default controls. */
+.osu-search-row input[type="text"] {
     flex: 1 1 100%;
     min-width: 0;
     padding: 11px 14px;
@@ -934,16 +938,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-family: inherit;
     transition: all 0.3s;
 }
-#osu-search-input:focus {
+.osu-search-row input[type="text"]:focus {
     outline: none;
     border-color: var(--accent-light-purple);
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
-#osu-sort-select,
-#osu-lang-filter,
-#osu-genre-filter,
-#osu-source-filter,
-#osu-artist-filter {
+.osu-search-row select {
     flex: 1 1 45%;
     min-width: 0;
     padding: 11px 12px;
@@ -953,6 +953,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: var(--text);
     font-size: 0.85rem;
     font-family: inherit;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.osu-search-row select:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
 
 /* Small frosted pill at the top of a card's info block — the beatmapset's
