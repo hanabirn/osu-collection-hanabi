@@ -381,7 +381,7 @@ I18N.fr = {
                 <p class="howto-tab-desc">Publie ta collection organisée publiquement, ou parcours celles des autres et importe-les directement. Chaque compte osu! ne peut en publier qu'une seule.</p>
                 <div class="howto-feat"><b>Publier / dépublier</b><span>Connexion requise. Publier envoie ta collection actuelle à la galerie ; republier écrase l'ancienne au lieu de créer une deuxième entrée.</span></div>
                 <div class="howto-feat"><b>Recherche / tri / filtre</b><span>Cherche par nom de joueur ou tag ; trie par récent/❤ plus aimés/nombre de cartes/meilleure note ; ou affiche seulement celles que tu as aimées.</span></div>
-                <div class="howto-feat"><b>Détail de la collection</b><span>Clique sur une carte pour l'ouvrir : navigue par onglet mode/catégorie, import en un clic, copie le lien de partage, et une section commentaires en dessous — tout utilisateur connecté peut commenter, et la suppression est permise à l'auteur du commentaire ou au publicateur de cette collection.</span></div>
+                <div class="howto-feat"><b>Détail de la collection</b><span>Clique sur une carte pour l'ouvrir : navigue par onglet mode/catégorie, import en un clic, copie le lien de partage — une fois connecté, aussi « Superposer mes scores » (marque ta propre note + des stats de notes sur chaque map) et « Copier le code d'intégration » pour un iframe à coller sur un forum/blog. Une section commentaires en dessous — tout utilisateur connecté peut commenter, et la suppression est permise à l'auteur du commentaire ou au publicateur de cette collection.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -421,7 +421,7 @@ I18N.fr = {
                 <div class="howto-tab-title">✦ Catalogue</div>
                 <p class="howto-tab-desc">Un navigateur pour tout le catalogue ranked, découpé par artiste/langue/genre/source/feat.</p>
                 <div class="howto-feat"><b>Combinaisons de filtres</b><span>Les quatre menus déroulants se combinent, plus un filtre de mode et un interrupteur « inclure les 18+ », avec quatre options de tri.</span></div>
-                <div class="howto-feat"><b>➕ Créer une collection depuis ce filtre</b><span>S'active seulement quand tes filtres donnent des résultats — un clic transforme tout le résultat filtré en une nouvelle catégorie dans ta collection.</span></div>
+                <div class="howto-feat"><b>➕ Créer une collection depuis ce filtre</b><span>S'active seulement quand tes filtres donnent des résultats — un clic transforme tout le résultat filtré en une nouvelle catégorie dans ta collection ; coche « Catégorie dynamique » pour récupérer plus tard, en un clic, les maps nouvellement ranked qui correspondent au même filtre.</span></div>
             </div>
 
             <div class="howto-tab">

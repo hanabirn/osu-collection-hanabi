@@ -72,7 +72,7 @@ I18N.en = {
                 <p class="howto-tab-desc">Publish your organized collection publicly, or browse others' and import them directly. Each osu! account can publish only one.</p>
                 <div class="howto-feat"><b>Publish / unpublish</b><span>Login required. Publishing sends your current collection to the gallery; publishing again overwrites the old one instead of creating a second entry.</span></div>
                 <div class="howto-feat"><b>Search / sort / filter</b><span>Search by player name or tag; sort by recent/❤ most liked/set count/highest rating; or show only ones you've liked.</span></div>
-                <div class="howto-feat"><b>Collection detail</b><span>Click a card to open it: browse by mode/category tab, one-click import, copy a share link, and a comments section below — anyone logged in can comment, and deletion is allowed for the commenter or that collection's publisher.</span></div>
+                <div class="howto-feat"><b>Collection detail</b><span>Click a card to open it: browse by mode/category tab, one-click import, copy a share link — once logged in, also "Overlay my scores" (marks your own grade + a grade breakdown on every map) and "Copy embed code" for an iframe to paste into a forum/blog post. A comments section sits below — anyone logged in can comment, and deletion is allowed for the commenter or that collection's publisher.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -112,7 +112,7 @@ I18N.en = {
                 <div class="howto-tab-title">✦ Catalog</div>
                 <p class="howto-tab-desc">A browser for the entire ranked catalog, sliced by artist/language/genre/source/feat.</p>
                 <div class="howto-feat"><b>Filter combos</b><span>The four dropdowns can be combined, plus a mode filter and an "include 18+ tagged" toggle, with four sort options.</span></div>
-                <div class="howto-feat"><b>➕ Create a collection from this filter</b><span>Only enables once your filters return results — one click turns the whole filtered result into a new category in your collection.</span></div>
+                <div class="howto-feat"><b>➕ Create a collection from this filter</b><span>Only enables once your filters return results — one click turns the whole filtered result into a new category in your collection; check "Make it a dynamic category" to later pull in newly-ranked maps matching the same filter with one click.</span></div>
             </div>
 
             <div class="howto-tab">

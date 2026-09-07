@@ -381,7 +381,7 @@ I18N.de = {
                 <p class="howto-tab-desc">Veröffentliche deine organisierte Sammlung öffentlich oder durchsuche die anderer und importiere sie direkt. Jedes osu!-Konto kann nur eine veröffentlichen.</p>
                 <div class="howto-feat"><b>Veröffentlichen / zurückziehen</b><span>Login nötig. Veröffentlichen sendet deine aktuelle Sammlung an die Galerie; erneutes Veröffentlichen überschreibt die alte statt einen zweiten Eintrag zu erstellen.</span></div>
                 <div class="howto-feat"><b>Suche / Sortierung / Filter</b><span>Nach Spielername oder Tag suchen; sortieren nach neu/❤ beliebtesten/Kartenanzahl/höchster Bewertung; oder nur mit „Gefällt mir" markierte anzeigen.</span></div>
-                <div class="howto-feat"><b>Sammlungsdetails</b><span>Karte anklicken zum Öffnen: nach Modus/Kategorie-Tab durchsuchen, One-Klick-Import, Freigabelink kopieren, und darunter ein Kommentarbereich — jeder Angemeldete kann kommentieren, Löschen ist dem Kommentator oder dem Veröffentlicher der Sammlung erlaubt.</span></div>
+                <div class="howto-feat"><b>Sammlungsdetails</b><span>Karte anklicken zum Öffnen: nach Modus/Kategorie-Tab durchsuchen, One-Klick-Import, Freigabelink kopieren — nach Login außerdem „Meine Scores überlagern" (zeigt deine eigene Bewertung + eine Bewertungsstatistik auf jeder Map) und „Embed-Code kopieren" für ein iframe zum Einbetten in Forum/Blog. Darunter ein Kommentarbereich — jeder Angemeldete kann kommentieren, Löschen ist dem Kommentator oder dem Veröffentlicher der Sammlung erlaubt.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -421,7 +421,7 @@ I18N.de = {
                 <div class="howto-tab-title">✦ Katalog</div>
                 <p class="howto-tab-desc">Ein Browser für den gesamten ranked-Katalog, aufgeteilt nach Künstler/Sprache/Genre/Quelle/Feat.</p>
                 <div class="howto-feat"><b>Filterkombinationen</b><span>Die vier Dropdowns können kombiniert werden, plus ein Modus-Filter und ein „18+ markiert einschließen"-Schalter, mit vier Sortieroptionen.</span></div>
-                <div class="howto-feat"><b>➕ Sammlung aus diesem Filter erstellen</b><span>Wird erst aktiv, wenn deine Filter Ergebnisse liefern — ein Klick macht das gesamte gefilterte Ergebnis zu einer neuen Kategorie in deiner Sammlung.</span></div>
+                <div class="howto-feat"><b>➕ Sammlung aus diesem Filter erstellen</b><span>Wird erst aktiv, wenn deine Filter Ergebnisse liefern — ein Klick macht das gesamte gefilterte Ergebnis zu einer neuen Kategorie in deiner Sammlung. Mit „Als dynamische Kategorie" holst du später neu gerankte Maps, die zum selben Filter passen, mit einem Klick nach.</span></div>
             </div>
 
             <div class="howto-tab">

@@ -381,7 +381,7 @@ I18N.es = {
                 <p class="howto-tab-desc">Publica tu colección organizada, o explora las de otros e impórtalas directamente. Cada cuenta osu! solo puede publicar una.</p>
                 <div class="howto-feat"><b>Publicar / despublicar</b><span>Requiere sesión. Publicar envía tu colección actual a la galería; publicar de nuevo sobrescribe la anterior en vez de crear una segunda entrada.</span></div>
                 <div class="howto-feat"><b>Buscar / ordenar / filtrar</b><span>Busca por nombre de jugador o etiqueta; ordena por reciente/❤ más populares/cantidad de mapas/mayor calificación; o muestra solo las que te gustaron.</span></div>
-                <div class="howto-feat"><b>Detalle de colección</b><span>Haz clic en una tarjeta para abrirla: navega por pestaña de modo/categoría, importa con un clic, copia el enlace para compartir, y abajo una sección de comentarios — cualquiera con sesión iniciada puede comentar, y borrar está permitido al autor del comentario o al publicador de esa colección.</span></div>
+                <div class="howto-feat"><b>Detalle de colección</b><span>Haz clic en una tarjeta para abrirla: navega por pestaña de modo/categoría, importa con un clic, copia el enlace para compartir — con sesión iniciada, también "Superponer mis puntuaciones" (marca tu propia calificación + estadísticas de grado en cada mapa) y "Copiar código para insertar" para un iframe que pegar en un foro/blog. Abajo hay una sección de comentarios — cualquiera con sesión iniciada puede comentar, y borrar está permitido al autor del comentario o al publicador de esa colección.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -421,7 +421,7 @@ I18N.es = {
                 <div class="howto-tab-title">✦ Catálogo</div>
                 <p class="howto-tab-desc">Un navegador para todo el catálogo ranked, dividido por artista/idioma/género/fuente/feat.</p>
                 <div class="howto-feat"><b>Combinaciones de filtros</b><span>Los cuatro desplegables se pueden combinar, más un filtro de modo y un interruptor "incluir marcados 18+", con cuatro opciones de orden.</span></div>
-                <div class="howto-feat"><b>➕ Crear colección desde este filtro</b><span>Solo se activa cuando tus filtros dan resultados — un clic convierte todo el resultado filtrado en una nueva categoría en tu colección.</span></div>
+                <div class="howto-feat"><b>➕ Crear colección desde este filtro</b><span>Solo se activa cuando tus filtros dan resultados — un clic convierte todo el resultado filtrado en una nueva categoría en tu colección; marca "Hacerla categoría dinámica" para luego traer con un clic los mapas recién rankeados que coincidan con el mismo filtro.</span></div>
             </div>
 
             <div class="howto-tab">
