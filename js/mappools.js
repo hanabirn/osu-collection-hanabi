@@ -136,12 +136,15 @@ function mappoolModeApi(m) {
 
 /* Tournament-style mod badge for a bracket label — the 2-letter hexagon
    icons pools use (NM / HD / HR / DT / FM / TB), plus the osu!mania-only
-   ones. `slug` -> a css/osu.css `.mod-badge--<slug>` colour class. */
+   ones. `slug` -> a css/osu.css `.mod-badge--<slug>` colour class.
+   Keyed by the wiki's full bracket names (the WC crawler emits those) AND
+   by the short acronyms (the community-pool editor uses those). */
 const MOD_BADGE = {
     'No Mod': { ab: 'NM', slug: 'nm' },
     'Hidden': { ab: 'HD', slug: 'hd' },
     'Hard Rock': { ab: 'HR', slug: 'hr' },
     'Double Time': { ab: 'DT', slug: 'dt' },
+    'Nightcore': { ab: 'NC', slug: 'dt' },
     'Free Mod': { ab: 'FM', slug: 'fm' },
     'Tiebreaker': { ab: 'TB', slug: 'tb' },
     'Rice': { ab: 'RC', slug: 'rc' },
@@ -150,10 +153,25 @@ const MOD_BADGE = {
     'SV': { ab: 'SV', slug: 'sv' },
     'Extreme': { ab: 'EX', slug: 'ex' },
     'Mixed Mod': { ab: 'MM', slug: 'mm' },
+    'NM': { ab: 'NM', slug: 'nm' },
+    'HD': { ab: 'HD', slug: 'hd' },
+    'HR': { ab: 'HR', slug: 'hr' },
+    'DT': { ab: 'DT', slug: 'dt' },
+    'NC': { ab: 'NC', slug: 'dt' },
+    'FM': { ab: 'FM', slug: 'fm' },
+    'TB': { ab: 'TB', slug: 'tb' },
+    'RC': { ab: 'RC', slug: 'rc' },
+    'LN': { ab: 'LN', slug: 'ln' },
+    'HB': { ab: 'HB', slug: 'hb' },
+    'MM': { ab: 'MM', slug: 'mm' },
+    'MIXEDMOD': { ab: 'MM', slug: 'mm' },
+    'EZ': { ab: 'EZ', slug: 'nm' },
+    'FL': { ab: 'FL', slug: 'tb' },
+    'HT': { ab: 'HT', slug: 'dt' },
 };
 
 function mappoolBracketHead(label) {
-    const b = MOD_BADGE[label];
+    const b = MOD_BADGE[label] || MOD_BADGE[String(label).trim().toUpperCase()];
     const badge = b
         ? `<span class="mod-badge mod-badge--${b.slug}" aria-hidden="true">${b.ab}</span>`
         : '';
