@@ -220,6 +220,45 @@ async function cmdTop(options, interaction) {
     });
 }
 
+/* --- /practice ------------------------------------------------------------ */
+
+async function cmdPractice(options, interaction, origin) {
+    const who = await resolveWho(options, interaction);
+    if (!who) return L.ephemeral(t('need_name_or_link'));
+    const targetPp = Number(L.optVal(options, 'target_pp'));
+    const kind = Number.isFinite(targetPp) && targetPp > 0 ? 'goal' : 'push';
+
+    const qs = new URLSearchParams({ user: who, kind });
+    if (kind === 'goal') qs.set('target', String(targetPp));
+    const r = await fetch(`${origin}/.netlify/functions/practice-generate?${qs}`);
+    const data = await r.json().catch(() => ({}));
+
+    if (r.status === 404) return L.ephemeral(t('user_not_found', { name: who }));
+    if (r.status === 422 && data.error === 'not enough top plays') return L.ephemeral(t('practice_need_plays'));
+    if (r.status === 422) return L.ephemeral(t('practice_thin'));
+    if (data.error === 'goal already reached') return L.ephemeral(t('practice_goal_reached'));
+    if (!r.ok || !Array.isArray(data.maps) || !data.maps.length) return L.ephemeral(t('practice_thin'));
+
+    const beatmaps = data.maps.map(m => ({
+        mapId: m.beatmapId, mapSetId: m.setId, artist: m.artist, title: m.title,
+        diff: '', md5: '', mode: 0, stars: m.stars || 0,
+    }));
+    const bytes = buildOsdb([{ name: data.name, beatmaps }], 'osu! Collection bot');
+    const filename = `${data.name.replace(/[^\w.\- ]+/g, '').trim().slice(0, 60) || 'practice'}.osdb`;
+
+    const preview = data.maps.slice(0, 10)
+        .map(m => `★${Number(m.stars).toFixed(2)} · [${m.artist} - ${m.title}](https://osu.ppy.sh/b/${m.beatmapId})`)
+        .join('\n');
+    const extra = data.maps.length - 10;
+
+    return messageWithFile({
+        title: t('practice_title', { name: data.name }),
+        description: `${t('practice_summary', { count: data.count, note: data.note })}\n\n${preview}${extra > 0 ? `\n${t('practice_more', { n: extra })}` : ''}`,
+        color: PINK,
+        footer: L.siteFooter(t('export_done', { name: filename })),
+    }, { filename, body: bytes, contentType: 'application/octet-stream' });
+}
+
 /* --- /map ----------------------------------------------------------------- */
 
 function parseBeatmapId(raw) {
@@ -813,6 +852,7 @@ exports.handler = async (event) => {
                 case 'recent': return await cmdRecent(options, interaction);
                 case 'top': return await cmdTop(options, interaction);
                 case 'map': return await cmdMap(options, origin);
+                case 'practice': return await cmdPractice(options, interaction, origin);
                 case 'mappool': return await cmdMappool(options, origin);
                 case 'skin': return await cmdSkin(options, origin);
                 case 'link': return await cmdLink(options, interaction);

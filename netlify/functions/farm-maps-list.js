@@ -30,6 +30,9 @@ exports.handler = async (event) => {
     const mode = MODE_NUM[qs.mode] !== undefined ? qs.mode : 'osu';
     const mods = MODS_SET.has(qs.mods) ? qs.mods : 'NM';
     const page = Math.max(0, parseInt(qs.page, 10) || 0);
+    // Callers that want a bigger single page (the practice-collection
+    // generator, the Discord bot's exports) can raise it up to 200.
+    const pageSize = Math.max(1, Math.min(200, parseInt(qs.limit, 10) || PAGE_SIZE));
     const q = (qs.q || '').trim().toLowerCase().slice(0, 100);
     const farmOnly = qs.farmOnly === '1';
 
@@ -90,7 +93,7 @@ exports.handler = async (event) => {
         items.sort(sorter(SORT_FIELDS[sortKey], sortDir));
         const total = items.length;
         const pageItems = items
-            .slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+            .slice(page * pageSize, (page + 1) * pageSize)
             .map(({ __pp, __star, __sr, ...r }) => ({ ...r, pp: __pp, star: __star, speedRatio: __sr != null ? __sr : null }));
 
         return {
@@ -100,7 +103,7 @@ exports.handler = async (event) => {
                 items: pageItems,
                 total,
                 page,
-                pageSize: PAGE_SIZE,
+                pageSize,
                 coverage: {
                     discoveredCount: crawlState.discoveredCount || 0,
                     computedCount: crawlState.computedCount || 0,
