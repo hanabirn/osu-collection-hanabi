@@ -7,6 +7,49 @@ const { getCollectionsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
+
+/* Fire a "new collection published" embed into the Discord channel the bot
+   watches. Best-effort only: guarded by a short timeout and always caught by
+   the caller, so a Discord outage / permission change can never fail or
+   noticeably slow a publish. Inert unless both env vars are set. */
+async function announceNewCollection(entry, categoryNames, origin) {
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const channelId = process.env.DISCORD_GALLERY_CHANNEL_ID;
+    if (!token || !channelId) return;
+
+    const bits = [`${entry.totalSets} 圖組`];
+    if (entry.maxRating) bits.push(`最高 ${Number(entry.maxRating).toFixed(2)}★`);
+    if (entry.avgRating) bits.push(`平均 ${Number(entry.avgRating).toFixed(2)}★`);
+
+    const embed = {
+        title: `🎉 新收藏發佈：${entry.username || ('#' + entry.id)}`,
+        url: `${origin}/c/${entry.id}`,
+        description: bits.join(' · '),
+        color: 0xff66aa,
+        image: { url: `${origin}/.netlify/functions/og-collection?id=${entry.id}` },
+        footer: { text: 'osu! 歌曲收藏' },
+        timestamp: entry.updatedAt,
+    };
+    if (categoryNames && categoryNames.length) {
+        embed.fields = [{
+            name: `分類 (${categoryNames.length})`,
+            value: categoryNames.join(', ').slice(0, 1024),
+        }];
+    }
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    try {
+        await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+            method: 'POST',
+            headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ embeds: [embed], allowed_mentions: { parse: [] } }),
+            signal: ctrl.signal,
+        });
+    } finally {
+        clearTimeout(timer);
+    }
+}
 const MAX_SETS = 3000;
 const MAX_CATEGORIES = 100;
 const MAX_BODY_BYTES = 1.5 * 1024 * 1024;
@@ -154,6 +197,16 @@ exports.handler = async (event) => {
             likeCount: (existing && existing.likeCount) || 0,
         });
         await store.setJSON('index', filtered);
+
+        // Only the first time this osu! id publishes — republishes (an editor
+        // tweaking their collection) must not spam the channel.
+        if (!existing) {
+            const proto = event.headers['x-forwarded-proto'] || 'https';
+            const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+            try {
+                await announceNewCollection(filtered[filtered.length - 1], tags, `${proto}://${host}`);
+            } catch { /* Discord is best-effort; never fail a publish over it */ }
+        }
 
         return { statusCode: 200, headers, body: JSON.stringify({ ok: true, updatedAt }) };
     } catch (err) {
