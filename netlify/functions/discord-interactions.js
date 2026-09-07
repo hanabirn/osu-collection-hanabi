@@ -167,24 +167,30 @@ async function cmdTop(options, interaction) {
 
     const scores = await fetchScores(token, u.id, 'best', apiMode, 5, false);
     if (!scores.length) return L.ephemeral(`${u.username} 沒有 ${L.MODE_LABEL[apiMode]} 的最佳成績。`);
-    // A description block, not fields — fields box each entry into a narrow
-    // column and wrap the trailing "N 年前" mid-word.
-    const body = scores.map((s, i) => {
+    // One embed per play so each can carry its mod hexagon as a proper
+    // thumbnail (top-right, ~80 px) instead of a tiny inline emoji — the
+    // primary mod, or the grade badge for a no-mod play.
+    const embeds = scores.map((s, i) => {
         const bs = s.beatmapset || {}; const bm = s.beatmap || {};
+        const mods = L.modsList(s.mods);
         const modStr = L.modsTag(s.mods);
-        const head = `**#${i + 1}** ${L.gradeTag(s.rank)}${modStr ? ' ' + modStr : ''} · **${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}**`;
-        const line = `[${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id})`;
-        const meta = `${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`;
-        return `${head}\n${line}\n${meta}`;
-    }).join('\n\n');
-    return L.message({
-        author: L.osuAuthor(u, apiMode),
-        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${u.username} — ${L.MODE_LABEL[apiMode]} 最佳 ${scores.length} 名`,
-        url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`,
-        color: L.srColor(scores[0].beatmap && scores[0].beatmap.difficulty_rating),
-        description: body.slice(0, 4096),
-        footer: L.siteFooter('osu! API v2'),
+        const thumb = L.emojiImageUrl(L.MOD_EMOJI[mods[0]], 128) || L.emojiImageUrl(L.GRADE_EMOJI[s.rank], 128);
+        return {
+            author: i === 0
+                ? { name: `${u.username} — ${L.MODE_LABEL[apiMode]} 最佳 ${scores.length} 名`, url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`, icon_url: u.avatar_url || undefined }
+                : undefined,
+            title: `#${i + 1} · ${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+            url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
+            description: [
+                `${L.gradeTag(s.rank)}${modStr ? ' ' + modStr : ''} · **${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}**`,
+                `${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`,
+            ].join('\n'),
+            color: L.srColor(bm.difficulty_rating),
+            thumbnail: thumb ? { url: thumb } : undefined,
+            footer: i === scores.length - 1 ? L.siteFooter('osu! API v2') : undefined,
+        };
     });
+    return L.message(embeds);
 }
 
 /* --- /map ----------------------------------------------------------------- */

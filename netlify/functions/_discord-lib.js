@@ -99,14 +99,18 @@ function emojiImageUrl(tag, size = 96) {
     return m ? `https://cdn.discordapp.com/emojis/${m[1]}.${tag[1] === 'a' ? 'gif' : 'png'}?size=${size}` : null;
 }
 
-// osu! score `mods` (array of strings or {acronym}) -> a run of mod emojis.
-// "CL" (classic) is dropped as noise; unknown mods fall back to "+XX".
-function modsTag(mods) {
-    const arr = (mods || [])
+// osu! score `mods` (array of strings or {acronym}) -> plain acronym array,
+// "CL" (classic) dropped as noise.
+function modsList(mods) {
+    return (mods || [])
         .map(m => (typeof m === 'string' ? m : m && m.acronym))
         .filter(x => x && x !== 'CL')
         .map(x => String(x).toUpperCase());
-    return arr.map(m => MOD_EMOJI[m] || `+${m}`).join('');
+}
+
+// ... -> a run of mod emojis; unknown mods fall back to "+XX".
+function modsTag(mods) {
+    return modsList(mods).map(m => MOD_EMOJI[m] || `+${m}`).join('');
 }
 
 /* --- signature --------------------------------------------------------- */
@@ -325,7 +329,7 @@ async function resolveOsuUser(token, nameOrId, apiMode) {
 
 module.exports = {
     PINK, SITE_ORIGIN, SITE_FOOTER, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
-    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag,
+    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag, modsList,
     bracketMod, bracketBadge, emojiImageUrl,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
     optsOf, optVal, invokerId,
