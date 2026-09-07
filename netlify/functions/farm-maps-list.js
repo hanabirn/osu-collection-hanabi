@@ -19,13 +19,20 @@ const MODS_SET = new Set(MOD_COMBOS.map(m => m || 'NM'));
    FARM_THRESHOLD_CURVE in _farm-constants.js takes effect immediately across
    the whole dataset instead of waiting on a full signal recompute. The
    expensive part (fetching the top-50 board -> farmFraction) stays cached in
-   the record; only the cheap threshold comparison is re-run. Records from
-   before the v4 heuristic (criterion 'dt'/'acc', no farmFraction) fall back
-   to their stored verdict. */
+   the record; only the cheap threshold comparison is re-run.
+
+   Records from before the v4 heuristic (criterion 'dt'/'acc', no
+   farmFraction) fall back to their stored verdict — EXCEPT mania, whose old
+   'acc' rule (>=70% of the board SS'd, flat) is the one that was wrong: it
+   flagged huge popular maps regardless of SR inflation. So a not-yet-v4
+   mania record counts as unclassified (false) until the crawl recomputes
+   it, rather than showing a verdict we've since rejected. */
 function isFarmMap(mode, r) {
     const fs = r.farmSignal;
     if (!fs) return false;
-    if (fs.criterion !== 'ease-v4' || typeof fs.farmFraction !== 'number') return !!fs.isFarm;
+    if (fs.criterion !== 'ease-v4' || typeof fs.farmFraction !== 'number') {
+        return mode === 'mania' ? false : !!fs.isFarm;
+    }
     const nmStars = Number.isFinite(fs.nmStars) ? fs.nmStars
         : (r.stars && Number.isFinite(r.stars.NM) ? r.stars.NM : null);
     return (fs.sampleSize || 0) >= FARM_MIN_SAMPLE
