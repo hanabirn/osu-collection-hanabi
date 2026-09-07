@@ -3984,6 +3984,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     background: var(--bg-stat);
     border: 1px solid var(--border-card);
 }
+.chat-media-preview[hidden] { display: none; }
 .chat-media-preview img {
     display: block;
     max-width: 160px;
