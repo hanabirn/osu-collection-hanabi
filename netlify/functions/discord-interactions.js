@@ -273,6 +273,55 @@ async function autocompleteMappool(options, origin) {
     })));
 }
 
+const MAPPOOL_PAGE = 9; // maps per message (Discord caps at 10 embeds; one slot spare)
+
+// One embed per map (cover + mods + stats), a page at a time, with prev/next
+// buttons for rounds longer than MAPPOOL_PAGE.
+function mappoolRoundView(pool, roundIdx, page, origin) {
+    const round = (pool.rounds || [])[roundIdx];
+    if (!round) return null;
+
+    const maps = [];
+    for (const b of round.brackets || []) {
+        for (const m of b.maps || []) maps.push({ ...m, bracket: b.label || '' });
+    }
+    const pages = Math.max(1, Math.ceil(maps.length / MAPPOOL_PAGE));
+    const p = Math.max(0, Math.min(pages - 1, page));
+    const slice = maps.slice(p * MAPPOOL_PAGE, p * MAPPOOL_PAGE + MAPPOOL_PAGE);
+
+    const embeds = slice.map((m, i) => {
+        const mt = L.modeTag(L.API_MODE[m.mode]);
+        const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
+        const meta = [
+            m.stars != null ? `★${Number(m.stars).toFixed(2)}` : null,
+            m.bpm != null ? `${Math.round(m.bpm)} BPM` : null,
+            m.length != null ? L.fmtLen(m.length) : null,
+            m.creator ? `mapper：${m.creator}` : null,
+        ].filter(Boolean).join(' · ');
+        return {
+            author: i === 0 ? { name: `${pool.label} — ${round.name}` } : undefined,
+            title: `${m.bracket ? `[${m.bracket}] ` : ''}${mt ? mt + ' ' : ''}${name}`.slice(0, 250),
+            url: `https://osu.ppy.sh/b/${m.beatmapId}`,
+            description: meta || undefined,
+            color: m.stars != null ? L.srColor(m.stars) : PINK,
+            image: m.setId ? { url: `https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover.jpg` } : undefined,
+            footer: i === slice.length - 1
+                ? L.siteFooter(`${round.name} · 第 ${p + 1}/${pages} 頁 · 共 ${maps.length} 圖`)
+                : undefined,
+        };
+    });
+    if (!embeds.length) embeds.push({ title: `${pool.label} — ${round.name}`, description: '（這一輪還沒有解析好的圖）', color: PINK });
+
+    const components = pages > 1 ? [{
+        type: 1,
+        components: [
+            { type: 2, style: 2, label: '◀ 上一頁', custom_id: `mp|${pool.folder}|${roundIdx}|${p - 1}`, disabled: p === 0 },
+            { type: 2, style: 2, label: '下一頁 ▶', custom_id: `mp|${pool.folder}|${roundIdx}|${p + 1}`, disabled: p >= pages - 1 },
+        ],
+    }] : [];
+    return { embeds, components };
+}
+
 async function cmdMappool(options, origin) {
     const folder = String(L.optVal(options, 'edition') || '').trim();
     const roundQ = String(L.optVal(options, 'round') || '').trim().toLowerCase();
@@ -285,29 +334,10 @@ async function cmdMappool(options, origin) {
     const rounds = pool.rounds || [];
 
     if (roundQ) {
-        const round = rounds.find(rd => (rd.name || '').toLowerCase().includes(roundQ));
-        if (!round) return L.ephemeral(`「${pool.label}」沒有符合「${roundQ}」的輪次。`);
-        const lines = [];
-        let heroSetId = null;   // tiebreaker cover if there is one, else the first map's
-        for (const b of round.brackets || []) {
-            for (const m of b.maps || []) {
-                if (m.setId && (heroSetId === null || m.isTiebreaker)) heroSetId = m.setId;
-                const tag = b.label ? `\`${b.label}\` ` : '';
-                const mt = L.modeTag(L.API_MODE[m.mode]);
-                const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
-                const sr = m.stars != null ? ` ★${Number(m.stars).toFixed(2)}` : '';
-                lines.push(`${mt ? mt + ' ' : ''}${tag}[${name}](https://osu.ppy.sh/b/${m.beatmapId})${sr}`);
-                if (lines.length >= 24) break;
-            }
-        }
-        return L.message({
-            title: `${pool.label} — ${round.name}`,
-            url: round.mappackUrl || `${origin}/`,
-            description: lines.join('\n') || '（這一輪還沒有解析好的圖）',
-            color: PINK,
-            image: heroSetId ? { url: `https://assets.ppy.sh/beatmaps/${heroSetId}/covers/cover.jpg` } : undefined,
-            footer: L.siteFooter('世界盃圖池'),
-        });
+        const roundIdx = rounds.findIndex(rd => (rd.name || '').toLowerCase().includes(roundQ));
+        if (roundIdx < 0) return L.ephemeral(`「${pool.label}」沒有符合「${roundQ}」的輪次。`);
+        const view = mappoolRoundView(pool, roundIdx, 0, origin);
+        return L.message(view.embeds, view.components);
     }
 
     return L.message({
@@ -493,6 +523,18 @@ async function cmdFarm(options, origin) {
 
 async function handleComponent(interaction, origin) {
     const id = (interaction.data && interaction.data.custom_id) || '';
+
+    // /mappool round pagination: mp|<folder>|<roundIdx>|<page>  (folder can
+    // contain "/", so "|" is the delimiter here rather than ":").
+    if (id.startsWith('mp|')) {
+        const [, folder, roundIdxStr, pageStr] = id.split('|');
+        const r = await fetch(`${origin}/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(folder)}`);
+        if (!r.ok) return L.updateMessage({ title: '世界盃圖池查詢失敗', color: PINK });
+        const view = mappoolRoundView(await r.json(), Number(roundIdxStr), Number(pageStr), origin);
+        if (!view) return L.updateMessage({ title: '找不到輪次', color: PINK });
+        return L.updateMessage(view.embeds, view.components);
+    }
+
     const [ns, action, arg] = id.split(':');
 
     if (ns === 'col' && action === 'rand') {

@@ -100,14 +100,16 @@ const json = (obj, statusCode = 200) => ({
     body: JSON.stringify(obj),
 });
 
+// `embed` may be a single embed object or an array (Discord allows up to 10
+// per message).
 const message = (embed, components) => json({
     type: R.MESSAGE,
-    data: { embeds: [].concat(embed), components: components || [], allowed_mentions: { parse: [] } },
+    data: { embeds: [].concat(embed).slice(0, 10), components: components || [], allowed_mentions: { parse: [] } },
 });
 
 const updateMessage = (embed, components) => json({
     type: R.UPDATE_MESSAGE,
-    data: { embeds: [].concat(embed), components: components || [], allowed_mentions: { parse: [] } },
+    data: { embeds: [].concat(embed).slice(0, 10), components: components || [], allowed_mentions: { parse: [] } },
 });
 
 const ephemeral = (content) => json({
