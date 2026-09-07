@@ -6,10 +6,32 @@
    a complete ranked-pool snapshot — the `coverage` block in the response
    lets the frontend say so honestly instead of implying completeness. */
 const { getFarmMapsStore } = require('./_blobs-store');
-const { MOD_COMBOS, MODE_NUM } = require('./_farm-constants');
+const {
+    MOD_COMBOS, MODE_NUM,
+    FARM_MIN_SAMPLE, FARM_PLAYCOUNT_THRESHOLD, farmThresholdForStars,
+} = require('./_farm-constants');
 
 const PAGE_SIZE = 20;
 const MODS_SET = new Set(MOD_COMBOS.map(m => m || 'NM'));
+
+/* Whether a record counts as a farm map, decided HERE at read time rather
+   than trusting the crawl-time farmSignal.isFarm snapshot — so retuning
+   FARM_THRESHOLD_CURVE in _farm-constants.js takes effect immediately across
+   the whole dataset instead of waiting on a full signal recompute. The
+   expensive part (fetching the top-50 board -> farmFraction) stays cached in
+   the record; only the cheap threshold comparison is re-run. Records from
+   before the v4 heuristic (criterion 'dt'/'acc', no farmFraction) fall back
+   to their stored verdict. */
+function isFarmMap(mode, r) {
+    const fs = r.farmSignal;
+    if (!fs) return false;
+    if (fs.criterion !== 'ease-v4' || typeof fs.farmFraction !== 'number') return !!fs.isFarm;
+    const nmStars = Number.isFinite(fs.nmStars) ? fs.nmStars
+        : (r.stars && Number.isFinite(r.stars.NM) ? r.stars.NM : null);
+    return (fs.sampleSize || 0) >= FARM_MIN_SAMPLE
+        && (fs.playcount || 0) >= FARM_PLAYCOUNT_THRESHOLD
+        && fs.farmFraction >= farmThresholdForStars(mode, nmStars);
+}
 
 function sorter(field, dir) {
     const mul = dir === 'asc' ? 1 : -1;
@@ -65,8 +87,8 @@ exports.handler = async (event) => {
         }).filter(r => r.__pp !== undefined && r.__star !== undefined);
 
         const farmClassifiedCount = items.filter(r => r.farmSignal).length;
-        const farmMapCount = items.filter(r => r.farmSignal && r.farmSignal.isFarm).length;
-        if (farmOnly) items = items.filter(r => r.farmSignal && r.farmSignal.isFarm);
+        const farmMapCount = items.filter(r => isFarmMap(mode, r)).length;
+        if (farmOnly) items = items.filter(r => isFarmMap(mode, r));
 
         if (ppMin !== null) items = items.filter(r => r.__pp >= ppMin);
         if (ppMax !== null) items = items.filter(r => r.__pp <= ppMax);

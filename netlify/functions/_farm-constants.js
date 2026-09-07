@@ -49,11 +49,16 @@ const FARM_PLAYCOUNT_THRESHOLD = 500;   // min beatmap playcount for any farm ca
 const FARM_MIN_SAMPLE = 15;             // min top-50 scores before we trust a ratio
 
 // threshold(stars) = clamp(base - slope * (stars - pivot), min, max)
+// mania sits far lower than the rest: its top-50 boards are near-universally
+// SS/near-SS even on farm maps (it's an accuracy game), so the ease fractions
+// compress into a narrow ~0.1-0.3 band. Calibrated 2026-09-07 against the
+// real recomputed distribution (median frac ~0.20, farm-ish outliers ~0.30+)
+// so the curve sits at roughly its 80th percentile instead of way above it.
 const FARM_THRESHOLD_CURVE = {
     osu:    { base: 0.66, slope: 0.11, pivot: 4.5, min: 0.20, max: 0.72 },
     taiko:  { base: 0.66, slope: 0.11, pivot: 4.0, min: 0.20, max: 0.72 },
     fruits: { base: 0.58, slope: 0.10, pivot: 4.0, min: 0.18, max: 0.66 },
-    mania:  { base: 0.54, slope: 0.09, pivot: 4.0, min: 0.18, max: 0.60 },
+    mania:  { base: 0.30, slope: 0.05, pivot: 4.0, min: 0.18, max: 0.34 },
 };
 
 function farmThresholdForStars(mode, stars) {

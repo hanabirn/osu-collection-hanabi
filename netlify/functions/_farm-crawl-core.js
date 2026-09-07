@@ -211,6 +211,10 @@ async function fetchFarmSignal(beatmapId, mode, token, nmStars) {
         if (!Number.isFinite(nmStars)) nmStars = beatmapData.difficulty_rating;
     }
 
+    // farmFraction (from the top-50 board) is the expensive, cached part.
+    // threshold / isFarm here are only a crawl-time snapshot — farm-maps-list.js
+    // re-derives the verdict at read time from farmFraction + the *current*
+    // FARM_THRESHOLD_CURVE, so retuning the curve doesn't need a recompute.
     const threshold = farmThresholdForStars(mode, nmStars);
     const isFarm = sampleSize >= FARM_MIN_SAMPLE
         && playcount >= FARM_PLAYCOUNT_THRESHOLD
