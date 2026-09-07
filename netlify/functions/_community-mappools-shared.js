@@ -159,12 +159,33 @@ const WYBIN_MOD_LABEL = {
     Rice: 'RC', LongNote: 'LN', 'Long Note': 'LN', Hybrid: 'HB',
 };
 
+// One wyBin stage's mod brackets. The tournament summary
+// (/api/v1/tournament/<slug>) only inlines modBrackets for `currentStageId`;
+// every other stage comes back with modBrackets:null and needs its own
+// /api/v1/tournament-stage/<id> fetch to get the pool. Returns the raw
+// modBrackets array (or []).
+async function fetchWybinStageBrackets(st) {
+    if (Array.isArray(st.modBrackets) && st.modBrackets.length) return st.modBrackets;
+    if (st.id == null) return [];
+    try {
+        const res = await fetch(`https://wybin.xyz/api/v1/tournament-stage/${st.id}`, {
+            headers: { Accept: 'application/json' },
+        });
+        if (!res.ok) return [];
+        return (await res.json()).modBrackets || [];
+    } catch {
+        return [];
+    }
+}
+
 /* Best-effort import of a wyBin tournament's mappool into our pool shape.
-   wyBin's /api/v1/tournament/<slug> carries stages[].modBrackets[].beatmaps[],
-   but many hosts leave it empty (they use Google Sheets) or fill it with
-   beatmapId:0 placeholder rows — so this often returns { count: 0 } and the
-   caller falls back to manual entry. Returns { rounds, count } where rounds
-   is [{ id, name, brackets:[{ label, custom, maps:[{beatmapId}] }] }]. */
+   Walks every stage (Qualifier … Grand Finals), pulling each stage's pool
+   from /api/v1/tournament-stage/<id> when the summary didn't inline it, so
+   all rounds are captured — not just the current one. Many hosts still leave
+   wyBin empty (Google Sheets) so this can return { count: 0 } and the caller
+   falls back to manual entry. Stages are ordered by start date so rounds
+   read Qualifier → GF. Returns { rounds, count } where rounds is
+   [{ id, name, brackets:[{ label, custom, maps:[{beatmapId}] }] }]. */
 async function importWybinPool(slug, mode) {
     let det;
     try {
@@ -179,12 +200,16 @@ async function importWybinPool(slug, mode) {
     const wantGm = { standard: 0, taiko: 1, catch: 2, mania: 3 }[mode];
     const takeAll = mode === 'all';
     const presetSet = new Set((PRESET_BRACKETS[mode] || []).map((x) => x.toLowerCase()));
+    const stages = (det.stages || [])
+        .filter((st) => st && st.name)
+        .sort((a, b) => (a.startDate || 0) - (b.startDate || 0));
     const rounds = [];
     let count = 0;
-    for (const st of (det.stages || [])) {
-        if (!st.name) continue;
+    for (const st of stages) {
+        if (rounds.length >= MAX_ROUNDS) break;
+        const modBrackets = await fetchWybinStageBrackets(st);
         const brackets = [];
-        for (const mb of (st.modBrackets || [])) {
+        for (const mb of modBrackets) {
             const ids = (mb.beatmaps || [])
                 .filter((m) => (m.beatmapId || 0) > 0 && (takeAll || m.gamemodeId == null || m.gamemodeId === wantGm))
                 .map((m) => parseInt(m.beatmapId, 10));
@@ -197,7 +222,6 @@ async function importWybinPool(slug, mode) {
             brackets.push({ label, custom: !presetSet.has(label.toLowerCase()), maps });
         }
         if (brackets.length) rounds.push({ id: slugify(st.name), name: String(st.name).slice(0, MAX_NAME_LEN), brackets });
-        if (rounds.length >= MAX_ROUNDS) break;
     }
     return { rounds, count };
 }

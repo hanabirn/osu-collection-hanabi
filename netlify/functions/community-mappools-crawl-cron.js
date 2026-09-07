@@ -10,7 +10,9 @@ const { crawlWybinMappools } = require('./_community-mappools-shared');
 
 exports.handler = async () => {
     try {
-        const result = await crawlWybinMappools(getCommunityMappoolsStore(), { budgetMs: 25000, perRun: 12 });
+        // Lower perRun than a plain list-walk would allow: each import now
+        // does a per-stage fetch for every round wyBin didn't inline.
+        const result = await crawlWybinMappools(getCommunityMappoolsStore(), { budgetMs: 25000, perRun: 8 });
         return { statusCode: 200, body: JSON.stringify(result) };
     } catch (err) {
         return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
