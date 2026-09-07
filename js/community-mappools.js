@@ -306,8 +306,10 @@ async function openCommunityPool(id, fresh) {
     if (!fresh || !cmpoolCur || cmpoolCur.id !== id) detail.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
     if (listEl) listEl.hidden = true;
     document.getElementById('cmpool-bar').hidden = true;
+    // Clear (not just [hidden]) — .osu-pagination is display:flex and would
+    // otherwise stay visible above the detail view.
     const pagerEl = document.getElementById('cmpool-pagination');
-    if (pagerEl) pagerEl.hidden = true;
+    if (pagerEl) pagerEl.innerHTML = '';
     try {
         // `fresh` bypasses the CDN cache so a just-made edit shows at once.
         const res = await fetch(`/.netlify/functions/community-mappools-list?id=${encodeURIComponent(id)}` + (fresh ? `&_=${Date.now()}` : ''));
@@ -327,10 +329,9 @@ function closeCommunityPoolDetail() {
     if (detail) { detail.hidden = true; detail.innerHTML = ''; }
     if (listEl) listEl.hidden = false;
     document.getElementById('cmpool-bar').hidden = false;
-    const pagerEl = document.getElementById('cmpool-pagination');
-    if (pagerEl) pagerEl.hidden = false;
     // Edits inside the detail view mark the list stale — refresh it now so
-    // the counts / new pool are right when we land back on it.
+    // the counts / new pool are right when we land back on it; either path
+    // rebuilds the pager (openCommunityPool cleared it).
     if (!cmpoolIndexLoaded) loadCommunityPoolIndex(true);
     else renderCommunityPoolList();
 }
