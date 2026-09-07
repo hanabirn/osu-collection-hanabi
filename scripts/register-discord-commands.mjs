@@ -23,56 +23,87 @@ async function loadDotEnv() {
     } catch { /* no .env, fine */ }
 }
 
-// Option types: 3 = STRING, 4 = INTEGER.
+// Option types: 3 = STRING, 4 = INTEGER, 5 = BOOLEAN.
+const MODE_CHOICES = [
+    { name: 'osu!', value: 'osu' },
+    { name: 'osu!taiko', value: 'taiko' },
+    { name: 'osu!catch', value: 'fruits' },
+    { name: 'osu!mania', value: 'mania' },
+];
+const usernameOpt = { type: 3, name: 'username', required: false, description: 'osu! 名稱或 ID（省略則用 /link 綁定的帳號）' };
+const modeOpt = { type: 3, name: 'mode', required: false, description: '遊戲模式（預設 osu!）', choices: MODE_CHOICES };
+
 const commands = [
     {
         name: 'collection',
         description: '搜尋並顯示一份已發佈的 osu! 收藏',
         options: [
-            {
-                type: 3, name: 'query', required: true, autocomplete: true,
-                description: '發佈者名稱、收藏 ID 或分類關鍵字',
-            },
-        ],
-    },
-    {
-        name: 'pp',
-        description: '查詢 osu! 玩家的 PP 與排名',
-        options: [
-            { type: 3, name: 'username', required: true, description: 'osu! 使用者名稱或 ID' },
-            {
-                type: 3, name: 'mode', required: false, description: '遊戲模式（預設 osu!）',
-                choices: [
-                    { name: 'osu!', value: 'osu' },
-                    { name: 'osu!taiko', value: 'taiko' },
-                    { name: 'osu!catch', value: 'fruits' },
-                    { name: 'osu!mania', value: 'mania' },
-                ],
-            },
-        ],
-    },
-    {
-        name: 'farm',
-        description: '從農分圖資料庫抽一張圖',
-        options: [
-            {
-                type: 3, name: 'mode', required: false, description: '遊戲模式（預設 osu!）',
-                choices: [
-                    { name: 'osu!', value: 'osu' },
-                    { name: 'osu!taiko', value: 'taiko' },
-                    { name: 'osu!catch', value: 'catch' },
-                    { name: 'osu!mania', value: 'mania' },
-                ],
-            },
-            { type: 4, name: 'pp_min', required: false, description: '最低 PP' },
+            { type: 3, name: 'query', required: true, autocomplete: true, description: '發佈者名稱、收藏 ID 或分類關鍵字' },
         ],
     },
     {
         name: 'gallery',
         description: '瀏覽收藏廣場最新發佈的收藏',
+        options: [{ type: 4, name: 'page', required: false, description: '頁碼（從 1 開始）' }],
+    },
+    {
+        name: 'pp',
+        description: '查詢 osu! 玩家的 PP 與排名',
+        options: [usernameOpt, modeOpt],
+    },
+    {
+        name: 'recent',
+        description: '查看某位玩家最近的一筆成績',
         options: [
-            { type: 4, name: 'page', required: false, description: '頁碼（從 1 開始）' },
+            usernameOpt, modeOpt,
+            { type: 4, name: 'index', required: false, description: '第幾筆（1 = 最新，最多 50）' },
         ],
+    },
+    {
+        name: 'top',
+        description: '查看某位玩家的最佳成績',
+        options: [
+            usernameOpt, modeOpt,
+            { type: 4, name: 'index', required: false, description: '看第幾名的單筆詳情（1–100；省略則列前 5）' },
+        ],
+    },
+    {
+        name: 'map',
+        description: '顯示一張圖譜的資訊與 PP 值',
+        options: [{ type: 3, name: 'query', required: true, description: 'osu! 圖譜連結或 ID' }],
+    },
+    {
+        name: 'mappool',
+        description: '瀏覽官方世界盃圖池',
+        options: [
+            { type: 3, name: 'edition', required: true, autocomplete: true, description: '賽事版本（例如 OWC/2024）' },
+            { type: 3, name: 'round', required: false, description: '輪次名稱（省略則列出所有輪次）' },
+        ],
+    },
+    {
+        name: 'skin',
+        description: '搜尋站內皮膚庫',
+        options: [{ type: 3, name: 'query', required: true, description: '皮膚名稱或作者' }],
+    },
+    {
+        name: 'farm',
+        description: '從農分圖資料庫抽一張圖',
+        options: [
+            { type: 3, name: 'mode', required: false, description: '遊戲模式（預設 osu!）', choices: [
+                { name: 'osu!', value: 'osu' }, { name: 'osu!taiko', value: 'taiko' },
+                { name: 'osu!catch', value: 'catch' }, { name: 'osu!mania', value: 'mania' },
+            ] },
+            { type: 4, name: 'pp_min', required: false, description: '最低 PP' },
+        ],
+    },
+    {
+        name: 'link',
+        description: '把你的 Discord 帳號綁定一個 osu! 帳號',
+        options: [{ type: 3, name: 'username', required: true, description: 'osu! 名稱或 ID' }],
+    },
+    {
+        name: 'unlink',
+        description: '解除 osu! 帳號綁定',
     },
 ];
 

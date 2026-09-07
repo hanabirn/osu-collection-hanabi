@@ -107,4 +107,15 @@ function getGalleryCommentsStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getDmStore, getGalleryCommentsStore };
+// Discord bot state (discord-interactions.js) — currently just the osu!
+// account link map, key `link:<discordUserId>` -> { osuUserId, osuUsername,
+// linkedAt }, so /pp /recent /top can be called with no argument.
+function getDiscordBotStore() {
+    return getStore({
+        name: 'osu-discord-bot',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore };
