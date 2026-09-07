@@ -145,7 +145,7 @@ function scoreEmbed(score, user, apiMode) {
         description: [
             `${L.gradeTag(score.rank)}${modStr ? ' ' + modStr : ''} · ${acc} · **${pp}**`,
             `${L.fmtNum(score.score)} · ${combo}`,
-            `★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(score.created_at)}`,
+            `${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'}★ · ${L.ago(score.created_at)}`,
         ].join('\n'),
         thumbnail: { url: covers['list@2x'] || covers.list || covers.card || undefined },
         color: L.srColor(bm.difficulty_rating),
@@ -207,7 +207,7 @@ async function cmdTop(options, interaction) {
         const modText = mods.length ? ` **+${mods.join('')}**` : '';
         const head = `**#${i + 1}** ${L.gradeTag(s.rank)}${modStr ? ' ' + modStr : ''}${modText} · **${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}**`;
         const line = `[${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id})`;
-        const meta = `${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ★${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'} · ${L.ago(s.created_at)}`;
+        const meta = `${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'}★ · ${L.ago(s.created_at)}`;
         return `${head}\n${line}\n${meta}`;
     }).join('\n\n');
     return L.message({
@@ -391,14 +391,16 @@ async function cmdPractice(options, interaction, origin) {
     const filename = `${data.name.replace(/[^\w.\- ]+/g, '').trim().slice(0, 60) || 'practice'}.osdb`;
 
     const preview = data.maps.slice(0, 10)
-        .map(m => `★${Number(m.stars).toFixed(2)} · [${m.artist} - ${m.title}](https://osu.ppy.sh/b/${m.beatmapId})`)
+        .map(m => `${Number(m.stars).toFixed(2)}★ · [${m.artist} - ${m.title}](https://osu.ppy.sh/b/${m.beatmapId})`)
         .join('\n');
     const extra = data.maps.length - 10;
 
+    const coverSet = (data.maps.find(m => m.setId) || {}).setId;
     return messageWithFile({
         title: t('practice_title', { name: data.name }),
         description: `${t('practice_summary', { count: data.count, note: data.note })}\n\n${preview}${extra > 0 ? `\n${t('practice_more', { n: extra })}` : ''}`,
         color: PINK,
+        thumbnail: coverSet ? { url: `https://assets.ppy.sh/beatmaps/${coverSet}/covers/list@2x.jpg` } : undefined,
         footer: L.siteFooter(t('export_done', { name: filename })),
     }, { filename, body: bytes, contentType: 'application/octet-stream' });
 }
@@ -458,7 +460,7 @@ async function cmdMap(options, origin) {
         color: L.srColor(bm.difficulty_rating),
         image: bs.covers ? { url: bs.covers.cover || bs.covers['cover@2x'] } : undefined,
         fields: [
-            { name: t('f_difficulty'), value: `★${Number(bm.difficulty_rating).toFixed(2)}`, inline: true },
+            { name: t('f_difficulty'), value: `${Number(bm.difficulty_rating).toFixed(2)}★`, inline: true },
             { name: 'BPM', value: bm.bpm != null ? String(Math.round(bm.bpm)) : '—', inline: true },
             { name: t('f_length'), value: L.fmtLen(bm.total_length), inline: true },
             { name: 'AR / OD / CS / HP', value: `${bm.ar ?? '—'} / ${bm.accuracy ?? '—'} / ${bm.cs ?? '—'} / ${bm.drain ?? '—'}`, inline: true },
@@ -513,7 +515,7 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
         const slotLabel = mod ? `**${mod}${m.slot || ''}**` : '';
         const badges = [slotLabel, mt].filter(Boolean).join('  ');
         const meta = [
-            m.stars != null ? `★${Number(m.stars).toFixed(2)}` : null,
+            m.stars != null ? `${Number(m.stars).toFixed(2)}★` : null,
             m.bpm != null ? `${Math.round(m.bpm)} BPM` : null,
             m.length != null ? L.fmtLen(m.length) : null,
             m.creator ? t('mapper', { n: m.creator }) : null,
@@ -673,6 +675,11 @@ async function cmdCollection(options, origin) {
     const catNames = ((full && full.categories) || []).map(c => c && c.name).filter(Boolean);
 
     const embed = {
+        author: {
+            name: entry.username || ('#' + entry.id),
+            url: `https://osu.ppy.sh/users/${entry.id}`,
+            icon_url: `https://a.ppy.sh/${entry.id}`,
+        },
         title: t('collection_title', { name: entry.username || ('#' + entry.id) }),
         url: `${origin}/c/${entry.id}`,
         description: collectionDescBits(entry).join(' · '),
@@ -726,6 +733,7 @@ async function cmdGallery(options, origin) {
         url: `${origin}/`,
         description: lines.join('\n'),
         color: PINK,
+        thumbnail: { url: `${origin}/.netlify/functions/og-collection?id=${items[0].id}` },
         footer: L.siteFooter(t('gallery_footer', { p: page + 1, total: data.total || items.length })),
     });
 }
@@ -783,19 +791,25 @@ async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
                 { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
                 { name: t('f_length'), value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
                 { name: 'AR / OD / CS', value: `${m.ar ?? '—'} / ${m.od ?? '—'} / ${m.cs ?? '—'}`, inline: true },
-                { name: t('f_position'), value: `${idx + 1} / ${L.fmtNum(total)}`, inline: true },
             ],
-            footer: L.siteFooter(t('farm_footer', { band })),
+            footer: L.siteFooter(`${t('farm_footer', { band })} · ${idx + 1}/${L.fmtNum(total)}`),
         },
-        components: [{
-            type: 1,
-            components: [
-                { type: 2, style: 2, label: t('farm_btn_prev'), custom_id: cid(idx - 1) },
-                { type: 2, style: 1, label: t('farm_btn_random'), custom_id: cid(-1) },
-                { type: 2, style: 2, label: t('farm_btn_next'), custom_id: cid(idx + 1) },
-                { type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `farmx|${mode}|${mods}|${ppMin}|${ppMax}` },
-            ],
-        }],
+        components: [
+            {
+                type: 1,
+                components: [
+                    { type: 2, style: 2, label: t('farm_btn_prev'), custom_id: cid(idx - 1) },
+                    { type: 2, style: 1, label: t('farm_btn_random'), custom_id: cid(-1) },
+                    { type: 2, style: 2, label: t('farm_btn_next'), custom_id: cid(idx + 1) },
+                ],
+            },
+            {
+                type: 1,
+                components: [
+                    { type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `farmx|${mode}|${mods}|${ppMin}|${ppMax}` },
+                ],
+            },
+        ],
     };
 }
 
@@ -849,10 +863,14 @@ function osdbResponse(collections, baseName) {
     const filename = `${baseName.replace(/[^\w.\- ]+/g, '').trim().slice(0, 60) || 'collection'}.osdb`;
     const bytes = buildOsdb(nonEmpty, 'osu! Collection bot');
     const total = nonEmpty.reduce((s, c) => s + c.beatmaps.length, 0);
-    return messageWithFile(
-        { color: PINK, description: t('export_done', { name: filename }), footer: L.siteFooter(`${total} · ${nonEmpty.length}`) },
-        { filename, body: bytes, contentType: 'application/octet-stream' },
-    );
+    // A cover from the first map so the confirmation isn't text-only.
+    const coverSet = (nonEmpty[0].beatmaps.find(b => b.mapSetId) || {}).mapSetId;
+    return messageWithFile({
+        color: PINK,
+        description: t('export_done', { name: filename }),
+        thumbnail: coverSet ? { url: `https://assets.ppy.sh/beatmaps/${coverSet}/covers/list@2x.jpg` } : undefined,
+        footer: L.siteFooter(`${total} · ${nonEmpty.length}`),
+    }, { filename, body: bytes, contentType: 'application/octet-stream' });
 }
 
 /* --- message component (buttons) --------------------------------------- */
