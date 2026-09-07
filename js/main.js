@@ -51,6 +51,7 @@ function switchTab(tab, el) {
     if (tab === 'farm-maps') ensureFarmMapsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();
+    if (tab === 'cmpool' && typeof ensureCmpoolLoaded === 'function') ensureCmpoolLoaded();
     if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
     // Chat polls on a timer only while its own tab is visible — started/
     // stopped here on every tab switch (not just the lazy first-load other

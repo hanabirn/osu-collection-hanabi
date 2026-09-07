@@ -25,20 +25,16 @@ const CMPOOL_PRESET_BRACKETS = {
 // chat.js's chatEncodeForOnclick). Round/bracket labels can be user text.
 function cmEnc(s) { return encodeURIComponent(String(s)).replace(/'/g, '%27'); }
 
-let cmpoolScope = 'wc';
 let cmpoolIndexLoaded = false;
 let cmpoolIndex = [];          // [{ id, tournamentName, mode, roundCount, mapCount, contributorCount, updatedAt, ... }]
 let cmpoolCur = null;          // resolved pool currently open in #cmpool-detail
 let cmpoolCreateMode = 'standard';
-let cmpoolTourneyOptions = []; // { name, slug, url, source }
+let cmpoolTourneyOptions = []; // { name, slug, url, source, gamemode }
+let cmpoolPickedTourney = null; // the { name, slug, url, source } chosen from the <select>, if any
 
-function switchMappoolScope(scope) {
-    cmpoolScope = scope;
-    document.getElementById('mappool-scope-wc').classList.toggle('active', scope === 'wc');
-    document.getElementById('mappool-scope-community').classList.toggle('active', scope === 'community');
-    document.getElementById('mappool-scope-wc-body').hidden = scope !== 'wc';
-    document.getElementById('mappool-scope-community-body').hidden = scope !== 'community';
-    if (scope === 'community' && !cmpoolIndexLoaded) loadCommunityPoolIndex();
+// Called from switchTab('cmpool') — lazy-load the pool index once.
+function ensureCmpoolLoaded() {
+    if (!cmpoolIndexLoaded) loadCommunityPoolIndex();
 }
 
 async function loadCommunityPoolIndex() {
@@ -77,14 +73,21 @@ function renderCommunityPoolList() {
 }
 
 /* ── create / join ── */
+// wyBin gamemode int -> our mode key (0=osu,1=taiko,2=catch,3=mania; 4=all).
+const CMPOOL_WYBIN_MODE = { 0: 'standard', 1: 'taiko', 2: 'catch', 3: 'mania' };
+
 async function openCommunityPoolCreate() {
     const box = document.getElementById('cmpool-create');
     if (!box) return;
     box.hidden = false;
     cmpoolCreateMode = 'standard';
+    cmpoolPickedTourney = null;
+    const nameEl = document.getElementById('cmpool-create-name');
+    if (nameEl) nameEl.value = '';
     renderCmpoolCreateModeTabs();
-    if (!cmpoolTourneyOptions.length) loadCmpoolTourneyOptions();
-    document.getElementById('cmpool-create-name')?.focus();
+    if (!cmpoolTourneyOptions.length) await loadCmpoolTourneyOptions();
+    renderCmpoolTourneySelect();
+    nameEl?.focus();
 }
 function closeCommunityPoolCreate() {
     const box = document.getElementById('cmpool-create');
@@ -95,8 +98,13 @@ function renderCmpoolCreateModeTabs() {
     if (!el) return;
     el.innerHTML = CMPOOL_MODES.map(m => {
         const ico = typeof modeIconSvg === 'function' ? modeIconSvg(m) : '';
-        return `<button class="osu-mode-tab${m === cmpoolCreateMode ? ' active' : ''}" onclick="cmpoolCreateMode='${m}';renderCmpoolCreateModeTabs()">${ico} ${CMPOOL_MODE_LABEL[m]}</button>`;
+        return `<button class="osu-mode-tab${m === cmpoolCreateMode ? ' active' : ''}" onclick="cmpoolSetCreateMode('${m}')">${ico} ${CMPOOL_MODE_LABEL[m]}</button>`;
     }).join('');
+}
+function cmpoolSetCreateMode(m) {
+    cmpoolCreateMode = m;
+    renderCmpoolCreateModeTabs();
+    renderCmpoolTourneySelect(); // list filters to the picked mode
 }
 async function loadCmpoolTourneyOptions() {
     try {
@@ -108,17 +116,35 @@ async function loadCmpoolTourneyOptions() {
             slug: x.slug || '',
             url: x.slug ? `https://wybin.xyz/tournaments/${x.slug}` : '',
             source: 'wybin',
-        })).filter(o => o.name);
+            gamemode: typeof x.gamemode === 'number' ? x.gamemode : null,
+        })).filter(o => o.name).sort((a, b) => a.name.localeCompare(b.name));
     } catch { cmpoolTourneyOptions = []; }
-    const dl = document.getElementById('cmpool-tourney-list');
-    if (dl) dl.innerHTML = cmpoolTourneyOptions.slice(0, 400).map(o => `<option value="${escHtml(o.name)}">`).join('');
+}
+// A visible dropdown of the tournaments on wyBin, filtered to the mode the
+// user picked (+ mixed-mode events), so they can browse rather than guess.
+function renderCmpoolTourneySelect() {
+    const sel = document.getElementById('cmpool-tourney-select');
+    if (!sel) return;
+    const want = { standard: 0, taiko: 1, catch: 2, mania: 3 }[cmpoolCreateMode];
+    const rows = cmpoolTourneyOptions.filter(o => o.gamemode == null || o.gamemode === want || o.gamemode === 4);
+    sel.innerHTML = `<option value="">${escHtml(t('cmpool_pick_from_list'))}</option>` +
+        rows.slice(0, 500).map((o, i) => `<option value="${i}">${escHtml(o.name)}</option>`).join('');
+    sel._rows = rows;
+}
+function onCmpoolTourneyPicked(sel) {
+    const o = sel.value !== '' && sel._rows ? sel._rows[parseInt(sel.value, 10)] : null;
+    cmpoolPickedTourney = o || null;
+    const nameEl = document.getElementById('cmpool-create-name');
+    if (nameEl && o) nameEl.value = o.name;
 }
 async function submitCommunityPoolCreate() {
     const name = (document.getElementById('cmpool-create-name') || {}).value.trim();
     if (!name) { showShareToast(t('cmpool_need_name')); return; }
     const token = getOsuAuthToken();
     if (!token) { showShareToast(t('chat_login_required')); return; }
-    const match = cmpoolTourneyOptions.find(o => o.name.toLowerCase() === name.toLowerCase());
+    const match = (cmpoolPickedTourney && cmpoolPickedTourney.name.toLowerCase() === name.toLowerCase())
+        ? cmpoolPickedTourney
+        : cmpoolTourneyOptions.find(o => o.name.toLowerCase() === name.toLowerCase());
     const tournament = match
         ? { name: match.name, slug: match.slug, source: match.source, url: match.url }
         : { name, source: 'custom' };
@@ -350,9 +376,9 @@ function cmpoolImportEvent() {
     mappoolImport(cmpoolCur.tournament.name, cmpoolEventSetIds());
 }
 
-/* language switch — the sub-tab content is JS-built */
+/* language switch — the tab content is JS-built */
 function refreshCommunityMappoolsLocalized() {
-    if (cmpoolScope !== 'community') return;
+    if (!cmpoolIndexLoaded) return;
     if (cmpoolCur) renderCommunityPoolDetail();
     else renderCommunityPoolList();
 }

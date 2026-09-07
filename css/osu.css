@@ -1845,6 +1845,17 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: var(--text);
     font: inherit;
 }
+.cmpool-create select {
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-input);
+    color: var(--text);
+    font: inherit;
+}
 .cmpool-create-actions { display: flex; gap: 8px; }
 .cmpool-row {
     display: flex;
