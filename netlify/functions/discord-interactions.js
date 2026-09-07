@@ -283,7 +283,7 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
 
     const maps = [];
     for (const b of round.brackets || []) {
-        for (const m of b.maps || []) maps.push({ ...m, bracket: b.label || '' });
+        (b.maps || []).forEach((m, si) => maps.push({ ...m, bracket: b.label || '', slot: si + 1 }));
     }
     const pages = Math.max(1, Math.ceil(maps.length / MAPPOOL_PAGE));
     const p = Math.max(0, Math.min(pages - 1, page));
@@ -292,6 +292,10 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
     const embeds = slice.map((m, i) => {
         const mt = L.modeTag(L.API_MODE[m.mode]);
         const name = m.resolved ? `${m.artist} - ${m.title} [${m.version}]` : `#${m.beatmapId}`;
+        // Badges (mod hexagon + slot number + ruleset) go in the description
+        // — custom emoji don't render in an embed title.
+        const bb = L.bracketBadge(m.bracket);
+        const badges = [bb ? `${bb}${m.slot ? ' ' + m.slot : ''}` : '', mt].filter(Boolean).join('  ');
         const meta = [
             m.stars != null ? `★${Number(m.stars).toFixed(2)}` : null,
             m.bpm != null ? `${Math.round(m.bpm)} BPM` : null,
@@ -300,9 +304,9 @@ function mappoolRoundView(pool, roundIdx, page, origin) {
         ].filter(Boolean).join(' · ');
         return {
             author: i === 0 ? { name: `${pool.label} — ${round.name}` } : undefined,
-            title: `${m.bracket ? `[${m.bracket}] ` : ''}${mt ? mt + ' ' : ''}${name}`.slice(0, 250),
+            title: name.slice(0, 250),
             url: `https://osu.ppy.sh/b/${m.beatmapId}`,
-            description: meta || undefined,
+            description: [badges, meta].filter(Boolean).join('\n') || undefined,
             color: m.stars != null ? L.srColor(m.stars) : PINK,
             image: m.setId ? { url: `https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover.jpg` } : undefined,
             footer: i === slice.length - 1

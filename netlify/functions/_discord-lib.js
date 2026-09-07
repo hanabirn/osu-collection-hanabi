@@ -64,6 +64,30 @@ const MOD_EMOJI = {
     '8K': '<:mod_8k:1546378901863800855>', '9K': '<:mod_9k:1546378911351308318>',
 };
 
+// A World Cup mappool bracket label -> the matching mod hexagon emoji, like
+// the badges the site's 世界盃圖池 tab shows. Handles both the full-word
+// labels the crawler stores ("No Mod", "Hard Rock", "Free Mod"...) and bare
+// acronyms ("NM1", "HD2"). FreeMod / TieBreaker have no mod icon, so they
+// come back as a short text chip.
+const BRACKET_MOD = {
+    'no mod': 'NM', nomod: 'NM',
+    hidden: 'HD',
+    'hard rock': 'HR', hardrock: 'HR',
+    'double time': 'DT', doubletime: 'DT',
+    nightcore: 'NC', flashlight: 'FL', easy: 'EZ',
+    'half time': 'HT', halftime: 'HT',
+    'sudden death': 'SD', perfect: 'PF', mirror: 'MR', random: 'RD',
+    'free mod': 'FM', freemod: 'FM',
+    tiebreaker: 'TB', 'tie breaker': 'TB',
+};
+function bracketBadge(label) {
+    if (!label) return '';
+    const norm = String(label).toLowerCase().replace(/\s*\d+$/, '').trim();
+    const mod = BRACKET_MOD[norm] || (/^[a-z]{2}$/.test(norm) ? norm.toUpperCase() : '');
+    if (mod && MOD_EMOJI[mod]) return MOD_EMOJI[mod];
+    return `\`${mod || label}\``;
+}
+
 // osu! score `mods` (array of strings or {acronym}) -> a run of mod emojis.
 // "CL" (classic) is dropped as noise; unknown mods fall back to "+XX".
 function modsTag(mods) {
@@ -290,7 +314,7 @@ async function resolveOsuUser(token, nameOrId, apiMode) {
 
 module.exports = {
     PINK, SITE_ORIGIN, SITE_FOOTER, SITE_ICON, T, R, EPHEMERAL, API_MODE, MODE_LABEL,
-    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag,
+    GRADE_EMOJI, gradeTag, MODE_EMOJI, modeTag, MOD_EMOJI, modsTag, bracketBadge,
     verifySignature, json, message, updateMessage, ephemeral, autocomplete,
     optsOf, optVal, invokerId,
     fmtLen, fmtNum, ago, flagEmoji, srColor, rankColor, sparkline, rankChartUrl,
