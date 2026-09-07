@@ -1973,10 +1973,13 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 5px 12px;
     border-radius: 8px;
     border: 1px solid var(--border-card);
+    background: transparent;
     color: var(--text-secondary);
     font-size: 0.78rem;
+    font-family: inherit;
     text-decoration: none;
     white-space: nowrap;
+    cursor: pointer;
 }
 .cmpool-tourney-link:hover { color: var(--text-pink); border-color: rgba(var(--accent-pink-rgb), 0.45); }
 .cmpool-delete {
