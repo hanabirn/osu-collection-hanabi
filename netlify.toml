@@ -52,6 +52,13 @@
   to = "/.netlify/functions/gallery-feed"
   status = 200
 
+# Chat room image/GIF attachments — /chat-media/<uuid> streams the stored
+# bytes (netlify/functions/chat-media.js).
+[[redirects]]
+  from = "/chat-media/:id"
+  to = "/.netlify/functions/chat-media?id=:id"
+  status = 200
+
 # Clean Interactions Endpoint URL for the Discord bot — set this as the
 # app's endpoint in the Discord developer portal (discord-interactions.js).
 # The rewrite preserves the POST body Discord needs for signature checking.

@@ -83,6 +83,18 @@ function getChatStore() {
     });
 }
 
+// Chat room image/GIF attachments (chat-upload/chat-media.js) — one binary
+// blob per upload keyed `media:<id>`, with { mime, authorId } metadata.
+// Separate store from getChatStore()'s JSON so the (larger, binary) media
+// bytes never get pulled in when a plain message read just wants the array.
+function getChatMediaStore() {
+    return getStore({
+        name: 'osu-chat-media',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
 // Direct messages (dm-conversations/dm-messages/dm-send/dm-read.js) —
 // per-conversation message arrays (conv:<minId>:<maxId>) plus each user's
 // own inbox summary (index:<userId>), same store as the send cooldown key.
@@ -118,4 +130,4 @@ function getDiscordBotStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore };
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getChatStore, getChatMediaStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore };

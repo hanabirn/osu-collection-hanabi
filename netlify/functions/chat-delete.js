@@ -5,7 +5,7 @@
    valve — no roles/permissions system needed for a solo-dev site). Owner id
    is env-overridable rather than only hardcoded so it can be corrected
    without a code change if it's ever wrong. */
-const { getChatStore } = require('./_blobs-store');
+const { getChatStore, getChatMediaStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
@@ -50,6 +50,11 @@ exports.handler = async (event) => {
 
         const remaining = messages.filter(m => m.id !== messageId);
         await store.setJSON('messages', remaining);
+
+        // Best-effort: drop the attachment blob too.
+        if (target.media && target.media.id) {
+            try { await getChatMediaStore().delete(`media:${target.media.id}`); } catch { /* ignore */ }
+        }
 
         return { statusCode: 200, headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ ok: true }) };
     } catch (err) {

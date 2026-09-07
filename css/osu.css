@@ -3961,6 +3961,54 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .input-group .chat-emoji-cell:hover { background: var(--bg-stat); box-shadow: none; transform: none; }
 
+/* ===== Image / GIF attachment ===== */
+.input-group .chat-emoji-btn#chat-attach-btn { font-size: 1.05rem; }
+.chat-message-media-link { display: inline-block; margin-top: 6px; }
+.chat-message-media {
+    display: block;
+    max-width: min(320px, 100%);
+    max-height: 240px;
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-stat);
+    cursor: zoom-in;
+}
+.chat-media-preview {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 6px;
+    border-radius: 10px;
+    background: var(--bg-stat);
+    border: 1px solid var(--border-card);
+}
+.chat-media-preview img {
+    display: block;
+    max-width: 160px;
+    max-height: 120px;
+    border-radius: 6px;
+}
+.chat-media-preview button {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 999px;
+    background: var(--pink);
+    color: #14101c;
+    cursor: pointer;
+    line-height: 1;
+}
+:root[data-theme="light"] .chat-media-preview button { color: #fff; }
+
 /* ===== Direct messages (js/dm.js) =====
    Reuses .chat-* building blocks (avatar-with-flag, .chat-message-name,
    .chat-message-time, .osu-empty) throughout rather than a parallel style

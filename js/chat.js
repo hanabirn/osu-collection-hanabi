@@ -18,6 +18,11 @@ let chatLastId = 0;
 let chatPollTimer = null;
 let chatReplyTarget = null; // { id, username, snippet }
 let chatEditingId = null;   // message id whose inline editor is currently open
+let chatPendingMedia = null; // { dataUrl, base64, mime } staged for the next send
+
+const CHAT_MEDIA_MAX_BYTES = 4 * 1024 * 1024;
+const CHAT_MEDIA_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+let chatPasteBound = false;
 
 /* ===== Emoji ===== curated Unicode set, grouped. No picker library: the
    ones on a CDN fetch their emoji-data JSON at runtime, which this site's
@@ -51,6 +56,14 @@ function ensureChatLoaded() {
         loadInitialChatMessages();
     }
     startChatPolling();
+    if (!chatPasteBound) {
+        chatPasteBound = true;
+        const input = document.getElementById('chat-input');
+        if (input) input.addEventListener('paste', (e) => {
+            const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+            if (item) { e.preventDefault(); onChatFilePicked(item.getAsFile()); }
+        });
+    }
 }
 
 function startChatPolling() {
@@ -161,6 +174,10 @@ function chatMessageHtml(m) {
     const replyHtml = m.replyToId && m.replyAuthorUsername ? `
         <div class="chat-reply-quote">${icon('cornerUpLeft', { extraClass: 'icon-label-gap' })}<b>${escapeHtmlOsu(m.replyAuthorUsername)}</b>：${escapeHtmlOsu(m.replyContent || '')}</div>` : '';
     const cardHtml = m.beatmapPreview ? chatBeatmapCardHtml(m.beatmapPreview) : '';
+    const mediaHtml = m.media && m.media.id ? `
+        <a class="chat-message-media-link" href="/chat-media/${encodeURIComponent(m.media.id)}" target="_blank" rel="noopener noreferrer">
+            <img class="chat-message-media" src="/chat-media/${encodeURIComponent(m.media.id)}" alt="" loading="lazy">
+        </a>` : '';
     const profileUrl = `https://osu.ppy.sh/users/${m.authorId}`;
     const editedMark = m.editedAt ? ` <span class="chat-message-edited" title="${escapeHtmlOsu(chatFormatTime(m.editedAt))}">${t('chat_edited_marker')}</span>` : '';
     return `
@@ -181,7 +198,8 @@ function chatMessageHtml(m) {
                 ${canDelete ? `<button class="chat-delete-btn" onclick="deleteChatMessage(${m.id})" title="${t('chat_delete_btn_title')}">${icon('x')}</button>` : ''}
             </div>
             ${replyHtml}
-            <div class="chat-message-content">${chatRenderContent(m.content)}</div>
+            ${m.content ? `<div class="chat-message-content">${chatRenderContent(m.content)}</div>` : ''}
+            ${mediaHtml}
             <div class="chat-translation" id="chat-translation-${m.id}" style="display:none;"></div>
             ${cardHtml}
         </div>
@@ -421,20 +439,64 @@ function chatInsertEmoji(ch) {
     chatPushEmojiRecent(ch);
 }
 
+/* ===== Image / GIF attachment ===== */
+function onChatFilePicked(file) {
+    if (!file) return;
+    if (!CHAT_MEDIA_TYPES.includes(file.type)) { showShareToast(t('chat_media_bad_type')); return; }
+    if (file.size > CHAT_MEDIA_MAX_BYTES) { showShareToast(t('chat_media_too_big')); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+        const dataUrl = String(reader.result || '');
+        const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+        if (!base64) return;
+        chatPendingMedia = { dataUrl, base64, mime: file.type };
+        const box = document.getElementById('chat-media-preview');
+        const img = document.getElementById('chat-media-preview-img');
+        if (img) img.src = dataUrl;
+        if (box) box.hidden = false;
+        document.getElementById('chat-input')?.focus();
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearChatPendingMedia() {
+    chatPendingMedia = null;
+    const box = document.getElementById('chat-media-preview');
+    const img = document.getElementById('chat-media-preview-img');
+    if (img) img.removeAttribute('src');
+    if (box) box.hidden = true;
+}
+
 async function sendChatMessage() {
     const input = document.getElementById('chat-input');
     if (!input) return;
     const content = input.value.trim();
-    if (!content) return;
+    if (!content && !chatPendingMedia) return;
     const token = getOsuAuthToken();
     if (!token) { showShareToast(t('chat_login_required')); return; }
 
     input.disabled = true;
+    const sendBtn = input.parentElement?.querySelector('button:last-child');
+    if (sendBtn) sendBtn.disabled = true;
     try {
+        let mediaId = null;
+        if (chatPendingMedia) {
+            const up = await fetch('/.netlify/functions/chat-upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ dataBase64: chatPendingMedia.base64 }),
+            });
+            if (up.status === 401) { showShareToast(t('osu_login_fail')); return; }
+            if (up.status === 429) { showShareToast(t('chat_rate_limited')); return; }
+            if (up.status === 403) { showShareToast(t('chat_media_disabled')); return; }
+            if (!up.ok) { showShareToast(t('chat_media_upload_fail')); return; }
+            mediaId = (await up.json()).mediaId;
+        }
+
         const res = await fetch('/.netlify/functions/chat-send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ content, replyToId: chatReplyTarget ? chatReplyTarget.id : null }),
+            body: JSON.stringify({ content, mediaId, replyToId: chatReplyTarget ? chatReplyTarget.id : null }),
         });
         if (res.status === 401) { showShareToast(t('osu_login_fail')); return; }
         if (res.status === 429) { showShareToast(t('chat_rate_limited')); return; }
@@ -454,11 +516,13 @@ async function sendChatMessage() {
         }
         input.value = '';
         clearChatReplyTarget();
+        clearChatPendingMedia();
     } catch (e) {
         console.error('Send chat message failed:', e);
         showShareToast(t('chat_send_fail'));
     } finally {
         input.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
         input.focus();
     }
 }

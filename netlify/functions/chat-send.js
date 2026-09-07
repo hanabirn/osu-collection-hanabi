@@ -13,10 +13,11 @@
    get_beatmaps API this site's own netlify/functions/osu.js already proxies
    (OSU_API_KEY), not OAuth — simplest path, and this site fetches
    beatmapsets this way everywhere else already. */
-const { getChatStore } = require('./_blobs-store');
+const { getChatStore, getChatMediaStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const {
     MAX_CONTENT_LENGTH, MAX_MESSAGES, REPLY_SNIPPET_LENGTH, resolveBeatmapPreview,
+    ALLOWED_MEDIA_MIME,
 } = require('./_chat-shared');
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
@@ -60,7 +61,8 @@ exports.handler = async (event) => {
     }
 
     const content = typeof body.content === 'string' ? body.content.trim() : '';
-    if (!content) {
+    const mediaId = typeof body.mediaId === 'string' && /^[0-9a-f-]{36}$/i.test(body.mediaId) ? body.mediaId : null;
+    if (!content && !mediaId) {
         return { statusCode: 422, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Message is empty' }) };
     }
     if (content.length > MAX_CONTENT_LENGTH) {
@@ -86,7 +88,23 @@ exports.handler = async (event) => {
                 replyAuthorUsername = target.authorUsername;
                 replyContent = target.content.length > REPLY_SNIPPET_LENGTH
                     ? target.content.slice(0, REPLY_SNIPPET_LENGTH) + '…'
-                    : target.content;
+                    : (target.content || (target.media ? '🖼️' : ''));
+            }
+        }
+
+        // Confirm the upload exists and is this caller's — a message can't
+        // point at someone else's (or a bogus) media id.
+        let media = null;
+        if (mediaId) {
+            try {
+                const meta = await getChatMediaStore().getMetadata(`media:${mediaId}`);
+                if (meta && meta.metadata && String(meta.metadata.authorId) === String(user.id)
+                    && ALLOWED_MEDIA_MIME.includes(meta.metadata.mime)) {
+                    media = { id: mediaId, mime: meta.metadata.mime };
+                }
+            } catch { /* missing / unreadable — message just posts without it */ }
+            if (!media) {
+                return { statusCode: 422, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Attachment not found, please re-upload' }) };
             }
         }
 
@@ -103,6 +121,7 @@ exports.handler = async (event) => {
             content,
             beatmapsetId: beatmapPreview ? beatmapPreview.beatmapsetId : null,
             beatmapPreview,
+            media,
             replyToId: replyAuthorUsername ? replyToId : null,
             replyAuthorUsername,
             replyContent,
@@ -111,6 +130,16 @@ exports.handler = async (event) => {
 
         messages.push(message);
         const trimmed = messages.slice(-MAX_MESSAGES);
+
+        // Best-effort: drop the blobs for messages that just fell out of the
+        // ring buffer so orphaned media doesn't accumulate forever.
+        const survivingIds = new Set(trimmed.map(m => m.id));
+        const droppedMedia = messages
+            .filter(m => m.media && m.media.id && !survivingIds.has(m.id))
+            .map(m => m.media.id);
+        for (const gone of droppedMedia) {
+            try { await getChatMediaStore().delete(`media:${gone}`); } catch { /* ignore */ }
+        }
 
         await store.setJSON('messages', trimmed);
         await store.set(`lastPostAt:${user.id}`, String(Date.now()));
