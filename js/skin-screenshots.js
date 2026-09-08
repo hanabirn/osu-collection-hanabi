@@ -142,7 +142,10 @@ function renderSkinScreenshotsList() {
 
     if (skinScreenshotsItems.length === 0) {
         const hasFilter = !!(skinScreenshotsQuery || skinScreenshotsMode || skinScreenshotsLikedOnly || skinScreenshotsMineOnly);
-        listEl.innerHTML = `<p class="osu-empty">${t(hasFilter ? 'ssc_no_results' : 'ssc_empty')}</p>`;
+        listEl.innerHTML = `<div class="empty-state">
+            <div class="empty-state-icon">${icon(hasFilter ? 'search' : 'camera', { size: '1.5rem' })}</div>
+            <div class="empty-state-sub">${escapeHtmlOsu(t(hasFilter ? 'ssc_no_results' : 'ssc_empty'))}</div>
+        </div>`;
         if (pageEl) pageEl.innerHTML = '';
         return;
     }

@@ -24,17 +24,17 @@ function renderGamesHub() {
     if (!el) return;
     el.innerHTML = `
         <div class="games-card" role="button" tabindex="0" onclick="openDailyGame()" onkeydown="if(event.key==='Enter')openDailyGame()">
-            <div class="games-card-emoji">🎯</div>
+            <div class="games-card-glyph">${icon('target', { size: '1.6rem' })}</div>
             <h3>${escHtml(t('games_daily_title'))}</h3>
             <p>${escHtml(t('games_daily_blurb'))}</p>
         </div>
         <div class="games-card" role="button" tabindex="0" onclick="openHiloGame()" onkeydown="if(event.key==='Enter')openHiloGame()">
-            <div class="games-card-emoji">⚖️</div>
+            <div class="games-card-glyph">${icon('trendingUp', { size: '1.6rem' })}</div>
             <h3>${escHtml(t('games_hilo_title'))}</h3>
             <p>${escHtml(t('games_hilo_blurb'))}</p>
         </div>
         <div class="games-card" role="button" tabindex="0" onclick="openQuizGame()" onkeydown="if(event.key==='Enter')openQuizGame()">
-            <div class="games-card-emoji">🏷️</div>
+            <div class="games-card-glyph">${icon('tag', { size: '1.6rem' })}</div>
             <h3>${escHtml(t('games_quiz_title'))}</h3>
             <p>${escHtml(t('games_quiz_blurb'))}</p>
         </div>`;

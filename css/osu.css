@@ -555,7 +555,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transition: all 0.2s;
 }
 .skin-backup-btn:hover { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(var(--accent-purple-rgb), 0.25); }
-.cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); }
+.cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); color: var(--accent-purple); }
 
 .skins-empty {
     text-align: center;
@@ -578,6 +578,16 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 12px;
+}
+.resources-list { display: flex; flex-direction: column; gap: 20px; }
+.resource-group-title {
+    margin: 0 0 10px;
+    padding-left: 9px;
+    border-left: 3px solid var(--pink);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text);
 }
 .resource-link-card {
     display: block;
@@ -1127,6 +1137,34 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     margin-top: 6px;
     font-size: 0.78rem;
     opacity: 0.75;
+}
+/* Richer empty state — icon chip + one line of copy. Used where a bare
+   centred sentence felt unfinished (私訊, 皮膚廣場). */
+.empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 44px 20px;
+}
+.empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    background: rgba(var(--pink-rgb), 0.1);
+    color: var(--pink);
+}
+.empty-state-icon svg { display: block; }
+.empty-state-sub {
+    max-width: 340px;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--text-dim2);
 }
 
 .osu-card {
@@ -2019,7 +2057,18 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .games-card:hover { border-color: rgba(var(--pink-rgb), 0.5); transform: translateY(-2px); }
 .games-card-emoji { font-size: 2rem; line-height: 1; }
-.games-card h3 { margin: 10px 0 4px; font-size: 1.05rem; }
+.games-card-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(var(--pink-rgb), 0.12);
+    color: var(--pink);
+}
+.games-card-glyph svg { display: block; }
+.games-card h3 { margin: 12px 0 4px; font-size: 1.05rem; }
 .games-card p { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
 #games-view[hidden] { display: none; }
 
@@ -4153,7 +4202,16 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    just removes its default bottom margin since this page has nothing below
    it. Message list scrolls internally (like .leaderboard-list) rather than
    growing the whole page, since new messages keep arriving via polling. */
-.chat-card { margin-bottom: 0; }
+/* Cap the conversation column so message lines stay a comfortable reading
+   width on the shared 1120px page shell instead of running edge to edge.
+   The page header block above the card is capped to match so the two align. */
+.chat-card { margin: 0 auto; max-width: 780px; }
+#page-chat > .eyebrow, #page-chat > .osu-page-title, #page-chat > .tournaments-hint,
+#page-dm > .eyebrow, #page-dm > .osu-page-title, #page-dm > .tournaments-hint {
+    max-width: 780px;
+    margin-left: auto;
+    margin-right: auto;
+}
 .chat-messages-list {
     display: flex;
     flex-direction: column;
@@ -4575,11 +4633,19 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    locale files for no real benefit — nothing here needs updating
    independently of the rest. */
 .howto-jumpnav {
+    position: sticky;
+    top: 8px;
+    z-index: 5;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
     margin-bottom: 22px;
+    padding: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.6);
 }
 .howto-jumpnav a {
     font-size: 0.78rem;
@@ -4590,20 +4656,24 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: 1px solid var(--border-card);
     color: var(--text-pink);
     text-decoration: none;
+    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
 }
-.howto-jumpnav a:hover { background: rgba(var(--accent-pink-rgb), 0.15); }
+.howto-jumpnav a:hover { background: rgba(var(--accent-pink-rgb), 0.15); color: var(--pink); }
 .howto-manual { display: flex; flex-direction: column; gap: 18px; }
 .howto-group {
     background: var(--bg-card-alt);
     border: 1px solid var(--border-card);
     border-radius: 16px;
     padding: 18px 20px;
-    scroll-margin-top: 16px;
+    scroll-margin-top: 64px;
 }
 .howto-group-title {
-    margin: 0 0 12px;
-    font-size: 1.02rem;
-    color: var(--text-pink);
+    margin: 0 0 14px;
+    padding-left: 10px;
+    border-left: 3px solid var(--pink);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
 }
 .howto-tab { margin-bottom: 16px; }
 .howto-tab:last-child { margin-bottom: 0; }
@@ -4619,14 +4689,15 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .howto-tab-desc { font-size: 0.84rem; color: var(--text-secondary); margin: 0 0 10px; }
 .howto-feat {
     display: grid;
-    grid-template-columns: 170px minmax(0, 1fr);
+    grid-template-columns: 180px minmax(0, 1fr);
     gap: 12px;
-    padding: 8px 0;
-    border-top: 1px solid var(--border-input);
+    padding: 9px 10px;
+    border-radius: 8px;
     font-size: 0.84rem;
+    line-height: 1.55;
 }
-.howto-feat:first-of-type { border-top: none; }
-.howto-feat b { font-weight: bold; }
+.howto-feat:nth-of-type(even) { background: var(--bg-stat); }
+.howto-feat b { font-weight: 700; color: var(--text); }
 .howto-feat span { color: var(--text-secondary); }
 @media (max-width: 600px) {
     .howto-feat { grid-template-columns: 1fr; gap: 3px; }

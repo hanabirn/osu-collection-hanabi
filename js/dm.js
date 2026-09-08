@@ -89,7 +89,10 @@ function renderDmConversationsList(conversations) {
     const listEl = document.getElementById('dm-conversations-list');
     if (!listEl) return;
     if (!conversations.length) {
-        listEl.innerHTML = `<p class="osu-empty">${t('dm_empty')}</p>`;
+        listEl.innerHTML = `<div class="empty-state">
+            <div class="empty-state-icon">${icon('messageCircle', { size: '1.5rem' })}</div>
+            <div class="empty-state-sub">${escapeHtmlOsu(t('dm_empty'))}</div>
+        </div>`;
         return;
     }
     listEl.innerHTML = conversations.map(c => `

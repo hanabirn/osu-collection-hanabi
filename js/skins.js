@@ -282,7 +282,7 @@ async function renderCloudSkinsList() {
         }
         container.innerHTML = items.map(it => `
             <div class="skin-item cloud-skin-item">
-                <div class="skin-item-thumb">☁️</div>
+                <div class="skin-item-thumb">${icon('cloud', { size: '1.1rem' })}</div>
                 <div class="skin-item-info">
                     <div class="skin-item-name">${escapeSkinName(it.name)}</div>
                     <div class="skin-item-meta">${formatSkinSize(it.size)} &middot; ${new Date(it.uploadedAt).toLocaleDateString()}</div>
