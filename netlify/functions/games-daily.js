@@ -19,7 +19,8 @@ const { getOsuToken } = require('./_osu-auth');
 const { verifyAuthToken } = require('./_auth-token');
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
-const MAX_GUESSES = 6;                 // => 5 hints
+const MAX_GUESSES = 3;                 // 6-way multiple choice => 2 hints then answer
+const OPTION_COUNT = 6;
 const FAVE_MIN = 150;                  // "recognisable enough" bar
 const PICK_TRIES = 18;
 
@@ -115,16 +116,50 @@ async function buildPuzzle(date) {
     const diffs = (picked.beatmaps || []).map(b => b.difficulty_rating).filter(n => n > 0);
     const srMin = diffs.length ? Math.min(...diffs) : null;
     const srMax = diffs.length ? Math.max(...diffs) : null;
-    const genreName = (picked.genre && picked.genre.name) || GENRES[picked.genre_id] || 'Other';
+    const genreId = (picked.genre && picked.genre.id) || picked.genre_id || null;
+    const genreName = (picked.genre && picked.genre.name) || GENRES[genreId] || 'Other';
     const langName = (picked.language && picked.language.name) || LANGS[picked.language_id] || 'Other';
 
+    // Two hints get shown (one per wrong pick) — put the discriminating ones
+    // first since the decoys already share genre / rough difficulty.
     const hints = [
-        { k: 'genre', v: genreName },
-        { k: 'lang', v: langName },
         { k: 'year', v: String(picked.ranked_date || '').slice(0, 4) || '—' },
-        { k: 'sr', v: srMin != null ? `${srMin.toFixed(2)}★ – ${srMax.toFixed(2)}★` : '—' },
         { k: 'mapper', v: picked.creator || '—' },
+        { k: 'sr', v: srMin != null ? `${srMin.toFixed(2)}★ – ${srMax.toFixed(2)}★` : '—' },
+        { k: 'lang', v: langName },
+        { k: 'genre', v: genreName },
     ];
+
+    // 5 plausible-but-wrong options: same genre, similar top difficulty,
+    // different primary artist. Relax to any candidate if that's too tight.
+    const answerArtistN = (picked.artist || '').toLowerCase();
+    const answerSR = srMax || 5;
+    let decoyPool = cands.filter(r =>
+        r.id !== picked.id &&
+        (r.primary_artist || r.artist || '').toLowerCase() !== answerArtistN &&
+        (genreId ? r.genre_id === genreId : true) &&
+        Math.abs((r.star_max || 5) - answerSR) <= 1.8);
+    if (decoyPool.length < OPTION_COUNT - 1) {
+        decoyPool = cands.filter(r => r.id !== picked.id && (r.title_unicode || r.title));
+    }
+    const decoys = [];
+    const seen = new Set([picked.id]);
+    for (let i = 0; decoyPool.length && decoys.length < OPTION_COUNT - 1 && i < 400; i++) {
+        const r = decoyPool[hashStr(`${date}:decoy:${i}`) % decoyPool.length];
+        if (seen.has(r.id)) continue;
+        seen.add(r.id);
+        decoys.push(r);
+    }
+    const optRecs = [...decoys.map(r => ({ id: r.id, artist: r.artist, title: r.title })),
+        { id: picked.id, artist: picked.artist, title: picked.title }];
+    for (let i = optRecs.length - 1; i > 0; i--) {
+        const j = hashStr(`${date}:shuf:${i}`) % (i + 1);
+        [optRecs[i], optRecs[j]] = [optRecs[j], optRecs[i]];
+    }
+    const options = optRecs.map(r => ({
+        id: r.id,
+        text: `${r.artist || ''} - ${r.title || ''}`.trim().slice(0, 90),
+    }));
 
     return {
         date,
@@ -132,6 +167,7 @@ async function buildPuzzle(date) {
         coverUrl: (picked.covers['cover@2x'] || picked.covers.cover || `https://assets.ppy.sh/beatmaps/${picked.id}/covers/cover@2x.jpg`),
         previewUrl: picked.preview_url ? (picked.preview_url.startsWith('http') ? picked.preview_url : `https:${picked.preview_url}`) : null,
         hints,
+        options,
         answer: {
             title: picked.title || '',
             artist: picked.artist || '',
@@ -183,7 +219,8 @@ exports.handler = async (event) => {
             coverUrl: p.coverUrl,
             previewUrl: p.previewUrl,
             maxGuesses: MAX_GUESSES,
-            hintCount: p.hints.length,
+            hintCount: Math.max(0, MAX_GUESSES - 1),
+            options: p.options || [],
             done: !!result,
             result: result ? { won: !!result.won, guesses: result.guesses } : null,
             answer: result ? { title: p.answer.title, artist: p.answer.artist, creator: p.answer.creator, setId: p.answer.setId, url: p.answer.url } : null,
@@ -191,20 +228,23 @@ exports.handler = async (event) => {
         }, { 'Cache-Control': 'no-store' });
     }
 
-    // ---------- POST: check a guess ----------
+    // ---------- POST: check a pick ----------
     if (event.httpMethod !== 'POST') return json(405, { error: 'GET or POST' });
 
     let body;
     try { body = JSON.parse(event.body || '{}'); } catch { return json(400, { error: 'bad json' }); }
     const date = String(body.date || todayUTC()).slice(0, 10);
     const guessNo = Math.max(0, Math.min(MAX_GUESSES - 1, parseInt(body.guessNo, 10) || 0));
-    const guess = String(body.guess || '').slice(0, 200);
     if (date > todayUTC()) return json(400, { error: 'no future puzzles' });
 
     const p = await getPuzzle(store, date);
     if (!p) return json(503, { error: 'puzzle not ready, try again shortly' });
 
-    const correct = guessHits(guess, p.answer);
+    // choiceId is the picked beatmapset id; free-text `guess` still accepted
+    // as a fallback (older client).
+    const correct = body.choiceId != null
+        ? String(body.choiceId) === String(p.answer.setId)
+        : guessHits(String(body.guess || '').slice(0, 200), p.answer);
     const isLast = guessNo >= MAX_GUESSES - 1;
     const done = correct || isLast;
     const revealHint = (!correct && !isLast) ? (p.hints[guessNo] || null) : null;

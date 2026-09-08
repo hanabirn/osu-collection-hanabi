@@ -1961,17 +1961,21 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .gd-clip button:hover, .gh-vs button:hover { border-color: rgba(var(--pink-rgb), 0.5); }
 
-.gd-board { max-width: 480px; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
-.gd-row { min-height: 40px; display: flex; align-items: center; gap: 10px; border-radius: 9px; padding: 6px 12px; border: 1px solid var(--border-card); }
-.gd-row.is-empty { opacity: .4; }
-.gd-row.is-hit { border-color: rgba(52, 211, 153, 0.55); background: rgba(52, 211, 153, 0.08); }
-.gd-row.is-miss { border-color: rgba(255, 118, 118, 0.4); }
-.gd-row.is-active { border-color: rgba(var(--pink-rgb), 0.5); }
-.gd-row input { flex: 1; background: var(--bg-input); border: 1px solid var(--border-input); color: var(--text); font: inherit; padding: 6px 10px; border-radius: 7px; }
-.gd-row.is-active button { border: none; background: var(--pink); color: #14101c; font: inherit; padding: 6px 14px; border-radius: 7px; cursor: pointer; }
-:root[data-theme="light"] .gd-row.is-active button { color: #fff; }
-.gd-row-guess { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gd-hint { font-size: 0.82rem; color: var(--text-dim); padding: 2px 12px 4px; }
+.gd-prompt { max-width: 480px; margin: 12px 0 6px; font-size: 0.85rem; color: var(--text-dim); }
+.gd-opts { max-width: 480px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.gd-opt {
+    text-align: left; border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text);
+    font: inherit; font-size: 0.85rem; padding: 10px 12px; border-radius: 9px; cursor: pointer;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    transition: border-color .12s var(--ease-out), background .12s var(--ease-out);
+}
+.gd-opt:hover:not(:disabled) { border-color: rgba(var(--pink-rgb), 0.55); }
+.gd-opt:disabled { cursor: default; }
+.gd-opt.is-wrong { opacity: .4; text-decoration: line-through; }
+.gd-opt.is-answer { border-color: rgba(52, 211, 153, 0.7); background: rgba(52, 211, 153, 0.12); opacity: 1; }
+.gd-hints { max-width: 480px; margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.gd-hint { font-size: 0.82rem; color: var(--text-dim); }
+@media (max-width: 520px) { .gd-opts { grid-template-columns: 1fr; } }
 .gd-outcome { max-width: 480px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-card); }
 .gd-outcome.is-win { border-color: rgba(52, 211, 153, 0.5); }
 .gd-outcome p { margin: 0 0 6px; }
@@ -1998,6 +2002,20 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .gh-arena { grid-template-columns: 1fr; }
     .gh-vs { justify-content: center; padding: 6px 0; }
 }
+
+/* 分類快問快答 */
+.gq-card { max-width: 480px; min-height: 120px; border-radius: 14px; border: 1px solid var(--border-card); background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 14px; margin-top: 8px; }
+.gq-card-t { color: #fff; font-weight: 600; font-size: 0.95rem; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+.gq-opts { max-width: 480px; margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.gq-opt { border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text); font: inherit; font-size: 0.85rem; padding: 10px 8px; border-radius: 9px; cursor: pointer; }
+.gq-opt:hover:not(:disabled) { border-color: rgba(var(--pink-rgb), 0.55); }
+.gq-opt:disabled { cursor: default; opacity: .7; }
+.gq-feedback { max-width: 480px; margin-top: 10px; font-size: 0.88rem; }
+.gq-feedback.is-ok { color: #34d399; }
+.gq-feedback.is-no { color: #ff7676; }
+.gq-over { max-width: 480px; margin-top: 14px; padding: 16px; border-radius: 12px; border: 1px solid var(--border-card); text-align: center; }
+.gq-over p { margin: 0 0 6px; }
+.gq-over button { border: 1px solid var(--border-card); background: transparent; color: var(--text); font: inherit; padding: 7px 14px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
 
 .cmpool-back {
     display: inline-flex;
