@@ -92,7 +92,7 @@ async function openDailyGame() {
         data = await r.json();
         if (!r.ok) throw new Error(data.error || 'load failed');
     } catch (e) {
-        v.innerHTML = `<button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('cmpool_back'))}</button>
+        v.innerHTML = `<button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('games_back'))}</button>
             <p class="osu-empty">${escHtml(t('games_daily_not_ready'))}</p>`;
         return;
     }
@@ -152,7 +152,7 @@ function gdRender() {
         const a = gd.answer || {};
         outcome = `<div class="gd-outcome ${gd.won ? 'is-win' : 'is-lose'}">
             <p>${escHtml(gd.won ? t('games_daily_win', { n: gd.guesses.length }) : t('games_daily_lose'))}</p>
-            ${a.title ? `<p class="gd-answer"><a href="${escHtml(a.url)}" target="_blank" rel="noopener">${escHtml(a.artist)} - ${escHtml(a.title)}</a><br><span class="gd-answer-sub">${escHtml(t('mapper', { n: a.creator || '—' }))}</span></p>` : ''}
+            ${a.title ? `<p class="gd-answer"><a href="${escHtml(a.url)}" target="_blank" rel="noopener">${escHtml(a.artist)} - ${escHtml(a.title)}</a><br><span class="gd-answer-sub">${escHtml(t('mapped_by', { n: a.creator || '—' }))}</span></p>` : ''}
             <div class="gd-outcome-actions">
                 <button onclick="gdShare()">${icon('share2', { size: '0.9em' })} ${escHtml(t('games_daily_share'))}</button>
                 ${a.setId ? `<button onclick="gamesSaveSet(${a.setId})">${icon('plus', { size: '0.9em' })} ${escHtml(t('games_save_btn'))}</button>` : ''}
@@ -161,7 +161,7 @@ function gdRender() {
     }
 
     v.innerHTML = `
-        <button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('cmpool_back'))}</button>
+        <button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('games_back'))}</button>
         <div class="gd-head">
             <h3>${escHtml(t('games_daily_title'))} <span class="gd-date">${escHtml(gd.date)}</span></h3>
             ${gd.streak != null ? `<span class="gd-streak">🔥 ${escHtml(t('games_daily_streak', { n: gd.streak }))}</span>` : ''}
@@ -285,12 +285,12 @@ async function openHiloGame() {
         if (!r.ok) throw new Error(d.error || 'load failed');
         deck = (d.rounds || []).filter(m => m.setId && m.title);
     } catch (e) {
-        v.innerHTML = `<button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('cmpool_back'))}</button>
+        v.innerHTML = `<button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('games_back'))}</button>
             <p class="osu-empty">${escHtml(t('mappools_load_fail'))}</p>`;
         return;
     }
     if (deck.length < 5) {
-        v.innerHTML = `<button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('cmpool_back'))}</button>
+        v.innerHTML = `<button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('games_back'))}</button>
             <p class="osu-empty">${escHtml(t('games_hilo_no_data'))}</p>`;
         return;
     }
@@ -308,7 +308,7 @@ function ghRender() {
         <div class="gh-card" style="background-image:linear-gradient(rgba(10,8,14,.55),rgba(10,8,14,.8)),url('https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover@2x.jpg');">
             <div class="gh-card-meta">
                 <div class="gh-card-title">${escHtml(m.artist)} - ${escHtml(m.title)}</div>
-                <div class="gh-card-sub">${escHtml(m.creator ? t('mapper', { n: m.creator }) : '')}</div>
+                <div class="gh-card-sub">${escHtml(m.creator ? t('mapped_by', { n: m.creator }) : '')}</div>
             </div>
             <div class="gh-card-stat">
                 ${showVal
@@ -340,7 +340,7 @@ function ghRender() {
     }
 
     v.innerHTML = `
-        <button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('cmpool_back'))}</button>
+        <button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('games_back'))}</button>
         <div class="gh-head">
             <h3>${escHtml(t('games_hilo_title'))}</h3>
             <span class="gh-score">${escHtml(t('games_hilo_streak', { n: gh.streak }))} · ${escHtml(t('games_hilo_best', { n: gh.best }))}</span>

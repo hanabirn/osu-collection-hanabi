@@ -259,6 +259,7 @@ I18N.ja = {
     nav_mappools: 'World Cup 譜面プール',
     nav_cmpool: 'コミュニティ譜面プール',
     nav_games: 'ミニゲーム',
+    games_back: '戻る',
     games_page_title: '✦ ミニゲーム ✦',
     games_hint: 'サイトの曲庫と Farm データで遊ぶミニゲーム。気に入った譜面はコレクションに追加できます（毎回確認します）。',
     games_daily_title: '毎日クイズ',

@@ -397,6 +397,7 @@ I18N.en = {
     nav_mappools: 'World Cup Pools',
     nav_cmpool: 'Community mappools',
     nav_games: 'Mini-games',
+    games_back: 'Back',
     games_page_title: '✦ Mini-games ✦',
     games_hint: 'Small games built on the site’s own catalog and Farm data. Maps you like can be added to your collection — it always asks first.',
     games_daily_title: 'Daily Guess',

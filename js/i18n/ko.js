@@ -259,6 +259,7 @@ I18N.ko = {
     nav_mappools: '월드컵 맵풀',
     nav_cmpool: '커뮤니티 맵풀',
     nav_games: '미니게임',
+    games_back: '뒤로',
     games_page_title: '✦ 미니게임 ✦',
     games_hint: '사이트의 곡 카탈로그와 Farm 데이터로 즐기는 미니게임. 마음에 든 맵은 컬렉션에 추가할 수 있습니다(항상 먼저 물어봅니다).',
     games_daily_title: '오늘의 맞히기',

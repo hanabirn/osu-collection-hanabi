@@ -259,6 +259,7 @@ I18N.de = {
     nav_mappools: 'World-Cup-Pools',
     nav_cmpool: 'Community-Mappools',
     nav_games: 'Minispiele',
+    games_back: 'Zurück',
     games_page_title: '✦ Minispiele ✦',
     games_hint: 'Kleine Spiele auf Basis des Seiten-Katalogs und der Farm-Daten. Maps, die dir gefallen, kannst du deiner Sammlung hinzufügen — es fragt immer vorher.',
     games_daily_title: 'Tägliches Raten',

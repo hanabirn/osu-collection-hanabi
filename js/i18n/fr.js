@@ -259,6 +259,7 @@ I18N.fr = {
     nav_mappools: 'Pools World Cup',
     nav_cmpool: 'Mappools communautaires',
     nav_games: 'Mini-jeux',
+    games_back: 'Retour',
     games_page_title: '✦ Mini-jeux ✦',
     games_hint: 'De petits jeux basés sur le catalogue et les données Farm du site. Les maps qui te plaisent peuvent être ajoutées à ta collection — ça demande toujours avant.',
     games_daily_title: 'Devinette du jour',

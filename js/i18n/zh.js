@@ -222,6 +222,7 @@ I18N.zh = {
     nav_mappools: '世界盃圖池',
     nav_cmpool: '社群賽圖分享',
     nav_games: '小遊戲',
+    games_back: '回小遊戲',
     games_page_title: '✦ 小遊戲 ✦',
     games_hint: '用站上的曲庫與 Farm 資料玩的小遊戲。喜歡的圖可以（詢問後）加進你的收藏。',
     games_daily_title: '每日猜圖',

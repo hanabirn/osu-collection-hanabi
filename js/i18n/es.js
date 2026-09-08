@@ -259,6 +259,7 @@ I18N.es = {
     nav_mappools: 'Pools de World Cup',
     nav_cmpool: 'Mappools de la comunidad',
     nav_games: 'Minijuegos',
+    games_back: 'Volver',
     games_page_title: '✦ Minijuegos ✦',
     games_hint: 'Juegos pequeños hechos con el catálogo y los datos de Farm del sitio. Los mapas que te gusten se pueden añadir a tu colección — siempre pregunta antes.',
     games_daily_title: 'Adivina diario',
