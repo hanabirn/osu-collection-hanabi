@@ -669,23 +669,23 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 
 .osu-refresh-all {
-    background: rgba(var(--pink-rgb),0.2);
-    color: var(--text-accent);
-    border: 1px solid rgba(var(--pink-rgb),0.3);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    background: var(--surface-1);
+    color: var(--text-dim);
+    border: 1px solid var(--border-card);
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: background 0.16s var(--ease-out), color 0.16s var(--ease-out), border-color 0.16s var(--ease-out);
 }
 .osu-refresh-all:hover {
-    color: #fff;
-    background: rgba(var(--pink-rgb),0.4);
-    border-color: var(--accent-purple);
+    color: var(--pink);
+    background: rgba(var(--pink-rgb),0.16);
+    border-color: rgba(var(--pink-rgb),0.45);
 }
 .osu-refresh-all.spinning {
     animation: spin 0.8s linear infinite;
@@ -956,7 +956,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .osu-search-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 16px;
 }
 /* Styled generically off .osu-search-row so every tab that reuses it
@@ -981,14 +981,16 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
 .osu-search-row select {
-    flex: 1 1 45%;
-    min-width: 0;
-    padding: 11px 12px;
-    border-radius: 10px;
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 124px;
+    max-width: 210px;
+    padding: 8px 11px;
+    border-radius: 9px;
     border: 1px solid var(--border-input);
     background-color: var(--bg-input);
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-family: inherit;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
@@ -1034,14 +1036,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .farm-range-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 16px;
+    gap: 8px 14px;
     margin-bottom: 12px;
 }
 .farm-range-field {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: var(--text-secondary);
 }
 .farm-range-field input {
@@ -1138,8 +1140,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .osu-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(var(--pink-rgb), 0.4);
-    box-shadow: 0 0 20px rgba(var(--pink-rgb), 0.16);
+    border-color: rgba(var(--pink-rgb), 0.45);
+    box-shadow: 0 10px 26px -12px rgba(0, 0, 0, 0.6);
 }
 
 .osu-card-bg {
@@ -2453,16 +2455,19 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 5px;
-    margin-top: 3px;
-    padding: 4px 8px;
-    background: rgba(0,0,0,0.5);
+    gap: 4px;
+    margin-top: 4px;
+    padding: 3px 7px;
+    background: rgba(0,0,0,0.34);
     border-radius: 999px;
     width: fit-content;
     max-width: 100%;
     overflow-x: auto;
     scrollbar-width: none;
+    opacity: 0.5;
+    transition: opacity 0.15s var(--ease-out);
 }
+.osu-card:hover .osu-card-diff-row { opacity: 1; }
 .osu-card-diff-row::-webkit-scrollbar {
     display: none;
 }
