@@ -1268,27 +1268,80 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: #34d399;
 }
 
-/* "copy !mp map" — sits left of the copy-id button on the right rail */
-.osu-mp-btn {
+/* ===== Card action toolbar =====
+   All 8 per-card actions live in one grouped strip along the top edge
+   instead of scattered circles at every corner. Faintly visible at rest
+   (so every action is discoverable without a hover and it works on touch),
+   fully opaque on hover / keyboard focus. The old per-button absolute
+   positioning is overridden below. */
+.osu-card-actions {
     position: absolute;
-    top: 8px;
-    right: 128px;
-    background: rgba(0,0,0,0.5);
-    color: rgba(255,255,255,0.6);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 11px;
+    background: linear-gradient(180deg, rgba(6,4,12,0.62), rgba(6,4,12,0.34));
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0.5;
+    transition: opacity 0.18s var(--ease-out);
+}
+.osu-card:hover .osu-card-actions,
+.osu-card:focus-within .osu-card-actions { opacity: 1; }
+
+.osu-card-actions > button {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    opacity: 1 !important;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    z-index: 3;
-    opacity: 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.34);
+    color: rgba(255,255,255,0.74);
+    cursor: pointer;
+    transition: background 0.14s var(--ease-out), color 0.14s var(--ease-out);
 }
-.osu-card:hover .osu-mp-btn { opacity: 1; }
-.osu-mp-btn:hover { color: #fff; background: rgba(var(--pink-rgb),0.5); }
+.osu-card-actions > button:hover { background: rgba(var(--pink-rgb),0.55); color: #fff; }
+.osu-card-actions > button:active { background: rgba(var(--pink-rgb),0.75); }
+.osu-card-actions > button svg { width: 15px; height: 15px; }
+.osu-card-actions > button:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 1px; }
+
+.osu-card-actions-sep {
+    flex: 0 0 auto;
+    width: 1px;
+    height: 18px;
+    margin: 0 2px;
+    background: rgba(255,255,255,0.22);
+}
+
+/* state colours layer on top of the shared button style */
+.osu-card-actions .osu-fav-btn.active { color: var(--accent-pink); }
+.osu-card-actions .osu-fav-btn.active:hover { color: #fff; }
+.osu-card-actions .osu-download-btn.local-downloaded { color: #34d399; }
+.osu-card-actions .osu-play-btn.playing { background: rgba(var(--pink-rgb),0.75); color: #fff; }
+.osu-card-actions .osu-copy-btn.copied { color: #34d399; }
+.osu-card-actions .osu-delete-btn:hover { background: rgba(255,90,90,0.6); }
+
+@media (hover: none) {
+    .osu-card-actions { opacity: 0.96; }
+    .osu-card-actions > button { width: 33px; height: 33px; }
+}
+@media (max-width: 460px) {
+    .osu-card-actions > button { width: 35px; height: 35px; }
+}
 
 .osu-download-btn {
     position: absolute;

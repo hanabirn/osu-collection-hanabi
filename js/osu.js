@@ -3895,14 +3895,18 @@ function renderOsuCollection() {
         <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
-            <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
-            <button class="osu-mp-btn" onclick="copyMpMap(${set.beatmapset_id}, event)" title="${t('mplist_mp_hint')}">${icon('swords')}</button>
-            <button class="osu-download-btn ${isLocalDl ? 'local-downloaded' : ''}" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}">${icon(isLocalDl ? 'check' : 'download')}</button>
-            <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>
-            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
-            <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}">${icon('heart', { filled: isFav })}</button>
-            <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}">${icon('tag')}</button>
-            <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="${t('osu_delete_btn_title')}">${icon('x')}</button>
+            <div class="osu-card-actions">
+                <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+                <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}" aria-label="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}">${icon('heart', { filled: isFav })}</button>
+                <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}" aria-label="${t('osu_category_btn_title')}">${icon('tag')}</button>
+                <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}" aria-label="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>
+                <span class="osu-card-actions-sep" aria-hidden="true"></span>
+                <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}" aria-label="${t('mappools_copy_id')}">${icon('copy')}</button>
+                <button class="osu-mp-btn" onclick="copyMpMap(${set.beatmapset_id}, event)" title="${t('mplist_mp_hint')}" aria-label="${t('mplist_mp_hint')}">${icon('swords')}</button>
+                <button class="osu-download-btn ${isLocalDl ? 'local-downloaded' : ''}" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}" aria-label="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}">${icon(isLocalDl ? 'check' : 'download')}</button>
+                <span class="osu-card-actions-sep" aria-hidden="true"></span>
+                <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="${t('osu_delete_btn_title')}" aria-label="${t('osu_delete_btn_title')}">${icon('x')}</button>
+            </div>
             <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)} ⭐` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)} ⭐`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
             <div class="osu-play-status" id="play-status-${set.beatmapset_id}" style="display:none;"></div>
             <div class="osu-card-info">
