@@ -650,42 +650,29 @@ async function batchDownloadCollectionView() {
     osuBatchDownloadPaused = false;
 }
 
-/* Turn the currently-shown list into a paste-ready block of
-   `!mp map <beatmapId> <mode>` lines for an osu! multiplayer lobby (you host,
-   paste one per round). Hardest difficulty of each set. Copies to clipboard. */
-function copyMpListForView() {
-    const status = document.getElementById('osu-batch-dl-status');
-    const sets = osuCurrentViewSets || [];
-    if (!sets.length) {
-        if (status) { status.innerText = t('mplist_copy_empty'); status.style.color = '#ff5252'; }
-        return;
+/* Copy one set's hardest difficulty as a `!mp map <beatmapId> <mode>` line
+   for an osu! multiplayer lobby (you host — paste one per round). Wired to
+   the small ⚔ button on every collection card. */
+function copyMpMap(setId, event) {
+    if (event) event.stopPropagation();
+    const col = getOsuCollection();
+    let set = null;
+    for (const m of OSU_MODES) {
+        const f = (col[m] || []).find(s => s.beatmapset_id === setId);
+        if (f) { set = f; break; }
     }
-    const lines = [];
-    const seen = new Set();
-    for (const set of sets) {
-        const diffs = (set.beatmaps || []).filter(b => b.beatmap_id);
-        if (!diffs.length) continue;
-        const hardest = diffs.slice().sort((a, b) => (a.difficulty_rating || 0) - (b.difficulty_rating || 0)).pop();
-        const bid = parseInt(hardest.beatmap_id, 10);
-        if (!bid || seen.has(bid)) continue;
-        seen.add(bid);
-        const mode = Number.isInteger(hardest.mode_int) ? hardest.mode_int
-            : (Number.isInteger(set.mode) ? set.mode : 0);
-        lines.push(`!mp map ${bid} ${mode}`);
-        if (lines.length >= 250) break;
-    }
-    if (!lines.length) {
-        if (status) { status.innerText = t('mplist_copy_empty'); status.style.color = '#ff5252'; }
-        return;
-    }
-    const text = lines.join('\n');
-    const done = () => { if (status) { status.innerText = t('mplist_copied', { n: lines.length }); status.style.color = '#34d399'; } };
+    if (!set) return;
+    const diffs = (set.beatmaps || []).filter(b => b.beatmap_id);
+    if (!diffs.length) return;
+    const hardest = diffs.slice().sort((a, b) => (a.difficulty_rating || 0) - (b.difficulty_rating || 0)).pop();
+    const mode = Number.isInteger(hardest.mode_int) ? hardest.mode_int
+        : (Number.isInteger(set.mode) ? set.mode : 0);
+    const line = `!mp map ${parseInt(hardest.beatmap_id, 10)} ${mode}`;
+    const toast = (msg) => { if (typeof showShareToast === 'function') showShareToast(msg); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, () => {
-            if (status) { status.innerText = text; status.style.color = '#c8a2e0'; }
-        });
-    } else if (status) {
-        status.innerText = text; status.style.color = '#c8a2e0';
+        navigator.clipboard.writeText(line).then(() => toast(t('mplist_mp_copied')), () => toast(line));
+    } else {
+        toast(line);
     }
 }
 
@@ -3909,6 +3896,7 @@ function renderOsuCollection() {
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
+            <button class="osu-mp-btn" onclick="copyMpMap(${set.beatmapset_id}, event)" title="${t('mplist_mp_hint')}">${icon('swords')}</button>
             <button class="osu-download-btn ${isLocalDl ? 'local-downloaded' : ''}" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}">${icon(isLocalDl ? 'check' : 'download')}</button>
             <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>

@@ -68,7 +68,7 @@ I18N.en = {
                 <div class="howto-feat"><b>Tools & settings (7 buttons)</b><span>Refresh all maps' data → 📊 Stats dashboard (with 8 collection achievement badges) → ✨ Collection wizard (see below) → Mark as played / one-click import favorites & most-played (login required) → 📁 Pick your local osu! Songs folder to mark which maps you already have (Chrome/Edge only, osu! stable only) → 🔒 Set a password, required for later edit/publish actions.</span></div>
                 <div class="howto-feat"><b>Search / filter / sort</b><span>Search by title or artist; filter by language, genre, source, or artist; sort by star rating.</span></div>
                 <div class="howto-feat"><b>Batch-download this list's files</b><span>Downloads every map in the current tab/search/filter view (every page, not just the visible one) as .osz, one at a time, via a no-login mirror — no app to install. The same button pauses/resumes mid-run without cutting off whatever's downloading. Once done, select them all in your file manager and drag the lot into osu! to import.</span></div>
-                <div class="howto-feat"><b>Copy as !mp list</b><span>Turns the current list into paste-ready <code>!mp map</code> lines for an osu! multiplayer lobby — be the host, then paste one per round. The Discord bot’s <code>/mplist</code> DMs you the same list.</span></div>
+                <div class="howto-feat"><b>Copy !mp map</b><span>Every card has a ⚔ button that copies that map as an <code>!mp map</code> line — be the host in an osu! multiplayer lobby and paste it to set the map. <code>/map</code> in the Discord bot shows the same line.</span></div>
                 <div class="howto-feat"><b>Category tabs</b><span>Besides the fixed Favorites/All Songs/Standard/Taiko/Catch/Mania tabs, the gear icon opens "Manage categories" to add your own.</span></div>
                 <div class="howto-feat"><b>Explore more</b><span>7 shortcut cards at the bottom, jumping to other common tabs.</span></div>
                 <div class="howto-feat"><b>✨ Collection wizard</b><span>Actually three tools in one: ① generate categories from your account (favorites/most-played/best/recent/a specific mapper) ② generate practice collections from your scores (push, goal pool, low-acc redo, similar untried maps, weak points) ③ health check (finds duplicates, deleted, unranked, or difficulty-count-changed maps). All three only merge in, never overwrite your existing collection.</span></div>
@@ -315,7 +315,7 @@ I18N.en = {
     osu_import_fail_json: 'Import failed: this file is not valid JSON.', osu_import_fail_format: 'Import failed: the file is missing collection data (the "collection" field).',
 
     osu_download_btn_title: 'Direct download (no-login mirror)',
-    mplist_copy_btn: 'Copy as !mp list', mplist_copy_hint: 'Copy a paste-ready !mp map list for a multiplayer lobby (you host)', mplist_copied: 'Copied {n} maps — paste one !mp map line per round in your lobby', mplist_copy_empty: 'This list is empty',
+    mplist_mp_hint: 'Copy this map as an !mp map line for a multiplayer lobby', mplist_mp_copied: 'Copied — paste it in your lobby',
     batch_dl_btn: 'Batch-download this list\'s files', batch_dl_empty: 'This list is empty — nothing to download',
     batch_dl_confirm: 'Download all {n} beatmapsets in this list? This triggers {n} browser downloads one after another — it\'ll take a while, so keep this tab open',
     batch_dl_progress: 'Downloading... {done}/{total}',

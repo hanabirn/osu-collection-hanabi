@@ -177,7 +177,7 @@ I18N.ja = {
     osu_import_fail_json: 'インポート失敗：このファイルは有効な JSON ではありません', osu_import_fail_format: 'インポート失敗：ファイルにコレクションデータ（collection フィールド）がありません',
 
     osu_download_btn_title: '直接ダウンロード（ログイン不要ミラー）',
-    mplist_copy_btn: '!mp リストをコピー', mplist_copy_hint: 'マルチ用の !mp map リストをコピー（あなたがホスト）', mplist_copied: '{n} 件コピーしました。ロビーで 1 行ずつ貼り付けてください', mplist_copy_empty: 'このリストは空です',
+    mplist_mp_hint: 'この譜面の !mp map 行をコピー（マルチ用）', mplist_mp_copied: 'コピーしました。ロビーに貼り付けてください',
     batch_dl_btn: 'このリストの譜面を一括ダウンロード', batch_dl_empty: 'このリストは空です。ダウンロードできるものがありません',
     batch_dl_confirm: 'このリストの {n} 個の譜面をダウンロードしますか？ブラウザのダウンロードを {n} 回連続で実行します。時間がかかるのでタブを閉じないでください',
     batch_dl_progress: 'ダウンロード中... {done}/{total}',
@@ -475,7 +475,7 @@ I18N.ja = {
                 <div class="howto-feat"><b>ツール・設定（7 個のボタン）</b><span>全マップのデータを再取得 → 📊 統計ダッシュボード（8 個の実績バッジ付き）→ ✨ 収藏整理ウィザード（下記参照）→ プレイ済みマーク／お気に入り・よく遊ぶ曲のワンクリック取込（ログイン必要）→ 📁 ローカルの osu! Songs フォルダを選んで、すでに持っている譜面を確認（Chrome/Edge 限定、osu! stable のみ対応）→ 🔒 パスワード設定、以降の編集/公開操作に必要。</span></div>
                 <div class="howto-feat"><b>検索／絞り込み／並び替え</b><span>曲名やアーティストで検索、言語・ジャンル・出典・アーティストで絞り込み、星数で並び替え可能。</span></div>
                 <div class="howto-feat"><b>このリストの譜面を一括ダウンロード</b><span>現在のタブ／検索／絞り込み結果（全ページ分）の譜面を .osz として順番にダウンロード、ログイン不要のミラー経由でアプリのインストールも不要です。同じボタンでダウンロード中に一時停止／再開でき、ダウンロード中のファイルが中断されることはありません。完了したらファイルをすべて選択して osu! にまとめてドラッグすれば取り込めます。</span></div>
-                <div class="howto-feat"><b>!mp リストをコピー</b><span>現在のリストを osu! マルチ用の <code>!mp map</code> 行に変換（あなたがホストになり、1行ずつ貼り付け）。Discord bot の <code>/mplist</code> でも同じリストが DM で届きます。</span></div>
+                <div class="howto-feat"><b>!mp map をコピー</b><span>各カードの ⚔ ボタンでその譜面の <code>!mp map</code> 行をコピー。osu! マルチでホストになって貼り付ければ譜面を設定できます。Discord bot の <code>/map</code> にも同じ行が出ます。</span></div>
                 <div class="howto-feat"><b>分類タブ</b><span>お気に入り／すべての曲／Standard／Taiko／Catch／Mania の固定タブに加え、歯車アイコンから「分類管理」で自分だけのタブを追加できます。</span></div>
                 <div class="howto-feat"><b>もっと見る</b><span>ページ最下部の 7 枚のショートカットカードから他のよく使うタブへ移動できます。</span></div>
                 <div class="howto-feat"><b>✨ 収藏整理ウィザード</b><span>実は 3 つのツールをまとめたもの：①アカウントから分類を生成（お気に入り／よく遊ぶ／ベストスコア／最近／特定の mapper）②成績から練習用収藏を生成（伸び代／目標プール／低精度やり直し／似た未プレイ曲／弱点）③健康診断（重複・削除済み・非 ranked・難易度数が変わったマップを検出）。3 つとも既存の収藏を上書きせず、マージするだけです。</span></div>

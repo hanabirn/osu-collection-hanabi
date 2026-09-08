@@ -139,7 +139,7 @@ I18N.zh = {
     osu_import_fail_json: '匯入失敗，這個檔案不是有效的 JSON', osu_import_fail_format: '匯入失敗，檔案內缺少收藏資料（collection 欄位）',
 
     osu_download_btn_title: '直接下載（免登入鏡像站）',
-    mplist_copy_btn: '複製 !mp 清單', mplist_copy_hint: '複製成可直接貼進多人房的 !mp map 清單（你當房主）', mplist_copied: '已複製 {n} 張圖 —— 在你的多人房裡一次貼一行 !mp map', mplist_copy_empty: '這個清單是空的',
+    mplist_mp_hint: '複製這張圖的 !mp map 指令，貼進多人房', mplist_mp_copied: '已複製 —— 貼進你的多人房',
     batch_dl_btn: '批量下載此清單圖檔', batch_dl_empty: '這個清單是空的，沒有東西可以下載',
     batch_dl_confirm: '要下載目前清單的 {n} 個圖檔嗎？會依序觸發 {n} 次瀏覽器下載，需要一段時間，請勿關閉分頁',
     batch_dl_progress: '下載中... {done}/{total}',
@@ -503,7 +503,7 @@ I18N.zh = {
                 <div class="howto-feat"><b>工具・設定（7 個按鈕）</b><span>重新整理全部圖資料 → 📊 統計儀表板（含 8 個收藏成就徽章）→ ✨ 收藏整理精靈（見下方說明）→ 標記已玩過／一鍵帶入最愛常玩（需登入）→ 📁 選擇本機 osu! Songs 資料夾，標出哪些圖已經下載過（僅 Chrome/Edge，只認得 osu! stable）→ 🔒 設定密碼，之後編輯/發布動作都要輸入這組密碼確認。</span></div>
                 <div class="howto-feat"><b>搜尋 / 篩選 / 排序</b><span>輸入框可搜曲名或作者；下拉選單可依語言、曲風、來源、歌手篩選，也能切換星數排序。</span></div>
                 <div class="howto-feat"><b>批量下載此清單圖檔</b><span>把目前分頁（含搜尋/篩選結果、跨所有分頁）的每張圖依序下載成 .osz，免登入鏡像站直連、無需安裝任何 App。下載中可以按同一顆按鈕暫停／繼續，不會中斷正在下載的那張圖。下載完在檔案總管全選，一次拖進 osu! 視窗即可批量匯入遊戲。</span></div>
-                <div class="howto-feat"><b>複製 !mp 清單</b><span>把目前清單變成可直接貼進多人房的 <code>!mp map</code> 指令（你當房主，一次貼一行換圖）。Discord bot 的 <code>/mplist</code> 也會把同一份清單私訊給你。</span></div>
+                <div class="howto-feat"><b>複製 !mp map</b><span>每張卡片都有一顆 ⚔ 按鈕，複製這張圖的 <code>!mp map</code> 指令 —— 在 osu! 多人房當房主貼上去就能換圖。Discord bot 的 <code>/map</code> 也會顯示同一行。</span></div>
                 <div class="howto-feat"><b>分類籤</b><span>最愛／全部歌曲／Standard／Taiko／Catch／Mania 六個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
                 <div class="howto-feat"><b>探索更多</b><span>頁面最下方 7 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
                 <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是三組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 依成績生成練習收藏（突破分／目標圖池／低準度重練／相似圖／弱項）③ 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。三組都只會合併加入，不會覆蓋現有收藏。</span></div>

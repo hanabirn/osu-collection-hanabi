@@ -453,6 +453,7 @@ async function cmdMap(options, origin) {
     } catch { /* pp is a nice-to-have */ }
 
     const mTag = L.modeTag(L.API_MODE[bm.mode]);
+    const mpMode = { osu: 0, taiko: 1, fruits: 2, mania: 3 }[bm.mode] ?? 0;
     return L.message({
         title: `${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
         url: bm.url || `https://osu.ppy.sh/b/${bm.id}`,
@@ -466,6 +467,7 @@ async function cmdMap(options, origin) {
             { name: 'AR / OD / CS / HP', value: `${bm.ar ?? '—'} / ${bm.accuracy ?? '—'} / ${bm.cs ?? '—'} / ${bm.drain ?? '—'}`, inline: true },
             { name: t('f_max_combo'), value: bm.max_combo != null ? `${L.fmtNum(bm.max_combo)}x` : '—', inline: true },
             { name: t('f_status'), value: bm.status || '—', inline: true },
+            { name: t('f_mp'), value: `\`!mp map ${bm.id} ${mpMode}\``, inline: false },
             ...(ppLine ? [{ name: t('f_pp_fc'), value: ppLine, inline: false }] : []),
         ],
         footer: L.siteFooter(bm.mode ? L.MODE_LABEL[L.API_MODE[bm.mode]] || bm.mode : undefined),
@@ -887,106 +889,6 @@ async function autocompleteCollection(options) {
     })));
 }
 
-/* --- /mplist ---------------------------------------------------------- */
-
-// DM a chunked `!mp map` list to the invoker. Returns false if the DM
-// couldn't be opened/sent (usually the user blocks DMs from the server).
-async function dmMplist(discordUid, name, lines, origin) {
-    const botToken = process.env.DISCORD_BOT_TOKEN;
-    if (!botToken || !discordUid) return false;
-    try {
-        const dc = await fetch('https://discord.com/api/v10/users/@me/channels', {
-            method: 'POST',
-            headers: { Authorization: `Bot ${botToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ recipient_id: discordUid }),
-        });
-        if (!dc.ok) return false;
-        const chan = await dc.json();
-        const send = (content) => fetch(`https://discord.com/api/v10/channels/${chan.id}/messages`, {
-            method: 'POST',
-            headers: { Authorization: `Bot ${botToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
-        });
-        await send(t('mplist_dm_header', { name, n: lines.length, url: `${origin}/c/` }));
-        let buf = [];
-        let len = 0;
-        for (const l of lines) {
-            if (len + l.length + 1 > 1850) {
-                await send('```\n' + buf.join('\n') + '\n```');
-                buf = []; len = 0;
-            }
-            buf.push(l); len += l.length + 1;
-        }
-        if (buf.length) await send('```\n' + buf.join('\n') + '\n```');
-        return true;
-    } catch (e) {
-        console.error('[mplist] DM failed:', e.message);
-        return false;
-    }
-}
-
-const MPLIST_MODE_INT = { osu: 0, taiko: 1, fruits: 2, mania: 3, standard: 0, catch: 2 };
-
-async function cmdMplist(options, interaction, origin) {
-    const query = String(L.optVal(options, 'query') || '').trim();
-    const wantInt = MPLIST_MODE_INT[String(L.optVal(options, 'mode') || '')] ?? null;
-    const store = getCollectionsStore();
-    const index = (await store.get('index', { type: 'json' })) || [];
-
-    let targetId = null;
-    if (query) {
-        let entry = null;
-        if (/^\d+$/.test(query)) entry = index.find(e => String(e.id) === query) || null;
-        if (!entry) {
-            const q = query.toLowerCase();
-            entry = index.find(e => (e.username || '').toLowerCase() === q)
-                || index.find(e => (e.username || '').toLowerCase().includes(q))
-                || index.find(e => (e.tags || []).some(tag => tag.toLowerCase().includes(q)))
-                || null;
-        }
-        if (!entry) return L.ephemeral(t('collection_not_found', { q: query }));
-        targetId = entry.id;
-    } else {
-        const link = await getLink(L.invokerId(interaction));
-        if (!link || !link.osuUserId) return L.ephemeral(t('mplist_need_query'));
-        targetId = link.osuUserId;
-    }
-
-    const full = await store.get(`full:${targetId}`, { type: 'json' });
-    if (!full || !full.collection) return L.ephemeral(t('mplist_not_found'));
-
-    const lines = [];
-    const seenBid = new Set();
-    for (const [mkey, mint] of [['standard', 0], ['taiko', 1], ['catch', 2], ['mania', 3]]) {
-        for (const set of full.collection[mkey] || []) {
-            const diffs = (set.beatmaps || [])
-                .map(b => ({
-                    id: b.beatmap_id,
-                    sr: Number(b.difficulty_rating) || 0,
-                    mi: typeof b.mode === 'number' ? b.mode : (MPLIST_MODE_INT[b.mode] ?? mint),
-                }))
-                .filter(b => b.id);
-            if (!diffs.length) continue;
-            let pick;
-            if (wantInt != null) {
-                pick = diffs.filter(b => b.mi === wantInt).sort((a, b) => b.sr - a.sr)[0]
-                    || diffs.slice().sort((a, b) => b.sr - a.sr)[0];
-            } else {
-                pick = diffs.slice().sort((a, b) => b.sr - a.sr)[0];
-            }
-            if (!pick || seenBid.has(pick.id)) continue;
-            seenBid.add(pick.id);
-            lines.push(`!mp map ${pick.id} ${pick.mi}`);
-            if (lines.length >= 250) break;
-        }
-        if (lines.length >= 250) break;
-    }
-    if (!lines.length) return L.ephemeral(t('mplist_empty'));
-
-    const ok = await dmMplist(L.invokerId(interaction), full.username || ('#' + targetId), lines, origin);
-    return L.ephemeral(ok ? t('mplist_sent', { n: lines.length }) : t('mplist_dm_failed'));
-}
-
 async function cmdGallery(options, origin) {
     const page = Math.max(0, Math.min(50, (Number(L.optVal(options, 'page')) || 1) - 1));
     const res = await fetch(`${origin}/.netlify/functions/collections-list?page=${page}&sort=recent`);
@@ -1300,7 +1202,7 @@ exports.handler = async (event) => {
 
     try {
         if (interaction.type === L.T.AUTOCOMPLETE) {
-            if (name === 'collection' || name === 'follow' || name === 'unfollow' || name === 'mplist') return await autocompleteCollection(options);
+            if (name === 'collection' || name === 'follow' || name === 'unfollow') return await autocompleteCollection(options);
             if (name === 'mappool') return await autocompleteMappool(options, origin);
             if (name === 'tourneypool') return await autocompleteTourneypool(options, origin);
             return L.autocomplete([]);
@@ -1326,7 +1228,6 @@ exports.handler = async (event) => {
                 case 'following': return await cmdFollowing(interaction);
                 case 'mappool': return await cmdMappool(options, origin);
                 case 'tourneypool': return await cmdTourneypool(options, origin);
-                case 'mplist': return await cmdMplist(options, interaction, origin);
                 case 'skin': return await cmdSkin(options, origin);
                 case 'link': return await cmdLink(options, interaction);
                 case 'unlink': return await cmdUnlink(interaction);

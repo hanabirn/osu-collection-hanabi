@@ -1268,6 +1268,28 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: #34d399;
 }
 
+/* "copy !mp map" — sits left of the copy-id button on the right rail */
+.osu-mp-btn {
+    position: absolute;
+    top: 8px;
+    right: 128px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .osu-mp-btn { opacity: 1; }
+.osu-mp-btn:hover { color: #fff; background: rgba(var(--pink-rgb),0.5); }
+
 .osu-download-btn {
     position: absolute;
     top: 8px;
@@ -1330,7 +1352,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    otherwise be permanently invisible and untappable — show them by default
    there instead (UX audit: "hover vs tap" + "touch target size", both High). */
 @media (hover: none) {
-    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn, .farm-add-btn {
+    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-mp-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn, .farm-add-btn {
         opacity: 0.85;
     }
 }

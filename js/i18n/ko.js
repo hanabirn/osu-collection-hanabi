@@ -177,7 +177,7 @@ I18N.ko = {
     osu_import_fail_json: '가져오기 실패: 유효한 JSON 파일이 아닙니다', osu_import_fail_format: '가져오기 실패: 파일에 컬렉션 데이터(collection 필드)가 없습니다',
 
     osu_download_btn_title: '직접 다운로드 (로그인 불필요 미러)',
-    mplist_copy_btn: '!mp 목록 복사', mplist_copy_hint: '멀티 로비용 !mp map 목록 복사 (당신이 호스트)', mplist_copied: '{n}개 맵 복사됨 — 로비에서 라운드마다 !mp map 한 줄씩 붙여넣기', mplist_copy_empty: '이 목록은 비어 있습니다',
+    mplist_mp_hint: '이 맵의 !mp map 줄 복사 (멀티용)', mplist_mp_copied: '복사됨 — 로비에 붙여넣으세요',
     batch_dl_btn: '이 목록 전체 다운로드', batch_dl_empty: '이 목록은 비어 있어 다운로드할 것이 없습니다',
     batch_dl_confirm: '이 목록의 {n}개 비트맵셋을 다운로드할까요? 브라우저 다운로드가 {n}번 연속으로 실행되어 시간이 걸리니 탭을 닫지 마세요',
     batch_dl_progress: '다운로드 중... {done}/{total}',
@@ -475,7 +475,7 @@ I18N.ko = {
                 <div class="howto-feat"><b>도구·설정 (버튼 7개)</b><span>모든 맵 데이터 새로고침 → 📊 통계 대시보드(업적 배지 8개 포함) → ✨ 컬렉션 정리 마법사(아래 설명 참고) → 플레이함 표시/즐겨찾기·자주 플레이 원클릭 가져오기(로그인 필요) → 📁 로컬 osu! Songs 폴더를 선택해 이미 가진 맵을 확인(Chrome/Edge에서만 지원, osu! stable만 인식) → 🔒 비밀번호 설정, 이후 편집/발행 작업에 필요.</span></div>
                 <div class="howto-feat"><b>검색 / 필터 / 정렬</b><span>곡명이나 아티스트로 검색; 언어, 장르, 출처, 아티스트로 필터링; 별점으로 정렬 가능.</span></div>
                 <div class="howto-feat"><b>이 목록 전체 다운로드</b><span>현재 탭/검색/필터 결과(모든 페이지 포함)의 맵을 .osz로 하나씩 순서대로 다운로드합니다. 로그인 불필요한 미러 경유라 앱 설치도 필요 없습니다. 같은 버튼으로 다운로드 중 일시정지/재개할 수 있고, 진행 중인 파일은 중단되지 않습니다. 완료되면 파일을 전부 선택해서 osu!에 한꺼번에 드래그하면 가져올 수 있습니다.</span></div>
-                <div class="howto-feat"><b>!mp 목록 복사</b><span>현재 목록을 osu! 멀티 로비용 <code>!mp map</code> 줄로 변환합니다 — 호스트가 되어 라운드마다 한 줄씩 붙여넣으세요. Discord 봇의 <code>/mplist</code> 명령도 같은 목록을 DM으로 보냅니다.</span></div>
+                <div class="howto-feat"><b>!mp map 복사</b><span>모든 카드에 ⚔ 버튼이 있어 해당 맵의 <code>!mp map</code> 줄을 복사합니다 — osu! 멀티 로비에서 호스트가 되어 붙여넣으면 맵이 설정됩니다. Discord 봇의 <code>/map</code> 에도 같은 줄이 표시됩니다.</span></div>
                 <div class="howto-feat"><b>분류 탭</b><span>즐겨찾기/전체 곡/Standard/Taiko/Catch/Mania 고정 탭 외에, 톱니바퀴 아이콘으로 "분류 관리"에서 직접 탭을 추가할 수 있습니다.</span></div>
                 <div class="howto-feat"><b>더 둘러보기</b><span>페이지 맨 아래 7개의 바로가기 카드로 다른 자주 쓰는 탭으로 이동합니다.</span></div>
                 <div class="howto-feat"><b>✨ 컬렉션 정리 마법사</b><span>사실 세 가지 도구: ① 계정에서 분류 생성(즐겨찾기/자주 플레이/베스트 성적/최근/특정 mapper) ② 성적 기반 연습 컬렉션 생성(돌파 점수, 목표 맵풀, 저정확도 재도전, 안 쳐본 비슷한 맵, 약점) ③ 건강 검진(중복, 삭제됨, 비ranked, 난이도 수 변경된 맵 검출). 세 가지 모두 기존 컬렉션을 덮어쓰지 않고 병합만 합니다.</span></div>
