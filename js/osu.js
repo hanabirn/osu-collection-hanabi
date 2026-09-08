@@ -650,6 +650,45 @@ async function batchDownloadCollectionView() {
     osuBatchDownloadPaused = false;
 }
 
+/* Turn the currently-shown list into a paste-ready block of
+   `!mp map <beatmapId> <mode>` lines for an osu! multiplayer lobby (you host,
+   paste one per round). Hardest difficulty of each set. Copies to clipboard. */
+function copyMpListForView() {
+    const status = document.getElementById('osu-batch-dl-status');
+    const sets = osuCurrentViewSets || [];
+    if (!sets.length) {
+        if (status) { status.innerText = t('mplist_copy_empty'); status.style.color = '#ff5252'; }
+        return;
+    }
+    const lines = [];
+    const seen = new Set();
+    for (const set of sets) {
+        const diffs = (set.beatmaps || []).filter(b => b.beatmap_id);
+        if (!diffs.length) continue;
+        const hardest = diffs.slice().sort((a, b) => (a.difficulty_rating || 0) - (b.difficulty_rating || 0)).pop();
+        const bid = parseInt(hardest.beatmap_id, 10);
+        if (!bid || seen.has(bid)) continue;
+        seen.add(bid);
+        const mode = Number.isInteger(hardest.mode_int) ? hardest.mode_int
+            : (Number.isInteger(set.mode) ? set.mode : 0);
+        lines.push(`!mp map ${bid} ${mode}`);
+        if (lines.length >= 250) break;
+    }
+    if (!lines.length) {
+        if (status) { status.innerText = t('mplist_copy_empty'); status.style.color = '#ff5252'; }
+        return;
+    }
+    const text = lines.join('\n');
+    const done = () => { if (status) { status.innerText = t('mplist_copied', { n: lines.length }); status.style.color = '#34d399'; } };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, () => {
+            if (status) { status.innerText = text; status.style.color = '#c8a2e0'; }
+        });
+    } else if (status) {
+        status.innerText = text; status.style.color = '#c8a2e0';
+    }
+}
+
 // Set<beatmapset_id> once scanLocalSongsFolder() has scanned a folder this
 // page load; null means "never scanned" (renderOsuCollection() falls back
 // to the plain download button for every card until then).

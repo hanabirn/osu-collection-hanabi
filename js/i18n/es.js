@@ -177,6 +177,7 @@ I18N.es = {
     osu_import_fail_json: 'Error al importar: el archivo no es un JSON válido', osu_import_fail_format: 'Error al importar: al archivo le faltan los datos de la colección (campo "collection")',
 
     osu_download_btn_title: 'Descarga directa (mirror sin inicio de sesión)',
+    mplist_copy_btn: 'Copiar como lista !mp', mplist_copy_hint: 'Copiar una lista !mp lista para pegar en un lobby multi (tú eres el anfitrión)', mplist_copied: '{n} mapas copiados — pega una línea !mp map por ronda', mplist_copy_empty: 'Esta lista está vacía',
     batch_dl_btn: 'Descargar todos los archivos de esta lista', batch_dl_empty: 'Esta lista está vacía, no hay nada que descargar',
     batch_dl_confirm: '¿Descargar los {n} beatmapsets de esta lista? Esto inicia {n} descargas del navegador una tras otra — tardará un rato, no cierres esta pestaña',
     batch_dl_progress: 'Descargando... {done}/{total}',

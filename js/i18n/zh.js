@@ -139,6 +139,7 @@ I18N.zh = {
     osu_import_fail_json: '匯入失敗，這個檔案不是有效的 JSON', osu_import_fail_format: '匯入失敗，檔案內缺少收藏資料（collection 欄位）',
 
     osu_download_btn_title: '直接下載（免登入鏡像站）',
+    mplist_copy_btn: '複製 !mp 清單', mplist_copy_hint: '複製成可直接貼進多人房的 !mp map 清單（你當房主）', mplist_copied: '已複製 {n} 張圖 —— 在你的多人房裡一次貼一行 !mp map', mplist_copy_empty: '這個清單是空的',
     batch_dl_btn: '批量下載此清單圖檔', batch_dl_empty: '這個清單是空的，沒有東西可以下載',
     batch_dl_confirm: '要下載目前清單的 {n} 個圖檔嗎？會依序觸發 {n} 次瀏覽器下載，需要一段時間，請勿關閉分頁',
     batch_dl_progress: '下載中... {done}/{total}',

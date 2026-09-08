@@ -177,6 +177,7 @@ I18N.ja = {
     osu_import_fail_json: 'インポート失敗：このファイルは有効な JSON ではありません', osu_import_fail_format: 'インポート失敗：ファイルにコレクションデータ（collection フィールド）がありません',
 
     osu_download_btn_title: '直接ダウンロード（ログイン不要ミラー）',
+    mplist_copy_btn: '!mp リストをコピー', mplist_copy_hint: 'マルチ用の !mp map リストをコピー（あなたがホスト）', mplist_copied: '{n} 件コピーしました。ロビーで 1 行ずつ貼り付けてください', mplist_copy_empty: 'このリストは空です',
     batch_dl_btn: 'このリストの譜面を一括ダウンロード', batch_dl_empty: 'このリストは空です。ダウンロードできるものがありません',
     batch_dl_confirm: 'このリストの {n} 個の譜面をダウンロードしますか？ブラウザのダウンロードを {n} 回連続で実行します。時間がかかるのでタブを閉じないでください',
     batch_dl_progress: 'ダウンロード中... {done}/{total}',

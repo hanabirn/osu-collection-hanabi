@@ -314,6 +314,7 @@ I18N.en = {
     osu_import_fail_json: 'Import failed: this file is not valid JSON.', osu_import_fail_format: 'Import failed: the file is missing collection data (the "collection" field).',
 
     osu_download_btn_title: 'Direct download (no-login mirror)',
+    mplist_copy_btn: 'Copy as !mp list', mplist_copy_hint: 'Copy a paste-ready !mp map list for a multiplayer lobby (you host)', mplist_copied: 'Copied {n} maps — paste one !mp map line per round in your lobby', mplist_copy_empty: 'This list is empty',
     batch_dl_btn: 'Batch-download this list\'s files', batch_dl_empty: 'This list is empty — nothing to download',
     batch_dl_confirm: 'Download all {n} beatmapsets in this list? This triggers {n} browser downloads one after another — it\'ll take a while, so keep this tab open',
     batch_dl_progress: 'Downloading... {done}/{total}',

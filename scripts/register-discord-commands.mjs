@@ -45,6 +45,8 @@ const LOC = {
     opt_tourneypool_mode: { en: 'Filter the list by game mode', 'zh-TW': '依遊戲模式篩選清單', 'zh-CN': '按游戏模式筛选列表', ja: 'ゲームモードで一覧を絞り込む', fr: 'Filtrer la liste par mode de jeu', de: 'Liste nach Spielmodus filtern', ru: 'Фильтр списка по режиму игры', 'es-ES': 'Filtrar la lista por modo de juego', ko: '게임 모드로 목록 필터' },
     opt_tourneypool_source: { en: 'Filter the list by where the pool came from', 'zh-TW': '依圖池來源篩選清單', 'zh-CN': '按图池来源筛选列表', ja: 'プールの出所で一覧を絞り込む', fr: 'Filtrer la liste par provenance du pool', de: 'Liste nach Pool-Herkunft filtern', ru: 'Фильтр списка по источнику маппула', 'es-ES': 'Filtrar la lista por origen del pool', ko: '풀 출처로 목록 필터' },
     cmd_skin: { en: "Search the site's skin library", 'zh-TW': '搜尋站內皮膚庫', 'zh-CN': '搜索站内皮肤库', ja: 'サイトのスキンライブラリを検索', fr: 'Rechercher dans la bibliothèque de skins du site', de: 'Die Skin-Bibliothek der Seite durchsuchen', ru: 'Поиск в библиотеке скинов сайта', 'es-ES': 'Buscar en la biblioteca de skins del sitio', ko: '사이트의 스킨 라이브러리 검색' },
+    cmd_mplist: { en: 'DM yourself a collection as a paste-ready !mp map list for multi', 'zh-TW': '把收藏做成可直接貼進多人房的 !mp 清單私訊給你', 'zh-CN': '把收藏做成可直接贴进多人房的 !mp 清单私信给你', ja: 'コレクションをマルチ用の !mp map リストにして DM で送る', fr: 'T’envoyer une collection en MP comme liste !mp prête à coller pour le multi', de: 'Dir eine Sammlung als einfügefertige !mp-map-Liste für Multi per DM schicken', ru: 'Прислать коллекцию в ЛС списком !mp map для мультиплеера', 'es-ES': 'Enviarte por MD una colección como lista !mp lista para pegar en multi', ko: '컬렉션을 멀티용 !mp map 목록으로 만들어 DM으로 전송' },
+    opt_mplist_query: { en: "Publisher name or collection ID (omit to use your /link'd account)", 'zh-TW': '發佈者名稱或收藏 ID（省略則用 /link 綁定的帳號）', 'zh-CN': '发布者名称或收藏 ID（省略则用 /link 绑定的账号）', ja: '公開者名またはコレクション ID（省略で /link 連携済みアカウント）', fr: 'Nom d’auteur ou ID de collection (vide = compte lié)', de: 'Name oder Sammlungs-ID (leer = verknüpftes Konto)', ru: 'Имя автора или ID коллекции (пусто — привязанный аккаунт)', 'es-ES': 'Nombre o ID de colección (vacío = cuenta vinculada)', ko: '게시자 이름 또는 컬렉션 ID (생략 시 연동된 계정)' },
     cmd_farm: { en: 'Draw a map from the farm-maps database', 'zh-TW': '從農分圖資料庫抽一張圖', 'zh-CN': '从农分图数据库抽一张图', ja: '効率譜面データベースから1譜面を抽選', fr: 'Tirer une map dans la base de farm maps', de: 'Eine Map aus der Farm-Maps-Datenbank ziehen', ru: 'Выбрать карту из базы фарм-карт', 'es-ES': 'Sacar un mapa de la base de farm maps', ko: '파밍 맵 데이터베이스에서 맵 뽑기' },
     cmd_link: { en: 'Link your Discord account to an osu! account', 'zh-TW': '把你的 Discord 帳號綁定一個 osu! 帳號', 'zh-CN': '把你的 Discord 账号绑定一个 osu! 账号', ja: 'Discord アカウントと osu! アカウントを連携', fr: 'Lier votre compte Discord à un compte osu!', de: 'Dein Discord-Konto mit einem osu!-Konto verknüpfen', ru: 'Привязать аккаунт Discord к аккаунту osu!', 'es-ES': 'Vincular tu cuenta de Discord a una cuenta de osu!', ko: 'Discord 계정을 osu! 계정과 연동' },
     cmd_unlink: { en: 'Unlink your osu! account', 'zh-TW': '解除 osu! 帳號綁定', 'zh-CN': '解除 osu! 账号绑定', ja: 'osu! アカウントの連携を解除', fr: 'Dissocier votre compte osu!', de: 'Verknüpfung deines osu!-Kontos aufheben', ru: 'Отвязать аккаунт osu!', 'es-ES': 'Desvincular tu cuenta de osu!', ko: 'osu! 계정 연동 해제' },
@@ -138,6 +140,13 @@ const commands = [
         ],
     },
     { name: 'skin', ...d('cmd_skin'), options: [{ type: 3, name: 'query', required: true, ...d('opt_skin_query') }] },
+    {
+        name: 'mplist', ...d('cmd_mplist'),
+        options: [
+            { type: 3, name: 'query', required: false, autocomplete: true, ...d('opt_mplist_query') },
+            modeOpt,
+        ],
+    },
     {
         name: 'farm', ...d('cmd_farm'),
         options: [

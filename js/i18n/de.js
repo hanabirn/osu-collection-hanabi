@@ -177,6 +177,7 @@ I18N.de = {
     osu_import_fail_json: 'Import fehlgeschlagen: Diese Datei ist kein gültiges JSON', osu_import_fail_format: 'Import fehlgeschlagen: Der Datei fehlen die Sammlungsdaten (Feld "collection")',
 
     osu_download_btn_title: 'Direkter Download (Mirror ohne Login)',
+    mplist_copy_btn: 'Als !mp-Liste kopieren', mplist_copy_hint: 'Einfügefertige !mp-map-Liste für eine Multi-Lobby kopieren (du hostest)', mplist_copied: '{n} Maps kopiert — füge pro Runde eine !mp-map-Zeile ein', mplist_copy_empty: 'Diese Liste ist leer',
     batch_dl_btn: 'Diese Liste als Dateien herunterladen', batch_dl_empty: 'Diese Liste ist leer — nichts zum Herunterladen',
     batch_dl_confirm: 'Alle {n} Beatmapsets dieser Liste herunterladen? Das löst {n} Browser-Downloads nacheinander aus und dauert eine Weile — Tab bitte offen lassen',
     batch_dl_progress: 'Wird heruntergeladen... {done}/{total}',
