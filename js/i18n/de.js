@@ -1,5 +1,5 @@
 I18N.de = {
-    title: 'osu! Sammlung', site_title: 'osu! Sammlung', site_tagline: '✦ Bau dir deine eigene Songsammlung auf! ✦',
+    title: 'osu! Sammlung', site_title: 'osu! Sammlung', site_tagline: 'Bau dir deine eigene Songsammlung auf',
     site_like_label: 'Gefällt mir', site_like_title: 'Gefällt dir die Seite? Gib ein Like!', site_share_label: 'Teilen', site_share_title: 'Diese Seite mit Freunden teilen', site_share_copied: 'Seitenlink kopiert!', site_share_text: 'Bau dir deine eigene osu!-Songsammlung auf!',
     pwa_install_btn_title: 'Zum Startbildschirm hinzufügen (funktioniert offline)',
     site_update_btn_title: 'Ein Update ist verfügbar, zum Aktualisieren klicken', site_update_available: 'Eine neue Version der Seite ist verfügbar — klicke, um neu zu laden und die neueste Version zu erhalten',
@@ -8,7 +8,7 @@ I18N.de = {
     volume_fab_title: 'Vorschau-Lautstärke einstellen',
     nav_chat: 'Chatroom',
     nav_dm: 'Direktnachrichten',
-    chat_page_title: '✦ Chatroom ✦',
+    chat_page_title: 'Chatroom',
     chat_page_hint: 'Chatte mit anderen Spielern, suche Mitspieler, teile Maps — ein osu!-Beatmap-Link wird automatisch zu einer Karte mit einem Ein-Klick-Button zum Hinzufügen zu deiner Sammlung.',
     chat_empty: 'Noch hat niemand etwas geschrieben — sei die/der Erste!', chat_load_fail: 'Chatroom konnte nicht geladen werden, versuch es später erneut',
     chat_input_placeholder: 'Nachricht eingeben...', chat_send_btn: 'Senden',
@@ -28,7 +28,7 @@ I18N.de = {
     chat_add_to_collection_btn: 'Zur Sammlung hinzufügen',
     chat_rate_limited: 'Du sendest zu schnell, mach langsamer', chat_send_fail: 'Senden fehlgeschlagen, versuch es später erneut',
 
-    dm_page_title: '✦ Direktnachrichten ✦', dm_page_hint: 'Chatte eins zu eins mit anderen Spielern.',
+    dm_page_title: 'Direktnachrichten', dm_page_hint: 'Chatte eins zu eins mit anderen Spielern.',
     dm_new_username_placeholder: 'Benutzernamen eingeben, um ein Gespräch zu starten...', dm_start_btn: 'Gespräch starten',
     dm_login_required: 'Melde dich mit osu! an, um Direktnachrichten zu nutzen',
     dm_empty: 'Noch keine Gespräche — gib einen Benutzernamen ein, um deine erste Nachricht zu senden!',
@@ -51,10 +51,10 @@ I18N.de = {
     lang_unspecified: 'Nicht angegeben', lang_english: 'Englisch', lang_japanese: 'Japanisch', lang_chinese: 'Chinesisch', lang_instrumental: 'Instrumental', lang_korean: 'Koreanisch', lang_french: 'Französisch', lang_german: 'Deutsch', lang_swedish: 'Schwedisch', lang_spanish: 'Spanisch', lang_italian: 'Italienisch', lang_russian: 'Russisch', lang_polish: 'Polnisch', lang_other: 'Andere', lang_unknown: 'Ohne Kennzeichnung', osu_lang_filter_all: 'Alle Sprachen', stats_dashboard_langs_title: 'Sprachen',
     osu_genre_filter_all: 'Alle Genres', osu_source_filter_all: 'Alle Quellen', osu_source_filter_none: '(Ohne Quelle)', genre_unspecified: 'Nicht angegeben', genre_video_game: 'Videospiel', genre_anime: 'Anime', genre_rock: 'Rock', genre_pop: 'Pop', genre_other: 'Andere', genre_novelty: 'Novelty', genre_hiphop: 'Hip-Hop', genre_electronic: 'Electronic', genre_metal: 'Metal', genre_classical: 'Klassik', genre_folk: 'Folk', genre_jazz: 'Jazz',
     osu_artist_filter_all: 'Alle Interpreten',
-    updates_title: '✦ Neuigkeiten ✦', updates_loading: 'Neuigkeiten werden geladen...', updates_empty: 'Momentan keine Neuigkeiten', updates_load_fail: 'Neuigkeiten konnten nicht geladen werden, bitte später erneut versuchen',
-    tournaments_title: '✦ Turniere ✦', tournaments_hint: 'Community-Turniere aus dem offiziellen Unterforum „Tournaments" und der wyBin-Plattform — das sind keine offiziellen Events, prüfe vor der Anmeldung die Regeln des Veranstalters.', tournaments_filter_hint: 'Der Spielmodus wird anhand des Titels geraten — nicht erkannte Titel erscheinen nur unter „Alle".', osu_filter_all: 'Alle', tournament_source_forum: 'Forum', tournament_rank_label: 'Zugelassener Rang', tournament_rank_all: 'Alle Ränge', tournament_rank_open: 'Offener Rang', tournament_rank_worldcup: 'World Cup', tournament_rank_digit: '{n}-stellig', tournament_rank_unknown: 'Nicht angegeben',
-    feedback_title: '✦ Vorschläge & Verbesserungen ✦', feedback_hint: 'Denkst du, an der Seite könnte etwas verbessert werden? Sag es mir hier — nur ich kann deine Nachricht sehen, andere Besucher nicht.', feedback_placeholder: 'Schreib deinen Vorschlag...', feedback_submit: 'Senden', feedback_success: 'Deine Nachricht wurde gesendet, danke für dein Feedback!',
-    skins_title: '🎵 Meine Skins 🎵', skins_hint: 'Lade osu!-Skin-Dateien (.osk) hoch, die du behalten möchtest, und lade sie jederzeit wieder herunter. Dateien werden standardmäßig nur in diesem Browser gespeichert und nie auf einen Server hochgeladen — bei Gerätewechsel oder Löschen der Browserdaten gehen sie verloren. Melde dich mit osu! an, um Skins unter 4MB optional in der Cloud zu sichern.', skins_list_title: '💾 Gespeicherte Skins',
+    updates_title: 'Neuigkeiten', updates_loading: 'Neuigkeiten werden geladen...', updates_empty: 'Momentan keine Neuigkeiten', updates_load_fail: 'Neuigkeiten konnten nicht geladen werden, bitte später erneut versuchen',
+    tournaments_title: 'Turniere', tournaments_hint: 'Community-Turniere aus dem offiziellen Unterforum „Tournaments" und der wyBin-Plattform — das sind keine offiziellen Events, prüfe vor der Anmeldung die Regeln des Veranstalters.', tournaments_filter_hint: 'Der Spielmodus wird anhand des Titels geraten — nicht erkannte Titel erscheinen nur unter „Alle".', osu_filter_all: 'Alle', tournament_source_forum: 'Forum', tournament_rank_label: 'Zugelassener Rang', tournament_rank_all: 'Alle Ränge', tournament_rank_open: 'Offener Rang', tournament_rank_worldcup: 'World Cup', tournament_rank_digit: '{n}-stellig', tournament_rank_unknown: 'Nicht angegeben',
+    feedback_title: 'Vorschläge & Verbesserungen', feedback_hint: 'Denkst du, an der Seite könnte etwas verbessert werden? Sag es mir hier — nur ich kann deine Nachricht sehen, andere Besucher nicht.', feedback_placeholder: 'Schreib deinen Vorschlag...', feedback_submit: 'Senden', feedback_success: 'Deine Nachricht wurde gesendet, danke für dein Feedback!',
+    skins_title: 'Meine Skins', skins_hint: 'Lade osu!-Skin-Dateien (.osk) hoch, die du behalten möchtest, und lade sie jederzeit wieder herunter. Dateien werden standardmäßig nur in diesem Browser gespeichert und nie auf einen Server hochgeladen — bei Gerätewechsel oder Löschen der Browserdaten gehen sie verloren. Melde dich mit osu! an, um Skins unter 4MB optional in der Cloud zu sichern.', skins_list_title: 'Gespeicherte Skins',
     skins_backup_btn: 'In der Cloud sichern', skins_backup_title: '☁️ Cloud-Backup',
     skins_backup_hint: 'Nur für dich — bis zu 30 Skins, jeweils unter 4MB. „Auf Gerät wiederherstellen" fügt ihn wieder zur obigen Liste hinzu.',
     skins_backup_login_required: 'Melde dich mit osu! an, um das Cloud-Backup zu nutzen', skins_backup_too_large: 'Dieser Skin überschreitet {limit}MB und kann daher nur auf diesem Gerät bleiben',
@@ -63,7 +63,7 @@ I18N.de = {
     skins_empty: 'Noch keine Skins gespeichert', skins_download: 'Herunterladen', skins_delete: 'Löschen', skins_delete_confirm: 'Diese Skin-Datei löschen?',
     skins_upload_done: '{n} Datei(en) hinzugefügt', skins_upload_fail: 'Hochladen von „{n}" fehlgeschlagen', skins_load_fail: 'Skin-Liste konnte nicht geladen werden — prüfe, ob der Browser lokalen Speicher erlaubt',
 
-    osu_title: '♫ Beatmap hinzufügen ♫', osu_placeholder: 'ID oder URL eingeben', osu_add: 'Hinzufügen',
+    osu_title: 'Beatmap hinzufügen', osu_placeholder: 'ID oder URL eingeben', osu_add: 'Hinzufügen',
     osu_password: 'Ein Sammlungs-Passwort festlegen\nVeröffentlichen im Gallery sowie Import / Export fragen es danach ab',
     osu_refresh_all_title: 'Aktuelle Daten aller Maps neu laden (Sterne, Status)',
     tools_group_io: 'Import / Export', tools_group_tools: 'Werkzeuge & Einstellungen',
@@ -79,8 +79,8 @@ I18N.de = {
     osu_all_songs: 'Alle Songs', osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!', osu_empty_banner_hint: 'Sobald du welche sammelst, zeigen Banner und Seitenhintergrund deine Beatmap-Cover.',
     hero_pitch: 'Ein Ort für deine osu!-Sammlung: aus dem Spiel importieren, Kategorien aus deinen Scores erzeugen, direkt zurück ins Spiel exportieren.',
     hero_feat_import: 'collection.db / .osdb aus dem Spiel importieren', hero_feat_generate: 'Kategorien aus deinem osu!-Konto erzeugen', hero_feat_share: 'Sammlungen teilen (mit Vorschaukarten)',
-    hero_stat_collections: '🌐 {n} öffentliche Sammlungen', hero_stat_likes: '❤ {n}',
-    hero_stat_farm: '🎵 {n}+ Maps in der Farm-Datenbank',
+    hero_stat_collections: '{n} öffentliche Sammlungen', hero_stat_likes: '❤ {n}',
+    hero_stat_farm: '{n}+ Maps in der Farm-Datenbank',
     hero_v2_stat: '{n} Sets · {c} Kategorien',
     hero_login_cta: 'Mit osu! anmelden und Favoriten übernehmen',
     digest_title: 'Seit deinem letzten Besuch',
@@ -118,7 +118,7 @@ I18N.de = {
     osu_confirm_password: 'Bestätigen:', osu_password_mismatch: 'Passwörter stimmen nicht überein',
     osu_password_set: 'Passwort gesetzt!',
     osu_copied: 'Kopiert!', mapped_by: 'von {n}',
-    osu_page_title: '✦ osu! Beatmap-Sammlung + Gesamt-PP-Suche ✦', visitor_lookup_title: '✦ Deinen osu! PP prüfen ✦', visitor_lookup_placeholder: 'osu! Benutzername oder ID', visitor_lookup_btn: 'Suchen', osu_login_btn: 'Mit osu! anmelden', osu_logout_btn: 'Abmelden', osu_login_fail: 'osu!-Anmeldung fehlgeschlagen, bitte erneut versuchen',
+    osu_page_title: 'osu! Beatmap-Sammlung + Gesamt-PP-Suche', visitor_lookup_title: 'Deinen osu! PP prüfen', visitor_lookup_placeholder: 'osu! Benutzername oder ID', visitor_lookup_btn: 'Suchen', osu_login_btn: 'Mit osu! anmelden', osu_logout_btn: 'Abmelden', osu_login_fail: 'osu!-Anmeldung fehlgeschlagen, bitte erneut versuchen',
     osu_profile_import_confirm: 'Dein osu!-Konto wurde erkannt. Deine favorisierten Beatmaps und deine 50 meistgespielten in deine Sammlung importieren? (Nichts Vorhandenes wird überschrieben.)',
     osu_profile_import_btn_title: 'Favoriten / meistgespielte aus deinem osu!-Konto holen\nBenötigt Login; fügt nur fehlende Maps hinzu, überschreibt nichts',
     osu_profile_importing: 'Import aus deinem osu!-Profil... {done}/{total}',
@@ -171,7 +171,7 @@ I18N.de = {
     osu_sort_default: 'Standardreihenfolge', osu_sort_rating_desc: 'Sterne (absteigend)', osu_sort_rating_asc: 'Sterne (aufsteigend)',
     pp_history_title: 'PP-Entwicklung', pp_history_empty: 'Noch nicht genug Verlauf — komm später wieder, um den Trend aufzubauen.',
     osu_stats_total: 'Gesamt gesammelt', osu_stats_avg_rating: 'Ø Schwierigkeit', osu_stats_max_rating: 'Max. Schwierigkeit',
-    featured_beatmap_label: '✦ Heute empfohlen ✦',
+    featured_beatmap_label: 'Heute empfohlen',
     osu_export: 'Sammlung als JSON-Backup herunterladen', osu_import: 'Sammlung aus einem JSON-Backup wiederherstellen\nWähle eine .json, die du zuvor über „Exportieren“ heruntergeladen hast — fügt deren Maps und Kategorien hinzu',
     osu_export_done: 'Sammlung exportiert!', osu_import_done: 'Sammlung importiert!', osu_import_fail: 'Import fehlgeschlagen. Bitte Dateiformat prüfen',
     osu_import_fail_json: 'Import fehlgeschlagen: Diese Datei ist kein gültiges JSON', osu_import_fail_format: 'Import fehlgeschlagen: Der Datei fehlen die Sammlungsdaten (Feld "collection")',
@@ -199,7 +199,7 @@ I18N.de = {
     stats_card_btn: 'Statistik-Karte erstellen', stats_card_done: 'Statistik-Karte heruntergeladen!', stats_card_fail: 'Statistik-Karte konnte nicht erstellt werden',
     collection_card_btn: 'Eine Vorschaukarte deiner Sammlung (PNG) herunterladen', collection_card_title: 'Meine osu!-Sammlung', collection_card_done: 'Sammlungskarte heruntergeladen!', collection_card_fail: 'Sammlungskarte konnte nicht erstellt werden',
 
-    nav_public_collections: 'Galerie', gallery_page_title: '✦ Spieler-Sammlungsgalerie ✦',
+    nav_public_collections: 'Galerie', gallery_page_title: 'Spieler-Sammlungsgalerie',
     publish_btn: 'Meine Sammlung veröffentlichen', publish_update_btn: 'Veröffentlichte Sammlung aktualisieren', publish_login_required: 'Melde dich zuerst mit osu! an, um deine Sammlung zu veröffentlichen',
     publish_relogin_prompt: 'Deine osu!-Anmeldung ist abgelaufen (alle 30 Tage neu zu bestätigen). Jetzt erneut anmelden?',
     publish_confirm: 'Deine Sammlung ({n} Beatmaps) öffentlich veröffentlichen? Du kannst sie jederzeit erneut veröffentlichen oder entfernen',
@@ -220,7 +220,7 @@ I18N.de = {
     gallery_like_login_required: 'Melde dich mit osu! an, um zu liken', gallery_like_fail: 'Liken fehlgeschlagen, bitte später erneut versuchen',
     gallery_no_results: 'Keine passenden Sammlungen — versuche ein anderes Stichwort oder Tag', gallery_tag_filter_clear_title: 'Tag-Filter entfernen',
 
-    nav_farm_maps: 'Farm-Maps', farm_page_title: '✦ Farm-Maps ✦',
+    nav_farm_maps: 'Farm-Maps', farm_page_title: 'Farm-Maps',
     farm_hint: 'Filtere den ranked Map-Pool nach PP / Sternebewertung / BPM / Mods. Die PP-Werte werden von dieser Seite selbst berechnet (nicht geschätzt, bei SS) — die Datenbank wächst noch und deckt evtl. noch nicht alle ranked Maps ab.',
     farm_search_placeholder: 'Titel oder Künstler suchen...',
     farm_sort_pp_desc: 'PP: hoch zu niedrig', farm_sort_pp_asc: 'PP: niedrig zu hoch',
@@ -236,7 +236,7 @@ I18N.de = {
 
     cdn_lib_fail: 'Eine externe Komponente konnte nicht geladen werden — Verbindung prüfen und erneut versuchen',
     nav_catalog: 'Katalog', explore_catalog_d: 'Durchstöbere den ganzen ranked-Katalog nach Künstler / Sprache / Genre — Sammlung mit einem Klick',
-    catalog_page_title: '✦ Katalog ✦',
+    catalog_page_title: 'Katalog',
     catalog_hint: 'Durchstöbere den gesamten ranked-Katalog nach Künstler / Sprache / Genre / Quelle / feat. Wähle ein Merkmal und mach mit einem Klick eine Sammlungskategorie daraus. Der Index wird vom Hintergrund-Crawler der Seite aufgebaut und deckt noch nicht jede ranked-Map ab.',
     catalog_search_placeholder: 'Titel / Künstler / Quelle suchen...',
     catalog_sort_ranked_desc: 'Ranked-Datum: neueste', catalog_sort_ranked_asc: 'Ranked-Datum: älteste',
@@ -272,7 +272,7 @@ I18N.de = {
     games_quiz_again: 'Nochmal spielen',
     games_quiz_correct_was: 'Es war {name}',
     games_quiz_no_data: 'Noch nicht genug Map-Daten, versuch es später.',
-    games_page_title: '✦ Minispiele ✦',
+    games_page_title: 'Minispiele',
     games_hint: 'Kleine Spiele auf Basis des Seiten-Katalogs und der Farm-Daten. Maps, die dir gefallen, kannst du deiner Sammlung hinzufügen — es fragt immer vorher.',
     games_daily_title: 'Tägliches Raten',
     games_daily_blurb: 'Ein Ranked-Set pro Tag — errate es an einem verschwommenen Cover, mit einem Hinweis pro Fehlversuch.',
@@ -310,8 +310,8 @@ I18N.de = {
     games_save_confirm: 'Dieses Beatmapset zu deiner Sammlung hinzufügen?',
     games_save_category: 'Aus Minispielen',
     games_save_done: '{n} Set(s) zu deiner Sammlung hinzugefügt',
-    mappools_page_title: '✦ World-Cup-Mappools ✦',
-    cmpool_page_title: '✦ Community-Mappools ✦',
+    mappools_page_title: 'World-Cup-Mappools',
+    cmpool_page_title: 'Community-Mappools',
     cmpool_hint: 'Von der Community gefüllte Turnier-Mappools — wähle ein Turnier, füge Runden und Mod-Brackets hinzu, trage Beatmap-Ids ein, die Metadaten holt die Seite. Zum Bearbeiten anmelden.',
     cmpool_pick_from_list: 'Turnier aus der Liste wählen…',
     cmpool_source_label: 'Quelle', cmpool_mode_label: 'Modus', cmpool_mode_all: 'Alle Modi',
@@ -410,7 +410,7 @@ I18N.de = {
     tracked_mappers_empty: 'Du beobachtest noch keine Mapper', notif_mapper_new_title: '{name} hat eine neue Map gerankt',
     notif_achievement_new_title: '{n} hat ein neues Abzeichen erhalten', notif_achievement_detail: '{count} neue(s) Abzeichen — hier klicken',
     notif_mapper_graveyard_title: '{name} hat eine neue Graveyard-Map', notif_mapper_loved_title: 'Eine Map von {name} wurde zu Loved hinzugefügt!',
-    resources_title: '✦ Weitere osu!-Ressourcen ✦', resources_hint: 'Ein paar Community-Tools, die man kennen sollte, statt sie selbst zu bauen:',
+    resources_title: 'Weitere osu!-Ressourcen', resources_hint: 'Ein paar Community-Tools, die man kennen sollte, statt sie selbst zu bauen:',
     resource_osusearch_desc: 'Erweiterte Beatmap-Suche nach Sternen, BPM, Länge und mehr', resource_osupps_desc: 'Ein weiterer Farm-Map-Tracker, gut zum Vergleichen',
     resource_maniatracker_desc: 'osu!mania-Ranglisten, Score-Tracking und eine Dan-Level-Schätzung',
     resource_osutrack_desc: 'Langzeit-Statistikverlauf — pp, Rang und Genauigkeit als Diagramm',
@@ -419,7 +419,7 @@ I18N.de = {
     resource_osustats_desc: 'Zählt deine Ranglistenplatzierungen — wie viele Top-50 / Top-100 du hältst',
     resource_collectionmanager_desc: 'Desktop-Sammlungseditor, kompatibel mit dem collection.db-Export dieser Seite', resource_osuskinner_desc: 'Online-Skin-Ersteller',
     resource_mappersguild_desc: 'Gilden-System, das das Mappen von vorgestellten Künstlern fördert', resource_osuskills_desc: 'Inoffizielle Skill-Bewertung (aim / speed / acc)',
-    nav_medals: 'Medaillen', medals_title: '✦ Medaillen-Galerie ✦',
+    nav_medals: 'Medaillen', medals_title: 'Medaillen-Galerie',
     medals_hint: 'Nach der Spielersuche werden hier alle osu!-Medaillen angezeigt, markiert mit denen, die dieser Spieler bereits hat (Daten von osekai.net)',
     medals_loading: 'Medaillendaten werden geladen...', medals_load_fail: 'Medaillendaten konnten nicht geladen werden, später erneut versuchen',
     medals_earned_label: '{n} / {total} erhalten', medals_filter_all: 'Alle', medals_filter_earned: 'Erhalten', medals_filter_missing: 'Fehlend',
@@ -432,7 +432,7 @@ I18N.de = {
     grade_history_filter_empty: 'Keine Einträge für diesen Rang',
     grade_history_filter_all: 'Alle',
     grade_history_truncated: 'Zeige die neuesten {n} von {total}',
-    nav_replay_analyze: 'Replay-Analyse', replay_analyze_title: '✦ Replay-Analyse ✦',
+    nav_replay_analyze: 'Replay-Analyse', replay_analyze_title: 'Replay-Analyse',
     replay_analyze_hint: 'Lade eine .osr-Datei hoch, um eine Ergebniszusammenfassung und ein Trefferzeit-Diagramm zu sehen. Wird komplett serverseitig aus der Datei selbst analysiert — kein Videorendering, kein Drittanbieterdienst.',
     replay_upload_btn: '.osr-Datei wählen', replay_upload_drag_hint: 'oder Datei hierher ziehen',
     replay_analyzing: 'Analysiere...', replay_analyze_fail: 'Analyse fehlgeschlagen — stelle sicher, dass die Datei eine gültige .osr ist',
@@ -445,11 +445,11 @@ I18N.de = {
 
     site_howto_title: 'Was jede Seite und jeder Button macht', site_howto_label: 'Handbuch',
     nav_howto: 'Handbuch',
-    howto_page_title: '📖 Handbuch', howto_page_hint: 'Nach dem Menü der Seite gruppiert — was jede Seite und jeder Button macht und wie man sie benutzt.',
+    howto_page_title: 'Handbuch', howto_page_hint: 'Nach dem Menü der Seite gruppiert — was jede Seite und jeder Button macht und wie man sie benutzt.',
     howto_group_global: 'Website-weit',
     howto_manual_body: `
         <div class="howto-group" id="howto-global">
-            <h3 class="howto-group-title">🌐 Website-weit</h3>
+            <h3 class="howto-group-title">Website-weit</h3>
             <p class="howto-tab-desc">Steuerelemente, die auf jeder Seite verfügbar sind, meist in den beiden oberen Ecken.</p>
             <div class="howto-feat"><b>Hell-/Dunkel-Umschalter</b><span>Oben links. Mond-/Sonnensymbol antippen zum Umschalten — die Wahl wird für künftige Besuche gespeichert.</span></div>
             <div class="howto-feat"><b>Zum Startbildschirm hinzufügen</b><span>Oben links, nur bei unterstützten Browsern sichtbar. Installiert die Website als App-Symbol mit einfacher Offline-Ansicht.</span></div>
@@ -465,10 +465,10 @@ I18N.de = {
         </div>
 
         <div class="howto-group" id="howto-core">
-            <h3 class="howto-group-title">✦ Kernfunktionen</h3>
+            <h3 class="howto-group-title">Kernfunktionen</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">♫ Sammlung <small>Standard-Startseite</small></div>
+                <div class="howto-tab-title">Sammlung <small>Standard-Startseite</small></div>
                 <p class="howto-tab-desc">Verwalte deine eigene osu!-Bibliothek: hinzufügen, kategorisieren, zurück ins Spiel exportieren oder mit einem alten Backup vergleichen.</p>
                 <div class="howto-feat"><b>Beatmap hinzufügen</b><span>ID oder osu!-URL der Karte einfügen (beatmapsets/... oder /b/... funktionieren beide) und Hinzufügen klicken.</span></div>
                 <div class="howto-feat"><b>Import/Export (6 Buttons)</b><span>Von links nach rechts: JSON-Backup exportieren → JSON importieren zum Wiederherstellen → Freigabelink kopieren → Vorschau-PNG-Karte herunterladen → Als collection.db exportieren, direkt für osu! → ⚔ Vergleich, altes Backup hochladen und sehen was hinzugefügt/entfernt wurde.</span></div>
@@ -482,7 +482,7 @@ I18N.de = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Öffentliche Galerie</div>
+                <div class="howto-tab-title">Öffentliche Galerie</div>
                 <p class="howto-tab-desc">Veröffentliche deine organisierte Sammlung öffentlich oder durchsuche die anderer und importiere sie direkt. Jedes osu!-Konto kann nur eine veröffentlichen.</p>
                 <div class="howto-feat"><b>Veröffentlichen / zurückziehen</b><span>Login nötig. Veröffentlichen sendet deine aktuelle Sammlung an die Galerie; erneutes Veröffentlichen überschreibt die alte statt einen zweiten Eintrag zu erstellen.</span></div>
                 <div class="howto-feat"><b>Suche / Sortierung / Filter</b><span>Nach Spielername oder Tag suchen; sortieren nach neu/❤ beliebtesten/Kartenanzahl/höchster Bewertung; oder nur mit „Gefällt mir" markierte anzeigen.</span></div>
@@ -490,21 +490,21 @@ I18N.de = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Skin-Galerie</div>
+                <div class="howto-tab-title">Skin-Galerie</div>
                 <p class="howto-tab-desc">Teile echte Ingame-Skin-Screenshots, damit andere sehen können wie ein Skin tatsächlich aussieht.</p>
                 <div class="howto-feat"><b>Meinen Skin-Screenshot teilen</b><span>Name und Autor (optional) ausfüllen, Download-Link oder .osk-Datei angeben (mindestens eins), Modus wählen, Screenshot hochladen und veröffentlichen.</span></div>
                 <div class="howto-feat"><b>Durchsuchen / Filtern</b><span>Nach Name oder Autor suchen, nach Modus filtern, nach neu oder beliebtesten sortieren, oder nur eigene/gelikte anzeigen.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Chatraum</div>
+                <div class="howto-tab-title">Chatraum</div>
                 <p class="howto-tab-desc">Ein öffentlicher Chatraum für alle Besucher.</p>
                 <div class="howto-feat"><b>Schreiben</b><span>Login nötig. Ein osu!-Beatmap-Link wird automatisch zu einer Karte mit One-Klick „Zur Sammlung hinzufügen"-Button.</span></div>
                 <div class="howto-feat"><b>Pro Nachricht möglich</b><span>Avatar/Name anklicken öffnet das osu!-Profil, Länderflagge ansehen, 🌐 antippen zum Übersetzen in deine aktuelle Oberflächensprache, auf eine Nachricht antworten, oder löschen (eigene Nachrichten, oder alle als Seitenbetreiber).</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Direktnachrichten</div>
+                <div class="howto-tab-title">Direktnachrichten</div>
                 <p class="howto-tab-desc">Ein privates 1:1-Gespräch mit einem Spieler, für alle anderen unsichtbar.</p>
                 <div class="howto-feat"><b>Neues Gespräch starten</b><span>Login nötig. Den osu!-Benutzernamen eingeben und „Gespräch starten" klicken.</span></div>
                 <div class="howto-feat"><b>Gesprächsliste / ungelesen</b><span>Ungelesene Zahlen erscheinen auch als Abzeichen neben „Nachrichten" im ☰-Menü. Ein Gespräch öffnen zeigt den Verlauf; „Zurück" führt zur Liste zurück.</span></div>
@@ -512,10 +512,10 @@ I18N.de = {
         </div>
 
         <div class="howto-group" id="howto-tools">
-            <h3 class="howto-group-title">✦ Werkzeugkasten</h3>
+            <h3 class="howto-group-title">Werkzeugkasten</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Farm-Karten</div>
+                <div class="howto-tab-title">Farm-Karten</div>
                 <p class="howto-tab-desc">Eine Liste von ranked Karten mit hoher PP-Effizienz — die PP-Zahlen werden von dieser Seite tatsächlich aus SS-Ergebnissen berechnet, nicht geschätzt.</p>
                 <div class="howto-feat"><b>Modus-/Mod-Tabs</b><span>Standard/Taiko/Catch/Mania, jeweils mit NM/DT/HD/HDDT/HR/HDHR-Mod-Kombinationen.</span></div>
                 <div class="howto-feat"><b>🔥 Nur Farm-Karten</b><span>Standardmäßig an. Für osu!/taiko: ≥70% der Top-50-Ergebnisse sind DT; für catch/mania: ≥70% sind 100% Genauigkeit (beide benötigen ≥500 Spiele).</span></div>
@@ -523,28 +523,28 @@ I18N.de = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Katalog</div>
+                <div class="howto-tab-title">Katalog</div>
                 <p class="howto-tab-desc">Ein Browser für den gesamten ranked-Katalog, aufgeteilt nach Künstler/Sprache/Genre/Quelle/Feat.</p>
                 <div class="howto-feat"><b>Filterkombinationen</b><span>Die vier Dropdowns können kombiniert werden, plus ein Modus-Filter und ein „18+ markiert einschließen"-Schalter, mit vier Sortieroptionen.</span></div>
                 <div class="howto-feat"><b>➕ Sammlung aus diesem Filter erstellen</b><span>Wird erst aktiv, wenn deine Filter Ergebnisse liefern — ein Klick macht das gesamte gefilterte Ergebnis zu einer neuen Kategorie in deiner Sammlung. Mit „Als dynamische Kategorie" holst du später neu gerankte Maps, die zum selben Filter passen, mit einem Klick nach.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Weltmeisterschafts-Mappools</div>
+                <div class="howto-tab-title">Weltmeisterschafts-Mappools</div>
                 <p class="howto-tab-desc">Offizielle Mappools jeder OWC/TWC/MWC (4K・7K)/CWC.</p>
                 <div class="howto-feat"><b>Ausgabe / Runde wählen</b><span>Modus-Tab → Ausgabenliste → eine wählen, um nach Runde zu durchsuchen, jede Karte mit ihrem Mod beschriftet.</span></div>
                 <div class="howto-feat"><b>➕ Zur Sammlung hinzufügen</b><span>Die ganze Ausgabe hinzufügen, oder nur eine Runde — man muss nicht alles nehmen.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ PP-Suche</div>
+                <div class="howto-tab-title">PP-Suche</div>
                 <p class="howto-tab-desc">Die PP eines beliebigen Spielers (auch deine eigene) nachschlagen, oder zwei nebeneinander vergleichen.</p>
                 <div class="howto-feat"><b>Deine osu!-PP nachschlagen</b><span>Benutzername oder ID eingeben und suchen. Ergebnisse enthalten Statistiken für alle Modi, ein PP-Verlaufsdiagramm, einen Verfolgen-Button und „Statistikkarte erstellen"; Tabs darunter: letzte Spiele / Top-Ergebnisse / PP-Ziel / Abzeichen / Notenverlauf.</span></div>
                 <div class="howto-feat"><b>⚔ Zwei-Spieler-Vergleich</b><span>Zwei Benutzernamen/IDs eingeben und Vergleichen klicken: zuerst Übersicht und überlagerte PP-Diagramme, dann darunter „Top-Play-Vergleich" mit den besten Ergebnissen beider Spieler nebeneinander.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Replay-Analyse</div>
+                <div class="howto-tab-title">Replay-Analyse</div>
                 <p class="howto-tab-desc">Eine .osr-Datei hochladen für Ergebnisdetails — komplett serverseitig geparst, keine Videokonvertierung oder Drittanbieter-Dienste.</p>
                 <div class="howto-feat"><b>Hochladen</b><span>Per Drag & Drop oder „.osr-Datei wählen" klicken — zeigt danach eine Ergebniszusammenfassung und ein Trefferzeit-Verteilungsdiagramm.</span></div>
             </div>
@@ -557,33 +557,33 @@ I18N.de = {
         </div>
 
         <div class="howto-group" id="howto-resources">
-            <h3 class="howto-group-title">✦ Ressourcen</h3>
+            <h3 class="howto-group-title">Ressourcen</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">🎵 Meine Skins <small>ein anderer Tab als „Skin-Galerie"</small></div>
+                <div class="howto-tab-title">Meine Skins <small>ein anderer Tab als „Skin-Galerie"</small></div>
                 <p class="howto-tab-desc">Dein privater Skin-Speicher, nicht öffentlich sichtbar — dafür „Skin-Galerie" verwenden.</p>
                 <div class="howto-feat"><b>Hochladen / Herunterladen</b><span>Hochgeladene .osk-Dateien leben nur in diesem Browser — Gerätewechsel oder Browserdaten löschen verliert sie; jederzeit zum Zurückholen herunterladen.</span></div>
                 <div class="howto-feat"><b>☁️ Cloud-Backup</b><span>Erscheint nur bei Anmeldung. Bis zu 30 Dateien, je 4MB; „Lokal wiederherstellen" fügt sie oben zur Liste hinzu.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ News</div>
+                <div class="howto-tab-title">News</div>
                 <p class="howto-tab-desc">Eine Liste offizieller osu!-Änderungsprotokolle — nur zum Durchsehen, keine Aktionen nötig.</p>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Turniere</div>
+                <div class="howto-tab-title">Turniere</div>
                 <p class="howto-tab-desc">Kombiniert den offiziellen Foren-Bereich Tournaments mit wyBins Community-Auflistungen (inoffizielle Events — vor Anmeldung die Regeln des Veranstalters selbst prüfen).</p>
                 <div class="howto-feat"><b>Modus-Filter</b><span>Modus wird automatisch aus Schlüsselwörtern im Titel erkannt; nicht erkennbare Beiträge erscheinen nur unter „Alle".</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Ressourcen</div>
+                <div class="howto-tab-title">Ressourcen</div>
                 <p class="howto-tab-desc">Eine Liste empfohlener Community-Tools, die hier nicht nachgebaut werden mussten — nur zum Durchsehen.</p>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Feedback</div>
+                <div class="howto-tab-title">Feedback</div>
                 <p class="howto-tab-desc">Ein Feedback-Formular. Gedanken aufschreiben und absenden — nur der Seitenbetreiber sieht es, andere Besucher nie.</p>
             </div>
         </div>

@@ -1,5 +1,5 @@
 I18N.ko = {
-    title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '✦ 나만의 곡 컬렉션을 만들어보세요! ✦',
+    title: 'osu! 컬렉션', site_title: 'osu! 컬렉션', site_tagline: '나만의 곡 컬렉션을 만들어보세요',
     site_like_label: '좋아요', site_like_title: '이 사이트가 마음에 들면 좋아요를 눌러주세요!', site_share_label: '공유', site_share_title: '이 사이트를 친구에게 공유하기', site_share_copied: '사이트 링크를 복사했습니다!', site_share_text: '나만의 osu! 곡 컬렉션을 만들어 보세요!',
     pwa_install_btn_title: '홈 화면에 추가 (오프라인 사용 가능)',
     site_update_btn_title: '업데이트가 있습니다. 클릭해서 업데이트', site_update_available: '새 버전이 있습니다 — 클릭하면 새로고침하여 최신 버전을 받습니다',
@@ -8,7 +8,7 @@ I18N.ko = {
     volume_fab_title: '미리듣기 음량 조절',
     nav_chat: '채팅방',
     nav_dm: '쪽지',
-    chat_page_title: '✦ 채팅방 ✦',
+    chat_page_title: '채팅방',
     chat_page_hint: '다른 플레이어와 채팅하고 맵을 공유해 보세요 — osu! 비트맵 링크를 붙여넣으면 원클릭으로 컬렉션에 추가할 수 있는 카드로 바뀝니다.',
     chat_empty: '아직 아무도 말하지 않았어요. 첫 번째가 되어보세요!', chat_load_fail: '채팅방을 불러오지 못했습니다. 나중에 다시 시도해 주세요',
     chat_input_placeholder: '메시지를 입력하세요...', chat_send_btn: '전송',
@@ -28,7 +28,7 @@ I18N.ko = {
     chat_add_to_collection_btn: '컬렉션에 추가',
     chat_rate_limited: '너무 빨리 보내고 있어요, 잠시 후 다시 시도해 주세요', chat_send_fail: '전송 실패, 나중에 다시 시도해 주세요',
 
-    dm_page_title: '✦ 쪽지 ✦', dm_page_hint: '다른 플레이어와 1:1로 대화하세요.',
+    dm_page_title: '쪽지', dm_page_hint: '다른 플레이어와 1:1로 대화하세요.',
     dm_new_username_placeholder: '사용자 이름을 입력해 대화를 시작하세요...', dm_start_btn: '대화 시작',
     dm_login_required: 'osu!에 로그인해야 쪽지를 사용할 수 있습니다',
     dm_empty: '아직 대화가 없어요. 사용자 이름을 입력해 첫 메시지를 보내보세요!',
@@ -51,10 +51,10 @@ I18N.ko = {
     lang_unspecified: '미지정', lang_english: '영어', lang_japanese: '일본어', lang_chinese: '중국어', lang_instrumental: '연주곡', lang_korean: '한국어', lang_french: '프랑스어', lang_german: '독일어', lang_swedish: '스웨덴어', lang_spanish: '스페인어', lang_italian: '이탈리아어', lang_russian: '러시아어', lang_polish: '폴란드어', lang_other: '기타', lang_unknown: '미표시', osu_lang_filter_all: '모든 언어', stats_dashboard_langs_title: '언어 분포',
     osu_genre_filter_all: '모든 장르', osu_source_filter_all: '모든 출처', osu_source_filter_none: '（출처 없음）', genre_unspecified: '미지정', genre_video_game: '비디오 게임', genre_anime: '애니메이션', genre_rock: '록', genre_pop: '팝', genre_other: '기타', genre_novelty: '노벨티', genre_hiphop: '힙합', genre_electronic: '일렉트로닉', genre_metal: '메탈', genre_classical: '클래식', genre_folk: '포크', genre_jazz: '재즈',
     osu_artist_filter_all: '모든 아티스트',
-    updates_title: '✦ 업데이트 소식 ✦', updates_loading: '업데이트 소식을 불러오는 중...', updates_empty: '현재 업데이트 소식이 없습니다', updates_load_fail: '업데이트 소식을 불러오지 못했습니다',
-    tournaments_title: '✦ 대회 ✦', tournaments_hint: '공식 포럼 「Tournaments」 게시판과 wyBin 플랫폼의 커뮤니티 대회를 함께 모아 보여줍니다. 공식 주최가 아니므로 참가 전 주최자의 규칙을 직접 확인해 주세요.', tournaments_filter_hint: '게임 모드는 제목의 키워드로 추측합니다. 인식되지 않는 제목은 "전체"에만 표시됩니다.', osu_filter_all: '전체', tournament_source_forum: '포럼', tournament_rank_label: '참가 랭크', tournament_rank_all: '전체 랭크', tournament_rank_open: '오픈 랭크', tournament_rank_worldcup: '월드컵', tournament_rank_digit: '{n}자리', tournament_rank_unknown: '미표기',
-    feedback_title: '✦ 제안&개선 ✦', feedback_hint: '사이트에서 개선이 필요한 부분이 있나요? 여기에 알려주세요. 이 메시지는 저만 볼 수 있고 다른 방문자는 볼 수 없습니다.', feedback_placeholder: '제안 사항을 적어주세요...', feedback_submit: '보내기', feedback_success: '메시지가 전송되었습니다. 소중한 의견 감사합니다!',
-    skins_title: '🎵 내 스킨 🎵', skins_hint: '보관하고 싶은 osu! 스킨 파일(.osk)을 업로드하면 언제든 다시 다운로드할 수 있습니다. 파일은 기본적으로 현재 브라우저에만 저장되며 서버에는 업로드되지 않습니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 사라집니다. osu! 로그인 시 4MB 이하 스킨을 선택적으로 클라우드에 백업할 수 있습니다.', skins_list_title: '💾 저장된 스킨',
+    updates_title: '업데이트 소식', updates_loading: '업데이트 소식을 불러오는 중...', updates_empty: '현재 업데이트 소식이 없습니다', updates_load_fail: '업데이트 소식을 불러오지 못했습니다',
+    tournaments_title: '대회', tournaments_hint: '공식 포럼 「Tournaments」 게시판과 wyBin 플랫폼의 커뮤니티 대회를 함께 모아 보여줍니다. 공식 주최가 아니므로 참가 전 주최자의 규칙을 직접 확인해 주세요.', tournaments_filter_hint: '게임 모드는 제목의 키워드로 추측합니다. 인식되지 않는 제목은 "전체"에만 표시됩니다.', osu_filter_all: '전체', tournament_source_forum: '포럼', tournament_rank_label: '참가 랭크', tournament_rank_all: '전체 랭크', tournament_rank_open: '오픈 랭크', tournament_rank_worldcup: '월드컵', tournament_rank_digit: '{n}자리', tournament_rank_unknown: '미표기',
+    feedback_title: '제안&개선', feedback_hint: '사이트에서 개선이 필요한 부분이 있나요? 여기에 알려주세요. 이 메시지는 저만 볼 수 있고 다른 방문자는 볼 수 없습니다.', feedback_placeholder: '제안 사항을 적어주세요...', feedback_submit: '보내기', feedback_success: '메시지가 전송되었습니다. 소중한 의견 감사합니다!',
+    skins_title: '내 스킨', skins_hint: '보관하고 싶은 osu! 스킨 파일(.osk)을 업로드하면 언제든 다시 다운로드할 수 있습니다. 파일은 기본적으로 현재 브라우저에만 저장되며 서버에는 업로드되지 않습니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 사라집니다. osu! 로그인 시 4MB 이하 스킨을 선택적으로 클라우드에 백업할 수 있습니다.', skins_list_title: '저장된 스킨',
     skins_backup_btn: '클라우드에 백업', skins_backup_title: '☁️ 클라우드 백업',
     skins_backup_hint: '본인만 사용할 수 있습니다. 최대 30개, 각 4MB 이하. "기기로 복원"을 누르면 위 목록에 다시 추가됩니다.',
     skins_backup_login_required: '클라우드 백업을 사용하려면 osu! 로그인이 필요합니다', skins_backup_too_large: '이 스킨은 {limit}MB를 초과하여 이 기기에만 저장할 수 있습니다',
@@ -63,7 +63,7 @@ I18N.ko = {
     skins_empty: '아직 저장된 스킨이 없습니다', skins_download: '다운로드', skins_delete: '삭제', skins_delete_confirm: '이 스킨 파일을 삭제하시겠습니까?',
     skins_upload_done: '{n}개 파일을 추가했습니다', skins_upload_fail: '"{n}" 업로드에 실패했습니다', skins_load_fail: '스킨 목록을 불러오지 못했습니다. 브라우저의 로컬 저장소 허용 여부를 확인해 주세요',
 
-    osu_title: '♫ 비트맵 추가 ♫', osu_placeholder: 'ID 또는 URL 입력', osu_add: '추가',
+    osu_title: '비트맵 추가', osu_placeholder: 'ID 또는 URL 입력', osu_add: '추가',
     osu_password: '컬렉션 비밀번호 설정\n이후 gallery 공개, 가져오기 / 내보내기에서 입력을 요구합니다',
     osu_refresh_all_title: '모든 맵의 최신 데이터 다시 가져오기 (별점, 상태)',
     tools_group_io: '컬렉션 입출력', tools_group_tools: '도구・설정',
@@ -79,8 +79,8 @@ I18N.ko = {
     osu_all_songs: '전체 곡', osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
     hero_pitch: 'osu! 컬렉션을 한곳에서 정리: 게임에서 가져오고, 점수로 카테고리를 자동 생성하고, 게임으로 바로 내보내기.',
     hero_feat_import: '게임의 collection.db / .osdb 가져오기', hero_feat_generate: 'osu! 계정에서 카테고리 생성', hero_feat_share: '컬렉션 공유 (미리보기 카드 포함)',
-    hero_stat_collections: '🌐 공개 컬렉션 {n}개', hero_stat_likes: '❤ {n}',
-    hero_stat_farm: '🎵 farm 데이터베이스에 {n}+ 맵',
+    hero_stat_collections: '공개 컬렉션 {n}개', hero_stat_likes: '❤ {n}',
+    hero_stat_farm: 'farm 데이터베이스에 {n}+ 맵',
     hero_v2_stat: '{n}개 맵 · {c}개 분류',
     hero_login_cta: 'osu!로 로그인하고 즐겨찾기 가져오기',
     digest_title: '새 소식',
@@ -118,7 +118,7 @@ I18N.ko = {
     osu_confirm_password: '비밀번호 확인:', osu_password_mismatch: '비밀번호가 일치하지 않습니다',
     osu_password_set: '비밀번호 설정 완료!',
     osu_copied: '복사됨!', mapped_by: '매핑: {n}',
-    osu_page_title: '✦ osu! 비트맵 컬렉션 + 총 PP 조회 ✦', visitor_lookup_title: '✦ osu! PP 조회 ✦', visitor_lookup_placeholder: 'osu! 사용자 이름 또는 ID', visitor_lookup_btn: '검색', osu_login_btn: 'osu!로 로그인', osu_logout_btn: '로그아웃', osu_login_fail: 'osu! 로그인에 실패했습니다. 다시 시도해 주세요',
+    osu_page_title: 'osu! 비트맵 컬렉션 + 총 PP 조회', visitor_lookup_title: 'osu! PP 조회', visitor_lookup_placeholder: 'osu! 사용자 이름 또는 ID', visitor_lookup_btn: '검색', osu_login_btn: 'osu!로 로그인', osu_logout_btn: '로그아웃', osu_login_fail: 'osu! 로그인에 실패했습니다. 다시 시도해 주세요',
     osu_profile_import_confirm: 'osu! 계정을 찾았습니다. 즐겨찾기한 비트맵과 가장 많이 플레이한 상위 50개를 컬렉션으로 가져올까요? (기존 데이터는 덮어쓰지 않습니다)',
     osu_profile_import_btn_title: 'osu! 계정에서 즐겨찾기 / 자주 플레이 가져오기\n로그인 필요; 기존 컬렉션을 덮어쓰지 않고 없는 맵만 추가',
     osu_profile_importing: 'osu! 프로필에서 가져오는 중... {done}/{total}',
@@ -171,7 +171,7 @@ I18N.ko = {
     osu_sort_default: '기본 정렬', osu_sort_rating_desc: '난이도 (높은순)', osu_sort_rating_asc: '난이도 (낮은순)',
     pp_history_title: 'PP 성장 추이', pp_history_empty: '아직 기록이 부족합니다. 다시 방문하면 추이가 쌓입니다.',
     osu_stats_total: '총 수집 수', osu_stats_avg_rating: '평균 난이도', osu_stats_max_rating: '최고 난이도',
-    featured_beatmap_label: '✦ 오늘의 추천 ✦',
+    featured_beatmap_label: '오늘의 추천',
     osu_export: '컬렉션을 JSON 백업으로 다운로드', osu_import: 'JSON 백업에서 복원\n이전에 "내보내기"로 받은 .json 파일을 선택하면 맵과 카테고리를 가져옵니다',
     osu_export_done: '내보내기 완료!', osu_import_done: '가져오기 완료!', osu_import_fail: '가져오기 실패. 파일 형식을 확인하세요',
     osu_import_fail_json: '가져오기 실패: 유효한 JSON 파일이 아닙니다', osu_import_fail_format: '가져오기 실패: 파일에 컬렉션 데이터(collection 필드)가 없습니다',
@@ -199,7 +199,7 @@ I18N.ko = {
     stats_card_btn: '전적 카드 생성', stats_card_done: '전적 카드가 다운로드되었습니다!', stats_card_fail: '전적 카드 생성 실패',
     collection_card_btn: '컬렉션 미리보기 이미지(PNG) 다운로드', collection_card_title: '내 osu! 컬렉션', collection_card_done: '컬렉션 카드가 다운로드되었습니다!', collection_card_fail: '컬렉션 카드 생성 실패',
 
-    nav_public_collections: '컬렉션 광장', gallery_page_title: '✦ 플레이어 컬렉션 광장 ✦',
+    nav_public_collections: '컬렉션 광장', gallery_page_title: '플레이어 컬렉션 광장',
     publish_btn: '내 컬렉션 발행하기', publish_update_btn: '발행한 컬렉션 업데이트', publish_login_required: '발행하려면 먼저 osu! 로그인이 필요합니다',
     publish_relogin_prompt: 'osu! 로그인이 만료되었습니다(30일마다 재인증 필요). 지금 다시 로그인할까요?',
     publish_confirm: '내 컬렉션({n}개의 비트맵)을 공개로 발행할까요? 언제든 다시 발행하거나 취소할 수 있어요',
@@ -220,7 +220,7 @@ I18N.ko = {
     gallery_like_login_required: '좋아요를 누르려면 osu! 로그인이 필요합니다', gallery_like_fail: '좋아요 실패, 잠시 후 다시 시도해주세요',
     gallery_no_results: '조건에 맞는 컬렉션이 없습니다. 다른 키워드나 태그를 시도해보세요', gallery_tag_filter_clear_title: '태그 필터 해제',
 
-    nav_farm_maps: '팜맵', farm_page_title: '✦ 팜맵 ✦',
+    nav_farm_maps: '팜맵', farm_page_title: '팜맵',
     farm_hint: 'PP / 별 난이도 / BPM / 모드로 ranked 맵 풀을 필터링합니다. PP는 이 사이트가 직접 계산한 값입니다(추정치 아님, SS 기준) — 데이터베이스는 아직 구축 중이며 모든 ranked 맵을 다루지 못할 수 있습니다.',
     farm_search_placeholder: '곡 제목 또는 아티스트 검색...',
     farm_sort_pp_desc: 'PP 높은순', farm_sort_pp_asc: 'PP 낮은순',
@@ -236,7 +236,7 @@ I18N.ko = {
 
     cdn_lib_fail: '외부 구성요소를 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도하세요',
     nav_catalog: '곡 카탈로그', explore_catalog_d: '아티스트／언어／장르로 전체 ranked 곡 탐색, 원클릭으로 컬렉션화',
-    catalog_page_title: '✦ 곡 카탈로그 ✦',
+    catalog_page_title: '곡 카탈로그',
     catalog_hint: '아티스트／언어／장르／소스／feat. 기준으로 전체 ranked 곡을 탐색하세요. 분류 하나를 고르면 그 이름으로 컬렉션 카테고리를 원클릭으로 만들 수 있습니다. 데이터는 이 사이트의 백그라운드 크롤러가 계속 수집 중이며 아직 모든 ranked 맵을 포함하지 않습니다.',
     catalog_search_placeholder: '곡명／아티스트／소스 검색...',
     catalog_sort_ranked_desc: 'ranked 날짜: 최신순', catalog_sort_ranked_asc: 'ranked 날짜: 오래된순',
@@ -272,7 +272,7 @@ I18N.ko = {
     games_quiz_again: '다시 하기',
     games_quiz_correct_was: '정답: {name}',
     games_quiz_no_data: '아직 맵 데이터가 부족합니다. 나중에 다시 시도하세요.',
-    games_page_title: '✦ 미니게임 ✦',
+    games_page_title: '미니게임',
     games_hint: '사이트의 곡 카탈로그와 Farm 데이터로 즐기는 미니게임. 마음에 든 맵은 컬렉션에 추가할 수 있습니다(항상 먼저 물어봅니다).',
     games_daily_title: '오늘의 맞히기',
     games_daily_blurb: '하루 한 개의 ranked 세트 — 흐릿한 커버로 곡을 맞히고, 틀릴 때마다 힌트가 하나씩.',
@@ -310,8 +310,8 @@ I18N.ko = {
     games_save_confirm: '이 비트맵셋을 컬렉션에 추가할까요?',
     games_save_category: '미니게임에서',
     games_save_done: '컬렉션에 {n}개 세트를 추가했습니다',
-    mappools_page_title: '✦ 월드컵 맵풀 ✦',
-    cmpool_page_title: '✦ 커뮤니티 맵풀 ✦',
+    mappools_page_title: '월드컵 맵풀',
+    cmpool_page_title: '커뮤니티 맵풀',
     cmpool_hint: '다 같이 채우는 대회 맵풀 — 참가한 대회를 고르고 라운드와 모드를 추가한 뒤 beatmap ID를 넣으면 사이트가 정보를 가져옵니다. 편집하려면 로그인하세요.',
     cmpool_pick_from_list: '목록에서 대회 선택…',
     cmpool_source_label: '출처', cmpool_mode_label: '모드', cmpool_mode_all: '전체 모드',
@@ -410,7 +410,7 @@ I18N.ko = {
     tracked_mappers_empty: '아직 추적 중인 매퍼가 없습니다', notif_mapper_new_title: '{name} 님이 새 맵을 랭크했습니다',
     notif_achievement_new_title: '{n} 님이 새 메달을 획득했습니다', notif_achievement_detail: '새 메달 {count}개 — 클릭해서 보기',
     notif_mapper_graveyard_title: '{name} 님의 새 Graveyard 맵', notif_mapper_loved_title: '{name} 님의 맵이 Loved에 등록되었습니다!',
-    resources_title: '✦ 더 많은 osu! 자료 ✦', resources_hint: '직접 만들 필요 없는, 알아두면 좋은 커뮤니티 도구들:',
+    resources_title: '더 많은 osu! 자료', resources_hint: '직접 만들 필요 없는, 알아두면 좋은 커뮤니티 도구들:',
     resource_osusearch_desc: '별점, BPM, 길이 등으로 필터링하는 고급 비트맵 검색 엔진', resource_osupps_desc: '또 다른 farm 맵 트래커, 비교하기 좋음',
     resource_maniatracker_desc: 'osu!mania 랭킹, 점수 추적, 단(dan) 레벨 추정',
     resource_osutrack_desc: '장기 스탯 기록 — pp, 랭크, 정확도를 시간별 그래프로',
@@ -419,7 +419,7 @@ I18N.ko = {
     resource_osustats_desc: '리더보드 순위 집계 — top-50 / top-100을 몇 개 보유했는지',
     resource_collectionmanager_desc: '데스크톱 컬렉션 편집 도구, 이 사이트의 collection.db 내보내기와 호환', resource_osuskinner_desc: '온라인 skin 제작 도구',
     resource_mappersguild_desc: '주목받는 아티스트의 매핑을 장려하는 길드 시스템', resource_osuskills_desc: '비공식 플레이어 능력별 평가 (aim / speed / acc)',
-    nav_medals: '메달', medals_title: '✦ 메달 도감 ✦',
+    nav_medals: '메달', medals_title: '메달 도감',
     medals_hint: '플레이어를 조회하면 모든 osu! 메달이 여기에 표시되고, 이 플레이어가 획득한 항목이 표시됩니다 (데이터 출처: osekai.net)',
     medals_loading: '메달 데이터 불러오는 중...', medals_load_fail: '메달 데이터를 불러오지 못했습니다. 나중에 다시 시도해 주세요',
     medals_earned_label: '획득 {n} / {total}', medals_filter_all: '전체', medals_filter_earned: '획득함', medals_filter_missing: '미획득',
@@ -432,7 +432,7 @@ I18N.ko = {
     grade_history_filter_empty: '이 등급에 해당하는 기록이 없습니다',
     grade_history_filter_all: '전체',
     grade_history_truncated: '최신 {n} / {total}건만 표시',
-    nav_replay_analyze: 'Replay 분석', replay_analyze_title: '✦ Replay 분석 ✦',
+    nav_replay_analyze: 'Replay 분석', replay_analyze_title: 'Replay 분석',
     replay_analyze_hint: '.osr 파일을 업로드하면 성적 요약과 타이밍 오차 분포를 볼 수 있습니다. 서버에서 파일 자체만 분석하며, 영상 렌더링이나 외부 변환 서비스에 의존하지 않습니다.',
     replay_upload_btn: '.osr 파일 선택', replay_upload_drag_hint: '또는 여기로 파일을 드래그하세요',
     replay_analyzing: '분석 중...', replay_analyze_fail: '분석 실패 — 유효한 .osr 파일인지 확인해 주세요',
@@ -445,11 +445,11 @@ I18N.ko = {
 
     site_howto_title: '각 페이지와 버튼의 기능 설명', site_howto_label: '사용 설명서',
     nav_howto: '사용 설명서',
-    howto_page_title: '📖 사용 설명서', howto_page_hint: '사이트 메뉴와 같은 분류로, 각 페이지와 버튼의 용도와 사용법을 정리했습니다.',
+    howto_page_title: '사용 설명서', howto_page_hint: '사이트 메뉴와 같은 분류로, 각 페이지와 버튼의 용도와 사용법을 정리했습니다.',
     howto_group_global: '사이트 전체',
     howto_manual_body: `
         <div class="howto-group" id="howto-global">
-            <h3 class="howto-group-title">🌐 사이트 전체</h3>
+            <h3 class="howto-group-title">사이트 전체</h3>
             <p class="howto-tab-desc">어느 페이지에서든 찾을 수 있는 컨트롤들로, 대부분 헤더 좌우 모서리에 모여 있습니다.</p>
             <div class="howto-feat"><b>다크 / 라이트 전환</b><span>왼쪽 위. 달/해 아이콘을 클릭하면 전환되고, 다음 방문 때도 선택이 기억됩니다.</span></div>
             <div class="howto-feat"><b>홈 화면에 추가</b><span>왼쪽 위, 지원하는 브라우저에서만 표시. 사이트를 앱 아이콘으로 설치해 오프라인에서도 기본 화면을 열 수 있습니다.</span></div>
@@ -465,10 +465,10 @@ I18N.ko = {
         </div>
 
         <div class="howto-group" id="howto-core">
-            <h3 class="howto-group-title">✦ 핵심 기능</h3>
+            <h3 class="howto-group-title">핵심 기능</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">♫ 컬렉션 <small>기본 홈페이지</small></div>
+                <div class="howto-tab-title">컬렉션 <small>기본 홈페이지</small></div>
                 <p class="howto-tab-desc">자신의 osu! 라이브러리 정리: 추가, 분류, 게임으로 내보내기, 예전 백업과 비교 등.</p>
                 <div class="howto-feat"><b>비트맵 추가</b><span>맵의 ID나 osu! URL(beatmapsets/... 또는 /b/... 모두 가능)을 붙여넣고 "추가"를 누릅니다.</span></div>
                 <div class="howto-feat"><b>컬렉션 가져오기/내보내기 (버튼 6개)</b><span>왼쪽부터: JSON 백업 다운로드 → JSON으로 복원 → 공유 링크 복사 → 미리보기 PNG 카드 다운로드 → collection.db로 내보내 osu!에 바로 사용 → ⚔ 차이 비교, 예전 백업을 올려 추가/삭제된 맵 확인.</span></div>
@@ -482,7 +482,7 @@ I18N.ko = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 컬렉션 갤러리</div>
+                <div class="howto-tab-title">컬렉션 갤러리</div>
                 <p class="howto-tab-desc">정리한 컬렉션을 공개하거나, 다른 사람의 컬렉션을 둘러보고 바로 가져올 수 있습니다. osu! 계정당 하나만 발행할 수 있습니다.</p>
                 <div class="howto-feat"><b>발행 / 발행 취소</b><span>로그인 필요. 발행하면 현재 컬렉션이 갤러리로 전송되고, 다시 발행하면 기존 것을 덮어쓰며 두 개가 되지 않습니다.</span></div>
                 <div class="howto-feat"><b>검색 / 정렬 / 필터</b><span>플레이어 이름이나 태그로 검색; 최신 발행/❤인기순/컬렉션 수/최고 별점으로 정렬; "좋아요한 것만 보기"도 가능.</span></div>
@@ -490,21 +490,21 @@ I18N.ko = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 스킨 갤러리</div>
+                <div class="howto-tab-title">스킨 갤러리</div>
                 <p class="howto-tab-desc">실제 플레이 화면의 스킨 스크린샷을 공유해, 고르기 전에 실제 효과를 미리 볼 수 있게 합니다.</p>
                 <div class="howto-feat"><b>내 스킨 스크린샷 공유</b><span>이름, 작성자(선택)를 입력하고, 다운로드 링크나 .osk 파일 중 하나 이상 업로드, 해당 모드 선택, 스크린샷 업로드 후 "발행"을 누릅니다.</span></div>
                 <div class="howto-feat"><b>둘러보기 / 필터</b><span>이름이나 작성자로 검색, 모드로 필터링, 최신순/인기순 정렬, 내가 좋아요하거나 업로드한 것만 보기도 가능.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 채팅방</div>
+                <div class="howto-tab-title">채팅방</div>
                 <p class="howto-tab-desc">모든 방문자가 함께 쓰는 공개 채팅방입니다.</p>
                 <div class="howto-feat"><b>발언</b><span>로그인 필요. osu! 비트맵 링크를 붙여넣으면 자동으로 원클릭 "컬렉션에 추가" 버튼이 있는 카드로 바뀝니다.</span></div>
                 <div class="howto-feat"><b>메시지별 기능</b><span>아바타/이름 클릭 시 해당 플레이어의 osu! 프로필로 이동, 국기 확인, 🌐로 현재 인터페이스 언어로 번역, 답장, 삭제(본인 메시지 또는 사이트 관리자는 전체 삭제 가능).</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 다이렉트 메시지</div>
+                <div class="howto-tab-title">다이렉트 메시지</div>
                 <p class="howto-tab-desc">한 플레이어와의 1:1 비공개 대화로, 다른 사람에게는 보이지 않습니다.</p>
                 <div class="howto-feat"><b>새 대화 시작</b><span>로그인 필요. 상대방의 osu! 유저명을 입력하고 "대화 시작"을 누릅니다.</span></div>
                 <div class="howto-feat"><b>대화 목록 / 읽지 않음</b><span>읽지 않은 수는 ☰ 메뉴의 "DM" 옆 배지로도 표시됩니다. 대화를 열면 스레드가 보이고, "뒤로"로 목록으로 돌아갑니다.</span></div>
@@ -512,10 +512,10 @@ I18N.ko = {
         </div>
 
         <div class="howto-group" id="howto-tools">
-            <h3 class="howto-group-title">✦ 도구 모음</h3>
+            <h3 class="howto-group-title">도구 모음</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Farm 맵</div>
+                <div class="howto-tab-title">Farm 맵</div>
                 <p class="howto-tab-desc">PP 효율이 높은 ranked 맵 목록——PP 수치는 본 사이트가 SS 성적으로 실제 계산한 값이며 추정치가 아닙니다.</p>
                 <div class="howto-feat"><b>모드 / Mod 탭</b><span>Standard/Taiko/Catch/Mania 각각 NM／DT／HD／HDDT／HR／HDHR 6가지 Mod 조합.</span></div>
                 <div class="howto-feat"><b>🔥 농맵만 보기</b><span>기본 켜짐. osu!/taiko는 Top 50 성적 중 DT 비율 ≥70%; catch/mania는 100% acc 비율 ≥70%(둘 다 플레이 횟수 ≥500 필요).</span></div>
@@ -523,28 +523,28 @@ I18N.ko = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 곡 분류</div>
+                <div class="howto-tab-title">곡 분류</div>
                 <p class="howto-tab-desc">전체 ranked 곡 라이브러리를 아티스트/언어/장르/출처/feat.로 살펴보는 브라우저입니다.</p>
                 <div class="howto-feat"><b>필터 조합</b><span>4개의 드롭다운을 동시에 사용 가능, 모드 필터와 "18+ 태그 포함" 스위치, 4가지 정렬 방식.</span></div>
                 <div class="howto-feat"><b>➕ 이 분류로 컬렉션 만들기</b><span>필터 조건에 결과가 있을 때만 활성화——클릭 한 번으로 필터링된 전체 결과를 컬렉션의 새 분류로 만듭니다. "동적 분류로 설정"을 체크하면 나중에 조건에 맞는 새로 랭크된 맵을 한 번에 다시 가져올 수 있습니다.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 월드컵 맵풀</div>
+                <div class="howto-tab-title">월드컵 맵풀</div>
                 <p class="howto-tab-desc">역대 OWC/TWC/MWC(4K・7K)/CWC 공식 대회 맵풀입니다.</p>
                 <div class="howto-feat"><b>대회 / 라운드 선택</b><span>모드 탭 → 대회 목록 → 선택 후 라운드별로 탐색, 각 맵에 mod가 표시됩니다.</span></div>
                 <div class="howto-feat"><b>➕ 컬렉션에 추가</b><span>대회 전체 또는 한 라운드만 추가 가능, 전체를 다 가져올 필요는 없습니다.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ PP 조회</div>
+                <div class="howto-tab-title">PP 조회</div>
                 <p class="howto-tab-desc">자신을 포함한 어떤 플레이어의 PP 상태도 조회하거나, 두 명을 나란히 비교할 수 있습니다.</p>
                 <div class="howto-feat"><b>osu! PP 조회</b><span>유저명이나 ID를 입력해 조회. 결과에는 네 모드 데이터, PP 히스토리 차트, 추적 버튼, "전적 카드 생성"이 포함되며, 아래 탭: 최근 플레이/베스트 성적/PP 목표/메달/성적 히스토리.</span></div>
                 <div class="howto-feat"><b>⚔ 1:1 PP 비교</b><span>두 유저명/ID를 입력하고 "비교" 클릭: 먼저 개요와 겹친 PP 차트를 보고, 아래 "Top Play 비교"에서 두 사람의 베스트 성적을 좌우로 나란히 볼 수 있습니다.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Replay 분석</div>
+                <div class="howto-tab-title">Replay 분석</div>
                 <p class="howto-tab-desc">.osr 파일을 업로드해 성적 세부사항을 확인——완전히 서버 측에서 파일 자체를 분석하며, 영상 변환이나 외부 서비스에 의존하지 않습니다.</p>
                 <div class="howto-feat"><b>업로드</b><span>드래그 앤 드롭하거나 ".osr 파일 선택" 클릭. 업로드 후 성적 요약과 타격 타이밍 분포 차트가 표시됩니다.</span></div>
             </div>
@@ -557,33 +557,33 @@ I18N.ko = {
         </div>
 
         <div class="howto-group" id="howto-resources">
-            <h3 class="howto-group-title">✦ 리소스</h3>
+            <h3 class="howto-group-title">리소스</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">🎵 내 스킨 <small>"스킨 갤러리"와는 다른 탭</small></div>
+                <div class="howto-tab-title">내 스킨 <small>"스킨 갤러리"와는 다른 탭</small></div>
                 <p class="howto-tab-desc">공개되지 않는 개인 스킨 보관함——공개 공유는 "스킨 갤러리"를 사용합니다.</p>
                 <div class="howto-feat"><b>업로드 / 다운로드</b><span>업로드한 .osk 파일은 이 브라우저에만 저장되며, 기기를 바꾸거나 브라우저 데이터를 지우면 사라집니다. 언제든 다시 다운로드할 수 있습니다.</span></div>
                 <div class="howto-feat"><b>☁️ 클라우드 백업</b><span>로그인 시에만 표시. 파일당 4MB 이하, 최대 30개; "로컬로 복원"하면 위 목록에 다시 추가됩니다.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 업데이트 정보</div>
+                <div class="howto-tab-title">업데이트 정보</div>
                 <p class="howto-tab-desc">osu! 공식 업데이트 로그 목록입니다. 열람만 가능하며 별도 조작은 필요 없습니다.</p>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 대회</div>
+                <div class="howto-tab-title">대회</div>
                 <p class="howto-tab-desc">공식 포럼 Tournaments 게시판과 wyBin 플랫폼의 커뮤니티 대회 정보를 통합했습니다(비공식 주최이므로 참가 전 주최자의 규칙을 직접 확인하세요).</p>
                 <div class="howto-feat"><b>모드 필터</b><span>제목 키워드로 모드를 자동 판별하며, 판별할 수 없는 글은 "전체" 탭에만 표시됩니다.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 리소스</div>
+                <div class="howto-tab-title">리소스</div>
                 <p class="howto-tab-desc">직접 만들 필요는 없지만 추천할 만한 커뮤니티 도구 링크 모음입니다. 열람만 가능합니다.</p>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ 제안 & 개선</div>
+                <div class="howto-tab-title">제안 & 개선</div>
                 <p class="howto-tab-desc">의견 제출 양식입니다. 생각을 적고 제출하면 되며, 사이트 관리자만 볼 수 있고 다른 방문자에게는 보이지 않습니다.</p>
             </div>
         </div>

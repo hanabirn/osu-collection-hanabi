@@ -1,5 +1,5 @@
 I18N.ru = {
-    title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: '✦ Собери свою собственную коллекцию песен! ✦',
+    title: 'osu! Коллекция', site_title: 'osu! Коллекция', site_tagline: 'Собери свою собственную коллекцию песен',
     site_like_label: 'Нравится', site_like_title: 'Понравился сайт? Поставьте лайк!', site_share_label: 'Поделиться', site_share_title: 'Поделиться сайтом с друзьями', site_share_copied: 'Ссылка на сайт скопирована!', site_share_text: 'Собери свою собственную коллекцию любимых карт osu!',
     pwa_install_btn_title: 'Добавить на главный экран (работает офлайн)',
     site_update_btn_title: 'Доступно обновление, нажмите для обновления', site_update_available: 'Доступна новая версия сайта — нажмите, чтобы перезагрузить и получить последнюю версию',
@@ -8,7 +8,7 @@ I18N.ru = {
     volume_fab_title: 'Настроить громкость превью',
     nav_chat: 'Чат',
     nav_dm: 'Личные сообщения',
-    chat_page_title: '✦ Чат ✦',
+    chat_page_title: 'Чат',
     chat_page_hint: 'Общайтесь с другими игроками, ищите тиммейтов, делитесь картами — вставьте ссылку на карту osu!, и она превратится в карточку с кнопкой добавления в коллекцию в один клик.',
     chat_empty: 'Пока никто не написал — станьте первым!', chat_load_fail: 'Не удалось загрузить чат, попробуйте позже',
     chat_input_placeholder: 'Введите сообщение...', chat_send_btn: 'Отправить',
@@ -28,7 +28,7 @@ I18N.ru = {
     chat_add_to_collection_btn: 'Добавить в коллекцию',
     chat_rate_limited: 'Вы отправляете слишком быстро, помедленнее', chat_send_fail: 'Не удалось отправить, попробуйте позже',
 
-    dm_page_title: '✦ Личные сообщения ✦', dm_page_hint: 'Общайтесь один на один с другими игроками.',
+    dm_page_title: 'Личные сообщения', dm_page_hint: 'Общайтесь один на один с другими игроками.',
     dm_new_username_placeholder: 'Введите имя пользователя, чтобы начать беседу...', dm_start_btn: 'Начать беседу',
     dm_login_required: 'Войдите через osu!, чтобы пользоваться личными сообщениями',
     dm_empty: 'Пока нет ни одной беседы — введите имя пользователя, чтобы отправить первое сообщение!',
@@ -51,10 +51,10 @@ I18N.ru = {
     lang_unspecified: 'Не указано', lang_english: 'Английский', lang_japanese: 'Японский', lang_chinese: 'Китайский', lang_instrumental: 'Инструментал', lang_korean: 'Корейский', lang_french: 'Французский', lang_german: 'Немецкий', lang_swedish: 'Шведский', lang_spanish: 'Испанский', lang_italian: 'Итальянский', lang_russian: 'Русский', lang_polish: 'Польский', lang_other: 'Другой', lang_unknown: 'Без метки', osu_lang_filter_all: 'Все языки', stats_dashboard_langs_title: 'Языки',
     osu_genre_filter_all: 'Все жанры', osu_source_filter_all: 'Все источники', osu_source_filter_none: '(Без источника)', genre_unspecified: 'Не указано', genre_video_game: 'Видеоигра', genre_anime: 'Аниме', genre_rock: 'Рок', genre_pop: 'Поп', genre_other: 'Другое', genre_novelty: 'Новелти', genre_hiphop: 'Хип-хоп', genre_electronic: 'Электроника', genre_metal: 'Метал', genre_classical: 'Классика', genre_folk: 'Фолк', genre_jazz: 'Джаз',
     osu_artist_filter_all: 'Все исполнители',
-    updates_title: '✦ Новости ✦', updates_loading: 'Загрузка новостей...', updates_empty: 'Новостей пока нет', updates_load_fail: 'Не удалось загрузить новости, попробуйте позже',
-    tournaments_title: '✦ Турниры ✦', tournaments_hint: 'Турниры сообщества с официального подфорума «Tournaments» и платформы wyBin — это не официальные мероприятия, уточняйте правила у организаторов перед регистрацией.', tournaments_filter_hint: 'Игровой режим определяется по ключевым словам в заголовке — темы без совпадений показываются только во вкладке «Все».', osu_filter_all: 'Все', tournament_source_forum: 'Форум', tournament_rank_label: 'Ранг участия', tournament_rank_all: 'Все ранги', tournament_rank_open: 'Открытый ранг', tournament_rank_worldcup: 'Кубок мира', tournament_rank_digit: '{n}-значный', tournament_rank_unknown: 'Не указан',
-    feedback_title: '✦ Предложения и улучшения ✦', feedback_hint: 'Думаете, что-то на сайте можно улучшить? Напишите здесь — ваше сообщение увижу только я, другие посетители его не увидят.', feedback_placeholder: 'Напишите ваше предложение...', feedback_submit: 'Отправить', feedback_success: 'Ваше сообщение отправлено, спасибо за отзыв!',
-    skins_title: '🎵 Мои скины 🎵', skins_hint: 'Загрузите файлы скинов osu! (.osk), которые хотите сохранить, и скачивайте их снова в любое время. По умолчанию файлы хранятся только в этом браузере и никогда не загружаются на сервер — при смене устройства или очистке данных браузера они будут потеряны. Войдите через osu!, чтобы по желанию сохранить скины до 4МБ в облаке.', skins_list_title: '💾 Сохранённые скины',
+    updates_title: 'Новости', updates_loading: 'Загрузка новостей...', updates_empty: 'Новостей пока нет', updates_load_fail: 'Не удалось загрузить новости, попробуйте позже',
+    tournaments_title: 'Турниры', tournaments_hint: 'Турниры сообщества с официального подфорума «Tournaments» и платформы wyBin — это не официальные мероприятия, уточняйте правила у организаторов перед регистрацией.', tournaments_filter_hint: 'Игровой режим определяется по ключевым словам в заголовке — темы без совпадений показываются только во вкладке «Все».', osu_filter_all: 'Все', tournament_source_forum: 'Форум', tournament_rank_label: 'Ранг участия', tournament_rank_all: 'Все ранги', tournament_rank_open: 'Открытый ранг', tournament_rank_worldcup: 'Кубок мира', tournament_rank_digit: '{n}-значный', tournament_rank_unknown: 'Не указан',
+    feedback_title: 'Предложения и улучшения', feedback_hint: 'Думаете, что-то на сайте можно улучшить? Напишите здесь — ваше сообщение увижу только я, другие посетители его не увидят.', feedback_placeholder: 'Напишите ваше предложение...', feedback_submit: 'Отправить', feedback_success: 'Ваше сообщение отправлено, спасибо за отзыв!',
+    skins_title: 'Мои скины', skins_hint: 'Загрузите файлы скинов osu! (.osk), которые хотите сохранить, и скачивайте их снова в любое время. По умолчанию файлы хранятся только в этом браузере и никогда не загружаются на сервер — при смене устройства или очистке данных браузера они будут потеряны. Войдите через osu!, чтобы по желанию сохранить скины до 4МБ в облаке.', skins_list_title: 'Сохранённые скины',
     skins_backup_btn: 'Сохранить в облако', skins_backup_title: '☁️ Облачное резервирование',
     skins_backup_hint: 'Только для вас — до 30 скинов, каждый до 4МБ. «Восстановить на устройство» вернёт его в список выше.',
     skins_backup_login_required: 'Войдите через osu!, чтобы использовать облачное резервирование', skins_backup_too_large: 'Этот скин превышает {limit}МБ, поэтому может храниться только на этом устройстве',
@@ -63,7 +63,7 @@ I18N.ru = {
     skins_empty: 'Пока нет сохранённых скинов', skins_download: 'Скачать', skins_delete: 'Удалить', skins_delete_confirm: 'Удалить этот файл скина?',
     skins_upload_done: 'Добавлено файлов: {n}', skins_upload_fail: 'Не удалось загрузить «{n}»', skins_load_fail: 'Не удалось загрузить список скинов — проверьте, разрешено ли браузеру локальное хранилище',
 
-    osu_title: '♫ Добавить битмап ♫', osu_placeholder: 'Введите ID или URL', osu_add: 'Добавить',
+    osu_title: 'Добавить битмап', osu_placeholder: 'Введите ID или URL', osu_add: 'Добавить',
     osu_password: 'Задать пароль коллекции\nПубликация в gallery и импорт / экспорт затем будут его запрашивать',
     osu_refresh_all_title: 'Обновить данные всех карт (звёзды, статус)',
     tools_group_io: 'Импорт / экспорт', tools_group_tools: 'Инструменты и настройки',
@@ -79,8 +79,8 @@ I18N.ru = {
     osu_all_songs: 'Все песни', osu_fav: 'Избранное', osu_empty_collection: 'Битмапов пока нет', osu_empty_hint: 'Введите ID выше!', osu_empty_banner_hint: 'Когда добавите несколько, баннер и фон страницы покажут обложки ваших карт.',
     hero_pitch: 'Одно место для вашей коллекции osu!: импорт из игры, авто-категории по вашим результатам, экспорт обратно в игру.',
     hero_feat_import: 'Импорт игрового collection.db / .osdb', hero_feat_generate: 'Категории из вашего аккаунта osu!', hero_feat_share: 'Делитесь коллекциями (с карточками-превью)',
-    hero_stat_collections: '🌐 публичных коллекций: {n}', hero_stat_likes: '❤ {n}',
-    hero_stat_farm: '🎵 {n}+ карт в базе farm',
+    hero_stat_collections: 'публичных коллекций: {n}', hero_stat_likes: '❤ {n}',
+    hero_stat_farm: '{n}+ карт в базе farm',
     hero_v2_stat: '{n} наборов · {c} категорий',
     hero_login_cta: 'Войдите через osu!, чтобы подтянуть избранное',
     digest_title: 'Пока вас не было',
@@ -118,7 +118,7 @@ I18N.ru = {
     osu_confirm_password: 'Подтвердите пароль:', osu_password_mismatch: 'Пароли не совпадают',
     osu_password_set: 'Пароль установлен!',
     osu_copied: 'Скопировано!', mapped_by: 'автор: {n}',
-    osu_page_title: '✦ Коллекция битмапов osu! + поиск общего PP ✦', visitor_lookup_title: '✦ Проверить свой osu! PP ✦', visitor_lookup_placeholder: 'Имя пользователя или ID', visitor_lookup_btn: 'Поиск', osu_login_btn: 'Войти через osu!', osu_logout_btn: 'Выйти', osu_login_fail: 'Не удалось войти через osu!, попробуйте снова',
+    osu_page_title: 'Коллекция битмапов osu! + поиск общего PP', visitor_lookup_title: 'Проверить свой osu! PP', visitor_lookup_placeholder: 'Имя пользователя или ID', visitor_lookup_btn: 'Поиск', osu_login_btn: 'Войти через osu!', osu_logout_btn: 'Выйти', osu_login_fail: 'Не удалось войти через osu!, попробуйте снова',
     osu_profile_import_confirm: 'Найден ваш аккаунт osu!. Импортировать избранные карты и 50 самых играемых в вашу коллекцию? (Ничего существующего не перезаписывается.)',
     osu_profile_import_btn_title: 'Загрузить избранное / часто играемое из вашего аккаунта osu!\nНужен вход; добавляет только отсутствующие карты, ничего не перезаписывает',
     osu_profile_importing: 'Импорт из вашего профиля osu!... {done}/{total}',
@@ -171,7 +171,7 @@ I18N.ru = {
     osu_sort_default: 'По умолчанию', osu_sort_rating_desc: 'Звёзды (по убыванию)', osu_sort_rating_asc: 'Звёзды (по возрастанию)',
     pp_history_title: 'Рост PP', pp_history_empty: 'Пока недостаточно данных — зайдите позже, чтобы накопить историю.',
     osu_stats_total: 'Всего собрано', osu_stats_avg_rating: 'Средняя сложность', osu_stats_max_rating: 'Макс. сложность',
-    featured_beatmap_label: '✦ Рекомендация дня ✦',
+    featured_beatmap_label: 'Рекомендация дня',
     osu_export: 'Скачать коллекцию как резервную копию JSON', osu_import: 'Восстановить коллекцию из копии JSON\nВыберите .json, который вы ранее скачали через «Экспорт» — добавит его карты и категории',
     osu_export_done: 'Коллекция экспортирована!', osu_import_done: 'Коллекция импортирована!', osu_import_fail: 'Ошибка импорта. Проверьте формат файла',
     osu_import_fail_json: 'Ошибка импорта: файл не является корректным JSON', osu_import_fail_format: 'Ошибка импорта: в файле отсутствуют данные коллекции (поле collection)',
@@ -199,7 +199,7 @@ I18N.ru = {
     stats_card_btn: 'Создать карточку статистики', stats_card_done: 'Карточка статистики скачана!', stats_card_fail: 'Не удалось создать карточку статистики',
     collection_card_btn: 'Скачать превью-картинку коллекции (PNG)', collection_card_title: 'Моя коллекция osu!', collection_card_done: 'Карточка коллекции скачана!', collection_card_fail: 'Не удалось создать карточку коллекции',
 
-    nav_public_collections: 'Галерея', gallery_page_title: '✦ Галерея коллекций игроков ✦',
+    nav_public_collections: 'Галерея', gallery_page_title: 'Галерея коллекций игроков',
     publish_btn: 'Опубликовать мою коллекцию', publish_update_btn: 'Обновить опубликованную коллекцию', publish_login_required: 'Сначала войдите через osu!, чтобы опубликовать коллекцию',
     publish_relogin_prompt: 'Срок входа osu! истёк (нужно подтверждать каждые 30 дней). Войти заново сейчас?',
     publish_confirm: 'Опубликовать вашу коллекцию ({n} карт) публично? Вы можете переопубликовать или удалить её в любое время',
@@ -220,7 +220,7 @@ I18N.ru = {
     gallery_like_login_required: 'Войдите через osu!, чтобы ставить лайки', gallery_like_fail: 'Не удалось поставить лайк, попробуйте позже',
     gallery_no_results: 'Нет коллекций по вашему запросу — попробуйте другое слово или тег', gallery_tag_filter_clear_title: 'Сбросить фильтр по тегу',
 
-    nav_farm_maps: 'Farm-карты', farm_page_title: '✦ Farm-карты ✦',
+    nav_farm_maps: 'Farm-карты', farm_page_title: 'Farm-карты',
     farm_hint: 'Фильтруйте пул ranked карт по PP / звёздам / BPM / модам. PP считается самим сайтом (не оценка, при SS) — база данных ещё пополняется и может охватывать не все ranked карты.',
     farm_search_placeholder: 'Поиск по названию или автору...',
     farm_sort_pp_desc: 'PP: сначала больше', farm_sort_pp_asc: 'PP: сначала меньше',
@@ -236,7 +236,7 @@ I18N.ru = {
 
     cdn_lib_fail: 'Не удалось загрузить внешний компонент — проверьте подключение и повторите',
     nav_catalog: 'Каталог', explore_catalog_d: 'Просмотр всего ranked-каталога по исполнителю / языку / жанру — коллекция в один клик',
-    catalog_page_title: '✦ Каталог ✦',
+    catalog_page_title: 'Каталог',
     catalog_hint: 'Просматривайте весь ranked-каталог по исполнителю / языку / жанру / источнику / feat. Выберите один признак и превратите его в категорию коллекции одним кликом. Индекс строится фоновым краулером сайта и пока охватывает не все ranked-карты.',
     catalog_search_placeholder: 'Поиск по названию / исполнителю / источнику...',
     catalog_sort_ranked_desc: 'Дата ranked: новее', catalog_sort_ranked_asc: 'Дата ranked: старее',
@@ -272,7 +272,7 @@ I18N.ru = {
     games_quiz_again: 'Играть снова',
     games_quiz_correct_was: 'Это {name}',
     games_quiz_no_data: 'Пока недостаточно данных по картам, попробуйте позже.',
-    games_page_title: '✦ Мини-игры ✦',
+    games_page_title: 'Мини-игры',
     games_hint: 'Небольшие игры на основе каталога сайта и данных Farm. Понравившиеся карты можно добавить в коллекцию — всегда с подтверждением.',
     games_daily_title: 'Угадай за день',
     games_daily_blurb: 'Один ranked-сет в день — угадай его по размытой обложке, подсказка за каждую ошибку.',
@@ -310,8 +310,8 @@ I18N.ru = {
     games_save_confirm: 'Добавить этот beatmapset в вашу коллекцию?',
     games_save_category: 'Из мини-игр',
     games_save_done: 'В коллекцию добавлено наборов: {n}',
-    mappools_page_title: '✦ Маппулы World Cup ✦',
-    cmpool_page_title: '✦ Маппулы сообщества ✦',
+    mappools_page_title: 'Маппулы World Cup',
+    cmpool_page_title: 'Маппулы сообщества',
     cmpool_hint: 'Маппулы турниров, которые заполняет сообщество — выберите турнир, добавьте раунды и мод-брекеты, впишите id карт, а сайт подтянет данные. Для редактирования нужен вход.',
     cmpool_pick_from_list: 'Выберите турнир из списка…',
     cmpool_source_label: 'Источник', cmpool_mode_label: 'Режим', cmpool_mode_all: 'Все режимы',
@@ -410,7 +410,7 @@ I18N.ru = {
     tracked_mappers_empty: 'Вы пока не отслеживаете ни одного маппера', notif_mapper_new_title: '{name} зарангал новую карту',
     notif_achievement_new_title: '{n} получил новую медаль', notif_achievement_detail: 'Новых медалей: {count} — нажмите, чтобы посмотреть',
     notif_mapper_graveyard_title: 'У {name} новая карта в graveyard', notif_mapper_loved_title: 'Карта {name} попала в Loved!',
-    resources_title: '✦ Больше ресурсов osu! ✦', resources_hint: 'Полезные инструменты сообщества, которые незачем повторять здесь:',
+    resources_title: 'Больше ресурсов osu!', resources_hint: 'Полезные инструменты сообщества, которые незачем повторять здесь:',
     resource_osusearch_desc: 'Продвинутый поиск карт по звёздам, BPM, длине и т.д.', resource_osupps_desc: 'Ещё один трекер farm-карт — удобно для сравнения',
     resource_maniatracker_desc: 'Рейтинги osu!mania, отслеживание скоров и оценка дана',
     resource_osutrack_desc: 'Долгосрочная история статистики — графики pp, ранга и точности',
@@ -419,7 +419,7 @@ I18N.ru = {
     resource_osustats_desc: 'Считает ваши места в таблицах — сколько у вас топ-50 / топ-100',
     resource_collectionmanager_desc: 'Десктопный редактор коллекций, совместим с экспортом collection.db этого сайта', resource_osuskinner_desc: 'Онлайн-конструктор скинов',
     resource_mappersguild_desc: 'Гильдия, поощряющая маппинг популярных треков', resource_osuskills_desc: 'Неофициальный рейтинг по навыкам (aim / speed / acc)',
-    nav_medals: 'Медали', medals_title: '✦ Галерея медалей ✦',
+    nav_medals: 'Медали', medals_title: 'Галерея медалей',
     medals_hint: 'После поиска игрока здесь появятся все медали osu!, с отметкой того, что получил этот игрок (данные с osekai.net)',
     medals_loading: 'Загрузка данных о медалях...', medals_load_fail: 'Не удалось загрузить данные о медалях, попробуйте позже',
     medals_earned_label: 'Получено {n} / {total}', medals_filter_all: 'Все', medals_filter_earned: 'Получены', medals_filter_missing: 'Не получены',
@@ -432,7 +432,7 @@ I18N.ru = {
     grade_history_filter_empty: 'Нет записей с такой оценкой',
     grade_history_filter_all: 'Все',
     grade_history_truncated: 'Показаны последние {n} из {total}',
-    nav_replay_analyze: 'Анализ реплея', replay_analyze_title: '✦ Анализ реплея ✦',
+    nav_replay_analyze: 'Анализ реплея', replay_analyze_title: 'Анализ реплея',
     replay_analyze_hint: 'Загрузите файл .osr, чтобы увидеть сводку по результату и график тайминга попаданий. Файл разбирается только на сервере — без рендера видео и сторонних сервисов конвертации.',
     replay_upload_btn: 'Выбрать файл .osr', replay_upload_drag_hint: 'или перетащите файл сюда',
     replay_analyzing: 'Анализ...', replay_analyze_fail: 'Ошибка анализа — убедитесь, что файл является корректным .osr',
@@ -445,11 +445,11 @@ I18N.ru = {
 
     site_howto_title: 'Что делает каждая страница и кнопка', site_howto_label: 'Руководство',
     nav_howto: 'Руководство',
-    howto_page_title: '📖 Руководство', howto_page_hint: 'Сгруппировано так же, как меню сайта — что делает каждая страница и кнопка, и как этим пользоваться.',
+    howto_page_title: 'Руководство', howto_page_hint: 'Сгруппировано так же, как меню сайта — что делает каждая страница и кнопка, и как этим пользоваться.',
     howto_group_global: 'Общее для сайта',
     howto_manual_body: `
         <div class="howto-group" id="howto-global">
-            <h3 class="howto-group-title">🌐 Общее для сайта</h3>
+            <h3 class="howto-group-title">Общее для сайта</h3>
             <p class="howto-tab-desc">Элементы управления, доступные с любой страницы, в основном сосредоточены в двух углах шапки.</p>
             <div class="howto-feat"><b>Переключатель тёмной / светлой темы</b><span>Слева вверху. Нажмите на иконку луны/солнца, чтобы переключить — выбор запоминается для будущих визитов.</span></div>
             <div class="howto-feat"><b>Добавить на главный экран</b><span>Слева вверху, отображается только в поддерживаемых браузерах. Устанавливает сайт как значок приложения с базовым офлайн-экраном.</span></div>
@@ -465,10 +465,10 @@ I18N.ru = {
         </div>
 
         <div class="howto-group" id="howto-core">
-            <h3 class="howto-group-title">✦ Основные функции</h3>
+            <h3 class="howto-group-title">Основные функции</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">♫ Коллекция <small>страница по умолчанию</small></div>
+                <div class="howto-tab-title">Коллекция <small>страница по умолчанию</small></div>
                 <p class="howto-tab-desc">Управляйте своей библиотекой osu!: добавляйте, распределяйте по категориям, экспортируйте обратно в игру или сравнивайте со старым бэкапом.</p>
                 <div class="howto-feat"><b>Добавить карту</b><span>Вставьте ID карты или ссылку osu! (подходят и beatmapsets/..., и /b/...) и нажмите «Добавить».</span></div>
                 <div class="howto-feat"><b>Импорт/экспорт (6 кнопок)</b><span>Слева направо: экспорт в JSON → импорт JSON для восстановления → копировать ссылку для общего доступа → скачать карточку-превью PNG → экспорт в collection.db для прямого использования в osu! → ⚔ Сравнение, загрузите старый бэкап и посмотрите что добавилось/удалилось.</span></div>
@@ -482,7 +482,7 @@ I18N.ru = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Публичная галерея</div>
+                <div class="howto-tab-title">Публичная галерея</div>
                 <p class="howto-tab-desc">Опубликуйте свою организованную коллекцию или просмотрите чужие и импортируйте их напрямую. Каждый аккаунт osu! может опубликовать только одну.</p>
                 <div class="howto-feat"><b>Публикация / снятие с публикации</b><span>Нужен вход. Публикация отправляет вашу текущую коллекцию в галерею; повторная публикация перезаписывает старую вместо создания второй записи.</span></div>
                 <div class="howto-feat"><b>Поиск / сортировка / фильтр</b><span>Поиск по имени игрока или тегу; сортировка по новизне/❤ популярности/количеству карт/наивысшему рейтингу; либо показать только понравившиеся.</span></div>
@@ -490,21 +490,21 @@ I18N.ru = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Галерея скинов</div>
+                <div class="howto-tab-title">Галерея скинов</div>
                 <p class="howto-tab-desc">Делитесь реальными скриншотами скинов из игры, чтобы другие увидели, как скин выглядит на самом деле, прежде чем выбрать его.</p>
                 <div class="howto-feat"><b>Поделиться скриншотом моего скина</b><span>Заполните название, автора (необязательно), укажите ссылку для скачивания или файл .osk (хотя бы одно), выберите режим, загрузите скриншот и опубликуйте.</span></div>
                 <div class="howto-feat"><b>Просмотр / фильтр</b><span>Поиск по названию или автору, фильтр по режиму, сортировка по новизне или популярности, либо показать только понравившиеся или загруженные вами.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Чат</div>
+                <div class="howto-tab-title">Чат</div>
                 <p class="howto-tab-desc">Публичный чат, общий для всех посетителей.</p>
                 <div class="howto-feat"><b>Написать сообщение</b><span>Нужен вход. Вставьте ссылку на карту osu!, и она автоматически превратится в карточку с кнопкой «добавить в коллекцию» в один клик.</span></div>
                 <div class="howto-feat"><b>Действия с сообщением</b><span>Клик по аватару/имени открывает профиль osu! этого игрока, видно флаг страны, нажмите 🌐 для перевода на текущий язык интерфейса, ответьте на сообщение или удалите (свои сообщения, либо любые, если вы владелец сайта).</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Личные сообщения</div>
+                <div class="howto-tab-title">Личные сообщения</div>
                 <p class="howto-tab-desc">Приватный разговор один на один с игроком, невидимый для остальных.</p>
                 <div class="howto-feat"><b>Начать новый разговор</b><span>Нужен вход. Введите имя пользователя osu! собеседника и нажмите «Начать разговор».</span></div>
                 <div class="howto-feat"><b>Список разговоров / непрочитанные</b><span>Счётчик непрочитанных также отображается значком рядом с «Сообщения» в меню ☰. Открытие разговора показывает переписку; «Назад» возвращает к списку.</span></div>
@@ -512,10 +512,10 @@ I18N.ru = {
         </div>
 
         <div class="howto-group" id="howto-tools">
-            <h3 class="howto-group-title">✦ Инструменты</h3>
+            <h3 class="howto-group-title">Инструменты</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Фарм-карты</div>
+                <div class="howto-tab-title">Фарм-карты</div>
                 <p class="howto-tab-desc">Список ranked-карт с высокой эффективностью PP — цифры PP реально рассчитаны этим сайтом по SS-результатам, а не оценены.</p>
                 <div class="howto-feat"><b>Вкладки режима / мода</b><span>Standard/Taiko/Catch/Mania, каждый с комбинациями модов NM/DT/HD/HDDT/HR/HDHR.</span></div>
                 <div class="howto-feat"><b>🔥 Только фарм-карты</b><span>Включено по умолчанию. Для osu!/taiko: ≥70% результатов Топ-50 с DT; для catch/mania: ≥70% со 100% точностью (оба требуют ≥500 игр).</span></div>
@@ -523,28 +523,28 @@ I18N.ru = {
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Каталог</div>
+                <div class="howto-tab-title">Каталог</div>
                 <p class="howto-tab-desc">Браузер всего ranked-каталога, разделённого по исполнителю/языку/жанру/источнику/feat.</p>
                 <div class="howto-feat"><b>Комбинации фильтров</b><span>Четыре выпадающих списка можно комбинировать, плюс фильтр режима и переключатель «включая 18+», с четырьмя вариантами сортировки.</span></div>
                 <div class="howto-feat"><b>➕ Создать коллекцию из этого фильтра</b><span>Активируется только когда фильтры дают результаты — один клик превращает весь отфильтрованный результат в новую категорию вашей коллекции; отметьте «Сделать динамической категорией», чтобы потом в один клик подтягивать новые карты, ранкнутые под тот же фильтр.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Маппулы Кубка мира</div>
+                <div class="howto-tab-title">Маппулы Кубка мира</div>
                 <p class="howto-tab-desc">Официальные маппулы каждого OWC/TWC/MWC (4K・7K)/CWC.</p>
                 <div class="howto-feat"><b>Выбор турнира / раунда</b><span>Вкладка режима → список турниров → выберите, чтобы просматривать по раундам, каждая карта помечена своим модом.</span></div>
                 <div class="howto-feat"><b>➕ Добавить в коллекцию</b><span>Добавьте весь турнир целиком или только один раунд — необязательно брать всё сразу.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Поиск PP</div>
+                <div class="howto-tab-title">Поиск PP</div>
                 <p class="howto-tab-desc">Посмотрите PP любого игрока (включая себя) или сравните двоих бок о бок.</p>
                 <div class="howto-feat"><b>Проверить свой PP osu!</b><span>Введите имя пользователя или ID и найдите. Результаты включают статистику по всем режимам, график истории PP, кнопку отслеживания и «Создать карточку статистики»; вкладки ниже: недавние игры / лучшие результаты / цель по PP / медали / история оценок.</span></div>
                 <div class="howto-feat"><b>⚔ Сравнение двух игроков</b><span>Заполните два имени пользователя/ID и нажмите «Сравнить»: сначала обзор и наложенные графики PP, затем ниже «Сравнение лучших игр» показывает лучшие результаты обоих игроков рядом.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Анализ реплея</div>
+                <div class="howto-tab-title">Анализ реплея</div>
                 <p class="howto-tab-desc">Загрузите файл .osr, чтобы увидеть детали результата — полностью разбирается на сервере, без конвертации видео или сторонних сервисов.</p>
                 <div class="howto-feat"><b>Загрузка</b><span>Перетащите файл или нажмите «Выбрать файл .osr» — после загрузки покажет сводку результата и график распределения тайминга попаданий.</span></div>
             </div>
@@ -557,33 +557,33 @@ I18N.ru = {
         </div>
 
         <div class="howto-group" id="howto-resources">
-            <h3 class="howto-group-title">✦ Ресурсы</h3>
+            <h3 class="howto-group-title">Ресурсы</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">🎵 Мои скины <small>отдельная вкладка от «Галереи скинов»</small></div>
+                <div class="howto-tab-title">Мои скины <small>отдельная вкладка от «Галереи скинов»</small></div>
                 <p class="howto-tab-desc">Личное хранилище скинов, не отображается публично — для этого используйте «Галерею скинов».</p>
                 <div class="howto-feat"><b>Загрузка / скачивание</b><span>Загруженные файлы .osk хранятся только в этом браузере — смена устройства или очистка данных браузера удалит их; скачайте в любой момент, чтобы вернуть их.</span></div>
                 <div class="howto-feat"><b>☁️ Облачное резервное копирование</b><span>Появляется только после входа. До 30 файлов, каждый до 4 МБ; «Восстановить локально» добавляет их обратно в список выше.</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Новости</div>
+                <div class="howto-tab-title">Новости</div>
                 <p class="howto-tab-desc">Список официальных записей об обновлениях osu! — только для просмотра, действия не нужны.</p>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Турниры</div>
+                <div class="howto-tab-title">Турниры</div>
                 <p class="howto-tab-desc">Объединяет раздел Tournaments официального форума и объявления сообщества на платформе wyBin (неофициальные мероприятия — перед регистрацией уточните правила у организатора).</p>
                 <div class="howto-feat"><b>Фильтр по режиму</b><span>Режим определяется автоматически по ключевым словам в заголовке; нераспознанные посты попадают только во вкладку «Все».</span></div>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Ресурсы</div>
+                <div class="howto-tab-title">Ресурсы</div>
                 <p class="howto-tab-desc">Список рекомендованных инструментов сообщества, которые не нужно было переделывать здесь — только для просмотра.</p>
             </div>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">✦ Предложения и улучшения</div>
+                <div class="howto-tab-title">Предложения и улучшения</div>
                 <p class="howto-tab-desc">Форма обратной связи. Напишите свои мысли и отправьте — видит только владелец сайта, другие посетители никогда не увидят.</p>
             </div>
         </div>
