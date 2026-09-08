@@ -212,6 +212,9 @@ exports.handler = async (event) => {
         let result = null, streak = null;
         if (user) {
             result = await store.get(`daily-result:${date}:${user.id}`, { type: 'json' });
+            // Ignore a result recorded under the old free-text rules (>3 guesses)
+            // so anyone who played that version today can play the new one.
+            if (result && result.guesses > MAX_GUESSES) result = null;
             const s = await store.get(`streak:${user.id}`, { type: 'json' });
             streak = s ? s.streak : 0;
         }
@@ -252,7 +255,8 @@ exports.handler = async (event) => {
 
     let streak = null;
     if (done && user) {
-        const prev = await store.get(`daily-result:${date}:${user.id}`, { type: 'json' });
+        let prev = await store.get(`daily-result:${date}:${user.id}`, { type: 'json' });
+        if (prev && prev.guesses > MAX_GUESSES) prev = null; // stale old-rules result
         if (!prev) {
             await store.setJSON(`daily-result:${date}:${user.id}`, {
                 won: correct, guesses: guessNo + 1, at: new Date().toISOString(),
