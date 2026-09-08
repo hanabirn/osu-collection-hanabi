@@ -1,0 +1,18 @@
+{
+  "name": "osu-collection-mp-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "osu! multiplayer host bot for osu! 歌曲收藏 — spins up a lobby that cycles maps from a visitor's saved collection / favourites. Runs as an always-on process (e.g. a small Hetzner VPS); the website talks to it through a Netlify Blobs queue.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "bancho.js": "^0.13.0",
+    "dotenv": "^16.4.5"
+  }
+}
