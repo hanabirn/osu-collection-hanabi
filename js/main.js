@@ -52,6 +52,7 @@ function switchTab(tab, el) {
     if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();
     if (tab === 'cmpool' && typeof ensureCmpoolLoaded === 'function') ensureCmpoolLoaded();
+    if (tab === 'games' && typeof ensureGamesLoaded === 'function') ensureGamesLoaded();
     if (tab === 'skin-screenshots') ensureSkinScreenshotsLoaded();
     // Chat polls on a timer only while its own tab is visible — started/
     // stopped here on every tab switch (not just the lazy first-load other
@@ -192,6 +193,7 @@ function refreshDynamicContent() {
     if (typeof renderFarmMapsList === 'function') renderFarmMapsList();
     if (typeof refreshCatalogLocalized === 'function') refreshCatalogLocalized();
     if (typeof refreshMappoolsLocalized === 'function') refreshMappoolsLocalized();
+    if (typeof refreshGamesLocalized === 'function') refreshGamesLocalized();
 }
 
 /* ===== Keyboard shortcuts =====
@@ -235,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkOsuLoginFromUrl();
     if (typeof checkGalleryDeepLink === 'function') checkGalleryDeepLink();
     if (typeof checkCmpoolDeepLink === 'function') checkCmpoolDeepLink();
+    if (typeof checkGamesDeepLink === 'function') checkGamesDeepLink();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof initNotifications === 'function') initNotifications();
     // "為你更新" digest — runs after notifications so it can count what just

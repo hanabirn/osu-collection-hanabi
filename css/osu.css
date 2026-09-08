@@ -1929,6 +1929,76 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: 1px solid var(--border-card);
 }
 .cmpool-src-wybin { color: var(--text-pink); border-color: rgba(var(--pink-rgb), 0.35); }
+/* ===== 小遊戲區 ===== */
+.games-hub { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 6px; }
+.games-hub[hidden] { display: none; }
+.games-card {
+    border: 1px solid var(--border-card);
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 22px 20px;
+    cursor: pointer;
+    transition: border-color .15s var(--ease-out), transform .15s var(--ease-out);
+}
+.games-card:hover { border-color: rgba(var(--pink-rgb), 0.5); transform: translateY(-2px); }
+.games-card-emoji { font-size: 2rem; line-height: 1; }
+.games-card h3 { margin: 10px 0 4px; font-size: 1.05rem; }
+.games-card p { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+#games-view[hidden] { display: none; }
+
+.gd-head, .gh-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 10px 0 12px; }
+.gd-head h3, .gh-head h3 { margin: 0; }
+.gd-date { color: var(--text-dim2); font-size: 0.85rem; font-weight: 400; }
+.gd-streak, .gh-score { margin-left: auto; color: var(--text-dim); font-size: 0.82rem; }
+
+.gd-cover-wrap { width: 100%; max-width: 480px; aspect-ratio: 900 / 250; overflow: hidden; border-radius: 12px; border: 1px solid var(--border-card); }
+.gd-cover { width: 100%; height: 100%; object-fit: cover; transition: filter .3s var(--ease-out), transform .3s var(--ease-out); }
+.gd-clip { margin: 10px 0; }
+.gd-clip button, .gd-outcome-actions button, .gh-vs button, .gh-over button {
+    border: 1px solid var(--border-card); background: transparent; color: var(--text);
+    font: inherit; padding: 7px 14px; border-radius: 9px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.gd-clip button:hover, .gh-vs button:hover { border-color: rgba(var(--pink-rgb), 0.5); }
+
+.gd-board { max-width: 480px; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.gd-row { min-height: 40px; display: flex; align-items: center; gap: 10px; border-radius: 9px; padding: 6px 12px; border: 1px solid var(--border-card); }
+.gd-row.is-empty { opacity: .4; }
+.gd-row.is-hit { border-color: rgba(52, 211, 153, 0.55); background: rgba(52, 211, 153, 0.08); }
+.gd-row.is-miss { border-color: rgba(255, 118, 118, 0.4); }
+.gd-row.is-active { border-color: rgba(var(--pink-rgb), 0.5); }
+.gd-row input { flex: 1; background: var(--bg-input); border: 1px solid var(--border-input); color: var(--text); font: inherit; padding: 6px 10px; border-radius: 7px; }
+.gd-row.is-active button { border: none; background: var(--pink); color: #14101c; font: inherit; padding: 6px 14px; border-radius: 7px; cursor: pointer; }
+:root[data-theme="light"] .gd-row.is-active button { color: #fff; }
+.gd-row-guess { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gd-hint { font-size: 0.82rem; color: var(--text-dim); padding: 2px 12px 4px; }
+.gd-outcome { max-width: 480px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-card); }
+.gd-outcome.is-win { border-color: rgba(52, 211, 153, 0.5); }
+.gd-outcome p { margin: 0 0 6px; }
+.gd-answer a { color: var(--text-pink); }
+.gd-answer-sub { color: var(--text-dim2); font-size: 0.82rem; }
+.gd-outcome-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.gh-arena { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; max-width: 720px; }
+.gh-card { position: relative; min-height: 220px; border-radius: 14px; border: 1px solid var(--border-card); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: space-between; padding: 14px; color: #fff; }
+.gh-card-title { font-weight: 600; font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.gh-card-sub { font-size: 0.78rem; opacity: .85; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.gh-card-stat { text-align: center; }
+.gh-val { font-size: 1.5rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+.gh-q { font-size: 2rem; font-weight: 700; opacity: .8; }
+.gh-vs { display: flex; align-items: center; }
+.gh-mid { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; }
+.gh-ask { font-size: 0.82rem; color: var(--text-dim); max-width: 120px; }
+.gh-ok { color: #34d399; font-size: 1.4rem; margin: 0; }
+.gh-no { color: #ff7676; font-size: 1.4rem; margin: 0; }
+.gh-over p { margin: 0; }
+.gh-best { color: var(--text-dim); font-size: 0.82rem; }
+.gh-save { font-size: 0.78rem; }
+@media (max-width: 560px) {
+    .gh-arena { grid-template-columns: 1fr; }
+    .gh-vs { justify-content: center; padding: 6px 0; }
+}
+
 .cmpool-back {
     display: inline-flex;
     align-items: center;

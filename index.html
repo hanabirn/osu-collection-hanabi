@@ -170,6 +170,7 @@
             <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
             <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
             <button class="site-nav-btn" onclick="switchTab('cmpool', this)" data-i18n="nav_cmpool">社群賽圖分享</button>
+            <button class="site-nav-btn" onclick="switchTab('games', this)" data-i18n="nav_games">小遊戲</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
             <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
             <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
@@ -574,6 +575,14 @@
         <div id="cmpool-list" class="cmpool-grid"></div>
         <div id="cmpool-pagination" class="osu-pagination"></div>
         <div id="cmpool-detail" hidden></div>
+    </section>
+
+    <section id="page-games" class="site-page" style="display:none;">
+        <p class="eyebrow">PLAY</p>
+        <h2 class="osu-page-title" data-i18n="games_page_title">✦ 小遊戲 ✦</h2>
+        <p class="tournaments-hint" data-i18n="games_hint">用站上的曲庫與 Farm 資料玩的小遊戲。喜歡的圖可以（詢問後）加進你的收藏。</p>
+        <div id="games-hub" class="games-hub"></div>
+        <div id="games-view" hidden></div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -1198,6 +1207,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>
+<script defer src="js/games.js"></script>
 <script defer src="js/global-search.js"></script>
 <script defer src="js/skins.js"></script>
 <script defer src="js/skin-screenshots.js"></script>

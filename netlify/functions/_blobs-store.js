@@ -143,4 +143,16 @@ function getDiscordBotStore() {
     });
 }
 
-module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getCommunityMappoolsStore, getChatStore, getChatMediaStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore };
+// Mini-games (games-daily.js / games-hilo.js): the cached daily puzzle
+// (`daily:<YYYY-MM-DD>` -> resolved puzzle incl. the server-only answer) and
+// per-user results / streaks (`daily-result:<date>:<userId>`,
+// `streak:<userId>`, `hilo-best:<userId>`).
+function getGamesStore() {
+    return getStore({
+        name: 'osu-games',
+        siteID: process.env.NETLIFY_BLOBS_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+}
+
+module.exports = { getCollectionsStore, getSkinBackupsStore, getFarmMapsStore, getSkinScreenshotsStore, getSiteStatsStore, getCatalogStore, getWcMappoolsStore, getCommunityMappoolsStore, getChatStore, getChatMediaStore, getDmStore, getGalleryCommentsStore, getDiscordBotStore, getGamesStore };
