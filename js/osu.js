@@ -4585,6 +4585,25 @@ function onPpCompareInputChange() {
     if (!inputA || !inputB) clearPpCompareResult();
 }
 
+/* 個人查詢 / 雙人對比 live in one card as two modes now (was two competing
+   cards). Pure show/hide — each mode keeps its own element ids and JS. */
+function switchLookupMode(mode, btn) {
+    const single = document.getElementById('lookup-mode-single');
+    const compare = document.getElementById('lookup-mode-compare');
+    if (!single || !compare) return;
+    const toCompare = mode === 'compare';
+    single.hidden = toCompare;
+    compare.hidden = !toCompare;
+    const btns = btn && btn.parentElement ? btn.parentElement.querySelectorAll('.lookup-mode-btn') : [];
+    btns.forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    const focus = (toCompare ? compare : single).querySelector('input');
+    if (focus) focus.focus();
+}
+
 async function comparePlayers() {
     const inputA = document.getElementById('pp-compare-input-a').value.trim();
     const inputB = document.getElementById('pp-compare-input-b').value.trim();

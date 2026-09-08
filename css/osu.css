@@ -2913,45 +2913,51 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 
 /* ===== Visitor Lookup ===== */
-/* Lays the single-player lookup card and the two-player compare card side by
-   side (lookup on the left, compare on the right). Below 760px there's no
-   room for two 520px-ish cards, so it just stacks; at/above that it goes
-   side by side (the outer width itself comes from .site-main's shared
-   max-width — see css/base.css). */
-.lookup-page-row {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-@media (min-width: 760px) {
-    .lookup-page-row {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-    .lookup-page-row .visitor-lookup-card {
-        flex: 1 1 0;
-        min-width: 0;
-        margin: 0;
-    }
-}
+/* 個人查詢 and 雙人對比 are two modes of one card now (switchLookupMode),
+   toggled by .lookup-mode-toggle — was two competing side-by-side cards. */
 .visitor-lookup-card {
     position: relative;
-    max-width: 520px;
+    max-width: 600px;
     margin: 0 auto 20px;
     background: var(--bg-card-alt);
-    border: 1px solid rgba(255,102,153,0.2);
+    border: 1px solid var(--border-card);
     border-radius: 20px;
     padding: 1.8rem 1.5rem;
     text-align: center;
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
     box-shadow: var(--shadow-card-inset);
 }
 .visitor-lookup-card h3 {
-    color: var(--text-pink);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    letter-spacing: 2px;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.9rem;
+}
+.lookup-mode-toggle {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 1.1rem;
+    padding: 3px;
+    border-radius: 11px;
+    background: var(--bg-stat);
+    border: 1px solid var(--border-card);
+}
+.lookup-mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+.lookup-mode-btn:hover { color: var(--text); }
+.lookup-mode-btn.active {
+    background: rgba(var(--accent-pink-rgb), 0.16);
+    color: var(--pink);
 }
 .visitor-lookup-input-row {
     display: flex;
@@ -3024,8 +3030,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 .osu-recent-item.skeleton { pointer-events: none; }
 
-/* ===== Two-player PP comparison card — sits to the right of the single-player
-   lookup card (see .lookup-page-row above), same .visitor-lookup-card shell. ===== */
+/* ===== Two-player PP comparison — the 雙人對比 mode of the lookup card
+   (#lookup-mode-compare, toggled by switchLookupMode). ===== */
 .pp-compare-input-row {
     display: flex;
     flex-wrap: wrap;
@@ -3063,16 +3069,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 /* ===== Two-player Top Play comparison (loadPpCompareTopPlays) =====
    auto-fit/minmax rather than a fixed 2-column grid so this still stacks to
-   one column on a true single-column phone layout. .pp-compare-card shares
-   a row with the single-player lookup card above 760px (see .lookup-page-row)
-   and is capped at max-width:520px there, so its usable interior is only
-   ~470px after padding — a 240px minimum (2*240=480) never actually fit two
-   columns in that shared-row layout, forcing a permanent single-column stack
-   even on wide desktop screens. 200px (2*200=400, comfortably under ~470px)
-   matches the mobile-fallback minimum already used for this same card type
-   elsewhere (#farm-maps-list/#catalog-list/.mappool-list at <=480px) and
-   reliably gives two side-by-side columns whenever the compare card itself
-   has reasonable width. */
+   one column on a narrow phone. The lookup card is capped at max-width:600px,
+   so the usable interior is ~540px after padding; a 200px minimum
+   (2*200=400) reliably gives two side-by-side columns on desktop and matches
+   the mobile-fallback minimum used for this card type elsewhere
+   (#farm-maps-list/#catalog-list/.mappool-list at <=480px). */
 .pp-compare-topplays-title {
     margin: 1rem 0 10px;
     text-align: center;
@@ -4225,6 +4226,17 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .chat-message { display: flex; gap: 10px; align-items: flex-start; }
 .chat-message .tracked-player-avatar { width: 34px; height: 34px; flex-shrink: 0; }
 .chat-message-author { flex-shrink: 0; }
+/* Consecutive messages from one author (chatIsGrouped) — avatar + name shown
+   once for the block; continuation lines pull up tight and keep the 34px
+   gutter so the body stays aligned. Timestamp fades in on hover. */
+.chat-message--grouped { margin-top: -6px; }
+.chat-message--grouped > .chat-message-author { visibility: hidden; }
+.chat-message--grouped > .chat-message-author .avatar-with-flag,
+.chat-message--grouped > .chat-message-author .tracked-player-avatar { height: 1px; }
+.chat-message--grouped .chat-message-name { display: none; }
+.chat-message--grouped .chat-message-time { opacity: 0; transition: opacity 0.12s var(--ease-out); }
+.chat-message--grouped:hover .chat-message-time,
+.chat-message--grouped:focus-within .chat-message-time { opacity: 1; }
 .chat-message-body { flex: 1; min-width: 0; }
 .chat-message-header { display: flex; align-items: center; gap: 8px; }
 .chat-message-name { font-weight: bold; color: var(--text); font-size: 0.88rem; text-decoration: none; }

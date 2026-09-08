@@ -9,6 +9,9 @@
    in js/osu.js); reading the room needs no login. */
 const CHAT_POLL_INTERVAL_MS = 4000;
 const CHAT_NEAR_BOTTOM_PX = 60;
+// Consecutive messages from the same author within this window render as one
+// visual block (avatar + name shown once, tighter spacing).
+const CHAT_GROUP_WINDOW_MS = 5 * 60 * 1000;
 // Only used to decide whether to *offer* the delete button client-side —
 // the real permission check lives server-side in chat-delete.js.
 const CHAT_OWNER_OSU_ID_HINT = '26696007';
@@ -97,7 +100,7 @@ async function loadInitialChatMessages() {
         const data = await res.json();
         const messages = data.messages || [];
         listEl.innerHTML = messages.length
-            ? messages.map(chatMessageHtml).join('')
+            ? messages.map((m, i) => chatMessageHtml(m, messages[i - 1])).join('')
             : `<p class="osu-empty">${t('chat_empty')}</p>`;
         if (messages.length) chatLastId = messages[messages.length - 1].id;
         listEl.scrollTop = listEl.scrollHeight;
@@ -117,7 +120,8 @@ function chatAppendMessages(listEl, messages) {
     const wasNearBottom = chatIsNearBottom(listEl);
     const empty = listEl.querySelector('.osu-empty');
     if (empty) listEl.innerHTML = '';
-    listEl.insertAdjacentHTML('beforeend', fresh.map(chatMessageHtml).join(''));
+    const prevNode = empty ? null : chatPrevFromNode(listEl.querySelector('.chat-message:last-child'));
+    listEl.insertAdjacentHTML('beforeend', fresh.map((m, i) => chatMessageHtml(m, i === 0 ? prevNode : fresh[i - 1])).join(''));
     chatLastId = Math.max(chatLastId, fresh[fresh.length - 1].id);
     if (wasNearBottom) listEl.scrollTop = listEl.scrollHeight;
 }
@@ -167,7 +171,24 @@ function chatRenderContent(text) {
     return html;
 }
 
-function chatMessageHtml(m) {
+/* True when `m` should visually continue `prev` (same author, close in time,
+   and not a reply — a reply always shows its own header for context). */
+function chatIsGrouped(m, prev) {
+    if (!prev || m.replyToId) return false;
+    if (String(prev.authorId) !== String(m.authorId)) return false;
+    const gap = new Date(m.createdAt) - new Date(prev.createdAt);
+    return gap >= 0 && gap < CHAT_GROUP_WINDOW_MS;
+}
+
+// Minimal {authorId, createdAt} for chatIsGrouped(), read back off a rendered
+// node so incremental append / in-place repaint can group against the DOM.
+function chatPrevFromNode(node) {
+    if (!node || !node.classList.contains('chat-message')) return null;
+    return { authorId: node.dataset.authorId, createdAt: node.dataset.createdAt };
+}
+
+function chatMessageHtml(m, prev) {
+    const grouped = chatIsGrouped(m, prev);
     const loggedInUser = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
     const isOwn = loggedInUser && String(loggedInUser.id) === String(m.authorId);
     const canDelete = loggedInUser && (isOwn || String(loggedInUser.id) === CHAT_OWNER_OSU_ID_HINT);
@@ -181,8 +202,8 @@ function chatMessageHtml(m) {
     const profileUrl = `https://osu.ppy.sh/users/${m.authorId}`;
     const editedMark = m.editedAt ? ` <span class="chat-message-edited" title="${escapeHtmlOsu(chatFormatTime(m.editedAt))}">${t('chat_edited_marker')}</span>` : '';
     return `
-    <div class="chat-message" id="chat-msg-${m.id}" data-edited-at="${escapeHtmlOsu(m.editedAt || '')}">
-        <a class="chat-message-author" href="${profileUrl}" target="_blank" rel="noopener noreferrer" title="${t('chat_view_profile_title')}">
+    <div class="chat-message${grouped ? ' chat-message--grouped' : ''}" id="chat-msg-${m.id}" data-edited-at="${escapeHtmlOsu(m.editedAt || '')}" data-author-id="${escapeHtmlOsu(String(m.authorId || ''))}" data-created-at="${escapeHtmlOsu(m.createdAt || '')}">
+        <a class="chat-message-author" href="${profileUrl}" target="_blank" rel="noopener noreferrer" title="${t('chat_view_profile_title')}" aria-hidden="${grouped ? 'true' : 'false'}">
             <div class="avatar-with-flag">
                 <img class="tracked-player-avatar" src="${osuAvatarUrl(m.authorId)}" alt="" onerror="this.style.visibility='hidden';">
                 ${m.authorCountry ? `<img class="avatar-flag-badge" src="${flagUrl(m.authorCountry)}" alt="" onerror="this.style.display='none';">` : ''}
@@ -286,7 +307,8 @@ function chatReplaceMessageNode(m) {
     if (chatEditingId === m.id) return;
     const node = document.getElementById(`chat-msg-${m.id}`);
     if (!node) return;
-    node.insertAdjacentHTML('afterend', chatMessageHtml(m));
+    const wasGrouped = node.classList.contains('chat-message--grouped');
+    node.insertAdjacentHTML('afterend', chatMessageHtml(m, wasGrouped ? chatPrevFromNode(node.previousElementSibling) : null));
     node.remove();
 }
 
