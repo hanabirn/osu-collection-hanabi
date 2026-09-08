@@ -182,7 +182,8 @@ async function buildPuzzle(date) {
 
 async function getPuzzle(store, date) {
     let p = await store.get(`daily:${date}`, { type: 'json' });
-    if (p) return p;
+    // Rebuild a puzzle cached before the multiple-choice change (no options).
+    if (p && Array.isArray(p.options) && p.options.length) return p;
     p = await buildPuzzle(date);
     if (p) await store.setJSON(`daily:${date}`, p);
     return p;
