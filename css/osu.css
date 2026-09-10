@@ -3890,7 +3890,29 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     position: relative;
     z-index: 2;
     padding: 12px 16px;
+    /* leave room for the always-visible play button pinned to the right */
+    padding-right: 66px;
     width: 100%;
+}
+/* The daily-pick banner gets the same preview button the cards have, but
+   pinned centre-right and always visible (it's one prominent element, not a
+   hover-reveal grid item). playOsuPreview() stopPropagation()s so it doesn't
+   also open the beatmap page via the banner's own onclick. */
+.featured-beatmap-play {
+    top: 50%;
+    left: auto;
+    right: 14px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    opacity: 1;
+    background: rgba(0,0,0,0.55);
+}
+.featured-beatmap-play:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+.featured-beatmap-play.playing {
+    transform: translateY(-50%);
 }
 .featured-beatmap-label {
     font-size: 0.7rem;

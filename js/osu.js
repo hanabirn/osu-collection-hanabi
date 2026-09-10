@@ -3597,6 +3597,7 @@ function renderFeaturedBeatmap() {
     el.innerHTML = `
         <div class="featured-beatmap-bg" style="background-image:url('${coverUrl}')"></div>
         <div class="featured-beatmap-overlay"></div>
+        <button class="osu-play-btn featured-beatmap-play" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
         <div class="featured-beatmap-info">
             <div class="featured-beatmap-label">${t('featured_beatmap_label')}</div>
             <div class="featured-beatmap-title">${modeIconSvg(set.__mode)} ${set.title}</div>
