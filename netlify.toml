@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist"
   functions = "netlify/functions"
+  # Skip the build+deploy entirely when a push only touched docs / mp-bot /
+  # READMEs — nothing that ends up in dist/. Saves build credits. See the
+  # script for the list of paths that still trigger a build.
+  ignore = "node scripts/should-build.mjs"
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
