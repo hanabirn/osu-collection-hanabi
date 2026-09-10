@@ -1,0 +1,42 @@
+# Normalise line endings: the site is developed on Windows (core.autocrlf=true)
+# but built and served on Linux (Netlify). Store everything text as LF so a
+# CRLF checkout can never leak into dist/ or a shell script.
+#
+# NOTE: this does NOT renormalise files already committed. Existing files keep
+# their stored bytes until they're next modified. A one-time
+# `git add --renormalize .` is a deliberate later step (see
+# docs/engineering-plan.md, phase 5), not something this file does on its own.
+
+* text=auto eol=lf
+
+# Explicitly text (in case content sniffing guesses wrong)
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+*.ts    text eol=lf
+*.json  text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.md    text eol=lf
+*.svg   text eol=lf
+*.sh    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+
+# Binary — never touch these
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.wasm  binary
+*.osk   binary
+*.osz   binary
+*.db    binary
+*.osdb  binary

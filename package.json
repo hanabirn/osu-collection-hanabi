@@ -1,12 +1,28 @@
 {
   "name": "osu-collection-hanabi",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "dev": "http-server . -p 8080 -c-1 --silent",
     "build": "node scripts/build.mjs",
-    "discord:register": "node scripts/register-discord-commands.mjs"
+    "discord:register": "node scripts/register-discord-commands.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit -p jsconfig.json"
   },
   "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@types/node": "^22.10.1",
     "esbuild": "^0.25.0",
-    "opencc-js": "^1.4.2"
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0",
+    "http-server": "^14.1.1",
+    "opencc-js": "^1.4.2",
+    "prettier": "^3.4.1",
+    "typescript": "^5.7.2"
   }
 }

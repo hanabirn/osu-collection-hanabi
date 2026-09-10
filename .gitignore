@@ -4,3 +4,8 @@
 node_modules/
 dist/
 js/i18n/zh-Hans.js
+
+# Tooling caches
+.eslintcache
+*.tsbuildinfo
+.vite/

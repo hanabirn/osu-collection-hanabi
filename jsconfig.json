@@ -1,0 +1,34 @@
+{
+  // Phase 1 of docs/engineering-plan.md: stand up TypeScript-based checking
+  // for the plain-JS source WITHOUT converting anything and WITHOUT a wall of
+  // red.
+  //
+  // `checkJs` is FALSE on purpose. A census with checkJs:true reports ~210
+  // issues across js/ (dominated by DOM-property access on the loosely-typed
+  // `HTMLElement` that getElementById returns — not real bugs). Making
+  // `npm run typecheck` mean something requires an opt-in ramp instead:
+  //
+  //   - add `// @ts-check` to the top of a file to type-check just that file
+  //   - phases 3-4 do this file by file, tightening as the ES-module
+  //     conversion removes the cross-file-global guesswork
+  //
+  // Today `npm run typecheck` passes (nothing opts in yet). `scripts/*.mjs`
+  // are real modules and can take `// @ts-check` immediately (@types/node is
+  // installed).
+  "compilerOptions": {
+    "checkJs": false,
+    "allowJs": true,
+    "noEmit": true,
+    "target": "es2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "types": ["node"],
+    "strict": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["js/**/*.js", "scripts/**/*.mjs", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "netlify", "mp-bot", "js/i18n/zh-Hans.js"]
+}

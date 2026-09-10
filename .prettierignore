@@ -1,0 +1,26 @@
+# Prettier config is in place for NEW code from phase 1 onward. The existing
+# 24k-line source is intentionally NOT reformatted yet — that's a deliberate
+# one-shot step in phase 5 (see docs/engineering-plan.md), because it's a huge
+# diff that needs the batch-push discipline.
+#
+# Until then, `npm run format` / `format:check` only meaningfully touch files
+# you choose to run it on explicitly.
+
+dist/
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+
+# Generated at build time from js/i18n/zh.js
+js/i18n/zh-Hans.js
+
+# Locale dicts are hand-maintained with many keys per line on purpose;
+# reformatting them one-key-per-line would explode the diff and the file size.
+js/i18n/
+
+# Standalone sub-project with its own tooling
+mp-bot/
+
+# Markdown left to the author's own wrapping
+*.md
