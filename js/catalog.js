@@ -10,7 +10,9 @@
    applyImportedCollections. Frontend mode keys ('standard'/…) bridge to the
    API's ruleset ints via CATALOG_MODE_INT. */
 const CATALOG_MODE_INT = { standard: 0, taiko: 1, catch: 2, mania: 3 };
-const CATALOG_PAGE_SIZE = 20;
+// 3-column grid, 3 rows per page (see #catalog-list in css/osu.css). The
+// server takes this as a `pageSize` override.
+const CATALOG_PAGE_SIZE = 9;
 
 let catalogLoaded = false;
 let catalogPage = 0;
@@ -96,7 +98,7 @@ async function loadCatalogPage(page) {
     if (pageEl) pageEl.innerHTML = '';
 
     try {
-        const params = catalogBuildParams({ page });
+        const params = catalogBuildParams({ page, pageSize: CATALOG_PAGE_SIZE });
         const res = await fetch(`/.netlify/functions/catalog-list?${params}`);
         if (!res.ok) throw new Error('bad response');
         const data = await res.json();

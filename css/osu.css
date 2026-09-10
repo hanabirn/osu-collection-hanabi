@@ -1509,10 +1509,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    handful per screen. Scoped to #farm-maps-list so the main collection
    grid (#osu-collection) and gallery cards keep their own proportions. */
 #farm-maps-list.osu-collection {
-    /* Wider than the base collection grid's 240px — these cards pack the
-       title + [difficulty name] on one line (farm-maps.js), which needs
-       more room before text-overflow:ellipsis starts eating it. */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Fixed 3 columns (6 per page, FARM_PAGE_SIZE) rather than auto-fill —
+       overflow goes to the next page. Drops to 2 then 1 on narrow screens;
+       the per-page count doesn't change, it just stacks into more rows. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
 }
 #farm-maps-list .osu-card {
@@ -1573,9 +1573,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     width: 19px;
     height: 19px;
 }
-@media (max-width: 480px) {
+@media (max-width: 760px) {
+    #farm-maps-list.osu-collection { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
     #farm-maps-list.osu-collection {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: 1fr;
         gap: 8px;
     }
 }
@@ -1680,9 +1683,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
    language / genre / source pills instead of pp/star/bpm. */
 #catalog-list.osu-collection {
-    /* Wider than the base collection grid's 240px — long titles + feat.
-       names were getting truncated too aggressively at that width. */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Fixed 3 columns (9 per page, CATALOG_PAGE_SIZE) rather than auto-fill —
+       overflow goes to the next page. Drops to 2 then 1 on narrow screens;
+       the per-page count doesn't change, it just stacks into more rows. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
 }
 #catalog-list .osu-card {
@@ -1720,9 +1724,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     overflow: hidden;
     text-overflow: ellipsis;
 }
-@media (max-width: 480px) {
+@media (max-width: 760px) {
+    #catalog-list.osu-collection { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
     #catalog-list.osu-collection {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: 1fr;
         gap: 8px;
     }
 }

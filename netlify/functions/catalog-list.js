@@ -24,6 +24,10 @@ exports.handler = async (event) => {
 
     const qs = event.queryStringParameters || {};
     const page = Math.max(0, parseInt(qs.page, 10) || 0);
+    // Optional page-size override from the frontend (the grid shows a fixed
+    // 3xN, so the client picks how many rows). Clamped; falls back to the
+    // default. Ignored on the `limit` lean path below.
+    const pageSize = qs.pageSize ? Math.min(50, Math.max(1, parseInt(qs.pageSize, 10) || 0)) : PAGE_SIZE;
     const q = (qs.q || '').trim().toLowerCase().slice(0, 100);
     const artist = (qs.artist || '').trim();
     const language = (qs.language || '').trim();      // '' | 'unknown' | '<id>'
@@ -126,7 +130,7 @@ exports.handler = async (event) => {
             .slice(0, FACET_TOP_N)
             .map(([k, c]) => ({ [keyName]: k, count: c }));
 
-        const pageItems = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+        const pageItems = items.slice(page * pageSize, (page + 1) * pageSize);
 
         return {
             statusCode: 200,
@@ -135,7 +139,7 @@ exports.handler = async (event) => {
                 items: pageItems,
                 total,
                 page,
-                pageSize: PAGE_SIZE,
+                pageSize,
                 facets: {
                     languages: [...langCounts.entries()]
                         .sort((a, b) => (a[0] === 'unknown' ? 1e9 : a[0]) - (b[0] === 'unknown' ? 1e9 : b[0]))
