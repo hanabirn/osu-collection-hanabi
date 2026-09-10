@@ -134,12 +134,18 @@ a:hover { text-decoration: underline; }
    docs/visual-redesign-spec.md.) */
 
 /* The title-note float animation never needs to escape the header box, but
-   the language dropdown and notification bell menus do — temporarily lift
-   the clip while either is open instead of removing overflow:hidden outright. */
+   the language / notification / contact dropdowns do — temporarily lift the
+   clip while one is open instead of removing overflow:hidden outright.
+   Also raise the header above .site-main (z-index:6): the header is a
+   permanent stacking context at z-index:5, so a menu's own z-index:210 is
+   trapped below page content until the whole header is lifted. 60 clears
+   page content + FABs but stays under the nav drawer (80), modal overlays
+   (200) and tooltips (3000). */
 .site-header.lang-menu-open,
 .site-header.notif-menu-open,
 .site-header.contact-menu-open {
     overflow: visible;
+    z-index: 60;
 }
 
 /* ===== Corner-pinned header controls =====
