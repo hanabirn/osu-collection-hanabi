@@ -5,6 +5,7 @@
    endpoint pattern only if we add a leaderboard later. Reads the whole
    `dataset:osu` blob once per call (same as farm-maps-list). */
 const { getFarmMapsStore } = require('./_blobs-store');
+const { getJSONGz } = require('./_blob-json');
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 const BATCH = 60;
@@ -15,7 +16,7 @@ exports.handler = async (event) => {
 
     try {
         const store = getFarmMapsStore();
-        const dataset = (await store.get('dataset:osu', { type: 'json' })) || [];
+        const dataset = (await getJSONGz(store, 'dataset:osu')) || [];
 
         const pool = [];
         for (const r of dataset) {

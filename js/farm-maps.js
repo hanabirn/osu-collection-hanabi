@@ -192,12 +192,27 @@ function renderFarmCoverage() {
         return;
     }
     const updated = new Date(farmCoverage.lastRunAt).toLocaleString();
-    let text = t('farm_coverage', { n: (farmCoverage.computedCount || 0).toLocaleString(), t: updated });
+    // The real indexed count — NOT computedCount, which is a cumulative
+    // recompute counter that keeps rising even when the dataset is frozen.
+    const indexed = farmCoverage.datasetSize != null
+        ? farmCoverage.datasetSize
+        : (farmCoverage.farmClassifiedCount || 0);
+    let text = t('farm_coverage', { n: indexed.toLocaleString(), t: updated });
     if (farmOnly) {
         text += ' ' + t('farm_coverage_farm', {
             n: (farmCoverage.farmMapCount || 0).toLocaleString(),
             c: (farmCoverage.farmClassifiedCount || 0).toLocaleString(),
         });
+    }
+    // Crawler self-check: the dataset write has been failing for a while, so
+    // the numbers above are stale. Dev-facing (console + a ⚠ with a title) —
+    // not worth a localized banner.
+    if ((farmCoverage.consecutiveWriteFails || 0) > 2) {
+        console.warn(`[farm crawler] dataset write failing (x${farmCoverage.consecutiveWriteFails}); last ok ${farmCoverage.lastOkAt || 'never'} — ${farmCoverage.lastError || 'unknown'}`);
+        text += ' ⚠';
+        el.title = `Farm crawler: dataset write has been failing since ${farmCoverage.lastOkAt || 'the last successful run'} (${farmCoverage.lastError || 'unknown error'}). Counts are stale.`;
+    } else {
+        el.removeAttribute('title');
     }
     el.textContent = text;
 }

@@ -26,10 +26,17 @@
 const rosu = require('rosu-pp-js');
 const { getOsuToken } = require('./_osu-auth');
 const { getFarmMapsStore } = require('./_blobs-store');
+const { setJSONGz, getJSONGz } = require('./_blob-json');
 const {
     STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES,
     FARM_MIN_SAMPLE, farmThresholdForStars, farmPlaycountFloor,
 } = require('./_farm-constants');
+
+// Leave this much of the run's budget unspent by the compute loop so
+// JSON.stringify + gzip + upload of the (multi-MB) dataset blob can finish
+// before the function's hard timeout. Clamped to 40% of the budget so the
+// short 9 s `-run` path still gets to compute something.
+const WRITE_RESERVE_MS = 10000;
 
 function stateKey(mode) { return `crawl-state:${mode}`; }
 function datasetKey(mode) { return `dataset:${mode}`; }
@@ -45,6 +52,8 @@ async function loadState(store, mode) {
         totalKnown: 0,
         lastRunAt: null,
         lastError: null,
+        lastOkAt: null,
+        consecutiveWriteFails: 0,
     };
 }
 
@@ -278,13 +287,19 @@ async function runCrawlBatch(mode, budgetMs) {
     const start = Date.now();
     const store = getFarmMapsStore();
     const state = await loadState(store, mode);
-    const dataset = (await store.get(datasetKey(mode), { type: 'json' })) || [];
+    // Full rollback target if the dataset write fails: the next run then
+    // redoes exactly this run's discovery/compute instead of skipping it.
+    const snapshot = JSON.parse(JSON.stringify(state));
+    const dataset = (await getJSONGz(store, datasetKey(mode))) || [];
     const index = new Map(dataset.map((r, i) => [r.beatmap_id, i]));
+
+    const writeReserve = Math.min(WRITE_RESERVE_MS, Math.floor(budgetMs * 0.4));
+    const computeDeadline = start + (budgetMs - writeReserve);
 
     let discovered = 0, computed = 0, error = null;
     try {
         const token = await getOsuToken();
-        while (Date.now() - start < budgetMs) {
+        while (Date.now() < computeDeadline) {
             if (state.pendingQueue.length === 0) {
                 const got = await discoverBatch(mode, state);
                 discovered += got;
@@ -312,12 +327,40 @@ async function runCrawlBatch(mode, budgetMs) {
         error = err.message;
     }
 
-    state.lastRunAt = new Date().toISOString();
-    state.lastError = error;
-    await store.setJSON(stateKey(mode), state);
-    await store.setJSON(datasetKey(mode), dataset);
+    // Write the dataset FIRST — it's the write that can time out. Only if it
+    // lands do we persist the advanced cursor/queue/counters; otherwise roll
+    // the state back to the pre-run snapshot (keeping just the diagnostics)
+    // so no discovery/compute work is silently lost.
+    const now = new Date().toISOString();
+    let writeOk = true;
+    try {
+        await setJSONGz(store, datasetKey(mode), dataset);
+    } catch (err) {
+        writeOk = false;
+        error = `dataset write failed: ${err.message}`;
+    }
 
-    return { mode, discovered, computed, datasetSize: dataset.length, queueLength: state.pendingQueue.length, error };
+    if (writeOk) {
+        state.lastRunAt = now;
+        state.lastOkAt = now;
+        state.lastError = error;
+        state.consecutiveWriteFails = 0;
+        await store.setJSON(stateKey(mode), state);
+    } else {
+        await store.setJSON(stateKey(mode), {
+            ...snapshot,
+            lastRunAt: now,
+            lastError: error,
+            consecutiveWriteFails: (snapshot.consecutiveWriteFails || 0) + 1,
+        });
+    }
+
+    return {
+        mode, discovered, computed, writeOk,
+        datasetSize: dataset.length,
+        queueLength: state.pendingQueue.length,
+        error,
+    };
 }
 
 module.exports = { runCrawlBatch, MOD_COMBOS, STAR_FLOOR, MODE_NUM, MODES };

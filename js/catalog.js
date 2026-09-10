@@ -335,11 +335,20 @@ function renderCatalogCoverage() {
         return;
     }
     const updated = new Date(catalogCoverage.lastRunAt).toLocaleString();
-    el.textContent = t('catalog_coverage', {
+    let text = t('catalog_coverage', {
         n: (catalogCoverage.datasetSize || 0).toLocaleString(),
         t: updated,
         m: catalogTotal.toLocaleString(),
     });
+    // Crawler self-check — see renderFarmCoverage() in js/farm-maps.js.
+    if ((catalogCoverage.consecutiveWriteFails || 0) > 2) {
+        console.warn(`[catalog crawler] dataset write failing (x${catalogCoverage.consecutiveWriteFails}); last ok ${catalogCoverage.lastOkAt || 'never'} — ${catalogCoverage.lastError || 'unknown'}`);
+        text += ' ⚠';
+        el.title = `Catalog crawler: dataset write has been failing since ${catalogCoverage.lastOkAt || 'the last successful run'} (${catalogCoverage.lastError || 'unknown error'}). Counts are stale.`;
+    } else {
+        el.removeAttribute('title');
+    }
+    el.textContent = text;
 }
 
 /* Called from refreshDynamicContent() on a site-language switch — the facet

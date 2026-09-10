@@ -6,6 +6,7 @@
    a complete ranked-pool snapshot — the `coverage` block in the response
    lets the frontend say so honestly instead of implying completeness. */
 const { getFarmMapsStore } = require('./_blobs-store');
+const { getJSONGz } = require('./_blob-json');
 const {
     MOD_COMBOS, MODE_NUM,
     FARM_MIN_SAMPLE, farmThresholdForStars, farmPlaycountFloor,
@@ -80,7 +81,7 @@ exports.handler = async (event) => {
 
     try {
         const store = getFarmMapsStore();
-        const dataset = (await store.get(`dataset:${mode}`, { type: 'json' })) || [];
+        const dataset = (await getJSONGz(store, `dataset:${mode}`)) || [];
         const crawlState = (await store.get(`crawl-state:${mode}`, { type: 'json' })) || {};
 
         let items = dataset.map(r => {
@@ -134,10 +135,14 @@ exports.handler = async (event) => {
                 page,
                 pageSize,
                 coverage: {
+                    datasetSize: dataset.length,
                     discoveredCount: crawlState.discoveredCount || 0,
                     computedCount: crawlState.computedCount || 0,
                     totalKnown: crawlState.totalKnown || 0,
                     lastRunAt: crawlState.lastRunAt || null,
+                    lastOkAt: crawlState.lastOkAt || null,
+                    lastError: crawlState.lastError || null,
+                    consecutiveWriteFails: crawlState.consecutiveWriteFails || 0,
                     farmClassifiedCount,
                     farmMapCount,
                 },

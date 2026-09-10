@@ -9,6 +9,7 @@
    are bare { id } — used by the "build a collection from this facet" action
    on the frontend. */
 const { getCatalogStore } = require('./_blobs-store');
+const { getJSONGz } = require('./_blob-json');
 
 const PAGE_SIZE = 20;
 const FACET_TOP_N = 50;
@@ -50,7 +51,7 @@ exports.handler = async (event) => {
 
     try {
         const store = getCatalogStore();
-        const dataset = (await store.get('catalog:all', { type: 'json' })) || [];
+        const dataset = (await getJSONGz(store, 'catalog:all')) || [];
         const state = (await store.get('catalog-state', { type: 'json' })) || {};
 
         // Context filter (mode + nsfw): facet counts are computed against
@@ -156,6 +157,9 @@ exports.handler = async (event) => {
                     discoveredCount: state.discoveredCount || 0,
                     sweepCount: state.sweepCount || 0,
                     lastRunAt: state.lastRunAt || null,
+                    lastOkAt: state.lastOkAt || null,
+                    lastError: state.lastError || null,
+                    consecutiveWriteFails: state.consecutiveWriteFails || 0,
                 },
             }),
         };

@@ -19,11 +19,15 @@
    get picked up over time without separate "check for new" logic. */
 const { getOsuToken } = require('./_osu-auth');
 const { getCatalogStore } = require('./_blobs-store');
+const { setJSONGz, getJSONGz } = require('./_blob-json');
 const { primaryArtist, artistKeys } = require('./_artist-keys');
 
 const STATE_KEY = 'catalog-state';
 const DATASET_KEY = 'catalog:all';
 const SEARCH_URL = 'https://osu.ppy.sh/api/v2/beatmapsets/search';
+
+// See _farm-crawl-core.js — leave room in the budget for the dataset write.
+const WRITE_RESERVE_MS = 10000;
 
 async function loadState(store) {
     const state = await store.get(STATE_KEY, { type: 'json' });
@@ -33,6 +37,8 @@ async function loadState(store) {
         sweepCount: 0,
         lastRunAt: null,
         lastError: null,
+        lastOkAt: null,
+        consecutiveWriteFails: 0,
     };
 }
 
@@ -90,12 +96,16 @@ async function runCrawlBatch(budgetMs) {
     const start = Date.now();
     const store = getCatalogStore();
     const state = await loadState(store);
-    const dataset = (await store.get(DATASET_KEY, { type: 'json' })) || [];
+    const snapshot = JSON.parse(JSON.stringify(state));
+    const dataset = (await getJSONGz(store, DATASET_KEY)) || [];
     const index = new Map(dataset.map((r, i) => [r.id, i]));
+
+    const writeReserve = Math.min(WRITE_RESERVE_MS, Math.floor(budgetMs * 0.4));
+    const discoverDeadline = start + (budgetMs - writeReserve);
 
     let discovered = 0, upserted = 0, error = null;
     try {
-        while (Date.now() - start < budgetMs) {
+        while (Date.now() < discoverDeadline) {
             const sets = await discoverBatch(state);
             if (sets.length === 0) {
                 // Cursor exhausted — already reset to null above; stop here
@@ -123,14 +133,37 @@ async function runCrawlBatch(budgetMs) {
         error = err.message;
     }
 
-    state.lastRunAt = new Date().toISOString();
-    state.lastError = error;
-    await store.setJSON(STATE_KEY, state);
-    await store.setJSON(DATASET_KEY, dataset);
+    // Dataset write first; roll state back to the pre-run snapshot if it
+    // fails, so the run's discoveries aren't silently lost (see
+    // _farm-crawl-core.js for the fuller rationale).
+    const now = new Date().toISOString();
+    let writeOk = true;
+    try {
+        await setJSONGz(store, DATASET_KEY, dataset);
+    } catch (err) {
+        writeOk = false;
+        error = `dataset write failed: ${err.message}`;
+    }
+
+    if (writeOk) {
+        state.lastRunAt = now;
+        state.lastOkAt = now;
+        state.lastError = error;
+        state.consecutiveWriteFails = 0;
+        await store.setJSON(STATE_KEY, state);
+    } else {
+        await store.setJSON(STATE_KEY, {
+            ...snapshot,
+            lastRunAt: now,
+            lastError: error,
+            consecutiveWriteFails: (snapshot.consecutiveWriteFails || 0) + 1,
+        });
+    }
 
     return {
         discovered,
         upserted,
+        writeOk,
         datasetSize: dataset.length,
         sweepCount: state.sweepCount,
         cursorActive: !!state.searchCursor,

@@ -3,6 +3,7 @@
    common buckets), plus the bucket list for the answer buttons. The client
    runs the timer and scoring locally. Reads `catalog:all` once per call. */
 const { getCatalogStore } = require('./_blobs-store');
+const { getJSONGz } = require('./_blob-json');
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 const BATCH = 50;
@@ -20,7 +21,7 @@ exports.handler = async (event) => {
 
     try {
         const store = getCatalogStore();
-        const dataset = (await store.get('catalog:all', { type: 'json' })) || [];
+        const dataset = (await getJSONGz(store, 'catalog:all')) || [];
 
         const pool = [];
         for (const r of dataset) {

@@ -15,6 +15,7 @@
    (favourite_count), and cached in the games blob as `daily:<date>` with the
    answer kept server-side. */
 const { getGamesStore, getCatalogStore } = require('./_blobs-store');
+const { getJSONGz } = require('./_blob-json');
 const { getOsuToken } = require('./_osu-auth');
 const { verifyAuthToken } = require('./_auth-token');
 
@@ -94,7 +95,7 @@ async function resolveSet(id, token) {
 
 async function buildPuzzle(date) {
     const catalog = getCatalogStore();
-    const dataset = (await catalog.get('catalog:all', { type: 'json' })) || [];
+    const dataset = (await getJSONGz(catalog, 'catalog:all')) || [];
     const cands = dataset.filter(r =>
         r.id && !r.nsfw && r.ranked_date &&
         Array.isArray(r.modes) && r.modes.includes(0) &&
