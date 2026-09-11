@@ -1,35 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catch Tracker — TW osu!catch Rankings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="site-header">
     <div class="brand">Catch <span>Tracker</span></div>
     <nav>
-        <a href="index.html" class="active">Rankings</a>
-        <a href="feed.html">Live Feed</a>
+        <a href="index.html" class="active" data-i18n="nav_rankings">Rankings</a>
+        <a href="feed.html" data-i18n="nav_feed">Live Feed</a>
     </nav>
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
 </header>
 <main>
-    <h1>🇹🇼 osu!catch Rankings</h1>
-    <p class="coverage-note" id="coverage-note">Loading…</p>
+    <h1><span data-i18n="h1_rankings">osu!catch Rankings</span> <span class="mods-tag">TW</span></h1>
+    <p class="coverage-note" id="coverage-note" data-i18n="loading">Loading…</p>
+    <div class="table-wrap">
     <table>
         <thead>
-            <tr><th>#</th><th>Player</th><th>pp</th><th>Accuracy</th><th>Play Count</th></tr>
+            <tr><th data-i18n="th_rank">#</th><th data-i18n="th_player">Player</th><th data-i18n="th_pp">pp</th><th data-i18n="th_accuracy">Accuracy</th><th data-i18n="th_playcount">Play Count</th></tr>
         </thead>
         <tbody id="rankings-body"></tbody>
     </table>
+    </div>
     <div class="pagination">
-        <button id="prev-page">← Prev</button>
+        <button id="prev-page" data-i18n="prev">← Prev</button>
         <span id="page-label"></span>
-        <button id="next-page">Next →</button>
+        <button id="next-page" data-i18n="next">Next →</button>
     </div>
 </main>
-<footer class="site-footer">Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.</footer>
+<footer class="site-footer" data-i18n="footer_main">Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.</footer>
 <script src="js/common.js"></script>
 <script src="js/api.js"></script>
 <script src="js/render-rankings.js"></script>

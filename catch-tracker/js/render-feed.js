@@ -23,23 +23,24 @@ async function loadFeed() {
                 <tr>
                     <td><img class="avatar" src="${escapeHtml(s.avatar_url || '')}" alt=""> ${playerLink(s.user_id, s.username)}</td>
                     <td>${mapLink(s.beatmap_id, `${s.artist || ''} - ${s.title || ''} [${s.version || ''}]`)}</td>
-                    <td>${escapeHtml(formatMods(s.mods))}</td>
-                    <td>${gradeBadge(s.rank)}${s.is_fc ? ' FC' : ''}</td>
+                    <td>${modsTag(s.mods)}</td>
+                    <td>${gradeBadge(s.rank)}${fcTag(s.is_fc)}</td>
                     <td>${fmtAccuracy(s.accuracy)}</td>
                     <td>${fmtPP(s.pp)}</td>
                     <td>${relTime(s.created_at)}</td>
                 </tr>`).join('')
-            : `<tr><td colspan="7" class="empty-state">No scores in the feed yet — the score-poll cron runs every 5 minutes.</td></tr>`;
+            : `<tr><td colspan="7" class="empty-state">${t('empty_feed')}</td></tr>`;
 
         const c = data.coverage || {};
-        note.textContent = `Tracking ${c.totalPlayers || 0} players` +
-            (c.lastOkAt ? ` — last poll ${relTime(c.lastOkAt)} (${c.playersPolledThisSweep || 0}/${c.totalPlayers || 0} this sweep)` : ' — not yet polled');
+        note.textContent = c.lastOkAt
+            ? t('coverage_feed', { n: c.totalPlayers || 0, time: relTime(c.lastOkAt), done: c.playersPolledThisSweep || 0, total: c.totalPlayers || 0 })
+            : t('coverage_feed_pending', { n: c.totalPlayers || 0 });
 
-        document.getElementById('page-label').textContent = `Page ${_page + 1}`;
+        document.getElementById('page-label').textContent = t('page_label', { n: _page + 1 });
         document.getElementById('prev-page').disabled = _page === 0;
         document.getElementById('next-page').disabled = (_page + 1) * 30 >= data.total;
     } catch (err) {
-        note.textContent = 'Failed to load feed.';
+        note.textContent = t('failed_feed');
     }
 }
 

@@ -1,47 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catch Tracker — Live Feed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="site-header">
     <div class="brand">Catch <span>Tracker</span></div>
     <nav>
-        <a href="index.html">Rankings</a>
-        <a href="feed.html" class="active">Live Feed</a>
+        <a href="index.html" data-i18n="nav_rankings">Rankings</a>
+        <a href="feed.html" class="active" data-i18n="nav_feed">Live Feed</a>
     </nav>
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
 </header>
 <main>
-    <h1>Live Score Feed</h1>
-    <p class="coverage-note" id="coverage-note">Loading…</p>
+    <h1 data-i18n="h1_feed">Live Score Feed</h1>
+    <p class="coverage-note" id="coverage-note" data-i18n="loading">Loading…</p>
     <div class="filters">
         <select id="filter-grade">
-            <option value="">Any grade</option>
+            <option value="" data-i18n="filter_any_grade">Any grade</option>
             <option value="XH">XH</option><option value="X">X</option>
             <option value="SH">SH</option><option value="S">S</option>
             <option value="A">A</option><option value="B">B</option>
             <option value="C">C</option><option value="D">D</option>
-            <option value="F">F (fail)</option>
+            <option value="F" data-i18n="grade_f_fail">F (fail)</option>
         </select>
-        <label><input type="checkbox" id="filter-fc"> FC only</label>
-        <label><input type="checkbox" id="filter-choke"> Choke/fail only</label>
+        <label><input type="checkbox" id="filter-fc"> <span data-i18n="filter_fc_only">FC only</span></label>
+        <label><input type="checkbox" id="filter-choke"> <span data-i18n="filter_choke_only">Choke/fail only</span></label>
     </div>
+    <div class="table-wrap">
     <table>
         <thead>
-            <tr><th>Player</th><th>Map</th><th>Mods</th><th>Grade</th><th>Acc</th><th>pp</th><th>When</th></tr>
+            <tr><th data-i18n="th_player">Player</th><th data-i18n="th_map">Map</th><th data-i18n="th_mods">Mods</th><th data-i18n="th_grade">Grade</th><th data-i18n="th_acc">Acc</th><th data-i18n="th_pp">pp</th><th data-i18n="th_when">When</th></tr>
         </thead>
         <tbody id="feed-body"></tbody>
     </table>
+    </div>
     <div class="pagination">
-        <button id="prev-page">← Prev</button>
+        <button id="prev-page" data-i18n="prev">← Prev</button>
         <span id="page-label"></span>
-        <button id="next-page">Next →</button>
+        <button id="next-page" data-i18n="next">Next →</button>
     </div>
 </main>
-<footer class="site-footer">Auto-refreshes every 45s. Catch Tracker — a companion site for osu-collection-hanabi.</footer>
+<footer class="site-footer" data-i18n="footer_feed">Auto-refreshes every 45s. Catch Tracker — a companion site for osu-collection-hanabi.</footer>
 <script src="js/common.js"></script>
 <script src="js/api.js"></script>
 <script src="js/render-feed.js"></script>

@@ -1,23 +1,27 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catch Tracker — Map Stats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="site-header">
     <div class="brand">Catch <span>Tracker</span></div>
     <nav>
-        <a href="index.html">Rankings</a>
-        <a href="feed.html">Live Feed</a>
+        <a href="index.html" data-i18n="nav_rankings">Rankings</a>
+        <a href="feed.html" data-i18n="nav_feed">Live Feed</a>
     </nav>
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
 </header>
 <main id="map-main">
-    <p class="coverage-note">Loading…</p>
+    <p class="coverage-note" data-i18n="loading">Loading…</p>
 </main>
-<footer class="site-footer">Catch Tracker — a companion site for osu-collection-hanabi.</footer>
+<footer class="site-footer" data-i18n="footer_main">Catch Tracker — a companion site for osu-collection-hanabi.</footer>
 <script src="js/common.js"></script>
 <script src="js/api.js"></script>
 <script src="js/render-map.js"></script>

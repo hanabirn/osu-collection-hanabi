@@ -9,23 +9,24 @@ async function loadRankings() {
         body.innerHTML = data.items.length
             ? data.items.map((r, i) => `
                 <tr>
-                    <td>${startRank + i}</td>
+                    <td class="rank-num">${startRank + i}</td>
                     <td><img class="avatar" src="${escapeHtml(r.avatar_url || '')}" alt=""> ${playerLink(r.user_id, r.username)}</td>
                     <td>${fmtPP(r.pp)}</td>
                     <td>${fmtAccuracy(r.accuracy)}</td>
                     <td>${r.play_count ?? '—'}</td>
                 </tr>`).join('')
-            : `<tr><td colspan="5" class="empty-state">No ranked TW catch players tracked yet — the first rankings sweep may not have run.</td></tr>`;
+            : `<tr><td colspan="5" class="empty-state">${t('empty_rankings')}</td></tr>`;
 
         const c = data.coverage || {};
-        note.textContent = `Tracking ${data.total} TW catch players` +
-            (c.lastOkAt ? ` — last refreshed ${relTime(c.lastOkAt)}` : ' — not yet refreshed');
+        note.textContent = c.lastOkAt
+            ? t('coverage_rankings', { n: data.total, time: relTime(c.lastOkAt) })
+            : t('coverage_rankings_pending', { n: data.total });
 
-        document.getElementById('page-label').textContent = `Page ${_page + 1}`;
+        document.getElementById('page-label').textContent = t('page_label', { n: _page + 1 });
         document.getElementById('prev-page').disabled = _page === 0;
         document.getElementById('next-page').disabled = (_page + 1) * 50 >= data.total;
     } catch (err) {
-        note.textContent = 'Failed to load rankings.';
+        note.textContent = t('failed_rankings');
     }
 }
 

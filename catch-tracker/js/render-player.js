@@ -1,8 +1,8 @@
 function scoreRow(s) {
     return `<tr>
         <td>${mapLink(s.beatmap_id, `${s.artist || ''} - ${s.title || ''} [${s.version || ''}]`)}</td>
-        <td>${escapeHtml(formatMods(s.mods))}</td>
-        <td>${gradeBadge(s.rank)}${s.is_fc ? ' FC' : ''}</td>
+        <td>${modsTag(s.mods)}</td>
+        <td>${gradeBadge(s.rank)}${fcTag(s.is_fc)}</td>
         <td>${fmtAccuracy(s.accuracy)}</td>
         <td>${fmtPP(s.pp)}</td>
         <td>${relTime(s.created_at)}</td>
@@ -11,10 +11,10 @@ function scoreRow(s) {
 
 function scoreTable(scores, emptyMsg) {
     if (!scores.length) return `<p class="empty-state">${emptyMsg}</p>`;
-    return `<table>
-        <thead><tr><th>Map</th><th>Mods</th><th>Grade</th><th>Acc</th><th>pp</th><th>When</th></tr></thead>
+    return `<div class="table-wrap"><table>
+        <thead><tr><th>${t('th_map')}</th><th>${t('th_mods')}</th><th>${t('th_grade')}</th><th>${t('th_acc')}</th><th>${t('th_pp')}</th><th>${t('th_when')}</th></tr></thead>
         <tbody>${scores.map(scoreRow).join('')}</tbody>
-    </table>`;
+    </table></div>`;
 }
 
 async function loadPlayer() {
@@ -22,7 +22,7 @@ async function loadPlayer() {
     const params = new URLSearchParams(location.search);
     const userId = params.get('id');
     if (!userId) {
-        main.innerHTML = '<p class="empty-state">No player id given.</p>';
+        main.innerHTML = `<p class="empty-state">${t('player_no_id')}</p>`;
         return;
     }
 
@@ -38,20 +38,20 @@ async function loadPlayer() {
                     <h1 style="margin:0">${escapeHtml(p.username || userId)}</h1>
                     <div class="profile-stats">
                         <span>${fmtPP(p.pp)}</span>
-                        <span>#${p.country_rank ?? '—'} TW</span>
-                        <span>#${p.global_rank ?? '—'} global</span>
-                        <span>${fmtAccuracy(p.accuracy)} acc</span>
-                        <span>${p.play_count ?? '—'} plays</span>
+                        <span>${t('stat_tw', { n: p.country_rank ?? '—' })}</span>
+                        <span>${t('stat_global', { n: p.global_rank ?? '—' })}</span>
+                        <span>${t('stat_acc', { acc: fmtAccuracy(p.accuracy) })}</span>
+                        <span>${t('stat_plays', { n: p.play_count ?? '—' })}</span>
                     </div>
                 </div>
             </div>
-            <h2>Best Plays</h2>
-            ${scoreTable(data.bestPlays || [], 'No best plays available.')}
-            <h2>Recent Plays (seen by this tracker)</h2>
-            ${scoreTable(data.recentPlays || [], 'No recent plays observed yet by this tracker.')}
+            <h2>${t('best_plays')}</h2>
+            ${scoreTable(data.bestPlays || [], t('no_best_plays'))}
+            <h2>${t('recent_plays')}</h2>
+            ${scoreTable(data.recentPlays || [], t('no_recent_plays'))}
         `;
     } catch (err) {
-        main.innerHTML = '<p class="empty-state">Player not found.</p>';
+        main.innerHTML = `<p class="empty-state">${t('player_not_found')}</p>`;
     }
 }
 
