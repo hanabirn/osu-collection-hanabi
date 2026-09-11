@@ -5,8 +5,8 @@
    Exit !0 => let the build run.
 
    We skip whenever the range of commits since the last successful build only
-   touched paths that never reach the deployed site — docs/, mp-bot/, the
-   READMEs, .gitignore, etc. The list below is the inverse: the paths that DO
+   touched paths that never reach the deployed site — docs/, mp-bot/,
+   catch-tracker/, the READMEs, .gitignore, etc. The list below is the inverse: the paths that DO
    feed dist/ (see scripts/build.mjs COPY + MINIFY_DIRS + MINIFY_ROOT_FILES),
    the functions dir, and anything that changes how the build runs. */
 import { execFileSync } from 'node:child_process';

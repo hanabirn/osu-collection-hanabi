@@ -1,0 +1,69 @@
+# Setup
+
+## 1. Create the Netlify site
+
+1. In Netlify: **Add new site → Import an existing project**, pick the same
+   `hanabirn/osu-collection-hanabi` GitHub repo the main site uses.
+2. Under **Build settings**, set the **Base directory** to `catch-tracker`.
+   Build command / publish directory / functions directory are already set
+   via `catch-tracker/netlify.toml` (`publish = "."`,
+   `functions = "netlify/functions"`) — Netlify picks that file up
+   automatically once the base directory points at this folder.
+3. Deploy. This is a genuinely separate Netlify site from the main one —
+   separate site id, separate URL, separate build-minute usage — it just
+   happens to share a repo.
+4. Rename the site (Site configuration → General → Site details → Change
+   site name) to **`catch-tracker-hanabi`**, matching the main site's
+   `osu-collection-hanabi` naming — this is the URL already hardcoded into
+   `js/resources-data.js`'s Resources-tab entry on the main site. If a
+   different name is used instead, update that entry to match.
+
+## 2. Environment variables
+
+Set these on the **new** site (Site configuration → Environment variables).
+Nothing is inherited from the main site automatically.
+
+| Variable | Value | Notes |
+|---|---|---|
+| `OSU_CLIENT_ID` | same as the main site's | `client_credentials` grant has no redirect-URI/domain binding, so reusing the same osu! OAuth app is safe |
+| `OSU_CLIENT_SECRET` | same as the main site's | ditto |
+| `NETLIFY_BLOBS_SITE_ID` | **new** — this site's own Project ID | Site configuration → General → Project information. Must NOT be the main site's id — reusing it would write into the main site's blob storage. |
+| `NETLIFY_BLOBS_TOKEN` | **new** — a personal access token | User settings → Applications → New access token |
+| `CATCH_TRACKER_CRAWL_SECRET` | freshly generated random string | gates `rankings-crawl-run` / `scores-poll-run` |
+
+## 3. Seed the data
+
+Cron won't fire until the next scheduled tick (rankings: top of the hour;
+scores: next 5-minute mark). To seed immediately after first deploy, call
+the manual endpoints a few times with the secret header:
+
+```
+curl -X POST https://<catch-tracker-site>.netlify.app/.netlify/functions/rankings-crawl-run \
+  -H "x-catch-tracker-secret: <CATCH_TRACKER_CRAWL_SECRET>"
+
+curl -X POST https://<catch-tracker-site>.netlify.app/.netlify/functions/scores-poll-run \
+  -H "x-catch-tracker-secret: <CATCH_TRACKER_CRAWL_SECRET>"
+```
+
+Run `rankings-crawl-run` first (and enough times to complete a full sweep —
+watch the response's `sweepCompleted` field) so `players:index` exists
+before `scores-poll-run` has anything to poll. Running `scores-poll-run`
+twice in a row with no real new scores in between should report
+`newScoreCount: 0` the second time — that's the de-dup logic working.
+
+## 4. Verify
+
+- Watch this site's function logs (Netlify UI) for `rankings-crawl-cron`
+  and `scores-poll-cron` completing within budget.
+- Open the deployed URL, confirm all four pages render with data once the
+  feed has a few entries.
+- Note the actual full-sweep wall-clock time once real TW catch player
+  counts are known — this validates or invalidates the `perRun`/cadence
+  choices in `netlify/functions/_catch-constants.js`.
+
+## 5. Link back from the main site
+
+Once the URL is live, add it to the main site's `js/resources-data.js`
+`OSU_RESOURCES` array (see that file's own comment for the pattern) and add
+the matching `resource_catchtracker_desc` i18n key to the 8 hand-edited
+locale files under `js/i18n/`.

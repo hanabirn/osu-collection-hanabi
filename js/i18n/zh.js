@@ -382,6 +382,7 @@ I18N.zh = {
     resource_group_find: '找圖工具', resource_group_stats: '成績與數據', resource_group_make: '皮膚與製圖',
     resource_osusearch_desc: '進階圖譜搜尋引擎，可依星數、BPM、長度等條件篩選', resource_osupps_desc: '另一個 farm 圖追蹤網站，可以互相比較',
     resource_maniatracker_desc: 'osu!mania 排名、分數追蹤與段位（dan）估算',
+    resource_catchtracker_desc: '台灣 osu!catch 排名、即時分數追蹤與圖譜統計',
     resource_osutrack_desc: '長期數據追蹤 —— pp、排名、準度隨時間的折線圖',
     resource_osudaily_desc: 'rank 與 pp 互相換算，以及各模式的長期排名歷史',
     resource_osekai_desc: '成就（medal）解法與另類排名（badge、ranked 圖數等）',

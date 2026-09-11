@@ -558,6 +558,7 @@ I18N.en = {
     resource_group_find: 'Finding maps', resource_group_stats: 'Stats & tracking', resource_group_make: 'Skins & mapping',
     resource_osusearch_desc: 'Advanced beatmap search by star rating, BPM, length, and more', resource_osupps_desc: 'Another farm-map tracker — a good point of comparison',
     resource_maniatracker_desc: 'osu!mania rankings, score tracking and a dan-level estimator',
+    resource_catchtracker_desc: 'Taiwan osu!catch rankings, a live score feed, and per-map stats',
     resource_osutrack_desc: 'Long-term stat history — pp, rank and accuracy graphed over time',
     resource_osudaily_desc: 'Rank ↔ pp lookups and long-term rank history for every mode',
     resource_osekai_desc: 'Medal solutions and alternative rankings (badges, ranked maps, and more)',

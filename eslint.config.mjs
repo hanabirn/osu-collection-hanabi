@@ -21,6 +21,7 @@ export default [
             '**/node_modules/**',
             'js/i18n/zh-Hans.js', // generated at build time
             'mp-bot/**', // standalone sub-project, own tooling
+            'catch-tracker/**', // standalone sub-project, own tooling
         ],
     },
 

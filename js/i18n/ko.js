@@ -421,6 +421,7 @@ I18N.ko = {
     resource_group_find: '맵 찾기', resource_group_stats: '성적 · 통계', resource_group_make: '스킨 · 매핑',
     resource_osusearch_desc: '별점, BPM, 길이 등으로 필터링하는 고급 비트맵 검색 엔진', resource_osupps_desc: '또 다른 farm 맵 트래커, 비교하기 좋음',
     resource_maniatracker_desc: 'osu!mania 랭킹, 점수 추적, 단(dan) 레벨 추정',
+    resource_catchtracker_desc: '대만 osu!catch 랭킹, 실시간 점수 피드, 맵별 통계',
     resource_osutrack_desc: '장기 스탯 기록 — pp, 랭크, 정확도를 시간별 그래프로',
     resource_osudaily_desc: '랭크 ↔ pp 변환과 모든 모드의 장기 랭크 기록',
     resource_osekai_desc: '메달 획득법과 대체 랭킹 (배지, ranked 맵 수 등)',

@@ -421,6 +421,7 @@ I18N.ru = {
     resource_group_find: 'Поиск карт', resource_group_stats: 'Статистика и отслеживание', resource_group_make: 'Скины и маппинг',
     resource_osusearch_desc: 'Продвинутый поиск карт по звёздам, BPM, длине и т.д.', resource_osupps_desc: 'Ещё один трекер farm-карт — удобно для сравнения',
     resource_maniatracker_desc: 'Рейтинги osu!mania, отслеживание скоров и оценка дана',
+    resource_catchtracker_desc: 'Тайваньские рейтинги osu!catch, живая лента очков и статистика по картам',
     resource_osutrack_desc: 'Долгосрочная история статистики — графики pp, ранга и точности',
     resource_osudaily_desc: 'Перевод ранг ↔ pp и долгосрочная история ранга для всех режимов',
     resource_osekai_desc: 'Способы получения медалей и альтернативные рейтинги (значки, ranked-карты и др.)',

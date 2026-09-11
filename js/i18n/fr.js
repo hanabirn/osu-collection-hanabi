@@ -421,6 +421,7 @@ I18N.fr = {
     resource_group_find: 'Trouver des maps', resource_group_stats: 'Stats et suivi', resource_group_make: 'Skins et mapping',
     resource_osusearch_desc: 'Recherche avancée de beatmaps par étoiles, BPM, durée, etc.', resource_osupps_desc: 'Un autre tracker de farm maps — utile pour comparer',
     resource_maniatracker_desc: 'Classements osu!mania, suivi des scores et un estimateur de niveau dan',
+    resource_catchtracker_desc: 'Classements osu!catch de Taïwan, flux de scores en direct et statistiques par carte',
     resource_osutrack_desc: 'Historique des stats sur le long terme — pp, rang et précision en graphiques',
     resource_osudaily_desc: 'Conversion rang ↔ pp et historique de rang sur le long terme, tous modes',
     resource_osekai_desc: 'Solutions de médailles et classements alternatifs (badges, maps ranked, etc.)',

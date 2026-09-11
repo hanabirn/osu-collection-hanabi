@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catch Tracker — Live Feed</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="brand">Catch <span>Tracker</span></div>
+    <nav>
+        <a href="index.html">Rankings</a>
+        <a href="feed.html" class="active">Live Feed</a>
+    </nav>
+</header>
+<main>
+    <h1>Live Score Feed</h1>
+    <p class="coverage-note" id="coverage-note">Loading…</p>
+    <div class="filters">
+        <select id="filter-grade">
+            <option value="">Any grade</option>
+            <option value="XH">XH</option><option value="X">X</option>
+            <option value="SH">SH</option><option value="S">S</option>
+            <option value="A">A</option><option value="B">B</option>
+            <option value="C">C</option><option value="D">D</option>
+            <option value="F">F (fail)</option>
+        </select>
+        <label><input type="checkbox" id="filter-fc"> FC only</label>
+        <label><input type="checkbox" id="filter-choke"> Choke/fail only</label>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Player</th><th>Map</th><th>Mods</th><th>Grade</th><th>Acc</th><th>pp</th><th>When</th></tr>
+        </thead>
+        <tbody id="feed-body"></tbody>
+    </table>
+    <div class="pagination">
+        <button id="prev-page">← Prev</button>
+        <span id="page-label"></span>
+        <button id="next-page">Next →</button>
+    </div>
+</main>
+<footer class="site-footer">Auto-refreshes every 45s. Catch Tracker — a companion site for osu-collection-hanabi.</footer>
+<script src="js/common.js"></script>
+<script src="js/api.js"></script>
+<script src="js/render-feed.js"></script>
+</body>
+</html>

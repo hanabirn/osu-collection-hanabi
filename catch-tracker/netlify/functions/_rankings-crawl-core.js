@@ -1,0 +1,175 @@
+/* Shared rankings-sweep logic for the Catch Tracker, used by both the
+   scheduled cron handler (rankings-crawl-cron.js) and the manual/backfill
+   HTTP endpoint (rankings-crawl-run.js). Modeled directly on the main
+   site's _farm-crawl-core.js (discover/write/rollback shape), but much
+   simpler: no compute phase, just a straight page-walk over
+   GET /rankings/fruits/performance?country=TW.
+
+   osu! API v2's RankingController (app/Http/Controllers/RankingController.php
+   in ppy/osu-web) accepts a plain `page` query param for pagination (it also
+   accepts `cursor[page]`, but plain `page` is simpler and equally valid —
+   confirmed by reading that controller's source directly) and returns
+   { ranking: [...], total, cursor }. An empty `ranking` array means the
+   sweep has reached the end of the TW pool.
+
+   State lives in the rankings Blobs store:
+     - `rankings-crawl-state` (plain JSON): { cursorPage, totalKnown,
+       sweepCount, lastRunAt, lastOkAt, lastError, consecutiveWriteFails }
+     - `rankings:TW` (gzip array): one record per TW-ranked catch player,
+       upserted by user_id — never shrinks reactively (a player who drops
+       off the live TW rankings stays in the dataset/pollable until we
+       explicitly decide to prune, which v1 doesn't do).
+     - `players:index` (plain JSON): the score-poller's round-robin queue,
+       rebuilt from rankings:TW whenever a full sweep completes.
+
+   Like Farm, the cursor wraps to page 1 on exhaustion instead of stopping —
+   this is a perpetual refresh, not a one-time backfill, so newly-ranked TW
+   players get picked up automatically over time.
+
+   NOTE: the exact field names on a ranking entry's nested `user` object
+   (avatar_url, country_code vs country.code, cover.url, etc.) are written
+   defensively here (optional chaining + fallbacks) since they weren't
+   confirmed against a live API response during implementation — verify
+   against the first real crawl-run response and adjust if any field comes
+   back null across the board. */
+const { getOsuToken } = require('./_osu-auth');
+const { getRankingsStore } = require('./_blobs-store');
+const { setJSONGz, getJSONGz } = require('./_blob-json');
+const { MODE, COUNTRY } = require('./_catch-constants');
+
+const STATE_KEY = 'rankings-crawl-state';
+const RANKINGS_KEY = 'rankings:TW';
+const PLAYERS_INDEX_KEY = 'players:index';
+
+// Reserve this much of the budget for the (small, but still gzip+upload)
+// dataset write, same rationale as Farm's WRITE_RESERVE_MS.
+const WRITE_RESERVE_MS = 5000;
+
+async function loadState(store) {
+    const state = await store.get(STATE_KEY, { type: 'json' });
+    return state || {
+        cursorPage: 1,
+        totalKnown: null,
+        sweepCount: 0,
+        lastRunAt: null,
+        lastOkAt: null,
+        lastError: null,
+        consecutiveWriteFails: 0,
+    };
+}
+
+function toRecord(entry) {
+    const u = entry.user || {};
+    return {
+        user_id: u.id,
+        username: u.username || null,
+        country_code: u.country_code || (u.country && u.country.code) || COUNTRY,
+        avatar_url: u.avatar_url || null,
+        cover_url: (u.cover && u.cover.url) || null,
+        global_rank: entry.global_rank ?? null,
+        country_rank: entry.country_rank ?? null,
+        pp: entry.pp ?? null,
+        accuracy: entry.hit_accuracy ?? null,
+        play_count: entry.play_count ?? null,
+        level: (entry.level && entry.level.current) ?? null,
+        is_online: !!u.is_online,
+        last_visit: u.last_visit || null,
+        updatedAt: new Date().toISOString(),
+    };
+}
+
+async function runRankingsCrawl(budgetMs) {
+    const start = Date.now();
+    const store = getRankingsStore();
+    const state = await loadState(store);
+    const snapshot = JSON.parse(JSON.stringify(state));
+    const dataset = (await getJSONGz(store, RANKINGS_KEY)) || [];
+    const index = new Map(dataset.map((r, i) => [r.user_id, i]));
+
+    const writeReserve = Math.min(WRITE_RESERVE_MS, Math.floor(budgetMs * 0.4));
+    const deadline = start + (budgetMs - writeReserve);
+
+    let pagesFetched = 0, sweepCompleted = false, error = null;
+    try {
+        const token = await getOsuToken();
+        while (Date.now() < deadline) {
+            const page = state.cursorPage || 1;
+            const res = await fetch(
+                `https://osu.ppy.sh/api/v2/rankings/${MODE}/performance?country=${COUNTRY}&page=${page}`,
+                { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
+            );
+            if (!res.ok) throw new Error(`rankings fetch failed: ${res.status}`);
+            const data = await res.json();
+            const ranking = data.ranking || [];
+            pagesFetched++;
+            if (typeof data.total === 'number') state.totalKnown = data.total;
+
+            if (ranking.length === 0) {
+                state.cursorPage = 1;
+                state.sweepCount = (state.sweepCount || 0) + 1;
+                sweepCompleted = true;
+                break;
+            }
+
+            for (const entry of ranking) {
+                const record = toRecord(entry);
+                if (record.user_id == null) continue;
+                const idx = index.get(record.user_id);
+                if (idx === undefined) {
+                    dataset.push(record);
+                    index.set(record.user_id, dataset.length - 1);
+                } else {
+                    dataset[idx] = record;
+                }
+            }
+            state.cursorPage = page + 1;
+        }
+    } catch (err) {
+        error = err.message;
+    }
+
+    const now = new Date().toISOString();
+    let writeOk = true;
+    try {
+        await setJSONGz(store, RANKINGS_KEY, dataset);
+    } catch (err) {
+        writeOk = false;
+        error = `rankings write failed: ${err.message}`;
+    }
+
+    if (writeOk) {
+        if (sweepCompleted) {
+            // Rebuild the poll queue from the fresh dataset, preserving each
+            // player's lastPolledAt so the score-poller's round-robin cursor
+            // position stays meaningful across a rankings refresh.
+            try {
+                const existingIndex = (await store.get(PLAYERS_INDEX_KEY, { type: 'json' })) || [];
+                const lastPolled = new Map(existingIndex.map(p => [p.user_id, p.lastPolledAt]));
+                const playersIndex = dataset.map(r => ({
+                    user_id: r.user_id,
+                    username: r.username,
+                    lastPolledAt: lastPolled.get(r.user_id) || null,
+                }));
+                await store.setJSON(PLAYERS_INDEX_KEY, playersIndex);
+            } catch (err) {
+                error = error || `players:index rebuild failed: ${err.message}`;
+            }
+        }
+        state.lastRunAt = now;
+        state.lastOkAt = now;
+        state.lastError = error;
+        state.consecutiveWriteFails = 0;
+        await store.setJSON(STATE_KEY, state);
+    } else {
+        await store.setJSON(STATE_KEY, {
+            ...snapshot,
+            lastRunAt: now,
+            lastError: error,
+            consecutiveWriteFails: (snapshot.consecutiveWriteFails || 0) + 1,
+        });
+    }
+
+    return { pagesFetched, sweepCompleted, datasetSize: dataset.length, writeOk, error };
+}
+
+module.exports = { runRankingsCrawl };

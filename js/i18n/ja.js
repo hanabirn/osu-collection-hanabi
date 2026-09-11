@@ -421,6 +421,7 @@ I18N.ja = {
     resource_group_find: '譜面探し', resource_group_stats: 'スコア・統計', resource_group_make: 'スキン・作譜',
     resource_osusearch_desc: '☆数、BPM、長さなどで絞り込める高度な譜面検索エンジン', resource_osupps_desc: '別の farm 譜面トラッカー、比較に便利',
     resource_maniatracker_desc: 'osu!mania のランキング・スコア追跡・段位（dan）推定',
+    resource_catchtracker_desc: '台湾の osu!catch ランキング・ライブスコアフィード・譜面別統計',
     resource_osutrack_desc: '長期的なステータス推移 —— pp・ランク・精度の時系列グラフ',
     resource_osudaily_desc: 'ランクと pp の相互換算、各モードの長期ランク履歴',
     resource_osekai_desc: 'メダルの取得方法と代替ランキング（バッジ数・ranked 譜面数など）',

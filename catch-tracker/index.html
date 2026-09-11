@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catch Tracker — TW osu!catch Rankings</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="brand">Catch <span>Tracker</span></div>
+    <nav>
+        <a href="index.html" class="active">Rankings</a>
+        <a href="feed.html">Live Feed</a>
+    </nav>
+</header>
+<main>
+    <h1>🇹🇼 osu!catch Rankings</h1>
+    <p class="coverage-note" id="coverage-note">Loading…</p>
+    <table>
+        <thead>
+            <tr><th>#</th><th>Player</th><th>pp</th><th>Accuracy</th><th>Play Count</th></tr>
+        </thead>
+        <tbody id="rankings-body"></tbody>
+    </table>
+    <div class="pagination">
+        <button id="prev-page">← Prev</button>
+        <span id="page-label"></span>
+        <button id="next-page">Next →</button>
+    </div>
+</main>
+<footer class="site-footer">Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.</footer>
+<script src="js/common.js"></script>
+<script src="js/api.js"></script>
+<script src="js/render-rankings.js"></script>
+</body>
+</html>

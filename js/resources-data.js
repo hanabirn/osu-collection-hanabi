@@ -15,6 +15,7 @@ const OSU_RESOURCES = [
     { url: 'https://osustats.ppy.sh', name: 'osu!Stats', descKey: 'resource_osustats_desc', group: 'stats' },
     { url: 'https://osekai.net', name: 'Osekai', descKey: 'resource_osekai_desc', group: 'stats' },
     { url: 'https://mania-tracker.com', name: 'Mania Tracker', descKey: 'resource_maniatracker_desc', group: 'stats' },
+    { url: 'https://catch-tracker-hanabi.netlify.app', name: 'Catch Tracker', descKey: 'resource_catchtracker_desc', group: 'stats' },
     { url: 'http://osuskills.com', name: 'osu!Skills', descKey: 'resource_osuskills_desc', group: 'stats' },
     { url: 'https://osuskinner.com', name: 'osuskinner', descKey: 'resource_osuskinner_desc', group: 'make' },
     { url: 'https://mappersguild.com', name: "Mappers' Guild", descKey: 'resource_mappersguild_desc', group: 'make' },
