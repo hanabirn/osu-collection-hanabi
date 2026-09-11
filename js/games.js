@@ -55,6 +55,59 @@ function gamesOpenView() {
     return v;
 }
 
+/* The play-preview + add-to-collection pair pinned to a game's beatmap
+   banner (Higher or Lower cards, Genre-quiz card). playOsuPreview lives in
+   js/osu.js (loaded first) and stopPropagation()s itself. */
+function gamesCardBtns(setId) {
+    if (!setId) return '';
+    return `<div class="games-card-btns">
+        <button class="games-card-btn" onclick="playOsuPreview(${setId}, event)" aria-label="${escHtml(t('mappools_preview'))}" title="${escHtml(t('mappools_preview'))}">${icon('play', { filled: true, size: '0.8em' })}</button>
+        <button class="games-card-btn" onclick="event.stopPropagation();gamesSaveSet(${setId})" aria-label="${escHtml(t('games_save_btn'))}" title="${escHtml(t('games_save_btn'))}">${icon('plus', { size: '0.9em' })}</button>
+    </div>`;
+}
+
+/* ---- shared mini-game leaderboard (games-leaderboard.js) ---- */
+async function gamesFetchBoard(game) {
+    try {
+        const r = await fetch(`/.netlify/functions/games-leaderboard?game=${game}`);
+        const d = await r.json();
+        return r.ok ? (d.entries || []) : [];
+    } catch { return []; }
+}
+async function gamesSubmitScore(game, score) {
+    const tok = typeof getOsuAuthToken === 'function' && getOsuAuthToken();
+    if (!tok || !score) return null;
+    try {
+        const r = await fetch(`/.netlify/functions/games-leaderboard?game=${game}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
+            body: JSON.stringify({ score }),
+        });
+        const d = await r.json();
+        return r.ok ? (d.entries || null) : null;
+    } catch { return null; }
+}
+function gamesBoardHtml(entries) {
+    const me = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
+    const myId = me && String(me.id || me);
+    let rows;
+    if (!entries || entries.length === 0) {
+        rows = `<p class="games-board-empty">${escHtml(t('games_board_empty'))}</p>`;
+    } else {
+        rows = entries.map((e, i) => `<div class="games-board-row${myId && String(e.id) === myId ? ' is-me' : ''}">
+            <span class="games-board-rank">#${i + 1}</span>
+            <span class="games-board-name">${escHtml(e.username || String(e.id))}</span>
+            <span class="games-board-score">${escHtml(Number(e.score).toLocaleString())}</span>
+        </div>`).join('');
+    }
+    const foot = (typeof getLoggedInOsuUser === 'function' && !getLoggedInOsuUser())
+        ? `<p class="games-board-login">${escHtml(t('games_board_login'))}</p>` : '';
+    return `<div class="games-board">
+        <h4>${escHtml(t('games_board_title'))}</h4>
+        ${rows}${foot}
+    </div>`;
+}
+
 /* Save one set to the collection — always via a confirm, never silent. */
 async function gamesSaveSet(setId) {
     if (!setId) return;
@@ -293,8 +346,17 @@ async function openHiloGame() {
             <p class="osu-empty">${escHtml(t('games_hilo_no_data'))}</p>`;
         return;
     }
-    gh = { deck, i: 1, streak: 0, best: ghBest(), stat: GH_STATS[Math.floor(Math.random() * GH_STATS.length)], revealed: false, over: false };
+    gh = { deck, i: 1, streak: 0, best: ghBest(), stat: GH_STATS[Math.floor(Math.random() * GH_STATS.length)], revealed: false, over: false, board: [] };
     ghRender();
+    gamesFetchBoard('hilo').then(b => { if (gh && !gh.over) { gh.board = b; ghRender(); } });
+}
+
+async function ghGameOver() {
+    if (!gh) return;
+    gh.over = true;
+    ghRender();
+    const updated = await gamesSubmitScore('hilo', gh.streak);
+    if (gh && gh.over) { gh.board = updated || (await gamesFetchBoard('hilo')); ghRender(); }
 }
 
 function ghRender() {
@@ -305,6 +367,7 @@ function ghRender() {
 
     const card = (m, showVal) => `
         <div class="gh-card" style="background-image:linear-gradient(rgba(10,8,14,.55),rgba(10,8,14,.8)),url('https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover@2x.jpg');">
+            ${gamesCardBtns(m.setId)}
             <div class="gh-card-meta">
                 <div class="gh-card-title">${escHtml(m.artist)} - ${escHtml(m.title)}</div>
                 <div class="gh-card-sub">${escHtml(m.creator ? t('mapped_by', { n: m.creator }) : '')}</div>
@@ -319,16 +382,19 @@ function ghRender() {
     let mid;
     if (gh.over) {
         mid = `<div class="gh-mid gh-over">
+            <p>❌</p>
             <p>${escHtml(t('games_hilo_over', { n: gh.streak }))}</p>
             <p class="gh-best">${escHtml(t('games_hilo_best', { n: gh.best }))}</p>
             <button onclick="openHiloGame()">${icon('rotateCw', { size: '0.9em' })} ${escHtml(t('games_hilo_again'))}</button>
         </div>`;
     } else if (gh.revealed) {
-        const lv = ghStatVal(left, gh.stat), rv = ghStatVal(right, gh.stat);
+        // Only reached on a CORRECT guess (a wrong one sets gh.over -> the
+        // game-over panel). The old code derived the tick/cross from "is the
+        // right card higher", so a correct "Lower" guess wrongly showed a
+        // cross next to a "next" button.
         mid = `<div class="gh-mid">
-            <p class="${rv >= lv ? 'gh-ok' : 'gh-no'}">${rv >= lv ? '✅' : '❌'}</p>
+            <p class="gh-ok">✅</p>
             <button onclick="ghNext()">${escHtml(t('games_hilo_next'))}</button>
-            <button class="gh-save" onclick="gamesSaveSet(${right.setId})">${icon('plus', { size: '0.85em' })} ${escHtml(t('games_save_btn'))}</button>
         </div>`;
     } else {
         mid = `<div class="gh-mid">
@@ -344,10 +410,13 @@ function ghRender() {
             <h3>${escHtml(t('games_hilo_title'))}</h3>
             <span class="gh-score">${escHtml(t('games_hilo_streak', { n: gh.streak }))} · ${escHtml(t('games_hilo_best', { n: gh.best }))}</span>
         </div>
-        <div class="gh-arena">
-            ${card(left, true)}
-            <div class="gh-vs">${mid}</div>
-            ${card(right, gh.revealed || gh.over)}
+        <div class="games-layout">
+            <div class="gh-arena">
+                ${card(left, true)}
+                <div class="gh-vs">${mid}</div>
+                ${card(right, gh.revealed || gh.over)}
+            </div>
+            ${gamesBoardHtml(gh.board)}
         </div>`;
 }
 
@@ -361,10 +430,10 @@ function ghGuess(higher) {
     if (correct) {
         gh.streak++;
         if (gh.streak > gh.best) { gh.best = gh.streak; ghSetBest(gh.best); }
+        ghRender();
     } else {
-        gh.over = true;
+        ghGameOver();
     }
-    ghRender();
 }
 
 function ghNext() {
@@ -372,7 +441,7 @@ function ghNext() {
     gh.i++;
     gh.revealed = false;
     gh.stat = GH_STATS[Math.floor(Math.random() * GH_STATS.length)];
-    if (gh.i >= gh.deck.length) { gh.over = true; } // ran out of deck — treat as a clean finish
+    if (gh.i >= gh.deck.length) { ghGameOver(); return; } // ran out of deck — treat as a clean finish
     ghRender();
 }
 
@@ -407,8 +476,9 @@ async function openQuizGame() {
     gq = {
         deck, i: 0, score: 0, best: gqBest(),
         genres: data.genres, genreName: Object.fromEntries(data.genres.map(g => [g.id, g.name])),
-        timeLeft: GQ_SECONDS, timer: null, over: false, feedback: null, locked: false,
+        timeLeft: GQ_SECONDS, timer: null, over: false, feedback: null, locked: false, board: [],
     };
+    gamesFetchBoard('quiz').then(b => { if (gq) { gq.board = b; gqRender(); } });
     gq.timer = setInterval(() => {
         if (!gq || gq.over) return;
         gq.timeLeft--;
@@ -418,12 +488,14 @@ async function openQuizGame() {
     gqRender();
 }
 
-function gqEnd() {
+async function gqEnd() {
     if (!gq) return;
     if (gq.timer) { clearInterval(gq.timer); gq.timer = null; }
     gq.over = true;
     if (gq.score > gq.best) { gq.best = gq.score; gqSetBest(gq.best); }
     gqRender();
+    const updated = await gamesSubmitScore('quiz', gq.score);
+    if (gq && gq.over) { gq.board = updated || (await gamesFetchBoard('quiz')); gqRender(); }
 }
 
 function gqRender() {
@@ -434,10 +506,13 @@ function gqRender() {
         v.innerHTML = `
             <button class="cmpool-back" onclick="gamesBackToHub()">${icon('arrowLeft')} ${escHtml(t('games_back'))}</button>
             <div class="gh-head"><h3>${escHtml(t('games_quiz_title'))}</h3></div>
-            <div class="gq-over">
-                <p>${escHtml(t('games_quiz_over', { n: gq.score }))}</p>
-                <p class="gh-best">${escHtml(t('games_quiz_best', { n: gq.best }))}</p>
-                <button onclick="openQuizGame()">${icon('rotateCw', { size: '0.9em' })} ${escHtml(t('games_quiz_again'))}</button>
+            <div class="games-layout">
+                <div class="gq-over">
+                    <p>${escHtml(t('games_quiz_over', { n: gq.score }))}</p>
+                    <p class="gh-best">${escHtml(t('games_quiz_best', { n: gq.best }))}</p>
+                    <button onclick="openQuizGame()">${icon('rotateCw', { size: '0.9em' })} ${escHtml(t('games_quiz_again'))}</button>
+                </div>
+                ${gamesBoardHtml(gq.board)}
             </div>`;
         return;
     }
@@ -456,12 +531,18 @@ function gqRender() {
             <h3>${escHtml(t('games_quiz_title'))}</h3>
             <span class="gh-score"><span id="gq-time">${escHtml(t('games_quiz_time', { n: gq.timeLeft }))}</span> · ${escHtml(t('games_quiz_score', { n: gq.score }))}</span>
         </div>
-        <div class="gq-card" style="background-image:linear-gradient(rgba(10,8,14,.5),rgba(10,8,14,.82)),url('https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover@2x.jpg');">
-            <div class="gq-card-t">${escHtml(m.artist)} - ${escHtml(m.title)}</div>
-        </div>
-        <p class="gd-prompt">${escHtml(t('games_quiz_prompt'))}</p>
-        <div class="gq-opts">${btns}</div>
-        ${fb}`;
+        <div class="games-layout">
+            <div class="games-layout-main">
+                <div class="gq-card" style="background-image:linear-gradient(rgba(10,8,14,.5),rgba(10,8,14,.82)),url('https://assets.ppy.sh/beatmaps/${m.setId}/covers/cover@2x.jpg');">
+                    ${gamesCardBtns(m.setId)}
+                    <div class="gq-card-t">${escHtml(m.artist)} - ${escHtml(m.title)}</div>
+                </div>
+                <p class="gd-prompt">${escHtml(t('games_quiz_prompt'))}</p>
+                <div class="gq-opts">${btns}</div>
+                ${fb}
+            </div>
+            ${gamesBoardHtml(gq.board)}
+        </div>`;
 }
 
 function gqAnswer(genreId) {

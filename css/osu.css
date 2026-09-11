@@ -2146,6 +2146,44 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .gq-feedback { max-width: 480px; margin-top: 10px; font-size: 0.88rem; }
 .gq-feedback.is-ok { color: #34d399; }
 .gq-feedback.is-no { color: #ff7676; }
+
+/* Higher-or-Lower / Genre-quiz: preview + save buttons pinned to the
+   beatmap banner, and a shared streak/score leaderboard beside the arena. */
+.gq-card { position: relative; }
+.games-card-btns { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; z-index: 2; }
+.games-card-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer;
+    background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.85);
+    transition: background 0.15s, transform 0.15s;
+}
+.games-card-btn:hover { background: rgba(var(--pink-rgb), 0.6); color: #fff; transform: scale(1.1); }
+
+.games-layout { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.games-layout > .gh-arena,
+.games-layout > .games-layout-main,
+.games-layout > .gq-over { flex: 1 1 320px; min-width: 0; }
+.games-layout-main { max-width: 480px; }
+
+.games-board {
+    flex: 0 1 240px; align-self: stretch;
+    border: 1px solid var(--border-card); border-radius: 12px;
+    background: var(--bg-stat); padding: 10px 12px;
+}
+.games-board h4 { margin: 0 0 8px; font-size: 0.85rem; color: var(--text); }
+.games-board-row {
+    display: grid; grid-template-columns: 2rem 1fr auto; gap: 6px; align-items: baseline;
+    padding: 4px 6px; border-radius: 7px; font-size: 0.82rem;
+}
+.games-board-row.is-me { background: rgba(var(--pink-rgb), 0.14); }
+.games-board-rank { color: var(--text-dim2); font-variant-numeric: tabular-nums; }
+.games-board-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.games-board-score { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.games-board-empty, .games-board-login { font-size: 0.78rem; color: var(--text-dim); margin: 6px 2px 0; }
+@media (max-width: 560px) {
+    .games-board { flex-basis: 100%; }
+}
 .gq-over { max-width: 480px; margin-top: 14px; padding: 16px; border-radius: 12px; border: 1px solid var(--border-card); text-align: center; }
 .gq-over p { margin: 0 0 6px; }
 .gq-over button { border: 1px solid var(--border-card); background: transparent; color: var(--text); font: inherit; padding: 7px 14px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
