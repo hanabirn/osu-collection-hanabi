@@ -945,7 +945,7 @@ footer.site-footer {
     margin-top: 12px;
     flex-wrap: wrap;
 }
-.replay-skin-row .coverage-note { margin: 0; }
+.replay-skin-status { font-size: 0.8rem; color: var(--text-dim); }
 
 /* ---------- BBCode editor ---------- */
 

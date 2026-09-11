@@ -273,7 +273,19 @@ class ReplayPlayer {
                 }
             }, { once: true });
             this.audio.addEventListener('error', () => { this.audioReady = false; });
-            this.audio.addEventListener('ended', () => { this.playing = false; });
+            // The audio mirror sometimes only has a ~10s PREVIEW cached
+            // for a given beatmapset rather than the full track (falls
+            // back silently server-side) — if the track ends well before
+            // the map itself does, hand playback back to the manual clock
+            // instead of stopping the visual replay early.
+            this.audio.addEventListener('ended', () => {
+                if (this.mapTime < this.maxTime - 250) {
+                    this.audioReady = false;
+                    this.lastWall = performance.now();
+                } else {
+                    this.playing = false;
+                }
+            });
         }
     }
 
@@ -422,7 +434,7 @@ function playerHtml() {
                 <label class="pill" for="replay-skin-input" style="cursor:pointer">${escapeHtml(t('replay_use_skin'))}</label>
                 <input type="file" id="replay-skin-input" accept=".osk" hidden>
                 <button type="button" id="replay-skin-clear" class="pill" hidden>${escapeHtml(t('replay_clear_skin'))}</button>
-                <span id="replay-skin-status" class="coverage-note"></span>
+                <span id="replay-skin-status" class="replay-skin-status"></span>
             </div>
             <p class="coverage-note" style="margin-top:10px">
                 這是依據回放資料與圖譜物件重建的簡化動畫，非官方畫面；接到/落空僅為視覺估算，非官方判定。
@@ -504,8 +516,14 @@ async function run() {
 
         // Full song audio is best-effort only — a missing beatmapset_id
         // (older links) or a failed load must never block the visual
-        // replay, so no error is surfaced to the user either way.
-        if (beatmapsetId) audioEl.src = AUDIO_URL(beatmapsetId);
+        // replay, so no error is surfaced to the user either way. Setting
+        // .src on a <audio> that was just injected via innerHTML doesn't
+        // reliably auto-start loading in every browser — call load()
+        // explicitly rather than relying on preload="auto" alone.
+        if (beatmapsetId) {
+            audioEl.src = AUDIO_URL(beatmapsetId);
+            audioEl.load();
+        }
 
         const player = new ReplayPlayer(canvas, items, frames, {
             clockRate: clockRateForMods(mods),
