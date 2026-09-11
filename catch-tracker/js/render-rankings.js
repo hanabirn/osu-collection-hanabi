@@ -1,5 +1,15 @@
 let _page = 0;
 
+async function loadHighlights() {
+    const strip = document.getElementById('highlight-strip');
+    try {
+        const data = await apiGet('feed-list', { sort: 'pp', limit: 3 });
+        strip.innerHTML = data.items.map(highlightCard).join('') || `<p class="empty-state">${t('no_data')}</p>`;
+    } catch {
+        strip.hidden = true;
+    }
+}
+
 async function loadRankings() {
     const body = document.getElementById('rankings-body');
     const note = document.getElementById('coverage-note');
@@ -34,3 +44,4 @@ document.getElementById('prev-page').addEventListener('click', () => { if (_page
 document.getElementById('next-page').addEventListener('click', () => { _page++; loadRankings(); });
 
 loadRankings();
+loadHighlights();

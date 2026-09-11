@@ -60,6 +60,17 @@ const LANG_STRINGS = {
         footer_main: 'Catch Tracker — osu-collection-hanabi 的姊妹站。資料來自官方 osu! API。',
 
         rel_sec: '{n} 秒前', rel_min: '{n} 分鐘前', rel_hr: '{n} 小時前', rel_day: '{n} 天前',
+
+        search_placeholder: '搜尋玩家…',
+        search_no_results: '沒有符合的玩家',
+        highlight_best_plays: '近期最佳成績',
+        stat_joined: '註冊於 {date}',
+        stat_playtime: '遊玩時長 {h} 小時',
+        grade_tally: '評級累計',
+        most_used_mod: '常用 Mod',
+        newest_best: '最新的最佳成績',
+        oldest_best: '最舊的最佳成績',
+        view_all: '查看全部 →',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -106,6 +117,17 @@ const LANG_STRINGS = {
         footer_main: 'Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.',
 
         rel_sec: '{n}s ago', rel_min: '{n}m ago', rel_hr: '{n}h ago', rel_day: '{n}d ago',
+
+        search_placeholder: 'Search players…',
+        search_no_results: 'No matching players',
+        highlight_best_plays: 'Recent Best Plays',
+        stat_joined: 'Joined {date}',
+        stat_playtime: '{h}h play time',
+        grade_tally: 'Grade Tally',
+        most_used_mod: 'Most-used Mod',
+        newest_best: 'Newest Best Play',
+        oldest_best: 'Oldest Best Play',
+        view_all: 'View all →',
     },
 };
 
@@ -204,3 +226,103 @@ function playerLink(userId, username) {
 function mapLink(beatmapId, label) {
     return `<a class="map-link" href="map.html?id=${encodeURIComponent(beatmapId)}">${escapeHtml(label)}</a>`;
 }
+
+// osu!'s stable beatmapset-cover CDN pattern — no extra API call needed,
+// every feed/score record already carries beatmapset_id.
+function coverArtUrl(beatmapsetId) {
+    return beatmapsetId ? `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/cover.jpg` : '';
+}
+
+function highlightCard(s) {
+    const cover = coverArtUrl(s.beatmapset_id);
+    const style = cover ? ` style="background-image:url('${cover.replace(/'/g, '%27')}')"` : '';
+    return `<a class="highlight-card" href="map.html?id=${encodeURIComponent(s.beatmap_id)}"${style}>
+        <div class="highlight-pp">${fmtPP(s.pp)}</div>
+        <div class="highlight-player">${escapeHtml(s.username || '')}</div>
+        <div class="highlight-map">${escapeHtml(s.title || '')} [${escapeHtml(s.version || '')}]</div>
+        <div class="highlight-when">${relTime(s.created_at)}</div>
+    </a>`;
+}
+
+/* ---------- header player search (every page) ---------- */
+
+/* Injected into the header rather than hand-added to all 4 HTML files —
+   searches the already-cached rankings:TW dataset server-side
+   (rankings-list.js's `q` param), so this needs no new dataset of its own. */
+function initPlayerSearch() {
+    const toggle = document.getElementById('lang-toggle');
+    if (!toggle || !toggle.parentElement) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'search-wrap';
+    wrap.innerHTML = `
+        <input type="text" id="player-search-input" class="search-input" placeholder="${escapeHtml(t('search_placeholder'))}" autocomplete="off">
+        <div class="search-results" id="player-search-results" hidden></div>
+    `;
+    toggle.parentElement.insertBefore(wrap, toggle);
+
+    const input = wrap.querySelector('#player-search-input');
+    const results = wrap.querySelector('#player-search-results');
+    let debounceTimer = null;
+
+    async function runSearch(q) {
+        try {
+            const data = await apiGet('rankings-list', { q, limit: 8 });
+            if (!data.items.length) {
+                results.innerHTML = `<div class="search-empty">${escapeHtml(t('search_no_results'))}</div>`;
+            } else {
+                results.innerHTML = data.items.map(r => `
+                    <a class="search-result-row" href="player.html?id=${encodeURIComponent(r.user_id)}">
+                        <img class="avatar" src="${escapeHtml(r.avatar_url || '')}" alt="">
+                        <span>${escapeHtml(r.username)}</span>
+                        <span class="search-result-pp">${fmtPP(r.pp)}</span>
+                    </a>`).join('');
+            }
+            results.hidden = false;
+        } catch {
+            results.hidden = true;
+        }
+    }
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const q = input.value.trim();
+        if (!q) { results.hidden = true; return; }
+        debounceTimer = setTimeout(() => runSearch(q), 250);
+    });
+    input.addEventListener('focus', () => { if (input.value.trim() && results.innerHTML) results.hidden = false; });
+    document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) results.hidden = true; });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Escape') { results.hidden = true; input.blur(); } });
+}
+
+/* ---------- decorative background: falling bananas ----------
+   osu!catch's default skin uses a banana for the spinner — a light,
+   purely decorative nod to that. Desktop-only and skipped under
+   prefers-reduced-motion, matching the main site's own restraint around
+   background animation (it stripped a heavier particle effect for mobile
+   thermal reasons — see project memory). transform-only keyframe (no
+   layout properties), a handful of elements, no blur/shadow. */
+function initBananaRain() {
+    if (window.matchMedia('(max-width: 700px)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const container = document.createElement('div');
+    container.className = 'banana-rain';
+    container.setAttribute('aria-hidden', 'true');
+    const COUNT = 7;
+    for (let i = 0; i < COUNT; i++) {
+        const span = document.createElement('span');
+        span.textContent = '🍌';
+        span.style.left = `${(i / COUNT) * 100 + Math.random() * (100 / COUNT) * 0.6}%`;
+        span.style.fontSize = `${16 + Math.random() * 14}px`;
+        span.style.opacity = (0.14 + Math.random() * 0.18).toFixed(2);
+        span.style.animationDuration = `${16 + Math.random() * 12}s`;
+        span.style.animationDelay = `${-Math.random() * 25}s`;
+        container.appendChild(span);
+    }
+    document.body.prepend(container);
+}
+initBananaRain();
+// common.js is loaded at the end of <body>, after the header markup, so the
+// DOM is already parsed — no need to wait for DOMContentLoaded here.
+initPlayerSearch();

@@ -30,12 +30,17 @@ exports.handler = async (event) => {
     const qs = event.queryStringParameters || {};
     const page = Math.max(0, parseInt(qs.page, 10) || 0);
     const pageSize = Math.max(1, Math.min(100, parseInt(qs.limit, 10) || PAGE_SIZE));
+    // Username search (header search widget) — substring match over the
+    // full cached dataset, bypassing normal pagination since a search is
+    // expected to return a short list, not a page-by-page browse.
+    const q = (qs.q || '').trim().toLowerCase().slice(0, 50);
 
     try {
         const store = getRankingsStore();
         const rankings = await loadRankings(store);
 
-        const sorted = [...rankings].sort((a, b) => (b.pp || 0) - (a.pp || 0));
+        let sorted = [...rankings].sort((a, b) => (b.pp || 0) - (a.pp || 0));
+        if (q) sorted = sorted.filter(r => (r.username || '').toLowerCase().includes(q));
         const total = sorted.length;
         const pageItems = sorted.slice(page * pageSize, (page + 1) * pageSize);
 

@@ -1,26 +1,27 @@
-/* Single-player profile: combines the cached rankings:TW record (avatar,
-   rank, pp, accuracy) with a filtered slice of feed:recent (recent plays
-   this tracker has already seen) and a LIVE, uncached call to
-   GET /users/{id}/scores/best?mode=fruits&limit=100 for "best plays" — best
-   lists change rarely enough per player that a second cache/de-dup layer
-   isn't worth it for v1 (see catch-tracker's implementation plan). If the
-   player isn't in the cached rankings (e.g. queried by id directly, not yet
-   swept), falls back to a live GET /users/{id}/fruits call for basic
-   profile info instead of failing outright. */
+/* Single-player profile: combines the cached rankings:TW record (rank/pp
+   maintained by our own crawler) with a LIVE call to GET /users/{id}/fruits
+   for fields we don't crawl ourselves (join_date, play_time, career
+   grade_counts) and a LIVE call to GET /users/{id}/scores/best for "best
+   plays" — these live calls aren't cached; a single profile-page view is
+   cheap enough that a second cache/de-dup layer isn't worth it for v1 (see
+   catch-tracker's implementation plan). If the player isn't in the cached
+   rankings (e.g. queried by id directly, not yet swept), the live /fruits
+   call also backfills the rank/pp/accuracy fields instead of failing
+   outright. mostUsedMod is derived here from bestPlays so the client
+   doesn't need to re-implement the tally. */
 const { getOsuToken } = require('./_osu-auth');
 const { getFeedStore, getRankingsStore } = require('./_blobs-store');
 const { getJSONGz } = require('./_blob-json');
 const { MODE } = require('./_catch-constants');
 
-// The live /scores/best response is shaped like a raw osu! API v2 Score
-// object (nested beatmap/beatmapset, mods possibly as {acronym} objects) —
-// normalize it to the same flat shape feed:recent records use, so
-// render-player.js can render both lists with one function.
 function isFC(s) {
     if (s.perfect === true || s.perfect === 1) return true;
     const st = s.statistics || {};
     const miss = st.count_miss ?? st.miss ?? null;
     return miss === 0;
+}
+function modAcronyms(mods) {
+    return Array.isArray(mods) ? mods.map(m => (typeof m === 'string' ? m : m.acronym)) : [];
 }
 function normalizeScore(score) {
     const bm = score.beatmap || {};
@@ -34,7 +35,8 @@ function normalizeScore(score) {
         version: bm.version || null,
         creator: bms.creator || null,
         difficulty_rating: bm.difficulty_rating ?? null,
-        mods: Array.isArray(score.mods) ? score.mods.map(m => (typeof m === 'string' ? m : m.acronym)) : [],
+        bpm: bm.bpm ?? null,
+        mods: modAcronyms(score.mods),
         rank: score.rank || null,
         accuracy: score.accuracy ?? null,
         max_combo: score.max_combo ?? null,
@@ -43,6 +45,19 @@ function normalizeScore(score) {
         passed: score.passed !== false,
         created_at: score.created_at || null,
     };
+}
+
+function mostUsedMod(bestPlays) {
+    const counts = new Map();
+    for (const s of bestPlays) {
+        const key = s.mods.length ? s.mods.slice().sort().join('') : 'NM';
+        counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    let best = null, bestCount = 0;
+    for (const [key, n] of counts) {
+        if (n > bestCount) { best = key; bestCount = n; }
+    }
+    return best ? { mod: best, count: bestCount, total: bestPlays.length } : null;
 }
 
 exports.handler = async (event) => {
@@ -69,34 +84,49 @@ exports.handler = async (event) => {
         const rankings = (await getJSONGz(rankingsStore, 'rankings:TW')) || [];
         let profile = rankings.find(r => r.user_id === userId) || null;
 
-        if (!profile) {
+        // Always fetched live — join_date/play_time/grade_counts aren't
+        // crawled/cached anywhere, and this also backfills a profile for a
+        // player not yet in our TW sweep.
+        let liveUser = null;
+        try {
             const res = await fetch(`https://osu.ppy.sh/api/v2/users/${userId}/${MODE}`, {
                 headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
             });
-            if (res.ok) {
-                const u = await res.json();
-                const stats = u.statistics || {};
-                profile = {
-                    user_id: u.id, username: u.username,
-                    country_code: u.country_code || (u.country && u.country.code) || null,
-                    avatar_url: u.avatar_url || `https://a.ppy.sh/${u.id}`,
-                    cover_url: (u.cover && u.cover.url) || null,
-                    global_rank: stats.global_rank ?? null,
-                    country_rank: stats.country_rank ?? null,
-                    pp: stats.pp ?? null,
-                    // hit_accuracy is 0-100; normalize to 0-1 to match
-                    // rankings-crawl-core.js / feed records.
-                    accuracy: typeof stats.hit_accuracy === 'number' ? stats.hit_accuracy / 100 : null,
-                    play_count: stats.play_count ?? null,
-                    level: (stats.level && stats.level.current) ?? null,
-                    is_online: !!u.is_online, last_visit: u.last_visit || null,
-                    updatedAt: new Date().toISOString(),
-                };
-            }
+            if (res.ok) liveUser = await res.json();
+        } catch { /* profile still renders from cache if this fails */ }
+
+        if (!profile && liveUser) {
+            const stats = liveUser.statistics || {};
+            profile = {
+                user_id: liveUser.id, username: liveUser.username,
+                country_code: liveUser.country_code || (liveUser.country && liveUser.country.code) || null,
+                avatar_url: liveUser.avatar_url || `https://a.ppy.sh/${liveUser.id}`,
+                cover_url: (liveUser.cover && liveUser.cover.url) || null,
+                global_rank: stats.global_rank ?? null,
+                country_rank: stats.country_rank ?? null,
+                pp: stats.pp ?? null,
+                accuracy: typeof stats.hit_accuracy === 'number' ? stats.hit_accuracy / 100 : null,
+                play_count: stats.play_count ?? null,
+                level: (stats.level && stats.level.current) ?? null,
+                is_online: !!liveUser.is_online, last_visit: liveUser.last_visit || null,
+                updatedAt: new Date().toISOString(),
+            };
         }
 
         if (!profile) {
             return { statusCode: 404, headers, body: JSON.stringify({ error: 'player not found' }) };
+        }
+
+        if (liveUser) {
+            const stats = liveUser.statistics || {};
+            profile.join_date = liveUser.join_date || null;
+            profile.play_time_seconds = stats.play_time ?? null;
+            profile.grade_counts = stats.grade_counts || null;
+            // Username/avatar can drift (name changes, new avatar) between
+            // our last rankings sweep and now — the live call is fresher.
+            profile.username = liveUser.username || profile.username;
+            profile.avatar_url = liveUser.avatar_url || profile.avatar_url;
+            profile.cover_url = (liveUser.cover && liveUser.cover.url) || profile.cover_url;
         }
 
         const feed = (await getJSONGz(feedStore, 'feed:recent')) || [];
@@ -116,7 +146,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: { ...headers, 'Cache-Control': 'public, max-age=30' },
-            body: JSON.stringify({ profile, recentPlays, bestPlays }),
+            body: JSON.stringify({ profile, recentPlays, bestPlays, mostUsedMod: mostUsedMod(bestPlays) }),
         };
     } catch (err) {
         return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };

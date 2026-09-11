@@ -1,13 +1,33 @@
 let _page = 0;
-let _refreshTimer = null;
+let _grade = '';
+
+const GRADE_FILTER_OPTIONS = ['', 'XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D', 'F'];
+
+function buildGradeFilter() {
+    const group = document.getElementById('filter-grade-group');
+    group.innerHTML = GRADE_FILTER_OPTIONS.map(g => {
+        const color = g ? (GRADE_COLORS[g] || '#9691b8') : null;
+        const style = color ? ` style="--grade-color:${color}"` : '';
+        const label = g ? (g === 'F' ? t('grade_f_fail') : g) : t('filter_any_grade');
+        return `<button type="button" class="pill${g === _grade ? ' active' : ''}" data-grade="${g}"${style}>${escapeHtml(label)}</button>`;
+    }).join('');
+    group.querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            _grade = btn.getAttribute('data-grade');
+            _page = 0;
+            group.querySelectorAll('.pill').forEach(b => b.classList.toggle('active', b === btn));
+            loadFeed();
+        });
+    });
+}
 
 function currentFilters() {
     return {
         page: _page,
         limit: 30,
-        grade: document.getElementById('filter-grade').value || undefined,
-        fcOnly: document.getElementById('filter-fc').checked ? '1' : undefined,
-        chokeOnly: document.getElementById('filter-choke').checked ? '1' : undefined,
+        grade: _grade || undefined,
+        fcOnly: document.getElementById('filter-fc').classList.contains('active') ? '1' : undefined,
+        chokeOnly: document.getElementById('filter-choke').classList.contains('active') ? '1' : undefined,
     };
 }
 
@@ -46,9 +66,14 @@ async function loadFeed() {
 
 document.getElementById('prev-page').addEventListener('click', () => { if (_page > 0) { _page--; loadFeed(); } });
 document.getElementById('next-page').addEventListener('click', () => { _page++; loadFeed(); });
-['filter-grade', 'filter-fc', 'filter-choke'].forEach(id => {
-    document.getElementById(id).addEventListener('change', () => { _page = 0; loadFeed(); });
+['filter-fc', 'filter-choke'].forEach(id => {
+    document.getElementById(id).addEventListener('click', (e) => {
+        e.currentTarget.classList.toggle('active');
+        _page = 0;
+        loadFeed();
+    });
 });
 
+buildGradeFilter();
 loadFeed();
-_refreshTimer = setInterval(loadFeed, 45000);
+setInterval(loadFeed, 45000);

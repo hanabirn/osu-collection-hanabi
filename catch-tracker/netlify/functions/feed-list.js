@@ -38,6 +38,9 @@ exports.handler = async (event) => {
     const chokeOnly = qs.chokeOnly === '1';
     const page = Math.max(0, parseInt(qs.page, 10) || 0);
     const pageSize = Math.max(1, Math.min(100, parseInt(qs.limit, 10) || PAGE_SIZE));
+    // 'pp' powers the homepage's "Recent Best Plays" highlight strip
+    // (highest-pp plays first); default is newest-first, the live-feed view.
+    const sort = qs.sort === 'pp' ? 'pp' : 'recent';
 
     try {
         const feedStore = getFeedStore();
@@ -48,6 +51,9 @@ exports.handler = async (event) => {
         if (mods) items = items.filter(r => (r.mods || []).join('') === mods);
         if (fcOnly) items = items.filter(r => r.is_fc);
         if (chokeOnly) items = items.filter(r => !r.is_fc);
+        if (sort === 'pp') {
+            items = items.filter(r => r.pp != null).sort((a, b) => b.pp - a.pp);
+        }
 
         const total = items.length;
         const pageItems = items.slice(page * pageSize, (page + 1) * pageSize);
