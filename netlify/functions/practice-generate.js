@@ -4,14 +4,19 @@
    score-driven kinds (弱項 / 低準度 / 相似圖) stay site-only for now — they
    need recent-plays / per-map strain analysis this doesn't do.
 
-   GET ?user=<name|id>&kind=push|goal&target=<pp>&mode=osu
+   GET ?user=<name|id>&kind=push|goal&target=<pp>&mode=osu|taiko|fruits|mania
    -> { name, note, count, maps: [{ beatmapId, setId, artist, title, stars }] }
 
-   Standard mode only (PRACTICE_MODE), matching the site. osu! API v2 via the
-   shared client-credentials token; farm-maps-list is hit once with a big
-   `limit` so the whole thing is ~3 fetches. */
+   Any of the four rulesets (default osu). The band math is ruleset-agnostic
+   — it works off the user's best-score pp/star spread in that mode and the
+   farm dataset for that mode. Coverage for taiko/catch/mania is thinner, so
+   a narrow band there can come back "not enough coverage" (422). osu! API v2
+   via the shared client-credentials token; farm-maps-list is hit once with a
+   big `limit` so the whole thing is ~3 fetches. */
 const { getOsuToken } = require('./_osu-auth');
+const { MODE_INT } = require('./_osdb');
 
+const MODES = new Set(['osu', 'taiko', 'fruits', 'mania']);
 const N_MIN = 40;
 const N_MAX = 60;
 const GOOD_ACC = 0.95;
@@ -45,6 +50,7 @@ exports.handler = async (event) => {
     const qs = event.queryStringParameters || {};
     const user = (qs.user || '').trim();
     const kind = qs.kind === 'goal' ? 'goal' : 'push';
+    const mode = MODES.has(qs.mode) ? qs.mode : 'osu';
     const target = parseFloat(qs.target);
     if (!user) return fail(400, 'user required');
     if (kind === 'goal' && !(Number.isFinite(target) && target > 0)) return fail(400, 'target required for goal');
@@ -56,14 +62,14 @@ exports.handler = async (event) => {
         const token = await getOsuToken();
         const auth = { headers: { Authorization: `Bearer ${token}` } };
 
-        // Resolve + current total pp in one call.
-        const uRes = await fetch(`https://osu.ppy.sh/api/v2/users/${encodeURIComponent(user)}/osu?key=username`, auth);
+        // Resolve + current total pp (for this mode) in one call.
+        const uRes = await fetch(`https://osu.ppy.sh/api/v2/users/${encodeURIComponent(user)}/${mode}?key=username`, auth);
         if (uRes.status === 404) return fail(404, 'user not found');
         if (!uRes.ok) return fail(502, 'osu! API user lookup failed');
         const u = await uRes.json();
         const currentTotal = (u.statistics && u.statistics.pp) || 0;
 
-        const bRes = await fetch(`https://osu.ppy.sh/api/v2/users/${u.id}/scores/best?mode=osu&limit=100`, auth);
+        const bRes = await fetch(`https://osu.ppy.sh/api/v2/users/${u.id}/scores/best?mode=${mode}&limit=100`, auth);
         if (!bRes.ok) return fail(502, 'osu! API best-scores failed');
         const best = await bRes.json();
         if (!best.length || best.length < 10) return fail(422, 'not enough top plays');
@@ -98,7 +104,7 @@ exports.handler = async (event) => {
         }
 
         const fp = new URLSearchParams({
-            mode: 'osu', mods: 'NM', limit: '200', sort: band.sort,
+            mode, mods: 'NM', limit: '200', sort: band.sort,
             starMin: band.starMin.toFixed(2), starMax: band.starMax.toFixed(2),
             ppMin: band.ppMin.toFixed(1), ppMax: band.ppMax.toFixed(1),
         });
@@ -118,10 +124,14 @@ exports.handler = async (event) => {
         }
         if (maps.length < N_MIN) return fail(422, 'not enough coverage in that band');
 
-        const name = kind === 'goal'
+        const MODE_TAG = { osu: '', taiko: ' [taiko]', fruits: ' [catch]', mania: ' [mania]' };
+        const name = (kind === 'goal'
             ? `Practice — goal ${Math.round(target)}pp`
-            : `Practice — push (${u.username})`;
-        return { statusCode: 200, headers, body: JSON.stringify({ name, note, count: maps.length, kind, maps }) };
+            : `Practice — push (${u.username})`) + MODE_TAG[mode];
+        return {
+            statusCode: 200, headers,
+            body: JSON.stringify({ name, note, count: maps.length, kind, mode: MODE_INT[mode], maps }),
+        };
     } catch (err) {
         return fail(500, err.message);
     }

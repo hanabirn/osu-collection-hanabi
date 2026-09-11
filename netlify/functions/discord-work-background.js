@@ -37,7 +37,8 @@ async function runPractice({ options, invokerId, origin }) {
 
     const targetPp = Number(L.optVal(options, 'target_pp'));
     const kind = Number.isFinite(targetPp) && targetPp > 0 ? 'goal' : 'push';
-    const qs = new URLSearchParams({ user: who, kind });
+    const mode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
+    const qs = new URLSearchParams({ user: who, kind, mode });
     if (kind === 'goal') qs.set('target', String(targetPp));
 
     const r = await fetch(`${origin}/.netlify/functions/practice-generate?${qs}`);
@@ -51,7 +52,7 @@ async function runPractice({ options, invokerId, origin }) {
 
     const beatmaps = data.maps.map(m => ({
         mapId: m.beatmapId, mapSetId: m.setId, artist: m.artist, title: m.title,
-        diff: '', md5: '', mode: 0, stars: m.stars || 0,
+        diff: '', md5: '', mode: data.mode || 0, stars: m.stars || 0,
     }));
     const bytes = buildOsdb([{ name: data.name, beatmaps }], 'osu! Collection bot');
     const filename = `${data.name.replace(/[^\w.\- ]+/g, '').trim().slice(0, 60) || 'practice'}.osdb`;
