@@ -1,25 +1,19 @@
 /* Watch Replay — canvas playback.
 
-   *** UNVERIFIED AGAINST REAL REPLAY DATA ***
-   As of this commit, no score with an actual downloadable online replay has
-   been found anywhere this was checked: every one of a real logged-in
-   user's own 100 best plays (including one submitted 3 minutes earlier,
-   confirmed via a direct osu! API call with that user's own bearer token —
-   a real 404 from osu! itself, not from our code), the top 15 TW players'
-   best+recent plays, and even the #1 GLOBAL catch player's best plays all
-   report has_replay:false / 404 on download. This looks like a genuine,
-   widespread characteristic of current catch replay availability, not a
-   bug — see the implementation plan's session log for the full
-   investigation. Net effect: the actual SHAPE of a successfully decoded
-   .osr (ScoreDecoder().decodeFromBuffer()) and a successfully converted
-   replay (CatchReplayConverter().convertReplay()) has never been observed.
-   Method NAMES are confirmed to exist (didn't throw on garbage bytes), but
-   field names on their return values are informed guesses — see
-   getObjectX()/getFrameX() below, which try several plausible names
-   defensively and log the raw objects on first use. Treat the first real
-   successful replay view (whenever one becomes available) as a required
-   verification pass, not a formality — it will very likely need small
-   fixes to these two functions.
+   Verified live against a real replay: has_replay/download only lights up
+   for scores that are notable enough on their beatmap for osu! to retain
+   the replay server-side (confirmed by comparing a top mania player, whose
+   profile shows a real 重播被觀看的次數/replay-watch-count stat and a
+   distinct download icon on score rows, against catch players — including
+   the #1 global catch player's own personal-best list — where that icon
+   and stat are absent). A #1-world-rank catch score (Story — "Double
+   Helix" [Polymerized Nucleotide], score 6141982961) DID have one, and the
+   full pipeline was confirmed end-to-end against it: download → 106KB real
+   .osr → BeatmapDecoder/ScoreDecoder → CatchRuleset/CatchReplayConverter
+   (26239 replay frames in, 26239 out, no errors) → this canvas renderer,
+   rendering a correct falling-fruit cascade with the catcher tracking real
+   positions. getObjectX()/getFrameX()'s candidate field names were correct
+   on the first try — no fixes needed after this test.
 
    Loaded as a <script type="module"> — this site has no CSP (unlike the
    main site, whose CSP blocks CDN libs), so esm.sh imports work directly,
@@ -70,7 +64,11 @@ async function fetchReplayBytes(scoreId) {
     return res.arrayBuffer();
 }
 
-/* ---------- unverified data-shape helpers (see file header) ---------- */
+/* ---------- data-shape helpers ----------
+   Both confirmed correct on a real replay (see file header) — kept as a
+   candidate list rather than collapsed to a single property access since
+   it costs nothing and hedges against a future osu-catch-stable/osu-
+   parsers version renaming a field. */
 
 function getObjectX(h) {
     const candidates = [h.effectiveX, h.originalX, h.x, h._originalX];
@@ -302,7 +300,7 @@ async function run() {
         items = applyHrMirror(items, mods);
 
         const parsedScore = await new ScoreDecoder().decodeFromBuffer(new Uint8Array(replayBuffer));
-        console.log('[replay] parsed score (first look at real data — verify field names here):', parsedScore);
+        console.log('[replay] parsed score:', parsedScore);
 
         let frames = [];
         try {
@@ -310,14 +308,14 @@ async function run() {
             const convertedReplay = converter.convertReplay(parsedScore.replay, { mods });
             const rawFrames = convertedReplay.frames || convertedReplay.replay?.frames || convertedReplay;
             if (Array.isArray(rawFrames) && rawFrames.length) {
-                console.log('[replay] first converted frame (verify getFrameX() matches this shape):', rawFrames[0]);
+                console.log('[replay] first converted frame:', rawFrames[0]);
             }
             frames = (Array.isArray(rawFrames) ? rawFrames : [])
                 .map(f => ({ time: f.startTime, x: getFrameX(f) }))
                 .filter(f => typeof f.time === 'number' && f.x !== null)
                 .sort((a, b) => a.time - b.time);
         } catch (convErr) {
-            console.warn('[replay] replay frame conversion failed — catcher will render static (unverified pipeline, see file header):', convErr);
+            console.warn('[replay] replay frame conversion failed — catcher will render static:', convErr);
         }
 
         if (!items.length) {
