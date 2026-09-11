@@ -4275,7 +4275,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    The page header block above the card is capped to match so the two align. */
 /* A clearer frame than the shared .osu-add-card's faint 1px --border, so the
    chat column reads as its own contained box. */
-.chat-card { margin: 0 auto; max-width: 780px; border: 2px solid var(--border-strong); }
+.chat-card { margin: 0 auto; max-width: 780px; border: 5px solid var(--border-strong); }
 #page-chat > .eyebrow, #page-chat > .osu-page-title, #page-chat > .tournaments-hint,
 #page-dm > .eyebrow, #page-dm > .osu-page-title, #page-dm > .tournaments-hint {
     max-width: 780px;
