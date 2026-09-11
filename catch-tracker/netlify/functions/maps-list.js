@@ -1,25 +1,71 @@
 /* Public, filtered/paginated view over the catch map catalog (maps:catch,
    written by maps-crawl-cron.js / maps-crawl-run.js — see
    _maps-crawl-core.js). Same pure read-only GET + TTL cache + honest
-   coverage-block shape as this site's other *-list.js endpoints. */
+   coverage-block shape as this site's other *-list.js endpoints.
+
+   The crawled dataset has one record per DIFFICULTY. Grouped here into one
+   item per beatmapSET (each carrying a `diffs` array, ascending by star)
+   so a 6-diff map shows as one catalog card instead of 6 — matching how
+   the main site's own catalog/beatmap listings treat a set as the unit,
+   not a single difficulty. Filtering/sorting/pagination all operate on
+   the grouped sets, not the raw per-diff rows, so a set never gets split
+   across a page boundary. */
 const { getMapsStore } = require('./_blobs-store');
 const { getJSONGz } = require('./_blob-json');
 
 const PAGE_SIZE = 24;
 const DS_CACHE_TTL_MS = 60_000;
-let _dsCache = { at: 0, maps: null };
+let _dsCache = { at: 0, maps: null, sets: null };
 
-async function loadMaps(store) {
+function groupIntoSets(maps) {
+    const bySet = new Map();
+    for (const r of maps) {
+        let set = bySet.get(r.beatmapset_id);
+        if (!set) {
+            set = {
+                beatmapset_id: r.beatmapset_id,
+                artist: r.artist,
+                title: r.title,
+                creator: r.creator,
+                status: r.status,
+                ranked_date: r.ranked_date,
+                bpm: r.bpm,
+                total_length: r.total_length,
+                diffs: [],
+            };
+            bySet.set(r.beatmapset_id, set);
+        }
+        set.diffs.push({
+            beatmap_id: r.beatmap_id,
+            version: r.version,
+            difficulty_rating: r.difficulty_rating,
+            cs: r.cs, ar: r.ar, od: r.od, hp: r.hp,
+        });
+    }
+    const sets = [...bySet.values()];
+    for (const set of sets) {
+        set.diffs.sort((a, b) => (a.difficulty_rating || 0) - (b.difficulty_rating || 0));
+        set.star_min = set.diffs.length ? set.diffs[0].difficulty_rating : null;
+        set.star_max = set.diffs.length ? set.diffs[set.diffs.length - 1].difficulty_rating : null;
+        // Representative id for "click the card body" — the middle
+        // difficulty reads as more typical of the set than the hardest.
+        set.primary_beatmap_id = set.diffs[Math.floor((set.diffs.length - 1) / 2)]?.beatmap_id ?? null;
+    }
+    return sets;
+}
+
+async function loadSets(store) {
     const now = Date.now();
-    if (_dsCache.maps && now - _dsCache.at < DS_CACHE_TTL_MS) return _dsCache.maps;
+    if (_dsCache.sets && now - _dsCache.at < DS_CACHE_TTL_MS) return _dsCache;
     const maps = (await getJSONGz(store, 'maps:catch')) || [];
-    _dsCache = { at: now, maps };
-    return maps;
+    const sets = groupIntoSets(maps);
+    _dsCache = { at: now, maps, sets };
+    return _dsCache;
 }
 
 const SORTERS = {
-    star_desc: (a, b) => (b.difficulty_rating || 0) - (a.difficulty_rating || 0),
-    star_asc: (a, b) => (a.difficulty_rating || 0) - (b.difficulty_rating || 0),
+    star_desc: (a, b) => (b.star_max || 0) - (a.star_max || 0),
+    star_asc: (a, b) => (a.star_min || 0) - (b.star_min || 0),
     bpm_desc: (a, b) => (b.bpm || 0) - (a.bpm || 0),
     length_desc: (a, b) => (b.total_length || 0) - (a.total_length || 0),
     newest: (a, b) => new Date(b.ranked_date || 0) - new Date(a.ranked_date || 0),
@@ -49,9 +95,9 @@ exports.handler = async (event) => {
 
     try {
         const store = getMapsStore();
-        const maps = await loadMaps(store);
+        const { maps, sets } = await loadSets(store);
 
-        let items = maps;
+        let items = sets;
         if (status) items = items.filter(r => r.status === status);
         if (q) {
             items = items.filter(r =>
@@ -60,8 +106,10 @@ exports.handler = async (event) => {
                 (r.creator || '').toLowerCase().includes(q)
             );
         }
-        if (starMin !== null) items = items.filter(r => (r.difficulty_rating || 0) >= starMin);
-        if (starMax !== null) items = items.filter(r => (r.difficulty_rating || 0) <= starMax);
+        // A set matches a star range if ANY of its difficulties fall in
+        // it — a 1★-9★ set shouldn't disappear just because starMax=5.
+        if (starMin !== null) items = items.filter(r => (r.star_max ?? 0) >= starMin);
+        if (starMax !== null) items = items.filter(r => (r.star_min ?? 0) <= starMax);
         if (bpmMin !== null) items = items.filter(r => (r.bpm || 0) >= bpmMin);
         if (bpmMax !== null) items = items.filter(r => (r.bpm || 0) <= bpmMax);
         if (lengthMin !== null) items = items.filter(r => (r.total_length || 0) >= lengthMin);
@@ -74,6 +122,7 @@ exports.handler = async (event) => {
         const state = (await store.get('maps-crawl-state', { type: 'json' })) || {};
         const coverage = {
             datasetSize: maps.length,
+            setCount: sets.length,
             countsByStatus: state.countsByStatus || {},
             sweepCount: state.sweepCount || 0,
             lastRunAt: state.lastRunAt || null,

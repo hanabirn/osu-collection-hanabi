@@ -3,17 +3,32 @@ let _status = '';
 let _q = '';
 let _searchDebounce = null;
 
-function mapCard(m) {
-    const cover = coverArtUrl(m.beatmapset_id);
+const MAX_DIFF_ICONS = 8;
+
+function mapCard(set) {
+    const cover = coverArtUrl(set.beatmapset_id);
     const style = cover ? ` style="background-image:url('${cover.replace(/'/g, '%27')}')"` : '';
-    const star = m.difficulty_rating != null ? m.difficulty_rating.toFixed(2) + '★' : '';
-    return `<a class="map-card" href="map.html?id=${encodeURIComponent(m.beatmap_id)}"${style}>
-${statusBadge(m.status)}
-        ${star ? `<span class="map-star">${escapeHtml(star)}</span>` : ''}
-        <div class="map-title">${escapeHtml(m.title || '')} [${escapeHtml(m.version || '')}]</div>
-        <div class="map-artist">${escapeHtml(m.artist || '')}</div>
-        <div class="map-meta">${m.bpm != null ? Math.round(m.bpm) + ' BPM · ' : ''}${fmtLength(m.total_length)}</div>
-    </a>`;
+    const starLabel = set.star_min != null && set.star_max != null
+        ? (set.star_min === set.star_max ? set.star_min.toFixed(2) + '★' : `${set.star_min.toFixed(2)}–${set.star_max.toFixed(2)}★`)
+        : '';
+    const shown = set.diffs.slice(0, MAX_DIFF_ICONS);
+    const overflow = set.diffs.length - shown.length;
+    const diffRow = shown.map(d => diffIcon(d.beatmap_id, d.difficulty_rating, d.version)).join('')
+        + (overflow > 0 ? `<span class="diff-icon-more">+${overflow}</span>` : '');
+    const target = set.primary_beatmap_id ?? (set.diffs[0] && set.diffs[0].beatmap_id);
+
+    return `<div class="map-card" onclick="location.href='map.html?id=${encodeURIComponent(target)}'">
+        <div class="map-card-cover"${style}>
+${statusBadge(set.status)}
+            ${starLabel ? `<span class="map-star">${escapeHtml(starLabel)}</span>` : ''}
+        </div>
+        <div class="map-card-body">
+            <div class="map-title">${escapeHtml(set.title || '')}</div>
+            <div class="map-artist">${escapeHtml(set.artist || '')}</div>
+            <div class="diff-icon-row">${diffRow}<span class="diff-count-label">${set.diffs.length}${escapeHtml(t('diff_count_suffix'))}</span></div>
+            <div class="map-meta">${set.bpm != null ? Math.round(set.bpm) + ' BPM · ' : ''}${fmtLength(set.total_length)}</div>
+        </div>
+    </div>`;
 }
 
 async function loadMaps() {

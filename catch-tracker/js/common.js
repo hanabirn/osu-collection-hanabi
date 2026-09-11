@@ -81,6 +81,7 @@ const LANG_STRINGS = {
         coverage_maps: '已收錄 {n} 張圖譜（Ranked {ranked}／Loved {loved}）',
         empty_maps: '沒有符合條件的圖譜。',
         failed_maps: '圖譜庫載入失敗。',
+        diff_count_suffix: '譜',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -148,6 +149,7 @@ const LANG_STRINGS = {
         coverage_maps: '{n} maps indexed (Ranked {ranked} / Loved {loved})',
         empty_maps: 'No maps match these filters.',
         failed_maps: 'Failed to load the map catalog.',
+        diff_count_suffix: ' diffs',
     },
 };
 
@@ -276,6 +278,58 @@ function statusIcon(status) {
 }
 
 // Label text + icon to its right, e.g. "RANKED [chevrons]" / "LOVED [heart]".
+/* Star-rating colour scale + catch-mode icon shape, ported verbatim from
+   the main osu-collection site's js/osu.js (same STAR_COLOR_STOPS table,
+   same liftForContrast() dark-card-background fix, same catch glyph) so
+   Catch Tracker's difficulty icons read as visually "the same language"
+   as the main site's own beatmap cards, per request. */
+const CATCH_ICON_PATH = '<circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/>';
+const STAR_COLOR_STOPS = [
+    [0.1, [79, 192, 255]],
+    [1.25, [79, 192, 255]],
+    [2.0, [79, 255, 213]],
+    [2.5, [124, 255, 79]],
+    [3.3, [246, 240, 92]],
+    [4.2, [255, 128, 104]],
+    [4.9, [255, 78, 111]],
+    [5.8, [198, 69, 184]],
+    [6.7, [101, 99, 222]],
+    [7.7, [24, 21, 142]],
+    [9.0, [0, 0, 0]],
+];
+function liftForContrast(rgb, minLum = 92) {
+    const lum = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+    if (lum >= minLum) return rgb;
+    const r = (minLum - lum) / (255 - lum);
+    return rgb.map(v => v + (255 - v) * r);
+}
+function rgbHex(rgb) {
+    return '#' + rgb.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+}
+function starRatingColor(stars) {
+    stars = Number(stars) || 0;
+    const stops = STAR_COLOR_STOPS;
+    if (stars <= 0) return '#888';
+    if (stars <= stops[0][0]) return rgbHex(liftForContrast(stops[0][1]));
+    for (let i = 1; i < stops.length; i++) {
+        if (stars <= stops[i][0]) {
+            const [s0, c0] = stops[i - 1];
+            const [s1, c1] = stops[i];
+            const t = (stars - s0) / (s1 - s0);
+            return rgbHex(liftForContrast(c0.map((v, idx) => v + (c1[idx] - v) * t)));
+        }
+    }
+    return rgbHex(liftForContrast(stops[stops.length - 1][1]));
+}
+function diffIcon(beatmapId, stars, label) {
+    const color = starRatingColor(stars);
+    const starsStr = (Number(stars) || 0).toFixed(2);
+    const title = label ? `${label} ${starsStr} ★` : `${starsStr} ★`;
+    return `<a class="diff-icon" href="map.html?id=${encodeURIComponent(beatmapId)}" title="${escapeHtml(title)}" onclick="event.stopPropagation()" style="color:${color}">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">${CATCH_ICON_PATH}</svg>
+    </a>`;
+}
+
 function statusBadge(status) {
     if (!STATUS_ICONS[status]) return '';
     const label = status === 'ranked' ? t('status_ranked') : t('status_loved');

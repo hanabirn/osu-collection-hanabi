@@ -481,38 +481,42 @@ td.wrap, th.wrap { white-space: normal; }
 
 /* ---------- map catalog ---------- */
 
-.map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-bottom: 18px; }
+/* Cover-on-top, content-below card — modeled on mania-tracker.com/maps'
+   own layout (referenced live in conversation) rather than the earlier
+   full-bleed poster style, which is kept only for the highlight strips. */
+.map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 18px; }
 .map-card {
-    position: relative;
     border-radius: var(--radius);
     overflow: hidden;
     border: 1px solid var(--border);
-    background-color: var(--bg-card);
-    aspect-ratio: 2.6 / 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 12px;
-    color: #fff;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: border-color 150ms ease;
+}
+.map-card:hover { border-color: var(--border-strong); }
+.map-card-cover {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background-color: var(--bg-elevated);
     background-size: cover;
     background-position: center;
 }
-.map-card::before {
+.map-card-cover::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(10, 10, 22, 0.15) 0%, rgba(10, 10, 22, 0.95) 100%);
+    background: linear-gradient(180deg, rgba(10, 10, 22, 0) 55%, rgba(10, 10, 22, 0.55) 100%);
 }
-.map-card > * { position: relative; z-index: 1; }
-.map-card:hover { text-decoration: none; border-color: var(--border-strong); }
+.map-card-cover > * { position: relative; z-index: 1; }
+.map-card-body { padding: 10px 12px 12px; }
 .map-card .map-star {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     z-index: 1;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     padding: 3px 8px;
     border-radius: 999px;
     background: rgba(10, 10, 22, 0.65);
@@ -541,9 +545,28 @@ td.wrap, th.wrap { white-space: normal; }
 .status-icon svg { width: 100%; height: 100%; }
 .status-icon.ranked { color: #38bdf8; }
 .status-icon.loved { color: var(--accent); }
-.map-card .map-title { font-weight: 700; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.map-card .map-artist { font-size: 0.78rem; color: rgba(255, 255, 255, 0.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.map-card .map-meta { font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); margin-top: 4px; }
+.map-card .map-title { font-weight: 700; font-size: 0.85rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.map-card .map-artist { font-size: 0.76rem; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.map-card .map-meta { font-size: 0.72rem; color: var(--text-faint); margin-top: 5px; }
+.diff-count-label { font-size: 0.72rem; color: var(--text-dim); margin-left: 3px; }
+
+.diff-icon-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.diff-icon {
+    display: inline-flex;
+    width: 17px;
+    height: 17px;
+    flex: none;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+    transition: transform 120ms ease;
+}
+.diff-icon svg { width: 100%; height: 100%; }
+.diff-icon:hover { transform: scale(1.25); text-decoration: none; }
+.diff-icon-more {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    font-family: var(--font-display);
+}
 
 /* ---------- decorative falling-banana background ---------- */
 
