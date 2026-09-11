@@ -126,9 +126,9 @@ a:hover { text-decoration: underline; }
     flex-direction: column;
     justify-content: center;
     background: var(--bg);
-    /* --border-strong (not --border): this is the main structural line
-       between the header and the page — it should read clearly. */
-    border-bottom: 1px solid var(--border-strong);
+    /* The main structural line between the header and the page — 2px of the
+       strong border token so it reads clearly on the near-black shell. */
+    border-bottom: 2px solid var(--border-strong);
 }
 /* (The 2026 redesign removed the whole-header cover carousel #bg-carousel,
    its .site-header-overlay wash, and the .has-cover-banner light-on-dark

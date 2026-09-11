@@ -35,7 +35,7 @@
 .explore-row {
     margin-top: 28px;
     padding-top: 20px;
-    border-top: 1px solid var(--border-strong);
+    border-top: 2px solid var(--border-strong);
 }
 .explore-row h3 {
     margin: 0 0 14px;
@@ -4273,9 +4273,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* Cap the conversation column so message lines stay a comfortable reading
    width on the shared 1120px page shell instead of running edge to edge.
    The page header block above the card is capped to match so the two align. */
-/* A clearer frame than the shared .osu-add-card's faint --border, so the
+/* A clearer frame than the shared .osu-add-card's faint 1px --border, so the
    chat column reads as its own contained box. */
-.chat-card { margin: 0 auto; max-width: 780px; border-color: var(--border-strong); }
+.chat-card { margin: 0 auto; max-width: 780px; border: 2px solid var(--border-strong); }
 #page-chat > .eyebrow, #page-chat > .osu-page-title, #page-chat > .tournaments-hint,
 #page-dm > .eyebrow, #page-dm > .osu-page-title, #page-dm > .tournaments-hint {
     max-width: 780px;
