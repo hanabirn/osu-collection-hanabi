@@ -676,78 +676,12 @@ function copyMpMap(setId, event) {
     }
 }
 
-// Set<beatmapset_id> once scanLocalSongsFolder() has scanned a folder this
-// page load; null means "never scanned" (renderOsuCollection() falls back
-// to the plain download button for every card until then).
-let osuLocalDownloadedIds = null;
-
-/* Cross-references the collection against what's actually sitting in the
-   user's own osu! Songs folder — no server round-trip, no account needed.
-   Chromium-only (File System Access API; no Firefox/Safari fallback) and
-   osu! *stable* only: it works by reading directory NAMES, not contents,
-   relying on stable's own "<beatmapset_id> <artist> - <title>" folder
-   naming convention. osu!lazer stores songs in a completely different
-   layout (hashed files + a Realm database) so this can't see a lazer
-   install at all — same ceiling as the collection.db export already has. */
-// Each beatmapset's own folder under Songs/ is named "<id> Artist - Title" —
-// this collects the leading id from every direct subdirectory of `handle`.
-async function collectLocalBeatmapIds(handle) {
-    const ids = new Set();
-    for await (const [name, entryHandle] of handle.entries()) {
-        if (entryHandle.kind !== 'directory') continue;
-        const m = name.match(/^(\d+)\s/);
-        if (m) ids.add(Number(m[1]));
-    }
-    return ids;
-}
-
-async function scanLocalSongsFolder() {
-    if (!window.showDirectoryPicker) {
-        alert(t('local_scan_unsupported'));
-        return;
-    }
-    let dirHandle;
-    try {
-        dirHandle = await window.showDirectoryPicker();
-    } catch (e) {
-        return; // user cancelled the native folder picker
-    }
-
-    let ids;
-    try {
-        ids = await collectLocalBeatmapIds(dirHandle);
-        // A common mistake: picking the osu! install folder instead of
-        // descending into Songs/ first. That folder has no "<id> Artist -
-        // Title" entries of its own, so a 0-match top level isn't
-        // necessarily an error — if there's a "Songs" subfolder, scan
-        // *that* instead of reporting a confusing "0 found".
-        if (ids.size === 0) {
-            for await (const [name, entryHandle] of dirHandle.entries()) {
-                if (entryHandle.kind === 'directory' && name.toLowerCase() === 'songs') {
-                    ids = await collectLocalBeatmapIds(entryHandle);
-                    break;
-                }
-            }
-        }
-    } catch (e) {
-        console.error('Local Songs folder scan failed:', e);
-        alert(t('local_scan_fail'));
-        return;
-    }
-
-    osuLocalDownloadedIds = ids;
-    renderOsuCollection();
-    const status = document.getElementById('osu-status');
-    if (status) {
-        if (ids.size === 0) {
-            status.innerText = t('local_scan_none');
-            status.style.color = '';
-        } else {
-            status.innerText = t('local_scan_done', { n: ids.size });
-            status.style.color = '#34d399';
-        }
-    }
-}
+// Local Songs-folder scan (File System Access API) was removed: Chrome
+// hard-blocks a website from opening ANY folder under %AppData% ("contains
+// system files"), and that's exactly where osu! *stable*'s default install
+// puts Songs — %localappdata%\osu!\Songs. So the feature only ever worked
+// for the minority who installed to a custom, non-AppData path; everyone
+// else hit an unfixable browser-level wall. See [[local-download-scan-2026-09]].
 
 function osuSetVolume(val) {
     osuVolume = parseFloat(val);
@@ -3973,10 +3907,6 @@ function renderOsuCollection() {
         // hasn't been backfilled yet shows 🌐 未標記 until it fills in.
         const langLabel = osuLangName(set) || t('lang_unknown');
         const langBadge = `<span class="osu-lang-badge" data-tip="${escHtml(langLabel)}">${set.language ? osuLangFlag(set) : '🌐'} ${escHtml(langLabel)}</span>`;
-        // Once osuLocalDownloadedIds is populated (scanLocalSongsFolder()),
-        // re-skin this same button rather than adding a separate badge — the
-        // download button's own job is moot for a set already on disk.
-        const isLocalDl = osuLocalDownloadedIds && osuLocalDownloadedIds.has(set.beatmapset_id);
         return `
         <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
@@ -3989,7 +3919,7 @@ function renderOsuCollection() {
                 <span class="osu-card-actions-sep" aria-hidden="true"></span>
                 <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}" aria-label="${t('mappools_copy_id')}">${icon('copy')}</button>
                 <button class="osu-mp-btn" onclick="copyMpMap(${set.beatmapset_id}, event)" title="${t('mplist_mp_hint')}" aria-label="${t('mplist_mp_hint')}">${icon('swords')}</button>
-                <button class="osu-download-btn ${isLocalDl ? 'local-downloaded' : ''}" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}" aria-label="${isLocalDl ? t('local_downloaded_title') : t('osu_download_btn_title')}">${icon(isLocalDl ? 'check' : 'download')}</button>
+                <button class="osu-download-btn" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${t('osu_download_btn_title')}" aria-label="${t('osu_download_btn_title')}">${icon('download')}</button>
                 <span class="osu-card-actions-sep" aria-hidden="true"></span>
                 <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="${t('osu_delete_btn_title')}" aria-label="${t('osu_delete_btn_title')}">${icon('x')}</button>
             </div>

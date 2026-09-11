@@ -71,12 +71,6 @@ I18N.ja = {
     howto_ctools: '<ol><li>まず osu! でログイン（右上）</li><li>アカウントからカテゴリを生成：お気に入り／よくプレイ／ベストスコア／最近／特定のマッパー</li><li>練習コレクション：スコアから「何を練習すべきか」を生成（突破分・目標プール・弱点…）。「pp を精密計算」にチェックでより正確（ただし遅い）</li><li>状態チェック：重複・削除済み・非 ranked・難易度数の変化を検出</li><li>生成したカテゴリはコレクションに統合され、「osu! Collection にエクスポート」でゲームに戻せます</li></ol>',
     howto_db: '<ol><li>先に譜面をカテゴリ分けする（右側のタブ、または「コレクション整理」で自動生成）</li><li>（任意）PC にある既存のコレクションを残したい場合：下の「既存の collection.db をマージ」で osu! フォルダのファイルを選ぶ</li><li>「collection.db をエクスポート」でダウンロード</li><li>osu! を閉じ、ダウンロードした collection.db を osu! インストールフォルダにコピー（古いものと置き換え）</li><li>osu! を起動すると、ゲーム内の Collections に表示されます</li></ol><p>.osdb は beatmap ID を持つため Collection Manager／osu!Stats で使え、譜面ごとのハッシュは不要です。</p>',
     check_played_btn_title: 'このページのプレイ済み譜面を表示\nosu! ログインが必要。各譜面のベストスコアを確認します',
-    local_scan_btn_title: 'ローカルの osu! Songs フォルダを選んで、すでに持っている譜面を確認\nChrome/Edge 限定、osu! stable のみ対応',
-    local_scan_unsupported: 'お使いのブラウザは対応していません。Chrome か Edge をお試しください',
-    local_scan_fail: 'フォルダを読み込めませんでした。osu! の Songs フォルダを選んだか確認してください',
-    local_scan_done: 'ローカルフォルダと照合しました：{n} 個のビートマップセットを検出',
-    local_scan_none: 'このフォルダに譜面が見つかりませんでした。osu! の Songs フォルダ自体を選んでいるか確認してください（osu! のインストールフォルダではありません）',
-    local_downloaded_title: 'すでにローカルの Songs フォルダにあります',
     osu_all_songs: 'すべての曲', osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
     hero_pitch: 'osu! のコレクションをまとめて整理：ゲームから取り込み、スコアからカテゴリを自動生成、ゲームへそのまま書き出し。',
     hero_feat_import: 'ゲームの collection.db／.osdb を取り込み', hero_feat_generate: 'osu! アカウントからカテゴリを生成', hero_feat_share: 'コレクションを共有（プレビューカード付き）',
@@ -478,7 +472,7 @@ I18N.ja = {
                 <p class="howto-tab-desc">自分の osu! ライブラリを整理：追加、分類、ゲームへのエクスポート、古いバックアップとの差分比較など。</p>
                 <div class="howto-feat"><b>Beatmap を追加</b><span>ID または osu! の URL（beatmapsets/... でも /b/... でも可）を貼り付けて「新增」を押します。</span></div>
                 <div class="howto-feat"><b>収藏の入出力（6 個のボタン）</b><span>左から：JSON バックアップをダウンロード → JSON から復元 → 共有リンクをコピー → プレビュー画像 PNG をダウンロード → collection.db として書き出し、そのまま osu! に使用 → ⚔ 差分比較、古いバックアップをアップロードして追加/削除されたマップを確認。</span></div>
-                <div class="howto-feat"><b>ツール・設定（7 個のボタン）</b><span>全マップのデータを再取得 → 📊 統計ダッシュボード（8 個の実績バッジ付き）→ ✨ 収藏整理ウィザード（下記参照）→ プレイ済みマーク／お気に入り・よく遊ぶ曲のワンクリック取込（ログイン必要）→ 📁 ローカルの osu! Songs フォルダを選んで、すでに持っている譜面を確認（Chrome/Edge 限定、osu! stable のみ対応）→ 🔒 パスワード設定、以降の編集/公開操作に必要。</span></div>
+                <div class="howto-feat"><b>ツール・設定（6 個のボタン）</b><span>全マップのデータを再取得 → 📊 統計ダッシュボード（8 個の実績バッジ付き）→ ✨ 収藏整理ウィザード（下記参照）→ プレイ済みマーク／お気に入り・よく遊ぶ曲のワンクリック取込（ログイン必要）→ 🔒 パスワード設定、以降の編集/公開操作に必要。</span></div>
                 <div class="howto-feat"><b>検索／絞り込み／並び替え</b><span>曲名やアーティストで検索、言語・ジャンル・出典・アーティストで絞り込み、星数で並び替え可能。</span></div>
                 <div class="howto-feat"><b>このリストの譜面を一括ダウンロード</b><span>現在のタブ／検索／絞り込み結果（全ページ分）の譜面を .osz として順番にダウンロード、ログイン不要のミラー経由でアプリのインストールも不要です。同じボタンでダウンロード中に一時停止／再開でき、ダウンロード中のファイルが中断されることはありません。完了したらファイルをすべて選択して osu! にまとめてドラッグすれば取り込めます。</span></div>
                 <div class="howto-feat"><b>!mp map をコピー</b><span>各カードの ⚔ ボタンでその譜面の <code>!mp map</code> 行をコピー。osu! マルチでホストになって貼り付ければ譜面を設定できます。Discord bot の <code>/map</code> にも同じ行が出ます。</span></div>
