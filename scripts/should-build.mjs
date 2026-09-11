@@ -17,8 +17,14 @@ const RELEVANT = [
     'netlify', 'netlify.toml', 'package.json', 'package-lock.json',
 ];
 
-const base = process.env.CACHED_COMMIT_REF || 'HEAD^';
+// On a brand-new site's first-ever deploy, Netlify sets CACHED_COMMIT_REF to
+// the SAME commit as COMMIT_REF (not empty) — a naive `|| 'HEAD^'` fallback
+// never triggers in that case, `git diff SHA..SHA` is trivially empty, and
+// the first deploy skips itself (found while setting up catch-tracker/'s
+// sibling script). Treat base===head as "no usable cache" too.
 const head = process.env.COMMIT_REF || 'HEAD';
+const cached = process.env.CACHED_COMMIT_REF;
+const base = (cached && cached !== head) ? cached : 'HEAD^';
 
 try {
     // `git diff --quiet` exits 0 when there is NO change in the given paths,

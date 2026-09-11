@@ -10,7 +10,14 @@
    CACHED_COMMIT_REF/COMMIT_REF are still whole-repo commit SHAs and `git
    diff` runs from the repo root — so paths here are repo-root-relative
    (prefixed with catch-tracker/), same as the main script's paths are
-   root-relative too. */
+   root-relative too.
+
+   Gotcha found on this site's actual first deploy: on a brand-new site with
+   no prior successful build, Netlify sets CACHED_COMMIT_REF to the SAME
+   commit as COMMIT_REF (not empty) — `git diff SHA..SHA` is then trivially
+   empty, so the naive `CACHED_COMMIT_REF || 'HEAD^'` fallback never
+   triggers and every first deploy skips itself. Treat base===head as "no
+   usable cache info" too, not just an unset/missing CACHED_COMMIT_REF. */
 import { execFileSync } from 'node:child_process';
 
 const RELEVANT = [
@@ -20,8 +27,9 @@ const RELEVANT = [
     'catch-tracker/package.json', 'catch-tracker/package-lock.json',
 ];
 
-const base = process.env.CACHED_COMMIT_REF || 'HEAD^';
 const head = process.env.COMMIT_REF || 'HEAD';
+const cached = process.env.CACHED_COMMIT_REF;
+const base = (cached && cached !== head) ? cached : 'HEAD^';
 
 try {
     execFileSync('git', ['diff', '--quiet', base, head, '--', ...RELEVANT], { stdio: 'ignore' });
