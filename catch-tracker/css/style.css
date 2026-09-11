@@ -182,6 +182,21 @@ main > h1::before {
 
 main h2 { font-size: 1.05rem; color: var(--text); margin-top: 28px; }
 
+/* Maps catalog page title — bigger + centered, with the catch mode glyph
+   standing in for the usual accent dot. */
+.maps-title {
+    justify-content: center;
+    text-align: center;
+    font-size: 2.1rem;
+    gap: 12px;
+}
+.maps-title::before { display: none; }
+.maps-title-icon { width: 32px; height: 32px; color: var(--accent); flex: none; }
+@media (max-width: 640px) {
+    .maps-title { font-size: 1.6rem; }
+    .maps-title-icon { width: 26px; height: 26px; }
+}
+
 .coverage-note {
     display: inline-flex;
     align-items: center;
