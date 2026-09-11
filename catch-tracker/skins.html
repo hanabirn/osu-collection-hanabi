@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catch Tracker — Skins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="brand">Catch <span>Tracker</span></div>
+    <nav>
+        <a href="index.html" data-i18n="nav_rankings">Rankings</a>
+        <a href="feed.html" data-i18n="nav_feed">Live Feed</a>
+        <a href="maps.html" data-i18n="nav_maps">Maps</a>
+        <a href="skins.html" class="active" data-i18n="nav_skins">Skins</a>
+    </nav>
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+</header>
+<main class="wide">
+    <h1 class="maps-title">
+        <svg class="maps-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3l-4 3v3h3v12h10V9h3V6l-4-3"/><path d="M9 3a3 3 0 0 0 6 0"/></svg>
+        <span data-i18n="h1_skins">osu! Skins</span>
+    </h1>
+    <p class="coverage-note" id="coverage-note" data-i18n="loading">Loading…</p>
+
+    <button type="button" class="pill" id="toggle-upload" style="margin-bottom:16px" data-i18n="skins_upload_toggle">Upload a skin</button>
+
+    <div class="card" id="upload-form" hidden>
+        <h2 style="margin-top:0" data-i18n="skins_upload_title">Upload a skin</h2>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-top:-6px" data-i18n="skins_upload_note">Anyone can upload — no login required. Please only upload skins you have the right to share.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:420px">
+            <input type="text" id="skin-name" class="search-input" style="width:100%" data-i18n-placeholder="skins_name_placeholder" placeholder="Skin name">
+            <input type="text" id="skin-uploader" class="search-input" style="width:100%" data-i18n-placeholder="skins_uploader_placeholder" placeholder="Your name (optional)">
+            <label style="font-size:0.82rem;color:var(--text-dim)" data-i18n="skins_file_label">.osk file (max 3MB)</label>
+            <input type="file" id="skin-file" accept=".osk">
+            <label style="font-size:0.82rem;color:var(--text-dim)" data-i18n="skins_preview_label">Preview image (optional, JPEG/PNG, max 1.5MB)</label>
+            <input type="file" id="skin-preview" accept="image/jpeg,image/png">
+            <button type="button" class="pill toggle" id="submit-upload" data-i18n="skins_submit">Submit</button>
+            <p id="upload-status" style="font-size:0.82rem;min-height:1.2em"></p>
+        </div>
+    </div>
+
+    <div class="filters">
+        <input type="text" id="skins-search" class="search-input" style="width:220px" data-i18n-placeholder="skins_search_placeholder" placeholder="Search skins or uploaders…">
+        <select id="skins-sort">
+            <option value="newest" data-i18n="sort_newest">Newest</option>
+            <option value="downloads" data-i18n="sort_downloads">Most downloaded</option>
+        </select>
+    </div>
+    <div class="map-grid" id="skins-grid"></div>
+    <div class="pagination">
+        <button id="prev-page" data-i18n="prev">← Prev</button>
+        <span id="page-label"></span>
+        <button id="next-page" data-i18n="next">Next →</button>
+    </div>
+</main>
+<footer class="site-footer" data-i18n="footer_main">Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.</footer>
+<script src="js/common.js"></script>
+<script src="js/api.js"></script>
+<script src="js/render-skins.js"></script>
+</body>
+</html>

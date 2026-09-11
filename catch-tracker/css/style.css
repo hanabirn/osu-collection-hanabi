@@ -648,6 +648,43 @@ main:has(.pagination) { padding-bottom: 90px; }
 .map-card-cover > * { position: relative; z-index: 1; }
 .map-card-body { padding: 10px 12px 12px; }
 
+/* ---------- skins page ---------- */
+
+.skin-card { cursor: default; }
+.skin-placeholder-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    color: var(--text-faint);
+}
+.skin-download-btn {
+    display: inline-block;
+    margin-top: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+.skin-download-btn:hover { text-decoration: none; }
+
+#upload-form input[type="file"] {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+}
+#upload-form input[type="file"]::file-selector-button {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-right: 10px;
+}
+#upload-form input[type="file"]::file-selector-button:hover { border-color: var(--primary); }
+
 /* Preview play button — a play triangle that swaps to a small animated
    equalizer while a preview is playing. Bars are pure CSS transform
    (scaleY) animations, not driven by real audio analysis (that needs

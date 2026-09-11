@@ -34,4 +34,14 @@ function getMapsStore() {
     return store('catch-tracker-maps');
 }
 
-module.exports = { getRankingsStore, getFeedStore, getMapsStore };
+// Public skin catalog (skins-upload/list/download/image.js) — a browsable
+// community skin-file catalog (anyone can upload/download), NOT the same
+// thing as the main site's skins feature (a private per-user login-gated
+// cloud *backup* of your own skins — nobody else can see or download
+// those). `index` (plain JSON array of metadata), `file:{id}` (binary
+// .osk), `preview:{id}` (binary preview image, optional).
+function getSkinsStore() {
+    return store('catch-tracker-skins');
+}
+
+module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore };
