@@ -75,6 +75,7 @@ I18N.ja = {
     local_scan_unsupported: 'お使いのブラウザは対応していません。Chrome か Edge をお試しください',
     local_scan_fail: 'フォルダを読み込めませんでした。osu! の Songs フォルダを選んだか確認してください',
     local_scan_done: 'ローカルフォルダと照合しました：{n} 個のビートマップセットを検出',
+    local_scan_none: 'このフォルダに譜面が見つかりませんでした。osu! の Songs フォルダ自体を選んでいるか確認してください（osu! のインストールフォルダではありません）',
     local_downloaded_title: 'すでにローカルの Songs フォルダにあります',
     osu_all_songs: 'すべての曲', osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
     hero_pitch: 'osu! のコレクションをまとめて整理：ゲームから取り込み、スコアからカテゴリを自動生成、ゲームへそのまま書き出し。',

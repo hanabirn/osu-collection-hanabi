@@ -689,6 +689,18 @@ let osuLocalDownloadedIds = null;
    naming convention. osu!lazer stores songs in a completely different
    layout (hashed files + a Realm database) so this can't see a lazer
    install at all — same ceiling as the collection.db export already has. */
+// Each beatmapset's own folder under Songs/ is named "<id> Artist - Title" —
+// this collects the leading id from every direct subdirectory of `handle`.
+async function collectLocalBeatmapIds(handle) {
+    const ids = new Set();
+    for await (const [name, entryHandle] of handle.entries()) {
+        if (entryHandle.kind !== 'directory') continue;
+        const m = name.match(/^(\d+)\s/);
+        if (m) ids.add(Number(m[1]));
+    }
+    return ids;
+}
+
 async function scanLocalSongsFolder() {
     if (!window.showDirectoryPicker) {
         alert(t('local_scan_unsupported'));
@@ -701,12 +713,21 @@ async function scanLocalSongsFolder() {
         return; // user cancelled the native folder picker
     }
 
-    const ids = new Set();
+    let ids;
     try {
-        for await (const [name, handle] of dirHandle.entries()) {
-            if (handle.kind !== 'directory') continue;
-            const m = name.match(/^(\d+)\s/);
-            if (m) ids.add(Number(m[1]));
+        ids = await collectLocalBeatmapIds(dirHandle);
+        // A common mistake: picking the osu! install folder instead of
+        // descending into Songs/ first. That folder has no "<id> Artist -
+        // Title" entries of its own, so a 0-match top level isn't
+        // necessarily an error — if there's a "Songs" subfolder, scan
+        // *that* instead of reporting a confusing "0 found".
+        if (ids.size === 0) {
+            for await (const [name, entryHandle] of dirHandle.entries()) {
+                if (entryHandle.kind === 'directory' && name.toLowerCase() === 'songs') {
+                    ids = await collectLocalBeatmapIds(entryHandle);
+                    break;
+                }
+            }
         }
     } catch (e) {
         console.error('Local Songs folder scan failed:', e);
@@ -717,7 +738,15 @@ async function scanLocalSongsFolder() {
     osuLocalDownloadedIds = ids;
     renderOsuCollection();
     const status = document.getElementById('osu-status');
-    if (status) { status.innerText = t('local_scan_done', { n: ids.size }); status.style.color = '#34d399'; }
+    if (status) {
+        if (ids.size === 0) {
+            status.innerText = t('local_scan_none');
+            status.style.color = '';
+        } else {
+            status.innerText = t('local_scan_done', { n: ids.size });
+            status.style.color = '#34d399';
+        }
+    }
 }
 
 function osuSetVolume(val) {

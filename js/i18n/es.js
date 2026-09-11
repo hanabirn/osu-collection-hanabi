@@ -75,6 +75,7 @@ I18N.es = {
     local_scan_unsupported: 'Tu navegador no soporta esto — prueba con Chrome o Edge',
     local_scan_fail: 'No se pudo leer esa carpeta — asegúrate de elegir la carpeta Songs de osu!',
     local_scan_done: 'Comparado con tu carpeta local: {n} beatmapsets encontrados',
+    local_scan_none: 'No se encontraron mapas en esa carpeta — asegúrate de elegir la carpeta Songs de osu! (no la carpeta de instalación de osu!)',
     local_downloaded_title: 'Ya está en tu carpeta Songs local',
     osu_all_songs: 'Todas las canciones', osu_fav: 'Favoritos', osu_empty_collection: 'Aún no hay beatmaps', osu_empty_hint: 'Ingrese un ID arriba!', osu_empty_banner_hint: 'Cuando agregues algunos, el banner y el fondo de la página mostrarán tus portadas.',
     hero_pitch: 'Un solo lugar para organizar tu colección de osu!: importa desde el juego, crea categorías según tus scores y exporta de vuelta al juego.',

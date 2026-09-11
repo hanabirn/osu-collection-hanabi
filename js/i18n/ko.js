@@ -75,6 +75,7 @@ I18N.ko = {
     local_scan_unsupported: '이 브라우저는 지원하지 않습니다. Chrome이나 Edge를 사용해 주세요',
     local_scan_fail: '폴더를 읽지 못했습니다. osu!의 Songs 폴더를 선택했는지 확인하세요',
     local_scan_done: '로컬 폴더와 비교 완료: {n}개 비트맵셋 발견',
+    local_scan_none: '이 폴더에서 비트맵을 찾지 못했습니다. osu! 설치 폴더가 아니라 Songs 폴더 자체를 선택했는지 확인하세요',
     local_downloaded_title: '이미 로컬 Songs 폴더에 있습니다',
     osu_all_songs: '전체 곡', osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
     hero_pitch: 'osu! 컬렉션을 한곳에서 정리: 게임에서 가져오고, 점수로 카테고리를 자동 생성하고, 게임으로 바로 내보내기.',

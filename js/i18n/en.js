@@ -596,6 +596,7 @@ I18N.en = {
     local_scan_unsupported: "Your browser doesn't support this — try Chrome or Edge",
     local_scan_fail: "Couldn't read that folder — make sure you picked osu!'s Songs folder",
     local_scan_done: 'Matched against your local folder: {n} beatmapsets found',
+    local_scan_none: "No beatmaps found in that folder — make sure you picked osu!'s Songs folder itself (not the osu! install folder)",
     local_downloaded_title: 'Already in your local Songs folder',
     play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
 

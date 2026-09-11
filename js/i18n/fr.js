@@ -75,6 +75,7 @@ I18N.fr = {
     local_scan_unsupported: "Ton navigateur ne supporte pas cette fonction — essaie Chrome ou Edge",
     local_scan_fail: "Impossible de lire ce dossier — vérifie que c'est bien le dossier Songs d'osu!",
     local_scan_done: 'Comparé à ton dossier local : {n} beatmapsets trouvés',
+    local_scan_none: "Aucune map trouvée dans ce dossier — vérifie que tu as bien choisi le dossier Songs d'osu! lui-même (pas le dossier d'installation d'osu!)",
     local_downloaded_title: 'Déjà dans ton dossier Songs local',
     osu_all_songs: 'Tous les titres', osu_fav: 'Favoris', osu_empty_collection: 'Pas encore de beatmaps', osu_empty_hint: 'Entrez un ID ci-dessus!', osu_empty_banner_hint: 'Une fois que vous en ajoutez, la bannière et le fond de page affichent vos covers.',
     hero_pitch: "Un seul endroit pour organiser votre collection osu! : import depuis le jeu, catégories auto d'après vos scores, export direct vers le jeu.",

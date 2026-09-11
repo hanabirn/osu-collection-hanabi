@@ -75,6 +75,7 @@ I18N.de = {
     local_scan_unsupported: 'Dein Browser unterstützt das nicht — versuch es mit Chrome oder Edge',
     local_scan_fail: 'Ordner konnte nicht gelesen werden — stelle sicher, dass es osu!s Songs-Ordner ist',
     local_scan_done: 'Mit deinem lokalen Ordner abgeglichen: {n} Beatmapsets gefunden',
+    local_scan_none: 'In diesem Ordner wurden keine Beatmaps gefunden — stelle sicher, dass du den Songs-Ordner von osu! selbst ausgewählt hast (nicht den osu!-Installationsordner)',
     local_downloaded_title: 'Bereits in deinem lokalen Songs-Ordner',
     osu_all_songs: 'Alle Songs', osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!', osu_empty_banner_hint: 'Sobald du welche sammelst, zeigen Banner und Seitenhintergrund deine Beatmap-Cover.',
     hero_pitch: 'Ein Ort für deine osu!-Sammlung: aus dem Spiel importieren, Kategorien aus deinen Scores erzeugen, direkt zurück ins Spiel exportieren.',

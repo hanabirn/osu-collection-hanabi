@@ -421,6 +421,7 @@ I18N.zh = {
     local_scan_unsupported: '你的瀏覽器不支援這個功能，請用 Chrome 或 Edge',
     local_scan_fail: '讀取資料夾失敗，請確認選的是 osu! 的 Songs 資料夾',
     local_scan_done: '已比對本機資料夾，共 {n} 個譜面組',
+    local_scan_none: '這個資料夾裡沒有找到任何譜面，請確認選的是 osu! 的 Songs 資料夾（不是 osu! 安裝資料夾本身）',
     local_downloaded_title: '這張圖已經在你的本機 Songs 資料夾裡',
 
     pp_race_title: 'PP 賽跑',
