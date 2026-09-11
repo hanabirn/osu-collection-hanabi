@@ -927,24 +927,21 @@ async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
     const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
     if (ppMin) qs.set('ppMin', String(ppMin));
     if (ppMax) qs.set('ppMax', String(ppMax));
+    // One round-trip: farm-maps-list resolves the random/absolute index
+    // server-side and returns just that record + its position. Two fetches
+    // here used to blow past Discord's 3s window on an uncached pp band.
+    qs.set('pick', index < 0 ? 'random' : String(index));
     const any = t('farm_unlimited');
     const band = t('pp_band', { lo: ppMin || any, hi: ppMax || any });
 
-    const probe = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=0`);
-    if (!probe.ok) return { error: t('farm_query_fail') };
-    const d0 = await probe.json();
-    const total = d0.total || 0;
+    const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}`);
+    if (!r.ok) return { error: t('farm_query_fail') };
+    const d = await r.json();
+    const total = d.total || 0;
     if (!total) return { error: t('farm_none', { mode: L.MODE_LABEL[mode], mods, band }) };
 
-    const pageSize = d0.pageSize || 20;
-    const idx = index < 0 ? Math.floor(Math.random() * total) : (((index % total) + total) % total);
-    const pg = Math.floor(idx / pageSize);
-    let items = d0.items || [];
-    if (pg > 0) {
-        const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=${pg}`);
-        if (r.ok) items = (await r.json()).items || [];
-    }
-    const m = items[idx % pageSize];
+    const idx = d.pickIndex >= 0 ? d.pickIndex : 0;
+    const m = (d.items || [])[0];
     if (!m) return { error: t('farm_pick_fail') };
 
     const setId = m.beatmapset_id || null;
@@ -995,13 +992,12 @@ async function farmBandToCollection(mode, mods, ppMin, ppMax, origin, cap = 120)
     const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
     if (ppMin) qs.set('ppMin', String(ppMin));
     if (ppMax) qs.set('ppMax', String(ppMax));
+    // One fetch: farm-maps-list clamps `limit` to 200 server-side and `cap`
+    // is 120, so the whole band fits in a single page.
     const beatmaps = [];
-    for (let page = 0; beatmaps.length < cap && page < 8; page++) {
-        const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&page=${page}`);
-        if (!r.ok) break;
-        const items = (await r.json()).items || [];
-        if (!items.length) break;
-        for (const m of items) {
+    const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&limit=${cap}&page=0`);
+    if (r.ok) {
+        for (const m of ((await r.json()).items || [])) {
             beatmaps.push({
                 mapId: m.beatmap_id, mapSetId: m.beatmapset_id || 0,
                 artist: m.artist || '', title: m.title || '', diff: m.version || '',
