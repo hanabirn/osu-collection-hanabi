@@ -65,6 +65,7 @@ header.site-header {
     z-index: 10;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 24px;
     padding: 14px 20px;
     background: rgba(10, 10, 22, 0.85);
@@ -493,8 +494,12 @@ td.wrap, th.wrap { white-space: normal; }
     font-weight: 700;
     font-family: var(--font-display);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
     transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
+.pill:hover { text-decoration: none; }
 .pill:hover { color: var(--text); border-color: var(--border-strong); }
 .pill.active {
     color: var(--grade-color, var(--text));

@@ -10,13 +10,14 @@ function scoreRow(s) {
         <td>${fmtAccuracy(s.accuracy)}</td>
         <td>${fmtPP(s.pp)}</td>
         <td>${relTime(s.created_at)}</td>
+        <td>${replayLink(s)}</td>
     </tr>`;
 }
 
 function scoreTable(scores, emptyMsg) {
     if (!scores.length) return `<p class="empty-state">${emptyMsg}</p>`;
     return `<div class="table-wrap"><table>
-        <thead><tr><th>${t('th_map')}</th><th>${t('th_mods')}</th><th>${t('th_grade')}</th><th>${t('th_acc')}</th><th>${t('th_pp')}</th><th>${t('th_when')}</th></tr></thead>
+        <thead><tr><th>${t('th_map')}</th><th>${t('th_mods')}</th><th>${t('th_grade')}</th><th>${t('th_acc')}</th><th>${t('th_pp')}</th><th>${t('th_when')}</th><th></th></tr></thead>
         <tbody>${scores.map(scoreRow).join('')}</tbody>
     </table></div>`;
 }

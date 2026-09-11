@@ -364,6 +364,16 @@ function checkCtLoginFromUrl() {
     if (logoutBtn) logoutBtn.addEventListener('click', logoutCtUser);
 }
 
+/* Shared between render-player.js and render-map.js's score tables — a
+   score row only gets a Watch Replay link when has_replay is true (see
+   _scores-poll-core.js / player-get.js) and it has a score_id to look up. */
+function replayLink(s) {
+    if (!s.has_replay || !s.score_id) return '';
+    const params = new URLSearchParams({ score_id: s.score_id, beatmap_id: s.beatmap_id });
+    if (s.mods && s.mods.length) params.set('mods', s.mods.join(','));
+    return `<a class="pill" href="replay.html?${params.toString()}">${escapeHtml(t('watch_replay'))}</a>`;
+}
+
 /* ---------- grade badges / mods / relative time ---------- */
 
 /* A small hue ladder built from the site's own palette (violet primary,
