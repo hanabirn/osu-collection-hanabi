@@ -22,7 +22,30 @@
 
 const PARSERS_URL = 'https://esm.sh/osu-parsers@4.1.7';
 const CATCH_STABLE_URL = 'https://esm.sh/osu-catch-stable@4.0.1';
+const FFLATE_URL = 'https://esm.sh/fflate@0.8.2';
 const PLAYFIELD_X = 512; // osu! catch coordinate space width, in osu!pixels
+
+// Same mirror this project already trusts for bulk beatmap downloads (see
+// the main site's js/osu.js downloadBeatmapset()) — this is its separate,
+// dedicated, no-auth, CORS-open Music API, built to drop straight into an
+// <audio> element (supports HTTP Range for scrubbing).
+const AUDIO_URL = beatmapsetId => `https://mirror.hinamizawa.ai/v3/osu/music/audio/${beatmapsetId}`;
+
+// osu!catch skin element filenames (per osu!'s own skinning wiki) — the
+// four fruit "visual types" cycle by combo index in real gameplay, not by
+// hit-object identity, so getFruitType() below falls back to a simple
+// index-based cycle when the decoded hit object doesn't expose its own
+// visual-type field.
+const SKIN_FILES = {
+    catcher: 'fruit-catcher-idle',
+    banana: 'fruit-bananas',
+    droplet: 'fruit-drop',
+    fruit_apple: 'fruit-apple',
+    fruit_grapes: 'fruit-grapes',
+    fruit_orange: 'fruit-orange',
+    fruit_pear: 'fruit-pear',
+};
+const FRUIT_TYPE_CYCLE = ['apple', 'grapes', 'orange', 'pear'];
 
 const main = document.getElementById('replay-main');
 
@@ -95,10 +118,25 @@ function classifyObject(h, classes) {
     return 'fruit';
 }
 
-function buildDropItem(h, classes) {
+// Real catch skins draw one of 4 fruit sprites (apple/grapes/orange/pear)
+// per object, cycling by combo index rather than being tied to hit-object
+// identity. Tries a couple of plausible field names osu-catch-stable might
+// expose before falling back to a deterministic index-based cycle — same
+// "candidate list, never a hard failure" approach as getObjectX/getFrameX.
+function getFruitType(h, index) {
+    const candidates = [h.visualRepresentation, h.VisualRepresentation, h.fruitVisualRepresentation];
+    for (const c of candidates) if (typeof c === 'string') return c.toLowerCase();
+    return FRUIT_TYPE_CYCLE[index % FRUIT_TYPE_CYCLE.length];
+}
+
+function buildDropItem(h, classes, index) {
     const x = getObjectX(h);
     const preempt = (typeof h.timePreempt === 'number' && h.timePreempt > 0) ? h.timePreempt : 800;
-    return { time: h.startTime, spawnTime: h.startTime - preempt, x, kind: classifyObject(h, classes) };
+    const kind = classifyObject(h, classes);
+    return {
+        time: h.startTime, spawnTime: h.startTime - preempt, x, kind,
+        fruitType: kind === 'fruit' ? getFruitType(h, index) : null,
+    };
 }
 
 // Flattens juice-stream/banana-shower "holdable" objects into their
@@ -107,11 +145,12 @@ function buildDropItem(h, classes) {
 // catches directly.
 function flattenHitObjects(hitObjects, classes) {
     const out = [];
+    let i = 0;
     for (const h of hitObjects) {
         if (Array.isArray(h.nestedHitObjects) && h.nestedHitObjects.length) {
-            for (const n of h.nestedHitObjects) out.push(buildDropItem(n, classes));
+            for (const n of h.nestedHitObjects) out.push(buildDropItem(n, classes, i++));
         } else {
-            out.push(buildDropItem(h, classes));
+            out.push(buildDropItem(h, classes, i++));
         }
     }
     out.sort((a, b) => a.time - b.time);
@@ -142,6 +181,52 @@ function catcherWidthFor(cs) {
 
 const COLORS = { fruit: '#fb5a8c', droplet: '#60a5fa', tiny: '#93c5fd', banana: '#facc15' };
 
+/* ---------- skin import (opt-in, client-side only) ----------
+   Mirrors the main site's js/skins.js extractSkinAssets() technique: unzip
+   with a filter so only the handful of files this needs are decompressed,
+   never the whole .osk. Nothing is uploaded anywhere — this stays in the
+   visitor's own browser for the current page view (a deliberate v1
+   simplification: no IndexedDB persistence across reloads yet, since
+   re-picking the file is a single click and this avoids building out a
+   whole cache-invalidation scheme for a nice-to-have). */
+async function loadSkinSprites(file) {
+    const { unzipSync } = await import(FFLATE_URL);
+    const buf = new Uint8Array(await file.arrayBuffer());
+
+    const wanted = new Set(Object.values(SKIN_FILES));
+    const matchesWanted = name => {
+        const base = name.split('/').pop().replace(/@2x/i, '').replace(/\.png$/i, '');
+        return wanted.has(base.toLowerCase());
+    };
+
+    const unzipped = unzipSync(buf, { filter: f => !f.dir && matchesWanted(f.name) });
+
+    // Prefer @2x (higher-res) over the plain file when a skin ships both.
+    const byBase = {};
+    for (const [name, bytes] of Object.entries(unzipped)) {
+        const base = name.split('/').pop().replace(/@2x/i, '').replace(/\.png$/i, '').toLowerCase();
+        const isHiRes = /@2x/i.test(name);
+        if (!byBase[base] || (isHiRes && !byBase[base].isHiRes)) byBase[base] = { bytes, isHiRes };
+    }
+
+    const sprites = {};
+    await Promise.all(Object.entries(SKIN_FILES).map(async ([key, base]) => {
+        const entry = byBase[base];
+        if (!entry) return;
+        const blob = new Blob([entry.bytes], { type: 'image/png' });
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+        try {
+            await img.decode();
+            sprites[key] = img;
+        } catch {
+            // A corrupt/unreadable sprite just means that one kind keeps
+            // the procedural fallback — never blocks the rest of the skin.
+        }
+    }));
+    return sprites;
+}
+
 /* ---------- canvas player ---------- */
 
 class ReplayPlayer {
@@ -152,6 +237,7 @@ class ReplayPlayer {
         this.frames = frames;
         this.clockRate = opts.clockRate;
         this.catcherWidth = opts.catcherWidth;
+        this.sprites = {};
         const itemMin = items.length ? items[0].spawnTime : 0;
         const itemMax = items.length ? items[items.length - 1].time : 0;
         const frameMin = frames.length ? frames[0].time : itemMin;
@@ -164,7 +250,34 @@ class ReplayPlayer {
         this.rafId = null;
         this.lastWall = 0;
         this.onTick = opts.onTick || (() => {});
+
+        // Optional full-song audio (see AUDIO_URL) — driven purely as an
+        // additional playback clock source when it loads successfully;
+        // never required. audioReady flips true only once the browser
+        // confirms it can actually play the track, and flips back false on
+        // any error so tick() falls back to the manual RAF clock — a
+        // missing/failed audio track must never block the visual replay.
+        this.audio = opts.audio || null;
+        this.audioReady = false;
+        if (this.audio) {
+            this.audio.addEventListener('canplay', () => {
+                this.audioReady = true;
+                // Playback may already have been started on the manual
+                // clock before the audio finished loading — hand it the
+                // baton mid-flight rather than waiting for the next
+                // play() call.
+                if (this.playing) {
+                    this.audio.currentTime = Math.max(0, this.mapTime / 1000);
+                    this.audio.playbackRate = this.speed * this.clockRate;
+                    this.audio.play().catch(() => { this.audioReady = false; });
+                }
+            }, { once: true });
+            this.audio.addEventListener('error', () => { this.audioReady = false; });
+            this.audio.addEventListener('ended', () => { this.playing = false; });
+        }
     }
+
+    setSprites(sprites) { this.sprites = sprites || {}; }
 
     catcherXAt(t) {
         const frames = this.frames;
@@ -201,33 +314,55 @@ class ReplayPlayer {
             const px = toPx(it.x);
             const size = it.kind === 'tiny' ? 4 : it.kind === 'droplet' ? 7 : it.kind === 'banana' ? 9 : 10;
             ctx.globalAlpha = this.mapTime > it.time ? Math.max(0, 1 - (this.mapTime - it.time) / 150) : 1;
-            ctx.fillStyle = COLORS[it.kind] || COLORS.fruit;
-            ctx.beginPath();
-            ctx.arc(px, y, size, 0, Math.PI * 2);
-            ctx.fill();
+
+            const spriteKey = it.kind === 'fruit' ? `fruit_${it.fruitType}` : it.kind === 'tiny' ? 'droplet' : it.kind;
+            const sprite = this.sprites[spriteKey];
+            if (sprite) {
+                const d = size * 2.4;
+                ctx.drawImage(sprite, px - d / 2, y - d / 2, d, d);
+            } else {
+                ctx.fillStyle = COLORS[it.kind] || COLORS.fruit;
+                ctx.beginPath();
+                ctx.arc(px, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
         ctx.globalAlpha = 1;
 
         const catcherX = toPx(this.catcherXAt(this.mapTime));
         const cw = (this.catcherWidth / PLAYFIELD_X) * w;
         const ch = 18;
-        ctx.fillStyle = '#e2e2f0';
-        ctx.beginPath();
-        ctx.moveTo(catcherX - cw / 2, catchLineY + ch / 2);
-        ctx.lineTo(catcherX - cw / 3, catchLineY - ch / 2);
-        ctx.lineTo(catcherX + cw / 3, catchLineY - ch / 2);
-        ctx.lineTo(catcherX + cw / 2, catchLineY + ch / 2);
-        ctx.closePath();
-        ctx.fill();
+        const catcherSprite = this.sprites.catcher;
+        if (catcherSprite) {
+            const spriteH = cw * (catcherSprite.naturalHeight / catcherSprite.naturalWidth || 0.5);
+            ctx.drawImage(catcherSprite, catcherX - cw / 2, catchLineY - spriteH / 2, cw, spriteH);
+        } else {
+            ctx.fillStyle = '#e2e2f0';
+            ctx.beginPath();
+            ctx.moveTo(catcherX - cw / 2, catchLineY + ch / 2);
+            ctx.lineTo(catcherX - cw / 3, catchLineY - ch / 2);
+            ctx.lineTo(catcherX + cw / 3, catchLineY - ch / 2);
+            ctx.lineTo(catcherX + cw / 2, catchLineY + ch / 2);
+            ctx.closePath();
+            ctx.fill();
+        }
     }
 
     tick(wallNow) {
         if (this.playing) {
-            const dt = wallNow - this.lastWall;
-            this.mapTime += dt * this.speed * this.clockRate;
+            if (this.audioReady) {
+                // Audio is the clock while it's available — tighter sync
+                // than the manual RAF delta, and it's what actually makes
+                // DT/HT (playbackRate) audible.
+                this.mapTime = this.audio.currentTime * 1000;
+            } else {
+                const dt = wallNow - this.lastWall;
+                this.mapTime += dt * this.speed * this.clockRate;
+            }
             if (this.mapTime >= this.maxTime) {
                 this.mapTime = this.maxTime;
                 this.playing = false;
+                if (this.audioReady) this.audio.pause();
             }
         }
         this.lastWall = wallNow;
@@ -238,15 +373,42 @@ class ReplayPlayer {
 
     start() { this.lastWall = performance.now(); this.rafId = requestAnimationFrame(t => this.tick(t)); }
     stop() { if (this.rafId) cancelAnimationFrame(this.rafId); }
-    play() { if (this.mapTime >= this.maxTime) this.mapTime = this.minTime; this.playing = true; }
-    pause() { this.playing = false; }
-    seek(t) { this.mapTime = Math.min(this.maxTime, Math.max(this.minTime, t)); this.draw(); }
+
+    play() {
+        if (this.mapTime >= this.maxTime) this.mapTime = this.minTime;
+        this.playing = true;
+        if (this.audioReady) {
+            this.audio.currentTime = Math.max(0, this.mapTime / 1000);
+            this.audio.playbackRate = this.speed * this.clockRate;
+            // Autoplay policies are a non-issue here (play() only ever
+            // runs from a user click on the play button), but a rejected
+            // promise must still never break the visual replay.
+            this.audio.play().catch(() => { this.audioReady = false; });
+        }
+    }
+
+    pause() {
+        this.playing = false;
+        if (this.audioReady) this.audio.pause();
+    }
+
+    seek(t) {
+        this.mapTime = Math.min(this.maxTime, Math.max(this.minTime, t));
+        if (this.audioReady) this.audio.currentTime = Math.max(0, this.mapTime / 1000);
+        this.draw();
+    }
+
+    setSpeed(speed) {
+        this.speed = speed;
+        if (this.audioReady) this.audio.playbackRate = this.speed * this.clockRate;
+    }
 }
 
 function playerHtml() {
     return `
         <div class="card replay-card" style="max-width:720px;margin:24px auto;padding:20px">
             <canvas id="replay-canvas" class="replay-canvas" width="640" height="420"></canvas>
+            <audio id="replay-audio" preload="auto"></audio>
             <div class="replay-controls">
                 <button type="button" id="replay-playpause" class="pill toggle">▶</button>
                 <input type="range" id="replay-scrub" class="replay-scrub" min="0" max="1000" value="0">
@@ -255,6 +417,12 @@ function playerHtml() {
                     <option value="1" selected>1x</option>
                     <option value="2">2x</option>
                 </select>
+            </div>
+            <div class="replay-skin-row">
+                <label class="pill" for="replay-skin-input" style="cursor:pointer">${escapeHtml(t('replay_use_skin'))}</label>
+                <input type="file" id="replay-skin-input" accept=".osk" hidden>
+                <button type="button" id="replay-skin-clear" class="pill" hidden>${escapeHtml(t('replay_clear_skin'))}</button>
+                <span id="replay-skin-status" class="coverage-note"></span>
             </div>
             <p class="coverage-note" style="margin-top:10px">
                 這是依據回放資料與圖譜物件重建的簡化動畫，非官方畫面；接到/落空僅為視覺估算，非官方判定。
@@ -267,6 +435,7 @@ async function run() {
     const params = new URLSearchParams(location.search);
     const scoreId = params.get('score_id');
     const beatmapId = params.get('beatmap_id');
+    const beatmapsetId = params.get('beatmapset_id');
     const mods = (params.get('mods') || '').split(',').filter(Boolean);
 
     if (!scoreId || !beatmapId) {
@@ -325,13 +494,23 @@ async function run() {
 
         setStatus(playerHtml());
         const canvas = document.getElementById('replay-canvas');
+        const audioEl = document.getElementById('replay-audio');
         const playBtn = document.getElementById('replay-playpause');
         const scrub = document.getElementById('replay-scrub');
         const speedSel = document.getElementById('replay-speed');
+        const skinInput = document.getElementById('replay-skin-input');
+        const skinClearBtn = document.getElementById('replay-skin-clear');
+        const skinStatus = document.getElementById('replay-skin-status');
+
+        // Full song audio is best-effort only — a missing beatmapset_id
+        // (older links) or a failed load must never block the visual
+        // replay, so no error is surfaced to the user either way.
+        if (beatmapsetId) audioEl.src = AUDIO_URL(beatmapsetId);
 
         const player = new ReplayPlayer(canvas, items, frames, {
             clockRate: clockRateForMods(mods),
             catcherWidth: catcherWidthFor(cs),
+            audio: beatmapsetId ? audioEl : null,
             onTick: (mapTime, minTime, maxTime, playing) => {
                 const pct = maxTime > minTime ? ((mapTime - minTime) / (maxTime - minTime)) * 1000 : 0;
                 scrub.value = String(pct);
@@ -347,7 +526,28 @@ async function run() {
             const frac = Number(scrub.value) / 1000;
             player.seek(player.minTime + frac * (player.maxTime - player.minTime));
         });
-        speedSel.addEventListener('change', () => { player.speed = Number(speedSel.value); });
+        speedSel.addEventListener('change', () => { player.setSpeed(Number(speedSel.value)); });
+
+        skinInput.addEventListener('change', async () => {
+            const file = skinInput.files && skinInput.files[0];
+            if (!file) return;
+            skinStatus.textContent = t('replay_skin_loading');
+            try {
+                const sprites = await loadSkinSprites(file);
+                player.setSprites(sprites);
+                skinStatus.textContent = t('replay_skin_loaded', { n: Object.keys(sprites).length });
+                skinClearBtn.hidden = false;
+            } catch (skinErr) {
+                console.warn('[replay] skin load failed:', skinErr);
+                skinStatus.textContent = t('replay_skin_invalid');
+            }
+        });
+        skinClearBtn.addEventListener('click', () => {
+            player.setSprites({});
+            skinInput.value = '';
+            skinStatus.textContent = '';
+            skinClearBtn.hidden = true;
+        });
 
         player.start();
     } catch (err) {

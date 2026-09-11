@@ -938,6 +938,15 @@ footer.site-footer {
 .replay-controls .pill.toggle { min-width: 44px; justify-content: center; }
 .replay-scrub { flex: 1 1 auto; }
 
+.replay-skin-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+.replay-skin-row .coverage-note { margin: 0; }
+
 /* ---------- BBCode editor ---------- */
 
 .bbcode-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }

@@ -127,6 +127,11 @@ const LANG_STRINGS = {
         replay_not_found: '找不到這筆成績的回放',
         replay_owner_only: '這個回放可能只有本人才能觀看',
         replay_fetch_failed: '回放下載失敗：{msg}',
+        replay_use_skin: '使用你的 osu! 皮膚',
+        replay_clear_skin: '清除皮膚',
+        replay_skin_loading: '皮膚載入中…',
+        replay_skin_loaded: '已套用皮膚（{n} 個圖案）',
+        replay_skin_invalid: '無法讀取這個 .osk 檔案',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -240,6 +245,11 @@ const LANG_STRINGS = {
         replay_not_found: 'No replay available for this score',
         replay_owner_only: 'This replay may only be viewable by its owner',
         replay_fetch_failed: 'Failed to download replay: {msg}',
+        replay_use_skin: 'Use your osu! skin',
+        replay_clear_skin: 'Clear skin',
+        replay_skin_loading: 'Loading skin…',
+        replay_skin_loaded: 'Skin applied ({n} sprites)',
+        replay_skin_invalid: 'Could not read this .osk file',
     },
 };
 
@@ -370,6 +380,7 @@ function checkCtLoginFromUrl() {
 function replayLink(s) {
     if (!s.has_replay || !s.score_id) return '';
     const params = new URLSearchParams({ score_id: s.score_id, beatmap_id: s.beatmap_id });
+    if (s.beatmapset_id) params.set('beatmapset_id', s.beatmapset_id);
     if (s.mods && s.mods.length) params.set('mods', s.mods.join(','));
     return `<a class="pill" href="replay.html?${params.toString()}">${escapeHtml(t('watch_replay'))}</a>`;
 }
