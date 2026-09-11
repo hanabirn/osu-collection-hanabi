@@ -419,6 +419,8 @@ I18N.zh = {
     play_status_played_title: '你打過這張圖，評級 {rank}', play_status_fc_title: '你 FC 過這張圖，評級 {rank}',
 
     local_db_btn_title: '上傳你的 osu!.db，標出哪些圖已經下載過\n只認得 osu! stable，檔案通常在 %localappdata%\\osu!\\osu!.db',
+    local_db_copy_path_title: '複製 osu!.db 的路徑，貼到檔案選擇視窗的「檔案名稱」欄位就能直接跳過去\n%localappdata%\\osu!\\osu!.db',
+    local_db_path_copied: '已複製路徑，貼到檔案視窗的檔名欄位吧',
     local_db_fail: '讀取失敗，請確認選的是 osu! stable 的 osu!.db 檔案',
     local_db_none: '這個檔案裡沒有找到任何圖',
     local_db_done: '已比對本機資料庫，共 {n} 個譜面組',

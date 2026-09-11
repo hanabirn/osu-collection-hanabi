@@ -158,6 +158,21 @@ function parseOsuDb(buffer) {
 
 // ---- UI wiring --------------------------------------------------------
 
+// Native file-picker dialogs can't be pre-filled or navigated by page JS
+// (no web API exposes that, by design) — copying the path so the visitor
+// can paste it into the dialog's filename field is the closest we can get
+// to "jump straight there" without them having to type/remember it.
+const LOCAL_DB_PATH = '%localappdata%\\osu!\\osu!.db';
+
+function copyLocalDbPath() {
+    const toast = (msg) => { if (typeof showShareToast === 'function') showShareToast(msg); };
+    if (!navigator.clipboard || !navigator.clipboard.writeText) { toast(LOCAL_DB_PATH); return; }
+    navigator.clipboard.writeText(LOCAL_DB_PATH).then(
+        () => toast(t('local_db_path_copied')),
+        () => toast(LOCAL_DB_PATH),
+    );
+}
+
 function handleLocalDbFile(event) {
     const input = event.target;
     const file = input.files && input.files[0];

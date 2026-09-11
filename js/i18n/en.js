@@ -596,6 +596,8 @@ I18N.en = {
     play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
 
     local_db_btn_title: "Upload your osu!.db to mark which maps you already have\nosu! stable only, usually at %localappdata%\\osu!\\osu!.db",
+    local_db_copy_path_title: "Copy the osu!.db path — paste it into the file picker's filename field to jump straight there\n%localappdata%\\osu!\\osu!.db",
+    local_db_path_copied: "Path copied — paste it into the file picker's filename field",
     local_db_fail: "Couldn't read that file — make sure it's osu! stable's osu!.db",
     local_db_none: 'No beatmaps found in that file',
     local_db_done: 'Matched against your local database: {n} beatmapsets found',

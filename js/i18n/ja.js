@@ -72,6 +72,8 @@ I18N.ja = {
     howto_db: '<ol><li>先に譜面をカテゴリ分けする（右側のタブ、または「コレクション整理」で自動生成）</li><li>（任意）PC にある既存のコレクションを残したい場合：下の「既存の collection.db をマージ」で osu! フォルダのファイルを選ぶ</li><li>「collection.db をエクスポート」でダウンロード</li><li>osu! を閉じ、ダウンロードした collection.db を osu! インストールフォルダにコピー（古いものと置き換え）</li><li>osu! を起動すると、ゲーム内の Collections に表示されます</li></ol><p>.osdb は beatmap ID を持つため Collection Manager／osu!Stats で使え、譜面ごとのハッシュは不要です。</p>',
     check_played_btn_title: 'このページのプレイ済み譜面を表示\nosu! ログインが必要。各譜面のベストスコアを確認します',
     local_db_btn_title: 'osu!.db をアップロードして、すでに持っている譜面を確認\nosu! stable 専用。通常 %localappdata%\\osu!\\osu!.db にあります',
+    local_db_copy_path_title: 'osu!.db のパスをコピー — ファイル選択画面の「ファイル名」欄に貼り付ければ直接そこへ移動できます\n%localappdata%\\osu!\\osu!.db',
+    local_db_path_copied: 'パスをコピーしました。ファイル選択画面のファイル名欄に貼り付けてください',
     local_db_fail: '読み込めませんでした。osu! stable の osu!.db か確認してください',
     local_db_none: 'このファイルに譜面が見つかりませんでした',
     local_db_done: 'ローカルデータベースと照合しました：{n} 個のビートマップセットを検出',

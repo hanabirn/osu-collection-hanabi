@@ -72,6 +72,8 @@ I18N.ko = {
     howto_db: '<ol><li>먼저 맵을 카테고리로 분류 (오른쪽 탭, 또는 "컬렉션 정리"로 자동 생성)</li><li>(선택) PC에 있는 기존 컬렉션을 유지하려면: 아래 "기존 collection.db 병합"에서 osu! 폴더의 파일 선택</li><li>"collection.db 내보내기"로 다운로드</li><li>osu!를 닫고, 받은 collection.db를 osu! 설치 폴더에 복사 (기존 파일 교체)</li><li>osu!를 켜면 게임의 Collections 목록에 나타납니다</li></ol><p>.osdb는 beatmap ID를 담고 있어 Collection Manager / osu!Stats에서 쓰며 맵별 해시가 필요 없습니다.</p>',
     check_played_btn_title: '이 페이지에서 플레이한 맵 표시\nosu! 로그인 필요; 각 맵의 베스트 기록을 확인합니다',
     local_db_btn_title: 'osu!.db를 업로드해 이미 가진 맵을 확인\nosu! stable 전용, 보통 %localappdata%\\osu!\\osu!.db에 있습니다',
+    local_db_copy_path_title: 'osu!.db 경로를 복사 — 파일 선택 창의 파일 이름 칸에 붙여넣으면 바로 이동합니다\n%localappdata%\\osu!\\osu!.db',
+    local_db_path_copied: '경로를 복사했습니다. 파일 선택 창의 파일 이름 칸에 붙여넣으세요',
     local_db_fail: '읽지 못했습니다. osu! stable의 osu!.db가 맞는지 확인하세요',
     local_db_none: '이 파일에서 비트맵을 찾지 못했습니다',
     local_db_done: '로컬 데이터베이스와 비교 완료: {n}개 비트맵셋 발견',

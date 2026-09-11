@@ -72,6 +72,8 @@ I18N.de = {
     howto_db: '<ol><li>Sortiere deine Maps zuerst in Kategorien (die Tabs rechts oder in den Sammlungs-Tools automatisch erzeugen)</li><li>Optional — um die bereits auf dem PC vorhandenen Sammlungen zu behalten: wähle die collection.db aus deinem osu!-Ordner unter „Vorhandene collection.db zusammenführen“ unten</li><li>Klicke auf „collection.db exportieren“ zum Herunterladen</li><li>Schließe osu! und kopiere die heruntergeladene collection.db in deinen osu!-Installationsordner (die alte ersetzen)</li><li>Starte osu! — deine Sammlungen sind in der Collections-Liste im Spiel</li></ol><p>.osdb enthält Beatmap-IDs für Collection Manager / osu!Stats und braucht daher keine Hashes pro Map.</p>',
     check_played_btn_title: 'Markieren, welche Maps auf dieser Seite du gespielt hast\nBenötigt osu!-Login; prüft deinen besten Score auf jeder Map',
     local_db_btn_title: 'Lade deine osu!.db hoch, um zu sehen, welche Maps du schon hast\nNur osu! stable, meist unter %localappdata%\\osu!\\osu!.db',
+    local_db_copy_path_title: 'osu!.db-Pfad kopieren — im Dateiauswahlfenster ins Feld „Dateiname" einfügen, um direkt dorthin zu springen\n%localappdata%\\osu!\\osu!.db',
+    local_db_path_copied: 'Pfad kopiert — ins Feld „Dateiname" einfügen',
     local_db_fail: 'Datei konnte nicht gelesen werden — stelle sicher, dass es die osu!.db von osu! stable ist',
     local_db_none: 'In dieser Datei wurden keine Beatmaps gefunden',
     local_db_done: 'Mit deiner lokalen Datenbank abgeglichen: {n} Beatmapsets gefunden',
