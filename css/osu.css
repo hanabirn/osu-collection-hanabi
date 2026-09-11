@@ -1398,7 +1398,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* state colours layer on top of the shared button style */
 .osu-card-actions .osu-fav-btn.active { color: var(--accent-pink); }
 .osu-card-actions .osu-fav-btn.active:hover { color: #fff; }
-.osu-card-actions .osu-download-btn.db-matched { color: #34d399; }
+.osu-card-actions .osu-download-btn.db-matched { background: rgba(52,211,153,0.85); color: #fff; }
 .osu-card-actions .osu-play-btn.playing { background: rgba(var(--pink-rgb),0.75); color: #fff; }
 .osu-card-actions .osu-copy-btn.copied { color: #34d399; }
 .osu-card-actions .osu-delete-btn:hover { background: rgba(255,90,90,0.6); }
@@ -1436,9 +1436,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     background: rgba(52,211,153,0.5);
 }
 .osu-download-btn.db-matched {
-    color: #34d399;
-    background: rgba(52,211,153,0.18);
+    color: #fff;
+    background: rgba(52,211,153,0.85);
     opacity: 1;
+}
+.osu-download-btn.db-matched:hover {
+    background: rgba(52,211,153,1);
 }
 .osu-play-btn {
     position: absolute;
