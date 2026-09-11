@@ -4,6 +4,7 @@ let _q = '';
 let _searchDebounce = null;
 
 const MAX_DIFF_ICONS = 8;
+const PAGE_SIZE = 16; // 4x4 grid
 
 function mapCard(set) {
     const cover = coverArtUrl(set.beatmapset_id);
@@ -36,7 +37,7 @@ async function loadMaps() {
     const note = document.getElementById('coverage-note');
     try {
         const data = await apiGet('maps-list', {
-            page: _page, limit: 24,
+            page: _page, limit: PAGE_SIZE,
             status: _status || undefined,
             q: _q || undefined,
             sort: document.getElementById('maps-sort').value,
@@ -52,7 +53,7 @@ async function loadMaps() {
 
         document.getElementById('page-label').textContent = t('page_label', { n: _page + 1 });
         document.getElementById('prev-page').disabled = _page === 0;
-        document.getElementById('next-page').disabled = (_page + 1) * 24 >= data.total;
+        document.getElementById('next-page').disabled = (_page + 1) * PAGE_SIZE >= data.total;
     } catch (err) {
         note.textContent = t('failed_maps');
     }

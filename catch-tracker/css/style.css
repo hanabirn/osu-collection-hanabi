@@ -159,6 +159,7 @@ header.site-header nav a.active { color: var(--accent); background: var(--accent
 /* ---------- layout ---------- */
 
 main { max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; }
+main.wide { max-width: 1400px; }
 
 main h1 {
     font-size: 1.6rem;
@@ -484,7 +485,16 @@ td.wrap, th.wrap { white-space: normal; }
 /* Cover-on-top, content-below card — modeled on mania-tracker.com/maps'
    own layout (referenced live in conversation) rather than the earlier
    full-bleed poster style, which is kept only for the highlight strips. */
-.map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.map-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+@media (max-width: 1180px) {
+    .map-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+    .map-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+    .map-grid { grid-template-columns: 1fr; }
+}
 .map-card {
     border-radius: var(--radius);
     overflow: hidden;
