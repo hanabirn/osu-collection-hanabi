@@ -50,6 +50,7 @@ async function loadState(store) {
     return state || {
         cursorPage: 1,
         totalKnown: null,
+        pageSize: null,
         sweepCount: 0,
         lastRunAt: null,
         lastOkAt: null,
@@ -69,7 +70,10 @@ function toRecord(entry) {
         global_rank: entry.global_rank ?? null,
         country_rank: entry.country_rank ?? null,
         pp: entry.pp ?? null,
-        accuracy: entry.hit_accuracy ?? null,
+        // hit_accuracy comes back 0-100 (e.g. 99.89); normalize to the same
+        // 0-1 scale player-get.js/feed records use for score.accuracy
+        // (confirmed live: rendered as "9989.24%" before this fix).
+        accuracy: typeof entry.hit_accuracy === 'number' ? entry.hit_accuracy / 100 : null,
         play_count: entry.play_count ?? null,
         level: (entry.level && entry.level.current) ?? null,
         is_online: !!u.is_online,
@@ -94,6 +98,26 @@ async function runRankingsCrawl(budgetMs) {
         const token = await getOsuToken();
         while (Date.now() < deadline) {
             const page = state.cursorPage || 1;
+
+            // osu!'s RankingController clamps an out-of-range `page` back to
+            // the last valid page instead of returning an empty result (
+            // confirmed live: cursorPage kept climbing past 100+ while
+            // datasetSize plateaued, since every clamped request just
+            // re-returned the same already-seen last page) — so an
+            // ever-incrementing cursor waiting for `ranking.length === 0`
+            // never terminates. Once `total` + the page size learned from
+            // page 1 are known, stop BEFORE issuing a request that would
+            // just get clamped.
+            if (state.totalKnown != null && state.pageSize) {
+                const maxPages = Math.max(1, Math.ceil(state.totalKnown / state.pageSize));
+                if (page > maxPages) {
+                    state.cursorPage = 1;
+                    state.sweepCount = (state.sweepCount || 0) + 1;
+                    sweepCompleted = true;
+                    break;
+                }
+            }
+
             const res = await fetch(
                 `https://osu.ppy.sh/api/v2/rankings/${MODE}/performance?country=${COUNTRY}&page=${page}`,
                 { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
@@ -103,8 +127,15 @@ async function runRankingsCrawl(budgetMs) {
             const ranking = data.ranking || [];
             pagesFetched++;
             if (typeof data.total === 'number') state.totalKnown = data.total;
+            // Learn from the largest page seen so far, not just page 1 —
+            // self-heals even if cursorPage is already stuck past the real
+            // end from before this fix existed (every full page has the
+            // same length; only the last/partial page is shorter).
+            if (ranking.length > 0) state.pageSize = Math.max(state.pageSize || 0, ranking.length);
 
             if (ranking.length === 0) {
+                // Fallback safety net in case osu! ever changes to a
+                // 404/empty response instead of clamping.
                 state.cursorPage = 1;
                 state.sweepCount = (state.sweepCount || 0) + 1;
                 sweepCompleted = true;

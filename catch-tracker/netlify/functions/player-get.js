@@ -84,7 +84,9 @@ exports.handler = async (event) => {
                     global_rank: stats.global_rank ?? null,
                     country_rank: stats.country_rank ?? null,
                     pp: stats.pp ?? null,
-                    accuracy: stats.hit_accuracy ?? null,
+                    // hit_accuracy is 0-100; normalize to 0-1 to match
+                    // rankings-crawl-core.js / feed records.
+                    accuracy: typeof stats.hit_accuracy === 'number' ? stats.hit_accuracy / 100 : null,
                     play_count: stats.play_count ?? null,
                     level: (stats.level && stats.level.current) ?? null,
                     is_online: !!u.is_online, last_visit: u.last_visit || null,
