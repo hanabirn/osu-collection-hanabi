@@ -82,6 +82,8 @@ const S = {
     top_none: { en: '{name} has no best {mode} scores.', zh: '{name} 沒有 {mode} 的最佳成績。', zhs: '{name} 没有 {mode} 的最佳成绩。', ja: '{name} に {mode} のベストスコアがありません。', fr: "{name} n'a aucun meilleur score {mode}.", de: '{name} hat keine {mode}-Bestscores.', ru: 'У {name} нет лучших результатов {mode}.', es: '{name} no tiene mejores puntuaciones de {mode}.', ko: '{name} 님의 {mode} 최고 기록이 없습니다.' },
     top_no_nth: { en: '{name} has no #{idx} {mode} score.', zh: '{name} 沒有第 {idx} 名的 {mode} 成績。', zhs: '{name} 没有第 {idx} 名的 {mode} 成绩。', ja: '{name} に {mode} の {idx} 位のスコアがありません。', fr: "{name} n'a pas de score {mode} au rang #{idx}.", de: '{name} hat keinen {mode}-Score auf Platz #{idx}.', ru: 'У {name} нет результата {mode} на месте #{idx}.', es: '{name} no tiene una puntuación de {mode} en el puesto #{idx}.', ko: '{name} 님의 {mode} {idx}위 기록이 없습니다.' },
     top_title: { en: "{name} — {mode} top {n}", zh: '{name} — {mode} 最佳 {n} 名', zhs: '{name} — {mode} 最佳 {n} 名', ja: '{name} — {mode} ベスト {n}', fr: '{name} — top {n} {mode}', de: '{name} — {mode} Top {n}', ru: '{name} — топ-{n} {mode}', es: '{name} — top {n} de {mode}', ko: '{name} — {mode} 상위 {n}' },
+    page_prev: { en: '◀ Prev', zh: '◀ 上一頁', zhs: '◀ 上一页', ja: '◀ 前へ', fr: '◀ Préc.', de: '◀ Zurück', ru: '◀ Назад', es: '◀ Ant.', ko: '◀ 이전' },
+    page_next: { en: 'Next ▶', zh: '下一頁 ▶', zhs: '下一页 ▶', ja: '次へ ▶', fr: 'Suiv. ▶', de: 'Weiter ▶', ru: 'Вперёд ▶', es: 'Sig. ▶', ko: '다음 ▶' },
 
     // --- /map ---
     map_not_found: { en: "Can't find that map.", zh: '找不到這張圖。', zhs: '找不到这张图。', ja: 'その譜面が見つかりません。', fr: 'Impossible de trouver cette map.', de: 'Diese Map wurde nicht gefunden.', ru: 'Не удалось найти эту карту.', es: 'No se encuentra ese mapa.', ko: '해당 맵을 찾을 수 없습니다.' },

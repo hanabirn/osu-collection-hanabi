@@ -163,6 +163,58 @@ async function fetchScores(token, userId, type, apiMode, limit, includeFails) {
     return res.json();
 }
 
+/* --- /top pagination (5 scores/page, top 50, one embed per score with a
+   thumbnail cover) — shared by the initial command and the ◀▶ buttons. --- */
+const TOP_PER_PAGE = 5;
+const TOP_MAX = 50;
+
+function topScoreEmbed(s, rank, apiMode) {
+    const bs = s.beatmapset || {};
+    const bm = s.beatmap || {};
+    const covers = bs.covers || {};
+    const modStr = L.modsTag(s.mods);
+    const mods = L.modsList(s.mods);
+    const acc = s.accuracy != null ? `${(s.accuracy * 100).toFixed(2)}%` : '—';
+    const pp = s.pp != null ? `${Math.round(s.pp)}pp` : (s.passed === false ? t('not_passed') : '—');
+    return {
+        title: `#${rank} · ${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+        url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
+        description: [
+            `${L.gradeTag(s.rank)}${modStr ? ' ' + modStr : ''}${mods.length ? ` **+${mods.join('')}**` : ''} · ${acc} · **${pp}**`,
+            `${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'}★ · ${L.ago(s.created_at)}`,
+        ].join('\n'),
+        thumbnail: { url: covers['list@2x'] || covers.list || covers.card || undefined },
+        color: L.srColor(bm.difficulty_rating),
+    };
+}
+
+// { id, username, avatar_url } is enough — the component path (no fresh
+// osu! API user lookup) only has that much.
+function topPage(u, apiMode, scores, page) {
+    const total = Math.min(scores.length, TOP_MAX);
+    const pages = Math.max(1, Math.ceil(total / TOP_PER_PAGE));
+    page = Math.max(0, Math.min(pages - 1, Number(page) || 0));
+    const start = page * TOP_PER_PAGE;
+
+    const embeds = scores.slice(start, start + TOP_PER_PAGE)
+        .map((s, i) => topScoreEmbed(s, start + i + 1, apiMode));
+    if (embeds[0]) embeds[0].author = L.osuAuthor(u, apiMode);
+    const last = embeds[embeds.length - 1];
+    if (last) {
+        last.footer = L.siteFooter(`${t('top_title', { name: u.username, mode: L.MODE_LABEL[apiMode], n: total })} · ${page + 1}/${pages}`);
+    }
+
+    const cid = (p) => `top|${u.id}|${apiMode}|${Math.max(0, p)}|${encodeURIComponent(u.username)}`;
+    const components = [{
+        type: 1,
+        components: [
+            { type: 2, style: 2, label: t('page_prev'), custom_id: cid(page - 1), disabled: page === 0 },
+            { type: 2, style: 2, label: t('page_next'), custom_id: cid(page + 1), disabled: page >= pages - 1 },
+        ],
+    }];
+    return { embeds, components };
+}
+
 async function cmdRecent(options, interaction) {
     const who = await resolveWho(options, interaction);
     if (!who) return L.ephemeral(t('need_name_or_link'));
@@ -198,26 +250,10 @@ async function cmdTop(options, interaction) {
         return L.message(e);
     }
 
-    const scores = await fetchScores(token, u.id, 'best', apiMode, 5, false);
+    const scores = await fetchScores(token, u.id, 'best', apiMode, TOP_MAX, false);
     if (!scores.length) return L.ephemeral(t('top_none', { name: u.username, mode: L.MODE_LABEL[apiMode] }));
-    const body = scores.map((s, i) => {
-        const bs = s.beatmapset || {}; const bm = s.beatmap || {};
-        const mods = L.modsList(s.mods);
-        const modStr = L.modsTag(s.mods);
-        const modText = mods.length ? ` **+${mods.join('')}**` : '';
-        const head = `**#${i + 1}** ${L.gradeTag(s.rank)}${modStr ? ' ' + modStr : ''}${modText} · **${s.pp != null ? Math.round(s.pp) + 'pp' : '—'}**`;
-        const line = `[${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]](${bm.url || 'https://osu.ppy.sh/b/' + bm.id})`;
-        const meta = `${s.accuracy != null ? (s.accuracy * 100).toFixed(2) + '%' : '—'} · ${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'}★ · ${L.ago(s.created_at)}`;
-        return `${head}\n${line}\n${meta}`;
-    }).join('\n\n');
-    return L.message({
-        author: L.osuAuthor(u, apiMode),
-        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${t('top_title', { name: u.username, mode: L.MODE_LABEL[apiMode], n: scores.length })}`,
-        url: `https://osu.ppy.sh/users/${u.id}/${apiMode}`,
-        color: L.srColor(scores[0].beatmap && scores[0].beatmap.difficulty_rating),
-        description: body.slice(0, 4096),
-        footer: L.siteFooter(t('api_v2')),
-    });
+    const v = topPage(u, apiMode, scores, 0);
+    return L.message(v.embeds, v.components);
 }
 
 /* --- /collect-channel: build a collection from links in this channel --- */
@@ -1031,6 +1067,28 @@ function osdbResponse(collections, baseName) {
 
 async function handleComponent(interaction, origin) {
     const id = (interaction.data && interaction.data.custom_id) || '';
+
+    // /top pagination: top|<userId>|<mode>|<page>|<usernameEncoded>. No fresh
+    // osu! user lookup here — the username came along in the custom_id and
+    // a.ppy.sh/<id> is a stable avatar URL, so this is one osu! API call.
+    if (id.startsWith('top|')) {
+        const [, userId, mode, pageS, nameEnc] = id.split('|');
+        const apiMode = L.API_MODE[mode] || 'osu';
+        const username = nameEnc ? decodeURIComponent(nameEnc) : `#${userId}`;
+        let scores;
+        try {
+            const token = await getOsuToken();
+            scores = await fetchScores(token, userId, 'best', apiMode, TOP_MAX, false);
+        } catch {
+            return L.updateMessage({ title: t('top_none', { name: username, mode: L.MODE_LABEL[apiMode] }), color: PINK });
+        }
+        if (!scores || !scores.length) {
+            return L.updateMessage({ title: t('top_none', { name: username, mode: L.MODE_LABEL[apiMode] }), color: PINK });
+        }
+        const u = { id: userId, username, avatar_url: `https://a.ppy.sh/${userId}` };
+        const v = topPage(u, apiMode, scores, Number(pageS) || 0);
+        return L.updateMessage(v.embeds, v.components);
+    }
 
     // .osdb export of a WC edition / one round: mpx|<folder>|<roundIdx|'*'>
     if (id.startsWith('mpx|')) {
