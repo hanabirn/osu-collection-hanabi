@@ -351,7 +351,25 @@ td.wrap, th.wrap { white-space: normal; }
 
 /* ---------- pagination ---------- */
 
-.pagination { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+/* Fixed to the viewport bottom (mania-tracker.com's own pagination bar
+   does this) so prev/next stay reachable without scrolling all the way
+   down a long table/grid. main:has(.pagination) reserves matching bottom
+   padding so the bar never covers the last row of real content. */
+.pagination {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+    padding: 14px 20px;
+    background: rgba(10, 10, 22, 0.92);
+    border-top: 1px solid var(--border);
+}
 .pagination button {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -366,7 +384,9 @@ td.wrap, th.wrap { white-space: normal; }
 }
 .pagination button:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-soft); }
 .pagination button:disabled { opacity: 0.35; cursor: default; }
-.pagination span { color: var(--text-dim); font-size: 0.85rem; }
+.pagination span { color: var(--text-dim); font-size: 0.85rem; min-width: 60px; text-align: center; }
+
+main:has(.pagination) { padding-bottom: 90px; }
 
 /* ---------- cards ---------- */
 
