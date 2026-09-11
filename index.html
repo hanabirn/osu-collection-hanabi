@@ -495,8 +495,16 @@
             </select>
             <select id="catalog-lang-filter" onchange="switchCatalogLang(this.value)"><option value="all" data-i18n="osu_lang_filter_all">全部語言</option></select>
             <select id="catalog-genre-filter" onchange="switchCatalogGenre(this.value)"><option value="all" data-i18n="osu_genre_filter_all">全部曲風</option></select>
-            <select id="catalog-source-filter" onchange="switchCatalogSource(this.value)"><option value="all" data-i18n="osu_source_filter_all">全部來源</option></select>
-            <select id="catalog-artist-filter" onchange="switchCatalogArtist(this.value)"><option value="all" data-i18n="osu_artist_filter_all">全部歌手</option></select>
+            <div class="catalog-combo" id="catalog-source-combo">
+                <input type="text" class="catalog-combo-input" id="catalog-source-combo-input" autocomplete="off" data-i18n-placeholder="osu_source_filter_all" placeholder="全部來源"
+                    oninput="catalogComboFilter('source', this.value)" onfocus="catalogComboOpen('source')">
+                <div class="catalog-combo-list" id="catalog-source-combo-list" hidden></div>
+            </div>
+            <div class="catalog-combo" id="catalog-artist-combo">
+                <input type="text" class="catalog-combo-input" id="catalog-artist-combo-input" autocomplete="off" data-i18n-placeholder="osu_artist_filter_all" placeholder="全部歌手"
+                    oninput="catalogComboFilter('artist', this.value)" onfocus="catalogComboOpen('artist')">
+                <div class="catalog-combo-list" id="catalog-artist-combo-list" hidden></div>
+            </div>
             <label class="gallery-liked-only-label">
                 <input type="checkbox" id="catalog-nsfw-checkbox" onchange="toggleCatalogNsfw(this.checked)">
                 <span data-i18n="catalog_nsfw_toggle">含 18+ 標記</span>

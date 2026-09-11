@@ -247,6 +247,7 @@ I18N.es = {
     catalog_coverage_pending: 'La base de datos aún se está preparando — vuelve pronto',
     catalog_empty: 'Ningún beatmapset coincide — prueba otro filtro',
     catalog_load_fail: 'No se pudo cargar el catálogo, inténtalo más tarde',
+    catalog_combo_no_match: 'Sin resultados coincidentes', catalog_combo_more_hint: '{n} resultados más — escribe para acotar la búsqueda',
     catalog_create_collection_btn: '➕ Crear una colección con este criterio',
     catalog_smart_toggle: 'Convertir en categoría dinámica', smart_cat_badge: 'Dinámica', smart_cat_last_sync: 'Última sincronización {d}', smart_cat_refresh_btn: 'Traer mapas recién clasificados', smart_cat_detach: 'Hacer estática', smart_cat_detach_confirm: '¿Dejar de sincronizar esta categoría? (los mapas ya añadidos se conservan)', smart_cat_no_new: 'No hay mapas nuevos que coincidan', smart_cat_synced: '{n} mapas nuevos añadidos',
     catalog_create_collection_hint: 'Elige primero un artista / idioma / género / fuente',

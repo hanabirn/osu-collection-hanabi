@@ -14,9 +14,9 @@
    vocabulary (shared modeIconSvg() etc.) right up until the fetch call. */
 const FARM_MODE_TO_API = { standard: 'osu', taiko: 'taiko', catch: 'fruits', mania: 'mania' };
 const FARM_MOD_COMBOS = ['NM', 'DT', 'HD', 'HDDT', 'HR', 'HDHR'];
-// 3-column grid, 2 rows per page (see #farm-maps-list in css/osu.css). Sent
+// 3-column grid, 4 rows per page (see #farm-maps-list in css/osu.css). Sent
 // to the server as `limit` (it already honours that override).
-const FARM_PAGE_SIZE = 6;
+const FARM_PAGE_SIZE = 12;
 
 let farmMapsLoaded = false;
 let farmMode = 'standard';

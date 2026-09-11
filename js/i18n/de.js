@@ -247,6 +247,7 @@ I18N.de = {
     catalog_coverage_pending: 'Die Datenbank wird noch vorbereitet — schau bald wieder vorbei',
     catalog_empty: 'Keine passenden Beatmapsets — probier einen anderen Filter',
     catalog_load_fail: 'Katalog konnte nicht geladen werden, später erneut versuchen',
+    catalog_combo_no_match: 'Keine passenden Ergebnisse', catalog_combo_more_hint: 'Noch {n} weitere Ergebnisse — Suche eingrenzen',
     catalog_create_collection_btn: '➕ Sammlung aus diesem Merkmal erstellen',
     catalog_smart_toggle: 'Als dynamische Kategorie', smart_cat_badge: 'Dynamisch', smart_cat_last_sync: 'Zuletzt synchronisiert {d}', smart_cat_refresh_btn: 'Neu gerankte Maps holen', smart_cat_detach: 'Statisch machen', smart_cat_detach_confirm: 'Diese Kategorie nicht mehr synchron halten? (gesammelte Maps bleiben)', smart_cat_no_new: 'Keine neuen passenden Maps', smart_cat_synced: '{n} neue Maps hinzugefügt',
     catalog_create_collection_hint: 'Wähle zuerst einen Künstler / eine Sprache / ein Genre / eine Quelle',

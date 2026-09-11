@@ -247,6 +247,7 @@ I18N.ru = {
     catalog_coverage_pending: 'База данных ещё готовится — загляните позже',
     catalog_empty: 'Нет подходящих наборов карт — измените фильтр',
     catalog_load_fail: 'Не удалось загрузить каталог, попробуйте позже',
+    catalog_combo_no_match: 'Нет совпадений', catalog_combo_more_hint: 'Ещё {n} результатов — уточните запрос',
     catalog_create_collection_btn: '➕ Создать коллекцию из этого признака',
     catalog_smart_toggle: 'Сделать динамической категорией', smart_cat_badge: 'Динамическая', smart_cat_last_sync: 'Последняя синхронизация {d}', smart_cat_refresh_btn: 'Подтянуть новые ранкнутые карты', smart_cat_detach: 'Сделать статической', smart_cat_detach_confirm: 'Прекратить синхронизацию этой категории? (добавленные карты останутся)', smart_cat_no_new: 'Нет новых подходящих карт', smart_cat_synced: 'Добавлено новых карт: {n}',
     catalog_create_collection_hint: 'Сначала выберите один исполнитель / язык / жанр / источник',

@@ -12,7 +12,6 @@ const { getCatalogStore } = require('./_blobs-store');
 const { getJSONGz } = require('./_blob-json');
 
 const PAGE_SIZE = 20;
-const FACET_TOP_N = 50;
 const MAX_LIMIT = 300;
 
 exports.handler = async (event) => {
@@ -125,10 +124,14 @@ exports.handler = async (event) => {
                 for (const k of r.artist_keys) artistCounts.set(k, (artistCounts.get(k) || 0) + 1);
             }
         }
+        // Every name carrying >=2 maps (rarer ones fold into "all"/"none"),
+        // sorted alphabetically for display — no top-N cap, the frontend is a
+        // searchable combobox rather than a plain <select> so a long list is
+        // fine. 'ja' locale collation orders kana by あいうえお reading order
+        // while still sorting Latin names A-Z.
         const topBy = (map, keyName) => [...map.entries()]
             .filter(([, c]) => c >= 2)
-            .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])))
-            .slice(0, FACET_TOP_N)
+            .sort((a, b) => String(a[0]).localeCompare(String(b[0]), 'ja'))
             .map(([k, c]) => ({ [keyName]: k, count: c }));
 
         const pageItems = items.slice(page * pageSize, (page + 1) * pageSize);

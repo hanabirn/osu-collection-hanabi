@@ -10,9 +10,9 @@
    applyImportedCollections. Frontend mode keys ('standard'/…) bridge to the
    API's ruleset ints via CATALOG_MODE_INT. */
 const CATALOG_MODE_INT = { standard: 0, taiko: 1, catch: 2, mania: 3 };
-// 3-column grid, 3 rows per page (see #catalog-list in css/osu.css). The
+// 3-column grid, 4 rows per page (see #catalog-list in css/osu.css). The
 // server takes this as a `pageSize` override.
-const CATALOG_PAGE_SIZE = 9;
+const CATALOG_PAGE_SIZE = 12;
 
 let catalogLoaded = false;
 let catalogPage = 0;
@@ -29,6 +29,17 @@ let catalogTotal = 0;
 let catalogCoverage = null;
 let catalogFacets = null;
 let catalogSearchDebounce = null;
+
+// The source/artist facets are unbounded (see catalog-list.js), so instead
+// of a plain <select> they're a searchable combobox: a text input that
+// filters catalogFacets.topSources/topArtists client-side. Rendered list is
+// still capped at CATALOG_COMBO_MAX_RESULTS to keep the dropdown DOM small
+// when the query is empty/broad — narrower typing shrinks it below the cap.
+const CATALOG_COMBO_MAX_RESULTS = 200;
+const catalogComboState = {
+    source: { query: '', open: false },
+    artist: { query: '', open: false },
+};
 
 function ensureCatalogLoaded() {
     if (!catalogLoaded) loadCatalogPage(0);
@@ -115,9 +126,9 @@ async function loadCatalogPage(page) {
     }
 }
 
-/* Rebuild the language / genre / source / artist <select>s from the facet
-   counts the server returned, keeping the current selection even if it fell
-   out of the top-N (append it as an extra option so it stays valid). */
+/* Rebuild the language/genre <select>s and the source/artist comboboxes
+   from the facet counts the server returned, keeping the current selection
+   valid even if it fell out of the facet response. */
 function rebuildCatalogFacetSelects() {
     if (!catalogFacets) return;
     const f = catalogFacets;
@@ -148,36 +159,130 @@ function rebuildCatalogFacetSelects() {
         genreSel.value = [...genreSel.options].some(o => o.value === catalogGenre) ? catalogGenre : (catalogGenre = 'all');
     }
 
-    const srcSel = document.getElementById('catalog-source-filter');
-    if (srcSel) {
-        let html = `<option value="all">${t('osu_source_filter_all')}</option>`;
-        if (f.noSourceCount) html += `<option value="none">${t('osu_source_filter_none')} (${f.noSourceCount})</option>`;
-        const sources = (f.topSources || []).slice();
-        if (catalogSource !== 'all' && catalogSource !== 'none' && !sources.some(s => s.name === catalogSource)) {
-            sources.push({ name: catalogSource, count: '·' });
-        }
-        for (const { name, count } of sources) {
-            html += `<option value="${escHtml(name)}">${escHtml(name)} (${count})</option>`;
-        }
-        srcSel.innerHTML = html;
-        srcSel.value = [...srcSel.options].some(o => o.value === catalogSource) ? catalogSource : (catalogSource = 'all');
-    }
-
-    const artistSel = document.getElementById('catalog-artist-filter');
-    if (artistSel) {
-        let html = `<option value="all">${t('osu_artist_filter_all')}</option>`;
-        const artists = (f.topArtists || []).slice();
-        if (catalogArtist !== 'all' && !artists.some(a => a.key === catalogArtist)) {
-            artists.push({ key: catalogArtist, count: '·' });
-        }
-        for (const { key, count } of artists) {
-            html += `<option value="${escHtml(key)}">${escHtml(key)} (${count})</option>`;
-        }
-        artistSel.innerHTML = html;
-        artistSel.value = [...artistSel.options].some(o => o.value === catalogArtist) ? catalogArtist : (catalogArtist = 'all');
-    }
-
+    // Source/artist are unbounded lists (no top-N cap server-side, see
+    // catalog-list.js), so they're a searchable combobox instead of a plain
+    // <select> — see catalogCombo* below.
+    catalogComboSyncValue('source');
+    catalogComboSyncValue('artist');
 }
+
+/* Every option for a combo kind, current facet counts plus a fallback entry
+   for the active selection if it's since dropped below the >=2 cutoff (so
+   the active filter still has a matching row). Source's "none" bucket is
+   pinned first, ahead of the alphabetically-sorted names from the server. */
+function catalogComboOptions(kind) {
+    if (!catalogFacets) return [];
+    if (kind === 'source') {
+        const opts = [];
+        if (catalogFacets.noSourceCount) opts.push({ value: 'none', label: t('osu_source_filter_none'), count: catalogFacets.noSourceCount });
+        for (const { name, count } of (catalogFacets.topSources || [])) opts.push({ value: name, label: name, count });
+        if (catalogSource !== 'all' && catalogSource !== 'none' && !opts.some(o => o.value === catalogSource)) {
+            opts.push({ value: catalogSource, label: catalogSource, count: '·' });
+        }
+        return opts;
+    }
+    const opts = (catalogFacets.topArtists || []).map(({ key, count }) => ({ value: key, label: key, count }));
+    if (catalogArtist !== 'all' && !opts.some(o => o.value === catalogArtist)) {
+        opts.push({ value: catalogArtist, label: catalogArtist, count: '·' });
+    }
+    return opts;
+}
+
+/* Reset an out-of-range selection back to 'all' (facets can shrink as
+   filters change) and refresh what the combo's input box displays. */
+function catalogComboSyncValue(kind) {
+    const opts = catalogComboOptions(kind);
+    if (kind === 'source') {
+        if (catalogSource !== 'all' && catalogSource !== 'none' && !opts.some(o => o.value === catalogSource)) catalogSource = 'all';
+    } else if (catalogArtist !== 'all' && !opts.some(o => o.value === catalogArtist)) {
+        catalogArtist = 'all';
+    }
+    const inputEl = document.getElementById(`catalog-${kind}-combo-input`);
+    if (!inputEl) return;
+    const current = kind === 'source' ? catalogSource : catalogArtist;
+    if (current === 'all') inputEl.value = '';
+    else if (current === 'none') inputEl.value = t('osu_source_filter_none');
+    else inputEl.value = current;
+    if (catalogComboState[kind].open) catalogComboRender(kind);
+}
+
+/* Rebuild the dropdown panel's contents: an "all" row, then every option
+   whose label contains the typed query (case-insensitive substring, so it
+   also matches mid-word — good enough without per-language reading data),
+   capped at CATALOG_COMBO_MAX_RESULTS with a "N more, keep typing" hint. */
+function catalogComboRender(kind) {
+    const listEl = document.getElementById(`catalog-${kind}-combo-list`);
+    if (!listEl) return;
+    const current = kind === 'source' ? catalogSource : catalogArtist;
+    const q = catalogComboState[kind].query.trim().toLowerCase();
+    const opts = catalogComboOptions(kind);
+    const matches = q ? opts.filter(o => o.label.toLowerCase().includes(q)) : opts;
+    const shown = matches.slice(0, CATALOG_COMBO_MAX_RESULTS);
+
+    const allLabel = t(kind === 'source' ? 'osu_source_filter_all' : 'osu_artist_filter_all');
+    let html = `<div class="catalog-combo-option${current === 'all' ? ' active' : ''}" data-combo-kind="${kind}" data-combo-value="all">${escHtml(allLabel)}</div>`;
+    if (!shown.length) {
+        html += `<div class="catalog-combo-empty">${t('catalog_combo_no_match')}</div>`;
+    } else {
+        for (const o of shown) {
+            html += `<div class="catalog-combo-option${o.value === current ? ' active' : ''}" data-combo-kind="${kind}" data-combo-value="${escHtml(o.value)}">${escHtml(o.label)} (${o.count})</div>`;
+        }
+        if (matches.length > shown.length) {
+            html += `<div class="catalog-combo-more">${t('catalog_combo_more_hint', { n: matches.length - shown.length })}</div>`;
+        }
+    }
+    listEl.innerHTML = html;
+}
+
+function catalogComboOpen(kind) {
+    catalogComboClose(kind === 'source' ? 'artist' : 'source');
+    catalogComboState[kind].open = true;
+    catalogComboRender(kind);
+    const listEl = document.getElementById(`catalog-${kind}-combo-list`);
+    if (listEl) listEl.hidden = false;
+}
+
+function catalogComboFilter(kind, value) {
+    catalogComboState[kind].query = value;
+    catalogComboOpen(kind);
+}
+
+function catalogComboClose(kind) {
+    if (!catalogComboState[kind].open) return;
+    catalogComboState[kind].open = false;
+    catalogComboState[kind].query = '';
+    const listEl = document.getElementById(`catalog-${kind}-combo-list`);
+    if (listEl) listEl.hidden = true;
+    // Closing without picking anything (Escape / click away) would otherwise
+    // leave whatever the visitor typed sitting in the box instead of the
+    // actually-active filter — snap the displayed text back in sync.
+    catalogComboSyncValue(kind);
+}
+
+function catalogComboPick(kind, value) {
+    if (kind === 'source') switchCatalogSource(value);
+    else switchCatalogArtist(value);
+    catalogComboClose(kind);
+}
+
+/* Delegated rather than inline onclick with dynamic strings, since artist/
+   source names can contain quotes/unicode that would need fragile escaping
+   into a JS string literal embedded in an HTML attribute (see the same
+   rationale in global-search.js). */
+document.addEventListener('click', (e) => {
+    const opt = e.target.closest('.catalog-combo-option');
+    if (opt) {
+        catalogComboPick(opt.dataset.comboKind, opt.dataset.comboValue);
+        return;
+    }
+    if (!e.target.closest('#catalog-source-combo')) catalogComboClose('source');
+    if (!e.target.closest('#catalog-artist-combo')) catalogComboClose('artist');
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    catalogComboClose('source');
+    catalogComboClose('artist');
+});
 
 /* How many sets in the visitor's own collection match the active facet.
    artist uses the same artistKeys() split as the crawler; source/genre/

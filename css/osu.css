@@ -1566,7 +1566,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    handful per screen. Scoped to #farm-maps-list so the main collection
    grid (#osu-collection) and gallery cards keep their own proportions. */
 #farm-maps-list.osu-collection {
-    /* Fixed 3 columns (6 per page, FARM_PAGE_SIZE) rather than auto-fill —
+    /* Fixed 3 columns (12 per page, FARM_PAGE_SIZE) rather than auto-fill —
        overflow goes to the next page. Drops to 2 then 1 on narrow screens;
        the per-page count doesn't change, it just stacks into more rows. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1737,10 +1737,78 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .smart-cat-detach svg { width: 13px; height: 13px; }
 .smart-cat-detach:hover { color: var(--text-primary); }
 
+/* Catalog "全部歌手"/"全部來源" searchable combobox — these two facets are
+   unbounded (no top-N cap, see catalog-list.js), so a plain <select> would
+   grow into a huge list; a text input + filtered floating panel keeps the
+   visible list short no matter how many names exist. Sized/styled to match
+   the plain <select>s it sits next to in the same .osu-search-row. */
+.catalog-combo {
+    position: relative;
+    flex: 0 1 auto;
+}
+/* IDs, not the .catalog-combo-input class — this is an input[type="text"]
+   inside .osu-search-row, and that generic rule (higher specificity: class
+   + attribute + element) would otherwise win over a single-class selector
+   here and force it full-width like the main search box. */
+#catalog-source-combo-input, #catalog-artist-combo-input {
+    width: auto;
+    min-width: 124px;
+    max-width: 210px;
+    padding: 8px 11px;
+    border-radius: 9px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-family: inherit;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+#catalog-source-combo-input:focus, #catalog-artist-combo-input:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+    box-shadow: 0 0 15px rgba(192,132,252,0.25);
+}
+.catalog-combo-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    min-width: 100%;
+    max-width: 320px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background: var(--bg-card);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
+.catalog-combo-option {
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.catalog-combo-option:hover { background: rgba(var(--accent-purple-rgb), 0.18); }
+.catalog-combo-option.active {
+    background: rgba(var(--accent-purple-rgb), 0.28);
+    font-weight: 700;
+}
+.catalog-combo-empty,
+.catalog-combo-more {
+    padding: 7px 10px;
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+}
 /* Catalog tab — same dense card grid as Farm 圖, but the meta line carries
    language / genre / source pills instead of pp/star/bpm. */
 #catalog-list.osu-collection {
-    /* Fixed 3 columns (9 per page, CATALOG_PAGE_SIZE) rather than auto-fill —
+    /* Fixed 3 columns (12 per page, CATALOG_PAGE_SIZE) rather than auto-fill —
        overflow goes to the next page. Drops to 2 then 1 on narrow screens;
        the per-page count doesn't change, it just stacks into more rows. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
