@@ -470,6 +470,27 @@ async function cmdMap(options, origin) {
         }
     } catch { /* pp is a nice-to-have */ }
 
+    // Mod-combo PP comparison at SS (matches the farm dataset's own
+    // convention — _farm-constants.js COMPUTE_ACCURACY). Mania's score mods
+    // don't change pp except DT's rate change (same domain knowledge as
+    // _farm-crawl-core.js's easeWeight()), so only NM/DT are worth showing
+    // there — HD/HR/HDDT/HDHR would just repeat the NM number.
+    const modCombos = bm.mode === 'mania' ? ['', 'DT'] : ['', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'];
+    let modPpLine = null;
+    try {
+        const modResults = await Promise.all(modCombos.map(async (mods) => {
+            const r = await fetch(`${origin}/.netlify/functions/osu-pp?id=${bm.id}&acc=100${mods ? `&mods=${mods}` : ''}`);
+            if (!r.ok) return null;
+            const d = await r.json();
+            const pp = d && d.pp && d.pp['100'];
+            return Number.isFinite(pp) ? Math.round(pp) : null;
+        }));
+        const parts = modCombos
+            .map((mods, i) => (modResults[i] != null ? `${mods || 'NM'} **${modResults[i]}**` : null))
+            .filter(Boolean);
+        if (parts.length > 1) modPpLine = parts.join(' · ');
+    } catch { /* nice-to-have */ }
+
     const mTag = L.modeTag(L.API_MODE[bm.mode]);
     const mpMode = { osu: 0, taiko: 1, fruits: 2, mania: 3 }[bm.mode] ?? 0;
     return L.message({
@@ -487,6 +508,7 @@ async function cmdMap(options, origin) {
             { name: t('f_status'), value: bm.status || '—', inline: true },
             { name: t('f_mp'), value: `\`!mp map ${bm.id} ${mpMode}\``, inline: false },
             ...(ppLine ? [{ name: t('f_pp_fc'), value: ppLine, inline: false }] : []),
+            ...(modPpLine ? [{ name: t('f_pp_mods'), value: modPpLine, inline: false }] : []),
         ],
         footer: L.siteFooter(bm.mode ? L.MODE_LABEL[L.API_MODE[bm.mode]] || bm.mode : undefined),
     });

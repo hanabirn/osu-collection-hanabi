@@ -95,6 +95,7 @@ const S = {
     f_status: { en: 'Status', zh: '狀態', zhs: '状态', ja: 'ステータス', fr: 'Statut', de: 'Status', ru: 'Статус', es: 'Estado', ko: '상태' },
     f_mp: { en: 'Multiplayer', zh: '多人房', zhs: '多人房', ja: 'マルチ', fr: 'Multijoueur', de: 'Multiplayer', ru: 'Мультиплеер', es: 'Multijugador', ko: '멀티' },
     f_pp_fc: { en: 'PP (FC)', zh: 'PP（FC）', zhs: 'PP（FC）', ja: 'PP（FC）', fr: 'PP (FC)', de: 'PP (FC)', ru: 'PP (FC)', es: 'PP (FC)', ko: 'PP (FC)' },
+    f_pp_mods: { en: 'PP by mod (SS)', zh: '各 Mod 的 PP（SS）', zhs: '各 Mod 的 PP（SS）', ja: 'Mod 別 PP（SS）', fr: 'PP par mod (SS)', de: 'PP nach Mod (SS)', ru: 'PP по модам (SS)', es: 'PP por mod (SS)', ko: 'Mod별 PP（SS）' },
 
     // --- /mappool ---
     mappool_need_edition: { en: 'Pick an edition (e.g. OWC/2024).', zh: '請選一個賽事版本（例如 OWC/2024）。', zhs: '请选一个赛事版本（例如 OWC/2024）。', ja: '大会（例：OWC/2024）を選んでください。', fr: 'Choisissez une édition (ex. OWC/2024).', de: 'Wähle eine Ausgabe (z. B. OWC/2024).', ru: 'Выберите турнир (напр. OWC/2024).', es: 'Elige una edición (p. ej. OWC/2024).', ko: '대회를 선택하세요 (예: OWC/2024).' },
