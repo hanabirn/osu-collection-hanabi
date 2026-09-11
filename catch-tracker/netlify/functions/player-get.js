@@ -43,6 +43,7 @@ function normalizeScore(score) {
         pp: score.pp ?? null,
         is_fc: isFC(score),
         passed: score.passed !== false,
+        has_replay: score.has_replay === true,
         created_at: score.created_at || null,
     };
 }

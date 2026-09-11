@@ -30,6 +30,21 @@ Nothing is inherited from the main site automatically.
 | `NETLIFY_BLOBS_SITE_ID` | **new** — this site's own Project ID | Site configuration → General → Project information. Must NOT be the main site's id — reusing it would write into the main site's blob storage. |
 | `NETLIFY_BLOBS_TOKEN` | **new** — a personal access token | User settings → Applications → New access token |
 | `CATCH_TRACKER_CRAWL_SECRET` | freshly generated random string | gates `rankings-crawl-run` / `scores-poll-run` |
+| `OSU_REPLAY_CLIENT_ID` | **new osu! OAuth app**, separate from `OSU_CLIENT_ID` | `authorization_code` binds a redirect URI to one app — see below |
+| `OSU_REPLAY_CLIENT_SECRET` | that new app's secret | |
+| `OSU_REPLAY_REDIRECT_URI` | `https://<catch-tracker-site>.netlify.app/.netlify/functions/osu-replay-callback` | must exactly match the callback URL registered on the new osu! OAuth app |
+| `OSU_AUTH_SECRET` | freshly generated random string | signs Watch Replay's identity token — do NOT reuse the main site's value |
+| `TOKEN_ENC_KEY` | `openssl rand -base64 32` | encrypts each logged-in user's osu! access/refresh token at rest (see `_token-crypto.js`) |
+
+### Watch Replay's osu! OAuth app
+
+1. On osu!, go to Account Settings → OAuth → **New OAuth Application**.
+2. Application Callback URLs: the exact `OSU_REPLAY_REDIRECT_URI` above.
+3. Copy the generated Client ID/Secret into the two env vars above.
+4. This app is used ONLY for the user-login flow (Watch Replay) — the
+   existing `OSU_CLIENT_ID`/`OSU_CLIENT_SECRET` (shared with the main site,
+   `client_credentials` only) are untouched and keep working exactly as
+   before.
 
 ## 3. Seed the data
 

@@ -117,6 +117,16 @@ const LANG_STRINGS = {
         bbcode_copy: '複製 BBCode',
         bbcode_clear: '清空',
         bbcode_placeholder: '在這裡輸入你的 BBCode…',
+
+        login_with_osu: '使用 osu! 登入',
+        logout: '登出',
+        login_failed: '登入失敗，請再試一次',
+        watch_replay: '看回放',
+        replay_login_prompt: '使用 osu! 帳號登入以觀看回放',
+        replay_loading: '回放載入中…',
+        replay_not_found: '找不到這筆成績的回放',
+        replay_owner_only: '這個回放可能只有本人才能觀看',
+        replay_fetch_failed: '回放下載失敗：{msg}',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -220,6 +230,16 @@ const LANG_STRINGS = {
         bbcode_copy: 'Copy BBCode',
         bbcode_clear: 'Clear',
         bbcode_placeholder: 'Write your BBCode here…',
+
+        login_with_osu: 'Login with osu!',
+        logout: 'Logout',
+        login_failed: 'Login failed, please try again',
+        watch_replay: 'Watch Replay',
+        replay_login_prompt: 'Login with your osu! account to watch replays',
+        replay_loading: 'Loading replay…',
+        replay_not_found: 'No replay available for this score',
+        replay_owner_only: 'This replay may only be viewable by its owner',
+        replay_fetch_failed: 'Failed to download replay: {msg}',
     },
 };
 
@@ -262,6 +282,87 @@ function applyStaticI18n() {
     document.documentElement.lang = getLang() === 'zh' ? 'zh-Hant' : 'en';
 }
 applyStaticI18n();
+
+/* ---------- osu! OAuth login (Watch Replay) ----------
+   netlify/functions/osu-replay-login.js + osu-replay-callback.js run the
+   authorization-code flow and redirect back here with
+   ?ct_login=<id>&ct_login_name=<name>&ct_login_token=<signed token> (or
+   ?ct_login_error=<stage> on failure). Unlike the main site's login, the
+   real osu! access token is never sent to the client — it stays encrypted
+   server-side (see _replay-auth.js) so replay-download.js can reuse it on
+   later visits without asking for another login every time. */
+const CT_LOGIN_STORAGE_KEY = 'ct_logged_in_user';
+
+function getCtLoggedInUser() {
+    try { return JSON.parse(localStorage.getItem(CT_LOGIN_STORAGE_KEY)); }
+    catch { return null; }
+}
+
+function getCtAuthToken() {
+    const user = getCtLoggedInUser();
+    return user && user.token ? user.token : null;
+}
+
+function logoutCtUser() {
+    localStorage.removeItem(CT_LOGIN_STORAGE_KEY);
+    applyCtLoggedInUser();
+}
+
+function ctLoginUrl() {
+    const returnTo = location.pathname + location.search;
+    return `/.netlify/functions/osu-replay-login?${new URLSearchParams({ return_to: returnTo })}`;
+}
+
+function applyCtLoggedInUser() {
+    const user = getCtLoggedInUser();
+    const loginBtn = document.getElementById('ct-login-btn');
+    const pill = document.getElementById('ct-logged-in-pill');
+    if (loginBtn) {
+        loginBtn.style.display = user ? 'none' : '';
+        loginBtn.href = ctLoginUrl();
+    }
+    if (pill) pill.style.display = user ? '' : 'none';
+    if (!user) return;
+    const nameEl = document.getElementById('ct-logged-in-name');
+    const avatarEl = document.getElementById('ct-logged-in-avatar');
+    if (nameEl) nameEl.textContent = user.username || `#${user.id}`;
+    if (avatarEl) avatarEl.src = `https://a.ppy.sh/${user.id}`;
+}
+
+function showCtLoginMsg(msg) {
+    const el = document.getElementById('ct-login-msg');
+    if (!el) return;
+    el.textContent = msg;
+    el.hidden = false;
+    setTimeout(() => { el.hidden = true; }, 6000);
+}
+
+function checkCtLoginFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('ct_login');
+    const loginFailed = params.get('ct_login_error');
+
+    if (id) {
+        localStorage.setItem(CT_LOGIN_STORAGE_KEY, JSON.stringify({
+            id,
+            username: params.get('ct_login_name') || '',
+            token: params.get('ct_login_token') || null,
+        }));
+    }
+    if (id || loginFailed) {
+        params.delete('ct_login');
+        params.delete('ct_login_name');
+        params.delete('ct_login_token');
+        params.delete('ct_login_error');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+        if (loginFailed) showCtLoginMsg(t('login_failed'));
+    }
+
+    applyCtLoggedInUser();
+    const logoutBtn = document.getElementById('ct-logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logoutCtUser);
+}
 
 /* ---------- grade badges / mods / relative time ---------- */
 
@@ -549,3 +650,4 @@ initBananaRain();
 // common.js is loaded at the end of <body>, after the header markup, so the
 // DOM is already parsed — no need to wait for DOMContentLoaded here.
 initPlayerSearch();
+checkCtLoginFromUrl();

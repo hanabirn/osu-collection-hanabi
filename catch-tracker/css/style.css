@@ -156,6 +156,52 @@ header.site-header nav a.active { color: var(--accent); background: var(--accent
 }
 .lang-toggle:hover { color: var(--text); border-color: var(--primary); }
 
+/* ---------- header login (Watch Replay) ---------- */
+
+.ct-login-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    padding: 0 14px;
+    min-height: 34px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    transition: border-color 150ms ease, color 150ms ease;
+}
+.ct-login-btn:hover { color: var(--text); border-color: var(--primary); text-decoration: none; }
+
+.ct-login-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 6px 4px 4px;
+    min-height: 34px;
+}
+.ct-login-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.ct-login-pill span { font-size: 0.82rem; font-weight: 600; color: var(--text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ct-logout-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 0.76rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+.ct-logout-btn:hover { color: var(--accent); background: var(--accent-soft); }
+
+.ct-login-msg { font-size: 0.78rem; color: var(--accent); }
+
 /* ---------- layout ---------- */
 
 main { max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; }
