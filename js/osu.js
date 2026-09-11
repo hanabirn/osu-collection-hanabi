@@ -676,12 +676,14 @@ function copyMpMap(setId, event) {
     }
 }
 
-// Local Songs-folder scan (File System Access API) was removed: Chrome
-// hard-blocks a website from opening ANY folder under %AppData% ("contains
-// system files"), and that's exactly where osu! *stable*'s default install
-// puts Songs — %localappdata%\osu!\Songs. So the feature only ever worked
-// for the minority who installed to a custom, non-AppData path; everyone
-// else hit an unfixable browser-level wall. See [[local-download-scan-2026-09]].
+// The original local-download detector asked for a *folder* handle (File
+// System Access API) to osu! stable's Songs directory — Chrome hard-blocks
+// that everywhere under %AppData%, which is exactly where the default
+// install puts Songs, so it only ever worked for a custom-path minority.
+// Replaced with js/local-db-match.js: a plain single-file upload of osu!
+// stable's own "osu!.db" cache (same %AppData% folder, but a single-file
+// pick isn't subject to the directory-grant block), parsed client-side for
+// beatmapset ids. See isLocalDbMatched() in js/local-db-match.js / [[local-download-scan-2026-09]].
 
 function osuSetVolume(val) {
     osuVolume = parseFloat(val);
@@ -3883,6 +3885,7 @@ function renderOsuCollection() {
     container.innerHTML = pageSets.map(set => {
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         const isFav = isOsuFavorited(set.beatmapset_id);
+        const isLocalDl = typeof isLocalDbMatched === 'function' && isLocalDbMatched(set.beatmapset_id);
         // A beatmapset can mix rulesets (e.g. a taiko+mania crossover set) —
         // each difficulty may belong to a different mode than the set's own
         // collection category, so prefer each beatmap's own mode_int (added
@@ -3919,7 +3922,7 @@ function renderOsuCollection() {
                 <span class="osu-card-actions-sep" aria-hidden="true"></span>
                 <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}" aria-label="${t('mappools_copy_id')}">${icon('copy')}</button>
                 <button class="osu-mp-btn" onclick="copyMpMap(${set.beatmapset_id}, event)" title="${t('mplist_mp_hint')}" aria-label="${t('mplist_mp_hint')}">${icon('swords')}</button>
-                <button class="osu-download-btn" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${t('osu_download_btn_title')}" aria-label="${t('osu_download_btn_title')}">${icon('download')}</button>
+                <button class="osu-download-btn ${isLocalDl ? 'db-matched' : ''}" onclick="downloadBeatmapset(${set.beatmapset_id}, event)" title="${isLocalDl ? t('local_db_matched_title') : t('osu_download_btn_title')}" aria-label="${isLocalDl ? t('local_db_matched_title') : t('osu_download_btn_title')}">${icon('download')}</button>
                 <span class="osu-card-actions-sep" aria-hidden="true"></span>
                 <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="${t('osu_delete_btn_title')}" aria-label="${t('osu_delete_btn_title')}">${icon('x')}</button>
             </div>

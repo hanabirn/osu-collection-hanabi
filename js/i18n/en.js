@@ -65,7 +65,7 @@ I18N.en = {
                 <p class="howto-tab-desc">Manage your own osu! library: add, categorize, export back to the game, or diff against an old backup.</p>
                 <div class="howto-feat"><b>Add a beatmap</b><span>Paste the map's ID or osu! URL (beatmapsets/... or /b/... both work) and click Add.</span></div>
                 <div class="howto-feat"><b>Import/export (6 buttons)</b><span>Left to right: Export JSON backup → Import JSON to restore → Copy a share link → Download a preview PNG card → Export as collection.db to drop straight into osu! → ⚔ Diff, upload an old backup to see what was added/removed.</span></div>
-                <div class="howto-feat"><b>Tools & settings (6 buttons)</b><span>Refresh all maps' data → 📊 Stats dashboard (with 8 collection achievement badges) → ✨ Collection wizard (see below) → Mark as played / one-click import favorites & most-played (login required) → 🔒 Set a password, required for later edit/publish actions.</span></div>
+                <div class="howto-feat"><b>Tools & settings (7 buttons)</b><span>Refresh all maps' data → 📊 Stats dashboard (with 8 collection achievement badges) → ✨ Collection wizard (see below) → Mark as played / one-click import favorites & most-played (login required) → 📁 Upload your osu!.db to mark which maps you already have (osu! stable only) → 🔒 Set a password, required for later edit/publish actions.</span></div>
                 <div class="howto-feat"><b>Search / filter / sort</b><span>Search by title or artist; filter by language, genre, source, or artist; sort by star rating.</span></div>
                 <div class="howto-feat"><b>Batch-download this list's files</b><span>Downloads every map in the current tab/search/filter view (every page, not just the visible one) as .osz, one at a time, via a no-login mirror — no app to install. The same button pauses/resumes mid-run without cutting off whatever's downloading. Once done, select them all in your file manager and drag the lot into osu! to import.</span></div>
                 <div class="howto-feat"><b>Copy !mp map</b><span>Every card has a ⚔ button that copies that map as an <code>!mp map</code> line — be the host in an osu! multiplayer lobby and paste it to set the map. <code>/map</code> in the Discord bot shows the same line.</span></div>
@@ -593,6 +593,12 @@ I18N.en = {
     check_played_btn_title: "Mark which maps on this page you've played\nNeeds osu! login; checks your best score on each map", play_status_unplayed_title: "You haven't played this map yet (hardest difficulty)",
 
     play_status_played_title: 'You\'ve played this map, rank {rank}', play_status_fc_title: "You've FC'd this map, rank {rank}",
+
+    local_db_btn_title: "Upload your osu!.db to mark which maps you already have\nosu! stable only, usually at %localappdata%\\osu!\\osu!.db",
+    local_db_fail: "Couldn't read that file — make sure it's osu! stable's osu!.db",
+    local_db_none: 'No beatmaps found in that file',
+    local_db_done: 'Matched against your local database: {n} beatmapsets found',
+    local_db_matched_title: 'Already in your local osu!.db',
 
     pp_race_title: 'PP Race',
 
