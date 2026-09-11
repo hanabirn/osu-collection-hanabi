@@ -95,6 +95,7 @@ I18N.de = {
     digest_goal: 'Ziel {target}pp — noch {remaining} ({pct}%)',
     digest_goal_done: '🎉 Ziel erreicht: {target}pp!',
     explore_title: 'Mehr entdecken',
+    trending_title: 'Angesagte neue Songs',
     explore_lookup_d: 'Dein Gesamt-PP, eine tägliche Fortschrittskurve, Vergleich mit Freunden',
     explore_farm_d: 'Eine Liste von High-pp-Farm-Maps passend zu deinem Bereich',
     explore_gallery_d: 'Durchstöbere öffentliche Sammlungen, importiere eine mit einem Klick',

@@ -32,6 +32,34 @@
 /* "探索更多" — feature doorways at the bottom of the collection page so a
    first-time visitor discovers this is a companion app, not a one-shot
    converter (the 12 tabs otherwise live only behind the ☰ drawer). */
+/* 熱門新曲: site-wide discovery row (js/trending.js) — reuses .osu-card's
+   own building blocks (bg/overlay/info/farm-add-btn), just with its own
+   grid sizing + a compact aspect ratio to suit the extra meta line. */
+.trending-row {
+    margin-top: 28px;
+}
+.trending-row h3 {
+    margin: 0 0 14px;
+    text-align: center;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+}
+.trending-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+#trending-grid .osu-card { aspect-ratio: 4 / 1.35; }
+#trending-grid .osu-card-title { font-size: 0.85rem; }
+#trending-grid .osu-card-artist { font-size: 0.7rem; }
+.trending-card-meta {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.75);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+    margin-top: 2px;
+}
+
 .explore-row {
     margin-top: 28px;
     padding-top: 20px;

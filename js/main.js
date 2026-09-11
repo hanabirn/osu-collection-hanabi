@@ -194,6 +194,7 @@ function refreshDynamicContent() {
     if (typeof refreshCatalogLocalized === 'function') refreshCatalogLocalized();
     if (typeof refreshMappoolsLocalized === 'function') refreshMappoolsLocalized();
     if (typeof refreshGamesLocalized === 'function') refreshGamesLocalized();
+    if (typeof refreshTrendingLocalized === 'function') refreshTrendingLocalized();
 }
 
 /* ===== Keyboard shortcuts =====
@@ -243,4 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // "為你更新" digest — runs after notifications so it can count what just
     // landed; its own network calls are gated (PP at most every 6h).
     setTimeout(() => { if (typeof renderCollectionDigest === 'function') renderCollectionDigest(); }, 1200);
+    // 熱門新曲 — a discovery nice-to-have, yields to everything above it.
+    setTimeout(() => { if (typeof loadTrendingSongs === 'function') loadTrendingSongs(); }, 1500);
 });

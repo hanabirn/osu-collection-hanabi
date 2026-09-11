@@ -95,6 +95,7 @@ I18N.es = {
     digest_goal: 'Objetivo {target}pp — faltan {remaining} ({pct}%)',
     digest_goal_done: '🎉 ¡Objetivo alcanzado: {target}pp!',
     explore_title: 'Explorar más',
+    trending_title: 'Canciones nuevas populares',
     explore_lookup_d: 'Tu PP total, una curva de progreso diaria, comparar con amigos',
     explore_farm_d: 'Una lista de mapas farm de alto pp ajustada a tu nivel',
     explore_gallery_d: 'Explora colecciones públicas, importa una con un clic',

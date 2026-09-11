@@ -95,6 +95,7 @@ I18N.ru = {
     digest_goal: 'Цель {target}pp — осталось {remaining} ({pct}%)',
     digest_goal_done: '🎉 Цель достигнута: {target}pp!',
     explore_title: 'Ещё возможности',
+    trending_title: 'Популярные новинки',
     explore_lookup_d: 'Ваш общий PP, график прогресса по дням, сравнение с друзьями',
     explore_farm_d: 'Список фарм-карт с высоким pp под ваш диапазон',
     explore_gallery_d: 'Смотрите чужие коллекции и импортируйте в один клик',

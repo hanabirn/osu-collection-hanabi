@@ -95,6 +95,7 @@ I18N.ja = {
     digest_goal: '目標 {target}pp — あと {remaining}（{pct}%）',
     digest_goal_done: '🎉 目標 {target}pp を達成！',
     explore_title: 'もっと見る',
+    trending_title: '話題の新曲',
     explore_lookup_d: '合計 PP、日別の推移グラフ、フレンドと比較',
     explore_farm_d: 'あなたの分帯向けの高 pp farm 譜面リスト',
     explore_gallery_d: '他の人の公開コレクションを見て、ワンクリックで取り込み',

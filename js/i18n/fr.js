@@ -95,6 +95,7 @@ I18N.fr = {
     digest_goal: 'Objectif {target}pp — encore {remaining} ({pct}%)',
     digest_goal_done: '🎉 Objectif atteint : {target}pp !',
     explore_title: 'Explorer plus',
+    trending_title: 'Nouveautés tendance',
     explore_lookup_d: 'Ton PP total, une courbe de progression quotidienne, comparaison entre amis',
     explore_farm_d: 'Une liste de maps farm à haut pp adaptée à ton niveau',
     explore_gallery_d: 'Parcours les collections publiques, importe-en une en un clic',

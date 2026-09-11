@@ -233,6 +233,7 @@ I18N.en = {
     digest_goal: 'Goal {target}pp — {remaining} to go ({pct}%)',
     digest_goal_done: '🎉 Goal reached: {target}pp!',
     explore_title: 'Explore more',
+    trending_title: 'Trending new songs',
     explore_lookup_d: 'Your total PP, a daily progress curve, compare with friends',
     explore_farm_d: 'A high-pp farm-map list tuned to your bracket',
     explore_gallery_d: 'Browse public collections, import one with a click',

@@ -57,6 +57,7 @@ I18N.zh = {
     digest_goal: '目標 {target}pp — 還差 {remaining}（{pct}%）',
     digest_goal_done: '🎉 已達成目標 {target}pp！',
     explore_title: '探索更多',
+    trending_title: '熱門新曲',
     explore_lookup_d: '查你的總 PP、每日進步曲線、和朋友比較',
     explore_farm_d: '依你分段整理的高 pp farm 圖清單',
     explore_gallery_d: '看別人公開的收藏，一鍵匯入你的',

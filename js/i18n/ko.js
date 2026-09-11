@@ -95,6 +95,7 @@ I18N.ko = {
     digest_goal: '목표 {target}pp — {remaining} 남음 ({pct}%)',
     digest_goal_done: '🎉 목표 {target}pp 달성!',
     explore_title: '더 살펴보기',
+    trending_title: '인기 신곡',
     explore_lookup_d: '총 PP, 일별 진행 곡선, 친구와 비교',
     explore_farm_d: '내 랭크대에 맞춘 고 pp farm 맵 목록',
     explore_gallery_d: '다른 사람의 공개 컬렉션을 보고 클릭 한 번으로 가져오기',
