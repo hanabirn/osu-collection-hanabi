@@ -263,6 +263,25 @@ function coverArtUrl(beatmapsetId) {
     return beatmapsetId ? `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/cover.jpg` : '';
 }
 
+// Small inline-SVG status badges matching osu!'s own iconography (blue
+// double-chevron for ranked, pink heart for loved) instead of a plain
+// text pill — see the reference screenshot in conversation.
+const STATUS_ICONS = {
+    ranked: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 14 12 8 18 14"></polyline><polyline points="6 20 12 14 18 20"></polyline></svg>',
+    loved: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.716-4.35-9.428-8.014C.29 9.86 1.1 6.2 4.2 4.9c2.1-.88 4.42-.1 5.8 1.62C11.38 4.8 13.7 4.02 15.8 4.9c3.1 1.3 3.91 4.96 1.63 8.086C18.716 16.65 12 21 12 21z"/></svg>',
+};
+function statusIcon(status) {
+    const svg = STATUS_ICONS[status];
+    return svg ? `<span class="status-icon ${status}" title="${escapeHtml(status)}">${svg}</span>` : '';
+}
+
+// Label text + icon to its right, e.g. "RANKED [chevrons]" / "LOVED [heart]".
+function statusBadge(status) {
+    if (!STATUS_ICONS[status]) return '';
+    const label = status === 'ranked' ? t('status_ranked') : t('status_loved');
+    return `<span class="map-status-badge ${status}">${escapeHtml(label)}${statusIcon(status)}</span>`;
+}
+
 function highlightCard(s) {
     const cover = coverArtUrl(s.beatmapset_id);
     const style = cover ? ` style="background-image:url('${cover.replace(/'/g, '%27')}')"` : '';

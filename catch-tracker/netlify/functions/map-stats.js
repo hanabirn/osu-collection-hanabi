@@ -73,21 +73,24 @@ exports.handler = async (event) => {
             difficulty_rating: scores[0].difficulty_rating,
         } : null;
 
-        if (!meta) {
-            const maps = await loadMaps();
-            const cataloged = maps.find(m => m.beatmap_id === beatmapId);
-            if (cataloged) {
-                meta = {
-                    beatmap_id: cataloged.beatmap_id,
-                    beatmapset_id: cataloged.beatmapset_id,
-                    artist: cataloged.artist,
-                    title: cataloged.title,
-                    version: cataloged.version,
-                    creator: cataloged.creator,
-                    difficulty_rating: cataloged.difficulty_rating,
-                };
-            }
+        // The catalog is also the only source for ranked/loved status —
+        // feed records (from observed scores) don't carry it — so look it
+        // up regardless of whether `meta` already came from a score.
+        const maps = await loadMaps();
+        const cataloged = maps.find(m => m.beatmap_id === beatmapId);
+
+        if (!meta && cataloged) {
+            meta = {
+                beatmap_id: cataloged.beatmap_id,
+                beatmapset_id: cataloged.beatmapset_id,
+                artist: cataloged.artist,
+                title: cataloged.title,
+                version: cataloged.version,
+                creator: cataloged.creator,
+                difficulty_rating: cataloged.difficulty_rating,
+            };
         }
+        if (meta) meta.status = cataloged ? cataloged.status : null;
 
         return {
             statusCode: 200,

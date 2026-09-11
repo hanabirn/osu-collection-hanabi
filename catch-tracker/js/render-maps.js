@@ -8,7 +8,7 @@ function mapCard(m) {
     const style = cover ? ` style="background-image:url('${cover.replace(/'/g, '%27')}')"` : '';
     const star = m.difficulty_rating != null ? m.difficulty_rating.toFixed(2) + '★' : '';
     return `<a class="map-card" href="map.html?id=${encodeURIComponent(m.beatmap_id)}"${style}>
-        <span class="map-status">${escapeHtml(m.status || '')}</span>
+${statusBadge(m.status)}
         ${star ? `<span class="map-star">${escapeHtml(star)}</span>` : ''}
         <div class="map-title">${escapeHtml(m.title || '')} [${escapeHtml(m.version || '')}]</div>
         <div class="map-artist">${escapeHtml(m.artist || '')}</div>
