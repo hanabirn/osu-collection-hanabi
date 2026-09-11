@@ -7,7 +7,7 @@ const MAX_DIFF_ICONS = 8;
 const PAGE_SIZE = 16; // 4x4 grid
 
 function mapCard(set) {
-    const cover = coverArtUrl(set.beatmapset_id);
+    const cover = coverArtUrlCard(set.beatmapset_id);
     const style = cover ? ` style="background-image:url('${cover.replace(/'/g, '%27')}')"` : '';
     const starLabel = set.star_min != null && set.star_max != null
         ? (set.star_min === set.star_max ? set.star_min.toFixed(2) + '★' : `${set.star_min.toFixed(2)}–${set.star_max.toFixed(2)}★`)

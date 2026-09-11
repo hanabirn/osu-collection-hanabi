@@ -526,7 +526,7 @@ main:has(.pagination) { padding-bottom: 90px; }
 .map-card:hover { border-color: var(--border-strong); }
 .map-card-cover {
     position: relative;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 2.79 / 1; /* matches osu!'s own "card" cover crop, measured off mania-tracker.com/maps (279x100) */
     background-color: var(--bg-elevated);
     background-size: cover;
     background-position: center;

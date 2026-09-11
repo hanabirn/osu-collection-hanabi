@@ -265,6 +265,15 @@ function coverArtUrl(beatmapsetId) {
     return beatmapsetId ? `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/cover.jpg` : '';
 }
 
+// osu!'s "card" cover variant — purpose-cropped to a ~2.8:1 banner (279x100
+// measured live off mania-tracker.com/maps, which uses this exact variant
+// for its catalog grid), rather than forcing the wider `cover.jpg` hero
+// crop into a narrow box via background-size:cover and losing more of the
+// image than necessary.
+function coverArtUrlCard(beatmapsetId) {
+    return beatmapsetId ? `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card.jpg` : '';
+}
+
 // Small inline-SVG status badges matching osu!'s own iconography (blue
 // double-chevron for ranked, pink heart for loved) instead of a plain
 // text pill — see the reference screenshot in conversation.
