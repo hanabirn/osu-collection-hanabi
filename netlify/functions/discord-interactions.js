@@ -364,45 +364,27 @@ async function cmdFollowing(interaction) {
     return L.ephemeral(t('following_list', { names: names.join(', ') }));
 }
 
-/* --- /practice ------------------------------------------------------------ */
+/* --- deferred (slow) commands ------------------------------------------- *
+   A command whose work can't finish inside Discord's 3 s window: hand it to
+   the discord-work-background.js background function, then answer with a
+   deferred ("Bot is thinking…") response. The background fn PATCHes the
+   result in (see _discord-followup.js). `/practice` is the first — its
+   getOsuToken -> 2 osu! API calls -> farm-maps-list chain is ~2–4 s. */
+async function dispatchDeferred(command, { interaction, options, origin, lang }) {
+    const accepted = await fetch(`${origin}/.netlify/functions/discord-work-background`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-work-secret': process.env.DISCORD_WORK_SECRET || '' },
+        body: JSON.stringify({
+            command, lang,
+            appId: interaction.application_id,
+            token: interaction.token,
+            invokerId: L.invokerId(interaction),
+            options, origin,
+        }),
+    }).then(r => r.ok || r.status === 202).catch(() => false);
 
-async function cmdPractice(options, interaction, origin) {
-    const who = await resolveWho(options, interaction);
-    if (!who) return L.ephemeral(t('need_name_or_link'));
-    const targetPp = Number(L.optVal(options, 'target_pp'));
-    const kind = Number.isFinite(targetPp) && targetPp > 0 ? 'goal' : 'push';
-
-    const qs = new URLSearchParams({ user: who, kind });
-    if (kind === 'goal') qs.set('target', String(targetPp));
-    const r = await fetch(`${origin}/.netlify/functions/practice-generate?${qs}`);
-    const data = await r.json().catch(() => ({}));
-
-    if (r.status === 404) return L.ephemeral(t('user_not_found', { name: who }));
-    if (r.status === 422 && data.error === 'not enough top plays') return L.ephemeral(t('practice_need_plays'));
-    if (r.status === 422) return L.ephemeral(t('practice_thin'));
-    if (data.error === 'goal already reached') return L.ephemeral(t('practice_goal_reached'));
-    if (!r.ok || !Array.isArray(data.maps) || !data.maps.length) return L.ephemeral(t('practice_thin'));
-
-    const beatmaps = data.maps.map(m => ({
-        mapId: m.beatmapId, mapSetId: m.setId, artist: m.artist, title: m.title,
-        diff: '', md5: '', mode: 0, stars: m.stars || 0,
-    }));
-    const bytes = buildOsdb([{ name: data.name, beatmaps }], 'osu! Collection bot');
-    const filename = `${data.name.replace(/[^\w.\- ]+/g, '').trim().slice(0, 60) || 'practice'}.osdb`;
-
-    const preview = data.maps.slice(0, 10)
-        .map(m => `${Number(m.stars).toFixed(2)}★ · [${m.artist} - ${m.title}](https://osu.ppy.sh/b/${m.beatmapId})`)
-        .join('\n');
-    const extra = data.maps.length - 10;
-
-    const coverSet = (data.maps.find(m => m.setId) || {}).setId;
-    return messageWithFile({
-        title: t('practice_title', { name: data.name }),
-        description: `${t('practice_summary', { count: data.count, note: data.note })}\n\n${preview}${extra > 0 ? `\n${t('practice_more', { n: extra })}` : ''}`,
-        color: PINK,
-        thumbnail: coverSet ? { url: `https://assets.ppy.sh/beatmaps/${coverSet}/covers/list@2x.jpg` } : undefined,
-        footer: L.siteFooter(t('export_done', { name: filename })),
-    }, { filename, body: bytes, contentType: 'application/octet-stream' });
+    if (!accepted) return L.ephemeral(t('deferred_timeout'));
+    return L.json({ type: L.R.DEFERRED_MESSAGE, data: { flags: L.EPHEMERAL } });
 }
 
 /* --- /map ----------------------------------------------------------------- */
@@ -1217,7 +1199,9 @@ exports.handler = async (event) => {
                 case 'recent': return await cmdRecent(options, interaction);
                 case 'top': return await cmdTop(options, interaction);
                 case 'map': return await cmdMap(options, origin);
-                case 'practice': return await cmdPractice(options, interaction, origin);
+                case 'practice': return await dispatchDeferred('practice', {
+                    interaction, options, origin, lang: savedLang || interaction.locale,
+                });
                 case 'collect-channel': return await cmdCollectChannel(options, interaction, origin);
                 case 'follow': return await cmdFollow(options, interaction);
                 case 'unfollow': return await cmdUnfollow(options, interaction);
