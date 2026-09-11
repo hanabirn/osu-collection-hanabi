@@ -859,18 +859,27 @@ async function cmdCollection(options, origin) {
     if (!entry) return L.ephemeral(t('collection_not_found', { q: query }));
 
     const full = await store.get(`full:${entry.id}`, { type: 'json' });
+    // og-collection.js's own pick order: first non-empty mode, that mode's
+    // first set. Mirrored here so the "cover art from" link points at
+    // exactly the set the embed's image is showing.
+    const MODE_API = { standard: 'osu', taiko: 'taiko', catch: 'fruits', mania: 'mania' };
     const modeBits = [];
+    let coverSet = null;
     if (full && full.collection) {
-        for (const [m, label] of [['standard', 'std'], ['taiko', 'taiko'], ['catch', 'catch'], ['mania', 'mania']]) {
-            const n = Array.isArray(full.collection[m]) ? full.collection[m].length : 0;
-            if (n) modeBits.push(`${label} ${n}`);
+        for (const m of ['standard', 'taiko', 'catch', 'mania']) {
+            const arr = Array.isArray(full.collection[m]) ? full.collection[m] : [];
+            if (!arr.length) continue;
+            const tag = L.modeTag(MODE_API[m]);
+            modeBits.push(`${tag ? tag + ' ' : ''}${arr.length}`);
+            if (!coverSet && arr[0] && arr[0].beatmapset_id) coverSet = arr[0];
         }
     }
     const catNames = ((full && full.categories) || []).map(c => c && c.name).filter(Boolean);
 
+    const flag = L.flagEmoji(entry.country);
     const embed = {
         author: {
-            name: entry.username || ('#' + entry.id),
+            name: `${entry.username || ('#' + entry.id)}${flag ? ' ' + flag : ''}`,
             url: `https://osu.ppy.sh/users/${entry.id}`,
             icon_url: `https://a.ppy.sh/${entry.id}`,
         },
@@ -883,8 +892,21 @@ async function cmdCollection(options, origin) {
         footer: L.siteFooter(),
         timestamp: entry.updatedAt || undefined,
     };
-    if (modeBits.length) embed.fields.push({ name: t('f_mode_split'), value: modeBits.join(' · ') });
-    if (catNames.length) embed.fields.push({ name: t('f_categories', { n: catNames.length }), value: catNames.join(', ').slice(0, 1024) });
+    if (modeBits.length) embed.fields.push({ name: t('f_mode_split'), value: modeBits.join('   ') });
+    if (catNames.length) {
+        // One per line (not comma-packed) so a long category list doesn't
+        // read as one cramped run-on paragraph.
+        const shown = catNames.slice(0, 15);
+        const extra = catNames.length - shown.length;
+        embed.fields.push({
+            name: t('f_categories', { n: catNames.length }),
+            value: (shown.map(n => `• ${n}`).join('\n') + (extra > 0 ? `\n+${extra}…` : '')).slice(0, 1024),
+        });
+    }
+    if (coverSet) {
+        const name = `${coverSet.artist || ''} - ${coverSet.title || ''}`.trim() || `#${coverSet.beatmapset_id}`;
+        embed.fields.push({ name: t('f_cover_map'), value: `[${name}](https://osu.ppy.sh/s/${coverSet.beatmapset_id})` });
+    }
 
     return L.message(embed, collectionButtons(entry, origin));
 }

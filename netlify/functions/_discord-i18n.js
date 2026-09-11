@@ -128,6 +128,7 @@ const S = {
     collection_title: { en: "{name}'s osu! collection", zh: '{name} 的 osu! 收藏', zhs: '{name} 的 osu! 收藏', ja: '{name} の osu! コレクション', fr: 'Collection osu! de {name}', de: 'osu!-Sammlung von {name}', ru: 'osu!-коллекция {name}', es: 'Colección de osu! de {name}', ko: '{name} 님의 osu! 컬렉션' },
     f_mode_split: { en: 'Mode split', zh: '模式分佈', zhs: '模式分布', ja: 'モード内訳', fr: 'Répartition par mode', de: 'Modus-Verteilung', ru: 'По режимам', es: 'Reparto por modo', ko: '모드 분포' },
     f_categories: { en: 'Categories ({n})', zh: '分類 ({n})', zhs: '分类 ({n})', ja: 'カテゴリ ({n})', fr: 'Catégories ({n})', de: 'Kategorien ({n})', ru: 'Категории ({n})', es: 'Categorías ({n})', ko: '카테고리 ({n})' },
+    f_cover_map: { en: 'Cover art from', zh: '封面圖來源', zhs: '封面图来源', ja: 'カバー画像の元譜面', fr: 'Illustration de', de: 'Cover-Art von', ru: 'Обложка с карты', es: 'Portada de', ko: '커버 이미지 출처' },
     btn_open_collection: { en: 'Open collection', zh: '開啟收藏', zhs: '打开收藏', ja: 'コレクションを開く', fr: 'Ouvrir la collection', de: 'Sammlung öffnen', ru: 'Открыть коллекцию', es: 'Abrir colección', ko: '컬렉션 열기' },
     btn_owner_profile: { en: "Publisher's profile", zh: '發佈者主頁', zhs: '发布者主页', ja: '公開者のプロフィール', fr: "Profil de l'auteur", de: 'Profil des Erstellers', ru: 'Профиль автора', es: 'Perfil del autor', ko: '게시자 프로필' },
     btn_random_map: { en: '🎲 Random map', zh: '🎲 隨機一張圖', zhs: '🎲 随机一张图', ja: '🎲 ランダムな1譜面', fr: '🎲 Map aléatoire', de: '🎲 Zufällige Map', ru: '🎲 Случайная карта', es: '🎲 Mapa al azar', ko: '🎲 랜덤 맵' },
