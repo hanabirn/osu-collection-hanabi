@@ -539,6 +539,58 @@ main:has(.pagination) { padding-bottom: 90px; }
 }
 .map-card-cover > * { position: relative; z-index: 1; }
 .map-card-body { padding: 10px 12px 12px; }
+
+/* Preview play button — a play triangle that swaps to a small animated
+   equalizer while a preview is playing. Bars are pure CSS transform
+   (scaleY) animations, not driven by real audio analysis (that needs
+   Web Audio + CORS, which a purely decorative "simulated" visualizer per
+   request doesn't). */
+.preview-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(10, 10, 22, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+.map-card:hover .preview-btn,
+.preview-btn.playing { opacity: 1; }
+.preview-btn:hover { background: var(--primary); border-color: var(--primary); transform: translate(-50%, -50%) scale(1.08); }
+.preview-btn .icon-play { width: 13px; height: 13px; margin-left: 2px; }
+.preview-btn .icon-eq { display: none; align-items: flex-end; gap: 2px; height: 14px; }
+.preview-btn.playing .icon-play { display: none; }
+.preview-btn.playing .icon-eq { display: flex; }
+.icon-eq span {
+    display: block;
+    width: 3px;
+    background: currentColor;
+    border-radius: 1px;
+    transform-origin: bottom;
+    animation: eq-bounce 1s ease-in-out infinite;
+}
+.icon-eq span:nth-child(1) { height: 40%; animation-duration: 0.8s; animation-delay: -0.62s; }
+.icon-eq span:nth-child(2) { height: 80%; animation-duration: 1.15s; animation-delay: -0.2s; }
+.icon-eq span:nth-child(3) { height: 55%; animation-duration: 0.7s; animation-delay: -0.94s; }
+.icon-eq span:nth-child(4) { height: 95%; animation-duration: 1.3s; animation-delay: -0.4s; }
+.icon-eq span:nth-child(5) { height: 65%; animation-duration: 0.9s; animation-delay: -0.08s; }
+@keyframes eq-bounce {
+    0%, 100% { transform: scaleY(0.25); }
+    50% { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .icon-eq span { animation: none; height: 60%; }
+}
 .map-card .map-star {
     position: absolute;
     top: 8px;

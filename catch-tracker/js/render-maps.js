@@ -22,6 +22,7 @@ function mapCard(set) {
         <div class="map-card-cover"${style}>
 ${statusBadge(set.status)}
             ${starLabel ? `<span class="map-star">${escapeHtml(starLabel)}</span>` : ''}
+            ${previewButton(set.beatmapset_id)}
         </div>
         <div class="map-card-body">
             <div class="map-title">${escapeHtml(set.title || '')}</div>

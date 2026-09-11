@@ -274,6 +274,47 @@ function coverArtUrlCard(beatmapsetId) {
     return beatmapsetId ? `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card.jpg` : '';
 }
 
+/* ---------- audio preview button (play icon <-> animated equalizer) ----------
+   Plain <audio> playback needs no CORS at all (that's only a Web Audio
+   API/AnalyserNode requirement) — the main site's preview waveform feature
+   needed a CORS proxy specifically because it reads real frequency data;
+   here the bars are a decorative simulated equalizer (per request), not
+   driven by actual audio analysis, so this stays a plain <audio> element
+   with zero backend involvement. Only one preview plays at a time —
+   starting a new one stops whichever card was already playing. */
+let _previewAudio = null;
+let _previewBtn = null;
+
+function stopPreview() {
+    if (_previewAudio) _previewAudio.pause();
+    if (_previewBtn) _previewBtn.classList.remove('playing');
+    _previewAudio = null;
+    _previewBtn = null;
+}
+
+function togglePreview(beatmapsetId, btn) {
+    const wasThisBtn = _previewBtn === btn;
+    stopPreview();
+    if (wasThisBtn) return; // clicking the currently-playing card's button just stops it
+
+    const audio = new Audio(`https://b.ppy.sh/preview/${beatmapsetId}.mp3`);
+    audio.volume = 0.6;
+    audio.addEventListener('ended', stopPreview);
+    audio.addEventListener('error', stopPreview);
+    audio.play().catch(stopPreview);
+    btn.classList.add('playing');
+    _previewAudio = audio;
+    _previewBtn = btn;
+}
+
+function previewButton(beatmapsetId) {
+    if (!beatmapsetId) return '';
+    return `<button type="button" class="preview-btn" onclick="event.stopPropagation();togglePreview(${beatmapsetId},this)" title="Preview">
+        <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <span class="icon-eq"><span></span><span></span><span></span><span></span><span></span></span>
+    </button>`;
+}
+
 // Small inline-SVG status badges matching osu!'s own iconography (blue
 // double-chevron for ranked, pink heart for loved) instead of a plain
 // text pill — see the reference screenshot in conversation.
