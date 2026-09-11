@@ -71,6 +71,16 @@ const LANG_STRINGS = {
         newest_best: '最新的最佳成績',
         oldest_best: '最舊的最佳成績',
         view_all: '查看全部 →',
+
+        nav_maps: '圖譜庫',
+        h1_maps: 'osu!catch 圖譜庫',
+        maps_search_placeholder: '搜尋標題、藝術家、作者…',
+        status_any: '全部狀態', status_ranked: 'Ranked', status_loved: 'Loved',
+        sort_star_desc: '星數 高→低', sort_star_asc: '星數 低→高',
+        sort_bpm_desc: 'BPM 高→低', sort_length_desc: '長度 長→短', sort_newest: '最新上榜',
+        coverage_maps: '已收錄 {n} 張圖譜（Ranked {ranked}／Loved {loved}）',
+        empty_maps: '沒有符合條件的圖譜。',
+        failed_maps: '圖譜庫載入失敗。',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -128,6 +138,16 @@ const LANG_STRINGS = {
         newest_best: 'Newest Best Play',
         oldest_best: 'Oldest Best Play',
         view_all: 'View all →',
+
+        nav_maps: 'Maps',
+        h1_maps: 'osu!catch Map Catalog',
+        maps_search_placeholder: 'Search title, artist, creator…',
+        status_any: 'Any status', status_ranked: 'Ranked', status_loved: 'Loved',
+        sort_star_desc: 'Stars high→low', sort_star_asc: 'Stars low→high',
+        sort_bpm_desc: 'BPM high→low', sort_length_desc: 'Length long→short', sort_newest: 'Newest',
+        coverage_maps: '{n} maps indexed (Ranked {ranked} / Loved {loved})',
+        empty_maps: 'No maps match these filters.',
+        failed_maps: 'Failed to load the map catalog.',
     },
 };
 
@@ -157,6 +177,9 @@ function t(key, vars) {
 function applyStaticI18n() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
     });
     const toggle = document.getElementById('lang-toggle');
     if (toggle) {
@@ -217,6 +240,13 @@ function fmtPP(pp) {
 
 function fmtAccuracy(acc) {
     return acc != null ? `${(acc * 100).toFixed(2)}%` : '—';
+}
+
+function fmtLength(seconds) {
+    if (seconds == null) return '—';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 function playerLink(userId, username) {

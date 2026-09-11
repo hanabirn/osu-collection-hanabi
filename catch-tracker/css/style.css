@@ -479,6 +479,63 @@ td.wrap, th.wrap { white-space: normal; }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .section-head .view-all { font-size: 0.82rem; font-weight: 600; }
 
+/* ---------- map catalog ---------- */
+
+.map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.map-card {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background-color: var(--bg-card);
+    aspect-ratio: 16 / 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px;
+    color: #fff;
+    background-size: cover;
+    background-position: center;
+}
+.map-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10, 10, 22, 0.15) 0%, rgba(10, 10, 22, 0.95) 100%);
+}
+.map-card > * { position: relative; z-index: 1; }
+.map-card:hover { text-decoration: none; border-color: var(--border-strong); }
+.map-card .map-star {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(10, 10, 22, 0.65);
+    color: #facc15;
+}
+.map-card .map-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(10, 10, 22, 0.65);
+    color: var(--text-dim);
+}
+.map-card .map-title { font-weight: 700; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.map-card .map-artist { font-size: 0.78rem; color: rgba(255, 255, 255, 0.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.map-card .map-meta { font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); margin-top: 4px; }
+
 /* ---------- decorative falling-banana background ---------- */
 
 .banana-rain { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }

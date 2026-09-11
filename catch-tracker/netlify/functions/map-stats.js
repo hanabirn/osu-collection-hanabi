@@ -2,12 +2,19 @@
    derived on-demand from feed:recent filtered to that beatmap_id — no
    dedicated crawled dataset. This is explicitly NOT exhaustive (only scores
    this tracker has actually observed from the tracked TW cohort), same
-   honesty stance as the main site's farm-maps-list.js coverage block. */
-const { getFeedStore } = require('./_blobs-store');
+   honesty stance as the main site's farm-maps-list.js coverage block.
+
+   Falls back to the maps:catch catalog (_maps-crawl-core.js) for basic
+   meta when no scores have been observed yet — the new Maps catalog page
+   links here for every ranked/loved map, most of which won't have any
+   tracked-player scores yet, and showing nothing at all would be a dead
+   end for that flow. */
+const { getFeedStore, getMapsStore } = require('./_blobs-store');
 const { getJSONGz } = require('./_blob-json');
 
 const DS_CACHE_TTL_MS = 20_000;
 let _dsCache = { at: 0, feed: null };
+let _mapsCache = { at: 0, maps: null };
 
 async function loadFeed(store) {
     const now = Date.now();
@@ -15,6 +22,14 @@ async function loadFeed(store) {
     const feed = (await getJSONGz(store, 'feed:recent')) || [];
     _dsCache = { at: now, feed };
     return feed;
+}
+
+async function loadMaps() {
+    const now = Date.now();
+    if (_mapsCache.maps && now - _mapsCache.at < DS_CACHE_TTL_MS) return _mapsCache.maps;
+    const maps = (await getJSONGz(getMapsStore(), 'maps:catch')) || [];
+    _mapsCache = { at: now, maps };
+    return maps;
 }
 
 exports.handler = async (event) => {
@@ -48,7 +63,7 @@ exports.handler = async (event) => {
             if (s.is_fc) fcCount++;
         }
 
-        const meta = scores[0] ? {
+        let meta = scores[0] ? {
             beatmap_id: scores[0].beatmap_id,
             beatmapset_id: scores[0].beatmapset_id,
             artist: scores[0].artist,
@@ -57,6 +72,22 @@ exports.handler = async (event) => {
             creator: scores[0].creator,
             difficulty_rating: scores[0].difficulty_rating,
         } : null;
+
+        if (!meta) {
+            const maps = await loadMaps();
+            const cataloged = maps.find(m => m.beatmap_id === beatmapId);
+            if (cataloged) {
+                meta = {
+                    beatmap_id: cataloged.beatmap_id,
+                    beatmapset_id: cataloged.beatmapset_id,
+                    artist: cataloged.artist,
+                    title: cataloged.title,
+                    version: cataloged.version,
+                    creator: cataloged.creator,
+                    difficulty_rating: cataloged.difficulty_rating,
+                };
+            }
+        }
 
         return {
             statusCode: 200,

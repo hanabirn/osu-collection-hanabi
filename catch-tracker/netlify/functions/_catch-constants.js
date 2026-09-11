@@ -4,7 +4,13 @@
    design degrades gracefully if COUNTRY's ranked player pool turns out
    bigger than expected. */
 const MODE = 'fruits';
+const MODE_NUM = 2; // osu! API v2 ruleset id for fruits/catch
 const COUNTRY = 'TW';
+
+// Statuses swept by the maps catalog crawler, in order — see
+// _maps-crawl-core.js. osu! API v2's /beatmapsets/search `s` param takes
+// one status per request, so these are crawled as separate passes.
+const MAP_STATUSES = ['ranked', 'loved'];
 
 // Ring-buffer cap for feed:recent — old entries just fall off the end.
 const FEED_CAP = 2000;
@@ -27,7 +33,7 @@ const SCORE_POLL_PER_RUN_MANUAL = 30;
 const VALID_GRADES = new Set(['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D', 'F']);
 
 module.exports = {
-    MODE, COUNTRY, FEED_CAP, LAST_SEEN_CAP,
+    MODE, MODE_NUM, COUNTRY, MAP_STATUSES, FEED_CAP, LAST_SEEN_CAP,
     SCORE_POLL_PER_RUN_CRON, SCORE_POLL_PER_RUN_MANUAL,
     VALID_GRADES,
 };

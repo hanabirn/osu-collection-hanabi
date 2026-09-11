@@ -18,7 +18,12 @@ main site's 資源 (Resources) tab. See `SETUP.md` for first-time deployment.
   from tracked TW players, filterable by grade / FC / choke.
 - **Player** (`player.html?id=`) — one player's best + recent plays.
 - **Map** (`map.html?id=`) — grade/mod distribution for one beatmap, among
-  the tracked cohort's observed scores.
+  the tracked cohort's observed scores; falls back to the Maps catalog's
+  basic metadata when no scores have been observed yet.
+- **Maps** (`maps.html`) — a lightweight catalog of every ranked + loved
+  osu!catch beatmap (search / status / sort), scoped down from
+  mania-tracker's full pattern-filtered beatmap search since that's
+  redundant with the main site's own Catalog/Farm tabs for other modes.
 
 ## How the data gets there
 
@@ -32,6 +37,11 @@ Two independent crons (see `netlify.toml`):
    polling each player's `GET /users/{id}/scores/recent?mode=fruits` and
    detecting new scores by diffing against last poll's snapshot. New scores
    get prepended to the `feed:recent` ring buffer.
+3. **`maps-crawl-cron`** (every 30 min) — walks
+   `GET /beatmapsets/search?m=2` once per status in `MAP_STATUSES`
+   (`ranked`, `loved`), upserting into `maps:catch`. Metadata only (star
+   rating, bpm, length, CS/AR/OD/HP straight from the search response) — no
+   local PP computation, unlike the main site's Farm crawler.
 
 Both are time-boxed (`budgetMs`) AND item-capped (`perRun`) per invocation,
 so a tick that can't finish the whole player pool just does a partial sweep

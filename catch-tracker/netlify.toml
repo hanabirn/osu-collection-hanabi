@@ -24,3 +24,10 @@
 # crawler runs every 10 min for comparison).
 [functions."scores-poll-cron"]
   schedule = "*/5 * * * *"
+
+# Map catalog sweep: every ranked + loved catch beatmap, for the Maps page.
+# See netlify/functions/_maps-crawl-core.js. 30 min matches the main site's
+# Catalog crawler cadence — this only needs to keep pace with newly ranked/
+# loved maps, nothing time-sensitive.
+[functions."maps-crawl-cron"]
+  schedule = "*/30 * * * *"

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catch Tracker — Map Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="brand">Catch <span>Tracker</span></div>
+    <nav>
+        <a href="index.html" data-i18n="nav_rankings">Rankings</a>
+        <a href="feed.html" data-i18n="nav_feed">Live Feed</a>
+        <a href="maps.html" class="active" data-i18n="nav_maps">Maps</a>
+    </nav>
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+</header>
+<main>
+    <h1 data-i18n="h1_maps">osu!catch Map Catalog</h1>
+    <p class="coverage-note" id="coverage-note" data-i18n="loading">Loading…</p>
+    <div class="filters">
+        <input type="text" id="maps-search" class="search-input" style="width:220px" data-i18n-placeholder="maps_search_placeholder" placeholder="Search title, artist, creator…">
+        <div class="pill-group" id="status-filter">
+            <button type="button" class="pill active" data-status="" data-i18n="status_any">Any status</button>
+            <button type="button" class="pill" data-status="ranked" data-i18n="status_ranked">Ranked</button>
+            <button type="button" class="pill" data-status="loved" data-i18n="status_loved">Loved</button>
+        </div>
+        <select id="maps-sort">
+            <option value="star_desc" data-i18n="sort_star_desc">Stars high→low</option>
+            <option value="star_asc" data-i18n="sort_star_asc">Stars low→high</option>
+            <option value="bpm_desc" data-i18n="sort_bpm_desc">BPM high→low</option>
+            <option value="length_desc" data-i18n="sort_length_desc">Length long→short</option>
+            <option value="newest" data-i18n="sort_newest">Newest</option>
+        </select>
+    </div>
+    <div class="map-grid" id="maps-grid"></div>
+    <div class="pagination">
+        <button id="prev-page" data-i18n="prev">← Prev</button>
+        <span id="page-label"></span>
+        <button id="next-page" data-i18n="next">Next →</button>
+    </div>
+</main>
+<footer class="site-footer" data-i18n="footer_main">Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.</footer>
+<script src="js/common.js"></script>
+<script src="js/api.js"></script>
+<script src="js/render-maps.js"></script>
+</body>
+</html>

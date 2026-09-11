@@ -28,4 +28,10 @@ function getFeedStore() {
     return store('catch-tracker-feed');
 }
 
-module.exports = { getRankingsStore, getFeedStore };
+// Map catalog sweep: `maps:catch` (gzip array of every ranked+loved catch
+// beatmap) + `maps-crawl-state` (plain JSON cursor/diagnostics).
+function getMapsStore() {
+    return store('catch-tracker-maps');
+}
+
+module.exports = { getRankingsStore, getFeedStore, getMapsStore };
