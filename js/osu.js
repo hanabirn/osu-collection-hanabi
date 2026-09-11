@@ -726,17 +726,53 @@ function osuSetVolume(val) {
     if (osuCurrentAudio && !osuCurrentAudio.ended) osuCurrentAudio.volume = osuVolume;
 }
 
+// Markup for every .osu-play-btn: the static play icon, plus a hidden-until-
+// .playing bar visualizer (see startOsuViz below) that swaps in over it.
+function playBtnIcon() {
+    return `${icon('play', { filled: true })}<span class="osu-play-bars"><i></i><i></i><i></i><i></i></span>`;
+}
+
+/* Lazy, module-shared Web Audio graph for the preview-bar visualizer — one
+   AudioContext/AnalyserNode for the site's whole session, not one per play.
+   Routed through preview-proxy.js rather than b.ppy.sh directly: the
+   upstream mp3 has no Access-Control-Allow-Origin, which taints the graph
+   (AnalyserNode reads back silence) — see the proxy's own header comment. */
+let osuAudioCtx = null, osuAnalyser = null, osuCurrentSource = null, osuVizRaf = null;
+
+function stopOsuViz() {
+    if (osuVizRaf) { cancelAnimationFrame(osuVizRaf); osuVizRaf = null; }
+    if (osuCurrentSource) { try { osuCurrentSource.disconnect(); } catch { /* already gone */ } osuCurrentSource = null; }
+}
+
+function startOsuViz(analyser, btn) {
+    const bars = btn.querySelectorAll('.osu-play-bars i');
+    if (!bars.length) return;
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    const step = () => {
+        analyser.getByteFrequencyData(data);
+        const spread = Math.max(1, Math.floor(data.length / bars.length));
+        bars.forEach((bar, i) => {
+            const level = data[Math.min(data.length - 1, i * spread)] / 255;
+            bar.style.transform = `scaleY(${Math.max(0.15, level)})`;
+        });
+        osuVizRaf = requestAnimationFrame(step);
+    };
+    step();
+}
+
 function playOsuPreview(setId, event) {
     event.stopPropagation();
-    const previewUrl = `https://b.ppy.sh/preview/${setId}.mp3`;
+    const previewUrl = `/.netlify/functions/preview-proxy?id=${setId}`;
 
     if (osuCurrentAudio && !osuCurrentAudio.ended) {
         osuCurrentAudio.pause();
         document.querySelectorAll('.osu-play-btn').forEach(b => b.classList.remove('playing'));
+        stopOsuViz();
         if (osuCurrentAudio._setId === setId) { osuCurrentAudio = null; return; }
     }
 
     const audio = new Audio(previewUrl);
+    audio.crossOrigin = 'anonymous';
     audio._setId = setId;
     audio.volume = osuVolume;
     osuCurrentAudio = audio;
@@ -744,12 +780,32 @@ function playOsuPreview(setId, event) {
     const btn = event.currentTarget;
     btn.classList.add('playing');
     audio.play().catch(() => {});
+
+    // The visualizer is a garnish on top of playback above, never a
+    // prerequisite for it — any failure here (old browser, proxy hiccup,
+    // autoplay quirk) just leaves the button on its static icon.
+    try {
+        if (!osuAudioCtx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            osuAudioCtx = new AudioCtx();
+            osuAnalyser = osuAudioCtx.createAnalyser();
+            osuAnalyser.fftSize = 32;
+            osuAnalyser.connect(osuAudioCtx.destination);
+        }
+        if (osuAudioCtx.state === 'suspended') osuAudioCtx.resume().catch(() => {});
+        osuCurrentSource = osuAudioCtx.createMediaElementSource(audio);
+        osuCurrentSource.connect(osuAnalyser);
+        startOsuViz(osuAnalyser, btn);
+    } catch (e) { /* visualizer skipped, playback above is unaffected */ }
+
     audio.onended = () => {
         btn.classList.remove('playing');
+        stopOsuViz();
         osuCurrentAudio = null;
     };
     audio.onerror = () => {
         btn.classList.remove('playing');
+        stopOsuViz();
         osuCurrentAudio = null;
     };
 }
@@ -3597,7 +3653,7 @@ function renderFeaturedBeatmap() {
     el.innerHTML = `
         <div class="featured-beatmap-bg" style="background-image:url('${coverUrl}')"></div>
         <div class="featured-beatmap-overlay"></div>
-        <button class="osu-play-btn featured-beatmap-play" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+        <button class="osu-play-btn featured-beatmap-play" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${playBtnIcon()}</button>
         <div class="featured-beatmap-info">
             <div class="featured-beatmap-label">${t('featured_beatmap_label')}</div>
             <div class="featured-beatmap-title">${modeIconSvg(set.__mode)} ${set.title}</div>
@@ -3897,7 +3953,7 @@ function renderOsuCollection() {
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <div class="osu-card-actions">
-                <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+                <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${playBtnIcon()}</button>
                 <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}" aria-label="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}">${icon('heart', { filled: isFav })}</button>
                 <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}" aria-label="${t('osu_category_btn_title')}">${icon('tag')}</button>
                 <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}" aria-label="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>

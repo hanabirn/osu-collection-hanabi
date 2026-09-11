@@ -546,7 +546,7 @@ function renderGalleryDetailGrid() {
             <div class="gallery-detail-item-overlay"></div>
             ${modeBadge}
             <span class="gallery-detail-item-score" id="gd-score-${set.beatmapset_id}" style="display:none;"></span>
-            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event); event.preventDefault();" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+            <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event); event.preventDefault();" title="${t('mappools_preview')}">${playBtnIcon()}</button>
             <div class="gallery-detail-item-info">
                 <span class="gallery-detail-item-title">${escapeHtmlOsu(set.title || ('#' + set.beatmapset_id))}</span>
                 <span class="gallery-detail-item-stars">${maxDiff.toFixed(2)}⭐</span>

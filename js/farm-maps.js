@@ -154,7 +154,7 @@ function renderFarmMapsList() {
             <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addFarmMapToCollection(${item.beatmapset_id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${item.beatmapset_id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
             <button class="osu-download-btn" onclick="downloadBeatmapset(${item.beatmapset_id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
-            <button class="osu-play-btn" onclick="playOsuPreview(${item.beatmapset_id}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+            <button class="osu-play-btn" onclick="playOsuPreview(${item.beatmapset_id}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
             <div class="osu-card-mode-badge">${modeDiffIcon(farmMode, item.star, (farmMode === 'mania' && item.cs) ? `${item.version} [${Math.round(item.cs)}K]` : item.version)}</div>
             <div class="osu-card-info">
                 <div class="osu-card-title">${escapeHtmlOsu(item.title || '')} <span class="farm-card-version">[${escapeHtmlOsu(item.version || '')}]</span></div>

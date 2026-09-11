@@ -61,7 +61,7 @@ function gamesOpenView() {
 function gamesCardBtns(setId) {
     if (!setId) return '';
     return `<div class="games-card-btns">
-        <button class="games-card-btn" onclick="playOsuPreview(${setId}, event)" aria-label="${escHtml(t('mappools_preview'))}" title="${escHtml(t('mappools_preview'))}">${icon('play', { filled: true, size: '0.8em' })}</button>
+        <button class="games-card-btn" onclick="playOsuPreview(${setId}, event)" aria-label="${escHtml(t('mappools_preview'))}" title="${escHtml(t('mappools_preview'))}">${playBtnIcon()}</button>
         <button class="games-card-btn" onclick="event.stopPropagation();gamesSaveSet(${setId})" aria-label="${escHtml(t('games_save_btn'))}" title="${escHtml(t('games_save_btn'))}">${icon('plus', { size: '0.9em' })}</button>
     </div>`;
 }

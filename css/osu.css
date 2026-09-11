@@ -1441,6 +1441,33 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transform: translateX(-50%) scale(1.1);
 }
 
+/* Preview waveform: the static play icon swaps for 4 tiny audio-reactive
+   bars while playing (js/osu.js startOsuViz() drives their scaleY per
+   animation frame from an AnalyserNode). Same markup on every .osu-play-btn
+   plus the mini-games' .games-card-btn (js/games.js). */
+.osu-play-bars {
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    width: 13px;
+    height: 11px;
+}
+.osu-play-bars i {
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: currentColor;
+    border-radius: 1px;
+    transform: scaleY(0.15);
+    transform-origin: bottom;
+    transition: transform 0.08s linear;
+}
+.osu-play-btn.playing .icon-svg,
+.games-card-btn.playing .icon-svg { display: none; }
+.osu-play-btn.playing .osu-play-bars,
+.games-card-btn.playing .osu-play-bars { display: flex; }
+
 /* Touch devices have no :hover, so these hover-reveal action buttons would
    otherwise be permanently invisible and untappable — show them by default
    there instead (UX audit: "hover vs tap" + "touch target size", both High). */

@@ -199,7 +199,7 @@ function renderMappoolCard(mp, inCollection) {
         <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addMappoolCardToCollection(${setId}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
         <button class="osu-copy-btn" onclick="copyBeatmapId(${setId}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
         <button class="osu-download-btn" onclick="downloadBeatmapset(${setId}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
-        <button class="osu-play-btn" onclick="playOsuPreview(${setId}, event)" title="${t('mappools_preview')}">${icon('play', { filled: true })}</button>
+        <button class="osu-play-btn" onclick="playOsuPreview(${setId}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
         <div class="osu-card-info">
             <div class="osu-card-title">${escHtml(title)}</div>
             <div class="osu-card-artist">${escHtml(artist)}</div>
