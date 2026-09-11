@@ -947,6 +947,61 @@ footer.site-footer {
 }
 .replay-skin-status { font-size: 0.8rem; color: var(--text-dim); }
 
+.replay-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 220px;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 24px auto;
+    align-items: start;
+}
+.replay-side-panel { padding: 18px; }
+.replay-info-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+.replay-stats-panel { display: flex; flex-direction: column; gap: 10px; }
+.replay-stat-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; color: var(--text-dim); }
+.replay-stat-row strong { color: var(--text); font-family: var(--font-display); font-size: 1.05rem; }
+
+.replay-hp-bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.replay-hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    transition: width 120ms linear;
+}
+
+.replay-settings { margin-top: 14px; }
+.replay-settings summary { cursor: pointer; list-style: none; display: inline-flex; }
+.replay-settings summary::-webkit-details-marker { display: none; }
+.replay-settings summary::marker { content: ''; }
+.replay-settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+.replay-settings-body label { display: flex; align-items: center; gap: 8px; }
+.replay-settings-body input[type="range"] { flex: 1 1 auto; }
+
+/* Replay's own banana-rain default: off (the page is already visually
+   busy) unless explicitly re-enabled via the visual-settings panel. */
+.page-replay .banana-rain { display: none; }
+.page-replay.show-banana-rain .banana-rain { display: block; }
+
+@media (max-width: 900px) {
+    .replay-layout { grid-template-columns: 1fr; max-width: 640px; }
+    .replay-main-col { order: -1; }
+}
+
 /* ---------- BBCode editor ---------- */
 
 .bbcode-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }

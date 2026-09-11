@@ -132,6 +132,19 @@ const LANG_STRINGS = {
         replay_skin_loading: '皮膚載入中…',
         replay_skin_loaded: '已套用皮膚（{n} 個圖案）',
         replay_skin_invalid: '無法讀取這個 .osk 檔案',
+        replay_stat_combo: '連擊',
+        replay_stat_maxcombo: '最大連擊',
+        replay_stat_accuracy: '模擬準度',
+        replay_stat_caught: '接到',
+        replay_stat_miss: '漏接',
+        replay_stat_hp: 'HP',
+        replay_settings: '視覺設定',
+        replay_settings_blur: '背景模糊',
+        replay_settings_brightness: '亮度',
+        replay_settings_judgements: '顯示接到/漏空提示',
+        replay_settings_banana_rain: '顯示香蕉背景動畫',
+        replay_info_by: '由 {name} 遊玩',
+        replay_disclaimer: '這是依據回放資料與圖譜物件重建的簡化動畫，非官方畫面；接到/漏接與統計數據皆為視覺估算，非官方判定。',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -250,6 +263,19 @@ const LANG_STRINGS = {
         replay_skin_loading: 'Loading skin…',
         replay_skin_loaded: 'Skin applied ({n} sprites)',
         replay_skin_invalid: 'Could not read this .osk file',
+        replay_stat_combo: 'Combo',
+        replay_stat_maxcombo: 'Max Combo',
+        replay_stat_accuracy: 'Sim. Accuracy',
+        replay_stat_caught: 'Caught',
+        replay_stat_miss: 'Miss',
+        replay_stat_hp: 'HP',
+        replay_settings: 'Visual settings',
+        replay_settings_blur: 'Background blur',
+        replay_settings_brightness: 'Brightness',
+        replay_settings_judgements: 'Show catch/miss popups',
+        replay_settings_banana_rain: 'Show banana background',
+        replay_info_by: 'Played by {name}',
+        replay_disclaimer: 'This is a simplified reconstruction from replay + beatmap data, not an official view; catch/miss results and stats are visual estimates, not official judgements.',
     },
 };
 
@@ -376,12 +402,23 @@ function checkCtLoginFromUrl() {
 
 /* Shared between render-player.js and render-map.js's score tables — a
    score row only gets a Watch Replay link when has_replay is true (see
-   _scores-poll-core.js / player-get.js) and it has a score_id to look up. */
-function replayLink(s) {
+   _scores-poll-core.js / player-get.js) and it has a score_id to look up.
+   `username` is a second param (rather than always reading s.username)
+   because player.html's score rows don't carry a per-score username (every
+   row is the same, already-known player) — render-player.js passes the
+   page's own player username explicitly; render-map.js's rows already
+   have s.username per-row and don't need to. */
+function replayLink(s, username) {
     if (!s.has_replay || !s.score_id) return '';
     const params = new URLSearchParams({ score_id: s.score_id, beatmap_id: s.beatmap_id });
     if (s.beatmapset_id) params.set('beatmapset_id', s.beatmapset_id);
     if (s.mods && s.mods.length) params.set('mods', s.mods.join(','));
+    if (s.title) params.set('title', s.title);
+    if (s.artist) params.set('artist', s.artist);
+    if (s.version) params.set('version', s.version);
+    if (s.rank) params.set('rank', s.rank);
+    const uname = username || s.username;
+    if (uname) params.set('username', uname);
     return `<a class="pill" href="replay.html?${params.toString()}">${escapeHtml(t('watch_replay'))}</a>`;
 }
 

@@ -15,6 +15,16 @@
    positions. getObjectX()/getFrameX()'s candidate field names were correct
    on the first try — no fixes needed after this test.
 
+   Also verified: full-song audio (mirror.hinamizawa.ai) and client-side
+   .osk skin sprites (fflate) both work — see the git history for that pass.
+
+   This pass adds a catch-NATIVE stat panel (combo/accuracy/caught/miss/HP)
+   instead of copying mania-tracker's MAX/300/200/100/50/MISS/UR columns —
+   those are timing-judgement terms that don't exist in catch (catch is a
+   purely positional catch-or-miss result). Judgement is a simple
+   position-at-catch-time check against the catcher — see computeJudgements()
+   — labeled everywhere as a simulation/estimate, not an official verdict.
+
    Loaded as a <script type="module"> — this site has no CSP (unlike the
    main site, whose CSP blocks CDN libs), so esm.sh imports work directly,
    no build step needed. common.js/api.js are loaded first as classic
@@ -46,6 +56,14 @@ const SKIN_FILES = {
     fruit_pear: 'fruit-pear',
 };
 const FRUIT_TYPE_CYCLE = ['apple', 'grapes', 'orange', 'pear'];
+
+// Judgement-simulation tuning — all approximations, see file header.
+const CATCH_LENIENCY = 10; // osu!pixels, roughly matches catch's small edge-catch allowance
+const HP_GAIN = 0.5;
+const HP_LOSS = 4;
+const POPUP_DURATION_MS = 600;
+const SETTINGS_KEY = 'ct_replay_settings';
+const DEFAULT_SETTINGS = { blur: 0, brightness: 100, popups: true, bananaRain: false };
 
 const main = document.getElementById('replay-main');
 
@@ -136,6 +154,7 @@ function buildDropItem(h, classes, index) {
     return {
         time: h.startTime, spawnTime: h.startTime - preempt, x, kind,
         fruitType: kind === 'fruit' ? getFruitType(h, index) : null,
+        caught: false,
     };
 }
 
@@ -177,6 +196,72 @@ function clockRateForMods(mods) {
 function catcherWidthFor(cs) {
     const scale = 1 - 0.7 * ((cs ?? 5) - 5) / 5;
     return Math.max(40, 106.75 * scale);
+}
+
+// Interpolated catcher X at time t — a plain function (not a class method)
+// so computeJudgements() can use it before a ReplayPlayer exists yet;
+// ReplayPlayer.catcherXAt() below just delegates to this.
+function catcherXAt(frames, t) {
+    if (!frames.length) return PLAYFIELD_X / 2;
+    if (t <= frames[0].time) return frames[0].x;
+    if (t >= frames[frames.length - 1].time) return frames[frames.length - 1].x;
+    let lo = 0, hi = frames.length - 1;
+    while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (frames[mid].time <= t) lo = mid; else hi = mid;
+    }
+    const a = frames[lo], b = frames[hi];
+    const span = b.time - a.time;
+    const frac = span > 0 ? (t - a.time) / span : 0;
+    return a.x + (b.x - a.x) * frac;
+}
+
+// One-time pass: was the catcher under each object at the moment it
+// reached the catch line? A positional approximation of the real hitbox
+// (real osu!catch's catcher plate is trapezoidal and hyperdash extends the
+// catchable range) — see file header for the full honesty caveat.
+function computeJudgements(items, frames, catcherWidth) {
+    const halfWidth = catcherWidth / 2 + CATCH_LENIENCY;
+    for (const it of items) {
+        it.caught = Math.abs(catcherXAt(frames, it.time) - it.x) <= halfWidth;
+    }
+    return items;
+}
+
+// Pure function of mapTime — recomputed from scratch each call rather than
+// tracked incrementally, so it stays correct across seeks/scrubbing without
+// separate forward/backward bookkeeping. items.length is at most a few
+// thousand, so a full scan per call (even at 60fps) is not worth optimizing
+// away for v1. tiny droplets don't affect combo/HP in real catch, so
+// they're excluded here the same way.
+function computeStats(items, mapTime) {
+    let combo = 0, maxCombo = 0, caught = 0, miss = 0, hp = 100;
+    for (const it of items) {
+        if (it.time > mapTime) break; // items are sorted by time
+        if (it.kind === 'tiny') continue;
+        if (it.caught) {
+            combo++;
+            caught++;
+            hp = Math.min(100, hp + HP_GAIN);
+        } else {
+            combo = 0;
+            miss++;
+            hp = Math.max(0, hp - HP_LOSS);
+        }
+        if (combo > maxCombo) maxCombo = combo;
+    }
+    const total = caught + miss;
+    return { combo, maxCombo, caught, miss, accuracy: total > 0 ? caught / total : 1, hp };
+}
+
+function loadSettings() {
+    try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_SETTINGS };
+    } catch { return { ...DEFAULT_SETTINGS }; }
+}
+function saveSettings(s) {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch { /* per-viewer convenience only */ }
 }
 
 const COLORS = { fruit: '#fb5a8c', droplet: '#60a5fa', tiny: '#93c5fd', banana: '#facc15' };
@@ -238,6 +323,9 @@ class ReplayPlayer {
         this.clockRate = opts.clockRate;
         this.catcherWidth = opts.catcherWidth;
         this.sprites = {};
+        this.showPopups = true;
+        this.popups = [];
+        this.lastPoppedTime = null;
         const itemMin = items.length ? items[0].spawnTime : 0;
         const itemMax = items.length ? items[items.length - 1].time : 0;
         const frameMin = frames.length ? frames[0].time : itemMin;
@@ -290,21 +378,34 @@ class ReplayPlayer {
     }
 
     setSprites(sprites) { this.sprites = sprites || {}; }
+    setVisualSettings(s) {
+        this.canvas.style.filter = `blur(${s.blur}px) brightness(${s.brightness}%)`;
+        this.showPopups = s.popups;
+    }
 
-    catcherXAt(t) {
-        const frames = this.frames;
-        if (!frames.length) return PLAYFIELD_X / 2;
-        if (t <= frames[0].time) return frames[0].x;
-        if (t >= frames[frames.length - 1].time) return frames[frames.length - 1].x;
-        let lo = 0, hi = frames.length - 1;
-        while (hi - lo > 1) {
-            const mid = (lo + hi) >> 1;
-            if (frames[mid].time <= t) lo = mid; else hi = mid;
+    catcherXAt(t) { return catcherXAt(this.frames, t); }
+
+    currentStats() { return computeStats(this.items, this.mapTime); }
+
+    // Spawns judgement popups for items whose time falls within the range
+    // just crossed since the last call. Skipped entirely on a large jump
+    // (a seek/scrub) so dragging the scrub bar doesn't dump hundreds of
+    // popups on screen at once.
+    updatePopups(prevTime) {
+        if (this.lastPoppedTime === null) { this.lastPoppedTime = prevTime; }
+        const jumped = Math.abs(prevTime - this.lastPoppedTime) > 50 || this.mapTime < this.lastPoppedTime;
+        if (this.showPopups && !jumped && this.mapTime > this.lastPoppedTime) {
+            for (const it of this.items) {
+                if (it.kind === 'tiny') continue;
+                if (it.time > this.lastPoppedTime && it.time <= this.mapTime) {
+                    this.popups.push({ time: it.time, x: it.x, caught: it.caught });
+                }
+            }
         }
-        const a = frames[lo], b = frames[hi];
-        const span = b.time - a.time;
-        const frac = span > 0 ? (t - a.time) / span : 0;
-        return a.x + (b.x - a.x) * frac;
+        this.lastPoppedTime = this.mapTime;
+        if (this.popups.length) {
+            this.popups = this.popups.filter(p => this.mapTime - p.time < POPUP_DURATION_MS);
+        }
     }
 
     draw() {
@@ -358,9 +459,26 @@ class ReplayPlayer {
             ctx.closePath();
             ctx.fill();
         }
+
+        if (this.showPopups) {
+            for (const p of this.popups) {
+                const age = this.mapTime - p.time;
+                if (age < 0 || age > POPUP_DURATION_MS) continue;
+                const alpha = 1 - age / POPUP_DURATION_MS;
+                const py = catchLineY - 20 - age * 0.06;
+                ctx.globalAlpha = Math.max(0, alpha);
+                ctx.fillStyle = p.caught ? '#4ade80' : '#f87171';
+                ctx.font = '700 13px "Chakra Petch", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.caught ? t('replay_stat_caught') : t('replay_stat_miss'), toPx(p.x), py);
+            }
+            ctx.globalAlpha = 1;
+            ctx.textAlign = 'start';
+        }
     }
 
     tick(wallNow) {
+        const prevTime = this.mapTime;
         if (this.playing) {
             if (this.audioReady) {
                 // Audio is the clock while it's available — tighter sync
@@ -378,8 +496,9 @@ class ReplayPlayer {
             }
         }
         this.lastWall = wallNow;
+        this.updatePopups(prevTime);
         this.draw();
-        this.onTick(this.mapTime, this.minTime, this.maxTime, this.playing);
+        this.onTick(this.mapTime, this.minTime, this.maxTime, this.playing, this.currentStats());
         this.rafId = requestAnimationFrame(t => this.tick(t));
     }
 
@@ -407,7 +526,10 @@ class ReplayPlayer {
     seek(t) {
         this.mapTime = Math.min(this.maxTime, Math.max(this.minTime, t));
         if (this.audioReady) this.audio.currentTime = Math.max(0, this.mapTime / 1000);
+        this.lastPoppedTime = this.mapTime;
+        this.popups = [];
         this.draw();
+        this.onTick(this.mapTime, this.minTime, this.maxTime, this.playing, this.currentStats());
     }
 
     setSpeed(speed) {
@@ -416,29 +538,80 @@ class ReplayPlayer {
     }
 }
 
-function playerHtml() {
+function infoPanelHtml(meta) {
+    const title = [meta.artist, meta.title].filter(Boolean).join(' - ');
     return `
-        <div class="card replay-card" style="max-width:720px;margin:24px auto;padding:20px">
-            <canvas id="replay-canvas" class="replay-canvas" width="640" height="420"></canvas>
-            <audio id="replay-audio" preload="auto"></audio>
-            <div class="replay-controls">
-                <button type="button" id="replay-playpause" class="pill toggle">▶</button>
-                <input type="range" id="replay-scrub" class="replay-scrub" min="0" max="1000" value="0">
-                <select id="replay-speed">
-                    <option value="0.5">0.5x</option>
-                    <option value="1" selected>1x</option>
-                    <option value="2">2x</option>
-                </select>
+        <aside class="replay-side-panel card">
+            <h2 style="margin-top:0;font-size:1rem">${escapeHtml(title || t('replay_loading'))}</h2>
+            ${meta.version ? `<p class="coverage-note" style="margin:0 0 10px">[${escapeHtml(meta.version)}]</p>` : ''}
+            ${meta.username ? `<p style="margin:0 0 8px">${escapeHtml(t('replay_info_by', { name: meta.username }))}</p>` : ''}
+            <div class="replay-info-tags">
+                ${meta.rank ? gradeBadge(meta.rank) : ''}
+                ${meta.mods.length ? modsTag(meta.mods) : ''}
             </div>
-            <div class="replay-skin-row">
-                <label class="pill" for="replay-skin-input" style="cursor:pointer">${escapeHtml(t('replay_use_skin'))}</label>
-                <input type="file" id="replay-skin-input" accept=".osk" hidden>
-                <button type="button" id="replay-skin-clear" class="pill" hidden>${escapeHtml(t('replay_clear_skin'))}</button>
-                <span id="replay-skin-status" class="replay-skin-status"></span>
+        </aside>
+    `;
+}
+
+function statsPanelHtml() {
+    return `
+        <aside class="replay-side-panel card replay-stats-panel">
+            <div class="replay-hp-bar"><div class="replay-hp-fill" id="replay-hp-fill"></div></div>
+            <div class="replay-stat-row"><span>${escapeHtml(t('replay_stat_combo'))}</span><strong id="replay-stat-combo">0</strong></div>
+            <div class="replay-stat-row"><span>${escapeHtml(t('replay_stat_maxcombo'))}</span><strong id="replay-stat-maxcombo">0</strong></div>
+            <div class="replay-stat-row"><span>${escapeHtml(t('replay_stat_accuracy'))}</span><strong id="replay-stat-accuracy">100%</strong></div>
+            <div class="replay-stat-row"><span>${escapeHtml(t('replay_stat_caught'))}</span><strong id="replay-stat-caught">0</strong></div>
+            <div class="replay-stat-row"><span>${escapeHtml(t('replay_stat_miss'))}</span><strong id="replay-stat-miss">0</strong></div>
+        </aside>
+    `;
+}
+
+function settingsPanelHtml(s) {
+    return `
+        <details class="replay-settings">
+            <summary class="pill">${escapeHtml(t('replay_settings'))}</summary>
+            <div class="replay-settings-body">
+                <label>${escapeHtml(t('replay_settings_blur'))}
+                    <input type="range" id="replay-set-blur" min="0" max="8" step="0.5" value="${s.blur}">
+                </label>
+                <label>${escapeHtml(t('replay_settings_brightness'))}
+                    <input type="range" id="replay-set-brightness" min="40" max="140" step="5" value="${s.brightness}">
+                </label>
+                <label><input type="checkbox" id="replay-set-popups" ${s.popups ? 'checked' : ''}> ${escapeHtml(t('replay_settings_judgements'))}</label>
+                <label><input type="checkbox" id="replay-set-banana" ${s.bananaRain ? 'checked' : ''}> ${escapeHtml(t('replay_settings_banana_rain'))}</label>
             </div>
-            <p class="coverage-note" style="margin-top:10px">
-                這是依據回放資料與圖譜物件重建的簡化動畫，非官方畫面；接到/落空僅為視覺估算，非官方判定。
-            </p>
+        </details>
+    `;
+}
+
+function playerHtml(meta, settings) {
+    return `
+        <div class="replay-layout">
+            ${infoPanelHtml(meta)}
+            <div class="replay-main-col">
+                <div class="card replay-card">
+                    <canvas id="replay-canvas" class="replay-canvas" width="640" height="420"></canvas>
+                    <audio id="replay-audio" preload="auto"></audio>
+                    <div class="replay-controls">
+                        <button type="button" id="replay-playpause" class="pill toggle">▶</button>
+                        <input type="range" id="replay-scrub" class="replay-scrub" min="0" max="1000" value="0">
+                        <select id="replay-speed">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="2">2x</option>
+                        </select>
+                    </div>
+                    <div class="replay-skin-row">
+                        <label class="pill" for="replay-skin-input" style="cursor:pointer">${escapeHtml(t('replay_use_skin'))}</label>
+                        <input type="file" id="replay-skin-input" accept=".osk" hidden>
+                        <button type="button" id="replay-skin-clear" class="pill" hidden>${escapeHtml(t('replay_clear_skin'))}</button>
+                        <span id="replay-skin-status" class="replay-skin-status"></span>
+                    </div>
+                    ${settingsPanelHtml(settings)}
+                    <p class="coverage-note" style="margin-top:10px">${escapeHtml(t('replay_disclaimer'))}</p>
+                </div>
+            </div>
+            ${statsPanelHtml()}
         </div>
     `;
 }
@@ -449,6 +622,14 @@ async function run() {
     const beatmapId = params.get('beatmap_id');
     const beatmapsetId = params.get('beatmapset_id');
     const mods = (params.get('mods') || '').split(',').filter(Boolean);
+    const meta = {
+        title: params.get('title') || '',
+        artist: params.get('artist') || '',
+        version: params.get('version') || '',
+        username: params.get('username') || '',
+        rank: params.get('rank') || '',
+        mods,
+    };
 
     if (!scoreId || !beatmapId) {
         setStatus(errorHtml(t('replay_not_found')));
@@ -504,7 +685,11 @@ async function run() {
             return;
         }
 
-        setStatus(playerHtml());
+        const catcherWidth = catcherWidthFor(cs);
+        computeJudgements(items, frames, catcherWidth);
+
+        const settings = loadSettings();
+        setStatus(playerHtml(meta, settings));
         const canvas = document.getElementById('replay-canvas');
         const audioEl = document.getElementById('replay-audio');
         const playBtn = document.getElementById('replay-playpause');
@@ -513,6 +698,12 @@ async function run() {
         const skinInput = document.getElementById('replay-skin-input');
         const skinClearBtn = document.getElementById('replay-skin-clear');
         const skinStatus = document.getElementById('replay-skin-status');
+        const hpFill = document.getElementById('replay-hp-fill');
+        const statCombo = document.getElementById('replay-stat-combo');
+        const statMaxCombo = document.getElementById('replay-stat-maxcombo');
+        const statAccuracy = document.getElementById('replay-stat-accuracy');
+        const statCaught = document.getElementById('replay-stat-caught');
+        const statMiss = document.getElementById('replay-stat-miss');
 
         // Full song audio is best-effort only — a missing beatmapset_id
         // (older links) or a failed load must never block the visual
@@ -527,14 +718,22 @@ async function run() {
 
         const player = new ReplayPlayer(canvas, items, frames, {
             clockRate: clockRateForMods(mods),
-            catcherWidth: catcherWidthFor(cs),
+            catcherWidth,
             audio: beatmapsetId ? audioEl : null,
-            onTick: (mapTime, minTime, maxTime, playing) => {
+            onTick: (mapTime, minTime, maxTime, playing, stats) => {
                 const pct = maxTime > minTime ? ((mapTime - minTime) / (maxTime - minTime)) * 1000 : 0;
                 scrub.value = String(pct);
                 playBtn.textContent = playing ? '⏸' : '▶';
+                hpFill.style.width = `${stats.hp}%`;
+                statCombo.textContent = stats.combo;
+                statMaxCombo.textContent = stats.maxCombo;
+                statAccuracy.textContent = `${(stats.accuracy * 100).toFixed(1)}%`;
+                statCaught.textContent = stats.caught;
+                statMiss.textContent = stats.miss;
             },
         });
+        player.setVisualSettings(settings);
+        document.body.classList.toggle('show-banana-rain', settings.bananaRain);
 
         playBtn.addEventListener('click', () => {
             if (player.playing) player.pause(); else player.play();
@@ -565,6 +764,23 @@ async function run() {
             skinInput.value = '';
             skinStatus.textContent = '';
             skinClearBtn.hidden = true;
+        });
+
+        const blurInput = document.getElementById('replay-set-blur');
+        const brightnessInput = document.getElementById('replay-set-brightness');
+        const popupsInput = document.getElementById('replay-set-popups');
+        const bananaInput = document.getElementById('replay-set-banana');
+        const onSettingsChange = () => {
+            settings.blur = Number(blurInput.value);
+            settings.brightness = Number(brightnessInput.value);
+            settings.popups = popupsInput.checked;
+            settings.bananaRain = bananaInput.checked;
+            player.setVisualSettings(settings);
+            document.body.classList.toggle('show-banana-rain', settings.bananaRain);
+            saveSettings(settings);
+        };
+        [blurInput, brightnessInput, popupsInput, bananaInput].forEach(el => {
+            el.addEventListener('input', onSettingsChange);
         });
 
         player.start();
