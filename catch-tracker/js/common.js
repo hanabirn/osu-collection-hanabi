@@ -82,6 +82,7 @@ const LANG_STRINGS = {
         empty_maps: '沒有符合條件的圖譜。',
         failed_maps: '圖譜庫載入失敗。',
         diff_count_suffix: '譜',
+        star_any: '任何星數',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -150,6 +151,7 @@ const LANG_STRINGS = {
         empty_maps: 'No maps match these filters.',
         failed_maps: 'Failed to load the map catalog.',
         diff_count_suffix: ' diffs',
+        star_any: 'Any star',
     },
 };
 

@@ -36,6 +36,15 @@
             <option value="length_desc" data-i18n="sort_length_desc">Length long→short</option>
             <option value="newest" data-i18n="sort_newest">Newest</option>
         </select>
+        <div class="star-range" id="star-range">
+            <svg class="star-range-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.98 6.04 6.67.97-4.83 4.7 1.14 6.65L12 17.77l-5.96 3.13 1.14-6.65-4.83-4.7 6.67-.97L12 2.5z"/></svg>
+            <span class="star-range-label" id="star-range-label" data-i18n="star_any">Any</span>
+            <div class="star-range-track">
+                <div class="star-range-fill" id="star-range-fill"></div>
+                <input type="range" id="star-min" class="star-range-input" min="0" max="10" step="0.1" value="0" aria-label="Minimum star rating">
+                <input type="range" id="star-max" class="star-range-input" min="0" max="10" step="0.1" value="10" aria-label="Maximum star rating">
+            </div>
+        </div>
     </div>
     <div class="map-grid" id="maps-grid"></div>
     <div class="pagination">

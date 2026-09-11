@@ -327,6 +327,99 @@ td.wrap, th.wrap { white-space: normal; }
 }
 .filters input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; }
 
+/* ---------- star difficulty range picker ---------- */
+/* A from-scratch redesign of the rainbow-gradient-capsule star picker
+   referenced in conversation, restyled to this site's own minimal-tech /
+   violet-rose language instead of copying the loud rainbow verbatim: the
+   full star-color spectrum (same STAR_COLOR_STOPS family used by the diff
+   icons) sits dimmed in the track as a meaningful reference, while the
+   selected range lights up with the site's own accent gradient + glow. */
+.star-range {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 14px;
+    min-height: 40px;
+}
+.star-range-icon { width: 14px; height: 14px; color: #facc15; flex: none; }
+.star-range-label {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    min-width: 74px;
+}
+.star-range-track { position: relative; width: 160px; height: 32px; flex: none; }
+.star-range-track::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+        #4fc0ff 0%, #4fc0ff 12%, #4fffd5 20%, #7cff4f 25%,
+        #f6f05c 33%, #ff8068 42%, #ff4e6f 49%, #c645b8 58%,
+        #6563de 67%, #18158e 77%, #000000 100%);
+    filter: brightness(0.5) saturate(0.55);
+}
+.star-range-fill {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.55);
+}
+.star-range-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 32px;
+    margin: 0;
+    background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+    pointer-events: none;
+    z-index: 2;
+}
+.star-range-input::-webkit-slider-runnable-track { background: transparent; height: 32px; }
+.star-range-input::-moz-range-track { background: transparent; height: 32px; border: none; }
+.star-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: auto;
+    width: 14px;
+    height: 14px;
+    margin-top: 9px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px var(--primary-soft);
+    transition: box-shadow 150ms ease, transform 150ms ease;
+}
+.star-range-input::-webkit-slider-thumb:hover,
+.star-range-input::-webkit-slider-thumb:active { box-shadow: 0 0 0 6px var(--primary-soft); transform: scale(1.12); }
+.star-range-input::-moz-range-thumb {
+    pointer-events: auto;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
 .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
 .pill {
     background: var(--bg-card);
@@ -567,6 +660,29 @@ main:has(.pagination) { padding-bottom: 90px; }
 .map-card:hover .preview-btn,
 .preview-btn.playing { opacity: 1; }
 .preview-btn:hover { background: var(--primary); border-color: var(--primary); transform: translate(-50%, -50%) scale(1.08); }
+
+/* Bottom-right corner of the cover was otherwise empty — jumps to the
+   beatmapset's real osu! page in a new tab. */
+.cover-link-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 10, 22, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+    opacity: 0;
+    transition: opacity 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+.map-card:hover .cover-link-btn { opacity: 1; }
+.cover-link-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; text-decoration: none; }
+.cover-link-btn svg { width: 12px; height: 12px; }
 .preview-btn .icon-play { width: 13px; height: 13px; margin-left: 2px; }
 .preview-btn .icon-eq { display: none; align-items: flex-end; gap: 2px; height: 14px; }
 .preview-btn.playing .icon-play { display: none; }
