@@ -85,6 +85,10 @@ function toFeedRecord(score, player) {
         statistics: score.statistics || {},
         is_fc: isFC(score),
         passed: score.passed !== false,
+        // Confirmed against osu!'s own API docs (Score object: "has_replay
+        // boolean — Whether an online replay exists for this score.").
+        // Genuinely false for plenty of real, good plays — replay upload
+        // isn't guaranteed for every score, not a field-name bug.
         has_replay: score.has_replay === true,
         created_at: score.created_at || null,
         seenAt: new Date().toISOString(),

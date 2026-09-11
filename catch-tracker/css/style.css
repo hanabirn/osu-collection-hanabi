@@ -917,6 +917,27 @@ footer.site-footer {
     padding: 30px 20px 40px;
 }
 
+/* ---------- Watch Replay ---------- */
+
+.replay-canvas {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 640 / 420;
+    background: #05050c;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+.replay-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+.replay-controls .pill.toggle { min-width: 44px; justify-content: center; }
+.replay-scrub { flex: 1 1 auto; }
+
 /* ---------- BBCode editor ---------- */
 
 .bbcode-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
