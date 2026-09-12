@@ -5,9 +5,17 @@
    the replay server-side. A #1-world-rank catch score (Story — "Double
    Helix" [Polymerized Nucleotide], score 6141982961) DID have one, and the
    full pipeline was confirmed end-to-end: download → real .osr →
-   BeatmapDecoder/ScoreDecoder → CatchRuleset/CatchReplayConverter → this
-   canvas renderer. Also verified: full-song audio (mirror.hinamizawa.ai)
-   and client-side .osk skin sprites (fflate) — see git history.
+   BeatmapDecoder/ScoreDecoder/CatchRuleset → this canvas renderer.
+   CatchReplayConverter was tried for the replay side but turned out
+   broken (26239 raw frames collapsed to 24, wrong timestamps) AND
+   unnecessary — ScoreDecoder's raw parsedScore.replay.frames already carry
+   position.x directly, in the same coordinate space as the raw decoded
+   beatmap hit objects (confirmed by comparing raw frame X against hit
+   object X on a real HR replay: diffs of a few px, vs 100-400px when
+   compared against a manually-512-mirrored X) — so nothing here manually
+   mirrors for HR either; both sides are used exactly as decoded. Also
+   verified: full-song audio (mirror.hinamizawa.ai) and client-side .osk
+   skin sprites (fflate) — see git history.
 
    This pass matches mania-tracker.com's replay-viewer PRESENTATION (full-
    bleed dark theater over a blurred cover, borderless floating HUD text,
@@ -62,7 +70,9 @@ const HP_GAIN = 0.5;
 const HP_LOSS = 4;
 const POPUP_DURATION_MS = 600;
 const SETTINGS_KEY = 'ct_replay_settings';
-const DEFAULT_SETTINGS = { blur: 0, brightness: 100, popups: true, bananaRain: false };
+// blur/brightness default to the same values the .replay-theater-scrim CSS
+// rule used before these became adjustable — see applyBackgroundSettings().
+const DEFAULT_SETTINGS = { blur: 26, brightness: 50, popups: true, bananaRain: false };
 
 const main = document.getElementById('replay-main');
 
@@ -172,10 +182,15 @@ function flattenHitObjects(hitObjects, classes) {
     return out;
 }
 
-function applyHrMirror(items, mods) {
-    if (!mods.includes('HR')) return items;
-    return items.map(it => ({ ...it, x: PLAYFIELD_X - it.x }));
-}
+// NOT mirroring for HR is deliberate, confirmed against a real HR replay
+// this session: raw replay-frame X (parsedScore.replay.frames) matches the
+// RAW/undecoded beatmap hit-object X directly (within a few osu!pixels —
+// diff ~1-20px across sampled objects), not a 512-mirrored value (which was
+// off by 100-400px on the same objects). osu! evidently records replay
+// cursor position in the beatmap's original coordinate space regardless of
+// HR — the mirror is a display/input transform only, not a coordinate
+// transform — so both hit objects and replay frames are decoded/used as-is
+// with no manual mirroring anywhere in this file.
 function clockRateForMods(mods) {
     if (mods.includes('DT') || mods.includes('NC')) return 1.5;
     if (mods.includes('HT') || mods.includes('DC')) return 0.75;
@@ -317,8 +332,11 @@ class ReplayPlayer {
     }
 
     setSprites(sprites) { this.sprites = sprites || {}; }
+    // Blur/brightness intentionally do NOT touch the canvas — those settings
+    // are about the ambient background banner, not the gameplay itself
+    // (blurring fruit/catcher would hurt playback legibility). See run()'s
+    // applyBackgroundSettings(), which targets the scrim instead.
     setVisualSettings(s) {
-        this.canvas.style.filter = `blur(${s.blur}px) brightness(${s.brightness}%)`;
         this.showPopups = s.popups;
     }
     resize(w, h) {
@@ -547,10 +565,10 @@ function theaterHtml(meta) {
 function settingsDrawerHtml(s) {
     return `
         <label>${escapeHtml(t('replay_settings_blur'))}
-            <input type="range" id="replay-set-blur" min="0" max="8" step="0.5" value="${s.blur}">
+            <input type="range" id="replay-set-blur" min="0" max="50" step="2" value="${s.blur}">
         </label>
         <label>${escapeHtml(t('replay_settings_brightness'))}
-            <input type="range" id="replay-set-brightness" min="40" max="140" step="5" value="${s.brightness}">
+            <input type="range" id="replay-set-brightness" min="10" max="100" step="5" value="${s.brightness}">
         </label>
         <label><input type="checkbox" id="replay-set-popups" ${s.popups ? 'checked' : ''}> ${escapeHtml(t('replay_settings_judgements'))}</label>
         <label><input type="checkbox" id="replay-set-banana" ${s.bananaRain ? 'checked' : ''}> ${escapeHtml(t('replay_settings_banana_rain'))}</label>
@@ -561,6 +579,15 @@ function settingsDrawerHtml(s) {
 function resizeCanvasToDisplaySize(player, canvas) {
     const rect = canvas.getBoundingClientRect();
     if (rect.width > 0 && rect.height > 0) player.resize(rect.width, rect.height);
+}
+
+// Blur/brightness settings apply to the background banner (the blurred
+// cover-art scrim), not the gameplay canvas — see ReplayPlayer.
+// setVisualSettings()'s comment for why.
+function applyBackgroundSettings(scrim, s) {
+    const filter = `blur(${s.blur}px) brightness(${s.brightness}%) saturate(1.15)`;
+    scrim.style.backdropFilter = filter;
+    scrim.style.webkitBackdropFilter = filter;
 }
 
 async function run() {
@@ -599,7 +626,7 @@ async function run() {
 
         const { BeatmapDecoder, ScoreDecoder } = await import(PARSERS_URL);
         const catchStable = await import(CATCH_STABLE_URL);
-        const { CatchRuleset, CatchReplayConverter, Fruit, Banana, JuiceDroplet, JuiceTinyDroplet } = catchStable;
+        const { CatchRuleset, Fruit, Banana, JuiceDroplet, JuiceTinyDroplet } = catchStable;
 
         const ruleset = new CatchRuleset();
         const parsedBeatmap = new BeatmapDecoder().decodeFromString(osuText);
@@ -607,24 +634,22 @@ async function run() {
         const cs = (catchBeatmap.difficulty && catchBeatmap.difficulty.circleSize)
             ?? (parsedBeatmap.difficulty && parsedBeatmap.difficulty.circleSize) ?? 5;
 
-        let items = flattenHitObjects(catchBeatmap.hitObjects, { Fruit, Banana, JuiceDroplet, JuiceTinyDroplet });
-        items = applyHrMirror(items, mods);
+        const items = flattenHitObjects(catchBeatmap.hitObjects, { Fruit, Banana, JuiceDroplet, JuiceTinyDroplet });
 
         const parsedScore = await new ScoreDecoder().decodeFromBuffer(new Uint8Array(replayBuffer));
         console.log('[replay] parsed score:', parsedScore);
 
-        let frames = [];
-        try {
-            const converter = new CatchReplayConverter(catchBeatmap);
-            const convertedReplay = converter.convertReplay(parsedScore.replay, { mods });
-            const rawFrames = convertedReplay.frames || convertedReplay.replay?.frames || convertedReplay;
-            frames = (Array.isArray(rawFrames) ? rawFrames : [])
-                .map(f => ({ time: f.startTime, x: getFrameX(f) }))
-                .filter(f => typeof f.time === 'number' && f.x !== null)
-                .sort((a, b) => a.time - b.time);
-        } catch (convErr) {
-            console.warn('[replay] replay frame conversion failed — catcher will render static:', convErr);
-        }
+        // Use the raw decoded replay frames directly — CatchReplayConverter
+        // was tried first but produced garbage on a real replay (26239 raw
+        // frames collapsed to 24, with wildly wrong timestamps). The raw
+        // frames already carry exactly what's needed (position.x, in the
+        // same coordinate space as the raw beatmap hit objects — see the
+        // no-mirroring note near clockRateForMods above), so the converter
+        // step turned out to be unnecessary as well as broken.
+        const frames = (parsedScore.replay && parsedScore.replay.frames ? parsedScore.replay.frames : [])
+            .map(f => ({ time: f.startTime, x: getFrameX(f) }))
+            .filter(f => typeof f.time === 'number' && f.x !== null)
+            .sort((a, b) => a.time - b.time);
 
         if (!items.length) {
             setStatus(errorHtml(t('replay_not_found')));
@@ -688,6 +713,8 @@ async function run() {
         });
         player.setVisualSettings(settings);
         document.body.classList.toggle('show-banana-rain', settings.bananaRain);
+        const scrim = theater.querySelector('.replay-theater-scrim');
+        applyBackgroundSettings(scrim, settings);
 
         resizeCanvasToDisplaySize(player, canvas);
         window.addEventListener('resize', () => resizeCanvasToDisplaySize(player, canvas));
@@ -750,6 +777,7 @@ async function run() {
             settings.bananaRain = bananaInput.checked;
             player.setVisualSettings(settings);
             document.body.classList.toggle('show-banana-rain', settings.bananaRain);
+            applyBackgroundSettings(scrim, settings);
             saveSettings(settings);
         };
         [blurInput, brightnessInput, popupsInput, bananaInput].forEach(el => {
