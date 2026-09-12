@@ -31,7 +31,7 @@ function mapCard(set) {
         <div class="map-card-cover"${style}>
 ${statusBadge(set.status)}
             ${starLabel ? `<span class="map-star">${escapeHtml(starLabel)}</span>` : ''}
-            ${previewButton(set.beatmapset_id)}
+            ${previewButton(set.beatmapset_id, set.bpm, set.title, set.artist, cover)}
             ${osuLinkBtn(set.beatmapset_id)}
         </div>
         <div class="map-card-body">
@@ -57,6 +57,13 @@ async function loadMaps() {
             starMin: starMinInput > 0 ? starMinInput : undefined,
             starMax: starMaxInput < STAR_SLIDER_MAX ? starMaxInput : undefined,
         });
+
+        // A page/filter/sort change is about to replace the whole grid —
+        // any currently-playing preview's card is going away, and the
+        // preview queue (see common.js's previewButton()) needs to start
+        // fresh so its indices match the new cards about to be rendered.
+        stopPreview();
+        resetPreviewQueue();
 
         grid.innerHTML = data.items.length
             ? data.items.map(mapCard).join('')

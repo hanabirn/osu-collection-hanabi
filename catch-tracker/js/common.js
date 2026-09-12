@@ -412,46 +412,197 @@ function avatarWithFlagHtml(avatarUrl, countryCode, avatarClass) {
     </span>`;
 }
 
-/* ---------- audio preview button (play icon <-> animated equalizer) ----------
+/* ---------- audio preview button + floating mini-player ----------
    Plain <audio> playback needs no CORS at all (that's only a Web Audio
    API/AnalyserNode requirement) — the main site's preview waveform feature
    needed a CORS proxy specifically because it reads real frequency data;
-   here the bars are a decorative simulated equalizer (per request), not
-   driven by actual audio analysis, so this stays a plain <audio> element
-   with zero backend involvement. Only one preview plays at a time —
-   starting a new one stops whichever card was already playing. */
+   the in-card bars here are a decorative simulated equalizer (per
+   request), not driven by actual audio analysis, so this stays a plain
+   <audio> element with zero backend involvement.
+
+   A page that renders preview buttons (currently just render-maps.js)
+   calls resetPreviewQueue() once before rendering a batch of cards, then
+   previewButton() for each card — each call appends {beatmapsetId, title,
+   artist, cover} to _previewQueue and bakes that item's queue index into
+   the button's onclick. This is what lets the floating mini-player's
+   prev/next step through "whatever's currently on screen" without the
+   page needing its own separate queue logic. Only one preview plays at a
+   time; starting a new one stops whichever was already playing. */
 let _previewAudio = null;
-let _previewBtn = null;
+let _previewIndex = -1;
+let _previewQueue = [];
+let _previewVolume = (() => {
+    try { const v = parseFloat(localStorage.getItem('ct_preview_volume')); return Number.isFinite(v) ? v : 0.6; }
+    catch { return 0.6; }
+})();
+let _previewLoop = false;
+
+function resetPreviewQueue() {
+    _previewQueue = [];
+}
+
+function previewButtons() {
+    return document.querySelectorAll('.preview-btn');
+}
 
 function stopPreview() {
     if (_previewAudio) _previewAudio.pause();
-    if (_previewBtn) _previewBtn.classList.remove('playing');
+    const btn = previewButtons()[_previewIndex];
+    if (btn) btn.classList.remove('playing', 'paused');
     _previewAudio = null;
-    _previewBtn = null;
+    _previewIndex = -1;
+    hideMiniPlayer();
 }
 
-function togglePreview(beatmapsetId, btn) {
-    const wasThisBtn = _previewBtn === btn;
-    stopPreview();
-    if (wasThisBtn) return; // clicking the currently-playing card's button just stops it
+function startPreviewAt(index) {
+    const item = _previewQueue[index];
+    if (!item) return;
+    const prevBtn = previewButtons()[_previewIndex];
+    if (prevBtn) prevBtn.classList.remove('playing', 'paused');
+    if (_previewAudio) _previewAudio.pause();
 
-    const audio = new Audio(`https://b.ppy.sh/preview/${beatmapsetId}.mp3`);
-    audio.volume = 0.6;
-    audio.addEventListener('ended', stopPreview);
+    const audio = new Audio(`https://b.ppy.sh/preview/${item.beatmapsetId}.mp3`);
+    audio.volume = _previewVolume;
+    audio.loop = _previewLoop;
+    audio.addEventListener('ended', nextPreview);
     audio.addEventListener('error', stopPreview);
+    audio.addEventListener('timeupdate', updateMiniPlayerProgress);
+    audio.addEventListener('loadedmetadata', updateMiniPlayerProgress);
+    audio.addEventListener('play', updateMiniPlayerPlayState);
+    audio.addEventListener('pause', updateMiniPlayerPlayState);
     audio.play().catch(stopPreview);
-    btn.classList.add('playing');
+
+    const btn = previewButtons()[index];
+    if (btn) btn.classList.add('playing');
     _previewAudio = audio;
-    _previewBtn = btn;
+    _previewIndex = index;
+    showMiniPlayer(item);
 }
 
-function previewButton(beatmapsetId) {
+function togglePreviewAt(index) {
+    if (_previewIndex === index) { stopPreview(); return; }
+    startPreviewAt(index);
+}
+
+function nextPreview() {
+    if (!_previewQueue.length) return stopPreview();
+    startPreviewAt((_previewIndex + 1 + _previewQueue.length) % _previewQueue.length);
+}
+function prevPreview() {
+    if (!_previewQueue.length) return stopPreview();
+    startPreviewAt((_previewIndex - 1 + _previewQueue.length) % _previewQueue.length);
+}
+function togglePlayPause() {
+    if (!_previewAudio) return;
+    if (_previewAudio.paused) _previewAudio.play().catch(stopPreview); else _previewAudio.pause();
+}
+function toggleLoop() {
+    _previewLoop = !_previewLoop;
+    if (_previewAudio) _previewAudio.loop = _previewLoop;
+    const btn = document.getElementById('mini-player-loop');
+    if (btn) btn.classList.toggle('active', _previewLoop);
+}
+
+function fmtPreviewTime(s) {
+    if (!Number.isFinite(s) || s < 0) return '0:00';
+    return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+}
+
+const MINI_PLAYER_PLAY_ICON = '<path d="M8 5v14l11-7z"/>';
+const MINI_PLAYER_PAUSE_ICON = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+
+function updateMiniPlayerPlayState() {
+    if (!_previewAudio) return;
+    const playBtn = document.getElementById('mini-player-playpause');
+    if (playBtn) playBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${_previewAudio.paused ? MINI_PLAYER_PLAY_ICON : MINI_PLAYER_PAUSE_ICON}</svg>`;
+    const activeBtn = previewButtons()[_previewIndex];
+    if (activeBtn) activeBtn.classList.toggle('paused', _previewAudio.paused);
+}
+
+function updateMiniPlayerProgress() {
+    if (!_previewAudio) return;
+    const seek = document.getElementById('mini-player-seek');
+    const time = document.getElementById('mini-player-time');
+    if (!seek || !time) return;
+    const duration = _previewAudio.duration || 0;
+    const current = _previewAudio.currentTime || 0;
+    if (document.activeElement !== seek) seek.value = duration ? String(current / duration) : '0';
+    time.textContent = `${fmtPreviewTime(current)} / ${fmtPreviewTime(duration)}`;
+}
+
+function ensureMiniPlayer() {
+    if (document.getElementById('mini-player')) return;
+    const el = document.createElement('div');
+    el.id = 'mini-player';
+    el.className = 'mini-player';
+    el.hidden = true;
+    el.innerHTML = `
+        <div class="mini-player-top">
+            <img class="mini-player-cover" id="mini-player-cover" alt="">
+            <div class="mini-player-info">
+                <div class="mini-player-title" id="mini-player-title"></div>
+                <div class="mini-player-artist" id="mini-player-artist"></div>
+            </div>
+            <svg class="mini-player-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+            <input type="range" id="mini-player-volume" min="0" max="1" step="0.01" title="Volume">
+            <button type="button" class="mini-player-icon-btn" id="mini-player-close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+        </div>
+        <div class="mini-player-controls">
+            <button type="button" class="mini-player-icon-btn" id="mini-player-prev" title="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14l-11-7z"/></svg></button>
+            <button type="button" class="mini-player-icon-btn" id="mini-player-playpause" title="Play/Pause"><svg viewBox="0 0 24 24" fill="currentColor">${MINI_PLAYER_PAUSE_ICON}</svg></button>
+            <button type="button" class="mini-player-icon-btn" id="mini-player-next" title="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+            <button type="button" class="mini-player-icon-btn" id="mini-player-loop" title="Loop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+            <input type="range" id="mini-player-seek" min="0" max="1" step="0.001">
+            <span class="mini-player-time" id="mini-player-time">0:00 / 0:00</span>
+        </div>`;
+    document.body.appendChild(el);
+
+    document.getElementById('mini-player-close').addEventListener('click', stopPreview);
+    document.getElementById('mini-player-playpause').addEventListener('click', togglePlayPause);
+    document.getElementById('mini-player-prev').addEventListener('click', prevPreview);
+    document.getElementById('mini-player-next').addEventListener('click', nextPreview);
+    document.getElementById('mini-player-loop').addEventListener('click', toggleLoop);
+    document.getElementById('mini-player-volume').addEventListener('input', (e) => {
+        _previewVolume = parseFloat(e.target.value);
+        if (_previewAudio) _previewAudio.volume = _previewVolume;
+        try { localStorage.setItem('ct_preview_volume', String(_previewVolume)); } catch { /* private mode etc. — just skip persisting */ }
+    });
+    document.getElementById('mini-player-seek').addEventListener('input', (e) => {
+        if (_previewAudio && _previewAudio.duration) _previewAudio.currentTime = parseFloat(e.target.value) * _previewAudio.duration;
+    });
+}
+
+function showMiniPlayer(item) {
+    ensureMiniPlayer();
+    document.getElementById('mini-player').hidden = false;
+    document.getElementById('mini-player-cover').src = item.cover || '';
+    document.getElementById('mini-player-title').textContent = item.title || '';
+    document.getElementById('mini-player-artist').textContent = item.artist || '';
+    document.getElementById('mini-player-volume').value = String(_previewVolume);
+    document.getElementById('mini-player-seek').value = '0';
+    document.getElementById('mini-player-time').textContent = '0:00 / 0:00';
+    updateMiniPlayerPlayState();
+}
+
+function hideMiniPlayer() {
+    const el = document.getElementById('mini-player');
+    if (el) el.hidden = true;
+}
+
+function previewButton(beatmapsetId, bpm, title, artist, cover) {
     if (!beatmapsetId) return '';
+    const index = _previewQueue.length;
+    _previewQueue.push({ beatmapsetId, title: title || '', artist: artist || '', cover: cover || '' });
     // 12 bars — see the CSS's .icon-eq span:nth-child(1..12) for the
     // hand-tuned per-bar height/duration/delay that gives the full-width
-    // playing-state visualizer its wave look.
+    // playing-state visualizer its wave look. Each bar's animation-duration
+    // is `calc(var(--beat-s) * <per-bar multiplier>)` rather than a fixed
+    // length, so the whole visualizer's bounce rate actually tracks this
+    // specific map's tempo — --beat-s (one beat's length in seconds,
+    // 60/bpm) is set inline here per card since bpm varies per map.
+    const beatSeconds = bpm && bpm > 0 ? (60 / bpm) : 0.4; // ~150 BPM fallback if bpm is missing
     const bars = '<span></span>'.repeat(12);
-    return `<button type="button" class="preview-btn" onclick="event.stopPropagation();togglePreview(${beatmapsetId},this)" title="Preview">
+    return `<button type="button" class="preview-btn" style="--beat-s:${beatSeconds.toFixed(4)}s" onclick="event.stopPropagation();togglePreviewAt(${index})" title="Preview">
         <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         <span class="icon-eq">${bars}</span>
     </button>`;

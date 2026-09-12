@@ -819,7 +819,7 @@ main:has(.pagination) { padding-bottom: 90px; }
 .preview-btn .icon-play { width: 13px; height: 13px; margin-left: 2px; flex: none; }
 .preview-btn .icon-eq { display: none; align-items: flex-end; justify-content: center; gap: 2px; height: 14px; }
 .preview-btn.playing .icon-play { display: none; }
-.preview-btn.playing .icon-eq { display: flex; width: 100%; height: 100%; gap: 3px; padding: 0 8px; }
+.preview-btn.playing .icon-eq { display: flex; width: 100%; height: 100%; gap: 3px; padding: 0; }
 .icon-eq span {
     display: block;
     width: 3px;
@@ -835,21 +835,26 @@ main:has(.pagination) { padding-bottom: 90px; }
 .preview-btn.playing .icon-eq span {
     flex: 1 1 0;
     width: auto;
-    max-width: 6px;
     border-radius: 2px 2px 0 0;
 }
-.icon-eq span:nth-child(1) { height: 35%; animation-duration: 0.8s; animation-delay: -0.62s; }
-.icon-eq span:nth-child(2) { height: 62%; animation-duration: 1.05s; animation-delay: -0.1s; }
-.icon-eq span:nth-child(3) { height: 45%; animation-duration: 0.7s; animation-delay: -0.94s; }
-.icon-eq span:nth-child(4) { height: 90%; animation-duration: 1.3s; animation-delay: -0.4s; }
-.icon-eq span:nth-child(5) { height: 55%; animation-duration: 0.9s; animation-delay: -0.72s; }
-.icon-eq span:nth-child(6) { height: 100%; animation-duration: 1.4s; animation-delay: -0.15s; }
-.icon-eq span:nth-child(7) { height: 68%; animation-duration: 0.85s; animation-delay: -1.1s; }
-.icon-eq span:nth-child(8) { height: 48%; animation-duration: 1.1s; animation-delay: -0.55s; }
-.icon-eq span:nth-child(9) { height: 80%; animation-duration: 0.95s; animation-delay: -0.28s; }
-.icon-eq span:nth-child(10) { height: 40%; animation-duration: 1.2s; animation-delay: -0.85s; }
-.icon-eq span:nth-child(11) { height: 60%; animation-duration: 0.75s; animation-delay: -0.05s; }
-.icon-eq span:nth-child(12) { height: 30%; animation-duration: 1.05s; animation-delay: -0.48s; }
+/* Each bar's duration/delay is a multiple of --beat-s (one beat's length,
+   60/bpm — set inline per card by previewButton() in common.js) instead of
+   a fixed length, so the whole visualizer's bounce rate tracks this map's
+   actual tempo. Multipliers are just the old hand-tuned absolute values
+   (0.8s, 1.05s, ...) divided by a 0.4s reference beat (~150 BPM) — same
+   relative variety, now tempo-relative instead of fixed. */
+.icon-eq span:nth-child(1) { height: 35%; animation-duration: calc(var(--beat-s, 0.4s) * 2); animation-delay: calc(var(--beat-s, 0.4s) * -1.55); }
+.icon-eq span:nth-child(2) { height: 62%; animation-duration: calc(var(--beat-s, 0.4s) * 2.625); animation-delay: calc(var(--beat-s, 0.4s) * -0.25); }
+.icon-eq span:nth-child(3) { height: 45%; animation-duration: calc(var(--beat-s, 0.4s) * 1.75); animation-delay: calc(var(--beat-s, 0.4s) * -2.35); }
+.icon-eq span:nth-child(4) { height: 90%; animation-duration: calc(var(--beat-s, 0.4s) * 3.25); animation-delay: calc(var(--beat-s, 0.4s) * -1); }
+.icon-eq span:nth-child(5) { height: 55%; animation-duration: calc(var(--beat-s, 0.4s) * 2.25); animation-delay: calc(var(--beat-s, 0.4s) * -1.8); }
+.icon-eq span:nth-child(6) { height: 100%; animation-duration: calc(var(--beat-s, 0.4s) * 3.5); animation-delay: calc(var(--beat-s, 0.4s) * -0.375); }
+.icon-eq span:nth-child(7) { height: 68%; animation-duration: calc(var(--beat-s, 0.4s) * 2.125); animation-delay: calc(var(--beat-s, 0.4s) * -2.75); }
+.icon-eq span:nth-child(8) { height: 48%; animation-duration: calc(var(--beat-s, 0.4s) * 2.75); animation-delay: calc(var(--beat-s, 0.4s) * -1.375); }
+.icon-eq span:nth-child(9) { height: 80%; animation-duration: calc(var(--beat-s, 0.4s) * 2.375); animation-delay: calc(var(--beat-s, 0.4s) * -0.7); }
+.icon-eq span:nth-child(10) { height: 40%; animation-duration: calc(var(--beat-s, 0.4s) * 3); animation-delay: calc(var(--beat-s, 0.4s) * -2.125); }
+.icon-eq span:nth-child(11) { height: 60%; animation-duration: calc(var(--beat-s, 0.4s) * 1.875); animation-delay: calc(var(--beat-s, 0.4s) * -0.125); }
+.icon-eq span:nth-child(12) { height: 30%; animation-duration: calc(var(--beat-s, 0.4s) * 2.625); animation-delay: calc(var(--beat-s, 0.4s) * -1.2); }
 @keyframes eq-bounce {
     0%, 100% { transform: scaleY(0.2); }
     50% { transform: scaleY(1); }
@@ -857,6 +862,96 @@ main:has(.pagination) { padding-bottom: 90px; }
 @media (prefers-reduced-motion: reduce) {
     .icon-eq span { animation: none; height: 60%; }
 }
+/* Freezes the in-card bars (rather than hiding them) when the floating
+   mini-player is paused — same .icon-eq element, just pause the CSS
+   animation in place so the bars stay visible at whatever height they
+   were at. */
+.preview-btn.paused .icon-eq span { animation-play-state: paused; }
+
+/* ---------- floating mini-player ----------
+   Appears bottom-right once any preview starts (see common.js's
+   ensureMiniPlayer()/showMiniPlayer()) and persists across cards via
+   prev/next — a real transport control surface (pause/resume/seek/
+   volume/loop), separate from the decorative per-card equalizer. */
+.mini-player {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 500;
+    width: 320px;
+    max-width: calc(100vw - 40px);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    padding: 12px 14px;
+}
+.mini-player-top { display: flex; align-items: center; gap: 10px; }
+.mini-player-cover {
+    width: 38px;
+    height: 38px;
+    border-radius: 7px;
+    object-fit: cover;
+    background: var(--bg-elevated);
+    flex: none;
+}
+.mini-player-info { min-width: 0; flex: 1 1 auto; }
+.mini-player-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mini-player-artist {
+    font-size: 0.74rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mini-player-icon { width: 15px; height: 15px; color: var(--text-faint); flex: none; }
+.mini-player #mini-player-volume { width: 56px; flex: none; }
+.mini-player-icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 5px;
+    flex: none;
+}
+.mini-player-icon-btn:hover { color: var(--text); background: var(--bg-elevated); }
+.mini-player-icon-btn svg { width: 14px; height: 14px; }
+.mini-player-icon-btn.active { color: var(--accent); }
+#mini-player-close svg { width: 12px; height: 12px; }
+.mini-player-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+#mini-player-playpause svg { width: 18px; height: 18px; }
+#mini-player-playpause { width: 26px; height: 26px; color: var(--text); }
+.mini-player-controls input[type="range"] { flex: 1 1 auto; }
+.mini-player-time {
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    white-space: nowrap;
+}
+.mini-player input[type="range"] {
+    accent-color: var(--accent);
+    height: 4px;
+    cursor: pointer;
+}
+@media (max-width: 480px) {
+    .mini-player { right: 12px; bottom: 12px; left: 12px; width: auto; }
+}
+
 .map-card .map-star {
     position: absolute;
     top: 8px;
