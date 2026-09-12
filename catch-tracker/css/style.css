@@ -1155,6 +1155,7 @@ footer.site-footer {
 }
 .replay-settings-drawer label { display: flex; align-items: center; gap: 8px; }
 .replay-settings-drawer input[type="range"] { flex: 1 1 auto; }
+.replay-settings-drawer[hidden] { display: none; }
 
 .replay-disclaimer-note { max-width: 1200px; margin: 14px auto 0; }
 
