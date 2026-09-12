@@ -269,14 +269,28 @@ async function loadSkinSprites(file) {
         if (!byBase[base] || (isHiRes && !byBase[base].isHiRes)) byBase[base] = { bytes, isHiRes };
     }
 
+    // The load event (not img.decode()) — found live that decode() can hang
+    // indefinitely (never resolves OR rejects) on a real skin sprite while
+    // the tab is backgrounded, silently stalling the whole skin forever
+    // with no error surfaced. The classic load/error events fire reliably
+    // regardless of tab visibility, so a 5s timeout here is just a safety
+    // net, not the primary mechanism.
+    function loadOneSprite(bytes) {
+        return new Promise((resolve, reject) => {
+            const blob = new Blob([bytes], { type: 'image/png' });
+            const img = new Image();
+            const timer = setTimeout(() => reject(new Error('sprite load timed out')), 5000);
+            img.onload = () => { clearTimeout(timer); resolve(img); };
+            img.onerror = () => { clearTimeout(timer); reject(new Error('sprite failed to decode')); };
+            img.src = URL.createObjectURL(blob);
+        });
+    }
+
     const sprites = {};
     await Promise.all(Object.entries(SKIN_FILES).map(async ([key, base]) => {
         const entry = byBase[base];
         if (!entry) return;
-        const blob = new Blob([entry.bytes], { type: 'image/png' });
-        const img = new Image();
-        img.src = URL.createObjectURL(blob);
-        try { await img.decode(); sprites[key] = img; } catch { /* keep procedural fallback for this one */ }
+        try { sprites[key] = await loadOneSprite(entry.bytes); } catch { /* keep procedural fallback for this one */ }
     }));
     return sprites;
 }
