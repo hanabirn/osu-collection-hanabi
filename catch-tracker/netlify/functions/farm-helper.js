@@ -22,6 +22,11 @@ const { MODE } = require('./_catch-constants');
 
 const PEER_WINDOW_EACH_SIDE = 50; // ~100 peers total, per the approved plan
 const MAX_RESULTS = 50;
+// How many peers to hand back for the decorative rotating network graph —
+// deliberately not all ~100 (would be visually cluttered), just enough
+// nodes to read as "a group of people," same rough count mania-tracker's
+// own farm-helper graph shows.
+const GRAPH_PEER_COUNT = 24;
 // A peer median needs to beat the target's own pp on a map by more than
 // this to count as "可提升" — filters out noise-level differences that
 // aren't a meaningful recommendation.
@@ -183,11 +188,23 @@ exports.handler = async (event) => {
 
         candidates.sort((a, b) => b.gain - a.gain);
 
+        // Lean peer list for the decorative rotating network graph — just
+        // enough to draw nodes (avatar + a stable key), not the full
+        // ranking record. Evenly sampled across the window rather than
+        // just the first N, so the graph doesn't skew toward one side of
+        // the pp range on a lightly-populated window.
+        const graphStep = Math.max(1, Math.floor(peerWindow.length / GRAPH_PEER_COUNT));
+        const peers = peerWindow
+            .filter((_, i) => i % graphStep === 0)
+            .slice(0, GRAPH_PEER_COUNT)
+            .map(p => ({ user_id: p.user_id, username: p.username, avatar_url: p.avatar_url }));
+
         return {
             statusCode: 200,
             headers: { ...headers, 'Cache-Control': 'public, max-age=60' },
             body: JSON.stringify({
                 items: candidates.slice(0, MAX_RESULTS),
+                peers,
                 coverage: {
                     peerWindowSize: peerWindow.length,
                     peersCovered: coveragePeers,

@@ -405,6 +405,15 @@ td.wrap, th.wrap { white-space: normal; }
     margin: -6px 0 16px;
 }
 
+.farm-helper-top { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.farm-helper-top .profile-header { flex: 1 1 320px; margin-bottom: 0; }
+.farm-helper-graph-card { flex: 0 0 260px; width: 260px; height: 260px; padding: 0; overflow: hidden; margin-bottom: 0; }
+.farm-helper-graph { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.farm-helper-graph.dragging { cursor: grabbing; }
+@media (max-width: 760px) {
+    .farm-helper-graph-card { flex-basis: 100%; width: 100%; height: 240px; }
+}
+
 /* ---------- farm helper landing (no ?id=) ---------- */
 
 .farm-helper-landing { max-width: 560px; margin: 40px 0; }
