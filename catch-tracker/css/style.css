@@ -944,7 +944,19 @@ footer.site-footer {
     background: #05050c center / cover no-repeat;
     isolation: isolate;
 }
-.replay-theater:fullscreen { height: 100vh; }
+/* Native Fullscreen API promotes this element into its own top-layer
+   render context that already fills the whole screen — the width:100vw +
+   negative margin-left "breakout" trick above is for escaping main's
+   normal-flow max-width while still IN the page, and fighting it against
+   the browser's own fullscreen sizing is what was pushing the HUD panels
+   (anchored via left/right offsets on this element's box) out of place.
+   Reset both so this element's box in fullscreen is exactly the screen,
+   nothing added on top. */
+.replay-theater:fullscreen {
+    height: 100vh;
+    width: 100vw;
+    margin-left: 0;
+}
 .replay-theater-scrim {
     position: absolute;
     inset: 0;
