@@ -334,6 +334,31 @@ td.wrap, th.wrap { white-space: normal; }
     font-family: var(--font-display);
 }
 
+/* ---------- farm helper ---------- */
+
+.farm-helper-cat {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+}
+.farm-helper-cat--new { color: var(--accent); background: var(--accent-soft); }
+.farm-helper-cat--improve { color: var(--success); background: rgba(52, 211, 153, 0.14); }
+.farm-helper-gain {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+.farm-helper-disclaimer {
+    color: var(--text-faint);
+    font-size: 0.78rem;
+    max-width: 780px;
+    margin: -6px 0 16px;
+}
+
 /* ---------- filters ---------- */
 
 .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -554,6 +579,8 @@ main:has(.pagination) { padding-bottom: 90px; }
     background: linear-gradient(120deg, rgba(10, 10, 22, 0.94) 0%, rgba(10, 10, 22, 0.75) 55%, rgba(10, 10, 22, 0.55) 100%);
 }
 .profile-header > * { position: relative; z-index: 1; }
+.farm-helper-link { margin-left: auto; border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent); }
+.farm-helper-link:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); text-decoration: none; }
 .profile-header .avatar {
     width: 68px;
     height: 68px;

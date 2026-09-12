@@ -44,4 +44,14 @@ function getSkinsStore() {
     return store('catch-tracker-skins');
 }
 
-module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore };
+// Peer best-plays sweep (farm helper — see _peer-crawl-core.js):
+// `peer-bestplays:{user_id}` (plain JSON, one key per player, that
+// player's own top-100 best plays) + `peer-crawl-state` (plain JSON
+// cursor/diagnostics). One key per tracked player rather than one big
+// blob — farm-helper.js only ever needs ~100 of these per request
+// (a target player's rank-adjacent peer window), not the whole set.
+function getPeerStore() {
+    return store('catch-tracker-peers');
+}
+
+module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore, getPeerStore };

@@ -32,10 +32,19 @@ const LAST_SEEN_CAP = 100;
 const SCORE_POLL_PER_RUN_CRON = 300;
 const SCORE_POLL_PER_RUN_MANUAL = 30;
 
+// Peer best-plays crawler (farm helper — _peer-crawl-core.js): one
+// GET /scores/best per player (a heavier ~100-score response than the
+// score-poller's ~50-score /scores/recent), so a lower cap — budgetMs is
+// expected to be the binding constraint in practice, same as the other
+// crawlers, this is just the safety ceiling.
+const PEER_CRAWL_PER_RUN_CRON = 150;
+const PEER_CRAWL_PER_RUN_MANUAL = 20;
+
 const VALID_GRADES = new Set(['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D', 'F']);
 
 module.exports = {
     MODE, MODE_NUM, MAP_STATUSES, FEED_CAP, LAST_SEEN_CAP,
     SCORE_POLL_PER_RUN_CRON, SCORE_POLL_PER_RUN_MANUAL,
+    PEER_CRAWL_PER_RUN_CRON, PEER_CRAWL_PER_RUN_MANUAL,
     VALID_GRADES,
 };

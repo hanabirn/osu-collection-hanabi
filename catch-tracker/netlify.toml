@@ -31,3 +31,12 @@
 # loved maps, nothing time-sensitive.
 [functions."maps-crawl-cron"]
   schedule = "*/30 * * * *"
+
+# Peer best-plays sweep (farm helper): caches each tracked player's own
+# top-100 best plays for farm-helper.js's peer-comparison reads. See
+# netlify/functions/_peer-crawl-core.js. 10 min: between rankings' hourly
+# and score-poll's 5-min — this isn't as time-sensitive as the live feed,
+# but a full population sweep still needs many ticks so it shouldn't be
+# slower than necessary either.
+[functions."peer-crawl-cron"]
+  schedule = "*/10 * * * *"

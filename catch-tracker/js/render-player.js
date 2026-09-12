@@ -81,6 +81,7 @@ async function loadPlayer() {
                         ${extraStats.join('')}
                     </div>
                 </div>
+                <a class="pill farm-helper-link" href="farm-helper.html?id=${encodeURIComponent(userId)}">${escapeHtml(t('farm_helper_view'))}</a>
             </div>
 
             ${p.grade_counts || mostUsedMod ? `

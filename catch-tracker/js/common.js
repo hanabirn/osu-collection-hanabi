@@ -61,6 +61,21 @@ const LANG_STRINGS = {
 
         footer_main: 'Catch Tracker — osu-collection-hanabi 的姊妹站。資料來自官方 osu! API。',
 
+        nav_farm_helper: '刷圖助手',
+        farm_helper_view: '查看刷圖建議',
+        farm_helper_title: '刷圖助手',
+        farm_helper_category_new: '未打過',
+        farm_helper_category_improve: '可提升',
+        farm_helper_ref: '參考成績',
+        farm_helper_gain: '預估 PP',
+        th_category: '分類',
+        farm_helper_coverage: '同儕資料涵蓋 {n}/{total} 位鄰近玩家',
+        farm_helper_not_ranked: '這位玩家尚未在追蹤的排行榜中，無法計算同儕比較。',
+        farm_helper_disclaimer: '推薦依據是附近排名玩家的真實成績，不是難度試算；同儕資料仍在陸續建立中，涵蓋越完整、推薦越準確。只比對雙方的最佳 100 筆成績，可能遺漏你打過但分數不夠高的圖。',
+        farm_helper_no_data: '目前還沒有推薦——可能同儕資料還在建立中，或你已經超前附近的玩家了。',
+        farm_helper_no_id: '未提供玩家 ID。',
+        farm_helper_failed: '刷圖助手載入失敗。',
+
         rel_sec: '{n} 秒前', rel_min: '{n} 分鐘前', rel_hr: '{n} 小時前', rel_day: '{n} 天前',
 
         search_placeholder: '搜尋玩家…',
@@ -165,6 +180,21 @@ const LANG_STRINGS = {
         no_scores_short: 'No scores',
 
         footer_main: 'Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.',
+
+        nav_farm_helper: 'Farm Helper',
+        farm_helper_view: 'View farm recommendations',
+        farm_helper_title: 'Farm Helper',
+        farm_helper_category_new: 'New',
+        farm_helper_category_improve: 'Improve',
+        farm_helper_ref: 'Reference score',
+        farm_helper_gain: 'Est. PP',
+        th_category: 'Category',
+        farm_helper_coverage: 'Peer data covers {n}/{total} nearby players',
+        farm_helper_not_ranked: 'This player isn’t in the tracked rankings yet, so peer comparison isn’t available.',
+        farm_helper_disclaimer: 'Recommendations use nearby-ranked players’ real scores, not a difficulty estimate; peer data is still being built up, so coverage (and accuracy) improves over time. Only compares each side’s top 100 scores, so a map you’ve played but scored low on can be missed.',
+        farm_helper_no_data: 'No recommendations yet — peer data may still be building, or you’re already ahead of nearby players.',
+        farm_helper_no_id: 'No player id given.',
+        farm_helper_failed: 'Failed to load the farm helper.',
 
         rel_sec: '{n}s ago', rel_min: '{n}m ago', rel_hr: '{n}h ago', rel_day: '{n}d ago',
 
