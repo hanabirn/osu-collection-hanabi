@@ -1249,7 +1249,7 @@ main:has(.pagination) { padding-bottom: 90px; }
 }
 .map-status-badge.ranked { color: #38bdf8; }
 .map-status-badge.loved { color: var(--accent); }
-.map-status-badge--inline { position: static; display: inline-flex; vertical-align: middle; }
+.map-status-badge--inline { position: static; display: inline-flex; vertical-align: middle; flex: none; margin-left: auto; }
 .status-icon { display: inline-flex; width: 13px; height: 13px; }
 .status-icon svg { width: 100%; height: 100%; }
 .status-icon.ranked { color: #38bdf8; }
