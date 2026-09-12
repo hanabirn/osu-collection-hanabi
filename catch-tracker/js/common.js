@@ -118,33 +118,6 @@ const LANG_STRINGS = {
         bbcode_clear: '清空',
         bbcode_placeholder: '在這裡輸入你的 BBCode…',
 
-        login_with_osu: '使用 osu! 登入',
-        logout: '登出',
-        login_failed: '登入失敗，請再試一次',
-        watch_replay: '看回放',
-        replay_login_prompt: '使用 osu! 帳號登入以觀看回放',
-        replay_loading: '回放載入中…',
-        replay_not_found: '找不到這筆成績的回放',
-        replay_owner_only: '這個回放可能只有本人才能觀看',
-        replay_fetch_failed: '回放下載失敗：{msg}',
-        replay_use_skin: '使用你的 osu! 皮膚',
-        replay_clear_skin: '清除皮膚',
-        replay_skin_loading: '皮膚載入中…',
-        replay_skin_loaded: '已套用皮膚（{n} 個圖案）',
-        replay_skin_invalid: '無法讀取這個 .osk 檔案',
-        replay_stat_combo: '連擊',
-        replay_stat_maxcombo: '最大連擊',
-        replay_stat_accuracy: '模擬準度',
-        replay_stat_caught: '接到',
-        replay_stat_miss: '漏接',
-        replay_stat_hp: 'HP',
-        replay_settings: '視覺設定',
-        replay_settings_blur: '背景模糊',
-        replay_settings_brightness: '亮度',
-        replay_settings_judgements: '顯示接到/漏空提示',
-        replay_settings_banana_rain: '顯示香蕉背景動畫',
-        replay_info_by: '由 {name} 遊玩',
-        replay_disclaimer: '這是依據回放資料與圖譜物件重建的簡化動畫，非官方畫面；接到/漏接與統計數據皆為視覺估算，非官方判定。',
     },
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
@@ -249,33 +222,6 @@ const LANG_STRINGS = {
         bbcode_clear: 'Clear',
         bbcode_placeholder: 'Write your BBCode here…',
 
-        login_with_osu: 'Login with osu!',
-        logout: 'Logout',
-        login_failed: 'Login failed, please try again',
-        watch_replay: 'Watch Replay',
-        replay_login_prompt: 'Login with your osu! account to watch replays',
-        replay_loading: 'Loading replay…',
-        replay_not_found: 'No replay available for this score',
-        replay_owner_only: 'This replay may only be viewable by its owner',
-        replay_fetch_failed: 'Failed to download replay: {msg}',
-        replay_use_skin: 'Use your osu! skin',
-        replay_clear_skin: 'Clear skin',
-        replay_skin_loading: 'Loading skin…',
-        replay_skin_loaded: 'Skin applied ({n} sprites)',
-        replay_skin_invalid: 'Could not read this .osk file',
-        replay_stat_combo: 'Combo',
-        replay_stat_maxcombo: 'Max Combo',
-        replay_stat_accuracy: 'Sim. Accuracy',
-        replay_stat_caught: 'Caught',
-        replay_stat_miss: 'Miss',
-        replay_stat_hp: 'HP',
-        replay_settings: 'Visual settings',
-        replay_settings_blur: 'Background blur',
-        replay_settings_brightness: 'Brightness',
-        replay_settings_judgements: 'Show catch/miss popups',
-        replay_settings_banana_rain: 'Show banana background',
-        replay_info_by: 'Played by {name}',
-        replay_disclaimer: 'This is a simplified reconstruction from replay + beatmap data, not an official view; catch/miss results and stats are visual estimates, not official judgements.',
     },
 };
 
@@ -318,111 +264,6 @@ function applyStaticI18n() {
     document.documentElement.lang = getLang() === 'zh' ? 'zh-Hant' : 'en';
 }
 applyStaticI18n();
-
-/* ---------- osu! OAuth login (Watch Replay) ----------
-   netlify/functions/osu-replay-login.js + osu-replay-callback.js run the
-   authorization-code flow and redirect back here with
-   ?ct_login=<id>&ct_login_name=<name>&ct_login_token=<signed token> (or
-   ?ct_login_error=<stage> on failure). Unlike the main site's login, the
-   real osu! access token is never sent to the client — it stays encrypted
-   server-side (see _replay-auth.js) so replay-download.js can reuse it on
-   later visits without asking for another login every time. */
-const CT_LOGIN_STORAGE_KEY = 'ct_logged_in_user';
-
-function getCtLoggedInUser() {
-    try { return JSON.parse(localStorage.getItem(CT_LOGIN_STORAGE_KEY)); }
-    catch { return null; }
-}
-
-function getCtAuthToken() {
-    const user = getCtLoggedInUser();
-    return user && user.token ? user.token : null;
-}
-
-function logoutCtUser() {
-    localStorage.removeItem(CT_LOGIN_STORAGE_KEY);
-    applyCtLoggedInUser();
-}
-
-function ctLoginUrl() {
-    const returnTo = location.pathname + location.search;
-    return `/.netlify/functions/osu-replay-login?${new URLSearchParams({ return_to: returnTo })}`;
-}
-
-function applyCtLoggedInUser() {
-    const user = getCtLoggedInUser();
-    const loginBtn = document.getElementById('ct-login-btn');
-    const pill = document.getElementById('ct-logged-in-pill');
-    if (loginBtn) {
-        loginBtn.style.display = user ? 'none' : '';
-        loginBtn.href = ctLoginUrl();
-    }
-    if (pill) pill.style.display = user ? '' : 'none';
-    if (!user) return;
-    const nameEl = document.getElementById('ct-logged-in-name');
-    const avatarEl = document.getElementById('ct-logged-in-avatar');
-    if (nameEl) nameEl.textContent = user.username || `#${user.id}`;
-    if (avatarEl) avatarEl.src = `https://a.ppy.sh/${user.id}`;
-}
-
-function showCtLoginMsg(msg) {
-    const el = document.getElementById('ct-login-msg');
-    if (!el) return;
-    el.textContent = msg;
-    el.hidden = false;
-    setTimeout(() => { el.hidden = true; }, 6000);
-}
-
-function checkCtLoginFromUrl() {
-    const params = new URLSearchParams(location.search);
-    const id = params.get('ct_login');
-    const loginFailed = params.get('ct_login_error');
-
-    if (id) {
-        localStorage.setItem(CT_LOGIN_STORAGE_KEY, JSON.stringify({
-            id,
-            username: params.get('ct_login_name') || '',
-            token: params.get('ct_login_token') || null,
-        }));
-    }
-    if (id || loginFailed) {
-        params.delete('ct_login');
-        params.delete('ct_login_name');
-        params.delete('ct_login_token');
-        params.delete('ct_login_error');
-        const qs = params.toString();
-        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
-        if (loginFailed) showCtLoginMsg(t('login_failed'));
-    }
-
-    applyCtLoggedInUser();
-    const logoutBtn = document.getElementById('ct-logout-btn');
-    if (logoutBtn) logoutBtn.addEventListener('click', logoutCtUser);
-}
-
-/* Shared between render-player.js and render-map.js's score tables — a
-   score row only gets a Watch Replay link when has_replay is true (see
-   _scores-poll-core.js / player-get.js) and it has a score_id to look up.
-   `username` is a second param (rather than always reading s.username)
-   because player.html's score rows don't carry a per-score username (every
-   row is the same, already-known player) — render-player.js passes the
-   page's own player username explicitly; render-map.js's rows already
-   have s.username per-row and don't need to. */
-function replayLink(s, username, userId) {
-    if (!s.has_replay || !s.score_id) return '';
-    const params = new URLSearchParams({ score_id: s.score_id, beatmap_id: s.beatmap_id });
-    if (s.beatmapset_id) params.set('beatmapset_id', s.beatmapset_id);
-    if (s.mods && s.mods.length) params.set('mods', s.mods.join(','));
-    if (s.title) params.set('title', s.title);
-    if (s.artist) params.set('artist', s.artist);
-    if (s.version) params.set('version', s.version);
-    if (s.rank) params.set('rank', s.rank);
-    const uname = username || s.username;
-    if (uname) params.set('username', uname);
-    const uid = userId || s.user_id;
-    if (uid) params.set('user_id', uid);
-    return `<a class="pill" href="replay.html?${params.toString()}">${escapeHtml(t('watch_replay'))}</a>`;
-}
 
 /* ---------- grade badges / mods / relative time ---------- */
 
@@ -710,4 +551,3 @@ initBananaRain();
 // common.js is loaded at the end of <body>, after the header markup, so the
 // DOM is already parsed — no need to wait for DOMContentLoaded here.
 initPlayerSearch();
-checkCtLoginFromUrl();

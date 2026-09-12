@@ -44,20 +44,4 @@ function getSkinsStore() {
     return store('catch-tracker-skins');
 }
 
-// Watch Replay login (osu-replay-login/callback.js, _replay-auth.js):
-// `user-token:{user_id}` → encrypted {access_token, refresh_token,
-// expires_at} (see _token-crypto.js) so replay-download.js can call osu!'s
-// API again on a later visit without asking the user to re-login every time.
-function getAuthStore() {
-    return store('catch-tracker-auth');
-}
-
-// replay-download.js: `replay:{score_id}` → raw .osr bytes. A finished
-// score's replay never changes, so this is cached forever — sidesteps
-// re-hitting osu!'s download endpoint (and the user's own rate limit) on
-// every repeat view of the same replay.
-function getReplayCacheStore() {
-    return store('catch-tracker-replay-cache');
-}
-
-module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore, getAuthStore, getReplayCacheStore };
+module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore };

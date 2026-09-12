@@ -2,7 +2,7 @@ const GRADE_COUNT_FIELDS = [
     ['x', 'ss'], ['xh', 'ssh'], ['s', 's'], ['sh', 'sh'], ['a', 'a'],
 ];
 
-function scoreRow(s, username, userId) {
+function scoreRow(s) {
     return `<tr>
         <td>${mapLink(s.beatmap_id, `${s.artist || ''} - ${s.title || ''} [${s.version || ''}]`)}</td>
         <td>${modsTag(s.mods)}</td>
@@ -10,15 +10,14 @@ function scoreRow(s, username, userId) {
         <td>${fmtAccuracy(s.accuracy)}</td>
         <td>${fmtPP(s.pp)}</td>
         <td>${relTime(s.created_at)}</td>
-        <td>${replayLink(s, username, userId)}</td>
     </tr>`;
 }
 
-function scoreTable(scores, emptyMsg, username, userId) {
+function scoreTable(scores, emptyMsg) {
     if (!scores.length) return `<p class="empty-state">${emptyMsg}</p>`;
     return `<div class="table-wrap"><table>
-        <thead><tr><th>${t('th_map')}</th><th>${t('th_mods')}</th><th>${t('th_grade')}</th><th>${t('th_acc')}</th><th>${t('th_pp')}</th><th>${t('th_when')}</th><th></th></tr></thead>
-        <tbody>${scores.map(s => scoreRow(s, username, userId)).join('')}</tbody>
+        <thead><tr><th>${t('th_map')}</th><th>${t('th_mods')}</th><th>${t('th_grade')}</th><th>${t('th_acc')}</th><th>${t('th_pp')}</th><th>${t('th_when')}</th></tr></thead>
+        <tbody>${scores.map(s => scoreRow(s)).join('')}</tbody>
     </table></div>`;
 }
 
@@ -99,9 +98,9 @@ async function loadPlayer() {
             </div>` : ''}
 
             <h2>${t('best_plays')}</h2>
-            ${scoreTable(bestPlays, t('no_best_plays'), p.username, userId)}
+            ${scoreTable(bestPlays, t('no_best_plays'))}
             <h2>${t('recent_plays')}</h2>
-            ${scoreTable(data.recentPlays || [], t('no_recent_plays'), p.username, userId)}
+            ${scoreTable(data.recentPlays || [], t('no_recent_plays'))}
         `;
     } catch (err) {
         main.innerHTML = `<p class="empty-state">${t('player_not_found')}</p>`;
