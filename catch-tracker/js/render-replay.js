@@ -56,6 +56,8 @@ const AUDIO_URL = beatmapsetId => `https://mirror.hinamizawa.ai/v3/osu/music/aud
 
 const SKIN_FILES = {
     catcher: 'fruit-catcher-idle',
+    catcher_fail: 'fruit-catcher-fail',
+    catcher_kiai: 'fruit-catcher-kiai',
     banana: 'fruit-bananas',
     droplet: 'fruit-drop',
     fruit_apple: 'fruit-apple',
@@ -245,6 +247,66 @@ function computeJudgements(items, frames, catcherHitWidthPx) {
     return items;
 }
 
+// Confirmed against osu!lazer's real source this session
+// (CatchBeatmapProcessor.initialiseHyperDash() + Catcher.BASE_DASH_SPEED).
+// Ported as faithfully as practical: same "palpable objects" filter
+// (fruit + non-tiny droplets, no bananas), same distance/timing formula.
+// Since our catcher X already comes from real replay data (not a movement
+// simulation), this is used purely to decide WHEN to show the hyperdash
+// glow/trigger-fruit tint — not to move the catcher, which is unaffected.
+const CATCHER_BASE_DASH_SPEED = 1.0; // osu!pixels/ms, confirmed exact
+
+function computeHyperdash(items, catcherVisualWidthPx) {
+    const palpable = items.filter(it => it.kind === 'fruit' || it.kind === 'droplet');
+    const halfCatcherWidth = catcherVisualWidthPx / 2;
+    let lastDirection = 0;
+    let lastExcess = halfCatcherWidth;
+    const windows = [];
+    for (let i = 0; i < palpable.length - 1; i++) {
+        const cur = palpable[i], next = palpable[i + 1];
+        const thisDirection = next.x > cur.x ? 1 : -1;
+        const timeToNext = next.time - cur.time - 1000 / 60 / 4;
+        const distanceToNext = Math.abs(next.x - cur.x) - (lastDirection === thisDirection ? lastExcess : halfCatcherWidth);
+        const distanceToHyper = timeToNext * CATCHER_BASE_DASH_SPEED - distanceToNext;
+        if (distanceToHyper < 0) {
+            cur.isHyperDashTrigger = true;
+            windows.push({ start: cur.time, end: next.time });
+            lastExcess = halfCatcherWidth;
+        } else {
+            lastExcess = Math.max(0, Math.min(distanceToHyper, halfCatcherWidth));
+        }
+        lastDirection = thisDirection;
+    }
+    return windows;
+}
+
+// Best-effort extraction of the beatmap's kiai (hype-section) time ranges,
+// used only to pick the catcher's kiai skin sprite when one's loaded —
+// never blocks anything if the decoded beatmap's control-point shape
+// doesn't match what's tried here (osu-parsers' exact structure for this
+// wasn't verified against real data this session, unlike everything else
+// in this file that WAS — logged on first real use so a live test can
+// confirm/correct the field names quickly rather than guessing blind).
+function extractKiaiRanges(beatmap) {
+    try {
+        const points = beatmap?.controlPoints?.effectPoints ?? beatmap?.controlPoints?.effectPointAt ?? null;
+        if (!Array.isArray(points) || !points.length) return [];
+        console.log('[replay] effect points (verify kiaiMode field name here):', points[0]);
+        const sorted = [...points].sort((a, b) => a.startTime - b.startTime);
+        const ranges = [];
+        for (let i = 0; i < sorted.length; i++) {
+            const p = sorted[i];
+            const isKiai = p.kiaiMode ?? p.KiaiMode ?? p.kiai ?? false;
+            if (!isKiai) continue;
+            const end = sorted[i + 1] ? sorted[i + 1].startTime : Infinity;
+            ranges.push({ start: p.startTime, end });
+        }
+        return ranges;
+    } catch {
+        return [];
+    }
+}
+
 function computeStats(items, mapTime) {
     let combo = 0, maxCombo = 0, caught = 0, miss = 0, hp = 100;
     for (const it of items) {
@@ -417,6 +479,8 @@ class ReplayPlayer {
         this.frames = frames;
         this.clockRate = opts.clockRate;
         this.catcherWidth = opts.catcherWidth;
+        this.hyperdashWindows = opts.hyperdashWindows || [];
+        this.kiaiRanges = opts.kiaiRanges || [];
         this.sprites = {};
         this.showPopups = true;
         this.popups = [];
@@ -474,6 +538,22 @@ class ReplayPlayer {
     catcherXAt(t) { return catcherXAt(this.frames, t); }
     currentStats() { return computeStats(this.items, this.mapTime); }
 
+    // Both lists are small/sparse (hyperdash moments and kiai sections are
+    // occasional, not per-frame), so a linear scan per draw() call is fine
+    // — no need for the binary-search treatment catcherXAt() needs.
+    isHyperDashingAt(t) {
+        return this.hyperdashWindows.some(w => t >= w.start && t <= w.end);
+    }
+    isKiaiAt(t) {
+        return this.kiaiRanges.some(r => t >= r.start && t < r.end);
+    }
+    catcherSpriteFor(t) {
+        const recentMiss = this.popups.some(p => !p.caught && t - p.time >= 0 && t - p.time < 300);
+        if (recentMiss && this.sprites.catcher_fail) return this.sprites.catcher_fail;
+        if (this.isKiaiAt(t) && this.sprites.catcher_kiai) return this.sprites.catcher_kiai;
+        return this.sprites.catcher;
+    }
+
     updatePopups(prevTime) {
         if (this.lastPoppedTime === null) { this.lastPoppedTime = prevTime; }
         const jumped = Math.abs(prevTime - this.lastPoppedTime) > 50 || this.mapTime < this.lastPoppedTime;
@@ -530,13 +610,35 @@ class ReplayPlayer {
                 ctx.arc(px, y, size, 0, Math.PI * 2);
                 ctx.fill();
             }
+            // Real catch tints the object that forces a hyperdash — this
+            // draws a small orange ring around it regardless of whether a
+            // skin sprite or the procedural fallback is in use, matching
+            // the real "warning" cue without needing a skin's own colour.
+            if (it.isHyperDashTrigger) {
+                ctx.strokeStyle = '#fb923c';
+                ctx.lineWidth = Math.max(1.5, size * 0.15);
+                ctx.beginPath();
+                ctx.arc(px, y, size * 1.3, 0, Math.PI * 2);
+                ctx.stroke();
+            }
         }
         ctx.globalAlpha = 1;
 
         const catcherX = toPx(this.catcherXAt(this.mapTime));
         const cw = (this.catcherWidth / PLAYFIELD_X) * w;
         const ch = h * 0.045;
-        const catcherSprite = this.sprites.catcher;
+        const catcherSprite = this.catcherSpriteFor(this.mapTime);
+        const hyperDashing = this.isHyperDashingAt(this.mapTime);
+        if (hyperDashing) {
+            // Real catch tints the catcher and its dash trail red/orange
+            // during a hyperdash window (CatchBeatmapProcessor-triggered) —
+            // approximate with a glow behind the sprite rather than
+            // recolouring the sprite itself (which would fight a skin's
+            // own art).
+            ctx.save();
+            ctx.shadowColor = '#fb923c';
+            ctx.shadowBlur = w * 0.02;
+        }
         if (catcherSprite) {
             // Real catcher skin art is often a tall full-character sprite
             // (much taller than the actual catch hitbox) — scaling that to
@@ -572,6 +674,7 @@ class ReplayPlayer {
             ctx.closePath();
             ctx.fill();
         }
+        if (hyperDashing) ctx.restore();
 
         if (this.showPopups) {
             const fontSize = Math.max(12, w * 0.014);
@@ -814,6 +917,8 @@ async function run() {
 
         const catcherWidth = catcherVisualWidth(cs);
         computeJudgements(items, frames, catcherHitWidth(cs));
+        const hyperdashWindows = computeHyperdash(items, catcherWidth);
+        const kiaiRanges = extractKiaiRanges(catchBeatmap);
 
         const settings = loadSettings();
         setStatus(theaterHtml(meta));
@@ -847,6 +952,8 @@ async function run() {
         const player = new ReplayPlayer(canvas, items, frames, {
             clockRate: clockRateForMods(mods),
             catcherWidth,
+            hyperdashWindows,
+            kiaiRanges,
             audio: beatmapsetId ? audioEl : null,
             onTick: (mapTime, minTime, maxTime, playing, stats) => {
                 const pct = maxTime > minTime ? ((mapTime - minTime) / (maxTime - minTime)) * 1000 : 0;
