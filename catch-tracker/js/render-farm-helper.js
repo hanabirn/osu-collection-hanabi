@@ -117,7 +117,7 @@ function renderLanding(main) {
                     ${categoryExplainerRows()}
                 </div>
             </div>
-            ${loggedInUser ? `<div class="card farm-helper-graph-card"><canvas id="farm-helper-graph" class="farm-helper-graph"></canvas></div>` : ''}
+            ${loggedInUser ? `<div class="farm-helper-graph-card"><canvas id="farm-helper-graph" class="farm-helper-graph"></canvas></div>` : ''}
         </div>`;
 
     const input = document.getElementById('farm-helper-search-input');
@@ -227,6 +227,7 @@ function initPeerGraph(canvas, center, peers) {
         const theta = i * GOLDEN_ANGLE;
         return {
             img: loadImg(p.avatar_url),
+            peer: p,
             // Unit-sphere coordinates — rotated fresh each frame, never
             // mutated in place.
             ux: Math.cos(theta) * radiusAtY,
@@ -234,6 +235,28 @@ function initPeerGraph(canvas, center, peers) {
             uz: Math.sin(theta) * radiusAtY,
         };
     });
+
+    // A tooltip + click target for each node (matching mania-tracker.com's
+    // own graph — every peer node is hoverable/clickable there, linking to
+    // that player's page). Canvas has no per-shape hit-testing, so this
+    // keeps the current frame's on-screen circles (rebuilt every draw())
+    // to test pointer position against.
+    let lastFrameNodes = [];
+    const tooltip = document.createElement('div');
+    tooltip.className = 'farm-helper-graph-tooltip';
+    tooltip.hidden = true;
+    canvas.parentElement.appendChild(tooltip);
+
+    function nodeAt(x, y) {
+        // Iterate back-to-front (last drawn = nearest/topmost) so an
+        // overlap resolves to whichever node is actually on top.
+        for (let i = lastFrameNodes.length - 1; i >= 0; i--) {
+            const n = lastFrameNodes[i];
+            const dx = x - n.x, dy = y - n.y;
+            if (dx * dx + dy * dy <= n.r * n.r) return n;
+        }
+        return null;
+    }
 
     const dust = Array.from({ length: 24 }, () => ({
         x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.3,
@@ -246,6 +269,7 @@ function initPeerGraph(canvas, center, peers) {
     let pitchVelocity = 0;
     let dragging = false;
     let lastX = 0, lastY = 0;
+    let downX = 0, downY = 0;
     let lastTime = performance.now();
 
     canvas.addEventListener('pointerdown', (e) => {
@@ -254,11 +278,35 @@ function initPeerGraph(canvas, center, peers) {
         pitchVelocity = 0;
         lastX = e.clientX;
         lastY = e.clientY;
+        downX = e.clientX;
+        downY = e.clientY;
+        canvas.style.cursor = ''; // let the .dragging class's grabbing cursor take over
         canvas.setPointerCapture(e.pointerId);
         canvas.classList.add('dragging');
+        tooltip.hidden = true;
     });
     canvas.addEventListener('pointermove', (e) => {
-        if (!dragging) return;
+        if (!dragging) {
+            // Not rotating — treat this as hovering, and surface which
+            // node (if any) is under the pointer: a tooltip + pointer
+            // cursor, and a real click target (see the pointerup handler).
+            const rect = canvas.getBoundingClientRect();
+            const node = nodeAt(e.clientX - rect.left, e.clientY - rect.top);
+            if (node && node.peer) {
+                canvas.style.cursor = 'pointer';
+                tooltip.hidden = false;
+                tooltip.style.left = `${node.x}px`;
+                tooltip.style.top = `${node.y - node.r}px`;
+                tooltip.textContent = node.peer.pp != null
+                    ? `${node.peer.username} · ${Math.round(node.peer.pp)}pp`
+                    : node.peer.username || '';
+            } else {
+                canvas.style.cursor = '';
+                tooltip.hidden = true;
+            }
+            return;
+        }
+        tooltip.hidden = true;
         const dx = e.clientX - lastX;
         const dy = e.clientY - lastY;
         const dYaw = reduceMotion ? 0 : dx * 0.012;
@@ -271,9 +319,21 @@ function initPeerGraph(canvas, center, peers) {
         lastY = e.clientY;
     });
     function endDrag() { dragging = false; canvas.classList.remove('dragging'); }
-    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointerup', (e) => {
+        endDrag();
+        // A drag that barely moved reads as a tap/click — open that node's
+        // player page. A real rotate-drag (bigger movement) never triggers
+        // navigation, so spinning the sphere still works as before.
+        if (Math.abs(e.clientX - downX) < 6 && Math.abs(e.clientY - downY) < 6) {
+            const rect = canvas.getBoundingClientRect();
+            const node = nodeAt(e.clientX - rect.left, e.clientY - rect.top);
+            if (node && node.peer && node.peer.user_id != null) {
+                location.href = `player.html?id=${encodeURIComponent(node.peer.user_id)}`;
+            }
+        }
+    });
     canvas.addEventListener('pointercancel', endDrag);
-    canvas.addEventListener('pointerleave', endDrag);
+    canvas.addEventListener('pointerleave', () => { endDrag(); tooltip.hidden = true; canvas.style.cursor = ''; });
 
     function drawAvatar(img, x, y, r, alpha) {
         ctx.save();
@@ -334,7 +394,7 @@ function initPeerGraph(canvas, center, peers) {
             const z1 = n.ux * sinYaw + n.uz * cosYaw;
             const y2 = n.uy * cosPitch - z1 * sinPitch;
             const z2 = n.uy * sinPitch + z1 * cosPitch;
-            return { img: n.img, x: cx + x1 * R, y: cy + y2 * R, z: z2 };
+            return { img: n.img, peer: n.peer, x: cx + x1 * R, y: cy + y2 * R, z: z2 };
         });
         projected.sort((a, b) => a.z - b.z); // far first (painter's algorithm)
 
@@ -342,6 +402,7 @@ function initPeerGraph(canvas, center, peers) {
         for (const p of projected) {
             const depth = (p.z + 1) / 2; // 0 (far) .. 1 (near)
             const size = nodeR * (0.55 + 0.55 * depth);
+            p.r = size; // recorded for this frame's hover/click hit-testing
             const alpha = 0.35 + 0.65 * depth;
             ctx.globalAlpha = alpha * 0.5;
             ctx.strokeStyle = '#ffffff';
@@ -353,6 +414,7 @@ function initPeerGraph(canvas, center, peers) {
             drawAvatar(p.img, p.x, p.y, size, alpha);
         }
         ctx.globalAlpha = 1;
+        lastFrameNodes = projected;
 
         const centerR = nodeR * 1.7;
         drawAvatar(centerImg, cx, cy, centerR, 1);
