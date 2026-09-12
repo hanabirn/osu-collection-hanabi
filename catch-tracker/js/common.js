@@ -417,9 +417,13 @@ function togglePreview(beatmapsetId, btn) {
 
 function previewButton(beatmapsetId) {
     if (!beatmapsetId) return '';
+    // 12 bars — see the CSS's .icon-eq span:nth-child(1..12) for the
+    // hand-tuned per-bar height/duration/delay that gives the full-width
+    // playing-state visualizer its wave look.
+    const bars = '<span></span>'.repeat(12);
     return `<button type="button" class="preview-btn" onclick="event.stopPropagation();togglePreview(${beatmapsetId},this)" title="Preview">
         <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <span class="icon-eq"><span></span><span></span><span></span><span></span><span></span></span>
+        <span class="icon-eq">${bars}</span>
     </button>`;
 }
 
