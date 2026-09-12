@@ -430,15 +430,24 @@ class ReplayPlayer {
             // the catch-hitbox WIDTH and preserving aspect blows the height
             // up hugely (found live with a real default skin: the catcher
             // covered a third of the screen). Fit within a bounded box
-            // instead of deriving height purely from width x aspect, and
-            // anchor near the bottom so it reads as "standing at the line"
-            // rather than centered on it.
+            // instead of deriving height purely from width x aspect.
+            //
+            // Anchor: measured a real default-skin fruit-catcher-idle.png's
+            // alpha-channel width profile top-to-bottom — the WIDEST point
+            // (the plate the character holds up, i.e. where fruits actually
+            // land) is right near the top (~5% down), not the bottom/feet.
+            // Anchoring near the bottom (as a first pass did) put the catch
+            // line at the character's legs, with fruit falling through the
+            // whole body before "landing" — anchoring near the top instead
+            // so the plate sits at the catch line, with the rest of the
+            // character extending down (and naturally clipping off the
+            // bottom of the theater, same as real gameplay framing).
             const boxW = cw * 1.15;
             const boxH = h * 0.16;
             const aspect = (catcherSprite.naturalWidth || 1) / (catcherSprite.naturalHeight || 1);
             let spriteW = boxW, spriteH = boxW / aspect;
             if (spriteH > boxH) { spriteH = boxH; spriteW = boxH * aspect; }
-            ctx.drawImage(catcherSprite, catcherX - spriteW / 2, catchLineY - spriteH * 0.8, spriteW, spriteH);
+            ctx.drawImage(catcherSprite, catcherX - spriteW / 2, catchLineY - spriteH * 0.06, spriteW, spriteH);
         } else {
             ctx.fillStyle = '#e2e2f0';
             ctx.beginPath();
