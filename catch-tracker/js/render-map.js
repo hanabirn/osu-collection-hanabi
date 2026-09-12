@@ -37,7 +37,7 @@ async function loadMap() {
         main.innerHTML = `
             <div class="card profile-header${cover ? ' has-cover' : ''}"${cover ? ` style="background-image:url('${cover.replace(/'/g, '%27')}')"` : ''}>
                 <div>
-                    <h1 style="margin:0 0 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">${escapeHtml(m.artist)} - ${escapeHtml(m.title)} [${escapeHtml(m.version)}]${m.status ? `<span style="position:relative;display:inline-flex">${statusBadge(m.status)}</span>` : ''}</h1>
+                    <h1 style="margin:0 0 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">${escapeHtml(m.artist)} - ${escapeHtml(m.title)} [${escapeHtml(m.version)}]${m.status ? statusBadge(m.status, true) : ''}</h1>
                     <p style="color:var(--text-dim);margin:0">${t('mapped_by', { creator: escapeHtml(m.creator) })} · ${m.difficulty_rating != null ? m.difficulty_rating.toFixed(2) + '★' : ''}</p>
                 </div>
             </div>

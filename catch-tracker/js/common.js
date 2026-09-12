@@ -852,10 +852,17 @@ function diffIcon(beatmapId, stars, label) {
     </a>`;
 }
 
-function statusBadge(status) {
+// `.map-status-badge` is absolutely positioned by default (pinned to a
+// cover thumbnail's top-left corner — see maps.html's cards), so any call
+// site that isn't sitting inside a positioned cover container needs
+// `inline: true` or the badge floats out of flow and overlaps whatever
+// text happens to be nearby (found live on map.html's title card once it
+// grew its own cover banner — the badge had been silently mispositioned
+// there even before that, just less noticeably against a plain background).
+function statusBadge(status, inline) {
     if (!STATUS_ICONS[status]) return '';
     const label = status === 'ranked' ? t('status_ranked') : t('status_loved');
-    return `<span class="map-status-badge ${status}">${escapeHtml(label)}${statusIcon(status)}</span>`;
+    return `<span class="map-status-badge${inline ? ' map-status-badge--inline' : ''} ${status}">${escapeHtml(label)}${statusIcon(status)}</span>`;
 }
 
 function highlightCard(s) {
