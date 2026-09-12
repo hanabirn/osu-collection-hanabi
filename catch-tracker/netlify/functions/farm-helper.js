@@ -14,14 +14,30 @@
    real weighted-pp-total math: weightedPpSum(topPpDesc) + bonusPp). bonusPp
    is constant per player and cancels out in a before/after delta, so the
    gain from inserting one candidate score is just the weighted-sum delta
-   with no need to know the player's real total pp at all. */
+   with no need to know the player's real total pp at all.
+
+   Three candidate categories (mirrors mania-tracker's farm helper):
+     - 'new': target has no score at all on this beatmap.
+     - 'improve': target has a score, but the nearby-peer median clears it
+       by more than IMPROVE_MARGIN_PP.
+     - 'achieved': target already has a score peers aren't meaningfully
+       beating — no pp upside, but still useful as the "熱門" (popularity)
+       view's content, sorted by how many nearby peers also have it rather
+       than by pp gain.
+   `peer_count` (how many peers in the window have a cached score on this
+   beatmap at all) is computed for every category — it's the one shared
+   field that powers 為你推薦 (sort by gain) vs 熱門 (sort by peer_count)
+   entirely client-side from one fetched result set. */
 const { getOsuToken } = require('./_osu-auth');
-const { getRankingsStore, getPeerStore, getMapsStore } = require('./_blobs-store');
+const { getRankingsStore, getPeerStore, getMapsStore, getFarmHelperStore } = require('./_blobs-store');
 const { getJSONGz } = require('./_blob-json');
 const { MODE } = require('./_catch-constants');
 
 const PEER_WINDOW_EACH_SIDE = 50; // ~100 peers total, per the approved plan
-const MAX_RESULTS = 50;
+// Returned candidates are the union of the top N by pp gain (feeds 為你推薦)
+// and the top N by peer popularity (feeds 熱門) — one fetch covers both tabs.
+const MAX_RESULTS_PER_SORT = 50;
+const TOP_PEERS_PER_CANDIDATE = 5;
 // How many peers to hand back for the decorative rotating network graph —
 // deliberately not all ~100 (would be visually cluttered), just enough
 // nodes to read as "a group of people," same rough count mania-tracker's
@@ -56,6 +72,15 @@ async function fetchTargetBestPlays(userId, token) {
     return Array.isArray(scores) ? scores : [];
 }
 
+async function fetchPrefs(userId) {
+    const store = getFarmHelperStore();
+    const raw = await store.get(`prefs:${userId}`, { type: 'json' }).catch(() => null);
+    return {
+        hidden: raw && Array.isArray(raw.hidden) ? raw.hidden.map(String) : [],
+        easy: raw && Array.isArray(raw.easy) ? raw.easy.map(String) : [],
+    };
+}
+
 exports.handler = async (event) => {
     const headers = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 
@@ -77,12 +102,15 @@ exports.handler = async (event) => {
         const peerStore = getPeerStore();
         const mapsStore = getMapsStore();
 
-        const [rankings, maps, token] = await Promise.all([
+        const [rankings, maps, token, prefs] = await Promise.all([
             getJSONGz(rankingsStore, 'rankings:global').then(r => r || []),
             getJSONGz(mapsStore, 'maps:catch').then(m => m || []),
             getOsuToken(),
+            fetchPrefs(userId),
         ]);
         const mapIndex = new Map(maps.map(m => [m.beatmap_id, m]));
+        const hiddenSet = new Set(prefs.hidden);
+        const easySet = new Set(prefs.easy);
 
         const sortedRankings = [...rankings].sort((a, b) => (b.pp || 0) - (a.pp || 0));
         const myIndex = sortedRankings.findIndex(r => r.user_id === userId);
@@ -122,29 +150,68 @@ exports.handler = async (event) => {
             peerWindow.map(p => peerStore.get(`peer-bestplays:${p.user_id}`, { type: 'json' }).catch(() => null))
         );
 
-        // beatmap_id -> array of peer pp values on it (best plays we've
-        // cached for peers in the window).
+        // beatmap_id -> array of peer scores on it (best plays we've cached
+        // for peers in the window), each score carrying its scorer's
+        // identity so a candidate can list "who's actually playing this."
         const perMapPeerPp = new Map();
-        for (const record of peerRecords) {
+        for (let i = 0; i < peerRecords.length; i++) {
+            const record = peerRecords[i];
             if (!record || !Array.isArray(record.bestPlays)) continue;
             coveragePeers++;
+            const peer = peerWindow[i];
             for (const s of record.bestPlays) {
                 if (s.beatmap_id == null || s.pp == null) continue;
                 if (!perMapPeerPp.has(s.beatmap_id)) perMapPeerPp.set(s.beatmap_id, []);
-                perMapPeerPp.get(s.beatmap_id).push(s);
+                perMapPeerPp.get(s.beatmap_id).push({
+                    ...s,
+                    user_id: peer.user_id,
+                    username: peer.username,
+                    avatar_url: peer.avatar_url,
+                    country_code: peer.country_code,
+                });
             }
         }
 
         const candidates = [];
         for (const [beatmapId, peerScores] of perMapPeerPp) {
-            const peerPpMedian = median(peerScores.map(s => s.pp));
+            const beatmapIdStr = String(beatmapId);
             const ownPp = targetBestByMap.get(beatmapId);
-            let category = null;
+
+            // A hidden map (the target clicked 太難了) stays hidden until
+            // they actually have a score on it — at that point playing it
+            // is itself the "unhide," no separate action needed.
+            if (hiddenSet.has(beatmapIdStr) && ownPp == null) continue;
+
+            // A map flagged 太簡單 uses the strongest nearby peer score as
+            // the target instead of the median, raising the bar as asked.
+            const peerPpValues = peerScores.map(s => s.pp);
+            const peerTargetPp = easySet.has(beatmapIdStr) ? Math.max(...peerPpValues) : median(peerPpValues);
+
+            let category;
             if (ownPp == null) {
                 category = 'new';
-            } else if (peerPpMedian - ownPp > IMPROVE_MARGIN_PP) {
+            } else if (peerTargetPp - ownPp > IMPROVE_MARGIN_PP) {
                 category = 'improve';
             } else {
+                category = 'achieved';
+            }
+
+            const mapMeta = mapIndex.get(beatmapId) || {};
+            const sortedPeerScores = peerScores.slice().sort((a, b) => b.pp - a.pp);
+            const topPeers = sortedPeerScores.slice(0, TOP_PEERS_PER_CANDIDATE).map(s => ({
+                user_id: s.user_id, username: s.username, avatar_url: s.avatar_url,
+                pp: Math.round(s.pp * 10) / 10, mods: s.mods, accuracy: s.accuracy, rank: s.rank,
+            }));
+
+            const base = { beatmap_id: beatmapId, category, peer_count: peerScores.length, top_peers: topPeers, own_pp: ownPp != null ? Math.round(ownPp * 10) / 10 : null, title: mapMeta.title || null, artist: mapMeta.artist || null, version: mapMeta.version || null, difficulty_rating: mapMeta.difficulty_rating ?? null, beatmapset_id: mapMeta.beatmapset_id ?? null };
+
+            if (category === 'achieved') {
+                candidates.push({
+                    ...base,
+                    coverage_pct: coveragePeers ? Math.round((peerScores.length / coveragePeers) * 100) : 0,
+                    gain: null,
+                    peer_pp: Math.round(peerTargetPp * 10) / 10,
+                });
                 continue;
             }
 
@@ -154,39 +221,39 @@ exports.handler = async (event) => {
             // remove the one old ownPp entry before inserting the
             // hypothetical new one, rather than simulating both existing
             // at once.
-            let base = targetPpList;
+            let baseList = targetPpList;
             if (category === 'improve') {
                 const cut = targetPpList.indexOf(ownPp);
-                base = cut === -1 ? targetPpList : [...targetPpList.slice(0, cut), ...targetPpList.slice(cut + 1)];
+                baseList = cut === -1 ? targetPpList : [...targetPpList.slice(0, cut), ...targetPpList.slice(cut + 1)];
             }
-            const merged = [...base, peerPpMedian].sort((a, b) => b - a).slice(0, 100);
+            const merged = [...baseList, peerTargetPp].sort((a, b) => b - a).slice(0, 100);
             const gain = weightedPpSum(merged) - baseWeighted;
             if (gain <= 0) continue;
 
-            // Reference row: the peer closest to the median (most
+            // Reference row: the peer closest to the target value (most
             // representative single example to show, rather than an
             // aggregate stat with no concrete score behind it).
-            const ref = peerScores.slice().sort((a, b) => Math.abs(a.pp - peerPpMedian) - Math.abs(b.pp - peerPpMedian))[0];
-            const mapMeta = mapIndex.get(beatmapId) || {};
+            const ref = sortedPeerScores.slice().sort((a, b) => Math.abs(a.pp - peerTargetPp) - Math.abs(b.pp - peerTargetPp))[0];
 
             candidates.push({
-                beatmap_id: beatmapId,
-                category,
+                ...base,
                 gain: Math.round(gain * 10) / 10,
-                peer_pp: Math.round(peerPpMedian * 10) / 10,
-                own_pp: ownPp != null ? Math.round(ownPp * 10) / 10 : null,
+                peer_pp: Math.round(peerTargetPp * 10) / 10,
                 ref_mods: modAcronyms(ref.mods),
                 ref_accuracy: ref.accuracy ?? null,
                 ref_rank: ref.rank ?? null,
-                title: mapMeta.title || null,
-                artist: mapMeta.artist || null,
-                version: mapMeta.version || null,
-                difficulty_rating: mapMeta.difficulty_rating ?? null,
-                beatmapset_id: mapMeta.beatmapset_id ?? null,
             });
         }
 
-        candidates.sort((a, b) => b.gain - a.gain);
+        const byGain = candidates.filter(c => c.category !== 'achieved').sort((a, b) => b.gain - a.gain).slice(0, MAX_RESULTS_PER_SORT);
+        const byPopularity = candidates.slice().sort((a, b) => b.peer_count - a.peer_count).slice(0, MAX_RESULTS_PER_SORT);
+        const seen = new Set();
+        const items = [];
+        for (const c of [...byGain, ...byPopularity]) {
+            if (seen.has(c.beatmap_id)) continue;
+            seen.add(c.beatmap_id);
+            items.push(c);
+        }
 
         // Lean peer list for the decorative rotating network graph — just
         // enough to draw nodes (avatar + a stable key), not the full
@@ -203,7 +270,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: { ...headers, 'Cache-Control': 'public, max-age=60' },
             body: JSON.stringify({
-                items: candidates.slice(0, MAX_RESULTS),
+                items,
                 peers,
                 coverage: {
                     peerWindowSize: peerWindow.length,

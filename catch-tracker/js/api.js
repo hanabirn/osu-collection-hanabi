@@ -17,3 +17,17 @@ async function apiGet(fn, params) {
     if (!res.ok) throw new Error(`${fn} failed: ${res.status}`);
     return res.json();
 }
+
+// Same-origin POST with the logged-in user's signed identity token attached
+// (see common.js's getCtAuthToken()) — used by login-gated writes like
+// farm-helper-prefs.js's 太難了/太簡單 buttons.
+async function apiPost(fn, body) {
+    const token = getCtAuthToken();
+    const res = await fetch(`${API_BASE}/${fn}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'x-ct-auth-token': token } : {}) },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`${fn} failed: ${res.status}`);
+    return res.json();
+}

@@ -63,4 +63,12 @@ function getAuthStore() {
     return store('catch-tracker-auth');
 }
 
-module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore, getPeerStore, getAuthStore };
+// Farm helper per-user feedback (太難了/太簡單 — see farm-helper-prefs.js):
+// `prefs:{user_id}` -> { hidden: [beatmap_id...], easy: [beatmap_id...] }.
+// Bound to the target's own login-signed identity, not the viewer's, since
+// the preference belongs to whoever the recommendations are "for".
+function getFarmHelperStore() {
+    return store('catch-tracker-farm-prefs');
+}
+
+module.exports = { getRankingsStore, getFeedStore, getMapsStore, getSkinsStore, getPeerStore, getAuthStore, getFarmHelperStore };
