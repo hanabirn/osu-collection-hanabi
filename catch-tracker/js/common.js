@@ -75,6 +75,13 @@ const LANG_STRINGS = {
         farm_helper_no_data: '目前還沒有推薦——可能同儕資料還在建立中，或你已經超前附近的玩家了。',
         farm_helper_no_id: '未提供玩家 ID。',
         farm_helper_failed: '刷圖助手載入失敗。',
+        farm_helper_landing_title: '值得刷的圖譜',
+        farm_helper_landing_for: '為',
+        farm_helper_recent: '最近查看',
+        farm_helper_explainer_title: '依據附近 pp 玩家的成績，推薦：',
+        farm_helper_desc_new: '附近玩家很熱門，你還沒打過的圖',
+        farm_helper_desc_improve: '你有成績，但附近玩家的分數更高',
+        remove: '移除',
 
         rel_sec: '{n} 秒前', rel_min: '{n} 分鐘前', rel_hr: '{n} 小時前', rel_day: '{n} 天前',
 
@@ -195,6 +202,13 @@ const LANG_STRINGS = {
         farm_helper_no_data: 'No recommendations yet — peer data may still be building, or you’re already ahead of nearby players.',
         farm_helper_no_id: 'No player id given.',
         farm_helper_failed: 'Failed to load the farm helper.',
+        farm_helper_landing_title: 'Maps worth farming',
+        farm_helper_landing_for: 'for',
+        farm_helper_recent: 'Recent',
+        farm_helper_explainer_title: 'Based on what nearby-pp players are scoring:',
+        farm_helper_desc_new: 'Popular among nearby players, you haven’t played it',
+        farm_helper_desc_improve: 'You have a score, but nearby players are scoring higher',
+        remove: 'Remove',
 
         rel_sec: '{n}s ago', rel_min: '{n}m ago', rel_hr: '{n}h ago', rel_day: '{n}d ago',
 
