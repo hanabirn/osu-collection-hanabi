@@ -600,7 +600,29 @@ function previewButton(beatmapsetId, bpm, title, artist, cover) {
     // length, so the whole visualizer's bounce rate actually tracks this
     // specific map's tempo — --beat-s (one beat's length in seconds,
     // 60/bpm) is set inline here per card since bpm varies per map.
-    const beatSeconds = bpm && bpm > 0 ? (60 / bpm) : 0.4; // ~150 BPM fallback if bpm is missing
+    //
+    // Plain 60/bpm is technically tempo-accurate but reads as barely
+    // different card-to-card — a linear relationship means, say, a 2x BPM
+    // difference only ever gives a 2x speed difference, and two bars a
+    // human is glancing at for a second don't read as "2x faster" very
+    // clearly. Per request, exaggerate it: raise the BPM ratio (relative
+    // to a 150 BPM reference, chosen so a roughly-average-tempo map's
+    // speed is unchanged from before) to a >1 power so fast maps bounce
+    // noticeably faster and slow maps noticeably slower than tempo-
+    // accurate scaling alone would give — still monotonic in the real BPM
+    // (faster song = faster bounce, always), just a more perceptible curve.
+    // The exponent alone was still too subtle at 1.3 (per live feedback) —
+    // raised to 1.5, with an explicit floor/ceiling clamp on the result so
+    // a real outlier BPM (this catalog goes up to ~350+) can't push the
+    // exponent's effect into an uncomfortably fast flicker (rough seizure-
+    // risk territory) or a barely-moving crawl at the other end — the clamp
+    // bounds the extremes directly instead of leaning on a conservative
+    // exponent to do that job too.
+    const REFERENCE_BPM = 150, BEAT_EXPONENT = 1.5;
+    const MIN_BEAT_S = 0.12, MAX_BEAT_S = 0.9;
+    const beatSeconds = bpm && bpm > 0
+        ? Math.min(MAX_BEAT_S, Math.max(MIN_BEAT_S, 0.4 * Math.pow(REFERENCE_BPM / bpm, BEAT_EXPONENT)))
+        : 0.4;
     const bars = '<span></span>'.repeat(12);
     return `<button type="button" class="preview-btn" style="--beat-s:${beatSeconds.toFixed(4)}s" onclick="event.stopPropagation();togglePreviewAt(${index})" title="Preview">
         <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>

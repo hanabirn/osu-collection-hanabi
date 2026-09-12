@@ -837,8 +837,9 @@ main:has(.pagination) { padding-bottom: 90px; }
     width: auto;
     border-radius: 2px 2px 0 0;
 }
-/* Each bar's duration/delay is a multiple of --beat-s (one beat's length,
-   60/bpm — set inline per card by previewButton() in common.js) instead of
+/* Each bar's duration/delay is a multiple of --beat-s (an exaggerated,
+   tempo-monotonic beat length — see previewButton() in common.js for why
+   it's not literally 60/bpm) instead of
    a fixed length, so the whole visualizer's bounce rate tracks this map's
    actual tempo. Multipliers are just the old hand-tuned absolute values
    (0.8s, 1.05s, ...) divided by a 0.4s reference beat (~150 BPM) — same
@@ -935,7 +936,12 @@ main:has(.pagination) { padding-bottom: 90px; }
 .mini-player-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 #mini-player-playpause svg { width: 18px; height: 18px; }
 #mini-player-playpause { width: 26px; height: 26px; color: var(--text); }
-.mini-player-controls input[type="range"] { flex: 1 1 auto; }
+/* min-width:0 overrides the flex default of min-width:auto, which for a
+   range input resolves to its intrinsic UA width — without this, the seek
+   bar refuses to shrink below that even with flex-shrink:1, pushing the
+   time text (and the mini-player's own border) out past the card's right
+   edge (found live: "0:10" was getting clipped off). */
+.mini-player-controls input[type="range"] { flex: 1 1 auto; min-width: 0; }
 .mini-player-time {
     font-size: 0.7rem;
     color: var(--text-faint);
