@@ -255,13 +255,14 @@ td.wrap, th.wrap { white-space: normal; }
 .avatar-flag-badge {
     position: absolute;
     bottom: -3px;
-    right: 2px;
+    right: -3px;
     width: 55%;
     height: auto;
-    border-radius: 2px;
+    border-radius: 50%;
     border: 1.5px solid var(--bg-card);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     object-fit: cover;
+    background: var(--bg-card);
 }
 
 .player-link { color: var(--text); font-weight: 600; }
@@ -281,7 +282,17 @@ td.wrap, th.wrap { white-space: normal; }
 
 /* ---------- grade badges ---------- */
 
+/* Official osu! grade SVGs (js/common.js's gradeBadge(), assets/grades/) are
+   a fixed 32:16 aspect pill — scale by height and let width follow. */
 .grade-badge {
+    display: inline-block;
+    height: 20px;
+    width: auto;
+    vertical-align: middle;
+}
+/* Fallback for a grade string that isn't one of osu!'s known ranks (no icon
+   to show) — keeps the old plain-text pill look for that edge case only. */
+.grade-badge--text {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -293,9 +304,9 @@ td.wrap, th.wrap { white-space: normal; }
     font-weight: 700;
     font-size: 0.75rem;
     letter-spacing: 0.02em;
-    color: var(--grade-color);
-    background: color-mix(in srgb, var(--grade-color) 16%, transparent);
-    border: 1px solid color-mix(in srgb, var(--grade-color) 45%, transparent);
+    color: var(--text-dim);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
 }
 
 .fc-tag {

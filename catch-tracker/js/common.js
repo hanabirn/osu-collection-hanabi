@@ -271,17 +271,27 @@ applyStaticI18n();
 /* ---------- grade badges / mods / relative time ---------- */
 
 /* A small hue ladder built from the site's own palette (violet primary,
-   rose accent) rather than osu!'s literal rank colors — keeps every grade
-   badge visually part of the same system instead of an arbitrary rainbow. */
+   rose accent) rather than osu!'s literal rank colors — used only for the
+   grade FILTER pills (feed.html), which stay plain colored text/pills;
+   kept separate from gradeBadge() below now that score-row grade badges
+   render osu!'s own official icons instead. */
 const GRADE_COLORS = {
     XH: '#e2e2f0', X: '#facc15', SH: '#e2e2f0', S: '#facc15',
     A: '#34d399', B: '#38bdf8', C: '#fb923c', D: '#fb5a8c', F: '#f6584f',
 };
 
+// Official osu! rank badge SVGs, self-hosted (not hotlinked) — pulled 2026-09
+// straight from osu.ppy.sh's own site CSS (app.*.css's .score-rank--{grade}
+// background-image rules), same artwork osu! itself uses for score grades.
+// Self-hosted rather than hotlinked from osu.ppy.sh/assets/images/ because
+// those filenames carry a webpack content hash that changes on osu!'s own
+// redeploys — a stale cached URL would silently start 404ing. assets/grades/
+// has one file per VALID_GRADES entry (_catch-constants.js): XH X SH S A B
+// C D F, no separate icon for "?"/unknown (falls back to plain text).
 function gradeBadge(grade) {
     const g = grade || '?';
-    const color = GRADE_COLORS[g] || '#9691b8';
-    return `<span class="grade-badge" style="--grade-color:${color}">${escapeHtml(g)}</span>`;
+    if (!/^(XH|X|SH|S|A|B|C|D|F)$/.test(g)) return `<span class="grade-badge grade-badge--text">${escapeHtml(g)}</span>`;
+    return `<img class="grade-badge" src="assets/grades/${g}.svg" alt="${escapeHtml(g)}">`;
 }
 
 function fcTag(isFc) {
@@ -350,15 +360,17 @@ function coverArtUrlCard(beatmapsetId) {
 }
 
 /* ---------- country flags (post global-expansion) ----------
-   Ported from the main site's js/osu.js flagUrl()/avatar-with-flag pattern
-   — flagcdn.com serves flags keyed by lowercase ISO 3166-1 alpha-2, no auth/
-   CORS issues, already proven there. Wrapping the existing .avatar element
-   in a positioned span (rather than adding a sibling element) means the
-   badge overlays the avatar without needing any per-call-site layout
+   HatScripts/circle-flags (github.com/HatScripts/circle-flags, MIT license,
+   ISO 3166-1 alpha-2 filenames) via jsDelivr's GitHub-raw proxy — round
+   icon-style flags rather than flagcdn.com's rectangular photo-style ones
+   (swapped 2026-09 per request), no auth/attribution required, same
+   hotlink-safe CDN category as flagcdn. Wrapping the existing .avatar
+   element in a positioned span (rather than adding a sibling element) means
+   the badge overlays the avatar without needing any per-call-site layout
    changes — the wrapper is display:inline-flex so it takes on the avatar's
    own box size and margin. */
 function flagUrl(countryCode) {
-    return countryCode ? `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png` : '';
+    return countryCode ? `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${countryCode.toLowerCase()}.svg` : '';
 }
 
 function avatarWithFlagHtml(avatarUrl, countryCode, avatarClass) {
