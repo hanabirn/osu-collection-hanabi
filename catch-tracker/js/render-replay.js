@@ -402,8 +402,15 @@ class ReplayPlayer {
             const spriteKey = it.kind === 'fruit' ? `fruit_${it.fruitType}` : it.kind === 'tiny' ? 'droplet' : it.kind;
             const sprite = this.sprites[spriteKey];
             if (sprite) {
-                const d = size * 2.4;
-                ctx.drawImage(sprite, px - d / 2, y - d / 2, d, d);
+                // Fit within a (size*2.4)-square box rather than stretching
+                // to it — real skin fruit art is documented square, but
+                // this stays correct for a skin whose art isn't (e.g. a
+                // taller banana), instead of distorting it.
+                const box = size * 2.4;
+                const aspect = (sprite.naturalWidth || 1) / (sprite.naturalHeight || 1);
+                let dw = box, dh = box / aspect;
+                if (dh > box) { dh = box; dw = box * aspect; }
+                ctx.drawImage(sprite, px - dw / 2, y - dh / 2, dw, dh);
             } else {
                 ctx.fillStyle = COLORS[it.kind] || COLORS.fruit;
                 ctx.beginPath();
@@ -418,8 +425,20 @@ class ReplayPlayer {
         const ch = h * 0.045;
         const catcherSprite = this.sprites.catcher;
         if (catcherSprite) {
-            const spriteH = cw * (catcherSprite.naturalHeight / catcherSprite.naturalWidth || 0.5);
-            ctx.drawImage(catcherSprite, catcherX - cw / 2, catchLineY - spriteH / 2, cw, spriteH);
+            // Real catcher skin art is often a tall full-character sprite
+            // (much taller than the actual catch hitbox) — scaling that to
+            // the catch-hitbox WIDTH and preserving aspect blows the height
+            // up hugely (found live with a real default skin: the catcher
+            // covered a third of the screen). Fit within a bounded box
+            // instead of deriving height purely from width x aspect, and
+            // anchor near the bottom so it reads as "standing at the line"
+            // rather than centered on it.
+            const boxW = cw * 1.15;
+            const boxH = h * 0.16;
+            const aspect = (catcherSprite.naturalWidth || 1) / (catcherSprite.naturalHeight || 1);
+            let spriteW = boxW, spriteH = boxW / aspect;
+            if (spriteH > boxH) { spriteH = boxH; spriteW = boxH * aspect; }
+            ctx.drawImage(catcherSprite, catcherX - spriteW / 2, catchLineY - spriteH * 0.8, spriteW, spriteH);
         } else {
             ctx.fillStyle = '#e2e2f0';
             ctx.beginPath();
