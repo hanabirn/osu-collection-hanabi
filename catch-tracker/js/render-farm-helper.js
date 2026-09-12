@@ -134,15 +134,22 @@ function renderLanding(main) {
 }
 
 /* Decorative rotating peer-network graph, per request — modeled on
-   mania-tracker.com/farm-helper's own version (observed live: a canvas
-   with the viewed player centered, ~20 peer avatars connected to it by
-   thin lines arranged in a ring, the ring auto-rotating slowly on its own
-   and spinning faster/with momentum when dragged, plus a few unconnected
-   background dust particles). Built from scratch here — no library, plain
-   Canvas 2D + requestAnimationFrame, since nothing about the effect
-   itself needs one (just circles, lines, and an angle that changes over
-   time). Pointer Events (not mouse-specific) so drag-to-spin works with
-   touch too. */
+   mania-tracker.com/farm-helper's own version. Checked live and it's a
+   genuine 3D sphere, not a flat rotating ring: peer nodes clearly vary in
+   size/brightness and occlude each other as they move (near = bigger/
+   brighter/drawn on top, far = smaller/dimmer/drawn behind), and dragging
+   moves nodes along curved paths consistent with rotating a globe, not a
+   flat disc. Reimplemented here as that: peers are points on a unit
+   sphere (Fibonacci-sphere distribution — evenly spaced, no pole
+   clustering), rotated each frame by 3D rotation matrices (Y-axis for
+   idle auto-spin + horizontal drag, X-axis for vertical drag — a
+   standard trackball/globe interaction), then rendered with simple
+   orthographic projection (screen x/y = the rotated point's x/y directly)
+   plus depth-based size/opacity scaling from the rotated z, painter's-
+   algorithm sorted (far-to-near) so near nodes correctly draw over far
+   ones. No 3D library — it's ~10 lines of matrix math per point, plain
+   Canvas 2D for the actual drawing. Pointer Events (not mouse-specific)
+   so drag-to-spin works on touch too. */
 function initPeerGraph(canvas, center, peers) {
     if (!canvas || !peers.length) return;
     const ctx = canvas.getContext('2d');
@@ -165,55 +172,69 @@ function initPeerGraph(canvas, center, peers) {
         return img;
     }
     const centerImg = loadImg(center.avatar_url);
-    const nodes = peers.map((p, i) => ({
-        img: loadImg(p.avatar_url),
-        baseAngle: (i / peers.length) * Math.PI * 2,
-        // Slight per-node distance variation (not a perfect circle) —
-        // reads as more organic than every node sitting exactly on one
-        // ring, closer to the reference's own irregular layout.
-        radiusFactor: 0.78 + ((i * 37) % 7) / 7 * 0.18,
-    }));
+
+    // Fibonacci sphere: N points spread evenly over a unit sphere's
+    // surface using the golden angle — no clustering at the poles the way
+    // a naive lat/long grid would have.
+    const N = peers.length;
+    const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+    const nodes = peers.map((p, i) => {
+        const y = 1 - (i / Math.max(1, N - 1)) * 2; // 1 .. -1
+        const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
+        const theta = i * GOLDEN_ANGLE;
+        return {
+            img: loadImg(p.avatar_url),
+            // Unit-sphere coordinates — rotated fresh each frame, never
+            // mutated in place.
+            ux: Math.cos(theta) * radiusAtY,
+            uy: y,
+            uz: Math.sin(theta) * radiusAtY,
+        };
+    });
 
     const dust = Array.from({ length: 24 }, () => ({
         x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.3,
     }));
 
-    const IDLE_VELOCITY = 0.00022; // rad/ms
-    let rotation = Math.random() * Math.PI * 2;
-    let velocity = reduceMotion ? 0 : IDLE_VELOCITY;
+    const IDLE_YAW_SPEED = 0.00022; // rad/ms
+    let yaw = Math.random() * Math.PI * 2;
+    let pitch = -0.25; // slight tilt so the sphere doesn't read as a flat edge-on ring at rest
+    let yawVelocity = reduceMotion ? 0 : IDLE_YAW_SPEED;
+    let pitchVelocity = 0;
     let dragging = false;
-    let lastAngle = 0;
+    let lastX = 0, lastY = 0;
     let lastTime = performance.now();
-
-    function pointerAngle(clientX, clientY) {
-        const rect = canvas.getBoundingClientRect();
-        return Math.atan2(clientY - (rect.top + rect.height / 2), clientX - (rect.left + rect.width / 2));
-    }
 
     canvas.addEventListener('pointerdown', (e) => {
         dragging = true;
-        velocity = 0;
-        lastAngle = pointerAngle(e.clientX, e.clientY);
+        yawVelocity = 0;
+        pitchVelocity = 0;
+        lastX = e.clientX;
+        lastY = e.clientY;
         canvas.setPointerCapture(e.pointerId);
         canvas.classList.add('dragging');
     });
     canvas.addEventListener('pointermove', (e) => {
         if (!dragging) return;
-        const a = pointerAngle(e.clientX, e.clientY);
-        let delta = a - lastAngle;
-        if (delta > Math.PI) delta -= Math.PI * 2;
-        if (delta < -Math.PI) delta += Math.PI * 2;
-        rotation += delta;
-        velocity = reduceMotion ? 0 : delta * 60; // seed momentum from the last drag step's angular speed
-        lastAngle = a;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const dYaw = reduceMotion ? 0 : dx * 0.012;
+        const dPitch = reduceMotion ? 0 : dy * 0.012;
+        yaw += dYaw;
+        pitch = Math.max(-1.4, Math.min(1.4, pitch + dPitch));
+        yawVelocity = dYaw * 3.5; // seeds momentum from the last drag step's speed
+        pitchVelocity = dPitch * 3.5;
+        lastX = e.clientX;
+        lastY = e.clientY;
     });
     function endDrag() { dragging = false; canvas.classList.remove('dragging'); }
     canvas.addEventListener('pointerup', endDrag);
     canvas.addEventListener('pointercancel', endDrag);
     canvas.addEventListener('pointerleave', endDrag);
 
-    function drawAvatar(img, x, y, r) {
+    function drawAvatar(img, x, y, r, alpha) {
         ctx.save();
+        ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.closePath();
@@ -234,12 +255,18 @@ function initPeerGraph(canvas, center, peers) {
         lastTime = now;
 
         if (!dragging) {
-            // momentum decays back toward the idle baseline speed rather
-            // than to a full stop, so a drag-kick gradually settles into
-            // the same slow auto-drift it started from.
-            velocity += (IDLE_VELOCITY - velocity) * Math.min(1, dt / 900);
-            rotation += velocity * dt;
+            // Momentum decays back toward the idle baseline (yaw keeps
+            // auto-spinning; pitch settles back to 0 rather than to
+            // wherever a drag left it, so the sphere doesn't end up stuck
+            // looking at its own pole) rather than to a hard stop.
+            yawVelocity += (IDLE_YAW_SPEED - yawVelocity) * Math.min(1, dt / 900);
+            pitchVelocity += (0 - pitchVelocity) * Math.min(1, dt / 900);
+            pitch += (0 - pitch) * Math.min(1, dt / 4000);
+            yaw += yawVelocity * dt;
+            pitch += pitchVelocity * dt * 0.002;
         }
+        const cosYaw = Math.cos(yaw), sinYaw = Math.sin(yaw);
+        const cosPitch = Math.cos(pitch), sinPitch = Math.sin(pitch);
 
         const rect = canvas.getBoundingClientRect();
         const w = rect.width, h = rect.height;
@@ -247,7 +274,7 @@ function initPeerGraph(canvas, center, peers) {
         ctx.clearRect(0, 0, w, h);
 
         const cx = w / 2, cy = h / 2;
-        const R = Math.min(w, h) * 0.42;
+        const R = Math.min(w, h) * 0.4;
 
         ctx.fillStyle = 'rgba(255,255,255,0.22)';
         for (const d of dust) {
@@ -256,26 +283,36 @@ function initPeerGraph(canvas, center, peers) {
             ctx.fill();
         }
 
-        const positions = nodes.map(n => {
-            const a = n.baseAngle + rotation;
-            const r = R * n.radiusFactor;
-            return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, img: n.img };
+        // Rotate each unit-sphere point by yaw (around Y) then pitch
+        // (around X), scale to R, project orthographically (screen x/y =
+        // rotated x/y, z only drives depth-based size/opacity/order).
+        const projected = nodes.map(n => {
+            const x1 = n.ux * cosYaw - n.uz * sinYaw;
+            const z1 = n.ux * sinYaw + n.uz * cosYaw;
+            const y2 = n.uy * cosPitch - z1 * sinPitch;
+            const z2 = n.uy * sinPitch + z1 * cosPitch;
+            return { img: n.img, x: cx + x1 * R, y: cy + y2 * R, z: z2 };
         });
+        projected.sort((a, b) => a.z - b.z); // far first (painter's algorithm)
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-        ctx.lineWidth = 1;
-        for (const p of positions) {
+        const nodeR = Math.max(8, R * 0.11);
+        for (const p of projected) {
+            const depth = (p.z + 1) / 2; // 0 (far) .. 1 (near)
+            const size = nodeR * (0.55 + 0.55 * depth);
+            const alpha = 0.35 + 0.65 * depth;
+            ctx.globalAlpha = alpha * 0.5;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(p.x, p.y);
             ctx.stroke();
+            drawAvatar(p.img, p.x, p.y, size, alpha);
         }
+        ctx.globalAlpha = 1;
 
-        const nodeR = Math.max(9, R * 0.1);
-        for (const p of positions) drawAvatar(p.img, p.x, p.y, nodeR);
-
-        const centerR = nodeR * 1.6;
-        drawAvatar(centerImg, cx, cy, centerR);
+        const centerR = nodeR * 1.7;
+        drawAvatar(centerImg, cx, cy, centerR, 1);
         ctx.beginPath();
         ctx.arc(cx, cy, centerR, 0, Math.PI * 2);
         ctx.strokeStyle = '#fb5a8c';
