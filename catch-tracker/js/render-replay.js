@@ -280,24 +280,19 @@ function computeHyperdash(items, catcherVisualWidthPx) {
     return windows;
 }
 
-// Best-effort extraction of the beatmap's kiai (hype-section) time ranges,
-// used only to pick the catcher's kiai skin sprite when one's loaded —
-// never blocks anything if the decoded beatmap's control-point shape
-// doesn't match what's tried here (osu-parsers' exact structure for this
-// wasn't verified against real data this session, unlike everything else
-// in this file that WAS — logged on first real use so a live test can
-// confirm/correct the field names quickly rather than guessing blind).
+// Extracts the beatmap's kiai (hype-section) time ranges, used only to
+// pick the catcher's kiai skin sprite when one's loaded. Field name
+// confirmed live against a real decoded beatmap this session: osu-parsers'
+// EffectPoint exposes `kiai` (not `kiaiMode`).
 function extractKiaiRanges(beatmap) {
     try {
-        const points = beatmap?.controlPoints?.effectPoints ?? beatmap?.controlPoints?.effectPointAt ?? null;
+        const points = beatmap?.controlPoints?.effectPoints ?? null;
         if (!Array.isArray(points) || !points.length) return [];
-        console.log('[replay] effect points (verify kiaiMode field name here):', points[0]);
         const sorted = [...points].sort((a, b) => a.startTime - b.startTime);
         const ranges = [];
         for (let i = 0; i < sorted.length; i++) {
             const p = sorted[i];
-            const isKiai = p.kiaiMode ?? p.KiaiMode ?? p.kiai ?? false;
-            if (!isKiai) continue;
+            if (!p.kiai) continue;
             const end = sorted[i + 1] ? sorted[i + 1].startTime : Infinity;
             ranges.push({ start: p.startTime, end });
         }
