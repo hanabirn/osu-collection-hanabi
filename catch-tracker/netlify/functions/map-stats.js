@@ -1,7 +1,7 @@
 /* Per-map stats: aggregates grade/mod counts + FC rate for one beatmap,
    derived on-demand from feed:recent filtered to that beatmap_id — no
    dedicated crawled dataset. This is explicitly NOT exhaustive (only scores
-   this tracker has actually observed from the tracked TW cohort), same
+   this tracker has actually observed from the tracked player pool), same
    honesty stance as the main site's farm-maps-list.js coverage block.
 
    Falls back to the maps:catch catalog (_maps-crawl-core.js) for basic
@@ -103,7 +103,7 @@ exports.handler = async (event) => {
                 modCounts,
                 fcCount,
                 sampleSize: scores.length,
-                note: 'Aggregated only from scores this tracker has observed among tracked TW players — not exhaustive.',
+                note: 'Aggregated only from scores this tracker has observed among tracked players — not exhaustive.',
             }),
         };
     } catch (err) {

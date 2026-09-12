@@ -1,5 +1,5 @@
 /* gzip'd-JSON helpers for the big Netlify Blobs datasets (feed:recent,
-   rankings:TW). Ported verbatim from the main site's _blob-json.js — see
+   rankings:global). Ported verbatim from the main site's _blob-json.js — see
    that file's comments for the full rationale (scheduled functions have a
    30s hard timeout; gzip buys ~5-6x so multi-MB blobs still finish
    uploading in time). getJSONGz auto-detects gzip via magic bytes and falls

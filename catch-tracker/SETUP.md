@@ -57,9 +57,11 @@ twice in a row with no real new scores in between should report
   and `scores-poll-cron` completing within budget.
 - Open the deployed URL, confirm all four pages render with data once the
   feed has a few entries.
-- Note the actual full-sweep wall-clock time once real TW catch player
-  counts are known — this validates or invalidates the `perRun`/cadence
-  choices in `netlify/functions/_catch-constants.js`.
+- Note the actual full-sweep wall-clock time once real global catch player
+  counts are known (rankings went TW-only → global in 2026-09, capped
+  around osu! API's own ~10,000-player performance-rankings ceiling — see
+  `netlify/functions/_catch-constants.js`) — this validates or invalidates
+  the `perRun`/cadence choices there.
 
 ## 5. Link back from the main site
 

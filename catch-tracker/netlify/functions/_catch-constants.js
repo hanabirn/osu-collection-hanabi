@@ -1,11 +1,13 @@
-/* Shared knobs for the catch (osu!fruits) tracker. v1 is deliberately scoped
-   to a single country to keep the score-poll crawl small — see
-   docs in _scores-poll-core.js / _rankings-crawl-core.js for how the
-   design degrades gracefully if COUNTRY's ranked player pool turns out
-   bigger than expected. */
+/* Shared knobs for the catch (osu!fruits) tracker. v1 was scoped to a
+   single country (TW); expanded 2026-09 to global rankings — osu! API v2's
+   performance-rankings endpoint caps out around page 200 (~10,000 players)
+   regardless, so "global" means that same ceiling, not literally every
+   registered player. See docs in _scores-poll-core.js /
+   _rankings-crawl-core.js for how the design degrades gracefully (slower
+   full-sweep cadence, not breakage) if the real pool turns out bigger than
+   a single poll cycle can cover. */
 const MODE = 'fruits';
 const MODE_NUM = 2; // osu! API v2 ruleset id for fruits/catch
-const COUNTRY = 'TW';
 
 // Statuses swept by the maps catalog crawler, in order — see
 // _maps-crawl-core.js. osu! API v2's /beatmapsets/search `s` param takes
@@ -22,18 +24,18 @@ const LAST_SEEN_CAP = 100;
 // Score-poll round-robin: item-count cap per invocation, on top of the
 // wall-clock budgetMs cap (two independent levers, same as
 // crawlWybinMappools's {budgetMs, perRun} in the main site's
-// _community-mappools-shared.js). Sized generously above the assumed TW
-// catch pool (well under a few hundred players) so a normal tick sweeps the
-// whole pool; if the real pool is bigger, coverage just spans more ticks
-// instead of breaking — see scores-poll-state's playersPolledThisSweep/
-// totalPlayers fields.
+// _community-mappools-shared.js). Sized for the original TW-only pool
+// (~5k players); against the post-expansion global pool (up to ~10k) a full
+// round-robin sweep just spans roughly 2x as many ticks — coverage, not
+// breakage — see scores-poll-state's playersPolledThisSweep/totalPlayers
+// fields, already surfaced in feed-list.js's coverage block.
 const SCORE_POLL_PER_RUN_CRON = 300;
 const SCORE_POLL_PER_RUN_MANUAL = 30;
 
 const VALID_GRADES = new Set(['XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D', 'F']);
 
 module.exports = {
-    MODE, MODE_NUM, COUNTRY, MAP_STATUSES, FEED_CAP, LAST_SEEN_CAP,
+    MODE, MODE_NUM, MAP_STATUSES, FEED_CAP, LAST_SEEN_CAP,
     SCORE_POLL_PER_RUN_CRON, SCORE_POLL_PER_RUN_MANUAL,
     VALID_GRADES,
 };

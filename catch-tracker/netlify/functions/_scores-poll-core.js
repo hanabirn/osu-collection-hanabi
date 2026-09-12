@@ -69,6 +69,7 @@ function toFeedRecord(score, player) {
         score_id: score.id,
         user_id: player.user_id,
         username: player.username || null,
+        country_code: player.country_code || null,
         avatar_url: `https://a.ppy.sh/${player.user_id}`,
         beatmap_id: bm.id ?? score.beatmap_id ?? null,
         beatmapset_id: bms.id ?? null,

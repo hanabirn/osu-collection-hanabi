@@ -1,5 +1,5 @@
 /* Scheduled entry point for the rankings sweep — see netlify.toml for the
-   cron declaration (hourly: TW catch pp-rankings move slowly, and this
+   cron declaration (hourly: catch pp-rankings move slowly, and this
    cron doubles as "discover newly-ranked players" for the score-poller's
    queue). No auth needed — Netlify doesn't expose scheduled functions over
    a public URL. See rankings-crawl-run.js for the manual/backfill

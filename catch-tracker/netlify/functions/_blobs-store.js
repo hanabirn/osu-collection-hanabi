@@ -14,9 +14,9 @@ function store(name) {
     });
 }
 
-// Rankings sweep: `rankings:TW` (gzip array of player records) +
+// Rankings sweep: `rankings:global` (gzip array of player records) +
 // `rankings-crawl-state` (plain JSON cursor/diagnostics) +
-// `players:index` (plain JSON polling queue, derived from rankings:TW).
+// `players:index` (plain JSON polling queue, derived from rankings:global).
 function getRankingsStore() {
     return store('catch-tracker-rankings');
 }

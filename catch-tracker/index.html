@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catch Tracker — TW osu!catch Rankings</title>
+<title>Catch Tracker — osu!catch Rankings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,8 +22,11 @@
     <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
 </header>
 <main>
-    <h1><span data-i18n="h1_rankings">osu!catch Rankings</span> <span class="mods-tag">TW</span></h1>
+    <h1><span data-i18n="h1_rankings">osu!catch Rankings</span></h1>
     <p class="coverage-note" id="coverage-note" data-i18n="loading">Loading…</p>
+    <div class="filters">
+        <select id="filter-country"><option value="" data-i18n="filter_all_countries">All countries</option></select>
+    </div>
 
     <h2 data-i18n="highlight_best_plays">Recent Best Plays</h2>
     <div class="highlight-strip" id="highlight-strip"></div>

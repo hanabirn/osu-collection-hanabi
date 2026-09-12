@@ -69,12 +69,12 @@ async function loadPlayer() {
 
         main.innerHTML = `
             <div class="card profile-header${p.cover_url ? ' has-cover' : ''}"${coverStyle}>
-                <img class="avatar" src="${escapeHtml(p.avatar_url || '')}" alt="">
+                ${avatarWithFlagHtml(p.avatar_url, p.country_code)}
                 <div>
                     <h1 style="margin:0">${escapeHtml(p.username || userId)}</h1>
                     <div class="profile-stats">
                         <span>${fmtPP(p.pp)}</span>
-                        <span>${t('stat_tw', { n: p.country_rank ?? '—' })}</span>
+                        <span>${t('stat_country', { code: p.country_code || '—', n: p.country_rank ?? '—' })}</span>
                         <span>${t('stat_global', { n: p.global_rank ?? '—' })}</span>
                         <span>${t('stat_acc', { acc: fmtAccuracy(p.accuracy) })}</span>
                         <span>${t('stat_plays', { n: p.play_count ?? '—' })}</span>

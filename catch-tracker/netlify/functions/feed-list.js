@@ -36,6 +36,7 @@ exports.handler = async (event) => {
     const mods = (qs.mods || '').trim().toUpperCase() || null; // exact-match on the acronym set, e.g. "HDDT"
     const fcOnly = qs.fcOnly === '1';
     const chokeOnly = qs.chokeOnly === '1';
+    const country = (qs.country || '').trim().toUpperCase().slice(0, 2);
     const page = Math.max(0, parseInt(qs.page, 10) || 0);
     const pageSize = Math.max(1, Math.min(100, parseInt(qs.limit, 10) || PAGE_SIZE));
     // 'pp' powers the homepage's "Recent Best Plays" highlight strip
@@ -46,11 +47,24 @@ exports.handler = async (event) => {
         const feedStore = getFeedStore();
         const feed = await loadFeed(feedStore);
 
+        // Distinct countries + counts across the full feed (not the
+        // filtered/paginated result) so the filter dropdown always lists
+        // every option that currently has at least one feed entry.
+        const countryCounts = new Map();
+        for (const r of feed) {
+            if (!r.country_code) continue;
+            countryCounts.set(r.country_code, (countryCounts.get(r.country_code) || 0) + 1);
+        }
+        const countries = [...countryCounts.entries()]
+            .map(([code, count]) => ({ code, count }))
+            .sort((a, b) => b.count - a.count);
+
         let items = feed;
         if (grade) items = items.filter(r => r.rank === grade);
         if (mods) items = items.filter(r => (r.mods || []).join('') === mods);
         if (fcOnly) items = items.filter(r => r.is_fc);
         if (chokeOnly) items = items.filter(r => !r.is_fc);
+        if (country) items = items.filter(r => r.country_code === country);
         if (sort === 'pp') {
             items = items.filter(r => r.pp != null).sort((a, b) => b.pp - a.pp);
         }
@@ -75,7 +89,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: { ...headers, 'Cache-Control': 'public, max-age=20' },
-            body: JSON.stringify({ items: pageItems, total, page, pageSize, coverage }),
+            body: JSON.stringify({ items: pageItems, total, page, pageSize, coverage, countries }),
         };
     } catch (err) {
         return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };

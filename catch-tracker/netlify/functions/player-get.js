@@ -1,4 +1,4 @@
-/* Single-player profile: combines the cached rankings:TW record (rank/pp
+/* Single-player profile: combines the cached rankings:global record (rank/pp
    maintained by our own crawler) with a LIVE call to GET /users/{id}/fruits
    for fields we don't crawl ourselves (join_date, play_time, career
    grade_counts) and a LIVE call to GET /users/{id}/scores/best for "best
@@ -82,12 +82,12 @@ exports.handler = async (event) => {
         const feedStore = getFeedStore();
         const token = await getOsuToken();
 
-        const rankings = (await getJSONGz(rankingsStore, 'rankings:TW')) || [];
+        const rankings = (await getJSONGz(rankingsStore, 'rankings:global')) || [];
         let profile = rankings.find(r => r.user_id === userId) || null;
 
         // Always fetched live — join_date/play_time/grade_counts aren't
         // crawled/cached anywhere, and this also backfills a profile for a
-        // player not yet in our TW sweep.
+        // player not yet in our rankings sweep.
         let liveUser = null;
         try {
             const res = await fetch(`https://osu.ppy.sh/api/v2/users/${userId}/${MODE}`, {
@@ -128,6 +128,12 @@ exports.handler = async (event) => {
             profile.username = liveUser.username || profile.username;
             profile.avatar_url = liveUser.avatar_url || profile.avatar_url;
             profile.cover_url = (liveUser.cover && liveUser.cover.url) || profile.cover_url;
+            // Post-global-expansion gap: GET /rankings/fruits/performance
+            // (no country filter) comes back with country_rank always null
+            // on every entry (confirmed live) — only the per-user endpoint
+            // reliably has it, so backfill from here rather than leaving the
+            // cached rankings sweep's null in place.
+            profile.country_rank = stats.country_rank ?? profile.country_rank;
         }
 
         const feed = (await getJSONGz(feedStore, 'feed:recent')) || [];

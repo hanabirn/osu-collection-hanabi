@@ -249,6 +249,21 @@ td.wrap, th.wrap { white-space: normal; }
     object-fit: cover;
 }
 
+/* Country flag badge overlaid on an avatar — see common.js's
+   avatarWithFlagHtml(). Ported from the main site's identical pattern. */
+.avatar-with-flag { position: relative; display: inline-flex; vertical-align: middle; flex-shrink: 0; }
+.avatar-flag-badge {
+    position: absolute;
+    bottom: -3px;
+    right: 2px;
+    width: 55%;
+    height: auto;
+    border-radius: 2px;
+    border: 1.5px solid var(--bg-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    object-fit: cover;
+}
+
 .player-link { color: var(--text); font-weight: 600; }
 .player-link:hover { color: var(--accent); }
 .map-link {

@@ -2,9 +2,10 @@
    time, HTML escaping, and a tiny two-language (zh-Hant / en) i18n layer.
    This is a plain-HTML companion site (see the implementation plan for why
    it doesn't reuse the main site's full 8-locale i18n machinery) — just a
-   flat string table, since the tracked audience is Taiwan-only. Default
-   language is zh (Traditional Chinese) for that reason; en is the fallback
-   for anyone else who lands here. */
+   flat string table. Originally Taiwan-only (hence zh as the default
+   language); expanded 2026-09 to global rankings, but the owner/primary
+   audience is still Taiwan-based, so zh stays the default — en is the
+   fallback for everyone else. */
 
 function escapeHtml(str) {
     return String(str ?? '').replace(/[&<>"']/g, c => ({
@@ -18,14 +19,15 @@ const LANG_STRINGS = {
     zh: {
         nav_rankings: '排行榜', nav_feed: '即時動態',
         loading: '載入中…',
-        title_rankings: 'Catch Tracker — 台灣 osu!catch 排名',
+        title_rankings: 'Catch Tracker — osu!catch 全球排名',
         title_feed: 'Catch Tracker — 即時動態',
         h1_rankings: 'osu!catch 排名',
         th_rank: '#', th_player: '玩家', th_pp: 'PP', th_accuracy: '準度', th_playcount: '遊玩次數',
-        coverage_rankings: '追蹤 {n} 位台灣 catch 玩家 — 上次更新 {time}',
-        coverage_rankings_pending: '追蹤 {n} 位台灣 catch 玩家 — 尚未更新',
-        empty_rankings: '目前還沒有已追蹤的台灣 catch 玩家 — 可能第一次排名掃描尚未完成。',
+        coverage_rankings: '追蹤 {n} 位 catch 玩家 — 上次更新 {time}',
+        coverage_rankings_pending: '追蹤 {n} 位 catch 玩家 — 尚未更新',
+        empty_rankings: '目前還沒有已追蹤的 catch 玩家 — 可能第一次排名掃描尚未完成。',
         failed_rankings: '排行榜載入失敗。',
+        filter_all_countries: '所有國家',
         prev: '← 上一頁', next: '下一頁 →', page_label: '第 {n} 頁',
 
         h1_feed: '即時分數動態',
@@ -44,7 +46,7 @@ const LANG_STRINGS = {
         recent_plays: '近期成績（本站已觀測到的）',
         no_best_plays: '尚無可顯示的最佳成績。',
         no_recent_plays: '本站尚未觀測到這位玩家的近期成績。',
-        stat_tw: '台灣 #{n}', stat_global: '全球 #{n}', stat_acc: '準度 {acc}', stat_plays: '{n} 次遊玩',
+        stat_country: '{code} #{n}', stat_global: '全球 #{n}', stat_acc: '準度 {acc}', stat_plays: '{n} 次遊玩',
 
         map_no_id: '未提供圖譜 ID。',
         map_no_scores: '本站尚未在追蹤玩家中觀測到這張圖譜的成績。',
@@ -54,7 +56,7 @@ const LANG_STRINGS = {
         mod_usage: 'Mod 使用率',
         tracked_scores: '已追蹤的成績',
         no_data: '尚無資料',
-        map_coverage: '僅統計本站在追蹤台灣玩家中觀測到的成績，非完整資料。樣本數 {n}，FC 率 {fc}%。',
+        map_coverage: '僅統計本站在追蹤玩家中觀測到的成績，非完整資料。樣本數 {n}，FC 率 {fc}%。',
         no_scores_short: '無成績資料',
 
         footer_main: 'Catch Tracker — osu-collection-hanabi 的姊妹站。資料來自官方 osu! API。',
@@ -122,14 +124,15 @@ const LANG_STRINGS = {
     en: {
         nav_rankings: 'Rankings', nav_feed: 'Live Feed',
         loading: 'Loading…',
-        title_rankings: 'Catch Tracker — TW osu!catch Rankings',
+        title_rankings: 'Catch Tracker — Global osu!catch Rankings',
         title_feed: 'Catch Tracker — Live Feed',
         h1_rankings: 'osu!catch Rankings',
         th_rank: '#', th_player: 'Player', th_pp: 'pp', th_accuracy: 'Accuracy', th_playcount: 'Play Count',
-        coverage_rankings: 'Tracking {n} TW catch players — last refreshed {time}',
-        coverage_rankings_pending: 'Tracking {n} TW catch players — not yet refreshed',
-        empty_rankings: 'No ranked TW catch players tracked yet — the first rankings sweep may not have run.',
+        coverage_rankings: 'Tracking {n} catch players — last refreshed {time}',
+        coverage_rankings_pending: 'Tracking {n} catch players — not yet refreshed',
+        empty_rankings: 'No ranked catch players tracked yet — the first rankings sweep may not have run.',
         failed_rankings: 'Failed to load rankings.',
+        filter_all_countries: 'All countries',
         prev: '← Prev', next: 'Next →', page_label: 'Page {n}',
 
         h1_feed: 'Live Score Feed',
@@ -148,17 +151,17 @@ const LANG_STRINGS = {
         recent_plays: 'Recent Plays (seen by this tracker)',
         no_best_plays: 'No best plays available.',
         no_recent_plays: 'No recent plays observed yet by this tracker.',
-        stat_tw: '#{n} TW', stat_global: '#{n} global', stat_acc: '{acc} acc', stat_plays: '{n} plays',
+        stat_country: '#{n} {code}', stat_global: '#{n} global', stat_acc: '{acc} acc', stat_plays: '{n} plays',
 
         map_no_id: 'No map id given.',
-        map_no_scores: 'No scores observed yet for this map among tracked TW players.',
+        map_no_scores: 'No scores observed yet for this map among tracked players.',
         map_failed: 'Failed to load map stats.',
         mapped_by: 'mapped by {creator}',
         grade_distribution: 'Grade distribution',
         mod_usage: 'Mod usage',
         tracked_scores: 'Tracked scores',
         no_data: 'No data',
-        map_coverage: 'Aggregated only from scores observed among tracked TW players — not exhaustive. Sample size {n}, FC rate {fc}%.',
+        map_coverage: 'Aggregated only from scores observed among tracked players — not exhaustive. Sample size {n}, FC rate {fc}%.',
         no_scores_short: 'No scores',
 
         footer_main: 'Catch Tracker — a companion site for osu-collection-hanabi. Data via the official osu! API.',
@@ -346,6 +349,27 @@ function coverArtUrlCard(beatmapsetId) {
     return beatmapsetId ? `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card.jpg` : '';
 }
 
+/* ---------- country flags (post global-expansion) ----------
+   Ported from the main site's js/osu.js flagUrl()/avatar-with-flag pattern
+   — flagcdn.com serves flags keyed by lowercase ISO 3166-1 alpha-2, no auth/
+   CORS issues, already proven there. Wrapping the existing .avatar element
+   in a positioned span (rather than adding a sibling element) means the
+   badge overlays the avatar without needing any per-call-site layout
+   changes — the wrapper is display:inline-flex so it takes on the avatar's
+   own box size and margin. */
+function flagUrl(countryCode) {
+    return countryCode ? `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png` : '';
+}
+
+function avatarWithFlagHtml(avatarUrl, countryCode, avatarClass) {
+    const flag = flagUrl(countryCode);
+    const cls = avatarClass ? `avatar ${avatarClass}` : 'avatar';
+    return `<span class="avatar-with-flag">
+        <img class="${cls}" src="${escapeHtml(avatarUrl || '')}" alt="">
+        ${flag ? `<img class="avatar-flag-badge" src="${flag}" alt="${escapeHtml(countryCode)}" onerror="this.style.display='none';">` : ''}
+    </span>`;
+}
+
 /* ---------- audio preview button (play icon <-> animated equalizer) ----------
    Plain <audio> playback needs no CORS at all (that's only a Web Audio
    API/AnalyserNode requirement) — the main site's preview waveform feature
@@ -472,7 +496,7 @@ function highlightCard(s) {
 /* ---------- header player search (every page) ---------- */
 
 /* Injected into the header rather than hand-added to all 4 HTML files —
-   searches the already-cached rankings:TW dataset server-side
+   searches the already-cached rankings:global dataset server-side
    (rankings-list.js's `q` param), so this needs no new dataset of its own. */
 function initPlayerSearch() {
     const toggle = document.getElementById('lang-toggle');
@@ -498,7 +522,7 @@ function initPlayerSearch() {
             } else {
                 results.innerHTML = data.items.map(r => `
                     <a class="search-result-row" href="player.html?id=${encodeURIComponent(r.user_id)}">
-                        <img class="avatar" src="${escapeHtml(r.avatar_url || '')}" alt="">
+                        ${avatarWithFlagHtml(r.avatar_url, r.country_code)}
                         <span>${escapeHtml(r.username)}</span>
                         <span class="search-result-pp">${fmtPP(r.pp)}</span>
                     </a>`).join('');

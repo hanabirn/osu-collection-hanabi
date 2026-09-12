@@ -1,9 +1,9 @@
 /* Manual/backfill trigger for the rankings sweep — same core logic as
    rankings-crawl-cron.js (see _rankings-crawl-core.js), but reachable over
    plain HTTP, so it requires a shared secret (CATCH_TRACKER_CRAWL_SECRET
-   env var) via the x-catch-tracker-secret header. Used to seed rankings:TW
-   + players:index right after first deploy, before waiting on the hourly
-   cron. */
+   env var) via the x-catch-tracker-secret header. Used to seed
+   rankings:global + players:index right after first deploy, before waiting
+   on the hourly cron. */
 const { runRankingsCrawl } = require('./_rankings-crawl-core');
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };

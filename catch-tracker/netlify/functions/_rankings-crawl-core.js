@@ -3,27 +3,34 @@
    HTTP endpoint (rankings-crawl-run.js). Modeled directly on the main
    site's _farm-crawl-core.js (discover/write/rollback shape), but much
    simpler: no compute phase, just a straight page-walk over
-   GET /rankings/fruits/performance?country=TW.
+   GET /rankings/fruits/performance (global, no country filter — v1 was
+   TW-only; expanded 2026-09 once the TW pool proved too thin to sample
+   peer groups from for a planned "farm helper" feature).
 
    osu! API v2's RankingController (app/Http/Controllers/RankingController.php
    in ppy/osu-web) accepts a plain `page` query param for pagination (it also
    accepts `cursor[page]`, but plain `page` is simpler and equally valid —
    confirmed by reading that controller's source directly) and returns
-   { ranking: [...], total, cursor }. An empty `ranking` array means the
-   sweep has reached the end of the TW pool.
+   { ranking: [...], total, cursor }. Global performance rankings are capped
+   around page 200 (~10,000 players) by the API itself — "global" here means
+   that same ceiling, not literally every registered player. An empty
+   `ranking` array (or a clamped repeat — see below) means the sweep has
+   reached the end of that pool.
 
    State lives in the rankings Blobs store:
      - `rankings-crawl-state` (plain JSON): { cursorPage, totalKnown,
        sweepCount, lastRunAt, lastOkAt, lastError, consecutiveWriteFails }
-     - `rankings:TW` (gzip array): one record per TW-ranked catch player,
-       upserted by user_id — never shrinks reactively (a player who drops
-       off the live TW rankings stays in the dataset/pollable until we
-       explicitly decide to prune, which v1 doesn't do).
+     - `rankings:global` (gzip array): one record per ranked catch player
+       (was `rankings:TW` pre-expansion — renamed, not migrated; the old key
+       is just orphaned cache), upserted by user_id — never shrinks
+       reactively (a player who drops off the live rankings stays in the
+       dataset/pollable until we explicitly decide to prune, which v1
+       doesn't do).
      - `players:index` (plain JSON): the score-poller's round-robin queue,
-       rebuilt from rankings:TW whenever a full sweep completes.
+       rebuilt from rankings:global whenever a full sweep completes.
 
    Like Farm, the cursor wraps to page 1 on exhaustion instead of stopping —
-   this is a perpetual refresh, not a one-time backfill, so newly-ranked TW
+   this is a perpetual refresh, not a one-time backfill, so newly-ranked
    players get picked up automatically over time.
 
    NOTE: the exact field names on a ranking entry's nested `user` object
@@ -35,10 +42,10 @@
 const { getOsuToken } = require('./_osu-auth');
 const { getRankingsStore } = require('./_blobs-store');
 const { setJSONGz, getJSONGz } = require('./_blob-json');
-const { MODE, COUNTRY } = require('./_catch-constants');
+const { MODE } = require('./_catch-constants');
 
 const STATE_KEY = 'rankings-crawl-state';
-const RANKINGS_KEY = 'rankings:TW';
+const RANKINGS_KEY = 'rankings:global';
 const PLAYERS_INDEX_KEY = 'players:index';
 
 // Reserve this much of the budget for the (small, but still gzip+upload)
@@ -64,7 +71,7 @@ function toRecord(entry) {
     return {
         user_id: u.id,
         username: u.username || null,
-        country_code: u.country_code || (u.country && u.country.code) || COUNTRY,
+        country_code: u.country_code || (u.country && u.country.code) || null,
         avatar_url: u.avatar_url || null,
         cover_url: (u.cover && u.cover.url) || null,
         global_rank: entry.global_rank ?? null,
@@ -119,7 +126,7 @@ async function runRankingsCrawl(budgetMs) {
             }
 
             const res = await fetch(
-                `https://osu.ppy.sh/api/v2/rankings/${MODE}/performance?country=${COUNTRY}&page=${page}`,
+                `https://osu.ppy.sh/api/v2/rankings/${MODE}/performance?page=${page}`,
                 { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
             );
             if (!res.ok) throw new Error(`rankings fetch failed: ${res.status}`);
@@ -179,6 +186,7 @@ async function runRankingsCrawl(budgetMs) {
                 const playersIndex = dataset.map(r => ({
                     user_id: r.user_id,
                     username: r.username,
+                    country_code: r.country_code,
                     lastPolledAt: lastPolled.get(r.user_id) || null,
                 }));
                 await store.setJSON(PLAYERS_INDEX_KEY, playersIndex);

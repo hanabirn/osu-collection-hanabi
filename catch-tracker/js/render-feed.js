@@ -1,7 +1,23 @@
 let _page = 0;
 let _grade = '';
+let _country = '';
+let _countriesPopulated = false;
 
 const GRADE_FILTER_OPTIONS = ['', 'XH', 'X', 'SH', 'S', 'A', 'B', 'C', 'D', 'F'];
+
+// Populated once from the first response's `countries` list (every country
+// currently present in the feed, with counts) rather than rebuilt on every
+// poll — rebuilding a <select> out from under an open dropdown/mid-choice
+// would be a bad experience for no benefit (the list barely changes tick to
+// tick).
+function populateCountryFilter(countries) {
+    if (_countriesPopulated || !countries || !countries.length) return;
+    const select = document.getElementById('filter-country');
+    if (!select) return;
+    select.innerHTML = `<option value="">${escapeHtml(t('filter_all_countries'))}</option>` +
+        countries.map(c => `<option value="${escapeHtml(c.code)}">${escapeHtml(c.code)} (${c.count})</option>`).join('');
+    _countriesPopulated = true;
+}
 
 function buildGradeFilter() {
     const group = document.getElementById('filter-grade-group');
@@ -28,6 +44,7 @@ function currentFilters() {
         grade: _grade || undefined,
         fcOnly: document.getElementById('filter-fc').classList.contains('active') ? '1' : undefined,
         chokeOnly: document.getElementById('filter-choke').classList.contains('active') ? '1' : undefined,
+        country: _country || undefined,
     };
 }
 
@@ -41,7 +58,7 @@ async function loadFeed() {
         body.innerHTML = data.items.length
             ? data.items.map(s => `
                 <tr>
-                    <td><img class="avatar" src="${escapeHtml(s.avatar_url || '')}" alt=""> ${playerLink(s.user_id, s.username)}</td>
+                    <td>${avatarWithFlagHtml(s.avatar_url, s.country_code)} ${playerLink(s.user_id, s.username)}</td>
                     <td>${mapLink(s.beatmap_id, `${s.artist || ''} - ${s.title || ''} [${s.version || ''}]`)}</td>
                     <td>${modsTag(s.mods)}</td>
                     <td>${gradeBadge(s.rank)}${fcTag(s.is_fc)}</td>
@@ -50,6 +67,8 @@ async function loadFeed() {
                     <td>${relTime(s.created_at)}</td>
                 </tr>`).join('')
             : `<tr><td colspan="7" class="empty-state">${t('empty_feed')}</td></tr>`;
+
+        populateCountryFilter(data.countries);
 
         const c = data.coverage || {};
         note.textContent = c.lastOkAt
@@ -72,6 +91,11 @@ document.getElementById('next-page').addEventListener('click', () => { _page++; 
         _page = 0;
         loadFeed();
     });
+});
+document.getElementById('filter-country').addEventListener('change', (e) => {
+    _country = e.target.value;
+    _page = 0;
+    loadFeed();
 });
 
 buildGradeFilter();
