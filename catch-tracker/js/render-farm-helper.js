@@ -53,9 +53,14 @@ const FARM_HELPER_CATEGORY_ICONS = {
 
 function renderLanding(main) {
     const recent = loadRecentFarmHelper();
+    const loggedInUser = getCtLoggedInUser();
     main.innerHTML = `
         <div class="farm-helper-landing">
             <h1>${t('farm_helper_landing_title')}</h1>
+            ${loggedInUser ? `
+            <a class="pill farm-helper-landing-self-link" href="farm-helper.html?id=${encodeURIComponent(loggedInUser.id)}">
+                ${escapeHtml(t('farm_helper_my_own', { username: loggedInUser.username || `#${loggedInUser.id}` }))}
+            </a>` : ''}
             <div class="farm-helper-landing-search">
                 <span class="farm-helper-landing-for">${t('farm_helper_landing_for')}</span>
                 <div class="search-wrap farm-helper-search-wrap">

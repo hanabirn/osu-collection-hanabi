@@ -29,6 +29,9 @@ const LANG_STRINGS = {
         failed_rankings: '排行榜載入失敗。',
         filter_all_countries: '所有國家',
         prev: '← 上一頁', next: '下一頁 →', page_label: '第 {n} 頁',
+        login_with_osu: '使用 osu! 登入',
+        logout: '登出',
+        login_failed: '登入失敗，請再試一次',
 
         h1_feed: '即時分數動態',
         filter_any_grade: '任何評級', filter_fc_only: '僅 FC', filter_choke_only: '僅撞/失敗',
@@ -76,6 +79,7 @@ const LANG_STRINGS = {
         farm_helper_no_id: '未提供玩家 ID。',
         farm_helper_failed: '刷圖助手載入失敗。',
         farm_helper_landing_title: '值得刷的圖譜',
+        farm_helper_my_own: '查看我（{username}）的刷圖建議 →',
         farm_helper_landing_for: '為',
         farm_helper_recent: '最近查看',
         farm_helper_explainer_title: '依據附近 pp 玩家的成績，推薦：',
@@ -156,6 +160,9 @@ const LANG_STRINGS = {
         failed_rankings: 'Failed to load rankings.',
         filter_all_countries: 'All countries',
         prev: '← Prev', next: 'Next →', page_label: 'Page {n}',
+        login_with_osu: 'Login with osu!',
+        logout: 'Logout',
+        login_failed: 'Login failed, please try again',
 
         h1_feed: 'Live Score Feed',
         filter_any_grade: 'Any grade', filter_fc_only: 'FC only', filter_choke_only: 'Choke/fail only',
@@ -203,6 +210,7 @@ const LANG_STRINGS = {
         farm_helper_no_id: 'No player id given.',
         farm_helper_failed: 'Failed to load the farm helper.',
         farm_helper_landing_title: 'Maps worth farming',
+        farm_helper_my_own: 'View my ({username}) farm recommendations →',
         farm_helper_landing_for: 'for',
         farm_helper_recent: 'Recent',
         farm_helper_explainer_title: 'Based on what nearby-pp players are scoring:',
@@ -311,6 +319,91 @@ function applyStaticI18n() {
     document.documentElement.lang = getLang() === 'zh' ? 'zh-Hant' : 'en';
 }
 applyStaticI18n();
+
+/* ---------- osu! OAuth login (general site login) ----------
+   netlify/functions/osu-replay-login.js + osu-replay-callback.js run the
+   authorization-code flow and redirect back here with
+   ?ct_login=<id>&ct_login_name=<name>&ct_login_token=<signed token> (or
+   ?ct_login_error=<stage> on failure). The real osu! access token is
+   never sent to the client — it stays encrypted server-side (see
+   _user-auth.js) so a login-gated feature can reuse it on a later visit
+   without asking the user to re-login every time. (Originally built
+   Watch-Replay-only; removed with that feature, rebuilt as general login
+   2026-09 — route filenames kept as osu-replay-* since that's what's
+   registered on osu!'s own OAuth app settings, not because this is
+   replay-specific anymore.) */
+const CT_LOGIN_STORAGE_KEY = 'ct_logged_in_user';
+
+function getCtLoggedInUser() {
+    try { return JSON.parse(localStorage.getItem(CT_LOGIN_STORAGE_KEY)); }
+    catch { return null; }
+}
+
+function getCtAuthToken() {
+    const user = getCtLoggedInUser();
+    return user && user.token ? user.token : null;
+}
+
+function logoutCtUser() {
+    localStorage.removeItem(CT_LOGIN_STORAGE_KEY);
+    applyCtLoggedInUser();
+}
+
+function ctLoginUrl() {
+    const returnTo = location.pathname + location.search;
+    return `/.netlify/functions/osu-replay-login?${new URLSearchParams({ return_to: returnTo })}`;
+}
+
+function applyCtLoggedInUser() {
+    const user = getCtLoggedInUser();
+    const loginBtn = document.getElementById('ct-login-btn');
+    const pill = document.getElementById('ct-logged-in-pill');
+    if (loginBtn) {
+        loginBtn.style.display = user ? 'none' : '';
+        loginBtn.href = ctLoginUrl();
+    }
+    if (pill) pill.style.display = user ? '' : 'none';
+    if (!user) return;
+    const nameEl = document.getElementById('ct-logged-in-name');
+    const avatarEl = document.getElementById('ct-logged-in-avatar');
+    if (nameEl) nameEl.textContent = user.username || `#${user.id}`;
+    if (avatarEl) avatarEl.src = `https://a.ppy.sh/${user.id}`;
+}
+
+function showCtLoginMsg(msg) {
+    const el = document.getElementById('ct-login-msg');
+    if (!el) return;
+    el.textContent = msg;
+    el.hidden = false;
+    setTimeout(() => { el.hidden = true; }, 6000);
+}
+
+function checkCtLoginFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('ct_login');
+    const loginFailed = params.get('ct_login_error');
+
+    if (id) {
+        localStorage.setItem(CT_LOGIN_STORAGE_KEY, JSON.stringify({
+            id,
+            username: params.get('ct_login_name') || '',
+            token: params.get('ct_login_token') || null,
+        }));
+    }
+    if (id || loginFailed) {
+        params.delete('ct_login');
+        params.delete('ct_login_name');
+        params.delete('ct_login_token');
+        params.delete('ct_login_error');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+        if (loginFailed) showCtLoginMsg(t('login_failed'));
+    }
+
+    applyCtLoggedInUser();
+    const logoutBtn = document.getElementById('ct-logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logoutCtUser);
+}
 
 /* ---------- grade badges / mods / relative time ---------- */
 
@@ -808,3 +901,4 @@ initBananaRain();
 // common.js is loaded at the end of <body>, after the header markup, so the
 // DOM is already parsed — no need to wait for DOMContentLoaded here.
 initPlayerSearch();
+checkCtLoginFromUrl();
