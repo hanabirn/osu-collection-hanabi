@@ -408,7 +408,7 @@ function checkCtLoginFromUrl() {
    row is the same, already-known player) — render-player.js passes the
    page's own player username explicitly; render-map.js's rows already
    have s.username per-row and don't need to. */
-function replayLink(s, username) {
+function replayLink(s, username, userId) {
     if (!s.has_replay || !s.score_id) return '';
     const params = new URLSearchParams({ score_id: s.score_id, beatmap_id: s.beatmap_id });
     if (s.beatmapset_id) params.set('beatmapset_id', s.beatmapset_id);
@@ -419,6 +419,8 @@ function replayLink(s, username) {
     if (s.rank) params.set('rank', s.rank);
     const uname = username || s.username;
     if (uname) params.set('username', uname);
+    const uid = userId || s.user_id;
+    if (uid) params.set('user_id', uid);
     return `<a class="pill" href="replay.html?${params.toString()}">${escapeHtml(t('watch_replay'))}</a>`;
 }
 

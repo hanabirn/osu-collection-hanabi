@@ -917,58 +917,139 @@ footer.site-footer {
     padding: 30px 20px 40px;
 }
 
-/* ---------- Watch Replay ---------- */
+/* ---------- Watch Replay (theater layout) ----------
+   Deliberately breaks from the rest of the site's card/pill language —
+   this page is meant to feel like a dedicated viewer "mode", matching
+   mania-tracker.com's replay viewer: full-bleed dark theater over a
+   blurred beatmap cover, borderless floating HUD text (no card
+   backgrounds on the readouts themselves — legibility comes from
+   text-shadow against the dimmed backdrop, same as that reference). */
 
-.replay-canvas {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    aspect-ratio: 640 / 420;
-    background: #05050c;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-}
-.replay-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-}
-.replay-controls .pill.toggle { min-width: 44px; justify-content: center; }
-.replay-scrub { flex: 1 1 auto; }
+/* This page trades the rest of the site's normal page chrome (footer,
+   main's padding) for a near-fullscreen theater — only the slim header
+   stays, matching mania-tracker's own replay page (which keeps just its
+   site nav too). See also the .page-replay overrides further down and
+   the in-bar fullscreen-toggle button for TRUE OS fullscreen on top of
+   this already-large default. */
+.page-replay main { padding: 0; max-width: none; }
+.page-replay .site-footer { display: none; }
 
-.replay-skin-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-}
-.replay-skin-status { font-size: 0.8rem; color: var(--text-dim); }
-
-.replay-layout {
-    display: grid;
-    grid-template-columns: 220px minmax(0, 1fr) 220px;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 24px auto;
-    align-items: start;
-}
-.replay-side-panel { padding: 18px; }
-.replay-info-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-
-.replay-stats-panel { display: flex; flex-direction: column; gap: 10px; }
-.replay-stat-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; color: var(--text-dim); }
-.replay-stat-row strong { color: var(--text); font-family: var(--font-display); font-size: 1.05rem; }
-
-.replay-hp-bar {
-    height: 10px;
-    border-radius: 999px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+.replay-theater {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: calc(100vh - 64px);
+    min-height: 480px;
     overflow: hidden;
-    margin-bottom: 6px;
+    background: #05050c center / cover no-repeat;
+    isolation: isolate;
+}
+.replay-theater:fullscreen { height: 100vh; }
+.replay-theater-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: rgba(6, 6, 16, 0.4);
+    backdrop-filter: blur(26px) brightness(0.5) saturate(1.15);
+    -webkit-backdrop-filter: blur(26px) brightness(0.5) saturate(1.15);
+}
+.replay-canvas-full {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.replay-hud-acc, .replay-hud-combo {
+    position: absolute;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65), 0 0 2px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+.replay-hud-acc { top: 20px; left: 24px; font-size: clamp(1.1rem, 2vw, 1.5rem); }
+.replay-hud-combo {
+    top: 16px;
+    right: 24px;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+}
+
+.replay-hud-info {
+    position: absolute;
+    z-index: 2;
+    left: 24px;
+    bottom: 96px;
+    max-width: 60%;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+}
+.replay-hud-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+.replay-hud-sub { font-size: 0.8rem; opacity: 0.85; margin-top: 2px; }
+.replay-hud-tags { display: flex; gap: 6px; margin-top: 6px; pointer-events: auto; }
+
+.replay-hud-leaderboard {
+    position: absolute;
+    z-index: 2;
+    left: 24px;
+    top: 64px;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.replay-lb-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+.replay-lb-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex: none; }
+.replay-lb-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.replay-lb-score { font-variant-numeric: tabular-nums; opacity: 0.8; }
+.replay-lb-combo { font-variant-numeric: tabular-nums; width: 3.2em; text-align: right; }
+.replay-lb-current { color: #fff; font-weight: 700; }
+.replay-lb-current .replay-lb-name { color: var(--accent); }
+
+.replay-hud-stats {
+    position: absolute;
+    z-index: 2;
+    right: 24px;
+    top: 70px;
+    width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.replay-hud-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.65);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+.replay-hud-stat strong {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+}
+.replay-hp-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+    margin-top: 4px;
 }
 .replay-hp-fill {
     height: 100%;
@@ -977,29 +1058,117 @@ footer.site-footer {
     transition: width 120ms linear;
 }
 
-.replay-settings { margin-top: 14px; }
-.replay-settings summary { cursor: pointer; list-style: none; display: inline-flex; }
-.replay-settings summary::-webkit-details-marker { display: none; }
-.replay-settings summary::marker { content: ''; }
-.replay-settings-body {
+.replay-bottom-bar {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 14px 24px 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+}
+.replay-scrub-full {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--primary), rgba(255, 255, 255, 0.2));
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+.replay-scrub-full::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+.replay-scrub-full::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+}
+.replay-bottom-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.replay-play-btn {
+    min-width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.replay-speed-pills { display: flex; gap: 4px; }
+.replay-speed-pills button {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+.replay-speed-pills button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.replay-icon-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.76rem;
+    padding: 7px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.replay-skin-status { font-size: 0.76rem; color: rgba(255, 255, 255, 0.6); }
+
+.replay-settings-drawer {
+    position: absolute;
+    z-index: 4;
+    right: 24px;
+    bottom: 78px;
+    width: 220px;
+    background: rgba(10, 10, 22, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 14px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 10px;
-    font-size: 0.85rem;
-    color: var(--text-dim);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.75);
 }
-.replay-settings-body label { display: flex; align-items: center; gap: 8px; }
-.replay-settings-body input[type="range"] { flex: 1 1 auto; }
+.replay-settings-drawer label { display: flex; align-items: center; gap: 8px; }
+.replay-settings-drawer input[type="range"] { flex: 1 1 auto; }
+
+.replay-disclaimer-note { max-width: 1200px; margin: 14px auto 0; }
 
 /* Replay's own banana-rain default: off (the page is already visually
    busy) unless explicitly re-enabled via the visual-settings panel. */
 .page-replay .banana-rain { display: none; }
 .page-replay.show-banana-rain .banana-rain { display: block; }
 
-@media (max-width: 900px) {
-    .replay-layout { grid-template-columns: 1fr; max-width: 640px; }
-    .replay-main-col { order: -1; }
+@media (max-width: 640px) {
+    .replay-theater { height: calc(100vh - 130px); min-height: 420px; }
+    .replay-hud-leaderboard, .replay-hud-stats, .replay-hud-info { display: none; }
+    .replay-hud-combo { font-size: 1.6rem; }
+    .replay-bottom-controls { gap: 6px; }
+    .replay-settings-drawer { left: 12px; right: 12px; width: auto; }
 }
 
 /* ---------- BBCode editor ---------- */
