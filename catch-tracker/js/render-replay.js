@@ -65,7 +65,6 @@ const SKIN_FILES = {
 };
 const FRUIT_TYPE_CYCLE = ['apple', 'grapes', 'orange', 'pear'];
 
-const CATCH_LENIENCY = 10; // osu!pixels, roughly matches catch's small edge-catch allowance
 const HP_GAIN = 0.5;
 const HP_LOSS = 4;
 const POPUP_DURATION_MS = 600;
@@ -197,9 +196,30 @@ function clockRateForMods(mods) {
     return 1;
 }
 
-function catcherWidthFor(cs) {
-    const scale = 1 - 0.7 * ((cs ?? 5) - 5) / 5;
-    return Math.max(40, 106.75 * scale);
+// Confirmed against osu!lazer's real source this session (Catcher.cs +
+// LegacyRulesetExtensions.cs — no third-party site does catch skin/hitbox
+// positioning, so the game's own code is the only real reference):
+//   scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(cs)
+//         = (1 - 0.7*(cs-5)/5) / 2, doubled for the catcher's actual
+//           drawable scale — the /2 and *2 cancel, leaving this form.
+//   CATCHER_BASE_SIZE = Catcher.BASE_SIZE (106.75, confirmed exact).
+//   CATCHER_ALLOWED_CATCH_RANGE = Catcher.ALLOWED_CATCH_RANGE (0.8,
+//   confirmed exact) — only this fraction of the catcher's VISUAL width
+//   is the real judged hitbox; the plate looks wider than what actually
+//   counts for a catch. Previously this file used the visual width for
+//   judgement too (with a made-up +10px "leniency" fudge) — 25% too
+//   generous. Now visual and hit width are computed separately and
+//   correctly, with no invented fudge factor.
+function catcherScaleFor(cs) {
+    return 1 - 0.7 * ((cs ?? 5) - 5) / 5;
+}
+const CATCHER_BASE_SIZE = 106.75;
+const CATCHER_ALLOWED_CATCH_RANGE = 0.8;
+function catcherVisualWidth(cs) {
+    return Math.max(20, CATCHER_BASE_SIZE * catcherScaleFor(cs));
+}
+function catcherHitWidth(cs) {
+    return catcherVisualWidth(cs) * CATCHER_ALLOWED_CATCH_RANGE;
 }
 
 function catcherXAt(frames, t) {
@@ -217,8 +237,8 @@ function catcherXAt(frames, t) {
     return a.x + (b.x - a.x) * frac;
 }
 
-function computeJudgements(items, frames, catcherWidth) {
-    const halfWidth = catcherWidth / 2 + CATCH_LENIENCY;
+function computeJudgements(items, frames, catcherHitWidthPx) {
+    const halfWidth = catcherHitWidthPx / 2;
     for (const it of items) {
         it.caught = Math.abs(catcherXAt(frames, it.time) - it.x) <= halfWidth;
     }
@@ -250,7 +270,114 @@ function saveSettings(s) {
 
 const COLORS = { fruit: '#fb5a8c', droplet: '#60a5fa', tiny: '#93c5fd', banana: '#facc15' };
 
-/* ---------- skin import (opt-in, client-side only) ---------- */
+/* ---------- skin import (opt-in, client-side only) ----------
+   Three techniques below were confirmed this session by downloading and
+   reading mania-tracker.com's actual replay-skin-import bundle — their
+   code has ZERO catch-mode logic (verified: no fruit-/CatchTheBeat/
+   HyperDash/CatcherWidth strings anywhere, every "catch" match was just
+   JS's own try/catch syntax — mania-tracker never built catch support, so
+   there's nothing catch-specific to port), but three mode-agnostic
+   techniques from it are worth adopting regardless: the onload/decoding
+   hint pairing, capping oversized source textures, and persisting the
+   imported skin so a visitor doesn't have to re-upload every visit. */
+
+const MAX_SPRITE_TEXTURE = 1024; // sprites are drawn small on screen here; no need for their 4096/2048 device-tiered cap
+const SKIN_DB_NAME = 'ct-replay-skin';
+const SKIN_DB_STORE = 'skins';
+const SKIN_DB_KEY = 'last';
+
+function spriteSize(sprite) {
+    return { w: sprite.naturalWidth || sprite.width || 1, h: sprite.naturalHeight || sprite.height || 1 };
+}
+
+function downscaleToCanvas(img, maxSize) {
+    const scale = Math.min(1, maxSize / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas;
+}
+
+// The load event (not img.decode()) — found live that decode() can hang
+// indefinitely (never resolves OR rejects) on a real skin sprite while the
+// tab is backgrounded, silently stalling the whole skin forever with no
+// error surfaced. The classic load/error events fire reliably regardless
+// of tab visibility, so the 5s timeout here is just a safety net.
+function loadOneSprite(bytes) {
+    return new Promise((resolve, reject) => {
+        const blob = new Blob([bytes], { type: 'image/png' });
+        const img = new Image();
+        img.decoding = 'async';
+        const timer = setTimeout(() => reject(new Error('sprite load timed out')), 5000);
+        img.onload = () => {
+            clearTimeout(timer);
+            const oversized = img.naturalWidth > MAX_SPRITE_TEXTURE || img.naturalHeight > MAX_SPRITE_TEXTURE;
+            resolve(oversized ? downscaleToCanvas(img, MAX_SPRITE_TEXTURE) : img);
+        };
+        img.onerror = () => { clearTimeout(timer); reject(new Error('sprite failed to decode')); };
+        img.src = URL.createObjectURL(blob);
+    });
+}
+
+async function decodeSpritesFromBytes(rawBytesByKey) {
+    const sprites = {};
+    await Promise.all(Object.entries(rawBytesByKey).map(async ([key, bytes]) => {
+        try { sprites[key] = await loadOneSprite(bytes); } catch { /* keep procedural fallback for this one */ }
+    }));
+    return sprites;
+}
+
+function openSkinDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(SKIN_DB_NAME, 1);
+        req.onupgradeneeded = () => { req.result.createObjectStore(SKIN_DB_STORE); };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+// Persistence is purely a convenience (skip re-uploading next visit) —
+// every call site treats a failure here as a no-op, never a hard error.
+async function saveSkinToDB(rawBytesByKey) {
+    try {
+        const db = await openSkinDB();
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction(SKIN_DB_STORE, 'readwrite');
+            tx.objectStore(SKIN_DB_STORE).put(rawBytesByKey, SKIN_DB_KEY);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+    } catch { /* not fatal — the skin just won't be there next visit */ }
+}
+
+async function loadSkinBytesFromDB() {
+    try {
+        const db = await openSkinDB();
+        const result = await new Promise((resolve, reject) => {
+            const req = db.transaction(SKIN_DB_STORE, 'readonly').objectStore(SKIN_DB_STORE).get(SKIN_DB_KEY);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+        db.close();
+        return result || null;
+    } catch { return null; }
+}
+
+async function clearSkinDB() {
+    try {
+        const db = await openSkinDB();
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction(SKIN_DB_STORE, 'readwrite');
+            tx.objectStore(SKIN_DB_STORE).delete(SKIN_DB_KEY);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+    } catch { /* nothing to clean up if this fails */ }
+}
+
 async function loadSkinSprites(file) {
     const { unzipSync } = await import(FFLATE_URL);
     const buf = new Uint8Array(await file.arrayBuffer());
@@ -269,29 +396,14 @@ async function loadSkinSprites(file) {
         if (!byBase[base] || (isHiRes && !byBase[base].isHiRes)) byBase[base] = { bytes, isHiRes };
     }
 
-    // The load event (not img.decode()) — found live that decode() can hang
-    // indefinitely (never resolves OR rejects) on a real skin sprite while
-    // the tab is backgrounded, silently stalling the whole skin forever
-    // with no error surfaced. The classic load/error events fire reliably
-    // regardless of tab visibility, so a 5s timeout here is just a safety
-    // net, not the primary mechanism.
-    function loadOneSprite(bytes) {
-        return new Promise((resolve, reject) => {
-            const blob = new Blob([bytes], { type: 'image/png' });
-            const img = new Image();
-            const timer = setTimeout(() => reject(new Error('sprite load timed out')), 5000);
-            img.onload = () => { clearTimeout(timer); resolve(img); };
-            img.onerror = () => { clearTimeout(timer); reject(new Error('sprite failed to decode')); };
-            img.src = URL.createObjectURL(blob);
-        });
+    const rawBytesByKey = {};
+    for (const [key, base] of Object.entries(SKIN_FILES)) {
+        const entry = byBase[base];
+        if (entry) rawBytesByKey[key] = entry.bytes;
     }
 
-    const sprites = {};
-    await Promise.all(Object.entries(SKIN_FILES).map(async ([key, base]) => {
-        const entry = byBase[base];
-        if (!entry) return;
-        try { sprites[key] = await loadOneSprite(entry.bytes); } catch { /* keep procedural fallback for this one */ }
-    }));
+    const sprites = await decodeSpritesFromBytes(rawBytesByKey);
+    saveSkinToDB(rawBytesByKey); // best-effort, not awaited — never blocks showing the skin
     return sprites;
 }
 
@@ -407,7 +519,8 @@ class ReplayPlayer {
                 // this stays correct for a skin whose art isn't (e.g. a
                 // taller banana), instead of distorting it.
                 const box = size * 2.4;
-                const aspect = (sprite.naturalWidth || 1) / (sprite.naturalHeight || 1);
+                const spriteWH = spriteSize(sprite);
+                const aspect = spriteWH.w / spriteWH.h;
                 let dw = box, dh = box / aspect;
                 if (dh > box) { dh = box; dw = box * aspect; }
                 ctx.drawImage(sprite, px - dw / 2, y - dh / 2, dw, dh);
@@ -444,7 +557,8 @@ class ReplayPlayer {
             // bottom of the theater, same as real gameplay framing).
             const boxW = cw * 1.15;
             const boxH = h * 0.16;
-            const aspect = (catcherSprite.naturalWidth || 1) / (catcherSprite.naturalHeight || 1);
+            const catcherWH = spriteSize(catcherSprite);
+            const aspect = catcherWH.w / catcherWH.h;
             let spriteW = boxW, spriteH = boxW / aspect;
             if (spriteH > boxH) { spriteH = boxH; spriteW = boxH * aspect; }
             ctx.drawImage(catcherSprite, catcherX - spriteW / 2, catchLineY - spriteH * 0.06, spriteW, spriteH);
@@ -698,8 +812,8 @@ async function run() {
             return;
         }
 
-        const catcherWidth = catcherWidthFor(cs);
-        computeJudgements(items, frames, catcherWidth);
+        const catcherWidth = catcherVisualWidth(cs);
+        computeJudgements(items, frames, catcherHitWidth(cs));
 
         const settings = loadSettings();
         setStatus(theaterHtml(meta));
@@ -804,6 +918,22 @@ async function run() {
             skinInput.value = '';
             skinStatus.textContent = '';
             skinClearBtn.hidden = true;
+            clearSkinDB();
+        });
+
+        // Auto-load a previously-imported skin (IndexedDB) so a visitor
+        // doesn't have to re-upload every visit — best-effort, silently
+        // does nothing if there's no cached skin or it fails to decode.
+        loadSkinBytesFromDB().then(async rawBytesByKey => {
+            if (!rawBytesByKey) return;
+            try {
+                const sprites = await decodeSpritesFromBytes(rawBytesByKey);
+                if (Object.keys(sprites).length) {
+                    player.setSprites(sprites);
+                    skinStatus.textContent = t('replay_skin_loaded', { n: Object.keys(sprites).length });
+                    skinClearBtn.hidden = false;
+                }
+            } catch { /* cached skin is a convenience — a decode failure just means no skin applied */ }
         });
 
         settingsDrawer.innerHTML = settingsDrawerHtml(settings);
