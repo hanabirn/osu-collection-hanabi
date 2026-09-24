@@ -9,3 +9,7 @@ js/i18n/zh-Hans.js
 .eslintcache
 *.tsbuildinfo
 .vite/
+
+# Cloudflare Wrangler 的本機模擬器狀態與快取
+.wrangler
+worker/vendor/

@@ -7,7 +7,15 @@
    (NETLIFY_BLOBS_SITE_ID = Project ID from Netlify's Site configuration >
    General > Project information; NETLIFY_BLOBS_TOKEN = a personal access
    token from User settings > Applications > New access token). */
-const { getStore } = require('@netlify/blobs');
+const { getStore: netlifyGetStore } = require('@netlify/blobs');
+const { getCloudflareStore } = require('./_cf-store');
+
+/* 在 Cloudflare Workers 上跑時換成 KV/R2 的替身（介面相同，見 _cf-store.js）；
+   在 Netlify 上 getCloudflareStore() 回 null，走原本的 Blobs 路徑不變。
+   下面 14 個 getXStore() 因此一行都不用改，舊站也仍然部署得動。 */
+function getStore(opts) {
+    return getCloudflareStore(opts.name) ?? netlifyGetStore(opts);
+}
 
 function getCollectionsStore() {
     return getStore({

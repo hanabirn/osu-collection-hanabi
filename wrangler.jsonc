@@ -1,0 +1,61 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "osu-collection-hanabi",
+    "main": "worker/index.js",
+    "compatibility_date": "2026-09-23",
+    // nodejs_compat 是必要的：移植過來的函式用了 node:zlib（gzip 資料集）、
+    // node:crypto（推播金鑰雜湊、簽章）、Buffer 與 node:async_hooks（env 傳遞）。
+    "compatibility_flags": ["nodejs_compat"],
+
+    // 靜態網站仍由同一個 Worker 提供；沒對到路由的請求就交給 ASSETS。
+    // run_worker_first 預設 false，代表靜態檔優先，找不到才進 Worker——
+    // 但我們的函式路徑（/.netlify/functions/*）不會有同名靜態檔，所以安全。
+    "assets": {
+        "directory": "dist",
+        "binding": "ASSETS",
+    },
+
+    "observability": {
+        "enabled": true,
+    },
+
+    // osu-parsers 的 package.json exports 只在 "node" 條件下提供 require 入口，
+    // 而 Workers 的打包用的是瀏覽器條件，於是 require('osu-parsers') 解析不到。
+    // 直接指向它的 CJS 檔：裡面只用到 node:path（nodejs_compat 有提供），
+    // 且 replay-analyze 只呼叫 decodeFromBuffer / decodeFromString 這類純記憶體
+    // 操作，沒有檔案 I/O，所以行為與 Netlify 上完全一致。
+    "alias": {
+        "osu-parsers": "./netlify/functions/node_modules/osu-parsers/lib/node.cjs",
+        // rosu-pp-js 原版在模組載入時就 fs.readFileSync 它的 WASM，Workers 會直接
+        // 炸 ReferenceError: __dirname is not defined。指向建置期產生的修補版，
+        // 那份只換掉 WASM 載入方式（見 scripts/patch-rosu-wasm.mjs）。
+        "rosu-pp-js": "./worker/vendor/rosu-pp-js.js",
+    },
+
+    // 小型 JSON 資料。繫結名稱對應 _cf-store.js 的 KV_BINDINGS。
+    "kv_namespaces": [
+        { "binding": "KV_COLLECTIONS", "id": "f06a9a80e79743d5ab85729e156b2d36" },
+        { "binding": "KV_CHAT", "id": "a5e17c7db39d4191a205bcbf64753c5b" },
+        { "binding": "KV_DM", "id": "aab84b63edc843a284bc09cc92ec6782" },
+        { "binding": "KV_GALLERY_COMMENTS", "id": "982fe035e5074fa2b285425fe946007d" },
+        { "binding": "KV_COMMUNITY_MAPPOOLS", "id": "5f947c14a7954f258c10af5134b189f2" },
+        { "binding": "KV_WC_MAPPOOLS", "id": "e274418d43f04defb96adf58266cc401" },
+        { "binding": "KV_GAMES", "id": "f576956bed6d438ea35ea909d29ea131" },
+        { "binding": "KV_DISCORD_BOT", "id": "f081cbc7e5d943a2987f2a3e7b575101" },
+        { "binding": "KV_SITE_STATS", "id": "f70308caa4b244529fb59f7b6f0513af" },
+        { "binding": "KV_PUSH_SUBS", "id": "b8d4b54f77cf447f9adc898d52fe13d3" },
+        // 回應快取，補 Cache API 在 workers.dev 上無效的洞（見 worker/response-cache.js）
+        { "binding": "KV_RESP_CACHE", "id": "46b04544b0424429b1b52d1f024c331b" },
+    ],
+
+    // 大型資料集與二進位。dataset:osu 已 14.2 MiB 且會隨新圖上架成長，
+    // 超過 KV 的 25 MiB 單值上限只是時間問題，所以放 R2。
+    // 繫結名稱對應 _cf-store.js 的 R2_BINDINGS。
+    "r2_buckets": [
+        { "binding": "R2_CATALOG", "bucket_name": "osu-catalog" },
+        { "binding": "R2_FARM_MAPS", "bucket_name": "osu-farm-maps" },
+        { "binding": "R2_CHAT_MEDIA", "bucket_name": "osu-media" },
+        { "binding": "R2_SKIN_BACKUPS", "bucket_name": "osu-skin-backups" },
+        { "binding": "R2_SKIN_SCREENSHOTS", "bucket_name": "osu-skin-screenshots" },
+    ],
+}

@@ -3,7 +3,13 @@
    can't rely on @netlify/blobs' automatic env injection). One entry per
    push subscription, keyed by a hash of its endpoint. */
 const crypto = require('crypto');
-const { getStore } = require('@netlify/blobs');
+const { getStore: netlifyGetStore } = require('@netlify/blobs');
+const { getCloudflareStore } = require('./_cf-store');
+
+/* 同 _blobs-store.js：Workers 上換 KV，Netlify 上維持原樣。 */
+function getStore(opts) {
+    return getCloudflareStore(opts.name) ?? netlifyGetStore(opts);
+}
 
 function getPushStore() {
     return getStore({

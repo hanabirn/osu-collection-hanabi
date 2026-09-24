@@ -2,10 +2,14 @@
    records with just the fields the client needs to run rounds locally
    (SR / BPM / length / farm-PP / playcount). No auth, no state — the client
    keeps the streak; a personal best is stored via games-daily's streak
-   endpoint pattern only if we add a leaderboard later. Reads the whole
-   `dataset:osu` blob once per call (same as farm-maps-list). */
+   endpoint pattern only if we add a leaderboard later.
+
+   讀的是爬蟲預先算好的精簡切片（見 _farm-views.js），不是整包
+   dataset:<mode>。原本每次請求都要解壓並解析 46.8 MB、對 45,553 筆洗牌，
+   只為了回傳 60 筆 —— 在 Cloudflare Workers 免費版的 10ms CPU 額度下，
+   實測 8 次有 7 次回 error 1102。現在只讀一片（約 92 KB）。 */
 const { getFarmMapsStore } = require('./_blobs-store');
-const { getJSONGz } = require('./_blob-json');
+const { hiloMetaKey, hiloShardKey } = require('./_farm-views');
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 const BATCH = 60;
@@ -16,39 +20,34 @@ exports.handler = async (event) => {
 
     try {
         const store = getFarmMapsStore();
-        const dataset = (await getJSONGz(store, 'dataset:osu')) || [];
+        const mode = 'osu';
 
-        const pool = [];
-        for (const r of dataset) {
-            const sr = r.stars && Number.isFinite(r.stars.NM) ? r.stars.NM : null;
-            const pp = r.pp && Number.isFinite(r.pp.NM) ? r.pp.NM : null;
-            const plays = (r.farmSignal && r.farmSignal.playcount) || 0;
-            if (!r.beatmapset_id || !r.title || !r.bpm || !r.total_length || sr == null || pp == null || plays <= 0) continue;
-            pool.push({
-                setId: r.beatmapset_id,
-                bid: r.beatmap_id || null,
-                artist: r.artist || '',
-                title: r.title || '',
-                creator: r.creator || '',
-                version: r.version || '',
-                sr: Math.round(sr * 100) / 100,
-                bpm: Math.round(r.bpm),
-                len: r.total_length,
-                pp: Math.round(pp),
-                plays,
-            });
+        const meta = await store.get(hiloMetaKey(mode), { type: 'json' });
+        if (!meta || !meta.shardCount) {
+            /* 切片還沒產生（爬蟲尚未跑過新版）。回 503 而不是 500：
+               這是「暫時還沒準備好」，不是程式錯誤。 */
+            return {
+                statusCode: 503,
+                headers: { ...CORS, 'Cache-Control': 'no-store', 'Retry-After': '600' },
+                body: JSON.stringify({ error: 'hilo pool not built yet' }),
+            };
         }
 
-        // Fisher–Yates, take a batch.
-        for (let i = pool.length - 1; i > 0; i--) {
+        /* 切片在產生時已經全域洗過牌，所以任一片都是全域隨機樣本；
+           每次隨機挑一片，跨請求就有變化。 */
+        const index = Math.floor(Math.random() * meta.shardCount);
+        const shard = (await store.get(hiloShardKey(mode, index), { type: 'json' })) || [];
+
+        const rounds = shard.slice();
+        for (let i = rounds.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [pool[i], pool[j]] = [pool[j], pool[i]];
+            [rounds[i], rounds[j]] = [rounds[j], rounds[i]];
         }
 
         return {
             statusCode: 200,
             headers: { ...CORS, 'Cache-Control': 'no-store' },
-            body: JSON.stringify({ rounds: pool.slice(0, BATCH), poolSize: pool.length }),
+            body: JSON.stringify({ rounds: rounds.slice(0, BATCH), poolSize: meta.poolSize }),
         };
     } catch (e) {
         return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: e.message }) };

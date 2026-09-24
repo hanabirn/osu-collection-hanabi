@@ -27,6 +27,7 @@ const rosu = require('rosu-pp-js');
 const { getOsuToken } = require('./_osu-auth');
 const { getFarmMapsStore } = require('./_blobs-store');
 const { setJSONGz, getJSONGz } = require('./_blob-json');
+const { writeHiloShards } = require('./_farm-views');
 const {
     STAR_FLOOR, MOD_COMBOS, COMPUTE_ACCURACY, MODE_NUM, MODES,
     FARM_MIN_SAMPLE, farmThresholdForStars, farmPlaycountFloor,
@@ -341,6 +342,15 @@ async function runCrawlBatch(mode, budgetMs) {
     }
 
     if (writeOk) {
+        /* dataset 落地後順便更新 games-hilo 的精簡切片。
+           失敗不讓整次爬取回滾：切片是衍生資料，下一輪會重建，而且
+           games-hilo 讀不到切片時回 503（暫時無法服務）而非壞掉。 */
+        try {
+            await writeHiloShards(store, mode, dataset);
+        } catch (err) {
+            error = `${error ? error + '; ' : ''}hilo shards write failed: ${err.message}`;
+        }
+
         state.lastRunAt = now;
         state.lastOkAt = now;
         state.lastError = error;

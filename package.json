@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "http-server . -p 8080 -c-1 --silent",
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs && node scripts/gen-worker-routes.mjs && node scripts/patch-rosu-wasm.mjs",
     "discord:register": "node scripts/register-discord-commands.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
