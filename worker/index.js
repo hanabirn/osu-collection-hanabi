@@ -19,7 +19,7 @@ import rosuWasmModule from '../netlify/functions/node_modules/rosu-pp-js/rosu_pp
 globalThis.__ROSU_WASM_MODULE__ = rosuWasmModule;
 
 const { runWithEnv } = require('../netlify/functions/_cf-env');
-const { ROUTES } = require('./routes');
+const { ROUTES, CRON_HANDLERS } = require('./routes');
 const {
     EXPENSIVE_MS,
     parseMaxAge,
@@ -70,7 +70,34 @@ function resolveRoute(url) {
     return null;
 }
 
+/* cron 運算式 -> 要跑的排程函式。必須與 wrangler.jsonc 的 triggers.crons
+   逐字一致，Cloudflare 是用字串比對把 event.cron 傳回來的。
+   原本的排程宣告在 netlify.toml 的 [functions."<name>"] schedule。 */
+const CRON_SCHEDULE = {
+    '*/10 * * * *': 'farm-crawl-cron',
+    '*/30 * * * *': 'catalog-crawl-cron',
+    '0 */6 * * *': 'community-mappools-crawl-cron',
+    '0 6 * * 1': 'wc-mappool-crawl-cron',
+};
+
 export default {
+    async scheduled(event, env, ctx) {
+        const name = CRON_SCHEDULE[event.cron];
+        const handler = name && CRON_HANDLERS[name];
+        if (!handler) {
+            console.error('沒有對應的排程處理器:', event.cron);
+            return;
+        }
+        try {
+            /* 排程函式原本就是無參數的 exports.handler，回傳 Lambda 形狀的
+               物件；這裡只取它的結果寫 log，沒有 HTTP 回應要送。 */
+            const result = await runWithEnv(env, ctx, () => handler());
+            console.log(`排程 ${name} 完成:`, result?.statusCode, String(result?.body ?? '').slice(0, 300));
+        } catch (err) {
+            console.error(`排程 ${name} 失敗:`, err?.stack || err);
+        }
+    },
+
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
 
