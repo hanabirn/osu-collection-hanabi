@@ -1,6 +1,6 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
- * 端點數: 66
- * 排除: 排程 5 個（階段 4 改走 scheduled handler）、
+ * 端點數: 60
+ * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
  *       Discord 3 個（延後）、死程式碼 1 個
  */
 const { adapt } = require('./adapter');
@@ -29,16 +29,10 @@ const ROUTES = {
     "dm-read": adapt(require('../netlify/functions/dm-read').handler),
     "dm-send": adapt(require('../netlify/functions/dm-send').handler),
     "embed-collection": adapt(require('../netlify/functions/embed-collection').handler),
-    "farm-crawl-run": adapt(require('../netlify/functions/farm-crawl-run').handler),
-    "farm-maps-list": adapt(require('../netlify/functions/farm-maps-list').handler),
     "gallery-comments-delete": adapt(require('../netlify/functions/gallery-comments-delete').handler),
     "gallery-comments-list": adapt(require('../netlify/functions/gallery-comments-list').handler),
     "gallery-comments-post": adapt(require('../netlify/functions/gallery-comments-post').handler),
     "gallery-feed": adapt(require('../netlify/functions/gallery-feed').handler),
-    "games-daily": adapt(require('../netlify/functions/games-daily').handler),
-    "games-hilo": adapt(require('../netlify/functions/games-hilo').handler),
-    "games-leaderboard": adapt(require('../netlify/functions/games-leaderboard').handler),
-    "games-quiz": adapt(require('../netlify/functions/games-quiz').handler),
     "og-collection": adapt(require('../netlify/functions/og-collection').handler),
     "osekai-medals": adapt(require('../netlify/functions/osekai-medals').handler),
     "osu": adapt(require('../netlify/functions/osu').handler),
@@ -78,7 +72,6 @@ const ROUTES = {
 const CRON_HANDLERS = {
     "catalog-crawl-cron": require('../netlify/functions/catalog-crawl-cron').handler,
     "community-mappools-crawl-cron": require('../netlify/functions/community-mappools-crawl-cron').handler,
-    "farm-crawl-cron": require('../netlify/functions/farm-crawl-cron').handler,
     "push-cron": require('../netlify/functions/push-cron').handler,
     "wc-mappool-crawl-cron": require('../netlify/functions/wc-mappool-crawl-cron').handler,
 };

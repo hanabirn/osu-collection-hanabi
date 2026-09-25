@@ -82,7 +82,7 @@ I18N.ja = {
     hero_pitch: 'osu! のコレクションをまとめて整理：ゲームから取り込み、スコアからカテゴリを自動生成、ゲームへそのまま書き出し。',
     hero_feat_import: 'ゲームの collection.db／.osdb を取り込み', hero_feat_generate: 'osu! アカウントからカテゴリを生成', hero_feat_share: 'コレクションを共有（プレビューカード付き）',
     hero_stat_collections: '公開コレクション {n} 件', hero_stat_likes: '❤ {n}',
-    hero_stat_farm: 'farm データベースに {n}+ 譜面',
+    hero_stat_farm: '譜面インデックス {n}+ 件',
     hero_v2_stat: '{n} 譜面 · {c} 分類',
     hero_login_cta: 'osu! でログインしてお気に入りを取り込む',
     digest_title: 'あなたへの更新',

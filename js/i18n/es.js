@@ -82,7 +82,7 @@ I18N.es = {
     hero_pitch: 'Un solo lugar para organizar tu colección de osu!: importa desde el juego, crea categorías según tus scores y exporta de vuelta al juego.',
     hero_feat_import: 'Importar el collection.db / .osdb del juego', hero_feat_generate: 'Crear categorías desde tu cuenta de osu!', hero_feat_share: 'Comparte colecciones (con tarjetas de vista previa)',
     hero_stat_collections: '{n} colecciones públicas', hero_stat_likes: '❤ {n}',
-    hero_stat_farm: '{n}+ mapas en la base farm',
+    hero_stat_farm: '{n}+ mapas indexados',
     hero_v2_stat: '{n} sets · {c} categorías',
     hero_login_cta: 'Inicia sesión con osu! para traer tus favoritos',
     digest_title: 'Desde tu última visita',

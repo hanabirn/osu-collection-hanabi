@@ -200,11 +200,9 @@
         </div>
         <div class="nav-drawer-group">
             <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
-            <button class="site-nav-btn" onclick="switchTab('farm-maps', this)" data-i18n="nav_farm_maps">Farm 圖</button>
             <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
             <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
             <button class="site-nav-btn" onclick="switchTab('cmpool', this)" data-i18n="nav_cmpool">社群賽圖分享</button>
-            <button class="site-nav-btn" onclick="switchTab('games', this)" data-i18n="nav_games">小遊戲</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
             <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
             <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
@@ -240,7 +238,6 @@
     <button class="site-topnav-btn" data-tab="public-collections" onclick="switchTab('public-collections', this)" data-i18n="nav_public_collections">收藏廣場</button>
     <button class="site-topnav-btn" data-tab="lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
     <button class="site-topnav-btn" data-tab="chat" onclick="switchTab('chat', this)" data-i18n="nav_chat">聊天室</button>
-    <button class="site-topnav-btn" data-tab="games" onclick="switchTab('games', this)" data-i18n="nav_games">小遊戲</button>
     <button class="site-topnav-btn site-topnav-more" onclick="openNavDrawer()" data-icon="menu" data-icon-gap><span data-i18n="nav_more">更多</span></button>
 </nav>
 
@@ -397,11 +394,6 @@
                     <span class="explore-card-t" data-i18n="nav_lookup">PP 查詢</span>
                     <span class="explore-card-d" data-i18n="explore_lookup_d">查你的總 PP、每日進步曲線、和朋友比較</span>
                 </button>
-                <button class="explore-card" onclick="switchTab('farm-maps')">
-                    <span class="explore-card-icon" data-icon="target"></span>
-                    <span class="explore-card-t" data-i18n="nav_farm_maps">Farm 圖</span>
-                    <span class="explore-card-d" data-i18n="explore_farm_d">依你分段整理的高 pp farm 圖清單</span>
-                </button>
                 <button class="explore-card" onclick="switchTab('public-collections')">
                     <span class="explore-card-icon" data-icon="globe"></span>
                     <span class="explore-card-t" data-i18n="nav_public_collections">收藏廣場</span>
@@ -463,55 +455,6 @@
 
         <div id="public-collections-list" class="osu-collection"></div>
         <div id="public-collections-pagination" class="osu-pagination"></div>
-    </section>
-
-    <section id="page-farm-maps" class="site-page" style="display:none;">
-        <h2 class="osu-page-title" data-i18n="farm_page_title">Farm 圖</h2>
-        <p class="tournaments-hint" data-i18n="farm_hint">依 PP／星等／BPM／Mod 篩選 ranked 圖池，PP 由本站自行計算（非估算，採 SS 成績），資料庫仍在持續擴充中，可能尚未涵蓋全部 ranked 圖。</p>
-
-        <div class="osu-mode-tabs" id="farm-mode-tabs">
-            <button class="osu-tab active" onclick="switchFarmMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
-            <button class="osu-tab" onclick="switchFarmMode('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
-            <button class="osu-tab" onclick="switchFarmMode('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
-            <button class="osu-tab" onclick="switchFarmMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
-        </div>
-
-        <div class="osu-mode-tabs" id="farm-mods-tabs">
-            <button class="osu-tab active" onclick="switchFarmMods('NM', this)">NM</button>
-            <button class="osu-tab" onclick="switchFarmMods('DT', this)">DT</button>
-            <button class="osu-tab" onclick="switchFarmMods('HD', this)">HD</button>
-            <button class="osu-tab" onclick="switchFarmMods('HDDT', this)">HDDT</button>
-            <button class="osu-tab" onclick="switchFarmMods('HR', this)">HR</button>
-            <button class="osu-tab" onclick="switchFarmMods('HDHR', this)">HDHR</button>
-        </div>
-
-        <div class="osu-search-row">
-            <input type="text" id="farm-search-input" autocomplete="off" data-i18n-placeholder="farm_search_placeholder" placeholder="搜尋曲名或作者..." oninput="searchFarmMaps(this.value)">
-            <select id="farm-sort-select" onchange="switchFarmSort(this.value)">
-                <option value="pp_desc" data-i18n="farm_sort_pp_desc">PP 高到低</option>
-                <option value="pp_asc" data-i18n="farm_sort_pp_asc">PP 低到高</option>
-                <option value="star_desc" data-i18n="farm_sort_star_desc">星等高到低</option>
-                <option value="star_asc" data-i18n="farm_sort_star_asc">星等低到高</option>
-                <option value="bpm_desc" data-i18n="farm_sort_bpm_desc">BPM 高到低</option>
-                <option value="length_desc" data-i18n="farm_sort_length_desc">長度長到短</option>
-                <option value="new_desc" data-i18n="farm_sort_new_desc">最新收錄</option>
-            </select>
-            <label class="gallery-liked-only-label" data-i18n-title="farm_only_toggle_title" title="osu!／taiko：Top 50 中 DT 佔比 ≥ 70%；catch／mania：Top 50 中 100% acc 佔比 ≥ 70%（皆需遊玩次數 ≥ 500）">
-                <input type="checkbox" id="farm-only-checkbox" checked onchange="toggleFarmOnly(this.checked)">
-                <span data-i18n="farm_only_toggle">🔥 只看農圖</span>
-            </label>
-        </div>
-
-        <div class="farm-range-row">
-            <label class="farm-range-field"><span>PP</span><input type="number" id="farm-pp-min" placeholder="min" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-pp-max" placeholder="max" oninput="debounceFarmFilters()"></label>
-            <label class="farm-range-field"><span>★</span><input type="number" id="farm-star-min" placeholder="min" step="0.1" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-star-max" placeholder="max" step="0.1" oninput="debounceFarmFilters()"></label>
-            <label class="farm-range-field"><span>BPM</span><input type="number" id="farm-bpm-min" placeholder="min" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-bpm-max" placeholder="max" oninput="debounceFarmFilters()"></label>
-            <label class="farm-range-field"><span data-i18n="farm_filter_length">秒</span><input type="number" id="farm-length-min" placeholder="min" oninput="debounceFarmFilters()"><span>~</span><input type="number" id="farm-length-max" placeholder="max" oninput="debounceFarmFilters()"></label>
-        </div>
-
-        <div id="farm-coverage" class="farm-coverage"></div>
-        <div id="farm-maps-list" class="osu-collection"></div>
-        <div id="farm-maps-pagination" class="osu-pagination"></div>
     </section>
 
     <section id="page-catalog" class="site-page" style="display:none;">
@@ -633,14 +576,6 @@
         <div id="cmpool-list" class="cmpool-grid"></div>
         <div id="cmpool-pagination" class="osu-pagination"></div>
         <div id="cmpool-detail" hidden></div>
-    </section>
-
-    <section id="page-games" class="site-page" style="display:none;">
-        <p class="eyebrow">PLAY</p>
-        <h2 class="osu-page-title" data-i18n="games_page_title">小遊戲</h2>
-        <p class="tournaments-hint" data-i18n="games_hint">用站上的曲庫與 Farm 資料玩的小遊戲。喜歡的圖可以（詢問後）加進你的收藏。</p>
-        <div id="games-hub" class="games-hub"></div>
-        <div id="games-view" hidden></div>
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
@@ -1189,31 +1124,6 @@
 
         <hr class="collection-io-sep">
 
-        <p class="pp-calc-hint" data-i18n="practice_hint">依你的成績生成練習收藏（需登入）。突破分／目標圖池吃 farm 資料庫（5.5★ 以上）；低準度／相似圖吃你自己的成績，任何分段都能用。</p>
-        <div class="ctools-practice-row">
-            <select id="ctools-practice-mods" class="ctools-practice-mods" aria-label="mods">
-                <option value="NM">NM</option>
-                <option value="HD">HD</option>
-                <option value="HR">HR</option>
-                <option value="DT">DT</option>
-            </select>
-            <button class="btn" onclick="generatePracticeCollection('push')" data-i18n="practice_gen_push">突破分</button>
-            <button class="btn" onclick="generatePracticeCollection('goal')" data-i18n="practice_gen_goal">目標圖池</button>
-        </div>
-        <label class="ctools-practice-precise">
-            <input type="checkbox" id="ctools-practice-precise">
-            <span data-i18n="practice_precise_label">精算 pp（較慢）</span>
-        </label>
-        <div class="ctools-practice-row">
-            <button class="btn" onclick="generatePracticeCollection('lowacc')" data-i18n="practice_gen_lowacc">低準度重練</button>
-            <button class="btn" onclick="generatePracticeCollection('taste')" data-i18n="practice_gen_taste">沒打過的相似圖</button>
-            <button class="btn" onclick="generatePracticeCollection('weak')" data-i18n="practice_gen_weak">弱項</button>
-        </div>
-        <div id="ctools-practice-status" class="status"></div>
-        <div id="ctools-practice-progress"></div>
-
-        <hr class="collection-io-sep">
-
         <p class="pp-calc-hint" data-i18n="ctools_health_hint">掃描收藏，找出重複、已被刪除、非 ranked、難度數量有變的圖。</p>
         <button class="btn" onclick="runCollectionHealthCheck()" data-i18n="ctools_health_scan">掃描收藏</button>
         <div id="ctools-health-results"></div>
@@ -1310,11 +1220,9 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/replay-analyze.js"></script>
 <script defer src="js/public-collections.js"></script>
 <script defer src="js/gallery-comments.js"></script>
-<script defer src="js/farm-maps.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>
-<script defer src="js/games.js"></script>
 <script defer src="js/trending.js"></script>
 <script defer src="js/global-search.js"></script>
 <script defer src="js/skins.js"></script>

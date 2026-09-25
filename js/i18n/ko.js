@@ -82,7 +82,7 @@ I18N.ko = {
     hero_pitch: 'osu! 컬렉션을 한곳에서 정리: 게임에서 가져오고, 점수로 카테고리를 자동 생성하고, 게임으로 바로 내보내기.',
     hero_feat_import: '게임의 collection.db / .osdb 가져오기', hero_feat_generate: 'osu! 계정에서 카테고리 생성', hero_feat_share: '컬렉션 공유 (미리보기 카드 포함)',
     hero_stat_collections: '공개 컬렉션 {n}개', hero_stat_likes: '❤ {n}',
-    hero_stat_farm: 'farm 데이터베이스에 {n}+ 맵',
+    hero_stat_farm: '비트맵 색인 {n}+개',
     hero_v2_stat: '{n}개 맵 · {c}개 분류',
     hero_login_cta: 'osu!로 로그인하고 즐겨찾기 가져오기',
     digest_title: '새 소식',
