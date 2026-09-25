@@ -241,7 +241,7 @@ I18N.fr = {
     cdn_lib_fail: 'Échec du chargement d\'un composant externe — vérifiez votre connexion et réessayez',
     nav_catalog: 'Catalogue', explore_catalog_d: 'Parcourez tout le catalogue ranked par artiste / langue / genre — une collection en un clic',
     catalog_page_title: 'Catalogue',
-    catalog_hint: 'Parcourez tout le catalogue ranked par artiste / langue / genre / source / feat. Choisissez un critère et transformez-le en catégorie de collection en un clic. L\'index est construit par le crawler en arrière-plan du site et ne couvre pas encore toutes les maps ranked.',
+    catalog_hint: 'Parcourez le catalogue ranked et loved par artiste / langue / genre / source / feat. Choisissez un critère et transformez-le en catégorie de collection en un clic. L\'index est construit par le crawler en arrière-plan du site et ne couvre pas encore toutes les maps ranked.',
     catalog_search_placeholder: 'Rechercher titre / artiste / source...',
     catalog_sort_ranked_desc: 'Date ranked : récent', catalog_sort_ranked_asc: 'Date ranked : ancien',
     catalog_sort_title_asc: 'Titre A→Z', catalog_sort_artist_asc: 'Artiste A→Z',

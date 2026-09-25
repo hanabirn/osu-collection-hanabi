@@ -241,7 +241,7 @@ I18N.de = {
     cdn_lib_fail: 'Eine externe Komponente konnte nicht geladen werden — Verbindung prüfen und erneut versuchen',
     nav_catalog: 'Katalog', explore_catalog_d: 'Durchstöbere den ganzen ranked-Katalog nach Künstler / Sprache / Genre — Sammlung mit einem Klick',
     catalog_page_title: 'Katalog',
-    catalog_hint: 'Durchstöbere den gesamten ranked-Katalog nach Künstler / Sprache / Genre / Quelle / feat. Wähle ein Merkmal und mach mit einem Klick eine Sammlungskategorie daraus. Der Index wird vom Hintergrund-Crawler der Seite aufgebaut und deckt noch nicht jede ranked-Map ab.',
+    catalog_hint: 'Durchstöbere den ranked- und loved-Katalog nach Künstler / Sprache / Genre / Quelle / feat. Wähle ein Merkmal und mach mit einem Klick eine Sammlungskategorie daraus. Der Index wird vom Hintergrund-Crawler der Seite aufgebaut und deckt noch nicht jede ranked-Map ab.',
     catalog_search_placeholder: 'Titel / Künstler / Quelle suchen...',
     catalog_sort_ranked_desc: 'Ranked-Datum: neueste', catalog_sort_ranked_asc: 'Ranked-Datum: älteste',
     catalog_sort_title_asc: 'Titel A→Z', catalog_sort_artist_asc: 'Künstler A→Z',

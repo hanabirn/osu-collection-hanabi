@@ -241,7 +241,7 @@ I18N.ko = {
     cdn_lib_fail: '외부 구성요소를 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도하세요',
     nav_catalog: '곡 카탈로그', explore_catalog_d: '아티스트／언어／장르로 전체 ranked 곡 탐색, 원클릭으로 컬렉션화',
     catalog_page_title: '곡 카탈로그',
-    catalog_hint: '아티스트／언어／장르／소스／feat. 기준으로 전체 ranked 곡을 탐색하세요. 분류 하나를 고르면 그 이름으로 컬렉션 카테고리를 원클릭으로 만들 수 있습니다. 데이터는 이 사이트의 백그라운드 크롤러가 계속 수집 중이며 아직 모든 ranked 맵을 포함하지 않습니다.',
+    catalog_hint: '아티스트／언어／장르／소스／feat. 기준으로 전체 ranked · loved 곡을 탐색하세요. 분류 하나를 고르면 그 이름으로 컬렉션 카테고리를 원클릭으로 만들 수 있습니다. 데이터는 이 사이트의 백그라운드 크롤러가 계속 수집 중이며 아직 모든 ranked 맵을 포함하지 않습니다.',
     catalog_search_placeholder: '곡명／아티스트／소스 검색...',
     catalog_sort_ranked_desc: 'ranked 날짜: 최신순', catalog_sort_ranked_asc: 'ranked 날짜: 오래된순',
     catalog_sort_title_asc: '곡명 A→Z', catalog_sort_artist_asc: '아티스트 A→Z',

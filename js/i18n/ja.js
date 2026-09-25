@@ -241,7 +241,7 @@ I18N.ja = {
     cdn_lib_fail: '外部コンポーネントの読み込みに失敗しました。接続を確認して再試行してください',
     nav_catalog: '楽曲カタログ', explore_catalog_d: 'アーティスト／言語／ジャンルで ranked 全曲を閲覧、ワンクリックでコレクション化',
     catalog_page_title: '楽曲カタログ',
-    catalog_hint: 'アーティスト／言語／ジャンル／ソース／feat. で ranked 全曲を閲覧。1つの分類を選ぶと、その名前でコレクションのカテゴリをワンクリック作成できます。データは本サイトのバックグラウンドクローラーが順次収集中で、全 ranked 譜面はまだ網羅していません。',
+    catalog_hint: 'アーティスト／言語／ジャンル／ソース／feat. で ranked ・ loved 全曲を閲覧。1つの分類を選ぶと、その名前でコレクションのカテゴリをワンクリック作成できます。データは本サイトのバックグラウンドクローラーが順次収集中で、全 ranked 譜面はまだ網羅していません。',
     catalog_search_placeholder: '曲名／アーティスト／ソースを検索...',
     catalog_sort_ranked_desc: 'ranked 日：新しい順', catalog_sort_ranked_asc: 'ranked 日：古い順',
     catalog_sort_title_asc: '曲名 A→Z', catalog_sort_artist_asc: 'アーティスト A→Z',

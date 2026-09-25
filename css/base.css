@@ -145,7 +145,8 @@ a:hover { text-decoration: underline; }
    (200) and tooltips (3000). */
 .site-header.lang-menu-open,
 .site-header.notif-menu-open,
-.site-header.contact-menu-open {
+.site-header.contact-menu-open,
+.site-header.changelog-menu-open {
     overflow: visible;
     z-index: 60;
 }
@@ -554,7 +555,7 @@ a:hover { text-decoration: underline; }
     padding: 0 3px;
     border-radius: 999px;
     background: var(--accent-pink);
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-size: 0.62rem;
     font-weight: bold;
     line-height: 16px;
@@ -1136,7 +1137,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-weight: bold;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     border-color: transparent;
-    color: #fff;
+    color: var(--on-accent, #fff);
     box-shadow: 0 4px 14px rgba(var(--accent-pink-rgb), 0.3);
 }
 .osu-login-btn-large:hover {

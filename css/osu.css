@@ -163,7 +163,7 @@
     padding: 4px 12px;
     border-radius: 999px;
     background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
@@ -304,7 +304,7 @@
     padding: 11px 24px;
     border-radius: 999px;
     background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-size: 0.95rem;
     font-weight: 700;
     text-decoration: none;
@@ -569,7 +569,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transition: all 0.2s;
 }
 .skin-download-btn { border-color: var(--accent-pink); color: var(--accent-pink); }
-.skin-download-btn:hover { background: var(--accent-pink); color: #fff; }
+.skin-download-btn:hover { background: var(--accent-pink); color: var(--on-accent, #fff); }
 .skin-download-btn:active, .skin-delete-btn:active, .skin-backup-btn:active { transform: scale(0.95); }
 .skin-delete-btn:hover { border-color: #f87171; color: #f87171; }
 .skin-backup-btn {
@@ -811,7 +811,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .osu-io-btn:hover {
     background: rgba(var(--pink-rgb),0.3);
-    color: #fff;
+    color: var(--on-accent, #fff);
     border-color: var(--accent-purple);
 }
 
@@ -852,7 +852,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .osu-tab:active { transform: translateY(0) scale(0.96); }
 .osu-tab.active {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-weight: bold;
     border-color: transparent;
     box-shadow: 0 0 18px rgba(var(--accent-pink-rgb), 0.3);
@@ -1327,7 +1327,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .osu-card:hover .osu-copy-btn { opacity: 1; }
 .osu-copy-btn:hover {
-    color: #fff;
+    color: var(--on-accent, #fff);
     background: rgba(var(--pink-rgb),0.5);
 }
 .osu-copy-btn.copied {
@@ -1381,7 +1381,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     cursor: pointer;
     transition: background 0.14s var(--ease-out), color 0.14s var(--ease-out);
 }
-.osu-card-actions > button:hover { background: rgba(var(--pink-rgb),0.55); color: #fff; }
+.osu-card-actions > button:hover { background: rgba(var(--pink-rgb),0.55); color: var(--on-accent, #fff); }
 .osu-card-actions > button:active { background: rgba(var(--pink-rgb),0.75); }
 .osu-card-actions > button svg { width: 15px; height: 15px; }
 .osu-card-actions > button:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 1px; }
@@ -1504,6 +1504,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     flex: 1 1 0;
     width: auto;
     border-radius: 2px 2px 0 0;
+    /* Held back so the bars read as a visualizer BEHIND the card's title
+       and artist rather than competing with them — the text already paints
+       above (z-index:2), this keeps it the thing you read first. */
+    opacity: 0.5;
 }
 /* Each bar's duration/delay is a multiple of --beat-s (set inline per
    button by js/osu.js osuPreviewBeatStyle(), from the map's own BPM), same
@@ -1720,11 +1724,17 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    Only two buttons on the right (these cards have no delete/fav/category),
    so download lands at right:48 — clear of the centred play button even on
    the narrowest ~246px card in this grid. */
-#farm-maps-list .osu-play-btn,
+/* Centre the preview button in this grid's narrower cards. The transform
+   has to carry BOTH axes: the base .osu-play-btn positions itself with
+   top:50% + translate(-50%,-50%), so overriding it with translateX alone
+   dropped the vertical half-step and left the button hanging low. */
 #catalog-list .osu-play-btn {
     left: 50%;
     right: auto;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
+}
+#catalog-list .osu-play-btn:hover {
+    transform: translate(-50%, -50%) scale(1.1);
 }
 #farm-maps-list .osu-copy-btn,
 #catalog-list .osu-copy-btn { right: 8px; }
@@ -2148,7 +2158,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .mappool-edition-chip.active {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     border-color: transparent;
-    color: #fff;
+    color: var(--on-accent, #fff);
     box-shadow: 0 0 14px rgba(var(--accent-pink-rgb), 0.28);
 }
 
@@ -2516,7 +2526,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.85);
     transition: background 0.15s, transform 0.15s;
 }
-.games-card-btn:hover { background: rgba(var(--pink-rgb), 0.6); color: #fff; transform: scale(1.1); }
+.games-card-btn:hover { background: rgba(var(--pink-rgb), 0.6); color: var(--on-accent, #fff); transform: scale(1.1); }
 
 .games-layout { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
 .games-layout > .gh-arena,
@@ -3013,14 +3023,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
         background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
 }
 .osu-page-btn:hover:not(:disabled) {
-    color: #fff;
+    color: var(--on-accent, #fff);
     border-color: var(--accent-purple);
     background: rgba(var(--pink-rgb),0.3);
     transform: translateY(-1px);
 }
 .osu-page-btn.active {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-weight: bold;
     border-color: transparent;
     box-shadow: 0 0 12px rgba(var(--accent-pink-rgb), 0.3);
@@ -3313,7 +3323,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 }
-.fc-sim-btn:hover { background: rgba(var(--accent-pink-rgb), 0.55); color: #fff; }
+.fc-sim-btn:hover { background: rgba(var(--accent-pink-rgb), 0.55); color: var(--on-accent, #fff); }
 .fc-sim-btn .icon-svg { width: 0.85em; height: 0.85em; }
 
 /* Body-level singleton popover for the FC-if-simulated PP result, same
@@ -4011,7 +4021,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-weight: 700;
     letter-spacing: 0.04em;
     vertical-align: middle;
-    color: #fff;
+    color: var(--on-accent, #fff);
     background: linear-gradient(90deg, var(--accent-pink), var(--accent-light-purple));
 }
 .pcc-updated { font-size: 0.72rem; color: var(--text-dim2); }
@@ -4357,8 +4367,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .featured-beatmap-play:hover {
     transform: translateY(-50%) scale(1.1);
 }
+/* Playing turns this into the same bottom-anchored strip the grid cards
+   get (top:auto; bottom:0 in the shared .osu-play-btn.playing rule). The
+   idle centring transform must go with it — keeping translateY(-50%) here
+   lifted the strip by half its own height, so the bars floated over the
+   title instead of rising from the bottom edge. */
 .featured-beatmap-play.playing {
-    transform: translateY(-50%);
+    transform: none;
+    right: auto;
 }
 .featured-beatmap-label {
     font-size: 0.7rem;
@@ -4834,7 +4850,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border-radius: 999px;
     border: none;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-size: 0.78rem;
     font-weight: bold;
     cursor: pointer;
@@ -5024,7 +5040,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .dm-nav-badge {
     margin-left: auto;
     background: var(--accent-pink);
-    color: #fff;
+    color: var(--on-accent, #fff);
     font-size: 0.7rem;
     font-weight: bold;
     padding: 1px 7px;
@@ -5100,7 +5116,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .dm-message-mine .chat-message-body {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     border-radius: 14px 14px 4px 14px;
-    color: #fff;
+    color: var(--on-accent, #fff);
 }
 .dm-message-mine .chat-message-time { color: rgba(255,255,255,0.75); }
 

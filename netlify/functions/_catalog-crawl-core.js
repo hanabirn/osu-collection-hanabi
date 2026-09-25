@@ -1,22 +1,26 @@
-/* Shared crawl logic for the ranked-catalog metadata index, used by the
-   scheduled handler (catalog-crawl-cron.js) and the manual/backfill HTTP
-   endpoint (catalog-crawl-run.js). Deliberately much lighter than the Farm
-   Maps crawler (_farm-crawl-core.js): no rosu-pp, no .osu file fetch, no
-   per-map scores call — just page GET /beatmapsets/search and store one lean
-   record per beatmapSET.
+/* Shared crawl logic for the catalog metadata index, used by the scheduled
+   handler (catalog-crawl-cron.js) and the manual/backfill HTTP endpoint
+   (catalog-crawl-run.js). Deliberately light: no .osu file fetch and no
+   per-map scores call — just page GET /beatmapsets/search and store one
+   lean record per beatmapSET.
 
-   State lives in the osu-catalog Blobs store:
-     - `catalog-state`: { searchCursor, discoveredCount, sweepCount,
+   State lives in the osu-catalog store:
+     - `catalog-state`: { cursors, statusIndex, discoveredCount, sweepCount,
        lastRunAt, lastError }
      - `catalog:all`: array of records keyed (via an in-memory index) by set
        id; upsert absorbs the known ppy cursor-pagination duplicate-result
        bug for free.
 
+   Covers ranked AND loved (CATALOG_STATUSES). They are separate result
+   sets, so each keeps its own cursor and the crawler switches status when
+   one runs out — sharing a cursor would make each status resume from the
+   other's position and skip most of both. A sweep counts once every status
+   has been walked end to end, after which they restart from the newest
+   sets, which is also how newly-ranked and newly-loved sets get picked up
+   without separate "check for new" logic.
+
    One pass covers all four rulesets (no `m=` filter — a set's `modes` array
-   records which rulesets its difficulties span). When the search cursor is
-   exhausted it resets to null and sweepCount is bumped, so the next run
-   restarts from the newest ranked sets — which also means newly-ranked sets
-   get picked up over time without separate "check for new" logic. */
+   records which rulesets its difficulties span). */
 const { getOsuToken } = require('./_osu-auth');
 const { getCatalogStore } = require('./_blobs-store');
 const { setJSONGz, getJSONGz } = require('./_blob-json');
@@ -29,10 +33,20 @@ const SEARCH_URL = 'https://osu.ppy.sh/api/v2/beatmapsets/search';
 // See _farm-crawl-core.js — leave room in the budget for the dataset write.
 const WRITE_RESERVE_MS = 10000;
 
+/* Statuses to sweep, in order. Each gets its own cursor and the crawler
+   moves to the next one when the current status runs out of results, so
+   both stay current instead of ranked starving loved. */
+const CATALOG_STATUSES = ['ranked', 'loved'];
+
 async function loadState(store) {
     const state = await store.get(STATE_KEY, { type: 'json' });
     return state || {
-        searchCursor: null,
+        /* One cursor per status: they are independent result sets, so a
+           single shared cursor would have each status resume from the
+           other's position and skip most of both. */
+        cursors: {},
+        statusIndex: 0,
+        searchCursor: null,   // legacy single-status cursor, migrated on load
         discoveredCount: 0,
         sweepCount: 0,
         lastRunAt: null,
@@ -64,6 +78,10 @@ function toRecord(set) {
         genre_id: genreId,
         language_id: languageId,
         nsfw: !!set.nsfw,
+        /* 'ranked' | 'loved' — the catalog covers both now, and they are
+           worth telling apart in the UI (loved has no pp and its own
+           ranking rules). */
+        status: set.status || null,
         ranked_date: set.ranked_date || null,
         bpm: set.bpm || null,
         modes,
@@ -75,10 +93,30 @@ function toRecord(set) {
     };
 }
 
+/* Carries a state written before loved was crawled: its single
+   searchCursor belonged to ranked, so hand it over rather than restart
+   that sweep from the newest sets again. */
+function migrateCursors(state) {
+    if (!state.cursors) state.cursors = {};
+    if (state.searchCursor && state.cursors.ranked === undefined) {
+        state.cursors.ranked = state.searchCursor;
+    }
+    state.searchCursor = null;
+    if (typeof state.statusIndex !== 'number') state.statusIndex = 0;
+}
+
+function currentStatus(state) {
+    return CATALOG_STATUSES[state.statusIndex % CATALOG_STATUSES.length];
+}
+
 async function discoverBatch(state) {
+    migrateCursors(state);
     const token = await getOsuToken();
-    const params = new URLSearchParams({ s: 'ranked', sort: 'ranked_desc' });
-    if (state.searchCursor) params.set('cursor_string', state.searchCursor);
+    const status = currentStatus(state);
+
+    const params = new URLSearchParams({ s: status, sort: 'ranked_desc' });
+    const cursor = state.cursors[status];
+    if (cursor) params.set('cursor_string', cursor);
 
     const res = await fetch(`${SEARCH_URL}?${params}`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
@@ -87,8 +125,13 @@ async function discoverBatch(state) {
     const data = await res.json();
     const sets = data.beatmapsets || [];
 
-    state.searchCursor = data.cursor_string || null;
-    if (!state.searchCursor) state.sweepCount = (state.sweepCount || 0) + 1;
+    state.cursors[status] = data.cursor_string || null;
+    if (!state.cursors[status]) {
+        /* This status is exhausted — move to the next one. A sweep counts
+           only once every status has been walked end to end. */
+        state.statusIndex = (state.statusIndex + 1) % CATALOG_STATUSES.length;
+        if (state.statusIndex === 0) state.sweepCount = (state.sweepCount || 0) + 1;
+    }
     return sets;
 }
 
@@ -127,7 +170,7 @@ async function runCrawlBatch(budgetMs) {
                 upserted++;
             }
             discovered += sets.length;
-            if (!state.searchCursor) break; // finished a full sweep this run
+            if (!state.cursors[currentStatus(state)]) break; // this status is exhausted; resume next run
         }
     } catch (err) {
         error = err.message;
