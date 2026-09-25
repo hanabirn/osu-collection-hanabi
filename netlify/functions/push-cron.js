@@ -50,7 +50,7 @@ async function processSub(store, key, apiKey) {
             notes.push({
                 title: `${p.username || ('#' + p.id)} ${delta > 0 ? '+' : ''}${delta.toLocaleString()}pp`,
                 body: `${Math.round(now).toLocaleString()}pp`,
-                url: `https://osu-collection-hanabi.netlify.app/?osu_lookup=${p.id}`,
+                url: `https://osu.hanabirn.xyz/?osu_lookup=${p.id}`,
             });
         }
         p.lastPp = now;

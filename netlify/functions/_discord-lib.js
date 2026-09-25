@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const { t } = require('./_discord-i18n');
 
 const PINK = 0xff66aa;
-const SITE_ORIGIN = 'https://osu-collection-hanabi.netlify.app';
+const SITE_ORIGIN = 'https://osu.hanabirn.xyz';
 const SITE_ICON = `${SITE_ORIGIN}/assets/icons/icon-192.png`;
 
 // Interaction / response type numbers.
@@ -309,7 +309,7 @@ const siteFooter = (extra) => {
 
 function originOf(event) {
     const proto = (event.headers && event.headers['x-forwarded-proto']) || 'https';
-    const host = (event.headers && event.headers.host) || 'osu-collection-hanabi.netlify.app';
+    const host = (event.headers && event.headers.host) || 'osu.hanabirn.xyz';
     return `${proto}://${host}`;
 }
 

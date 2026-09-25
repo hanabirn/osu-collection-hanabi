@@ -245,7 +245,7 @@ exports.handler = async (event) => {
         await store.setJSON('index', filtered);
 
         const proto = event.headers['x-forwarded-proto'] || 'https';
-        const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+        const host = event.headers.host || 'osu.hanabirn.xyz';
         const origin = `${proto}://${host}`;
         const newEntry = filtered[filtered.length - 1];
 

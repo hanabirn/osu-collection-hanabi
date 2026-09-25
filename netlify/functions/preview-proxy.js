@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
     try {
         const res = await fetch(`https://b.ppy.sh/preview/${id}.mp3`, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu.hanabirn.xyz/)' },
         });
         if (!res.ok) {
             return { statusCode: res.status, headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store' }, body: 'Failed to fetch preview' };

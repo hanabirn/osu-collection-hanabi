@@ -13,7 +13,7 @@ const MAX_ITEMS = 40;
 
 exports.handler = async (event) => {
     const proto = event.headers['x-forwarded-proto'] || 'https';
-    const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+    const host = event.headers.host || 'osu.hanabirn.xyz';
     const origin = `${proto}://${host}`;
 
     let index = [];

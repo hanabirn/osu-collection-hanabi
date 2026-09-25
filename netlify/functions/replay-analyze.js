@@ -205,7 +205,7 @@ exports.handler = async (event) => {
         if (lookupRes.ok) {
             const beatmapInfo = await lookupRes.json();
             const osuRes = await fetch(`https://osu.ppy.sh/osu/${beatmapInfo.id}`, {
-                headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
+                headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu.hanabirn.xyz/)' },
             });
             const osuText = await osuRes.text();
 

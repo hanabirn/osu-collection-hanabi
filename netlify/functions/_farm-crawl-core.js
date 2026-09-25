@@ -241,7 +241,7 @@ async function fetchFarmSignal(beatmapId, mode, token, nmStars) {
 
 async function computeOne(item, mode, existingRecord, token) {
     const res = await fetch(`https://osu.ppy.sh/osu/${item.beatmap_id}`, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu.hanabirn.xyz/)' },
     });
     const text = await res.text();
     if (!res.ok || !text) throw new Error(`beatmap file fetch failed for ${item.beatmap_id}`);

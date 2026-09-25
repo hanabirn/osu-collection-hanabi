@@ -147,7 +147,7 @@ exports.handler = async (event) => {
             await store.set(`lastEditAt:${user.id}`, String(Date.now()));
 
             const proto = event.headers['x-forwarded-proto'] || 'https';
-            const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+            const host = event.headers.host || 'osu.hanabirn.xyz';
             await announceNewPool(pool, `${proto}://${host}`, imported);
 
             return { statusCode: 200, headers: { ...CORS, 'Cache-Control': 'no-store' }, body: JSON.stringify({ pool, imported }) };

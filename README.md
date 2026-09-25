@@ -7,7 +7,7 @@ collections** — browse and assemble `.db` / `.osdb` collections, look up pp,
 generate practice pools from your own scores, browse the ranked catalogue and
 every World Cup mappool, and chat with other players.
 
-**Live:** <https://osu-collection-hanabi.netlify.app>
+**Live:** <https://osu.hanabirn.xyz>
 
 This is a personal project by [HANABI_RN](https://osu.ppy.sh/users/26696007),
 not affiliated with or endorsed by ppy. "osu!" is a trademark of ppy Pty Ltd.

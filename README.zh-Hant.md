@@ -6,7 +6,7 @@
 輔助網站 —— 瀏覽與組合 `.db` / `.osdb` 收藏、查 pp、用自己的成績產生練習圖池、
 瀏覽整個 ranked 曲庫與所有世界盃圖池，還能跟其他玩家聊天。
 
-**線上網站：** <https://osu-collection-hanabi.netlify.app>
+**線上網站：** <https://osu.hanabirn.xyz>
 
 這是 [HANABI_RN](https://osu.ppy.sh/users/26696007) 的個人專案，與 ppy 無任何
 關聯、也未經其背書。「osu!」是 ppy Pty Ltd 的商標。

@@ -11,7 +11,7 @@
    separately via Discord's description_localizations (register script).
 
    Endpoint URL (set in the Discord developer portal):
-     https://osu-collection-hanabi.netlify.app/discord
+     https://osu.hanabirn.xyz/discord
    (netlify.toml rewrites /discord -> here.)
 
    Env: DISCORD_PUBLIC_KEY (signature). OSU_CLIENT_ID/SECRET (osu! API v2,

@@ -1,6 +1,6 @@
 # osu-collection-mp-bot
 
-The osu! **multiplayer host bot** for [osu! 歌曲收藏](https://osu-collection-hanabi.netlify.app).
+The osu! **multiplayer host bot** for [osu! 歌曲收藏](https://osu.hanabirn.xyz).
 It opens a multi lobby and cycles through the maps from a visitor's saved
 collection / favourites so a group can just play them.
 

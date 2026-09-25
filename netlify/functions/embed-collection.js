@@ -15,7 +15,7 @@ const MAX_COVERS = 12;
 exports.handler = async (event) => {
     const id = (event.queryStringParameters || {}).id;
     const proto = event.headers['x-forwarded-proto'] || 'https';
-    const host = event.headers.host || 'osu-collection-hanabi.netlify.app';
+    const host = event.headers.host || 'osu.hanabirn.xyz';
     const origin = `${proto}://${host}`;
 
     const html = (status, inner) => ({

@@ -46,7 +46,7 @@ exports.handler = async (event) => {
 
     try {
         const res = await fetch(`https://osu.ppy.sh/osu/${id}`, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu-collection-hanabi.netlify.app/)' },
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanabiOsuSite/1.0; +https://osu.hanabirn.xyz/)' },
         });
         const text = await res.text();
         if (!res.ok || !text) {

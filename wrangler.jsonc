@@ -19,6 +19,19 @@
         "enabled": true,
     },
 
+    // 正式網址。custom_domain 會讓 wrangler 自動建立 DNS 紀錄並申請憑證。
+    //
+    // workers_dev 要明確寫 true：只要設了 routes，wrangler 預設就會把
+    // workers.dev 網址關掉。切換期間兩個並存比較安全，舊網址還能當退路。
+    "workers_dev": true,
+    //
+    // 為什麼要自訂網域而不是沿用 workers.dev：帳號的 workers.dev 子網域
+    // 被稍早一個失敗的指令設成 osu-collection-hanabi，而 Cloudflare 不允許
+    // 再更改（API 回 code 10036），網址因此變成名字重複兩次的
+    // osu-collection-hanabi.osu-collection-hanabi.workers.dev。
+    // 更重要的是：自有網域不綁平台，日後再搬家對外網址不必再變一次。
+    "routes": [{ "pattern": "osu.hanabirn.xyz", "custom_domain": true }],
+
     // 排程。與 netlify.toml 原本的 schedule 一致，對應表在 worker/index.js
     // 的 CRON_SCHEDULE（Cloudflare 以 cron 字串比對，兩邊必須逐字相同）。
     //
