@@ -26,6 +26,8 @@ const ACCENT_BG_BASE = {
 // Full-strength accent tokens — set straight to the picked colour rather
 // than color-mixed, same as ctApplyAccent()'s --accent/--primary.
 const ACCENT_DIRECT_PROPS = ['--pink', '--pink-bright', '--text-pink', '--accent-pink', '--accent-purple'];
+// Text-only companions for the tokens above (see applyAccent).
+const ACCENT_TEXT_PROPS = ['--pink-text', '--pink-bright-text', '--accent-pink-text', '--accent-purple-text'];
 
 /* ===== Contrast guards =====
    The picker hands over an arbitrary hex, and two things break at the ends
@@ -104,6 +106,7 @@ function applyAccent(color) {
         root.removeProperty('--pink-rgb');
         root.removeProperty('--accent-pink-rgb');
         root.removeProperty('--accent-purple-rgb');
+        ACCENT_TEXT_PROPS.forEach(p => root.removeProperty(p));
         root.removeProperty('--on-accent');
         return;
     }
@@ -114,7 +117,15 @@ function applyAccent(color) {
        stays on --pink etc. so fills and borders are exactly what was
        picked. --on-accent is what any accent-painted control labels
        itself with. */
-    root.setProperty('--text-pink', readableOnShell(parts));
+    /* The accent doubles as a fill and as a text colour. Lightening it
+       outright would repaint buttons and borders that are meant to be
+       exactly what was picked, so text gets its own guarded variants and
+       css/*.css reads `var(--pink-text, var(--pink))` wherever the token
+       is a colour rather than a fill. With no accent set these are absent
+       and the fallback leaves the default theme untouched. */
+    const readable = readableOnShell(parts);
+    root.setProperty('--text-pink', readable);
+    ACCENT_TEXT_PROPS.forEach(p => root.setProperty(p, readable));
     root.setProperty('--on-accent', onAccentColor(parts));
     root.setProperty('--accent-light-purple', `color-mix(in srgb, ${color} 65%, white)`);
     root.setProperty('--pink-rgb', rgb);

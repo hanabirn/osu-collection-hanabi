@@ -96,7 +96,7 @@
     border-color: var(--accent-purple);
     background: rgba(var(--pink-rgb), 0.08);
 }
-.explore-card-icon .icon-svg { width: 20px; height: 20px; color: var(--accent-pink); }
+.explore-card-icon .icon-svg { width: 20px; height: 20px; color: var(--accent-pink-text, var(--accent-pink)); }
 .explore-card-t { font-weight: 700; font-size: 0.92rem; margin-top: 2px; }
 .explore-card-d { font-size: 0.78rem; color: var(--text-dim2); line-height: 1.45; }
 
@@ -132,7 +132,7 @@
     transition: background 0.15s;
 }
 .digest-item:hover { background: rgba(255, 255, 255, 0.14); }
-.digest-item .icon-svg { color: var(--accent-pink); }
+.digest-item .icon-svg { color: var(--accent-pink-text, var(--accent-pink)); }
 .digest-prompt { color: var(--text-secondary); }
 .digest-welcome {
     background: rgba(52, 211, 153, 0.1);
@@ -280,7 +280,7 @@
     font-size: 0.8rem;
     color: var(--text-secondary);
 }
-.collection-hero-feat .icon-svg { color: var(--accent-pink); }
+.collection-hero-feat .icon-svg { color: var(--accent-pink-text, var(--accent-pink)); }
 .collection-hero-foot {
     display: flex;
     flex-wrap: wrap;
@@ -423,7 +423,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.02em;
-    color: var(--accent-pink);
+    color: var(--accent-pink-text, var(--accent-pink));
     background: rgba(var(--accent-pink-rgb), 0.12);
     border: 1px solid rgba(var(--accent-pink-rgb), 0.3);
 }
@@ -568,7 +568,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: var(--text);
     transition: all 0.2s;
 }
-.skin-download-btn { border-color: var(--accent-pink); color: var(--accent-pink); }
+.skin-download-btn { border-color: var(--accent-pink); color: var(--accent-pink-text, var(--accent-pink)); }
 .skin-download-btn:hover { background: var(--accent-pink); color: var(--on-accent, #fff); }
 .skin-download-btn:active, .skin-delete-btn:active, .skin-backup-btn:active { transform: scale(0.95); }
 .skin-delete-btn:hover { border-color: #f87171; color: #f87171; }
@@ -579,11 +579,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     cursor: pointer;
     border: 1px solid var(--border-card);
     background: var(--bg-card);
-    color: var(--accent-purple);
+    color: var(--accent-purple-text, var(--accent-purple));
     transition: all 0.2s;
 }
 .skin-backup-btn:hover { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(var(--accent-purple-rgb), 0.25); }
-.cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); color: var(--accent-purple); }
+.cloud-skin-item .skin-item-thumb { background: rgba(var(--accent-purple-rgb), 0.12); color: var(--accent-purple-text, var(--accent-purple)); }
 
 .skins-empty {
     text-align: center;
@@ -720,7 +720,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transition: background 0.16s var(--ease-out), color 0.16s var(--ease-out), border-color 0.16s var(--ease-out);
 }
 .osu-refresh-all:hover {
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
     background: rgba(var(--pink-rgb),0.16);
     border-color: rgba(var(--pink-rgb),0.45);
 }
@@ -1184,7 +1184,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     height: 52px;
     border-radius: 15px;
     background: rgba(var(--pink-rgb), 0.1);
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
 }
 .empty-state-icon svg { display: block; }
 .empty-state-sub {
@@ -1395,7 +1395,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 
 /* state colours layer on top of the shared button style */
-.osu-card-actions .osu-fav-btn.active { color: var(--accent-pink); }
+.osu-card-actions .osu-fav-btn.active { color: var(--accent-pink-text, var(--accent-pink)); }
 .osu-card-actions .osu-fav-btn.active:hover { color: #fff; }
 .osu-card-actions .osu-download-btn.db-matched { background: rgba(52,211,153,0.85); color: #fff; }
 .osu-card-actions .osu-copy-btn.copied { color: #34d399; }
@@ -1592,11 +1592,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .osu-mini-player-icon-btn .icon-svg { width: 15px; height: 15px; }
 .osu-mini-player-icon-btn:hover { color: var(--text); background: var(--bg-stat); }
-.osu-mini-player-icon-btn.active { color: var(--accent-pink); }
+.osu-mini-player-icon-btn.active { color: var(--accent-pink-text, var(--accent-pink)); }
 .osu-mini-player-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 .osu-mini-player-playpause {
     background: var(--pink);
-    color: #14101c;
+    color: var(--on-accent, #14101c);
     border: none;
     width: 28px;
     height: 28px;
@@ -2475,7 +2475,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     height: 44px;
     border-radius: 12px;
     background: rgba(var(--pink-rgb), 0.12);
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
 }
 .games-card-glyph svg { display: block; }
 .games-card h3 { margin: 12px 0 4px; font-size: 1.05rem; }
@@ -2603,7 +2603,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 4px 0;
     margin-bottom: 8px;
 }
-.cmpool-back:hover { color: var(--accent-pink); }
+.cmpool-back:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 .cmpool-detail-head {
     display: flex;
     align-items: baseline;
@@ -2723,7 +2723,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: none;
     border-radius: 8px;
     background: var(--pink);
-    color: #14101c;
+    color: var(--on-accent, #14101c);
     padding: 0 10px;
     cursor: pointer;
     display: flex;
@@ -2759,7 +2759,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: none;
     border-radius: 8px;
     background: var(--pink);
-    color: #14101c;
+    color: var(--on-accent, #14101c);
     padding: 6px 14px;
     font: inherit;
     cursor: pointer;
@@ -3397,7 +3397,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     color: var(--text);
     padding: 2px 0;
 }
-.fc-sim-row b { color: var(--accent-pink); }
+.fc-sim-row b { color: var(--accent-pink-text, var(--accent-pink)); }
 .fc-sim-loading, .fc-sim-error {
     font-size: 0.8rem;
     color: var(--text-label);
@@ -3448,7 +3448,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .lookup-mode-btn:hover { color: var(--text); }
 .lookup-mode-btn.active {
     background: rgba(var(--accent-pink-rgb), 0.16);
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
 }
 .visitor-lookup-input-row {
     display: flex;
@@ -3553,8 +3553,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .pp-compare-side-b { border-color: rgba(var(--accent-purple-rgb), 0.4); }
 .pp-compare-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
 .pp-compare-side-name { font-size: 0.85rem; font-weight: bold; color: var(--text); }
-.pp-compare-side-a .pp-compare-side-pp { color: var(--accent-pink); }
-.pp-compare-side-b .pp-compare-side-pp { color: var(--accent-purple); }
+.pp-compare-side-a .pp-compare-side-pp { color: var(--accent-pink-text, var(--accent-pink)); }
+.pp-compare-side-b .pp-compare-side-pp { color: var(--accent-purple-text, var(--accent-purple)); }
 .pp-compare-side-pp { font-size: 0.95rem; font-weight: bold; }
 .pp-compare-vs { font-size: 0.8rem; font-weight: bold; color: var(--text-dim2); }
 
@@ -3913,7 +3913,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .leaderboard-rank { font-weight: bold; color: var(--text-dim2); width: 32px; flex-shrink: 0; text-align: center; }
 .leaderboard-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
 .leaderboard-name { flex: 1; font-weight: bold; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.leaderboard-pp { font-weight: bold; color: var(--accent-pink); }
+.leaderboard-pp { font-weight: bold; color: var(--accent-pink-text, var(--accent-pink)); }
 .tracked-players-empty {
     text-align: center;
     font-size: 0.82rem;
@@ -3958,7 +3958,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 2px 4px;
     line-height: 1;
 }
-.tracked-player-remove:hover { color: var(--accent-pink); }
+.tracked-player-remove:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 .visitor-result-name {
     font-size: 1.1rem;
     font-weight: bold;
@@ -4593,7 +4593,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
     margin-bottom: 8px;
 }
 .pp-calc-mods-row {
@@ -4760,7 +4760,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .chat-message-body { flex: 1; min-width: 0; }
 .chat-message-header { display: flex; align-items: center; gap: 8px; }
 .chat-message-name { font-weight: bold; color: var(--text); font-size: 0.88rem; text-decoration: none; }
-.chat-message-name:hover { color: var(--accent-pink); text-decoration: underline; }
+.chat-message-name:hover { color: var(--accent-pink-text, var(--accent-pink)); text-decoration: underline; }
 .chat-message-time { font-size: 0.72rem; color: var(--text-dim2); }
 /* Sits right beside the timestamp (not grouped with reply/delete below) —
    a normal left margin here, not auto, so it doesn't fight reply's own
@@ -4779,7 +4779,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 2px 4px;
     line-height: 1;
 }
-.chat-translate-btn:hover { color: var(--accent-pink); }
+.chat-translate-btn:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 .chat-reply-btn, .chat-delete-btn {
     margin-left: auto;
     border: none;
@@ -4791,7 +4791,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     line-height: 1;
 }
 .chat-delete-btn { margin-left: 4px; }
-.chat-reply-btn:hover, .chat-delete-btn:hover { color: var(--accent-pink); }
+.chat-reply-btn:hover, .chat-delete-btn:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 .chat-reply-quote {
     margin-top: 4px;
     padding: 5px 10px;
@@ -4915,7 +4915,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     cursor: pointer;
     flex-shrink: 0;
 }
-.chat-reply-banner button:hover { color: var(--accent-pink); }
+.chat-reply-banner button:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 .chat-login-required .btn { padding: 6px 14px; font-size: 0.8rem; flex-shrink: 0; }
 
 /* ===== Edit (own message, inline) ===== */
@@ -4929,7 +4929,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     padding: 2px 4px;
     line-height: 1;
 }
-.chat-edit-btn:hover { color: var(--accent-pink); }
+.chat-edit-btn:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 .chat-message-edited { font-size: 0.68rem; color: var(--text-dim2); font-style: italic; }
 .chat-edit-box { margin-top: 6px; }
 .chat-edit-input {
@@ -4954,7 +4954,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-weight: 700;
     cursor: pointer;
 }
-.chat-edit-save { background: var(--pink); color: #14101c; }
+.chat-edit-save { background: var(--pink); color: var(--on-accent, #14101c); }
 .chat-edit-cancel { background: var(--bg-stat); color: var(--text-secondary); }
 
 /* ===== Emoji picker =====
@@ -5063,7 +5063,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: none;
     border-radius: 999px;
     background: var(--pink);
-    color: #14101c;
+    color: var(--on-accent, #14101c);
     cursor: pointer;
     line-height: 1;
 }
@@ -5188,7 +5188,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     text-decoration: none;
     transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
 }
-.howto-jumpnav a:hover { background: rgba(var(--accent-pink-rgb), 0.15); color: var(--pink); }
+.howto-jumpnav a:hover { background: rgba(var(--accent-pink-rgb), 0.15); color: var(--pink-text, var(--pink)); }
 .howto-manual { display: flex; flex-direction: column; gap: 18px; }
 .howto-group {
     background: var(--bg-card-alt);
@@ -5302,7 +5302,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     overflow-wrap: break-word;
 }
 .bbcode-preview img { max-width: 100%; border-radius: 6px; }
-.bbcode-preview a { color: var(--accent-pink); }
+.bbcode-preview a { color: var(--accent-pink-text, var(--accent-pink)); }
 .bbcode-preview blockquote {
     margin: 8px 0;
     padding: 8px 12px;

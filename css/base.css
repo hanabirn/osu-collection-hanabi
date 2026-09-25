@@ -80,7 +80,7 @@ a:hover { text-decoration: underline; }
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
     margin: 0 0 6px;
 }
 .section-title {
@@ -275,9 +275,9 @@ a:hover { text-decoration: underline; }
 .tn-2, .tn-5 { font-size: 1.45rem; }
 .tn-3, .tn-4 { font-size: 1.95rem; }
 
-.tn-1, .tn-4 { color: var(--pink); }
+.tn-1, .tn-4 { color: var(--pink-text, var(--pink)); }
 .tn-2, .tn-5 { color: var(--text-pink); }
-.tn-3, .tn-6 { color: var(--pink); }
+.tn-3, .tn-6 { color: var(--pink-text, var(--pink)); }
 
 /* Bigger rise (up to -26px vs -10), a left/right sway (±8px, was none),
    a little scale breathing, and an opacity pulse (0.5 -> 1) so the notes
@@ -326,7 +326,7 @@ a:hover { text-decoration: underline; }
     z-index: 1;
     /* Redesign: static pink ring, one modest glow (the spec's single
        allowed glow). The infinite beat/hit-ring animations are gone. */
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
     filter: drop-shadow(0 0 8px rgba(var(--pink-rgb), 0.5));
     animation: none;
 }
@@ -603,7 +603,7 @@ a:hover { text-decoration: underline; }
     cursor: pointer;
     padding: 2px 4px;
 }
-.notif-clear-btn:hover { color: var(--accent-pink); }
+.notif-clear-btn:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 /* Opt-in Web Push toggle — only unhidden by js/pwa.js when the site owner
    has set the VAPID env vars AND the visitor is logged in. */
 .notif-push-row {
@@ -623,7 +623,7 @@ a:hover { text-decoration: underline; }
     transition: background 0.15s, color 0.15s;
 }
 .notif-push-row:hover { background: var(--bg-stat); color: var(--text); }
-.notif-push-row.on { color: var(--accent-pink); }
+.notif-push-row.on { color: var(--accent-pink-text, var(--accent-pink)); }
 .notif-menu-list {
     max-height: 340px;
     overflow-y: auto;
@@ -1059,7 +1059,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    collection page's ▶ preview button (see .osu-card-play's playPulse). */
 .site-update-btn {
     border-color: var(--accent-pink);
-    color: var(--accent-pink);
+    color: var(--accent-pink-text, var(--accent-pink));
     animation: siteUpdatePulse 1.6s ease-in-out infinite;
 }
 .site-update-btn:disabled { animation: none; opacity: 0.6; cursor: default; }
@@ -1123,7 +1123,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     line-height: 1;
     transition: color 0.2s var(--ease-out);
 }
-.osu-logout-btn:hover { color: var(--accent-pink); }
+.osu-logout-btn:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 
 /* Larger, higher-contrast osu! login control — this is the header's primary
    call-to-action (everything else up here is a utility icon), so it gets
@@ -1269,7 +1269,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .site-nav-btn:active { transform: scale(0.98); }
 .site-nav-btn.active {
     background: rgba(var(--accent-pink-rgb), 0.16);
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
     font-weight: 700;
     box-shadow: none;
 }
@@ -1309,7 +1309,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .site-topnav-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
 .site-topnav-btn.active {
     background: rgba(var(--accent-pink-rgb), 0.14);
-    color: var(--pink);
+    color: var(--pink-text, var(--pink));
     font-weight: 700;
 }
 .site-topnav-more { opacity: 0.85; }
@@ -1432,7 +1432,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     position: relative;
     flex-shrink: 0;
     background: var(--pink);
-    color: #14101c;
+    color: var(--on-accent, #14101c);
     border: none;
     padding: 10px 18px;
     border-radius: 10px;
