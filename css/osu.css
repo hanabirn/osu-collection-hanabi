@@ -1349,8 +1349,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     z-index: 3;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
+    /* Spread across the bar instead of bunching against the right edge:
+       the first button sits on the left edge, the last on the right, and
+       every gap between them is the same. The set is fixed (7 buttons and
+       2 separators on every card), so this never stretches into a sparse
+       row. nowrap because a wrapped second row would break that rhythm —
+       the narrow-viewport rules below shrink the buttons instead. */
+    justify-content: space-between;
+    flex-wrap: nowrap;
     gap: 3px;
     padding: 3px;
     border-radius: 11px;
