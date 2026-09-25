@@ -12,12 +12,13 @@
        bug for free.
 
    Covers ranked AND loved (CATALOG_STATUSES). They are separate result
-   sets, so each keeps its own cursor and the crawler switches status when
-   one runs out — sharing a cursor would make each status resume from the
-   other's position and skip most of both. A sweep counts once every status
-   has been walked end to end, after which they restart from the newest
-   sets, which is also how newly-ranked and newly-loved sets get picked up
-   without separate "check for new" logic.
+   sets, so each keeps its own cursor — sharing one would make each status
+   resume from the other's position and skip most of both. Runs alternate
+   between statuses so the two advance together; switching only on cursor
+   exhaustion would have meant a full pass over ranked's 55k sets before
+   the first loved one showed up. An exhausted cursor simply restarts that
+   status from the newest sets, which is also how newly-ranked and
+   newly-loved ones arrive without separate "check for new" logic.
 
    One pass covers all four rulesets (no `m=` filter — a set's `modes` array
    records which rulesets its difficulties span). */
@@ -126,11 +127,12 @@ async function discoverBatch(state) {
     const sets = data.beatmapsets || [];
 
     state.cursors[status] = data.cursor_string || null;
+    /* Exhausted: the next pass over this status starts from the newest sets
+       again, which is also how newly-ranked and newly-loved ones arrive. */
     if (!state.cursors[status]) {
-        /* This status is exhausted — move to the next one. A sweep counts
-           only once every status has been walked end to end. */
-        state.statusIndex = (state.statusIndex + 1) % CATALOG_STATUSES.length;
-        if (state.statusIndex === 0) state.sweepCount = (state.sweepCount || 0) + 1;
+        state.sweeps = state.sweeps || {};
+        state.sweeps[status] = (state.sweeps[status] || 0) + 1;
+        state.sweepCount = (state.sweepCount || 0) + 1;
     }
     return sets;
 }
@@ -170,7 +172,7 @@ async function runCrawlBatch(budgetMs) {
                 upserted++;
             }
             discovered += sets.length;
-            if (!state.cursors[currentStatus(state)]) break; // this status is exhausted; resume next run
+            if (!state.cursors[currentStatus(state)]) break; // exhausted; the next run starts it over
         }
     } catch (err) {
         error = err.message;
@@ -189,6 +191,11 @@ async function runCrawlBatch(budgetMs) {
     }
 
     if (writeOk) {
+        /* Hand the next run the other status. Switching only when a cursor
+           runs out would have meant one full pass over ranked — 55k sets,
+           the better part of a day — before a single loved set appeared.
+           Alternating per run lets both move forward together. */
+        state.statusIndex = (state.statusIndex + 1) % CATALOG_STATUSES.length;
         state.lastRunAt = now;
         state.lastOkAt = now;
         state.lastError = error;

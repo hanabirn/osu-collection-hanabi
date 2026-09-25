@@ -1736,6 +1736,41 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 #catalog-list .osu-play-btn:hover {
     transform: translate(-50%, -50%) scale(1.1);
 }
+/* Playing turns the button into a bottom-anchored strip. That lives in
+   .osu-play-btn.playing, which the ID selector above outranks — so the
+   centring left/transform leaked through and lifted the strip back to the
+   middle. Restore the shared behaviour at matching specificity. */
+#catalog-list .osu-play-btn.playing,
+#catalog-list .osu-play-btn.playing:hover {
+    left: 0;
+    transform: none;
+}
+
+/* Ranked / loved mark, bottom-right of the cover. Sits above the artwork
+   but below .osu-card-info, so a playing card's title still reads first. */
+.catalog-status-badge {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(10, 10, 22, 0.66);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+}
+.catalog-status-badge .icon-svg {
+    width: 14px;
+    height: 14px;
+}
+/* osu!'s own colours for the two states. */
+.catalog-status-badge.is-ranked { color: #7cd4ff; }
+.catalog-status-badge.is-loved { color: #ff8bcd; }
+.catalog-status-badge.is-loved .icon-svg { fill: currentColor; }
 #farm-maps-list .osu-copy-btn,
 #catalog-list .osu-copy-btn { right: 8px; }
 #farm-maps-list .osu-download-btn,

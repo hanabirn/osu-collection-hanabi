@@ -33,6 +33,7 @@ let catalogStarMin = 0;
 let catalogStarMax = CATALOG_STAR_SLIDER_MAX;
 let catalogStarDebounce = null;
 let catalogNsfw = false;
+let catalogStatus = '';     // '' = ranked + loved, else 'ranked' | 'loved'
 let catalogItems = [];
 let catalogTotal = 0;
 let catalogCoverage = null;
@@ -86,6 +87,7 @@ function catalogBuildParams(extra) {
     const params = new URLSearchParams({ sort: catalogSort });
     if (catalogQuery) params.set('q', catalogQuery);
     if (catalogMode) params.set('mode', String(CATALOG_MODE_INT[catalogMode]));
+    if (catalogStatus) params.set('status', catalogStatus);
     if (catalogLang !== 'all') params.set('language', catalogLang);
     if (catalogGenre !== 'all') params.set('genre', catalogGenre);
     if (catalogSource !== 'all') params.set('source', catalogSource);
@@ -104,6 +106,19 @@ function switchCatalogGenre(v) { catalogGenre = v; loadCatalogPage(0); }
 function switchCatalogSource(v) { catalogSource = v; loadCatalogPage(0); }
 function switchCatalogArtist(v) { catalogArtist = v; loadCatalogPage(0); }
 function toggleCatalogNsfw(checked) { catalogNsfw = checked; loadCatalogPage(0); }
+/* Ranked / loved mark, bottom-right of the cover — the same two symbols
+   the game uses (stacked chevrons, heart). Records crawled before loved
+   was covered carry no status; they were all ranked, so that is what an
+   absent value means. */
+function catalogStatusBadge(status) {
+    const s = status || 'ranked';
+    if (s !== 'ranked' && s !== 'loved') return '';
+    const label = s === 'loved' ? 'Loved' : 'Ranked';
+    return `<span class="catalog-status-badge is-${s}" title="${label}" aria-label="${label}">`
+        + `${icon(s === 'loved' ? 'heart' : 'chevronsUp')}</span>`;
+}
+
+function switchCatalogStatus(v) { catalogStatus = v; loadCatalogPage(0); }
 
 /* ===== ⭐ Star-rating range slider =====
    Two overlapping native <input type="range"> (the standard dual-thumb-
@@ -491,6 +506,7 @@ function renderCatalogList() {
             <button class="osu-copy-btn" onclick="copyBeatmapId(${item.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
             <button class="osu-download-btn" onclick="downloadBeatmapset(${item.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${item.id}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
+            ${catalogStatusBadge(item.status)}
             <div class="osu-card-info">
                 <div class="osu-card-title">${escHtml(item.title || '')}</div>
                 <div class="osu-card-artist">${escHtml(item.artist || '')}</div>

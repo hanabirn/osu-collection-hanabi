@@ -41,6 +41,10 @@ exports.handler = async (event) => {
     const modeRaw = parseInt(qs.mode, 10);
     const mode = (modeRaw === 0 || modeRaw === 1 || modeRaw === 2 || modeRaw === 3) ? modeRaw : null;
     const includeNsfw = qs.includeNsfw === '1';
+    // '' (both) | 'ranked' | 'loved'. Records crawled before loved was
+    // covered carry no status at all — they were all ranked, so that is
+    // what a missing value means here.
+    const status = qs.status === 'ranked' || qs.status === 'loved' ? qs.status : '';
     const limit = qs.limit ? Math.min(MAX_LIMIT, Math.max(1, parseInt(qs.limit, 10) || 0)) : 0;
 
     const [sortField, sortDir] = (qs.sort || 'ranked_desc').split('_');
@@ -64,6 +68,7 @@ exports.handler = async (event) => {
         let ctx = dataset;
         if (!includeNsfw) ctx = ctx.filter(r => !r.nsfw);
         if (mode !== null) ctx = ctx.filter(r => Array.isArray(r.modes) && r.modes.includes(mode));
+        if (status) ctx = ctx.filter(r => (r.status || 'ranked') === status);
 
         let items = ctx;
         if (language) {

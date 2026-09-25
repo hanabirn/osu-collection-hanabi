@@ -477,6 +477,11 @@
                 <option value="catch">Catch</option>
                 <option value="mania">Mania</option>
             </select>
+            <select id="catalog-status-filter" onchange="switchCatalogStatus(this.value)">
+                <option value="" data-i18n="catalog_status_all">全部狀態</option>
+                <option value="ranked" data-i18n="catalog_status_ranked">Ranked</option>
+                <option value="loved" data-i18n="catalog_status_loved">Loved</option>
+            </select>
             <select id="catalog-lang-filter" onchange="switchCatalogLang(this.value)"><option value="all" data-i18n="osu_lang_filter_all">全部語言</option></select>
             <select id="catalog-genre-filter" onchange="switchCatalogGenre(this.value)"><option value="all" data-i18n="osu_genre_filter_all">全部曲風</option></select>
             <div class="catalog-combo" id="catalog-source-combo">
