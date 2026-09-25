@@ -39,6 +39,15 @@ const WRITE_RESERVE_MS = 10000;
    both stay current instead of ranked starving loved. */
 const CATALOG_STATUSES = ['ranked', 'loved'];
 
+/* Cloudflare allows 50 subrequests per Worker invocation on the free plan,
+   and every search page plus the OAuth token request counts. The time
+   budget alone does not bound this — fast responses just mean more pages
+   inside the same window, which is exactly how a run started failing with
+   "Too many subrequests by single Worker invocation" and lost its
+   discoveries. Stop well short and let the next run continue from the
+   cursor. */
+const MAX_SEARCH_PAGES = 40;
+
 async function loadState(store) {
     const state = await store.get(STATE_KEY, { type: 'json' });
     return state || {
@@ -149,8 +158,10 @@ async function runCrawlBatch(budgetMs) {
     const discoverDeadline = start + (budgetMs - writeReserve);
 
     let discovered = 0, upserted = 0, error = null;
+    let pages = 0;
     try {
-        while (Date.now() < discoverDeadline) {
+        while (Date.now() < discoverDeadline && pages < MAX_SEARCH_PAGES) {
+            pages++;
             const sets = await discoverBatch(state);
             if (sets.length === 0) {
                 // Cursor exhausted — already reset to null above; stop here
@@ -213,6 +224,7 @@ async function runCrawlBatch(budgetMs) {
     return {
         discovered,
         upserted,
+        pages,
         writeOk,
         datasetSize: dataset.length,
         sweepCount: state.sweepCount,
