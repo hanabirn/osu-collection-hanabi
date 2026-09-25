@@ -81,3 +81,26 @@
   from = "/discord"
   to = "/.netlify/functions/discord-interactions"
   status = 200
+
+# 舊站導向新家。站已搬到 Cloudflare Workers（osu.hanabirn.xyz），
+# 但從這裡安裝過 PWA 或加了書籤的人仍會回到這個網址——而 osu! 的 OAuth
+# 只認得一個 callback，現在登記的是新網域，所以舊站的登入必定失敗
+# （實測回 invalid_client）。把進到首頁的人送過去。
+#
+# 只轉首頁，不做 /* 全站轉址：Discord 的互動端點還在這裡服務
+# （上面的 /discord 規則，以及它內部呼叫的 discord-work-background），
+# 全站轉址會把那條路徑一起吃掉。深層連結留在舊站也仍然可用。
+#
+# 用 302 而非 301：瀏覽器會把 301 硬快取住，之後想改回來很麻煩。
+# 等新站穩定一段時間、確定不需要退回，再換成 301。
+[[redirects]]
+  from = "/"
+  to = "https://osu.hanabirn.xyz/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/index.html"
+  to = "https://osu.hanabirn.xyz/"
+  status = 302
+  force = true

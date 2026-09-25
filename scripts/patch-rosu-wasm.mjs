@@ -40,7 +40,17 @@ if (!wasmModule) {
     );
 }`;
 
-const src = await readFile(SRC, 'utf8');
+/* Netlify 也跑同一個 npm run build，但它的建置環境不一定有
+   netlify/functions/node_modules（函式相依由它自己的外掛另外安裝）。
+   這份修補只有 Cloudflare 的打包需要，來源不在就跳過，不要讓
+   整個建置失敗——否則連舊站的轉址都部署不上去。 */
+let src;
+try {
+    src = await readFile(SRC, 'utf8');
+} catch {
+    console.log('找不到 rosu-pp-js 來源，略過修補（只有 Cloudflare 打包需要）');
+    process.exit(0);
+}
 
 if (!src.includes(ORIGINAL_LOADER)) {
     console.error('找不到預期的 WASM 載入片段 —— rosu-pp-js 可能升版了，請重新確認修補內容。');

@@ -135,17 +135,24 @@ export default {
 
         const kvCacheKey = 'v1:' + effectiveUrl.toString();
 
+        /* 查快取要整段包起來：快取只是加速手段，任何一層出問題都應該
+           安靜地退回去實際執行函式，而不是讓請求整個失敗。
+           曾經沒包，結果 KV 因為鍵過長丟例外，登入回呼直接變 Error 1101。 */
         if (isCacheable) {
-            const hit = await cache.match(cacheKey);
-            if (hit) {
-                const h = new Response(hit.body, hit);
-                h.headers.set('X-Edge-Cache', 'HIT');
-                return h;
+            try {
+                const hit = await cache.match(cacheKey);
+                if (hit) {
+                    const h = new Response(hit.body, hit);
+                    h.headers.set('X-Edge-Cache', 'HIT');
+                    return h;
+                }
+                /* caches.default 是各邊緣節點獨立的，KV 這層則是全域共用，
+                   冷節點也能命中。見 response-cache.js 的說明。 */
+                const kvHit = await readFromKv(env.KV_RESP_CACHE, kvCacheKey);
+                if (kvHit) return kvHit;
+            } catch (err) {
+                console.error('查快取失敗，改為直接執行:', String(err?.message || err));
             }
-            /* workers.dev 上 caches.default 是 no-op（實測永遠 MISS），
-               所以再查一次 KV 這層。見 response-cache.js 的說明。 */
-            const kvHit = await readFromKv(env.KV_RESP_CACHE, kvCacheKey);
-            if (kvHit) return kvHit;
         }
 
         try {

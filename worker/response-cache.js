@@ -31,9 +31,26 @@ function isPubliclyCacheable(cacheControl) {
     return /public/i.test(cc) && parseMaxAge(cc) > 0 && !/no-store|private/i.test(cc);
 }
 
+/* KV 的鍵上限是 512 bytes，超過會丟例外。網址帶長 query 時很容易撞到——
+   osu! 的 OAuth 授權碼就有 700 多字元，實測讓整個 Worker 回 Error 1101
+   （未捕捉的例外），登入直接壞掉。這類一次性網址本來也不該進快取，
+   所以太長就直接不碰快取。 */
+const MAX_KEY_BYTES = 480;
+
+function keyTooLong(key) {
+    return new TextEncoder().encode(key).length > MAX_KEY_BYTES;
+}
+
 async function readFromKv(ns, key) {
-    if (!ns) return null;
-    const hit = await ns.getWithMetadata(key, 'text');
+    if (!ns || keyTooLong(key)) return null;
+    let hit;
+    try {
+        hit = await ns.getWithMetadata(key, 'text');
+    } catch (err) {
+        /* 快取失敗絕不能拖垮請求本身 */
+        console.error('KV 快取讀取失敗:', String(err?.message || err));
+        return null;
+    }
     if (hit?.value == null) return null;
     const meta = hit.metadata ?? {};
     return new Response(hit.value, {
@@ -43,7 +60,7 @@ async function readFromKv(ns, key) {
 }
 
 async function writeToKv(ns, key, response, maxAge) {
-    if (!ns) return;
+    if (!ns || keyTooLong(key)) return;
     const body = await response.text();
     if (body.length > MAX_BYTES) return;
 
