@@ -35,10 +35,9 @@ const names = files
     .filter((n) => !DEAD.has(n))
     .sort();
 
-/* push-cron 先不納入：它 require('web-push')，那個套件依賴 Node 的 crypto
-   實作，在 Workers 打包不過（VAPID 簽章要用 Web Crypto 重寫，見遷移計畫
-   階段 3）。留在這裡會讓整包 build 失敗，所以等重寫完再加回來。 */
-const NEEDS_REWRITE = new Set(['push-cron']);
+/* 全部排程都已可在 Workers 上執行。push-cron 曾因 web-push 依賴
+   Node crypto 而打包不過，已改用 _web-push.js（Web Crypto 實作）。 */
+const NEEDS_REWRITE = new Set();
 
 const skipped = {
     cron: files

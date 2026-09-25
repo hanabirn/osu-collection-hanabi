@@ -35,13 +35,14 @@
     // 排程。與 netlify.toml 原本的 schedule 一致，對應表在 worker/index.js
     // 的 CRON_SCHEDULE（Cloudflare 以 cron 字串比對，兩邊必須逐字相同）。
     //
-    // 兩個尚未啟用：
-    //   */10 farm-crawl-cron —— farm-maps 功能去留未定，而且它每 10 分鐘就
-    //     跑一次 rosu-pp 重運算並打 osu! API，是目前限流壓力的主要來源。
-    //   */30 push-cron —— 依賴 web-push，需先用 Web Crypto 重寫 VAPID 簽章。
-    // 兩者的處理器都已接好，確定要用時把 cron 字串加回這個陣列即可。
+    // catalog 與 push 錯開到 :05/:35 與 :20/:50：Cloudflare 以 cron 字串
+    // 當索引，兩者原本同為每 30 分鐘會撞在一起，也會同時打 osu! API。
+    //
+    // 仍未啟用：farm-crawl-cron（每 10 分鐘）。farm-maps 功能去留未定，
+    // 而它每輪都跑 rosu-pp 重運算並打 osu! API，是限流壓力的主要來源。
+    // 處理器已接好，要用時把 "*/10 * * * *" 加回這個陣列即可。
     "triggers": {
-        "crons": ["*/30 * * * *", "0 */6 * * *", "0 6 * * 1"],
+        "crons": ["5,35 * * * *", "20,50 * * * *", "0 */6 * * *", "0 6 * * 1"],
     },
 
     // osu-parsers 的 package.json exports 只在 "node" 條件下提供 require 入口，

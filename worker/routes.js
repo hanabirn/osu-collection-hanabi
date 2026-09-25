@@ -1,6 +1,6 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
  * 端點數: 66
- * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
+ * 排除: 排程 5 個（階段 4 改走 scheduled handler）、
  *       Discord 3 個（延後）、死程式碼 1 個
  */
 const { adapt } = require('./adapter');
@@ -79,6 +79,7 @@ const CRON_HANDLERS = {
     "catalog-crawl-cron": require('../netlify/functions/catalog-crawl-cron').handler,
     "community-mappools-crawl-cron": require('../netlify/functions/community-mappools-crawl-cron').handler,
     "farm-crawl-cron": require('../netlify/functions/farm-crawl-cron').handler,
+    "push-cron": require('../netlify/functions/push-cron').handler,
     "wc-mappool-crawl-cron": require('../netlify/functions/wc-mappool-crawl-cron').handler,
 };
 

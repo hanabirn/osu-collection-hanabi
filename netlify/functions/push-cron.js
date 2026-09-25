@@ -11,7 +11,10 @@
 
    Only tracked-player PP for now. Mapper / tournament pushes would add
    their own check blocks here against fields on the same sub entry. */
-const webpush = require('web-push');
+/* 自行以 Web Crypto 實作的 Web Push，取代 web-push 套件——後者依賴
+   Node 的 crypto，在 Cloudflare Workers 上連打包都過不了。
+   介面刻意對齊：失敗時丟出帶 statusCode 的錯誤。 */
+const webpush = require('./_web-push');
 const { getPushStore } = require('./_push-store');
 
 const RUN_BUDGET_MS = 20000;
@@ -35,7 +38,7 @@ async function fetchTotalPp(id, apiKey) {
     return total;
 }
 
-async function processSub(store, key, apiKey) {
+async function processSub(store, key, apiKey, vapid) {
     const entry = await store.get(key, { type: 'json' });
     if (!entry || !entry.subscription || !Array.isArray(entry.players) || !entry.players.length) return;
 
@@ -59,7 +62,7 @@ async function processSub(store, key, apiKey) {
 
     for (const n of notes) {
         try {
-            await webpush.sendNotification(entry.subscription, JSON.stringify(n));
+            await webpush.sendNotification(entry.subscription, JSON.stringify(n), vapid);
         } catch (err) {
             if (err && (err.statusCode === 404 || err.statusCode === 410)) {
                 await store.delete(key);                     // subscription expired
@@ -78,11 +81,13 @@ exports.handler = async () => {
     const apiKey = process.env.OSU_API_KEY;
     if (!apiKey) return { statusCode: 200, body: 'no OSU_API_KEY' };
 
-    webpush.setVapidDetails(
-        process.env.VAPID_SUBJECT || 'mailto:admin@example.com',
-        process.env.VAPID_PUBLIC_KEY,
-        process.env.VAPID_PRIVATE_KEY,
-    );
+    /* 原本是 webpush.setVapidDetails() 設在模組層的全域狀態；改成每次
+       明確傳入，Workers 的 isolate 會重用，全域狀態容易殘留。 */
+    const vapid = {
+        subject: process.env.VAPID_SUBJECT || 'mailto:admin@example.com',
+        publicKey: process.env.VAPID_PUBLIC_KEY,
+        privateKey: process.env.VAPID_PRIVATE_KEY,
+    };
 
     const store = getPushStore();
     const start = Date.now();
@@ -100,7 +105,7 @@ exports.handler = async () => {
     while (Date.now() - start < RUN_BUDGET_MS && done < keys.length) {
         const batch = [];
         for (let n = 0; n < CHUNK && done < keys.length; n++, done++) {
-            batch.push(processSub(store, keys[i % keys.length], apiKey).catch(() => {}));
+            batch.push(processSub(store, keys[i % keys.length], apiKey, vapid).catch(() => {}));
             i++;
         }
         await Promise.all(batch);

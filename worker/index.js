@@ -75,7 +75,12 @@ function resolveRoute(url) {
    原本的排程宣告在 netlify.toml 的 [functions."<name>"] schedule。 */
 const CRON_SCHEDULE = {
     '*/10 * * * *': 'farm-crawl-cron',
-    '*/30 * * * *': 'catalog-crawl-cron',
+    // catalog 與 push 在 Netlify 上原本都是每 30 分鐘，但 Cloudflare 以 cron
+    // 字串當索引，同一個字串只能對到一個處理器。錯開成 :05 與 :20，
+    // 順便讓兩者不會擠在同一分鐘一起打 osu! API。
+    // （這裡刻意用行註解：cron 字串裡的斜線加星號會提前終止區塊註解。）
+    '5,35 * * * *': 'catalog-crawl-cron',
+    '20,50 * * * *': 'push-cron',
     '0 */6 * * *': 'community-mappools-crawl-cron',
     '0 6 * * 1': 'wc-mappool-crawl-cron',
 };
