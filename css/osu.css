@@ -1069,43 +1069,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     text-overflow: ellipsis;
 }
 
-/* ===== Farm Maps filter row + coverage note ===== */
-.farm-range-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    margin-bottom: 12px;
-}
-.farm-range-field {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.76rem;
-    color: var(--text-secondary);
-}
-.farm-range-field input {
-    width: 60px;
-    min-width: 0;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid var(--border-input);
-    background-color: var(--bg-input);
-    color: var(--text);
-    font-size: 0.85rem;
-    font-family: inherit;
-}
-.farm-range-field input:focus {
-    outline: none;
-    border-color: var(--accent-light-purple);
-    box-shadow: 0 0 12px rgba(192,132,252,0.25);
-}
-.farm-coverage {
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--text-dim2);
-    margin-bottom: 16px;
-}
-
 .gallery-filter-row { align-items: center; margin-top: -6px; flex-wrap: wrap; }
 .gallery-liked-only-label {
     display: flex;
@@ -1479,9 +1442,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    match it exactly (see js/osu.js playBtnIcon()'s header comment for why
    this is pure CSS transform(scaleY) animation, not real audio analysis).
    Idle: hidden, 12px tall, sized to its own content inside the small
-   circle button. Playing (.osu-play-btn only — see the shape-change rule
-   below; .games-card-btn stays a small circle and just shows these same
-   bars at that size): full width/height of the button, flex:1 bars. */
+   circle button. Playing: the button becomes a bottom-anchored strip
+   across the card (see the shape-change rule below) and the bars fill it,
+   flex:1 each, held back so the card's own title still reads first. */
 .osu-play-bars {
     display: none;
     align-items: flex-end;
@@ -1497,10 +1460,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     transform-origin: bottom;
     animation: osuEqBounce 1s ease-in-out infinite;
 }
-.osu-play-btn.playing .icon-svg,
-.games-card-btn.playing .icon-svg { display: none; }
-.osu-play-btn.playing .osu-play-bars,
-.games-card-btn.playing .osu-play-bars { display: flex; }
+.osu-play-btn.playing .icon-svg { display: none; }
+.osu-play-btn.playing .osu-play-bars { display: flex; }
 .osu-play-btn.playing .osu-play-bars {
     width: 100%;
     height: 100%;
@@ -1652,80 +1613,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    otherwise be permanently invisible and untappable — show them by default
    there instead (UX audit: "hover vs tap" + "touch target size", both High). */
 @media (hover: none) {
-    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-mp-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn, .farm-add-btn {
+    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-mp-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn {
         opacity: 0.85;
     }
 }
-.farm-add-btn {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    background: rgba(0,0,0,0.5);
-    color: rgba(255,255,255,0.6);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    z-index: 3;
-    opacity: 0;
-}
-.osu-card:hover .farm-add-btn { opacity: 1; }
-.farm-add-btn:hover {
-    color: #fff;
-    background: rgba(52,211,153,0.5);
-    transform: scale(1.1);
-}
-/* Already-collected state stays visible at all times (not hover-only, like
-   the plus button) since it's informational, not just an action trigger. */
-.farm-add-btn.in-collection {
-    opacity: 0.9;
-    color: #34d399;
-    background: rgba(52,211,153,0.18);
-    cursor: default;
-}
-.farm-add-btn.in-collection:hover { transform: none; }
 
-.farm-card-version {
-    color: rgba(255,255,255,0.6);
-    font-weight: normal;
-    font-size: 0.85em;
-}
-.farm-card-meta {
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-    margin-top: 1px;
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.8);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-.farm-card-pp {
-    color: var(--accent-yellow);
-    font-weight: bold;
-    font-size: 0.95rem;
-}
-
-/* Farm 圖 cards reuse .osu-collection/.osu-card (shared with the main
-   collection grid), but at 4/1.6 + a fixed 2-column grid every card ended
-   up wide+tall (full .site-page width / 2), so the list only fit a
-   handful per screen. Scoped to #farm-maps-list so the main collection
-   grid (#osu-collection) and gallery cards keep their own proportions. */
-#farm-maps-list.osu-collection {
-    /* Fixed 3 columns (12 per page, FARM_PAGE_SIZE) rather than auto-fill —
-       overflow goes to the next page. Drops to 2 then 1 on narrow screens;
-       the per-page count doesn't change, it just stacks into more rows. */
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-}
-#farm-maps-list .osu-card {
-    aspect-ratio: 4 / 1.3;
-    border-radius: 10px;
-}
 /* Farm & Catalog cards: play preview centred, copy + download on the right.
    Only two buttons on the right (these cards have no delete/fav/category),
    so download lands at right:48 — clear of the centred play button even on
@@ -1777,59 +1669,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .catalog-status-badge.is-ranked { color: #7cd4ff; }
 .catalog-status-badge.is-loved { color: #ff8bcd; }
 .catalog-status-badge.is-loved .icon-svg { fill: currentColor; }
-#farm-maps-list .osu-copy-btn,
 #catalog-list .osu-copy-btn { right: 8px; }
-#farm-maps-list .osu-download-btn,
 #catalog-list .osu-download-btn { right: 48px; }
-#farm-maps-list .osu-card-info {
-    padding: 8px 40px 6px 10px;
-}
-/* Denser farm cards (aspect 4/1.3) — shrink the language pill a touch so it
-   doesn't crowd the tighter title/meta stack below it. */
-#farm-maps-list .osu-lang-badge {
-    font-size: 0.64rem;
-    padding: 2px 8px;
-    margin-bottom: 2px;
-}
-#farm-maps-list .osu-card-title {
-    font-size: 0.85rem;
-}
-#farm-maps-list .farm-card-meta {
-    font-size: 0.7rem;
-    margin-top: 0;
-}
-#farm-maps-list .farm-card-pp {
-    font-size: 0.82rem;
-}
-#farm-maps-list .osu-card-artist {
-    font-size: 0.7rem;
-}
-#farm-maps-list .osu-card-mapper {
-    font-size: 0.62rem;
-    margin-top: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-#farm-maps-list .osu-card-mode-badge {
-    width: 30px;
-    height: 30px;
-    bottom: 6px;
-    right: 6px;
-}
-#farm-maps-list .osu-card-mode-badge .mode-icon-inline {
-    width: 19px;
-    height: 19px;
-}
-@media (max-width: 760px) {
-    #farm-maps-list.osu-collection { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 460px) {
-    #farm-maps-list.osu-collection {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-}
 
 /* ⭐ Catalog star-rating range slider — two overlapping native
    <input type="range">, transparent except the thumb (classic dual-thumb
@@ -2460,142 +2301,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border: 1px solid var(--border-card);
 }
 .cmpool-src-wybin { color: var(--text-pink); border-color: rgba(var(--pink-rgb), 0.35); }
-/* ===== 小遊戲區 ===== */
-.games-hub { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 6px; }
-.games-hub[hidden] { display: none; }
-.games-card {
-    border: 1px solid var(--border-card);
-    background: var(--bg-card);
-    border-radius: 14px;
-    padding: 22px 20px;
-    cursor: pointer;
-    transition: border-color .15s var(--ease-out), transform .15s var(--ease-out);
-}
-.games-card:hover { border-color: rgba(var(--pink-rgb), 0.5); transform: translateY(-2px); }
-.games-card-emoji { font-size: 2rem; line-height: 1; }
-.games-card-glyph {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(var(--pink-rgb), 0.12);
-    color: var(--pink-text, var(--pink));
-}
-.games-card-glyph svg { display: block; }
-.games-card h3 { margin: 12px 0 4px; font-size: 1.05rem; }
-.games-card p { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
-#games-view[hidden] { display: none; }
-
-.gd-head, .gh-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 10px 0 12px; }
-.gd-head h3, .gh-head h3 { margin: 0; }
-.gd-date { color: var(--text-dim2); font-size: 0.85rem; font-weight: 400; }
-.gd-streak, .gh-score { margin-left: auto; color: var(--text-dim); font-size: 0.82rem; }
-
-.gd-cover-wrap { width: 100%; max-width: 480px; aspect-ratio: 900 / 250; overflow: hidden; border-radius: 12px; border: 1px solid var(--border-card); }
-.gd-cover { width: 100%; height: 100%; object-fit: cover; transition: filter .3s var(--ease-out), transform .3s var(--ease-out); }
-.gd-clip { margin: 10px 0; }
-.gd-clip button, .gd-outcome-actions button, .gh-vs button, .gh-over button {
-    border: 1px solid var(--border-card); background: transparent; color: var(--text);
-    font: inherit; padding: 7px 14px; border-radius: 9px; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 6px;
-}
-.gd-clip button:hover, .gh-vs button:hover { border-color: rgba(var(--pink-rgb), 0.5); }
-
-.gd-prompt { max-width: 480px; margin: 12px 0 6px; font-size: 0.85rem; color: var(--text-dim); }
-.gd-opts { max-width: 480px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.gd-opt {
-    text-align: left; border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text);
-    font: inherit; font-size: 0.85rem; padding: 10px 12px; border-radius: 9px; cursor: pointer;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    transition: border-color .12s var(--ease-out), background .12s var(--ease-out);
-}
-.gd-opt:hover:not(:disabled) { border-color: rgba(var(--pink-rgb), 0.55); }
-.gd-opt:disabled { cursor: default; }
-.gd-opt.is-wrong { opacity: .4; text-decoration: line-through; }
-.gd-opt.is-answer { border-color: rgba(52, 211, 153, 0.7); background: rgba(52, 211, 153, 0.12); opacity: 1; }
-.gd-hints { max-width: 480px; margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
-.gd-hint { font-size: 0.82rem; color: var(--text-dim); }
-@media (max-width: 520px) { .gd-opts { grid-template-columns: 1fr; } }
-.gd-outcome { max-width: 480px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-card); }
-.gd-outcome.is-win { border-color: rgba(52, 211, 153, 0.5); }
-.gd-outcome p { margin: 0 0 6px; }
-.gd-answer a { color: var(--text-pink); }
-.gd-answer-sub { color: var(--text-dim2); font-size: 0.82rem; }
-.gd-outcome-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-
-.gh-arena { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; max-width: 720px; }
-.gh-card { position: relative; min-height: 220px; border-radius: 14px; border: 1px solid var(--border-card); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: space-between; padding: 14px; color: #fff; }
-.gh-card-title { font-weight: 600; font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
-.gh-card-sub { font-size: 0.78rem; opacity: .85; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
-.gh-card-stat { text-align: center; }
-.gh-val { font-size: 1.5rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
-.gh-q { font-size: 2rem; font-weight: 700; opacity: .8; }
-.gh-vs { display: flex; align-items: center; }
-.gh-mid { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; }
-.gh-ask { font-size: 0.82rem; color: var(--text-dim); max-width: 120px; }
-.gh-ok { color: #34d399; font-size: 1.4rem; margin: 0; }
-.gh-no { color: #ff7676; font-size: 1.4rem; margin: 0; }
-.gh-over p { margin: 0; }
-.gh-best { color: var(--text-dim); font-size: 0.82rem; }
-.gh-save { font-size: 0.78rem; }
-@media (max-width: 560px) {
-    .gh-arena { grid-template-columns: 1fr; }
-    .gh-vs { justify-content: center; padding: 6px 0; }
-}
-
-/* 分類快問快答 */
-.gq-card { max-width: 480px; min-height: 120px; border-radius: 14px; border: 1px solid var(--border-card); background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 14px; margin-top: 8px; }
-.gq-card-t { color: #fff; font-weight: 600; font-size: 0.95rem; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
-.gq-opts { max-width: 480px; margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-.gq-opt { border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text); font: inherit; font-size: 0.85rem; padding: 10px 8px; border-radius: 9px; cursor: pointer; }
-.gq-opt:hover:not(:disabled) { border-color: rgba(var(--pink-rgb), 0.55); }
-.gq-opt:disabled { cursor: default; opacity: .7; }
-.gq-feedback { max-width: 480px; margin-top: 10px; font-size: 0.88rem; }
-.gq-feedback.is-ok { color: #34d399; }
-.gq-feedback.is-no { color: #ff7676; }
-
-/* Higher-or-Lower / Genre-quiz: preview + save buttons pinned to the
-   beatmap banner, and a shared streak/score leaderboard beside the arena. */
-.gq-card { position: relative; }
-.games-card-btns { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; z-index: 2; }
-.games-card-btn {
-    width: 30px; height: 30px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    border: none; cursor: pointer;
-    background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.85);
-    transition: background 0.15s, transform 0.15s;
-}
-.games-card-btn:hover { background: rgba(var(--pink-rgb), 0.6); color: var(--on-accent, #fff); transform: scale(1.1); }
-
-.games-layout { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
-.games-layout > .gh-arena,
-.games-layout > .games-layout-main,
-.games-layout > .gq-over { flex: 1 1 320px; min-width: 0; }
-.games-layout-main { max-width: 480px; }
-
-.games-board {
-    flex: 0 1 240px; align-self: stretch;
-    border: 1px solid var(--border-card); border-radius: 12px;
-    background: var(--bg-stat); padding: 10px 12px;
-}
-.games-board h4 { margin: 0 0 8px; font-size: 0.85rem; color: var(--text); }
-.games-board-row {
-    display: grid; grid-template-columns: 2rem 1fr auto; gap: 6px; align-items: baseline;
-    padding: 4px 6px; border-radius: 7px; font-size: 0.82rem;
-}
-.games-board-row.is-me { background: rgba(var(--pink-rgb), 0.14); }
-.games-board-rank { color: var(--text-dim2); font-variant-numeric: tabular-nums; }
-.games-board-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.games-board-score { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
-.games-board-empty, .games-board-login { font-size: 0.78rem; color: var(--text-dim); margin: 6px 2px 0; }
-@media (max-width: 560px) {
-    .games-board { flex-basis: 100%; }
-}
-.gq-over { max-width: 480px; margin-top: 14px; padding: 16px; border-radius: 12px; border: 1px solid var(--border-card); text-align: center; }
-.gq-over p { margin: 0 0 6px; }
-.gq-over button { border: 1px solid var(--border-card); background: transparent; color: var(--text); font: inherit; padding: 7px 14px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
 
 .cmpool-back {
     display: inline-flex;
@@ -2879,14 +2584,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .osu-play-btn.playing:hover {
     transform: none;
     background: linear-gradient(180deg, rgba(10,10,22,0) 0%, rgba(10,10,22,0.5) 45%, rgba(10,10,22,0.78) 100%);
-}
-/* .games-card-btn (mini-games) keeps its small circle shape when playing —
-   its wrapper (.games-card-btns) is a shrink-to-fit icon row, not a full-
-   card-width box, so it has no room for the same expand-to-strip move. */
-.games-card-btn.playing {
-    opacity: 1;
-    color: #fff;
-    background: rgba(244,114,182,0.7);
 }
 
 .osu-card-info {
@@ -3580,7 +3277,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    so the usable interior is ~540px after padding; a 200px minimum
    (2*200=400) reliably gives two side-by-side columns on desktop and matches
    the mobile-fallback minimum used for this card type elsewhere
-   (#farm-maps-list/#catalog-list/.mappool-list at <=480px). */
+   (#catalog-list/.mappool-list at <=480px). */
 .pp-compare-topplays-title {
     margin: 1rem 0 10px;
     text-align: center;
