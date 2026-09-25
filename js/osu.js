@@ -985,7 +985,7 @@ async function deleteOsuCategory(categoryId, event) {
    the "static vs live" gap vs osu!Collector's fixed collections. Purely
    client-side: { [catId]: { facet:{type,value}, mode:'<int>'|'', label,
    lastSyncAt, lastCount } } in localStorage; refresh re-runs the same
-   catalog-list query the create button used. */
+   catalog query the create button used (catalogFetchLocal in catalog.js). */
 function getSmartCategories() {
     try { return JSON.parse(localStorage.getItem('osu_smart_categories')) || {}; }
     catch { return {}; }
@@ -1042,9 +1042,7 @@ async function refreshSmartCategory(catId) {
 
     try {
         setBtn(t('gallery_loading'), true);
-        const res = await fetch(`/.netlify/functions/catalog-list?${params}`);
-        if (!res.ok) throw new Error('bad response');
-        const data = await res.json();
+        const data = await catalogFetchLocal(params);
         const ids = (data.items || []).map(x => x.id).filter(Boolean);
         const have = new Set(getCategoryMemberIds(catId));
         const fresh = ids.filter(id => !have.has(id));
@@ -3091,7 +3089,9 @@ function initCollectionHero() {
         // The published-collection count is tiny while the gallery is young
         // and reads as "nobody uses this" — lead instead with the ranked
         // catalog the crawler has actually indexed (tens of thousands of sets).
-        fetch('/.netlify/functions/catalog-list?limit=1&page=0').then(r => (r.ok ? r.json() : null)),
+        // ?meta=1 answers from R2 metadata — just the count, not the ~2 MB
+        // index the catalog tab downloads.
+        fetch('/.netlify/functions/catalog-data?meta=1').then(r => (r.ok ? r.json() : null)),
         fetch('/.netlify/functions/site-likes').then(r => (r.ok ? r.json() : null)),
     ]).then(([a, b]) => {
         const computed = a.status === 'fulfilled' && a.value && typeof a.value.total === 'number'

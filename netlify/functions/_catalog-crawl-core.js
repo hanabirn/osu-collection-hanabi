@@ -1,6 +1,10 @@
-/* Shared crawl logic for the catalog metadata index, used by the scheduled
-   handler (catalog-crawl-cron.js) and the manual/backfill HTTP endpoint
-   (catalog-crawl-run.js). Deliberately light: no .osu file fetch and no
+/* Shared crawl logic for the catalog metadata index. On Cloudflare it runs
+   from GitHub Actions (scripts/catalog-crawl.mjs, .github/workflows/
+   catalog-crawl.yml): each run parses and rewrites the whole ~26 MB dataset,
+   ~0.5-0.8 s of CPU, and the free Workers plan's 10 ms limit applies to
+   Cron Triggers too, so as a Worker cron it was killed on most runs. The
+   Netlify copy still uses the scheduled handler (catalog-crawl-cron.js) and
+   the manual/backfill HTTP endpoint (catalog-crawl-run.js). Deliberately light: no .osu file fetch and no
    per-map scores call — just page GET /beatmapsets/search and store one
    lean record per beatmapSET.
 
@@ -26,6 +30,7 @@ const { getOsuToken } = require('./_osu-auth');
 const { getCatalogStore } = require('./_blobs-store');
 const { setJSONGz, getJSONGz } = require('./_blob-json');
 const { primaryArtist, artistKeys } = require('./_artist-keys');
+const { writeLeanCatalog, coverageFromState } = require('./_catalog-lean');
 
 const STATE_KEY = 'catalog-state';
 const DATASET_KEY = 'catalog:all';
@@ -146,9 +151,11 @@ async function discoverBatch(state) {
     return sets;
 }
 
-async function runCrawlBatch(budgetMs) {
+/* `store` defaults to the osu-catalog Blobs/R2 store; the GitHub Actions
+   crawler (scripts/catalog-crawl.mjs) passes a file-backed one with the
+   same get/set/setJSON interface, then uploads the result to R2 itself. */
+async function runCrawlBatch(budgetMs, { store = getCatalogStore() } = {}) {
     const start = Date.now();
-    const store = getCatalogStore();
     const state = await loadState(store);
     const snapshot = JSON.parse(JSON.stringify(state));
     const dataset = (await getJSONGz(store, DATASET_KEY)) || [];
@@ -201,6 +208,7 @@ async function runCrawlBatch(budgetMs) {
         error = `dataset write failed: ${err.message}`;
     }
 
+    let savedState;
     if (writeOk) {
         /* Hand the next run the other status. Switching only when a cursor
            runs out would have meant one full pass over ranked — 55k sets,
@@ -211,14 +219,28 @@ async function runCrawlBatch(budgetMs) {
         state.lastOkAt = now;
         state.lastError = error;
         state.consecutiveWriteFails = 0;
-        await store.setJSON(STATE_KEY, state);
+        savedState = state;
     } else {
-        await store.setJSON(STATE_KEY, {
+        savedState = {
             ...snapshot,
             lastRunAt: now,
             lastError: error,
             consecutiveWriteFails: (snapshot.consecutiveWriteFails || 0) + 1,
-        });
+        };
+    }
+    await store.setJSON(STATE_KEY, savedState);
+
+    /* The browser-facing lean copy (see _catalog-lean.js). Rebuilt even when
+       the dataset write failed, so the catalog page's coverage line still
+       shows the ⚠ for consecutiveWriteFails. Its own failure only costs
+       freshness — the previous copy keeps serving — so it never fails the
+       run. */
+    let leanOk = true;
+    try {
+        await writeLeanCatalog(store, dataset, coverageFromState(savedState, dataset.length));
+    } catch (err) {
+        leanOk = false;
+        console.error('catalog lean write failed:', err.message);
     }
 
     return {
@@ -226,6 +248,7 @@ async function runCrawlBatch(budgetMs) {
         upserted,
         pages,
         writeOk,
+        leanOk,
         datasetSize: dataset.length,
         sweepCount: state.sweepCount,
         cursorActive: !!state.searchCursor,

@@ -41,8 +41,14 @@
     // 仍未啟用：farm-crawl-cron（每 10 分鐘）。farm-maps 功能去留未定，
     // 而它每輪都跑 rosu-pp 重運算並打 osu! API，是限流壓力的主要來源。
     // 處理器已接好，要用時把 "*/10 * * * *" 加回這個陣列即可。
+    //
+    // 已移出：catalog-crawl-cron（原本的 "5,35 * * * *"）。它每輪要解析並重寫
+    // 整份 26 MB 的曲庫，約 0.5 秒 CPU，而免費方案的 10 ms 上限對排程也適用，
+    // 大多數輪次都被中斷。改由 GitHub Actions 執行，見
+    // .github/workflows/catalog-crawl.yml 與 scripts/catalog-crawl.mjs。
+    // 別加回來：兩邊同時跑會讀到同一份曲庫，後上傳的那邊會蓋掉另一邊的新資料。
     "triggers": {
-        "crons": ["5,35 * * * *", "20,50 * * * *", "0 */6 * * *", "0 6 * * 1"],
+        "crons": ["20,50 * * * *", "0 */6 * * *", "0 6 * * 1"],
     },
 
     // osu-parsers 的 package.json exports 只在 "node" 條件下提供 require 入口，

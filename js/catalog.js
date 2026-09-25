@@ -1,17 +1,25 @@
 /* ===== Catalog tab: browse the whole ranked beatmap catalog by artist /
    language / genre / source / feat. name. Backed by this site's own
-   metadata index (netlify/functions/catalog-list.js, fed by the
-   catalog-crawl-cron.js background crawler — no star floor, no PP, one lean
-   record per beatmapSET). The dataset is partial/growing, never implied
-   complete — see renderCatalogCoverage(). =====
+   metadata index, built by the catalog-crawl-cron.js background crawler —
+   no star floor, no PP, one lean record per beatmapSET. The dataset is
+   partial/growing, never implied complete — see renderCatalogCoverage().
+
+   Queries run in the browser: the whole lean index is downloaded once
+   (/.netlify/functions/catalog-data, ~2 MB gzipped, see
+   netlify/functions/_catalog-lean.js) and catalogQueryLocal() filters,
+   sorts and counts facets over it. The server-side catalog-list did the
+   same on every request and blew the free Workers plan's 10 ms CPU limit
+   (Error 1102, "載入曲庫失敗"). catalogFetchLocal() keeps catalog-list's
+   exact request/response shape, so the global search and smart categories
+   in osu.js use it too. =====
 
    Reuses osu.js helpers: OSU_GENRES / OSU_LANGUAGES (id -> localized name),
    escHtml, icon, buildPaginationPageButtons, addOsuBeatmap,
    applyImportedCollections. Frontend mode keys ('standard'/…) bridge to the
    API's ruleset ints via CATALOG_MODE_INT. */
 const CATALOG_MODE_INT = { standard: 0, taiko: 1, catch: 2, mania: 3 };
-// 3-column grid, 4 rows per page (see #catalog-list in css/osu.css). The
-// server takes this as a `pageSize` override.
+// 3-column grid, 4 rows per page (see #catalog-list in css/osu.css). Passed
+// to catalogQueryLocal() as the `pageSize` override.
 const CATALOG_PAGE_SIZE = 12;
 
 let catalogLoaded = false;
@@ -40,7 +48,7 @@ let catalogCoverage = null;
 let catalogFacets = null;
 let catalogSearchDebounce = null;
 
-// The source/artist facets are unbounded (see catalog-list.js), so instead
+// The source/artist facets are unbounded (see catalogQueryLocal()), so instead
 // of a plain <select> they're a searchable combobox: a text input that
 // filters catalogFacets.topSources/topArtists client-side. Rendered list is
 // still capped at CATALOG_COMBO_MAX_RESULTS to keep the dropdown DOM small
@@ -97,6 +105,225 @@ function catalogBuildParams(extra) {
     if (catalogNsfw) params.set('includeNsfw', '1');
     for (const [k, v] of Object.entries(extra || {})) params.set(k, String(v));
     return params;
+}
+
+/* ===== Client-side catalog index =====
+   Downloaded once per page load and shared by every caller; a failed
+   download clears the promise so the next action retries. The browser's
+   HTTP cache (ETag + max-age) makes repeat visits cheap. */
+const CATALOG_DATA_URL = '/.netlify/functions/catalog-data';
+const CATALOG_LEAN_VERSION = 1;
+let catalogDataPromise = null;
+
+function ensureCatalogData() {
+    if (!catalogDataPromise) {
+        catalogDataPromise = fetch(CATALOG_DATA_URL)
+            .then(res => {
+                if (!res.ok) throw new Error(`catalog-data ${res.status}`);
+                return res.json();
+            })
+            .then(decodeCatalogLean)
+            .catch(err => {
+                catalogDataPromise = null;
+                throw err;
+            });
+    }
+    return catalogDataPromise;
+}
+
+/* Inverse of buildLeanCatalog() in netlify/functions/_catalog-lean.js —
+   back to one object per set, with catalog-list's field names so the
+   card rendering and filters read the same properties as before. */
+function decodeCatalogLean(c) {
+    if (!c || c.v !== CATALOG_LEAN_VERSION || !Array.isArray(c.id)) throw new Error('unexpected catalog-data format');
+    const records = new Array(c.id.length);
+    for (let i = 0; i < c.id.length; i++) {
+        const artist = c.a[i];
+        const title = c.t[i];
+        const primary = c.pa[i] || artist;
+        records[i] = {
+            id: c.id[i],
+            artist,
+            artist_unicode: c.au[i] || artist,
+            title,
+            title_unicode: c.tu[i] || title,
+            creator: c.c[i],
+            source: c.s[i],
+            genre_id: c.g[i],
+            language_id: c.l[i],
+            nsfw: c.x[i] === 1,
+            ranked: c.rd[i],
+            modeMask: c.m[i],
+            star_min: c.s0[i],
+            star_max: c.s1[i],
+            diff_count: c.d[i],
+            status: c.st[i] === 1 ? 'loved' : 'ranked',
+            primary_artist: primary,
+            artist_keys: c.ak[i] === 0 ? [primary] : c.ak[i],
+        };
+    }
+    return { records, coverage: c.coverage || null, sorted: new Map() };
+}
+
+/* Sort keys and tie-break match catalog-list.js exactly (plain < / >
+   comparison, then id ascending in both directions). Each order is
+   computed once and reused, so a filter change never re-sorts. The old
+   server's 'new' (firstSeenAt) key isn't carried in the lean index and was
+   never offered in the UI; like any unknown key it falls back to 'ranked'. */
+const CATALOG_SORT_KEYS = {
+    ranked: r => r.ranked || 0,
+    title: r => (r.title_unicode || r.title || '').toLowerCase(),
+    artist: r => (r.primary_artist || r.artist || '').toLowerCase(),
+};
+
+function catalogSortedOrder(data, sortKey, mul) {
+    const cacheKey = `${sortKey}:${mul}`;
+    let order = data.sorted.get(cacheKey);
+    if (!order) {
+        const keyOf = CATALOG_SORT_KEYS[sortKey];
+        const keys = data.records.map(keyOf);
+        order = data.records.map((_, i) => i);
+        order.sort((a, b) => {
+            const va = keys[a], vb = keys[b];
+            if (va < vb) return -1 * mul;
+            if (va > vb) return 1 * mul;
+            return (data.records[a].id || 0) - (data.records[b].id || 0);
+        });
+        data.sorted.set(cacheKey, order);
+    }
+    return order;
+}
+
+let catalogCollator = null;
+
+/* Port of netlify/functions/catalog-list.js's handler: same query
+   parameters (as strings, like event.queryStringParameters), same
+   filtering semantics, same response shape — including the `limit` lean
+   mode used by "build a collection" and smart categories. */
+function catalogQueryLocal(qs, data) {
+    const PAGE_SIZE = 20;
+    const MAX_LIMIT = 300;
+    const page = Math.max(0, parseInt(qs.page, 10) || 0);
+    const pageSize = qs.pageSize ? Math.min(50, Math.max(1, parseInt(qs.pageSize, 10) || 0)) : PAGE_SIZE;
+    const q = (qs.q || '').trim().toLowerCase().slice(0, 100);
+    const artist = (qs.artist || '').trim();
+    const language = (qs.language || '').trim();
+    const genre = (qs.genre || '').trim();
+    const source = (qs.source || '').trim();
+    const sourceLower = source.toLowerCase();
+    const starMin = qs.starMin !== undefined && qs.starMin !== '' ? parseFloat(qs.starMin) : null;
+    const starMax = qs.starMax !== undefined && qs.starMax !== '' ? parseFloat(qs.starMax) : null;
+    const hasStar = Number.isFinite(starMin) || Number.isFinite(starMax);
+    const modeRaw = parseInt(qs.mode, 10);
+    const mode = (modeRaw === 0 || modeRaw === 1 || modeRaw === 2 || modeRaw === 3) ? modeRaw : null;
+    const includeNsfw = qs.includeNsfw === '1';
+    const status = qs.status === 'ranked' || qs.status === 'loved' ? qs.status : '';
+    const limit = qs.limit ? Math.min(MAX_LIMIT, Math.max(1, parseInt(qs.limit, 10) || 0)) : 0;
+
+    const [sortField, sortDir] = (qs.sort || 'ranked_desc').split('_');
+    const sortKey = CATALOG_SORT_KEYS[sortField] ? sortField : 'ranked';
+    const order = catalogSortedOrder(data, sortKey, sortDir === 'asc' ? 1 : -1);
+
+    // Context filter (mode + nsfw + status): facet counts are computed
+    // against this, not against the facet selections themselves.
+    const inContext = r => (includeNsfw || !r.nsfw)
+        && (mode === null || ((r.modeMask >> mode) & 1) === 1)
+        && (!status || r.status === status);
+    const matches = r => {
+        if (language) {
+            if (language === 'unknown' ? r.language_id != null : r.language_id !== Number(language)) return false;
+        }
+        if (genre) {
+            if (genre === 'unknown' ? r.genre_id != null : r.genre_id !== Number(genre)) return false;
+        }
+        if (source) {
+            if (source === 'none' ? !!r.source : (r.source || '').toLowerCase() !== sourceLower) return false;
+        }
+        if (artist && !(Array.isArray(r.artist_keys) && r.artist_keys.includes(artist))) return false;
+        if (hasStar) {
+            if (r.star_min == null || r.star_max == null) return false;
+            if (Number.isFinite(starMin) && r.star_max < starMin) return false;
+            if (Number.isFinite(starMax) && r.star_min > starMax) return false;
+        }
+        if (q && !(
+            (r.artist || '').toLowerCase().includes(q) ||
+            (r.artist_unicode || '').toLowerCase().includes(q) ||
+            (r.title || '').toLowerCase().includes(q) ||
+            (r.title_unicode || '').toLowerCase().includes(q) ||
+            (r.creator || '').toLowerCase().includes(q) ||
+            (r.source || '').toLowerCase().includes(q)
+        )) return false;
+        return true;
+    };
+
+    const recs = data.records;
+    const start = page * pageSize;
+    const end = start + pageSize;
+    const picked = [];
+    let total = 0;
+
+    if (limit) {
+        for (const i of order) {
+            const r = recs[i];
+            if (!inContext(r) || !matches(r)) continue;
+            if (total < limit) picked.push({ id: r.id });
+            total++;
+        }
+        return { items: picked, total };
+    }
+
+    const langCounts = new Map();
+    const genreCounts = new Map();
+    const artistCounts = new Map();
+    const sourceCounts = new Map();
+    let noSourceCount = 0;
+    for (const i of order) {
+        const r = recs[i];
+        if (!inContext(r)) continue;
+        const lk = r.language_id == null ? 'unknown' : r.language_id;
+        langCounts.set(lk, (langCounts.get(lk) || 0) + 1);
+        const gk = r.genre_id == null ? 'unknown' : r.genre_id;
+        genreCounts.set(gk, (genreCounts.get(gk) || 0) + 1);
+        if (r.source) sourceCounts.set(r.source, (sourceCounts.get(r.source) || 0) + 1);
+        else noSourceCount++;
+        if (Array.isArray(r.artist_keys)) {
+            for (const k of r.artist_keys) artistCounts.set(k, (artistCounts.get(k) || 0) + 1);
+        }
+        if (!matches(r)) continue;
+        if (total >= start && total < end) picked.push(r);
+        total++;
+    }
+
+    // Every name carrying >30 maps, alphabetical; 'ja' collation orders kana
+    // by reading while still sorting Latin names A-Z (as catalog-list did).
+    if (!catalogCollator) catalogCollator = new Intl.Collator('ja');
+    const topBy = (map, keyName) => [...map.entries()]
+        .filter(([, c]) => c > 30)
+        .sort((a, b) => catalogCollator.compare(String(a[0]), String(b[0])))
+        .map(([k, c]) => ({ [keyName]: k, count: c }));
+    const byId = (a, b) => (a[0] === 'unknown' ? 1e9 : a[0]) - (b[0] === 'unknown' ? 1e9 : b[0]);
+
+    return {
+        items: picked,
+        total,
+        page,
+        pageSize,
+        facets: {
+            languages: [...langCounts.entries()].sort(byId).map(([id, count]) => ({ id, count })),
+            genres: [...genreCounts.entries()].sort(byId).map(([id, count]) => ({ id, count })),
+            topArtists: topBy(artistCounts, 'key'),
+            topSources: topBy(sourceCounts, 'name'),
+            noSourceCount,
+        },
+        coverage: data.coverage,
+    };
+}
+
+/* Drop-in replacement for fetching /.netlify/functions/catalog-list:
+   takes the same URLSearchParams, resolves to the same JSON. */
+async function catalogFetchLocal(params) {
+    const data = await ensureCatalogData();
+    return catalogQueryLocal(Object.fromEntries(params), data);
 }
 
 function switchCatalogMode(v) { catalogMode = v; loadCatalogPage(0); }
@@ -208,9 +435,7 @@ async function loadCatalogPage(page) {
 
     try {
         const params = catalogBuildParams({ page, pageSize: CATALOG_PAGE_SIZE });
-        const res = await fetch(`/.netlify/functions/catalog-list?${params}`);
-        if (!res.ok) throw new Error('bad response');
-        const data = await res.json();
+        const data = await catalogFetchLocal(params);
         catalogPage = data.page || 0;
         catalogTotal = data.total || 0;
         catalogItems = data.items || [];
@@ -225,7 +450,7 @@ async function loadCatalogPage(page) {
 }
 
 /* Rebuild the language/genre <select>s and the source/artist comboboxes
-   from the facet counts the server returned, keeping the current selection
+   from the facet counts catalogQueryLocal() returned, keeping the current selection
    valid even if it fell out of the facet response. */
 function rebuildCatalogFacetSelects() {
     if (!catalogFacets) return;
@@ -257,8 +482,8 @@ function rebuildCatalogFacetSelects() {
         genreSel.value = [...genreSel.options].some(o => o.value === catalogGenre) ? catalogGenre : (catalogGenre = 'all');
     }
 
-    // Source/artist are unbounded lists (no top-N cap server-side, see
-    // catalog-list.js), so they're a searchable combobox instead of a plain
+    // Source/artist are unbounded lists (no top-N cap, see
+    // catalogQueryLocal()), so they're a searchable combobox instead of a plain
     // <select> — see catalogCombo* below.
     catalogComboSyncValue('source');
     catalogComboSyncValue('artist');
@@ -589,7 +814,7 @@ async function addCatalogToCollection(setId, event) {
     renderCatalogList();
 }
 
-/* Pull every set id matching the one active facet (capped server-side at
+/* Pull every set id matching the one active facet (capped by the query at
    300) and file them under a new category named after that facet, reusing
    the collection-import tail. */
 async function catalogCreateCollectionFromFacet() {
@@ -602,9 +827,7 @@ async function catalogCreateCollectionFromFacet() {
     try {
         if (btn) { btn.disabled = true; btn.textContent = t('gallery_loading'); }
         const params = catalogBuildParams({ limit: 300 });
-        const res = await fetch(`/.netlify/functions/catalog-list?${params}`);
-        if (!res.ok) throw new Error('bad response');
-        const data = await res.json();
+        const data = await catalogFetchLocal(params);
         ids = (data.items || []).map(x => x.id).filter(Boolean);
     } catch (e) {
         console.error('Catalog facet fetch failed:', e);

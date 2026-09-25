@@ -77,7 +77,11 @@ async function runGlobalSearch(q) {
     let mappoolResults = [];
     try {
         const [catRes, poolRes] = await Promise.all([
-            fetch(`/.netlify/functions/catalog-list?q=${encodeURIComponent(q)}`).then(r => r.ok ? r.json() : null).catch(() => null),
+            // Client-side over the catalog index (js/catalog.js); the first
+            // search downloads it, later ones reuse it.
+            (typeof catalogFetchLocal === 'function'
+                ? catalogFetchLocal(new URLSearchParams({ q }))
+                : Promise.resolve(null)).catch(() => null),
             fetch(`/.netlify/functions/wc-mappools-list?q=${encodeURIComponent(q)}&limit=5`).then(r => r.ok ? r.json() : null).catch(() => null),
         ]);
         if (catRes && Array.isArray(catRes.items)) catalogResults = catRes.items.slice(0, 5);

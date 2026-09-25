@@ -1,0 +1,54 @@
+# Ranked/loved catalog crawler. Moved here from the Worker's cron trigger:
+# each run parses and rewrites the whole ~26 MB catalog, far over the free
+# Workers plan's 10 ms CPU limit (which applies to cron too), so most Worker
+# runs died without saving. See scripts/catalog-crawl.mjs.
+#
+# Needs four repository secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   token with Workers R2 Storage: Edit
+#   CLOUDFLARE_ACCOUNT_ID  the Cloudflare account id
+#   OSU_CLIENT_ID          osu! OAuth app, same as the Worker's
+#   OSU_CLIENT_SECRET
+name: Catalog crawl
+
+on:
+  schedule:
+    # Same :05/:35 slots the Worker cron used. GitHub may start scheduled
+    # runs a few minutes late under load; the crawler doesn't mind.
+    - cron: '5,35 * * * *'
+  workflow_dispatch:
+
+# Two runs must never overlap: both would read the same catalog and the
+# later upload would drop whatever the earlier one added.
+concurrency:
+  group: catalog-crawl
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: netlify/functions/package-lock.json
+
+      # The crawl logic lives in netlify/functions and requires its deps
+      # (@netlify/blobs is loaded by the store module even though the file
+      # store is what gets used here).
+      - name: Install function dependencies
+        run: npm ci --prefix netlify/functions --omit=dev
+
+      - name: Crawl
+        run: node scripts/catalog-crawl.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OSU_CLIENT_ID: ${{ secrets.OSU_CLIENT_ID }}
+          OSU_CLIENT_SECRET: ${{ secrets.OSU_CLIENT_SECRET }}

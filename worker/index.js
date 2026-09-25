@@ -4,6 +4,7 @@
  * 因為前端 js/ 裡 34 處硬寫了 /.netlify/functions/... 的路徑）：
  *
  *   /.netlify/functions/<name>   -> ROUTES[name]
+ *   /.netlify/functions/catalog-data -> catalog-data.js（直接串流 R2，沒有 Netlify 版本）
  *   /c/<id>                      -> collection-share-page?id=<id>   （rewrite，網址列不變）
  *   /gallery.xml                 -> gallery-feed
  *   /chat-media/<id>             -> chat-media（函式從路徑尾端讀 id）
@@ -27,6 +28,7 @@ const {
     readFromKv,
     writeToKv,
 } = require('./response-cache');
+const { serveCatalogData } = require('./catalog-data');
 
 const FN_PREFIX = '/.netlify/functions/';
 
@@ -48,6 +50,8 @@ function resolveRoute(url) {
         if (name === 'discord-interactions' || name === 'discord-work-background') {
             return { special: discordNotPorted };
         }
+        /* 直接串流 R2，不經 adapter、不進回應快取（見 catalog-data.js）。 */
+        if (name === 'catalog-data') return { direct: serveCatalogData };
         const fn = ROUTES[name];
         return fn ? { fn } : null;
     }
@@ -75,11 +79,10 @@ function resolveRoute(url) {
    原本的排程宣告在 netlify.toml 的 [functions."<name>"] schedule。 */
 const CRON_SCHEDULE = {
     '*/10 * * * *': 'farm-crawl-cron',
-    // catalog 與 push 在 Netlify 上原本都是每 30 分鐘，但 Cloudflare 以 cron
-    // 字串當索引，同一個字串只能對到一個處理器。錯開成 :05 與 :20，
-    // 順便讓兩者不會擠在同一分鐘一起打 osu! API。
+    // push 原本與 catalog 同為每 30 分鐘，錯開到 :20，不跟 catalog 爬蟲
+    // 擠在同一分鐘打 osu! API。catalog 爬蟲已移到 GitHub Actions（見
+    // wrangler.jsonc 的 triggers 註解），這裡不再有它的項目。
     // （這裡刻意用行註解：cron 字串裡的斜線加星號會提前終止區塊註解。）
-    '5,35 * * * *': 'catalog-crawl-cron',
     '20,50 * * * *': 'push-cron',
     '0 */6 * * *': 'community-mappools-crawl-cron',
     '0 6 * * 1': 'wc-mappool-crawl-cron',
@@ -110,6 +113,17 @@ export default {
 
         if (!route) return env.ASSETS.fetch(request);
         if (route.special) return route.special();
+        if (route.direct) {
+            try {
+                return await route.direct(request, env, url);
+            } catch (err) {
+                console.error('direct route failed:', url.pathname, err?.stack || err);
+                return new Response(JSON.stringify({ error: 'internal error' }), {
+                    status: 500,
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            }
+        }
         if (!route.fn) return env.ASSETS.fetch(request);
 
         /* rewrite 進來的 id 要放進 query，讓函式照原本的
