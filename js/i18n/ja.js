@@ -490,7 +490,7 @@ I18N.ja = {
                 <div class="howto-feat"><b>!mp map をコピー</b><span>各カードの ⚔ ボタンでその譜面の <code>!mp map</code> 行をコピー。osu! マルチでホストになって貼り付ければ譜面を設定できます。Discord bot の <code>/map</code> にも同じ行が出ます。</span></div>
                 <div class="howto-feat"><b>分類タブ</b><span>お気に入り／すべての曲／Standard／Taiko／Catch／Mania の固定タブに加え、歯車アイコンから「分類管理」で自分だけのタブを追加できます。</span></div>
                 <div class="howto-feat"><b>もっと見る</b><span>ページ最下部の 7 枚のショートカットカードから他のよく使うタブへ移動できます。</span></div>
-                <div class="howto-feat"><b>✨ 収藏整理ウィザード</b><span>実は 3 つのツールをまとめたもの：①アカウントから分類を生成（お気に入り／よく遊ぶ／ベストスコア／最近／特定の mapper）②成績から練習用収藏を生成（伸び代／目標プール／低精度やり直し／似た未プレイ曲／弱点）③健康診断（重複・削除済み・非 ranked・難易度数が変わったマップを検出）。3 つとも既存の収藏を上書きせず、マージするだけです。</span></div>
+                <div class="howto-feat"><b>✨ 収藏整理ウィザード</b><span>実は 3 つのツールをまとめたもの：①アカウントから分類を生成（お気に入り／よく遊ぶ／ベストスコア／最近／特定の mapper）②健康診断（重複・削除済み・非 ranked・難易度数が変わったマップを検出）。3 つとも既存の収藏を上書きせず、マージするだけです。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -527,18 +527,12 @@ I18N.ja = {
             <h3 class="howto-group-title">ツール集</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">Farm 図</div>
-                <p class="howto-tab-desc">PP 効率の高い ranked マップのリスト——PP 数値は本サイトが SS スコアから実際に計算したもので、推定値ではありません。</p>
-                <div class="howto-feat"><b>モード／Mod タブ</b><span>Standard/Taiko/Catch/Mania それぞれに NM／DT／HD／HDDT／HR／HDHR の 6 つの Mod 組み合わせ。</span></div>
-                <div class="howto-feat"><b>🔥 農図のみ表示</b><span>デフォルトで有効。osu!／taiko は Top 50 成績中 DT 比率 ≥70%；catch／mania は 100% acc 比率 ≥70%（いずれもプレイ回数 ≥500 が条件）。</span></div>
-                <div class="howto-feat"><b>範囲絞り込み</b><span>PP・星数・BPM・長さはいずれも最小〜最大の範囲指定が可能。検索や複数の並び替え方法もあります。</span></div>
-            </div>
-
-            <div class="howto-tab">
                 <div class="howto-tab-title">曲庫分類</div>
                 <p class="howto-tab-desc">ranked 曲庫全体を、アーティスト／言語／ジャンル／出典／feat. で切り口を変えて閲覧できるブラウザです。</p>
                 <div class="howto-feat"><b>絞り込みの組み合わせ</b><span>4 つのプルダウンは併用可能、モード絞り込みと「18+ タグを含む」トグル、4 種類の並び替え方法もあります。</span></div>
                 <div class="howto-feat"><b>➕ この分類で収藏を作成</b><span>絞り込み条件で結果が出て初めて有効になり、ワンクリックで絞り込み結果全体を収藏内の新しい分類にできます。「動的な分類にする」にチェックすると、後で新しくランクインした条件に合う譜面をワンクリックで追加取り込みできます。</span></div>
+            
+                <div class="howto-feat"><b>Ranked / Loved</b><span>カバー右下のアイコンが譜面の状態を示します。青い二重シェブロンが ranked、ピンクのハートが loved です。上の状態メニューで絞り込めます。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -546,6 +540,14 @@ I18N.ja = {
                 <p class="howto-tab-desc">歴代 OWC／TWC／MWC（4K・7K）／CWC の公式試合図池です。</p>
                 <div class="howto-feat"><b>大会／ラウンド選択</b><span>モードタブ→大会一覧→選んでラウンドごとに閲覧、各マップに Mod が表示されます。</span></div>
                 <div class="howto-feat"><b>➕ 収藏に追加</b><span>大会全体、またはラウンド単位で追加でき、全部を追加する必要はありません。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">コミュニティ図池</div>
+                <p class="howto-tab-desc">プレイヤーが自分でまとめた大会の図池です。公式ワールドカップとは別に収録しています。</p>
+                <div class="howto-feat"><b>大会の作成 / 参加</b><span>ログインが必要です。自分で大会を立てるか、既存の大会に図池を追加できます。</span></div>
+                <div class="howto-feat"><b>ラウンドと図池</b><span>Qualifiers／Group stage／Round of 16 などのラウンドごとに分かれ、各譜面はプレビュー・ID コピー・ダウンロードができます。</span></div>
+                <div class="howto-feat"><b>自動収録</b><span>wyBin で図池が埋まった公開大会も定期的に取り込みます。手動で作った内容が上書きされることはありません。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -597,6 +599,13 @@ I18N.ja = {
             <div class="howto-tab">
                 <div class="howto-tab-title">ご意見・改善</div>
                 <p class="howto-tab-desc">フィードバックフォームです。意見を書いて送信するだけ——内容はサイト管理者だけが見られ、他の訪問者には見えません。</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">BBCode エディタ</div>
+                <p class="howto-tab-desc">osu! のプロフィールやフォーラム投稿を書くためのエディタです。左で入力し、右でその場でプレビューできます。</p>
+                <div class="howto-feat"><b>ツールバー</b><span>太字・斜体・下線・打ち消し線・色・サイズ・リンク・画像・中央寄せ・リスト・引用・コード・ネタバレ枠のボタンがあります。</span></div>
+                <div class="howto-feat"><b>BBCode をコピー</b><span>クリック一つでソース全体をコピーし、そのまま osu! に貼り付けられます。</span></div>
             </div>
         </div>
     `,

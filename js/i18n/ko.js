@@ -490,7 +490,7 @@ I18N.ko = {
                 <div class="howto-feat"><b>!mp map 복사</b><span>모든 카드에 ⚔ 버튼이 있어 해당 맵의 <code>!mp map</code> 줄을 복사합니다 — osu! 멀티 로비에서 호스트가 되어 붙여넣으면 맵이 설정됩니다. Discord 봇의 <code>/map</code> 에도 같은 줄이 표시됩니다.</span></div>
                 <div class="howto-feat"><b>분류 탭</b><span>즐겨찾기/전체 곡/Standard/Taiko/Catch/Mania 고정 탭 외에, 톱니바퀴 아이콘으로 "분류 관리"에서 직접 탭을 추가할 수 있습니다.</span></div>
                 <div class="howto-feat"><b>더 둘러보기</b><span>페이지 맨 아래 7개의 바로가기 카드로 다른 자주 쓰는 탭으로 이동합니다.</span></div>
-                <div class="howto-feat"><b>✨ 컬렉션 정리 마법사</b><span>사실 세 가지 도구: ① 계정에서 분류 생성(즐겨찾기/자주 플레이/베스트 성적/최근/특정 mapper) ② 성적 기반 연습 컬렉션 생성(돌파 점수, 목표 맵풀, 저정확도 재도전, 안 쳐본 비슷한 맵, 약점) ③ 건강 검진(중복, 삭제됨, 비ranked, 난이도 수 변경된 맵 검출). 세 가지 모두 기존 컬렉션을 덮어쓰지 않고 병합만 합니다.</span></div>
+                <div class="howto-feat"><b>✨ 컬렉션 정리 마법사</b><span>사실 세 가지 도구: ① 계정에서 분류 생성(즐겨찾기/자주 플레이/베스트 성적/최근/특정 mapper) ② 건강 검진(중복, 삭제됨, 비ranked, 난이도 수 변경된 맵 검출). 세 가지 모두 기존 컬렉션을 덮어쓰지 않고 병합만 합니다.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -527,18 +527,12 @@ I18N.ko = {
             <h3 class="howto-group-title">도구 모음</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">Farm 맵</div>
-                <p class="howto-tab-desc">PP 효율이 높은 ranked 맵 목록——PP 수치는 본 사이트가 SS 성적으로 실제 계산한 값이며 추정치가 아닙니다.</p>
-                <div class="howto-feat"><b>모드 / Mod 탭</b><span>Standard/Taiko/Catch/Mania 각각 NM／DT／HD／HDDT／HR／HDHR 6가지 Mod 조합.</span></div>
-                <div class="howto-feat"><b>🔥 농맵만 보기</b><span>기본 켜짐. osu!/taiko는 Top 50 성적 중 DT 비율 ≥70%; catch/mania는 100% acc 비율 ≥70%(둘 다 플레이 횟수 ≥500 필요).</span></div>
-                <div class="howto-feat"><b>구간 필터</b><span>PP, 별점, BPM, 길이 모두 최소~최대 구간 설정 가능, 검색과 여러 정렬 방식도 있습니다.</span></div>
-            </div>
-
-            <div class="howto-tab">
                 <div class="howto-tab-title">곡 분류</div>
                 <p class="howto-tab-desc">전체 ranked 곡 라이브러리를 아티스트/언어/장르/출처/feat.로 살펴보는 브라우저입니다.</p>
                 <div class="howto-feat"><b>필터 조합</b><span>4개의 드롭다운을 동시에 사용 가능, 모드 필터와 "18+ 태그 포함" 스위치, 4가지 정렬 방식.</span></div>
                 <div class="howto-feat"><b>➕ 이 분류로 컬렉션 만들기</b><span>필터 조건에 결과가 있을 때만 활성화——클릭 한 번으로 필터링된 전체 결과를 컬렉션의 새 분류로 만듭니다. "동적 분류로 설정"을 체크하면 나중에 조건에 맞는 새로 랭크된 맵을 한 번에 다시 가져올 수 있습니다.</span></div>
+            
+                <div class="howto-feat"><b>Ranked / Loved</b><span>커버 오른쪽 아래 아이콘이 비트맵 상태를 나타냅니다. 파란색 이중 꺾쇠는 ranked, 분홍색 하트는 loved입니다. 위의 상태 메뉴로 한 가지만 볼 수 있습니다.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -546,6 +540,14 @@ I18N.ko = {
                 <p class="howto-tab-desc">역대 OWC/TWC/MWC(4K・7K)/CWC 공식 대회 맵풀입니다.</p>
                 <div class="howto-feat"><b>대회 / 라운드 선택</b><span>모드 탭 → 대회 목록 → 선택 후 라운드별로 탐색, 각 맵에 mod가 표시됩니다.</span></div>
                 <div class="howto-feat"><b>➕ 컬렉션에 추가</b><span>대회 전체 또는 한 라운드만 추가 가능, 전체를 다 가져올 필요는 없습니다.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">커뮤니티 맵풀</div>
+                <p class="howto-tab-desc">플레이어가 직접 정리한 대회 맵풀입니다. 공식 월드컵과는 따로 수록합니다.</p>
+                <div class="howto-feat"><b>대회 만들기 / 참여</b><span>로그인이 필요합니다. 직접 대회를 만들거나 기존 대회에 맵풀을 추가할 수 있습니다.</span></div>
+                <div class="howto-feat"><b>라운드와 맵풀</b><span>Qualifiers／Group stage／Round of 16 같은 라운드별로 나뉘며, 각 비트맵은 미리듣기・ID 복사・다운로드가 가능합니다.</span></div>
+                <div class="howto-feat"><b>자동 수집</b><span>wyBin에서 맵풀이 채워진 공개 대회도 주기적으로 가져옵니다. 직접 만든 내용은 덮어쓰지 않습니다.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -597,6 +599,13 @@ I18N.ko = {
             <div class="howto-tab">
                 <div class="howto-tab-title">제안 & 개선</div>
                 <p class="howto-tab-desc">의견 제출 양식입니다. 생각을 적고 제출하면 되며, 사이트 관리자만 볼 수 있고 다른 방문자에게는 보이지 않습니다.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">BBCode 편집기</div>
+                <p class="howto-tab-desc">osu! 프로필이나 포럼 글을 쓰기 위한 편집기입니다. 왼쪽에서 입력하고 오른쪽에서 바로 미리 볼 수 있습니다.</p>
+                <div class="howto-feat"><b>도구 모음</b><span>굵게・기울임・밑줄・취소선・색상・크기・링크・이미지・가운데 정렬・목록・인용・코드・스포일러 상자 버튼이 있습니다.</span></div>
+                <div class="howto-feat"><b>BBCode 복사</b><span>한 번 누르면 전체 소스가 복사되어 osu!에 그대로 붙여넣을 수 있습니다.</span></div>
             </div>
         </div>
     `,

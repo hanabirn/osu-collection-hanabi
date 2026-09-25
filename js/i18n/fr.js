@@ -490,7 +490,7 @@ I18N.fr = {
                 <div class="howto-feat"><b>Copier !mp map</b><span>Chaque carte a un bouton ⚔ qui copie la map en ligne <code>!mp map</code> — sois l’hôte d’un lobby multi osu! et colle-la pour définir la map. La commande <code>/map</code> du bot Discord affiche la même ligne.</span></div>
                 <div class="howto-feat"><b>Onglets de catégorie</b><span>En plus des onglets fixes Favoris/Tous les titres/Standard/Taiko/Catch/Mania, l'icône d'engrenage ouvre « Gérer les catégories » pour en ajouter des tiennes.</span></div>
                 <div class="howto-feat"><b>Explorer plus</b><span>7 cartes de raccourci en bas, menant vers d'autres onglets courants.</span></div>
-                <div class="howto-feat"><b>✨ Assistant de collection</b><span>En fait trois outils en un : ① générer des catégories depuis ton compte (favoris/plus joués/meilleurs/récents/un mapper précis) ② générer des collections d'entraînement à partir de tes scores (push, pool objectif, reprise basse précision, cartes similaires jamais jouées, points faibles) ③ vérification de santé (trouve les doublons, supprimées, non-ranked, ou cartes dont le nombre de difficultés a changé). Les trois ne font que fusionner, jamais écraser ta collection existante.</span></div>
+                <div class="howto-feat"><b>✨ Assistant de collection</b><span>En fait trois outils en un : ① générer des catégories depuis ton compte (favoris/plus joués/meilleurs/récents/un mapper précis) ② vérification de santé (trouve les doublons, supprimées, non-ranked, ou cartes dont le nombre de difficultés a changé). Les trois ne font que fusionner, jamais écraser ta collection existante.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -527,18 +527,12 @@ I18N.fr = {
             <h3 class="howto-group-title">Boîte à Outils</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">Cartes Farm</div>
-                <p class="howto-tab-desc">Une liste de cartes ranked à haute efficacité PP — les chiffres de PP sont réellement calculés par ce site à partir de scores SS, pas estimés.</p>
-                <div class="howto-feat"><b>Onglets mode / mod</b><span>Standard/Taiko/Catch/Mania, chacun avec des combinaisons de mods NM/DT/HD/HDDT/HR/HDHR.</span></div>
-                <div class="howto-feat"><b>🔥 Cartes farm uniquement</b><span>Activé par défaut. Pour osu!/taiko : ≥70% des Top 50 scores sont en DT ; pour catch/mania : ≥70% sont à 100% de précision (les deux nécessitent ≥500 parties).</span></div>
-                <div class="howto-feat"><b>Filtres de plage</b><span>PP, note en étoiles, BPM et durée supportent tous une plage min~max, plus la recherche et plusieurs options de tri.</span></div>
-            </div>
-
-            <div class="howto-tab">
                 <div class="howto-tab-title">Catalogue</div>
                 <p class="howto-tab-desc">Un navigateur pour tout le catalogue ranked, découpé par artiste/langue/genre/source/feat.</p>
                 <div class="howto-feat"><b>Combinaisons de filtres</b><span>Les quatre menus déroulants se combinent, plus un filtre de mode et un interrupteur « inclure les 18+ », avec quatre options de tri.</span></div>
                 <div class="howto-feat"><b>➕ Créer une collection depuis ce filtre</b><span>S'active seulement quand tes filtres donnent des résultats — un clic transforme tout le résultat filtré en une nouvelle catégorie dans ta collection ; coche « Catégorie dynamique » pour récupérer plus tard, en un clic, les maps nouvellement ranked qui correspondent au même filtre.</span></div>
+            
+                <div class="howto-feat"><b>Ranked / Loved</b><span>L’icône en bas à droite de chaque jaquette indique le statut : chevrons bleus pour ranked, cœur rose pour loved. Le menu de statut au-dessus filtre sur l’un des deux.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -546,6 +540,14 @@ I18N.fr = {
                 <p class="howto-tab-desc">Mappools officiels de chaque OWC/TWC/MWC (4K・7K)/CWC.</p>
                 <div class="howto-feat"><b>Choisir édition / round</b><span>Onglet mode → liste des éditions → choisis-en une pour naviguer par round, chaque carte étiquetée avec son mod.</span></div>
                 <div class="howto-feat"><b>➕ Ajouter à la collection</b><span>Ajoute l'édition entière, ou juste un round — pas besoin de tout prendre.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">Mappools communautaires</div>
+                <p class="howto-tab-desc">Pools de tournoi montés par les joueurs, séparés de ceux de la Coupe du Monde officielle.</p>
+                <div class="howto-feat"><b>Créer / rejoindre un tournoi</b><span>Connexion requise. Lancez le vôtre ou ajoutez des pools à un tournoi existant.</span></div>
+                <div class="howto-feat"><b>Tours et pools</b><span>Séparés par tour — Qualifiers, Group stage, Round of 16, etc. Chaque map peut être écoutée, copiée par ID ou téléchargée.</span></div>
+                <div class="howto-feat"><b>Récupération automatique</b><span>Les tournois publics dont le pool est rempli sur wyBin sont importés régulièrement. Rien de ce que vous avez créé à la main n’est écrasé.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -597,6 +599,13 @@ I18N.fr = {
             <div class="howto-tab">
                 <div class="howto-tab-title">Suggestions & Améliorations</div>
                 <p class="howto-tab-desc">Un formulaire de retour. Écris tes idées et envoie — seul le propriétaire du site le voit, jamais les autres visiteurs.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">Éditeur BBCode</div>
+                <p class="howto-tab-desc">Pour rédiger un profil osu! ou un message de forum : on tape à gauche, le rendu s’affiche à droite.</p>
+                <div class="howto-feat"><b>Barre d’outils</b><span>Boutons pour gras, italique, souligné, barré, couleur, taille, liens, images, centrage, listes, citations, code et blocs spoiler.</span></div>
+                <div class="howto-feat"><b>Copier le BBCode</b><span>Un clic copie toute la source, prête à coller dans osu!.</span></div>
             </div>
         </div>
     `,

@@ -519,7 +519,7 @@ I18N.zh = {
                 <div class="howto-feat"><b>複製 !mp map</b><span>每張卡片都有一顆 ⚔ 按鈕，複製這張圖的 <code>!mp map</code> 指令 —— 在 osu! 多人房當房主貼上去就能換圖。Discord bot 的 <code>/map</code> 也會顯示同一行。</span></div>
                 <div class="howto-feat"><b>分類籤</b><span>最愛／全部歌曲／Standard／Taiko／Catch／Mania 六個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
                 <div class="howto-feat"><b>探索更多</b><span>頁面最下方 7 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
-                <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是三組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 依成績生成練習收藏（突破分／目標圖池／低準度重練／相似圖／弱項）③ 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。三組都只會合併加入，不會覆蓋現有收藏。</span></div>
+                <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是三組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。三組都只會合併加入，不會覆蓋現有收藏。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -556,18 +556,12 @@ I18N.zh = {
             <h3 class="howto-group-title">工具庫</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">Farm 圖</div>
-                <p class="howto-tab-desc">高 PP 效率的 ranked 圖清單——PP 數字是本站實際用 SS 成績算出來的，不是估算值。</p>
-                <div class="howto-feat"><b>模式 / Mod 籤</b><span>Standard/Taiko/Catch/Mania 各自搭配 NM／DT／HD／HDDT／HR／HDHR 六種 Mod 組合。</span></div>
-                <div class="howto-feat"><b>🔥 只看農圖</b><span>預設開啟。osu!／taiko 是 Top 50 成績裡 DT 佔比 ≥70%；catch／mania 是 100% acc 佔比 ≥70%（皆需遊玩次數 ≥500）。</span></div>
-                <div class="howto-feat"><b>區間篩選</b><span>PP、星等、BPM、長度都可設 min~max 區間，加上搜尋跟多種排序方式。</span></div>
-            </div>
-
-            <div class="howto-tab">
                 <div class="howto-tab-title">曲庫分類</div>
                 <p class="howto-tab-desc">整個 ranked 曲庫的瀏覽器，用歌手／語言／曲風／來源／feat. 切角度找圖。</p>
                 <div class="howto-feat"><b>篩選組合</b><span>四個下拉可疊加使用，另有模式篩選跟「含 18+ 標記」開關，四種排序方式。</span></div>
                 <div class="howto-feat"><b>➕ 建立此分類的收藏</b><span>選好篩選條件、清單有結果之後才會亮起——一鍵把整個篩選結果變成收藏裡的新分類；勾「設為動態分類」的話，那個分類之後可以一鍵把新上榜、符合條件的圖再拉進來。</span></div>
+            
+                <div class="howto-feat"><b>Ranked / Loved</b><span>右下角的圖示標出譜面狀態：藍色雙箭頭是 ranked、粉紅愛心是 loved。上方的狀態選單可以只看其中一種。</span></div>
             </div>
 
             <div class="howto-tab">
@@ -575,6 +569,14 @@ I18N.zh = {
                 <p class="howto-tab-desc">歷屆 OWC／TWC／MWC（4K・7K）／CWC 的官方比賽圖池。</p>
                 <div class="howto-feat"><b>選屆數 / 輪次</b><span>模式籤 → 屆數列表 → 選定後依輪次瀏覽，每張圖都標了 mod。</span></div>
                 <div class="howto-feat"><b>➕ 加入收藏</b><span>整屆或只挑其中一輪加入，不用整屆都要。</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">社群賽圖分享</div>
+                <p class="howto-tab-desc">玩家自己整理的比賽圖池，跟官方世界盃分開收錄。</p>
+                <div class="howto-feat"><b>建立 / 加入賽事</b><span>需登入。可以自己開一個賽事，或加進已存在的賽事補圖池。</span></div>
+                <div class="howto-feat"><b>輪次與圖池</b><span>照 Qualifiers／Group stage／Round of 16 這種輪次分開，每張圖都能預覽、複製 ID、下載。</span></div>
+                <div class="howto-feat"><b>自動收錄</b><span>系統也會定期從 wyBin 抓已經填好圖池的公開賽事，不會覆蓋你手動建立的內容。</span></div>
             </div>
 
 
@@ -627,6 +629,13 @@ I18N.zh = {
             <div class="howto-tab">
                 <div class="howto-tab-title">建議&改進</div>
                 <p class="howto-tab-desc">意見回饋表單。寫下想法按送出即可，只有站長看得到，其他訪客不會看見內容。</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">BBCode 編輯器</div>
+                <p class="howto-tab-desc">寫 osu! 個人簡介或論壇貼文用的編輯器，左邊打字、右邊即時預覽。</p>
+                <div class="howto-feat"><b>工具列</b><span>粗體、斜體、底線、刪除線、顏色、大小、連結、圖片、置中、清單、引用、程式碼、隱藏區塊等都有按鈕。</span></div>
+                <div class="howto-feat"><b>複製 BBCode</b><span>按一下複製整段原始碼，直接貼到 osu! 上就好。</span></div>
             </div>
         </div>
     `,

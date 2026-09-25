@@ -71,7 +71,7 @@ I18N.en = {
                 <div class="howto-feat"><b>Copy !mp map</b><span>Every card has a ⚔ button that copies that map as an <code>!mp map</code> line — be the host in an osu! multiplayer lobby and paste it to set the map. <code>/map</code> in the Discord bot shows the same line.</span></div>
                 <div class="howto-feat"><b>Category tabs</b><span>Besides the fixed Favorites/All Songs/Standard/Taiko/Catch/Mania tabs, the gear icon opens "Manage categories" to add your own.</span></div>
                 <div class="howto-feat"><b>Explore more</b><span>7 shortcut cards at the bottom, jumping to other common tabs.</span></div>
-                <div class="howto-feat"><b>✨ Collection wizard</b><span>Actually three tools in one: ① generate categories from your account (favorites/most-played/best/recent/a specific mapper) ② generate practice collections from your scores (push, goal pool, low-acc redo, similar untried maps, weak points) ③ health check (finds duplicates, deleted, unranked, or difficulty-count-changed maps). All three only merge in, never overwrite your existing collection.</span></div>
+                <div class="howto-feat"><b>✨ Collection wizard</b><span>Actually three tools in one: ① generate categories from your account (favorites/most-played/best/recent/a specific mapper) ② health check (finds duplicates, deleted, unranked, or difficulty-count-changed maps). All three only merge in, never overwrite your existing collection.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -108,18 +108,12 @@ I18N.en = {
             <h3 class="howto-group-title">Toolbox</h3>
 
             <div class="howto-tab">
-                <div class="howto-tab-title">Farm Maps</div>
-                <p class="howto-tab-desc">A list of high-PP-efficiency ranked maps — the PP numbers are actually calculated by this site from SS scores, not estimated.</p>
-                <div class="howto-feat"><b>Mode / mod tabs</b><span>Standard/Taiko/Catch/Mania, each paired with NM/DT/HD/HDDT/HR/HDHR mod combinations.</span></div>
-                <div class="howto-feat"><b>🔥 Farm maps only</b><span>On by default. For osu!/taiko: ≥70% of Top 50 scores are DT; for catch/mania: ≥70% are 100% acc (both require ≥500 plays).</span></div>
-                <div class="howto-feat"><b>Range filters</b><span>PP, star rating, BPM, and length all support a min~max range, plus search and several sort options.</span></div>
-            </div>
-
-            <div class="howto-tab">
                 <div class="howto-tab-title">Catalog</div>
                 <p class="howto-tab-desc">A browser for the entire ranked catalog, sliced by artist/language/genre/source/feat.</p>
                 <div class="howto-feat"><b>Filter combos</b><span>The four dropdowns can be combined, plus a mode filter and an "include 18+ tagged" toggle, with four sort options.</span></div>
                 <div class="howto-feat"><b>➕ Create a collection from this filter</b><span>Only enables once your filters return results — one click turns the whole filtered result into a new category in your collection; check "Make it a dynamic category" to later pull in newly-ranked maps matching the same filter with one click.</span></div>
+            
+                <div class="howto-feat"><b>Ranked / Loved</b><span>The mark in each cover’s bottom-right corner shows the status — blue chevrons for ranked, a pink heart for loved. The status dropdown above narrows the list to one of them.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -127,6 +121,14 @@ I18N.en = {
                 <p class="howto-tab-desc">Official mappools from every OWC/TWC/MWC (4K・7K)/CWC.</p>
                 <div class="howto-feat"><b>Pick an edition / round</b><span>Mode tab → edition list → pick one to browse by round, each map labeled with its mod.</span></div>
                 <div class="howto-feat"><b>➕ Add to collection</b><span>Add the whole edition, or just one round — no need to take the whole thing.</span></div>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">Community mappools</div>
+                <p class="howto-tab-desc">Tournament pools put together by players, kept separate from the official World Cup ones.</p>
+                <div class="howto-feat"><b>Create / join a tournament</b><span>Sign-in required. Start one yourself, or add pools to a tournament that already exists.</span></div>
+                <div class="howto-feat"><b>Rounds and pools</b><span>Split by round — Qualifiers, Group stage, Round of 16 and so on. Every map can be previewed, copied by ID or downloaded.</span></div>
+                <div class="howto-feat"><b>Automatic pickup</b><span>Public tournaments that have filled their pool on wyBin are crawled in periodically. Nothing you created by hand is overwritten.</span></div>
             </div>
 
             <div class="howto-tab">
@@ -178,6 +180,13 @@ I18N.en = {
             <div class="howto-tab">
                 <div class="howto-tab-title">Feedback</div>
                 <p class="howto-tab-desc">A feedback form. Write your thoughts and submit — only the site owner sees it, other visitors never do.</p>
+            </div>
+
+            <div class="howto-tab">
+                <div class="howto-tab-title">BBCode editor</div>
+                <p class="howto-tab-desc">For writing an osu! profile or a forum post — type on the left, see it rendered on the right.</p>
+                <div class="howto-feat"><b>Toolbar</b><span>Buttons for bold, italic, underline, strikethrough, colour, size, links, images, centring, lists, quotes, code and spoiler boxes.</span></div>
+                <div class="howto-feat"><b>Copy BBCode</b><span>One click copies the whole source, ready to paste into osu!.</span></div>
             </div>
         </div>
     `,

@@ -2826,7 +2826,17 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.mappool-list .osu-play-btn { left: 50%; right: auto; transform: translateX(-50%); }
+/* Centre the preview button in the mappool grids (World Cup and the
+   community pools share this list). Both axes have to be in the
+   transform: the base .osu-play-btn pairs top:50% with
+   translate(-50%,-50%), so overriding it with translateX alone dropped
+   the vertical half-step and left the button sitting low. */
+.mappool-list .osu-play-btn { left: 50%; right: auto; transform: translate(-50%, -50%); }
+.mappool-list .osu-play-btn:hover { transform: translate(-50%, -50%) scale(1.1); }
+/* Playing turns it into a bottom-anchored strip, and those two rules
+   outrank .osu-play-btn.playing — restore its left/transform. */
+.mappool-list .osu-play-btn.playing,
+.mappool-list .osu-play-btn.playing:hover { left: 0; transform: none; }
 .mappool-list .osu-copy-btn { right: 8px; }
 .mappool-list .osu-download-btn { right: 48px; }
 @media (max-width: 600px) {
