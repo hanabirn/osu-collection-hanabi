@@ -148,7 +148,7 @@ I18N.zh = {
     batch_dl_pause_btn: '暫停下載', batch_dl_resume_btn: '繼續下載', batch_dl_paused: '已暫停，{done}/{total}',
     batch_dl_done: '下載完成！共 {done} 個檔案，已存到你的下載資料夾',
     batch_dl_done_errors: '下載完成：{done} 個，其中 {failed} 個失敗（可能已下架或連線問題）',
-    batch_dl_hint: '下載多個檔案時，瀏覽器通常會跳出「允許這個網站下載多個檔案」的提示——請按允許，否則第二個檔案開始會被瀏覽器擋下。',
+    batch_dl_hint: '下載多個檔案時，瀏覽器通常會跳出「允許這個網站下載多個檔案」的提示——請按允許，否則第二個檔案開始會被瀏覽器擋下。', batch_dl_missing_btn: '下載本機還沒有的 {n} 個圖檔', batch_dl_missing_none: '這個清單的圖你的 osu! 都已經有了', batch_dl_missing_confirm: '要下載你的 osu! 還沒有的 {n} 個圖檔嗎？（已略過 osu!.db 裡已經有的 {skipped} 個）會依序觸發瀏覽器下載，需要一段時間，請勿關閉分頁', batch_dl_missing_done: '下載完成！共 {done} 個檔案。雙擊 .osz 或拖進 osu! 視窗就會匯入；之後重新選一次 osu!.db，「已下載」標記就會更新',
     pp_calc_btn_title: 'PP 試算與難度曲線', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '準確率', pp_calc_run: '計算',
     pp_calc_calculating: '計算中...', pp_calc_error: '計算失敗，請稍後再試', pp_calc_stars_label: '星數',
     pp_calc_strain_title: '難度曲線', pp_calc_strain_unsupported: '此譜面暫無難度曲線資料', pp_calc_acc_invalid: '請輸入 0～100 之間的準確率',

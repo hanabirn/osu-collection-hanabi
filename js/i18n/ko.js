@@ -188,7 +188,7 @@ I18N.ko = {
     batch_dl_pause_btn: '일시정지', batch_dl_resume_btn: '이어서 다운로드', batch_dl_paused: '일시정지됨, {done}/{total}',
     batch_dl_done: '완료! {done}개 파일을 다운로드 폴더에 저장했습니다',
     batch_dl_done_errors: '완료: {done}개 중 {failed}개 실패(삭제되었거나 연결 문제일 수 있음)',
-    batch_dl_hint: '여러 파일을 다운로드하면 브라우저가 "이 사이트가 여러 파일을 다운로드하도록 허용하시겠습니까?"라는 알림을 띄울 수 있습니다. 허용을 누르지 않으면 두 번째 파일부터 차단됩니다.',
+    batch_dl_hint: '여러 파일을 다운로드하면 브라우저가 "이 사이트가 여러 파일을 다운로드하도록 허용하시겠습니까?"라는 알림을 띄울 수 있습니다. 허용을 누르지 않으면 두 번째 파일부터 차단됩니다.', batch_dl_missing_btn: '아직 없는 {n}개 비트맵 다운로드', batch_dl_missing_none: '이 목록의 비트맵은 osu!에 모두 있습니다', batch_dl_missing_confirm: 'osu!에 아직 없는 {n}개 비트맵을 다운로드할까요? (osu!.db에 있는 {skipped}개는 건너뜀) 차례로 다운로드되니 탭을 닫지 마세요', batch_dl_missing_done: '완료! {done}개 파일을 다운로드했습니다. .osz를 더블클릭하거나 osu! 창에 끌어 넣으면 가져오며, osu!.db를 다시 선택하면 「다운로드됨」 표시가 갱신됩니다',
     pp_calc_btn_title: 'PP 계산 & 난이도 곡선', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '정확도', pp_calc_run: '계산',
     pp_calc_calculating: '계산 중...', pp_calc_error: '계산에 실패했습니다. 잠시 후 다시 시도해주세요', pp_calc_stars_label: '별점',
     pp_calc_strain_title: '난이도 곡선', pp_calc_strain_unsupported: '이 비트맵에는 난이도 곡선 데이터가 없습니다', pp_calc_acc_invalid: '0~100 사이의 정확도를 입력해주세요',

@@ -333,7 +333,7 @@ I18N.en = {
     batch_dl_pause_btn: 'Pause download', batch_dl_resume_btn: 'Resume download', batch_dl_paused: 'Paused, {done}/{total}',
     batch_dl_done: 'Done! {done} files saved to your Downloads folder',
     batch_dl_done_errors: 'Done: {done} files, {failed} failed (maybe removed from osu! or a connection issue)',
-    batch_dl_hint: 'Downloading several files usually makes the browser show a "allow this site to download multiple files" prompt — click Allow, or every file after the first gets blocked.',
+    batch_dl_hint: 'Downloading several files usually makes the browser show a "allow this site to download multiple files" prompt — click Allow, or every file after the first gets blocked.', batch_dl_missing_btn: 'Download the {n} sets you don’t have yet', batch_dl_missing_none: 'Your osu! already has every set in this list', batch_dl_missing_confirm: 'Download the {n} sets your osu! doesn’t have yet? ({skipped} already in your osu!.db are skipped.) They download one after another, so keep this tab open', batch_dl_missing_done: 'Done! {done} files downloaded. Double-click each .osz or drag it into osu! to import, then pick your osu!.db again to refresh the downloaded marks',
     pp_calc_btn_title: 'PP Calculator & Strain Graph', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Accuracy', pp_calc_run: 'Calculate',
     pp_calc_calculating: 'Calculating...', pp_calc_error: 'Calculation failed, please try again later', pp_calc_stars_label: 'Stars',
     pp_calc_strain_title: 'Difficulty Curve', pp_calc_strain_unsupported: 'No strain data available for this beatmap', pp_calc_acc_invalid: 'Enter an accuracy between 0 and 100',

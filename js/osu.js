@@ -678,31 +678,75 @@ let osuBatchDownloadResumeResolve = null;
    only holds the loop *between* files (checked before each fetch starts),
    it never aborts a file that's already downloading. */
 async function batchDownloadCollectionView() {
+    if (osuBatchDownloadActive) { toggleOsuBatchDownloadPause(); return; }
     const status = document.getElementById('osu-batch-dl-status');
-    const btn = document.getElementById('osu-batch-dl-btn');
-
-    if (osuBatchDownloadActive) {
-        osuBatchDownloadPaused = !osuBatchDownloadPaused;
-        if (osuBatchDownloadPaused) {
-            if (btn) btn.textContent = t('batch_dl_resume_btn');
-        } else {
-            if (btn) btn.textContent = t('batch_dl_pause_btn');
-            if (osuBatchDownloadResumeResolve) { osuBatchDownloadResumeResolve(); osuBatchDownloadResumeResolve = null; }
-        }
-        return;
-    }
-
     const sets = osuCurrentViewSets || [];
     if (!sets.length) {
         if (status) { status.innerText = t('batch_dl_empty'); status.style.color = '#ff5252'; }
         return;
     }
     if (!confirm(t('batch_dl_confirm', { n: sets.length }))) return;
+    await runOsuBatchDownload(sets, document.getElementById('osu-batch-dl-btn'), 'batch_dl_done');
+}
 
+/* Sets in the current view that the visitor's osu!.db doesn't have yet
+   (see js/local-db-match.js). Empty until an osu!.db has been scanned,
+   since without one there is no way to tell what's missing. */
+function osuMissingViewSets() {
+    if (typeof loadLocalDbIds !== 'function' || loadLocalDbIds().size === 0) return [];
+    return (osuCurrentViewSets || []).filter(s => !isLocalDbMatched(s.beatmapset_id));
+}
+
+/* The "only what I don't have" variant: same run, same pause/resume, but
+   skips every set osu!.db already lists. */
+async function batchDownloadMissingSets() {
+    if (osuBatchDownloadActive) { toggleOsuBatchDownloadPause(); return; }
+    const status = document.getElementById('osu-batch-dl-status');
+    const sets = osuMissingViewSets();
+    if (!sets.length) {
+        if (status) { status.innerText = t('batch_dl_missing_none'); status.style.color = '#34d399'; }
+        return;
+    }
+    const skipped = (osuCurrentViewSets || []).length - sets.length;
+    if (!confirm(t('batch_dl_missing_confirm', { n: sets.length, skipped }))) return;
+    await runOsuBatchDownload(sets, document.getElementById('osu-batch-dl-missing-btn'), 'batch_dl_missing_done');
+}
+
+/* Shown only once an osu!.db has been scanned, labelled with how many sets
+   in the current view it would fetch. Called from renderOsuCollection(), so
+   it follows tab/filter changes, a fresh osu!.db and a language switch. */
+function updateOsuBatchMissingButton() {
+    const btn = document.getElementById('osu-batch-dl-missing-btn');
+    if (!btn) return;
+    const scanned = typeof loadLocalDbIds === 'function' && loadLocalDbIds().size > 0;
+    btn.style.display = scanned ? '' : 'none';
+    if (scanned && btn !== osuBatchDownloadBtn) btn.textContent = t('batch_dl_missing_btn', { n: osuMissingViewSets().length });
+}
+
+let osuBatchDownloadBtn = null; // the button whose run is in progress
+
+function toggleOsuBatchDownloadPause() {
+    const btn = osuBatchDownloadBtn;
+    osuBatchDownloadPaused = !osuBatchDownloadPaused;
+    if (osuBatchDownloadPaused) {
+        if (btn) btn.textContent = t('batch_dl_resume_btn');
+    } else {
+        if (btn) btn.textContent = t('batch_dl_pause_btn');
+        if (osuBatchDownloadResumeResolve) { osuBatchDownloadResumeResolve(); osuBatchDownloadResumeResolve = null; }
+    }
+}
+
+async function runOsuBatchDownload(sets, btn, doneKey) {
+    const status = document.getElementById('osu-batch-dl-status');
     osuBatchDownloadActive = true;
     osuBatchDownloadPaused = false;
+    osuBatchDownloadBtn = btn;
     const originalLabel = btn ? btn.textContent : '';
     if (btn) btn.textContent = t('batch_dl_pause_btn');
+    // The other batch button would only pause this run, so it sits out.
+    const others = ['osu-batch-dl-btn', 'osu-batch-dl-missing-btn']
+        .map(id => document.getElementById(id)).filter(b => b && b !== btn);
+    others.forEach(b => { b.disabled = true; });
 
     let done = 0, failed = 0;
     for (const set of sets) {
@@ -720,12 +764,15 @@ async function batchDownloadCollectionView() {
         done++;
     }
     if (status) {
-        status.innerText = failed ? t('batch_dl_done_errors', { done, failed }) : t('batch_dl_done', { done });
+        status.innerText = failed ? t('batch_dl_done_errors', { done, failed }) : t(doneKey, { done });
         status.style.color = failed ? '#ff5252' : '#34d399';
     }
     if (btn) btn.textContent = originalLabel;
+    others.forEach(b => { b.disabled = false; });
     osuBatchDownloadActive = false;
     osuBatchDownloadPaused = false;
+    osuBatchDownloadBtn = null;
+    updateOsuBatchMissingButton();
 }
 
 /* Copy one set's hardest difficulty as a `!mp map <beatmapId> <mode>` line
@@ -3435,6 +3482,7 @@ function renderOsuCollection() {
 
     sets = sortOsuSets(sets);
     osuCurrentViewSets = sets;
+    updateOsuBatchMissingButton();
 
     if (sets.length === 0) {
         const msg = osuSearchQuery

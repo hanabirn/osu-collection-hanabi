@@ -188,7 +188,7 @@ I18N.de = {
     batch_dl_pause_btn: 'Download pausieren', batch_dl_resume_btn: 'Download fortsetzen', batch_dl_paused: 'Pausiert, {done}/{total}',
     batch_dl_done: 'Fertig! {done} Dateien im Download-Ordner gespeichert',
     batch_dl_done_errors: 'Fertig: {done} Dateien, {failed} fehlgeschlagen (evtl. entfernt oder Verbindungsproblem)',
-    batch_dl_hint: 'Beim Herunterladen mehrerer Dateien fragt der Browser meist "Mehrere Downloads von dieser Website zulassen?" — bitte zulassen, sonst wird ab der zweiten Datei blockiert.',
+    batch_dl_hint: 'Beim Herunterladen mehrerer Dateien fragt der Browser meist "Mehrere Downloads von dieser Website zulassen?" — bitte zulassen, sonst wird ab der zweiten Datei blockiert.', batch_dl_missing_btn: 'Die {n} fehlenden Sets herunterladen', batch_dl_missing_none: 'Dein osu! hat bereits alle Sets dieser Liste', batch_dl_missing_confirm: 'Die {n} Sets herunterladen, die dein osu! noch nicht hat? ({skipped} bereits in deiner osu!.db werden übersprungen.) Sie laden nacheinander, lass diesen Tab offen', batch_dl_missing_done: 'Fertig! {done} Dateien heruntergeladen. Jede .osz doppelklicken oder in osu! ziehen zum Importieren, dann osu!.db erneut wählen, um die Markierungen zu aktualisieren',
     pp_calc_btn_title: 'PP-Rechner & Schwierigkeitskurve', pp_calc_mods_label: 'Mods', pp_calc_acc_label: 'Genauigkeit', pp_calc_run: 'Berechnen',
     pp_calc_calculating: 'Berechnung läuft...', pp_calc_error: 'Berechnung fehlgeschlagen, bitte später erneut versuchen', pp_calc_stars_label: 'Sterne',
     pp_calc_strain_title: 'Schwierigkeitskurve', pp_calc_strain_unsupported: 'Für diese Beatmap sind keine Schwierigkeitsdaten verfügbar', pp_calc_acc_invalid: 'Bitte eine Genauigkeit zwischen 0 und 100 eingeben',

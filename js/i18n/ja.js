@@ -188,7 +188,7 @@ I18N.ja = {
     batch_dl_pause_btn: '一時停止', batch_dl_resume_btn: '再開', batch_dl_paused: '一時停止中 {done}/{total}',
     batch_dl_done: '完了！{done} 個のファイルをダウンロードフォルダに保存しました',
     batch_dl_done_errors: '完了：{done} 個、うち {failed} 個失敗（削除済みか通信エラーの可能性）',
-    batch_dl_hint: '複数ファイルをダウンロードすると、ブラウザが「このサイトに複数ファイルのダウンロードを許可しますか」と表示することがあります。許可を押してください。押さないと2つ目以降がブロックされます。',
+    batch_dl_hint: '複数ファイルをダウンロードすると、ブラウザが「このサイトに複数ファイルのダウンロードを許可しますか」と表示することがあります。許可を押してください。押さないと2つ目以降がブロックされます。', batch_dl_missing_btn: 'まだ持っていない {n} 個の譜面をダウンロード', batch_dl_missing_none: 'このリストの譜面はすべて osu! に入っています', batch_dl_missing_confirm: 'osu! にまだない {n} 個の譜面をダウンロードしますか？（osu!.db にある {skipped} 個はスキップ）順番にダウンロードするので、タブを閉じないでください', batch_dl_missing_done: '完了！{done} 個のファイルをダウンロードしました。.osz をダブルクリックするか osu! にドラッグで取り込み、osu!.db を選び直すと「ダウンロード済み」表示が更新されます',
     pp_calc_btn_title: 'PP試算・難易度カーブ', pp_calc_mods_label: 'Mods', pp_calc_acc_label: '正確率', pp_calc_run: '計算',
     pp_calc_calculating: '計算中...', pp_calc_error: '計算に失敗しました。しばらくしてから再試行してください', pp_calc_stars_label: '☆数',
     pp_calc_strain_title: '難易度カーブ', pp_calc_strain_unsupported: 'この譜面には難易度カーブのデータがありません', pp_calc_acc_invalid: '0～100の範囲で正確率を入力してください',
