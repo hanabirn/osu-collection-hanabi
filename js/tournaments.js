@@ -54,11 +54,15 @@ function detectTournamentRankTier(text) {
         // "3CWC5", "5WC", "4TWC2024" — an N-digit (optionally mode-lettered) World Cup
         || s.match(/\b([1-7])(?:C|T|M|S)?WC\d*\b/i);
     if (m) return 'digit' + m[1];
-    // explicit "#lo - #hi" range -> digit tier of the lower bound
-    m = s.match(/#?\s*(\d[\d,]*)\s*(k?)\s*[-–~]\s*#?\s*\d[\d,]*\s*k?/i);
+    // explicit "#lo - #hi" range -> digit tier of the lower bound. A range
+    // from #1 ("1-10K") has no lower limit, so its tier is the worst rank
+    // it still admits: #1 - #10,000 lets in up to #9,999, a 4-digit rank.
+    m = s.match(/#?\s*(\d[\d,]*)\s*(k?)\s*[-–~]\s*#?\s*(\d[\d,]*)\s*(k?)/i);
     if (m) {
-        let lo = parseInt(m[1].replace(/,/g, ''), 10);
-        if (m[2]) lo *= 1000;
+        const num = (digits, k) => parseInt(digits.replace(/,/g, ''), 10) * (k ? 1000 : 1);
+        const lo = num(m[1], m[2]);
+        const hi = num(m[3], m[4]);
+        if (lo === 1 && hi > 1) return 'digit' + Math.min(7, String(hi - 1).length);
         if (lo >= 1) return 'digit' + Math.min(7, String(lo).length);
     }
     if (/\bopen(\s*rank)?\b/i.test(s) || /\(\s*open\s*\)/i.test(s)) return 'open';
