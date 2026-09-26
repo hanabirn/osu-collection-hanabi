@@ -4282,7 +4282,10 @@ async function ensureMedalsGalleryLoaded() {
             fetchOsekaiMedals(),
             fetch(`/.netlify/functions/osu-user-achievements?id=${visitorLookupUserId}`),
         ]);
-        const achData = achRes.ok ? await achRes.json() : { achievements: [] };
+        // A failed lookup is not "no medals": showing 0/352 and caching it
+        // for this player until reload would misreport them.
+        if (!achRes.ok) throw new Error(`osu-user-achievements HTTP ${achRes.status}`);
+        const achData = await achRes.json();
         allOsekaiMedals = medals;
         visitorMedalIds = new Set(achData.achievements || []);
         medalsLoadedForUserId = visitorLookupUserId;
