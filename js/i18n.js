@@ -91,5 +91,7 @@ function t(key, params) {
     const dict = I18N[siteLang] || I18N.zh || {};
     const str = dict[key] || (I18N.zh || {})[key] || key;
     if (!params) return str;
-    return Object.entries(params).reduce((s, [k, v]) => s.replace(`{${k}}`, v), str);
+    // split/join rather than replace(): a string pattern only replaces the
+    // first match, and a placeholder may appear twice (batch_dl_confirm).
+    return Object.entries(params).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), str);
 }
