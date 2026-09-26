@@ -3,13 +3,16 @@
    世界盃圖池) and jumps straight into whichever tab has the match. Each of
    those already has its own full-featured in-tab search; this is a thin
    "which tab has this?" dispatcher on top, not a replacement for them —
-   results are capped small (5 per source) and clicking one just opens that
-   tab with its own search box prefilled (or, for mappools, the matching
-   edition selected), rather than trying to render a full results page here.
+   results are capped small (5 per source) and clicking one opens that tab
+   at the match itself — the collection page holding that map, the catalog
+   filtered to its title with its card highlighted, or for mappools the
+   matching edition — rather than rendering a full results page here.
 
    Reuses globals from osu.js (escHtml, t, icon, OSU_MODES, getOsuCollection,
-   filterOsuCollection, switchTab) and mappools.js (ensureMappoolsLoaded,
-   mappoolIndex, switchMappoolEdition). Loaded after both. ===== */
+   filterOsuCollection, jumpToOsuSet, flashOsuCard, switchTab), catalog.js
+   (catalogQuery, catalogLoaded, catalogSearchDebounce, loadCatalogPage) and
+   mappools.js (ensureMappoolsLoaded, mappoolIndex, switchMappoolEdition).
+   Loaded after all three. ===== */
 let globalSearchDebounce = null;
 let globalSearchToken = 0;
 
@@ -107,8 +110,9 @@ function globalSearchSectionHtml(titleKey, items, itemFn) {
     </div>`;
 }
 
-function globalSearchItemRow(coverUrl, title, subtitle, action, query) {
-    return `<div class="global-search-item" data-action="${action}" data-query="${escHtml(query)}">
+function globalSearchItemRow(coverUrl, title, subtitle, action, query, setId) {
+    const idAttr = setId ? ` data-set-id="${escHtml(String(setId))}"` : '';
+    return `<div class="global-search-item" data-action="${action}" data-query="${escHtml(query)}"${idAttr}>
         <div class="global-search-item-cover" style="background-image:url('${coverUrl}')"></div>
         <div class="global-search-item-text">
             <div class="global-search-item-title">${escHtml(title)}</div>
@@ -120,14 +124,14 @@ function globalSearchItemRow(coverUrl, title, subtitle, action, query) {
 function globalSearchCollectionItemHtml(s) {
     return globalSearchItemRow(
         `https://assets.ppy.sh/beatmaps/${s.beatmapset_id}/covers/card.jpg`,
-        s.title || '', s.artist || '', 'collection', s.title || s.artist || '',
+        s.title || '', s.artist || '', 'collection', s.title || s.artist || '', s.beatmapset_id,
     );
 }
 
 function globalSearchCatalogItemHtml(item) {
     return globalSearchItemRow(
         `https://assets.ppy.sh/beatmaps/${item.id}/covers/card.jpg`,
-        item.title || '', item.artist || '', 'catalog', item.title || item.artist || '',
+        item.title || '', item.artist || '', 'catalog', item.title || item.artist || '', item.id,
     );
 }
 
@@ -146,21 +150,46 @@ document.addEventListener('click', (e) => {
     const item = e.target.closest('.global-search-item');
     if (!item) return;
     const { action, query } = item.dataset;
+    const setId = Number(item.dataset.setId) || null;
     closeGlobalSearch();
     if (action === 'collection') {
+        // Straight to the map itself; the title search stays as the
+        // fallback if it's no longer in the collection.
+        if (setId && typeof jumpToOsuSet === 'function' && jumpToOsuSet(setId)) return;
         switchTab('collection');
         const input = document.getElementById('osu-search-input');
         if (input) input.value = query;
         if (typeof filterOsuCollection === 'function') filterOsuCollection(query);
     } else if (action === 'catalog') {
-        switchTab('catalog');
-        const input = document.getElementById('catalog-search-input');
-        if (input) input.value = query;
-        if (typeof searchCatalog === 'function') searchCatalog(query);
+        openCatalogResultFromSearch(query, setId);
     } else if (action === 'mappool') {
         openMappoolEditionFromSearch(query);
     }
 });
+
+/* The catalog pages over an index rather than a list in memory, so this
+   searches by title as before and then points at the exact map once its
+   card is on screen. The query is set before switching tabs so the tab's
+   own first load (ensureCatalogLoaded) already asks for the same thing. */
+function openCatalogResultFromSearch(query, setId) {
+    const input = document.getElementById('catalog-search-input');
+    if (input) input.value = query;
+    const wasLoaded = typeof catalogLoaded !== 'undefined' && catalogLoaded;
+    if (typeof catalogQuery !== 'undefined') catalogQuery = query.trim();
+    if (typeof catalogSearchDebounce !== 'undefined') clearTimeout(catalogSearchDebounce);
+    switchTab('catalog');
+    if (wasLoaded && typeof loadCatalogPage === 'function') loadCatalogPage(0);
+    if (!setId) return;
+    let tries = 0;
+    const poll = setInterval(() => {
+        tries++;
+        const card = document.querySelector(`#catalog-list .osu-card[data-set-id="${setId}"]`);
+        if (card || tries > 50) {
+            clearInterval(poll);
+            if (card && typeof flashOsuCard === 'function') flashOsuCard(card);
+        }
+    }, 200);
+}
 
 /* mappoolIndex loads asynchronously (ensureMappoolsLoaded), so a result
    clicked before it's ready needs to wait rather than no-op — bounded so a

@@ -270,6 +270,52 @@ function filterOsuCollection(query) {
     renderOsuCollection();
 }
 
+/* Scrolls a card into view and pulses an outline on it so the eye lands
+   on it — used when jumping to one specific map (global search). */
+function flashOsuCard(card) {
+    if (!card) return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    card.classList.remove('osu-card-flash');
+    void card.offsetWidth; // restart the animation if it's already running
+    card.classList.add('osu-card-flash');
+    clearTimeout(card._flashTimer);
+    card._flashTimer = setTimeout(() => card.classList.remove('osu-card-flash'), 2000);
+}
+
+/* Opens the collection on the page holding one set: its own mode tab, with
+   the search box cleared. Filters are only reset when they hide the set,
+   and 全部歌曲 is the last resort. Returns false if the set isn't there. */
+function jumpToOsuSet(setId) {
+    const col = getOsuCollection();
+    const home = OSU_MODES.find(m => col[m].some(s => s.beatmapset_id === setId));
+    if (!home) return false;
+    if (typeof switchTab === 'function') switchTab('collection');
+    const input = document.getElementById('osu-search-input');
+    if (input) input.value = '';
+    osuSearchQuery = '';
+    const showTab = mode => {
+        clearAllOsuTabActive();
+        document.querySelector(`#osu-collection-tabs [data-mode="${mode}"]`)?.classList.add('active');
+        osuCurrentTab = mode;
+        osuPage = 0;
+        renderOsuCollection();
+    };
+    const indexInView = () => osuCurrentViewSets.findIndex(s => s.beatmapset_id === setId);
+    showTab(home);
+    if (indexInView() < 0) {
+        osuLangFilter = osuGenreFilter = osuSourceFilter = osuArtistFilter = 'all';
+        renderOsuCollection();
+    }
+    if (indexInView() < 0) showTab('all');
+    const idx = indexInView();
+    if (idx < 0) return false;
+    const page = Math.floor(idx / OSU_PAGE_SIZE);
+    if (page !== osuPage) { osuPage = page; renderOsuCollection(); }
+    flashOsuCard(document.querySelector(`#osu-collection .osu-card[data-set-id="${setId}"]`));
+    return true;
+}
+
 function switchOsuSort(mode) {
     osuSortMode = mode;
     osuPage = 0;

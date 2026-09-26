@@ -1172,6 +1172,20 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     box-shadow: 0 10px 26px -12px rgba(0, 0, 0, 0.6);
 }
 
+/* flashOsuCard() in js/osu.js: points out the map a global-search jump
+   landed on. The ring fades rather than blinking. */
+.osu-card.osu-card-flash {
+    border-color: rgb(var(--pink-rgb));
+    animation: osu-card-flash 1.8s var(--ease-out) forwards;
+}
+@keyframes osu-card-flash {
+    0%, 35% { box-shadow: 0 0 0 3px rgba(var(--pink-rgb), 0.9), 0 0 24px rgba(var(--pink-rgb), 0.45); }
+    100% { box-shadow: 0 0 0 3px rgba(var(--pink-rgb), 0), 0 0 24px rgba(var(--pink-rgb), 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .osu-card.osu-card-flash { animation: none; box-shadow: 0 0 0 3px rgb(var(--pink-rgb)); }
+}
+
 .osu-card-bg {
     position: absolute;
     inset: 0;
