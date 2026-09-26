@@ -213,7 +213,7 @@ function chatMessageHtml(m, prev) {
             <div class="chat-message-header">
                 <a class="chat-message-name" href="${profileUrl}" target="_blank" rel="noopener noreferrer">${escapeHtmlOsu(m.authorUsername)}</a>
                 <span class="chat-message-time">${chatFormatTime(m.createdAt)}${editedMark}</span>
-                <button class="chat-translate-btn" onclick="toggleChatTranslation(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.content)}'), this)" title="${t('chat_translate_btn_title')}">${icon('globe', { size: '1.15em' })}</button>
+                <button class="chat-translate-btn" onclick="toggleChatTranslation(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.content)}'), this)" title="${t('chat_translate_btn_title')}"${chatHasTranslatableText(m.content) ? '' : ' hidden'}>${icon('globe', { size: '1.15em' })}</button>
                 <button class="chat-reply-btn" onclick="setChatReplyTarget(${m.id}, decodeURIComponent('${chatEncodeForOnclick(m.authorUsername)}'), decodeURIComponent('${chatEncodeForOnclick(m.content)}'))" title="${t('chat_reply_btn_title')}">${icon('cornerUpLeft')}</button>
                 ${isOwn ? `<button class="chat-edit-btn" onclick="startChatEdit(${m.id})" title="${t('chat_edit_btn_title')}">${icon('pencil')}</button>` : ''}
                 ${canDelete ? `<button class="chat-delete-btn" onclick="deleteChatMessage(${m.id})" title="${t('chat_delete_btn_title')}">${icon('x')}</button>` : ''}
@@ -334,6 +334,19 @@ const CHAT_TRANSLATE_TARGET = {
     en: 'en', ja: 'ja', ko: 'ko', ru: 'ru', fr: 'fr', es: 'es', de: 'de',
 };
 
+/* Only offer translation when there are letters to translate: an image-only
+   or emoji-only message always came back as 「翻譯失敗」. The button is
+   hidden rather than left out because chatMessageOriginalText() reads the
+   message's source text back from it for editing. */
+function chatHasTranslatableText(text) {
+    // The typed emoticons (":D", "xD") become emoji on screen, so they
+    // don't count as words. CHAT_EMOTICONS match escaped text, hence the
+    // separate strip for "<3" / "</3".
+    let s = (text || '').replace(/<\/?3/g, '');
+    for (const [re] of CHAT_EMOTICONS) s = s.replace(re, '');
+    return /\p{L}/u.test(s);
+}
+
 async function chatTranslate(text) {
     const target = CHAT_TRANSLATE_TARGET[siteLang] || 'en';
     const params = new URLSearchParams({ q: text, langpair: `autodetect|${target}` });
@@ -341,6 +354,20 @@ async function chatTranslate(text) {
     if (!res.ok) throw new Error(`MyMemory HTTP ${res.status}`);
     const data = await res.json();
     const translated = data && data.responseData && data.responseData.translatedText;
+    // A message already in the reader's language: MyMemory refuses with
+    // status 403 "PLEASE SELECT TWO DISTINCT LANGUAGES".
+    if (Number(data && data.responseStatus) === 403 && /DISTINCT LANGUAGES/i.test(translated || '')) {
+        const err = new Error('same language');
+        err.sameLanguage = true;
+        throw err;
+    }
+    // Sometimes it answers 200 with the text unchanged instead; showing
+    // that as a "translation" looks like nothing happened.
+    if (translated && translated.trim().toLowerCase() === String(text).trim().toLowerCase()) {
+        const err = new Error('unchanged');
+        err.unchanged = true;
+        throw err;
+    }
     // A spent quota can also arrive as 200 with the warning as the "translation".
     if (!translated || Number(data.responseStatus) !== 200 || /^MYMEMORY WARNING/i.test(translated)) {
         throw new Error(`MyMemory status ${data && data.responseStatus}`);
@@ -375,6 +402,11 @@ async function toggleChatTranslation(id, content, btnEl) {
         box.innerHTML = html;
         if (btnEl) btnEl.title = t('chat_translate_hide_title');
     } catch (e) {
+        if (e.sameLanguage || e.unchanged) {
+            const key = e.sameLanguage ? 'chat_translate_same_lang' : 'chat_translate_unchanged';
+            box.innerHTML = `<span class="chat-translation-loading">${t(key)}</span>`;
+            return;
+        }
         console.error('Chat translation failed:', e);
         box.innerHTML = `<span class="chat-translation-error">${t('chat_translate_fail')}</span>`;
     }

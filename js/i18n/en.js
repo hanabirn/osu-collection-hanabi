@@ -22,7 +22,7 @@ I18N.en = {
     chat_reply_btn_title: 'Reply to this message', chat_reply_cancel_title: 'Cancel reply',
     chat_view_profile_title: "View this player's osu! profile",
     chat_translate_btn_title: 'Translate this message', chat_translate_hide_title: 'Hide translation',
-    chat_translate_loading: 'Translating...', chat_translate_fail: 'Translation failed, try again later',
+    chat_translate_loading: 'Translating...', chat_translate_fail: 'Translation failed, try again later', chat_translate_same_lang: 'This message is already in your language', chat_translate_unchanged: 'The translation came back the same as the original',
     chat_replying_to: 'Replying to {name}: {content}',
     chat_delete_btn_title: 'Delete this message', chat_delete_confirm: 'Delete this message?', chat_delete_fail: 'Delete failed',
     chat_add_to_collection_btn: 'Add to collection',

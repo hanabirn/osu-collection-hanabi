@@ -22,7 +22,7 @@ I18N.ru = {
     chat_reply_btn_title: 'Ответить на это сообщение', chat_reply_cancel_title: 'Отменить ответ',
     chat_view_profile_title: 'Открыть профиль osu! этого игрока',
     chat_translate_btn_title: 'Перевести это сообщение', chat_translate_hide_title: 'Скрыть перевод',
-    chat_translate_loading: 'Перевод...', chat_translate_fail: 'Не удалось перевести, попробуйте позже',
+    chat_translate_loading: 'Перевод...', chat_translate_fail: 'Не удалось перевести, попробуйте позже', chat_translate_same_lang: 'Это сообщение уже на вашем языке', chat_translate_unchanged: 'Перевод совпал с оригиналом',
     chat_replying_to: 'Ответ {name}: {content}',
     chat_delete_btn_title: 'Удалить это сообщение', chat_delete_confirm: 'Удалить это сообщение?', chat_delete_fail: 'Не удалось удалить',
     chat_add_to_collection_btn: 'Добавить в коллекцию',

@@ -22,7 +22,7 @@ I18N.de = {
     chat_reply_btn_title: 'Auf diese Nachricht antworten', chat_reply_cancel_title: 'Antwort abbrechen',
     chat_view_profile_title: 'osu!-Profil dieses Spielers ansehen',
     chat_translate_btn_title: 'Diese Nachricht übersetzen', chat_translate_hide_title: 'Übersetzung ausblenden',
-    chat_translate_loading: 'Übersetze...', chat_translate_fail: 'Übersetzung fehlgeschlagen, versuch es später erneut',
+    chat_translate_loading: 'Übersetze...', chat_translate_fail: 'Übersetzung fehlgeschlagen, versuch es später erneut', chat_translate_same_lang: 'Diese Nachricht ist bereits in deiner Sprache', chat_translate_unchanged: 'Die Übersetzung ist identisch mit dem Original',
     chat_replying_to: 'Antwort an {name}: {content}',
     chat_delete_btn_title: 'Diese Nachricht löschen', chat_delete_confirm: 'Diese Nachricht löschen?', chat_delete_fail: 'Löschen fehlgeschlagen',
     chat_add_to_collection_btn: 'Zur Sammlung hinzufügen',

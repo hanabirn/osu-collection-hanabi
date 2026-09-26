@@ -22,7 +22,7 @@ I18N.ja = {
     chat_reply_btn_title: 'このメッセージに返信', chat_reply_cancel_title: '返信をキャンセル',
     chat_view_profile_title: 'このプレイヤーの osu! プロフィールを見る',
     chat_translate_btn_title: 'このメッセージを翻訳', chat_translate_hide_title: '翻訳を隠す',
-    chat_translate_loading: '翻訳中...', chat_translate_fail: '翻訳に失敗しました。しばらくしてからお試しください',
+    chat_translate_loading: '翻訳中...', chat_translate_fail: '翻訳に失敗しました。しばらくしてからお試しください', chat_translate_same_lang: 'このメッセージはすでにあなたの言語です', chat_translate_unchanged: '翻訳結果が原文と同じでした',
     chat_replying_to: '{name} に返信：{content}',
     chat_delete_btn_title: 'このメッセージを削除', chat_delete_confirm: 'このメッセージを削除しますか？', chat_delete_fail: '削除に失敗しました',
     chat_add_to_collection_btn: 'コレクションに追加',
