@@ -547,8 +547,9 @@ async function setupOsuPassword() {
 
 function copyBeatmapId(setId, event) {
     event.stopPropagation();
+    // Read it now: currentTarget is null by the time the clipboard resolves.
+    const btn = event.currentTarget;
     navigator.clipboard.writeText(String(setId)).then(() => {
-        const btn = event.currentTarget;
         btn.classList.add('copied');
         btn.innerHTML = icon('check');
         setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = icon('copy'); }, 1200);
