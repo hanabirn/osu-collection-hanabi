@@ -164,7 +164,7 @@ I18N.ru = {
     practice_precise_label: 'Точный расчёт pp (медленно)', practice_precise_pp: 'Точный расчёт pp… ({done}/{total})',
     ctools_health_hint: 'Проверить коллекцию на дубликаты, удалённые карты, не-ranked и изменение числа сложностей.', ctools_health_scan: 'Проверить коллекцию',
     ctools_health_scanning: 'Проверка... {done}/{total}',
-    ctools_health_dupes: 'Дубликаты наборов: {n}', ctools_health_dead: 'Удалено из osu!: {n}', ctools_health_diffchanged: 'Изменилось число сложностей: {n}', ctools_health_nonranked: 'Не ranked (graveyard/pending и т. п.): {n}',
+    ctools_health_dupes: 'Дубликаты наборов: {n}', ctools_health_dead: 'Удалено из osu!: {n}', ctools_health_diffchanged: 'Изменилось число сложностей: {n}', ctools_health_nonranked: 'Не ranked (graveyard/pending и т. п.): {n}', ctools_health_failed: 'Не удалось проверить (ошибка соединения, повторите позже): {n}',
     ctools_health_dedupe_btn: 'Убрать дубли', ctools_health_remove_btn: 'Удалить', ctools_health_refresh_btn: 'Обновить', ctools_health_ok: 'Коллекция в порядке ✓',
     osu_stat_global: 'Мировой рейтинг', osu_stat_accuracy: 'Точность', osu_stat_playcount: 'Игр', osu_total_pp: 'Всего PP (все режимы)',
     osu_recent_title: 'Недавние игры', osu_top_title: 'Лучшие игры',

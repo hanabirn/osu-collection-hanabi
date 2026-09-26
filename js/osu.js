@@ -2307,7 +2307,7 @@ async function runCollectionHealthCheck() {
 
     out.innerHTML = `<p class="status" style="color:#c8a2e0" id="ctools-health-progress"></p>`;
     const prog = document.getElementById('ctools-health-progress');
-    const dead = [], nonRanked = [], diffChanged = [];
+    const dead = [], nonRanked = [], diffChanged = [], failed = [];
     const CH = 6;
     for (let i = 0; i < ids.length; i += CH) {
         if (prog) prog.textContent = t('ctools_health_scanning', { done: i, total: ids.length });
@@ -2316,7 +2316,11 @@ async function runCollectionHealthCheck() {
         rs.forEach((r, k) => {
             const id = chunk[k];
             const stored = storedById.get(id);
-            if (!r || r.length === 0) { dead.push(id); return; }
+            // null = the lookup itself failed (rate limit, timeout). Only an
+            // empty answer means osu! no longer has the set; counting a
+            // failure as deleted would offer to remove a map that's fine.
+            if (r === null) { failed.push(id); return; }
+            if (r.length === 0) { dead.push(id); return; }
             if (!['1', '2', '4'].includes(String(r[0].approved))) nonRanked.push(id);
             if (stored && stored.beatmaps && r.length !== stored.beatmaps.length) diffChanged.push(id);
         });
@@ -2338,6 +2342,7 @@ async function runCollectionHealthCheck() {
     line('ctools_health_diffchanged', diffChanged,
         diffChanged.length ? `<button class="btn btn-sm" onclick="refreshAllOsuSets().then(runCollectionHealthCheck)">${escHtml(t('ctools_health_refresh_btn'))}</button>` : '');
     line('ctools_health_nonranked', nonRanked, '');
+    line('ctools_health_failed', failed, '');
 
     out.innerHTML = rows.length
         ? rows.join('')
@@ -2498,18 +2503,27 @@ function parseOsuInput(input) {
 async function osuFetch(params, timeoutMs = 12000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
-    let res;
+    let res, text;
     try {
         res = await fetch(`/.netlify/functions/osu?${params}`, { signal: controller.signal });
+        // Inside the timeout too: a body that stalls after the headers
+        // arrive would otherwise hang the caller forever.
+        text = await res.text();
     } catch (e) {
         if (e.name === 'AbortError') throw new Error(`請求逾時（${timeoutMs / 1000}秒）`);
         throw e;
     } finally {
         clearTimeout(timer);
     }
-    const text = await res.text();
-    try { return JSON.parse(text); }
+    let data;
+    try { data = JSON.parse(text); }
     catch { throw new Error(`Function 回傳非 JSON (HTTP ${res.status}): ${text.substring(0, 200)}`); }
+    // The function answers any upstream failure (osu!'s 429 included) with
+    // HTTP 500 and {error}. Returning that object would let callers read it
+    // as "no results" — 0 pp for a mode, no plays, a deleted map — so it
+    // throws like any other failure and each caller's catch handles it.
+    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
+    return data;
 }
 
 async function addOsuBeatmap(explicitId) {
@@ -3551,7 +3565,7 @@ async function fetchOsuPlaysHtml(userId, mode, type, limit) {
         const plays = await osuFetch(query);
         if (!plays || plays.length === 0) return '';
         const beatmapIds = [...new Set(plays.map(r => r.beatmap_id))];
-        const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`)));
+        const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`).catch(() => null)));
         const beatmapMap = {};
         beatmapIds.forEach((id, i) => {
             const bm = beatmapResults[i] && beatmapResults[i][0];
@@ -4437,7 +4451,7 @@ async function renderGradeHistoryList() {
     const capped = sorted.slice(0, GRADE_HISTORY_MAX_SHOWN);
     listEl.innerHTML = playsListSkeletonHTML(Math.min(capped.length, 5));
     const beatmapIds = [...new Set(capped.map(r => r.beatmap_id))];
-    const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`)));
+    const beatmapResults = await Promise.all(beatmapIds.map(id => osuFetch(`b=${id}`).catch(() => null)));
     const beatmapMap = {};
     beatmapIds.forEach((id, i) => {
         const bm = beatmapResults[i] && beatmapResults[i][0];

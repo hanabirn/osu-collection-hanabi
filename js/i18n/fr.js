@@ -164,7 +164,7 @@ I18N.fr = {
     practice_precise_label: 'pp précis (plus lent)', practice_precise_pp: 'Calcul du pp… ({done}/{total})',
     ctools_health_hint: 'Analyser la collection : doublons, maps supprimées, sets non ranked, changement du nombre de difficultés.', ctools_health_scan: 'Analyser la collection',
     ctools_health_scanning: 'Analyse... {done}/{total}',
-    ctools_health_dupes: 'Sets en double : {n}', ctools_health_dead: 'Supprimés d\'osu! : {n}', ctools_health_diffchanged: 'Nombre de difficultés modifié : {n}', ctools_health_nonranked: 'Non ranked (graveyard/pending/etc.) : {n}',
+    ctools_health_dupes: 'Sets en double : {n}', ctools_health_dead: 'Supprimés d\'osu! : {n}', ctools_health_diffchanged: 'Nombre de difficultés modifié : {n}', ctools_health_nonranked: 'Non ranked (graveyard/pending/etc.) : {n}', ctools_health_failed: 'Vérification impossible (échec de connexion, relancez plus tard) : {n}',
     ctools_health_dedupe_btn: 'Retirer les doublons', ctools_health_remove_btn: 'Retirer', ctools_health_refresh_btn: 'Actualiser', ctools_health_ok: 'La collection semble saine ✓',
     osu_stat_global: 'Rang mondial', osu_stat_accuracy: 'Précision', osu_stat_playcount: 'Parties', osu_total_pp: 'PP total (tous modes)',
     osu_recent_title: 'Parties récentes', osu_top_title: 'Meilleures parties',

@@ -124,7 +124,7 @@ I18N.zh = {
     practice_taste_thin: '找不到夠多符合的圖——可能你 top plays 的 mapper 太分散',
     ctools_health_hint: '掃描收藏，找出重複、已被刪除、非 ranked、難度數量有變的圖。', ctools_health_scan: '掃描收藏',
     ctools_health_scanning: '掃描中... {done}/{total}',
-    ctools_health_dupes: '重複的圖：{n}', ctools_health_dead: '已從 osu! 移除：{n}', ctools_health_diffchanged: '難度數量有變：{n}', ctools_health_nonranked: '非 ranked（graveyard／pending 等）：{n}',
+    ctools_health_dupes: '重複的圖：{n}', ctools_health_dead: '已從 osu! 移除：{n}', ctools_health_diffchanged: '難度數量有變：{n}', ctools_health_nonranked: '非 ranked（graveyard／pending 等）：{n}', ctools_health_failed: '無法檢查（連線失敗，請稍後再掃一次）：{n}',
     ctools_health_dedupe_btn: '移除重複', ctools_health_remove_btn: '移除', ctools_health_refresh_btn: '更新', ctools_health_ok: '收藏看起來很健康 ✓',
     osu_stat_global: '全球排名', osu_stat_accuracy: '準確率', osu_stat_playcount: '遊戲數', osu_total_pp: '全模式 PP',
     osu_recent_title: '最近遊玩', osu_top_title: '最佳成績',

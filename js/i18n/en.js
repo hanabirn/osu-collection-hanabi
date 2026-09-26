@@ -309,7 +309,7 @@ I18N.en = {
     practice_taste_thin: "Not enough matches — your top plays' mappers may be too spread out",
     ctools_health_hint: 'Scan the collection for duplicates, deleted maps, non-ranked sets, and difficulty-count changes.', ctools_health_scan: 'Scan collection',
     ctools_health_scanning: 'Scanning... {done}/{total}',
-    ctools_health_dupes: 'Duplicate sets: {n}', ctools_health_dead: 'Removed from osu!: {n}', ctools_health_diffchanged: 'Difficulty count changed: {n}', ctools_health_nonranked: 'Not ranked (graveyard/pending/etc.): {n}',
+    ctools_health_dupes: 'Duplicate sets: {n}', ctools_health_dead: 'Removed from osu!: {n}', ctools_health_diffchanged: 'Difficulty count changed: {n}', ctools_health_nonranked: 'Not ranked (graveyard/pending/etc.): {n}', ctools_health_failed: 'Couldn\'t check (connection failed, scan again later): {n}',
     ctools_health_dedupe_btn: 'Remove duplicates', ctools_health_remove_btn: 'Remove', ctools_health_refresh_btn: 'Refresh', ctools_health_ok: 'Collection looks healthy ✓',
     osu_stat_global: 'Global Rank', osu_stat_accuracy: 'Accuracy', osu_stat_playcount: 'Play Count', osu_total_pp: 'Total PP (All Modes)',
     osu_recent_title: 'Recent Plays', osu_top_title: 'Top Plays',

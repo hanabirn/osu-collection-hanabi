@@ -164,7 +164,7 @@ I18N.ko = {
     practice_precise_label: 'pp 정밀 계산 (느림)', practice_precise_pp: 'pp 정밀 계산 중… ({done}/{total})',
     ctools_health_hint: '컬렉션에서 중복, 삭제된 맵, 비 ranked, 난이도 수 변경을 검사합니다.', ctools_health_scan: '컬렉션 검사',
     ctools_health_scanning: '검사 중... {done}/{total}',
-    ctools_health_dupes: '중복 세트: {n}', ctools_health_dead: 'osu!에서 삭제됨: {n}', ctools_health_diffchanged: '난이도 수 변경: {n}', ctools_health_nonranked: '비 ranked (graveyard/pending 등): {n}',
+    ctools_health_dupes: '중복 세트: {n}', ctools_health_dead: 'osu!에서 삭제됨: {n}', ctools_health_diffchanged: '난이도 수 변경: {n}', ctools_health_nonranked: '비 ranked (graveyard/pending 등): {n}', ctools_health_failed: '확인 불가 (연결 실패, 나중에 다시 스캔하세요): {n}',
     ctools_health_dedupe_btn: '중복 제거', ctools_health_remove_btn: '제거', ctools_health_refresh_btn: '새로고침', ctools_health_ok: '컬렉션 상태가 양호합니다 ✓',
     osu_stat_global: '글로벌 랭크', osu_stat_accuracy: '정확도', osu_stat_playcount: '플레이 수', osu_total_pp: '전 모드 PP 합계',
     osu_recent_title: '최근 플레이', osu_top_title: '베스트 플레이',

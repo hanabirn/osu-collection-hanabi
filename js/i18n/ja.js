@@ -164,7 +164,7 @@ I18N.ja = {
     practice_precise_label: 'pp を精密計算（低速）', practice_precise_pp: 'pp を精密計算中…（{done}/{total}）',
     ctools_health_hint: 'コレクションをスキャンして、重複・削除済み・非 ranked・難易度数の変化を検出します。', ctools_health_scan: 'スキャン',
     ctools_health_scanning: 'スキャン中... {done}/{total}',
-    ctools_health_dupes: '重複した譜面: {n}', ctools_health_dead: 'osu! から削除済み: {n}', ctools_health_diffchanged: '難易度数が変化: {n}', ctools_health_nonranked: '非 ranked（graveyard/pending など）: {n}',
+    ctools_health_dupes: '重複した譜面: {n}', ctools_health_dead: 'osu! から削除済み: {n}', ctools_health_diffchanged: '難易度数が変化: {n}', ctools_health_nonranked: '非 ranked（graveyard/pending など）: {n}', ctools_health_failed: '確認できず（接続失敗。後でもう一度スキャンしてください）: {n}',
     ctools_health_dedupe_btn: '重複を削除', ctools_health_remove_btn: '削除', ctools_health_refresh_btn: '更新', ctools_health_ok: 'コレクションは健全です ✓',
     osu_stat_global: '世界ランク', osu_stat_accuracy: '精度', osu_stat_playcount: 'プレイ数', osu_total_pp: '全モード合計PP',
     osu_recent_title: '最近のプレイ', osu_top_title: 'ベストプレイ',
