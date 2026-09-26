@@ -314,12 +314,39 @@ function chatReplaceMessageNode(m) {
 
 /* ===== On-demand translation ("🌐" per message) =====
    Opt-in rather than auto-translating every message — most chat messages
-   don't need it, and this keeps the free MyMemory API (see
-   netlify/functions/chat-translate.js) called only for messages a visitor
-   actually asked about. Cached per message+site-language so re-clicking
-   (or a language switch mid-session) doesn't needlessly re-hit the API for
-   text already translated once. */
+   don't need it, and this keeps the free MyMemory API called only for
+   messages a visitor actually asked about. Cached per message+site-language
+   so re-clicking (or a language switch mid-session) doesn't needlessly
+   re-hit the API for text already translated once.
+
+   Called straight from the browser (MyMemory allows any origin), not via
+   netlify/functions/chat-translate.js: MyMemory's free quota is counted per
+   caller IP, and on Cloudflare every Worker calls out from shared IPs whose
+   daily quota was already spent — each request came back 429 "YOU USED ALL
+   AVAILABLE FREE TRANSLATIONS FOR TODAY". From the browser each visitor
+   uses their own quota (~5000 words/day). */
 const chatTranslationCache = {}; // `${messageId}:${lang}` -> translatedText
+
+// Site locale -> MyMemory target (same table as chat-translate.js). Chinese
+// needs the region or MyMemory can't tell which script to write.
+const CHAT_TRANSLATE_TARGET = {
+    zh: 'zh-TW', 'zh-Hans': 'zh-CN',
+    en: 'en', ja: 'ja', ko: 'ko', ru: 'ru', fr: 'fr', es: 'es', de: 'de',
+};
+
+async function chatTranslate(text) {
+    const target = CHAT_TRANSLATE_TARGET[siteLang] || 'en';
+    const params = new URLSearchParams({ q: text, langpair: `autodetect|${target}` });
+    const res = await fetch(`https://api.mymemory.translated.net/get?${params}`);
+    if (!res.ok) throw new Error(`MyMemory HTTP ${res.status}`);
+    const data = await res.json();
+    const translated = data && data.responseData && data.responseData.translatedText;
+    // A spent quota can also arrive as 200 with the warning as the "translation".
+    if (!translated || Number(data.responseStatus) !== 200 || /^MYMEMORY WARNING/i.test(translated)) {
+        throw new Error(`MyMemory status ${data && data.responseStatus}`);
+    }
+    return translated;
+}
 
 async function toggleChatTranslation(id, content, btnEl) {
     const box = document.getElementById(`chat-translation-${id}`);
@@ -342,14 +369,8 @@ async function toggleChatTranslation(id, content, btnEl) {
     box.style.display = 'block';
     box.innerHTML = `<span class="chat-translation-loading">${t('chat_translate_loading')}</span>`;
     try {
-        const res = await fetch('/.netlify/functions/chat-translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: content, targetLang: siteLang }),
-        });
-        if (!res.ok) throw new Error('translate failed');
-        const data = await res.json();
-        const html = `${icon('globe', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(data.translatedText)}`;
+        const translated = await chatTranslate(content);
+        const html = `${icon('globe', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(translated)}`;
         chatTranslationCache[cacheKey] = html;
         box.innerHTML = html;
         if (btnEl) btnEl.title = t('chat_translate_hide_title');
