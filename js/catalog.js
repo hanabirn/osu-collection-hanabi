@@ -456,30 +456,40 @@ function rebuildCatalogFacetSelects() {
     if (!catalogFacets) return;
     const f = catalogFacets;
 
+    // Another filter can leave the active language/genre with no matches,
+    // so it drops out of the facet counts. It stays listed at (0), as the
+    // source/artist combos already do: resetting it to "all" here would
+    // show 全部 above a list that was still filtered by it.
     const langSel = document.getElementById('catalog-lang-filter');
     if (langSel) {
-        let html = `<option value="all">${t('osu_lang_filter_all')}</option>`;
-        for (const { id, count } of (f.languages || [])) {
-            if (id === 'unknown') { html += `<option value="unknown">🌐 ${t('lang_unknown')} (${count})</option>`; continue; }
+        const langOption = (id, count) => {
+            if (id === 'unknown') return `<option value="unknown">🌐 ${t('lang_unknown')} (${count})</option>`;
             const e = OSU_LANGUAGES[id];
             const name = e ? t(e.key) : String(id);
             const flag = e ? e.flag : '🌐';
-            html += `<option value="${id}">${flag} ${escHtml(name)} (${count})</option>`;
-        }
+            return `<option value="${escHtml(String(id))}">${flag} ${escHtml(name)} (${count})</option>`;
+        };
+        const langs = f.languages || [];
+        let html = `<option value="all">${t('osu_lang_filter_all')}</option>`;
+        for (const { id, count } of langs) html += langOption(id, count);
+        if (catalogLang !== 'all' && !langs.some(l => String(l.id) === catalogLang)) html += langOption(catalogLang, 0);
         langSel.innerHTML = html;
-        langSel.value = [...langSel.options].some(o => o.value === catalogLang) ? catalogLang : (catalogLang = 'all');
+        langSel.value = catalogLang;
     }
 
     const genreSel = document.getElementById('catalog-genre-filter');
     if (genreSel) {
-        let html = `<option value="all">${t('osu_genre_filter_all')}</option>`;
-        for (const { id, count } of (f.genres || [])) {
-            if (id === 'unknown') { html += `<option value="unknown">${t('genre_unspecified')} (${count})</option>`; continue; }
+        const genreOption = (id, count) => {
+            if (id === 'unknown') return `<option value="unknown">${t('genre_unspecified')} (${count})</option>`;
             const name = OSU_GENRES[id] ? t(OSU_GENRES[id]) : String(id);
-            html += `<option value="${id}">${escHtml(name)} (${count})</option>`;
-        }
+            return `<option value="${escHtml(String(id))}">${escHtml(name)} (${count})</option>`;
+        };
+        const genres = f.genres || [];
+        let html = `<option value="all">${t('osu_genre_filter_all')}</option>`;
+        for (const { id, count } of genres) html += genreOption(id, count);
+        if (catalogGenre !== 'all' && !genres.some(g => String(g.id) === catalogGenre)) html += genreOption(catalogGenre, 0);
         genreSel.innerHTML = html;
-        genreSel.value = [...genreSel.options].some(o => o.value === catalogGenre) ? catalogGenre : (catalogGenre = 'all');
+        genreSel.value = catalogGenre;
     }
 
     // Source/artist are unbounded lists (no top-N cap, see
