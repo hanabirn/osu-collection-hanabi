@@ -568,7 +568,7 @@ I18N.en = {
     resources_title: 'More osu! Resources', resources_hint: "A few community tools worth knowing about — no need to reinvent them here:",
     h1_bbcode: 'BBCode Editor', bbcode_note: 'Runs entirely in your browser — nothing is sent anywhere. Copy the result into your osu! profile/forum post editor.', bbcode_source: 'BBCode', bbcode_preview: 'Preview', bbcode_copy: 'Copy BBCode', bbcode_clear: 'Clear', bbcode_placeholder: 'Write your BBCode here…', bbcode_copied: 'Copied!',
     resource_group_find: 'Finding maps', resource_group_stats: 'Stats & tracking', resource_group_make: 'Skins & mapping',
-    resource_osusearch_desc: 'Advanced beatmap search by star rating, BPM, length, and more', resource_osupps_desc: 'Another farm-map tracker — a good point of comparison',
+    resource_osupps_desc: 'Another farm-map tracker — a good point of comparison',
     resource_maniatracker_desc: 'osu!mania rankings, score tracking and a dan-level estimator',
     resource_catchtracker_desc: 'Taiwan osu!catch rankings, a live score feed, and per-map stats',
     resource_osutrack_desc: 'Long-term stat history — pp, rank and accuracy graphed over time',

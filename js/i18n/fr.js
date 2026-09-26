@@ -422,7 +422,7 @@ I18N.fr = {
     resources_title: 'Plus de ressources osu!', resources_hint: "Quelques outils communautaires utiles, pas besoin de les refaire ici :",
     h1_bbcode: 'Éditeur BBCode', bbcode_note: "Fonctionne entièrement dans votre navigateur — rien n'est envoyé ailleurs. Copiez le résultat dans l'éditeur de votre profil/message de forum osu!.", bbcode_source: 'BBCode', bbcode_preview: 'Aperçu', bbcode_copy: 'Copier le BBCode', bbcode_clear: 'Effacer', bbcode_placeholder: 'Écrivez votre BBCode ici…', bbcode_copied: 'Copié !',
     resource_group_find: 'Trouver des maps', resource_group_stats: 'Stats et suivi', resource_group_make: 'Skins et mapping',
-    resource_osusearch_desc: 'Recherche avancée de beatmaps par étoiles, BPM, durée, etc.', resource_osupps_desc: 'Un autre tracker de farm maps — utile pour comparer',
+    resource_osupps_desc: 'Un autre tracker de farm maps — utile pour comparer',
     resource_maniatracker_desc: 'Classements osu!mania, suivi des scores et un estimateur de niveau dan',
     resource_catchtracker_desc: 'Classements osu!catch de Taïwan, flux de scores en direct et statistiques par carte',
     resource_osutrack_desc: 'Historique des stats sur le long terme — pp, rang et précision en graphiques',

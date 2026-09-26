@@ -422,7 +422,7 @@ I18N.ja = {
     resources_title: 'その他の osu! リソース', resources_hint: '自作する必要のない、知っておくと便利なコミュニティツール：',
     h1_bbcode: 'BBCode エディター', bbcode_note: 'すべてブラウザ内で完結し、どこにも送信されません。結果を osu! のプロフィールやフォーラム投稿の編集欄にコピーしてください。', bbcode_source: 'BBCode', bbcode_preview: 'プレビュー', bbcode_copy: 'BBCode をコピー', bbcode_clear: 'クリア', bbcode_placeholder: 'ここに BBCode を入力…', bbcode_copied: 'コピーしました！',
     resource_group_find: '譜面探し', resource_group_stats: 'スコア・統計', resource_group_make: 'スキン・作譜',
-    resource_osusearch_desc: '☆数、BPM、長さなどで絞り込める高度な譜面検索エンジン', resource_osupps_desc: '別の farm 譜面トラッカー、比較に便利',
+    resource_osupps_desc: '別の farm 譜面トラッカー、比較に便利',
     resource_maniatracker_desc: 'osu!mania のランキング・スコア追跡・段位（dan）推定',
     resource_catchtracker_desc: '台湾の osu!catch ランキング・ライブスコアフィード・譜面別統計',
     resource_osutrack_desc: '長期的なステータス推移 —— pp・ランク・精度の時系列グラフ',

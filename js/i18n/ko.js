@@ -422,7 +422,7 @@ I18N.ko = {
     resources_title: '더 많은 osu! 자료', resources_hint: '직접 만들 필요 없는, 알아두면 좋은 커뮤니티 도구들:',
     h1_bbcode: 'BBCode 편집기', bbcode_note: '전부 브라우저에서 실행되며 어디로도 전송되지 않습니다. 결과를 osu! 프로필/포럼 게시글 편집기에 붙여넣으세요.', bbcode_source: 'BBCode', bbcode_preview: '미리보기', bbcode_copy: 'BBCode 복사', bbcode_clear: '지우기', bbcode_placeholder: '여기에 BBCode를 입력하세요…', bbcode_copied: '복사했습니다!',
     resource_group_find: '맵 찾기', resource_group_stats: '성적 · 통계', resource_group_make: '스킨 · 매핑',
-    resource_osusearch_desc: '별점, BPM, 길이 등으로 필터링하는 고급 비트맵 검색 엔진', resource_osupps_desc: '또 다른 farm 맵 트래커, 비교하기 좋음',
+    resource_osupps_desc: '또 다른 farm 맵 트래커, 비교하기 좋음',
     resource_maniatracker_desc: 'osu!mania 랭킹, 점수 추적, 단(dan) 레벨 추정',
     resource_catchtracker_desc: '대만 osu!catch 랭킹, 실시간 점수 피드, 맵별 통계',
     resource_osutrack_desc: '장기 스탯 기록 — pp, 랭크, 정확도를 시간별 그래프로',

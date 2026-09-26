@@ -422,7 +422,7 @@ I18N.de = {
     resources_title: 'Weitere osu!-Ressourcen', resources_hint: 'Ein paar Community-Tools, die man kennen sollte, statt sie selbst zu bauen:',
     h1_bbcode: 'BBCode-Editor', bbcode_note: 'Läuft komplett in deinem Browser — es wird nichts irgendwohin gesendet. Kopiere das Ergebnis in deinen osu!-Profil-/Forumseditor.', bbcode_source: 'BBCode', bbcode_preview: 'Vorschau', bbcode_copy: 'BBCode kopieren', bbcode_clear: 'Leeren', bbcode_placeholder: 'Schreibe hier deinen BBCode…', bbcode_copied: 'Kopiert!',
     resource_group_find: 'Beatmaps finden', resource_group_stats: 'Statistiken & Tracking', resource_group_make: 'Skins & Mapping',
-    resource_osusearch_desc: 'Erweiterte Beatmap-Suche nach Sternen, BPM, Länge und mehr', resource_osupps_desc: 'Ein weiterer Farm-Map-Tracker, gut zum Vergleichen',
+    resource_osupps_desc: 'Ein weiterer Farm-Map-Tracker, gut zum Vergleichen',
     resource_maniatracker_desc: 'osu!mania-Ranglisten, Score-Tracking und eine Dan-Level-Schätzung',
     resource_catchtracker_desc: 'Taiwanesische osu!catch-Ranglisten, Live-Score-Feed und Kartenstatistiken',
     resource_osutrack_desc: 'Langzeit-Statistikverlauf — pp, Rang und Genauigkeit als Diagramm',

@@ -422,7 +422,7 @@ I18N.ru = {
     resources_title: 'Больше ресурсов osu!', resources_hint: 'Полезные инструменты сообщества, которые незачем повторять здесь:',
     h1_bbcode: 'Редактор BBCode', bbcode_note: 'Полностью работает в вашем браузере — ничего никуда не отправляется. Скопируйте результат в редактор профиля/форума osu!.', bbcode_source: 'BBCode', bbcode_preview: 'Предпросмотр', bbcode_copy: 'Скопировать BBCode', bbcode_clear: 'Очистить', bbcode_placeholder: 'Введите здесь свой BBCode…', bbcode_copied: 'Скопировано!',
     resource_group_find: 'Поиск карт', resource_group_stats: 'Статистика и отслеживание', resource_group_make: 'Скины и маппинг',
-    resource_osusearch_desc: 'Продвинутый поиск карт по звёздам, BPM, длине и т.д.', resource_osupps_desc: 'Ещё один трекер farm-карт — удобно для сравнения',
+    resource_osupps_desc: 'Ещё один трекер farm-карт — удобно для сравнения',
     resource_maniatracker_desc: 'Рейтинги osu!mania, отслеживание скоров и оценка дана',
     resource_catchtracker_desc: 'Тайваньские рейтинги osu!catch, живая лента очков и статистика по картам',
     resource_osutrack_desc: 'Долгосрочная история статистики — графики pp, ранга и точности',

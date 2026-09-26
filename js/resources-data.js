@@ -7,7 +7,6 @@
    under a heading in renderResourcesList(); order within OSU_RESOURCES is
    preserved inside each bucket. */
 const OSU_RESOURCES = [
-    { url: 'https://osusearch.com', name: 'osu!search', descKey: 'resource_osusearch_desc', group: 'find' },
     { url: 'https://osu-pps.com/#/osu/maps', name: 'osu-pps', descKey: 'resource_osupps_desc', group: 'find' },
     { url: 'https://github.com/Piotrekol/CollectionManager', name: 'CollectionManager', descKey: 'resource_collectionmanager_desc', group: 'find' },
     { url: 'https://ameobea.me/osutrack/', name: 'osu!track', descKey: 'resource_osutrack_desc', group: 'stats' },

@@ -383,7 +383,7 @@ I18N.zh = {
     resources_title: '更多 osu! 資源', resources_hint: '一些沒必要自己做、但很推薦認識的社群工具：',
     h1_bbcode: 'BBCode 編輯器', bbcode_note: '完全在你的瀏覽器裡運作，不會傳送到任何地方。把結果複製貼到你的 osu! 個人頁或論壇貼文編輯器裡。', bbcode_source: 'BBCode', bbcode_preview: '預覽', bbcode_copy: '複製 BBCode', bbcode_clear: '清空', bbcode_placeholder: '在這裡輸入你的 BBCode…', bbcode_copied: '已複製！',
     resource_group_find: '找圖工具', resource_group_stats: '成績與數據', resource_group_make: '皮膚與製圖',
-    resource_osusearch_desc: '進階圖譜搜尋引擎，可依星數、BPM、長度等條件篩選', resource_osupps_desc: '另一個 farm 圖追蹤網站，可以互相比較',
+    resource_osupps_desc: '另一個 farm 圖追蹤網站，可以互相比較',
     resource_maniatracker_desc: 'osu!mania 排名、分數追蹤與段位（dan）估算',
     resource_catchtracker_desc: '台灣 osu!catch 排名、即時分數追蹤與圖譜統計',
     resource_osutrack_desc: '長期數據追蹤 —— pp、排名、準度隨時間的折線圖',
