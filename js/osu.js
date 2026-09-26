@@ -2643,12 +2643,15 @@ function switchOsuTab(mode, btn) {
     renderOsuCollection();
 }
 
+/* The card's ✕ sits one button over from download, and there is no undo,
+   so it asks first. Removal goes through removeOsuSetsByIds so the set
+   also leaves favourites and every category instead of lingering there. */
 async function removeOsuSet(setId) {
-    if (!await verifyOsuPassword()) return;
     const col = getOsuCollection();
-    OSU_MODES.forEach(m => { col[m] = col[m].filter(s => s.beatmapset_id !== setId); });
-    saveOsuCollection(col);
-    renderOsuCollection();
+    const set = OSU_MODES.map(m => col[m].find(s => s.beatmapset_id === setId)).find(Boolean);
+    const name = set ? `${set.artist} - ${set.title}` : `#${setId}`;
+    if (!confirm(t('osu_delete_confirm', { n: name }))) return;
+    await removeOsuSetsByIds([setId]);
 }
 
 async function refreshAllOsuSets() {

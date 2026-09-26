@@ -106,7 +106,7 @@ I18N.ru = {
     explore_tourney_d: 'Комьюнити-турниры с форума и платформы wyBin',
     osu_empty_fav: 'Избранных пока нет', osu_empty_fav_hint: 'Нажмите ♥ чтобы добавить!',
     osu_category_add_prompt: 'Введите название новой категории:', osu_category_rename_prompt: 'Переименовать категорию:',
-    osu_category_delete_confirm: 'Удалить эту категорию? (Битмапы останутся в коллекции — удалится только тег.)',
+    osu_category_delete_confirm: 'Удалить эту категорию? (Битмапы останутся в коллекции — удалится только тег.)', osu_delete_confirm: 'Удалить «{n}» из коллекции? (Он также исчезнет из избранного и категорий.)',
     osu_category_add_title: 'Добавить категорию', osu_category_rename_title: 'Переименовать', osu_category_delete_title: 'Удалить категорию',
     osu_category_btn_title: 'Добавить в категории...', osu_category_picker_title: 'Выберите категории',
     osu_fav_btn_title: 'Добавить в избранное', osu_unfav_btn_title: 'Убрать из избранного', osu_delete_btn_title: 'Удалить',

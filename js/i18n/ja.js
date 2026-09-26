@@ -106,7 +106,7 @@ I18N.ja = {
     explore_tourney_d: '公式フォーラム + wyBin のコミュニティ大会情報',
     osu_empty_fav: 'お気に入りはまだありません', osu_empty_fav_hint: '♥をクリックしてお気に入りに追加！',
     osu_category_add_prompt: '新しいカテゴリ名を入力：', osu_category_rename_prompt: 'カテゴリ名を変更：',
-    osu_category_delete_confirm: 'このカテゴリを削除しますか？（収蔵したビートマップは削除されません。タグだけが外れます）',
+    osu_category_delete_confirm: 'このカテゴリを削除しますか？（収蔵したビートマップは削除されません。タグだけが外れます）', osu_delete_confirm: '「{n}」をコレクションから削除しますか？（お気に入りとカテゴリからも外れます）',
     osu_category_add_title: 'カテゴリを追加', osu_category_rename_title: '名前を変更', osu_category_delete_title: 'カテゴリを削除',
     osu_category_btn_title: 'カテゴリに追加...', osu_category_picker_title: 'カテゴリを選択',
     osu_fav_btn_title: 'お気に入りに追加', osu_unfav_btn_title: 'お気に入りから削除', osu_delete_btn_title: '削除',
