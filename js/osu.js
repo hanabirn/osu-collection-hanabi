@@ -18,6 +18,26 @@ function showShareToast(msg) {
     toast._timer = setTimeout(function() { toast.className = 'share-toast'; }, 2500);
 }
 
+/* A toast with an 復原 button, for actions that happen at once instead of
+   asking first. Its own element rather than #share-toast, so a routine
+   confirmation fired meanwhile can't replace the button (same reasoning
+   as #site-update-toast in js/pwa.js). A newer undo replaces an older one. */
+function showUndoToast(msg, onUndo) {
+    let toast = document.getElementById('undo-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'undo-toast';
+        toast.setAttribute('role', 'status');
+        document.body.appendChild(toast);
+    }
+    const hide = () => { clearTimeout(toast._timer); toast.className = 'share-toast undo-toast'; };
+    toast.innerHTML = `<span>${escHtml(msg)}</span><button type="button" class="undo-toast-btn">${escHtml(t('osu_undo'))}</button>`;
+    toast.querySelector('button').onclick = () => { hide(); onUndo(); };
+    toast.className = 'share-toast undo-toast show';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(hide, 6000);
+}
+
 /* Builds the numbered-button portion of a pagination bar, collapsing long
    runs into a "…" — used by this file, public-collections.js and
    farm-maps.js, all of which can page into the hundreds/thousands and would
@@ -2654,15 +2674,49 @@ function switchOsuTab(mode, btn) {
     renderOsuCollection();
 }
 
-/* The card's ✕ sits one button over from download, and there is no undo,
-   so it asks first. Removal goes through removeOsuSetsByIds so the set
-   also leaves favourites and every category instead of lingering there. */
+/* The card's ✕ removes at once and offers 復原 for a few seconds. Removal
+   goes through removeOsuSetsByIds so the set also leaves favourites and
+   every category; the undo puts it back at the same places in each,
+   rather than restoring a snapshot that would also revert anything else
+   changed in the meantime. */
 async function removeOsuSet(setId) {
+    if (!await verifyOsuPassword()) return;
     const col = getOsuCollection();
-    const set = OSU_MODES.map(m => col[m].find(s => s.beatmapset_id === setId)).find(Boolean);
-    const name = set ? `${set.artist} - ${set.title}` : `#${setId}`;
-    if (!confirm(t('osu_delete_confirm', { n: name }))) return;
+    const spots = [];
+    OSU_MODES.forEach(m => col[m].forEach((s, i) => { if (s.beatmapset_id === setId) spots.push({ mode: m, index: i, set: s }); }));
+    if (!spots.length) return;
+    const favIndex = getOsuFavorites().indexOf(setId);
+    const members = getOsuCategoryMembers();
+    const catSpots = Object.keys(members)
+        .map(catId => ({ catId, index: (members[catId] || []).indexOf(setId) }))
+        .filter(c => c.index >= 0);
+
     await removeOsuSetsByIds([setId]);
+
+    const { artist, title } = spots[0].set;
+    showUndoToast(t('osu_deleted', { n: `${artist} - ${title}` }), () => {
+        const nowCol = getOsuCollection();
+        spots.forEach(({ mode, index, set }) => {
+            const list = nowCol[mode];
+            if (!list.some(s => s.beatmapset_id === setId)) list.splice(Math.min(index, list.length), 0, set);
+        });
+        saveOsuCollection(nowCol);
+        if (favIndex >= 0) {
+            const favs = getOsuFavorites();
+            if (!favs.includes(setId)) { favs.splice(Math.min(favIndex, favs.length), 0, setId); saveOsuFavorites(favs); }
+        }
+        if (catSpots.length) {
+            const liveCats = new Set(getOsuCategories().map(c => c.id));
+            const nowMembers = getOsuCategoryMembers();
+            catSpots.forEach(({ catId, index }) => {
+                if (!liveCats.has(catId)) return; // category deleted since
+                const ids = nowMembers[catId] || (nowMembers[catId] = []);
+                if (!ids.includes(setId)) ids.splice(Math.min(index, ids.length), 0, setId);
+            });
+            saveOsuCategoryMembers(nowMembers);
+        }
+        renderOsuCollection();
+    });
 }
 
 async function refreshAllOsuSets() {

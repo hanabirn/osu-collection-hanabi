@@ -1521,6 +1521,38 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
    overlapping if a plain confirmation toast fires while this is up. */
 #site-update-toast { bottom: 88px; }
 
+/* showUndoToast() in js/osu.js: message plus an 復原 button. Only the
+   visible toast takes clicks, so a hidden one never blocks the page. */
+.undo-toast {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 10px 8px 22px;
+    white-space: normal;
+    max-width: min(90vw, 460px);
+}
+.undo-toast.show { pointer-events: auto; }
+.undo-toast span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.undo-toast-btn {
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 999px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.undo-toast-btn:hover { background: rgba(255, 255, 255, 0.34); }
+.undo-toast-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
 /* ===== Maintenance banner (see initMaintenanceBanner in js/main.js) ===== */
 .maintenance-banner {
     position: relative;

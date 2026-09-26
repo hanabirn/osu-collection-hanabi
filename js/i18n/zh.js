@@ -66,7 +66,7 @@ I18N.zh = {
     explore_tourney_d: '官方論壇 + wyBin 的社群賽事情報',
     osu_empty_fav: '還沒有最愛的歌曲', osu_empty_fav_hint: '在其他分類中點擊 ♥ 加入最愛！',
     osu_category_add_prompt: '輸入新分類名稱：', osu_category_rename_prompt: '重新命名分類：',
-    osu_category_delete_confirm: '確定要刪除這個分類嗎？（不會刪除收藏的圖譜，只移除分類標籤）', osu_delete_confirm: '要從收藏中移除「{n}」嗎？（也會從最愛與分類中移除）',
+    osu_category_delete_confirm: '確定要刪除這個分類嗎？（不會刪除收藏的圖譜，只移除分類標籤）', osu_deleted: '已移除「{n}」', osu_undo: '復原',
     osu_category_add_title: '新增分類', osu_category_rename_title: '重新命名', osu_category_delete_title: '刪除分類',
     osu_category_btn_title: '加入分類...', osu_category_picker_title: '選擇分類',
     osu_fav_btn_title: '加入最愛', osu_unfav_btn_title: '取消最愛', osu_delete_btn_title: '移除',

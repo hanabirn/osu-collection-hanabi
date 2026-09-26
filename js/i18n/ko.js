@@ -106,7 +106,7 @@ I18N.ko = {
     explore_tourney_d: '공식 포럼 + wyBin의 커뮤니티 대회 정보',
     osu_empty_fav: '즐겨찾기가 없습니다', osu_empty_fav_hint: '♥를 눌러 즐겨찾기에 추가!',
     osu_category_add_prompt: '새 카테고리 이름 입력:', osu_category_rename_prompt: '카테고리 이름 변경:',
-    osu_category_delete_confirm: '이 카테고리를 삭제할까요? (수집한 비트맵은 삭제되지 않고 태그만 제거됩니다)', osu_delete_confirm: '「{n}」을(를) 컬렉션에서 삭제할까요? (즐겨찾기와 카테고리에서도 제거됩니다)',
+    osu_category_delete_confirm: '이 카테고리를 삭제할까요? (수집한 비트맵은 삭제되지 않고 태그만 제거됩니다)', osu_deleted: '「{n}」을(를) 삭제했습니다', osu_undo: '실행 취소',
     osu_category_add_title: '카테고리 추가', osu_category_rename_title: '이름 변경', osu_category_delete_title: '카테고리 삭제',
     osu_category_btn_title: '카테고리에 추가...', osu_category_picker_title: '카테고리 선택',
     osu_fav_btn_title: '즐겨찾기에 추가', osu_unfav_btn_title: '즐겨찾기에서 제거', osu_delete_btn_title: '삭제',

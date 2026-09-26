@@ -106,7 +106,7 @@ I18N.de = {
     explore_tourney_d: 'Community-Turniere aus dem Forum + wyBin',
     osu_empty_fav: 'Noch keine Favoriten', osu_empty_fav_hint: 'Klicken Sie ♥ um hinzuzufügen!',
     osu_category_add_prompt: 'Name der neuen Kategorie eingeben:', osu_category_rename_prompt: 'Kategorie umbenennen:',
-    osu_category_delete_confirm: 'Diese Kategorie löschen? (Beatmaps bleiben in deiner Sammlung — nur das Tag wird entfernt.)', osu_delete_confirm: '„{n}“ aus deiner Sammlung entfernen? (Auch aus Favoriten und Kategorien.)',
+    osu_category_delete_confirm: 'Diese Kategorie löschen? (Beatmaps bleiben in deiner Sammlung — nur das Tag wird entfernt.)', osu_deleted: '„{n}“ entfernt', osu_undo: 'Rückgängig',
     osu_category_add_title: 'Kategorie hinzufügen', osu_category_rename_title: 'Umbenennen', osu_category_delete_title: 'Kategorie löschen',
     osu_category_btn_title: 'Zu Kategorien hinzufügen...', osu_category_picker_title: 'Kategorien wählen',
     osu_fav_btn_title: 'Zu Favoriten hinzufügen', osu_unfav_btn_title: 'Aus Favoriten entfernen', osu_delete_btn_title: 'Entfernen',

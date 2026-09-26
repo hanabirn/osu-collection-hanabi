@@ -251,7 +251,7 @@ I18N.en = {
     explore_tourney_d: 'Community tournaments from the forum + wyBin',
     osu_empty_fav: 'No favorites yet', osu_empty_fav_hint: 'Click ♥ on beatmaps to add favorites!',
     osu_category_add_prompt: 'Enter new category name:', osu_category_rename_prompt: 'Rename category:',
-    osu_category_delete_confirm: 'Delete this category? (Beatmaps stay in your collection — only the tag is removed.)', osu_delete_confirm: 'Remove "{n}" from your collection? (It also leaves your favourites and categories.)',
+    osu_category_delete_confirm: 'Delete this category? (Beatmaps stay in your collection — only the tag is removed.)', osu_deleted: 'Removed "{n}"', osu_undo: 'Undo',
     osu_category_add_title: 'Add category', osu_category_rename_title: 'Rename', osu_category_delete_title: 'Delete category',
     osu_category_btn_title: 'Assign to categories...', osu_category_picker_title: 'Choose categories',
     osu_fav_btn_title: 'Add to favorites', osu_unfav_btn_title: 'Remove from favorites', osu_delete_btn_title: 'Remove',
