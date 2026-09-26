@@ -516,6 +516,7 @@ I18N.zh = {
                 <div class="howto-feat"><b>工具・設定（7 個按鈕）</b><span>重新整理全部圖資料 → 📊 統計儀表板（含 8 個收藏成就徽章）→ ✨ 收藏整理精靈（見下方說明）→ 標記已玩過／一鍵帶入最愛常玩（需登入）→ 📁 上傳 osu!.db，標出哪些圖已經下載過（僅 osu! stable）→ 🔒 設定密碼，之後編輯/發布動作都要輸入這組密碼確認。</span></div>
                 <div class="howto-feat"><b>搜尋 / 篩選 / 排序</b><span>輸入框可搜曲名或作者；下拉選單可依語言、曲風、來源、歌手篩選，也能切換星數排序。</span></div>
                 <div class="howto-feat"><b>批量下載此清單圖檔</b><span>把目前分頁（含搜尋/篩選結果、跨所有分頁）的每張圖依序下載成 .osz，免登入鏡像站直連、無需安裝任何 App。下載中可以按同一顆按鈕暫停／繼續，不會中斷正在下載的那張圖。下載完在檔案總管全選，一次拖進 osu! 視窗即可批量匯入遊戲。</span></div>
+                <div class="howto-feat"><b>下載本機還沒有的圖檔</b><span>選過 osu!.db 之後才會出現，按鈕上會寫目前清單有幾張是你的 osu! 還沒有的。只下載那些圖，已經有的會自動略過，一樣可以暫停／繼續。匯入 osu! 之後重新選一次 osu!.db，數字就會更新。</span></div>
                 <div class="howto-feat"><b>複製 !mp map</b><span>每張卡片都有一顆 ⚔ 按鈕，複製這張圖的 <code>!mp map</code> 指令 —— 在 osu! 多人房當房主貼上去就能換圖。Discord bot 的 <code>/map</code> 也會顯示同一行。</span></div>
                 <div class="howto-feat"><b>分類籤</b><span>最愛／全部歌曲／Standard／Taiko／Catch／Mania 六個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
                 <div class="howto-feat"><b>探索更多</b><span>頁面最下方 7 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
