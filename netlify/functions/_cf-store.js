@@ -2,14 +2,18 @@
  *
  * 目的是讓那 75 個函式一行都不用改：它們拿到的物件方法名稱、參數、
  * 回傳值都與 @netlify/blobs 的 store 相同。實際盤點過整個 codebase，
- * 只用到這 6 個方法：
+ * 只用到這 7 個方法：
  *   get(key, {type:'json'|'text'|'arrayBuffer'})  94 處
  *   setJSON(key, value)                           61 處
  *   set(key, value, {metadata})                   15 處
  *   delete(key)                                   10 處
  *   list()                                         1 處（push-cron.js）
  *   getWithMetadata(key, {type})                   1 處（chat-media.js）
- * 沒用到的（getMetadata、list 的分頁選項、條件寫入等）就不實作，
+ *   getMetadata(key)                               1 處（chat-send.js）
+ * getMetadata 當初盤點漏掉了：chat-send 用它確認附件屬於發訊者，缺了這個
+ * 方法就丟 TypeError、被 catch 吞掉，結果每則附圖訊息都回 422「傳送失敗」
+ * （上傳本身是成功的）。補上時重新 grep 過所有 store 方法，就是這 7 個。
+ * 沒用到的（list 的分頁選項、條件寫入等）就不實作，
  * 免得寫出沒被驗證過的程式碼。
  *
  * KV vs R2 的分法：小型 JSON 走 KV（讀取快、免費額度大），大型資料集與
@@ -45,6 +49,14 @@ function kvStore(ns) {
             if (res?.value == null) return null;
             /* Netlify 回的是 { data, metadata, etag }，欄位名是 data 不是 value */
             return { data: res.value, metadata: res.metadata ?? {}, etag: undefined };
+        },
+
+        /* Netlify：鍵不存在回 null，否則 { etag, metadata }。KV 沒有只讀
+           metadata 的 API，getWithMetadata 會連值一起讀，這裡把值丟掉。 */
+        async getMetadata(key) {
+            const res = await ns.getWithMetadata(key, 'arrayBuffer');
+            if (res?.value == null) return null;
+            return { metadata: res.metadata ?? {}, etag: undefined };
         },
 
         async set(key, value, opts) {
@@ -115,6 +127,15 @@ function r2Store(bucket) {
                       ? await obj.arrayBuffer()
                       : await obj.text();
             return { data, metadata: obj.customMetadata ?? {}, etag: obj.etag };
+        },
+
+        /* head() 只取 metadata，不下載內容（聊天附件可能好幾 MB）。
+           customMetadata 的值都是字串（見 stringifyMetadata）；chat-send 比對
+           authorId 時本來就用 String() 包起來，數字轉成字串後仍相等。 */
+        async getMetadata(key) {
+            const obj = await bucket.head(key);
+            if (obj == null) return null;
+            return { metadata: obj.customMetadata ?? {}, etag: obj.etag };
         },
 
         async set(key, value, opts) {
