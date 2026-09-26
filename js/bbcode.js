@@ -278,10 +278,19 @@
 
             let openTag, closeTag, insertText;
             if (hasDefault) {
-                const val = selected || defaultVal;
+                // data-default is the tag's argument ([color=red]); a selection
+                // is the text it applies to, not the argument. The one
+                // exception is a selected link, which is both.
+                const selectedIsUrl = tag === 'url' && /^https?:\/\/\S+$/i.test(selected.trim());
+                const val = selectedIsUrl ? selected.trim() : defaultVal;
                 openTag = `[${tag}=${val}]`;
                 closeTag = `[/${tag}]`;
                 insertText = selected || '';
+            } else if (btn.hasAttribute('data-placeholder')) {
+                // Tags whose content is the value, like [img]url[/img].
+                openTag = `[${tag}]`;
+                closeTag = `[/${tag}]`;
+                insertText = selected || btn.getAttribute('data-placeholder');
             } else if (btn.hasAttribute('data-block')) {
                 openTag = `[${tag}]\n[*]`;
                 closeTag = `\n[/${tag}]`;
