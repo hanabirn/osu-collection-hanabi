@@ -393,7 +393,7 @@ I18N.es = {
     collection_db_hint: 'Crea un collection.db que tu cliente de osu! puede leer, a partir de tus categorías (incluyendo favoritos) — descárgalo y cópialo en tu carpeta de osu!. Esto reemplaza tu collection.db actual — si quieres conservar lo que ya tienes, súbelo abajo primero para fusionarlo (las colecciones con el mismo nombre se sobrescribirán, el resto no se tocará).',
     collection_db_merge_label: 'Fusionar con el collection.db existente (opcional)', collection_db_export_btn: 'Exportar collection.db',
     collection_db_empty: 'Tu colección está vacía — no hay nada que exportar', collection_db_fetching: 'Obteniendo información de beatmaps... {done}/{total}',
-    collection_db_all_name: 'osu! Colección', collection_db_done: '¡Exportación completa! Copia collection.db a tu carpeta de osu!',
+    collection_db_all_name: 'osu! Colección', collection_db_done: '¡Exportación completa! Copia collection.db a tu carpeta de osu!', collection_db_done_partial: 'Se descargó collection.db, pero {n} sets no se pudieron consultar y faltan en él. Vuelve a exportar más tarde',
 
     stats_dashboard_btn_title: 'Ver gráficos por dificultad / modo / mapper', stats_dashboard_title: 'Panel de Estadísticas de la Colección',
     stats_dashboard_empty: 'Tu colección está vacía — nada que mostrar todavía', stats_dashboard_stars_title: 'Distribución de estrellas',

@@ -393,7 +393,7 @@ I18N.de = {
     collection_db_hint: 'Erstellt eine collection.db, die dein osu!-Client lesen kann, basierend auf deinen Kategorien (inkl. Favoriten) — herunterladen und in deinen osu!-Ordner kopieren. Das ersetzt deine vorhandene collection.db — willst du das Bestehende behalten, lade es unten hoch, um es zuerst zusammenzuführen (gleichnamige Sammlungen werden überschrieben, alles andere bleibt unberührt).',
     collection_db_merge_label: 'Mit vorhandener collection.db zusammenführen (optional)', collection_db_export_btn: 'collection.db exportieren',
     collection_db_empty: 'Deine Sammlung ist leer — nichts zu exportieren', collection_db_fetching: 'Beatmap-Infos werden geladen... {done}/{total}',
-    collection_db_all_name: 'osu! Sammlung', collection_db_done: 'Export abgeschlossen! Kopiere collection.db in deinen osu!-Ordner',
+    collection_db_all_name: 'osu! Sammlung', collection_db_done: 'Export abgeschlossen! Kopiere collection.db in deinen osu!-Ordner', collection_db_done_partial: 'collection.db heruntergeladen, aber {n} Sets konnten nicht abgerufen werden und fehlen darin. Exportiere später erneut',
 
     stats_dashboard_btn_title: 'Diagramme nach Sternen / Modus / Mapper ansehen', stats_dashboard_title: 'Sammlungs-Statistik-Dashboard',
     stats_dashboard_empty: 'Deine Sammlung ist leer — noch nichts anzuzeigen', stats_dashboard_stars_title: 'Sterne-Verteilung',

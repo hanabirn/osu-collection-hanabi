@@ -1530,42 +1530,52 @@ async function exportOsuCollectionDb() {
     }
 
     const setById = new Map(allSets.map(s => [s.beatmapset_id, s]));
-    const allBeatmapIds = [...new Set(allSets.flatMap(s => s.beatmaps.map(b => b.beatmap_id)))];
+
+    // Decide which sets go into which in-game collection first, so only
+    // those sets need their MD5s looked up — not the whole library.
+    const buckets = new Map();
+    const addBucket = (name, beatmapsetIds) => {
+        if (!name) return;
+        if (!buckets.has(name)) buckets.set(name, new Set());
+        const bucket = buckets.get(name);
+        beatmapsetIds.forEach(setId => { if (setById.has(setId)) bucket.add(setId); });
+    };
+    getOsuCategories().forEach(c => {
+        const members = getOsuCategoryMembers()[c.id] || [];
+        if (members.length) addBucket(c.name, members);
+    });
+    const favorites = getOsuFavorites();
+    if (favorites.length) addBucket(t('osu_fav'), favorites);
+    if (buckets.size === 0) addBucket(t('collection_db_all_name'), allSets.map(s => s.beatmapset_id));
+
+    // One s= lookup returns every difficulty of a set with its file_md5,
+    // so this is one request per set rather than one per difficulty.
+    const neededSetIds = [...new Set([...buckets.values()].flatMap(b => [...b]))];
     const md5Map = {};
-    const CHUNK = 10;
+    let failedSets = 0;
+    const CHUNK = 6;
 
     status.style.color = '#c8a2e0';
-    for (let i = 0; i < allBeatmapIds.length; i += CHUNK) {
-        status.innerText = t('collection_db_fetching', { done: i, total: allBeatmapIds.length });
-        const chunk = allBeatmapIds.slice(i, i + CHUNK);
-        const results = await Promise.all(chunk.map(id => osuFetch(`b=${id}`).catch(() => null)));
-        results.forEach((r, idx) => {
-            const bm = r && r[0];
-            if (bm && bm.file_md5) md5Map[chunk[idx]] = bm.file_md5;
+    for (let i = 0; i < neededSetIds.length; i += CHUNK) {
+        status.innerText = t('collection_db_fetching', { done: i, total: neededSetIds.length });
+        const chunk = neededSetIds.slice(i, i + CHUNK);
+        const results = await Promise.all(chunk.map(id => osuFetch(`s=${id}`).catch(() => null)));
+        results.forEach(r => {
+            if (r === null) { failedSets++; return; }
+            r.forEach(bm => { if (bm.file_md5) md5Map[bm.beatmap_id] = bm.file_md5; });
         });
     }
 
     const generated = new Map();
-    const addToCollection = (name, beatmapsetIds, catId) => {
-        if (!name) return;
-        if (!generated.has(name)) generated.set(name, new Set());
-        const bucket = generated.get(name);
-        beatmapsetIds.forEach(setId => {
-            const set = setById.get(setId);
-            if (!set) return;
-            set.beatmaps.forEach(b => {
-                if (md5Map[b.beatmap_id]) bucket.add(md5Map[b.beatmap_id]);
+    for (const [name, setIds] of buckets) {
+        const hashes = new Set();
+        setIds.forEach(setId => {
+            setById.get(setId).beatmaps.forEach(b => {
+                if (md5Map[b.beatmap_id]) hashes.add(md5Map[b.beatmap_id]);
             });
         });
-    };
-
-    getOsuCategories().forEach(c => {
-        const members = getOsuCategoryMembers()[c.id] || [];
-        if (members.length) addToCollection(c.name, members, c.id);
-    });
-    const favorites = getOsuFavorites();
-    if (favorites.length) addToCollection(t('osu_fav'), favorites);
-    if (generated.size === 0) addToCollection(t('collection_db_all_name'), allSets.map(s => s.beatmapset_id));
+        generated.set(name, hashes);
+    }
 
     let finalMap = generated;
     const mergeFile = document.getElementById('collection-db-merge-input').files[0];
@@ -1590,8 +1600,9 @@ async function exportOsuCollectionDb() {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    status.innerText = t('collection_db_done');
-    status.style.color = '#34d399';
+    // Say so when lookups failed: those sets are missing from the file.
+    status.innerText = failedSets ? t('collection_db_done_partial', { n: failedSets }) : t('collection_db_done');
+    status.style.color = failedSets ? '#f59e0b' : '#34d399';
 }
 
 /* ===== .osdb (Collection Manager / osu!Stats format) =====

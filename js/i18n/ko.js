@@ -393,7 +393,7 @@ I18N.ko = {
     collection_db_hint: '분류(즐겨찾기 포함)를 기준으로 osu! 클라이언트가 읽을 수 있는 collection.db를 만듭니다. 다운로드 후 osu! 폴더에 복사하세요. 이 파일은 기존 collection.db를 대체합니다—기존 컬렉션을 유지하려면 아래에서 먼저 업로드해 병합하세요(같은 이름의 컬렉션은 덮어써지고, 나머지는 그대로 유지됩니다).',
     collection_db_merge_label: '기존 collection.db와 병합 (선택)', collection_db_export_btn: 'collection.db 내보내기',
     collection_db_empty: '컬렉션이 비어 있어 내보낼 것이 없습니다', collection_db_fetching: '비트맵 정보 불러오는 중... {done}/{total}',
-    collection_db_all_name: 'osu! 컬렉션', collection_db_done: '내보내기 완료! collection.db를 osu! 폴더에 복사하세요',
+    collection_db_all_name: 'osu! 컬렉션', collection_db_done: '내보내기 완료! collection.db를 osu! 폴더에 복사하세요', collection_db_done_partial: 'collection.db를 다운로드했지만 {n}개 비트맵을 불러오지 못해 빠져 있습니다. 나중에 다시 내보내 주세요',
 
     stats_dashboard_btn_title: '별점 / 모드 / 매퍼별 분포 차트 보기', stats_dashboard_title: '컬렉션 통계 대시보드',
     stats_dashboard_empty: '컬렉션이 비어 있어 통계가 없습니다', stats_dashboard_stars_title: '별점 분포',

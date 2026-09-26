@@ -393,7 +393,7 @@ I18N.ja = {
     collection_db_hint: 'あなたの分類（「お気に入り」を含む）から、osu!クライアントが読み込める collection.db を作成します。ダウンロードして osu! フォルダにコピーしてください。これはあなたの端末にある既存の collection.db を置き換えます。既存のコレクションを残したい場合は、下で先にアップロードして統合してください（同名のコレクションは上書きされ、それ以外はそのまま残ります）。',
     collection_db_merge_label: '既存の collection.db と統合（任意）', collection_db_export_btn: 'collection.db を書き出す',
     collection_db_empty: 'コレクションが空です。書き出すものがありません', collection_db_fetching: '譜面情報を取得中... {done}/{total}',
-    collection_db_all_name: 'osu!コレクション', collection_db_done: '書き出し完了！collection.db を osu! フォルダにコピーしてください',
+    collection_db_all_name: 'osu!コレクション', collection_db_done: '書き出し完了！collection.db を osu! フォルダにコピーしてください', collection_db_done_partial: 'collection.db をダウンロードしましたが、{n} 件の譜面を取得できず含まれていません。後でもう一度書き出してください',
 
     stats_dashboard_btn_title: '星・モード・マッパー別の分布グラフを見る', stats_dashboard_title: 'コレクション統計ダッシュボード',
     stats_dashboard_empty: 'コレクションが空です。まだ統計データがありません', stats_dashboard_stars_title: '☆数の分布',

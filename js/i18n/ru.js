@@ -393,7 +393,7 @@ I18N.ru = {
     collection_db_hint: 'Создаёт collection.db, который понимает клиент osu!, на основе ваших категорий (включая избранное) — скачайте и скопируйте в папку osu!. Это заменит существующий collection.db — если хотите сохранить то, что уже есть, сначала загрузите его ниже для объединения (коллекции с тем же именем будут перезаписаны, остальные останутся нетронутыми).',
     collection_db_merge_label: 'Объединить с существующим collection.db (необязательно)', collection_db_export_btn: 'Экспорт collection.db',
     collection_db_empty: 'Ваша коллекция пуста — нечего экспортировать', collection_db_fetching: 'Получение данных карт... {done}/{total}',
-    collection_db_all_name: 'osu! Коллекция', collection_db_done: 'Экспорт завершён! Скопируйте collection.db в папку osu!',
+    collection_db_all_name: 'osu! Коллекция', collection_db_done: 'Экспорт завершён! Скопируйте collection.db в папку osu!', collection_db_done_partial: 'collection.db скачан, но {n} наборов не удалось получить, и их в нём нет. Попробуйте экспортировать позже',
 
     stats_dashboard_btn_title: 'Графики по звёздам / режимам / мапперам', stats_dashboard_title: 'Панель статистики коллекции',
     stats_dashboard_empty: 'Ваша коллекция пуста — пока нечего показать', stats_dashboard_stars_title: 'Распределение по звёздам',

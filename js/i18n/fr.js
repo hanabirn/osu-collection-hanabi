@@ -393,7 +393,7 @@ I18N.fr = {
     collection_db_hint: "Génère un collection.db lisible par le client osu! à partir de vos catégories (favoris inclus) — téléchargez-le et copiez-le dans votre dossier osu!. Cela remplace votre collection.db existant — pour garder ce qui y est déjà, téléversez-le ci-dessous pour le fusionner d'abord (les collections de même nom seront écrasées, le reste ne sera pas touché).",
     collection_db_merge_label: 'Fusionner avec le collection.db existant (optionnel)', collection_db_export_btn: 'Exporter collection.db',
     collection_db_empty: "Votre collection est vide — rien à exporter", collection_db_fetching: 'Récupération des infos des beatmaps... {done}/{total}',
-    collection_db_all_name: 'osu! Collection', collection_db_done: 'Export terminé ! Copiez collection.db dans votre dossier osu!',
+    collection_db_all_name: 'osu! Collection', collection_db_done: 'Export terminé ! Copiez collection.db dans votre dossier osu!', collection_db_done_partial: 'collection.db téléchargé, mais {n} sets n’ont pas pu être récupérés et n’y figurent pas. Réessayez l’export plus tard',
 
     stats_dashboard_btn_title: 'Voir les graphiques par difficulté / mode / mappeur', stats_dashboard_title: 'Tableau de Bord des Statistiques',
     stats_dashboard_empty: "Votre collection est vide — rien à afficher pour l'instant", stats_dashboard_stars_title: 'Répartition par étoiles',

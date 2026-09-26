@@ -539,7 +539,7 @@ I18N.en = {
     collection_db_hint: "Builds a collection.db your osu! client can read straight from your categories (including Favorites) — download it and drop it into your osu! folder. This replaces your existing collection.db, so if you want to keep what's already there, upload it below to merge first (same-named collections get overwritten, everything else stays untouched).",
     collection_db_merge_label: 'Merge with existing collection.db (optional)', collection_db_export_btn: 'Export collection.db',
     collection_db_empty: 'Your collection is empty — nothing to export', collection_db_fetching: 'Fetching beatmap info... {done}/{total}',
-    collection_db_all_name: 'osu! Collection', collection_db_done: 'Export complete! Copy collection.db into your osu! folder',
+    collection_db_all_name: 'osu! Collection', collection_db_done: 'Export complete! Copy collection.db into your osu! folder', collection_db_done_partial: "collection.db downloaded, but {n} sets couldn't be looked up and are missing from it. Try exporting again later",
 
     stats_dashboard_btn_title: 'See star / mode / mapper breakdown charts', stats_dashboard_title: 'Collection Stats Dashboard',
     stats_dashboard_empty: 'Your collection is empty — nothing to show yet', stats_dashboard_stars_title: 'Star rating distribution',

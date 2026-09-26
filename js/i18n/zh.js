@@ -354,7 +354,7 @@ I18N.zh = {
     collection_db_hint: '會依照你的分類（含「最愛」）產生 osu! 遊戲讀得懂的 collection.db，下載後複製到你的 osu! 資料夾即可匯入。這會取代你電腦上原本的 collection.db——若想保留現有的收藏，可以先在下面上傳它一起合併（同名分類會被這裡的資料覆蓋，其他分類不受影響）。',
     collection_db_merge_label: '合併現有 collection.db（可略過）', collection_db_export_btn: '匯出 collection.db',
     collection_db_empty: '收藏是空的，沒有東西可以匯出', collection_db_fetching: '正在讀取譜面資訊... {done}/{total}',
-    collection_db_all_name: 'osu!收藏', collection_db_done: '匯出完成！請把 collection.db 複製到你的 osu! 資料夾',
+    collection_db_all_name: 'osu!收藏', collection_db_done: '匯出完成！請把 collection.db 複製到你的 osu! 資料夾', collection_db_done_partial: '已下載 collection.db，但有 {n} 張圖讀取失敗、沒有包含在檔案裡，請稍後再匯出一次',
 
     stats_dashboard_btn_title: '看收藏的星數 / 模式 / mapper 分佈圖表', stats_dashboard_title: '收藏統計儀表板',
     stats_dashboard_empty: '收藏是空的，還沒有統計資料', stats_dashboard_stars_title: '星數分布',
