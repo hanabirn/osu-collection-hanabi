@@ -211,6 +211,18 @@ let osuVolume = (() => {
 // #osu-volume itself only exists once #osu-mini-player is first built
 // (ensureOsuMiniPlayer() in playOsuPreview()), where its initial value is
 // set inline from osuVolume directly — nothing to sync at load time here.
+
+// Phones/tablets: the hardware volume keys change the system media volume,
+// which a page can neither read nor be notified of, so an in-page slider
+// only drifts out of step with them — and iOS ignores
+// HTMLMediaElement.volume altogether. There previews play at full volume,
+// the keys are the one control, and the slider row is hidden
+// (css/osu.css). Without this a volume saved low on the slider earlier
+// would stay stuck low with no way to raise it.
+const OSU_TOUCH_VOLUME = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+function osuPlaybackVolume() {
+    return OSU_TOUCH_VOLUME ? 1 : osuVolume;
+}
 let osuPage = 0;
 let osuSortMode = 'default';
 let osuSearchQuery = '';
@@ -687,7 +699,7 @@ function copyMpMap(setId, event) {
 function osuSetVolume(val) {
     osuVolume = parseFloat(val);
     localStorage.setItem(OSU_VOLUME_KEY, String(osuVolume));
-    if (osuCurrentAudio && !osuCurrentAudio.ended) osuCurrentAudio.volume = osuVolume;
+    if (osuCurrentAudio && !osuCurrentAudio.ended) osuCurrentAudio.volume = osuPlaybackVolume();
 }
 
 /* Markup for every .osu-play-btn/.games-card-btn: a static play icon, plus
@@ -738,7 +750,7 @@ function playOsuPreview(setId, event) {
     // Web Audio graph reading its samples) needs no CORS headers at all.
     const audio = new Audio(`https://b.ppy.sh/preview/${setId}.mp3`);
     audio._setId = setId;
-    audio.volume = osuVolume;
+    audio.volume = osuPlaybackVolume();
     audio.loop = osuPreviewLoop;
     osuCurrentAudio = audio;
 

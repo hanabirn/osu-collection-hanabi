@@ -1596,6 +1596,12 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     gap: 8px;
     margin-top: 8px;
 }
+/* Touch devices: the hardware volume keys are the control there and a page
+   can't follow them, so the slider is hidden (see osuPlaybackVolume() in
+   js/osu.js — same media query). */
+@media (hover: none) and (pointer: coarse) {
+    .osu-mini-player-volume-row { display: none; }
+}
 .osu-mini-player-volume-icon { color: var(--text-dim2); cursor: default; }
 .osu-mini-player-volume-icon:hover { background: none; }
 #osu-volume {
