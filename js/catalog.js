@@ -520,13 +520,20 @@ function catalogComboSyncValue(kind) {
     } else if (catalogArtist !== 'all' && !opts.some(o => o.value === catalogArtist)) {
         catalogArtist = 'all';
     }
+    // While the list is open the box holds what the visitor is typing — a
+    // query that finishes meanwhile (e.g. the one clearing the box starts)
+    // must not overwrite it. catalogComboClose() marks the combo closed
+    // before calling this, so closing still snaps the text back.
+    if (catalogComboState[kind].open) {
+        catalogComboRender(kind);
+        return;
+    }
     const inputEl = document.getElementById(`catalog-${kind}-combo-input`);
     if (!inputEl) return;
     const current = kind === 'source' ? catalogSource : catalogArtist;
     if (current === 'all') inputEl.value = '';
     else if (current === 'none') inputEl.value = t('osu_source_filter_none');
     else inputEl.value = current;
-    if (catalogComboState[kind].open) catalogComboRender(kind);
 }
 
 /* Rebuild the dropdown panel's contents: an "all" row, then every option
@@ -568,6 +575,17 @@ function catalogComboOpen(kind) {
 function catalogComboFilter(kind, value) {
     catalogComboState[kind].query = value;
     catalogComboOpen(kind);
+    // Emptying the box (Delete / Backspace) means "no artist/source" — drop
+    // back to 全部 right away instead of leaving the old filter applied
+    // behind an empty box. The list stays open to pick something else.
+    if (!value.trim() && catalogComboCurrent(kind) !== 'all') {
+        if (kind === 'source') switchCatalogSource('all');
+        else switchCatalogArtist('all');
+    }
+}
+
+function catalogComboCurrent(kind) {
+    return kind === 'source' ? catalogSource : catalogArtist;
 }
 
 function catalogComboClose(kind) {
@@ -601,10 +619,16 @@ document.addEventListener('click', (e) => {
     if (!e.target.closest('#catalog-source-combo')) catalogComboClose('source');
     if (!e.target.closest('#catalog-artist-combo')) catalogComboClose('artist');
 });
+/* Escape while a combo's list is open resets that combo to 全部 and closes
+   it. Only the open one: Escape pressed anywhere else on the page must not
+   silently clear a filter the visitor isn't looking at. */
 document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    catalogComboClose('source');
-    catalogComboClose('artist');
+    for (const kind of ['source', 'artist']) {
+        if (!catalogComboState[kind].open) continue;
+        if (catalogComboCurrent(kind) !== 'all') catalogComboPick(kind, 'all');
+        else catalogComboClose(kind);
+    }
 });
 
 /* How many sets in the visitor's own collection match the active facet.
