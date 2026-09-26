@@ -332,6 +332,16 @@ function importPublicCollectionData(data, fallbackName) {
     if (!confirm(t('gallery_import_confirm', { name, n: incomingCount }))) return;
 
     const added = mergeIncomingCollection(data.collection);
+    // Someone else's categories stay browse-only (see openGalleryDetailModal)
+    // — they'd clutter the downloader's own. But downloading your OWN
+    // published collection, e.g. on a second device, is how you carry your
+    // categories over, so for the publisher they're merged by name like the
+    // share-link import does. `id` in the payload is the publisher's osu! id
+    // (collections-publish.js); the login stores it as a string.
+    const me = getLoggedInOsuUser();
+    if (me && data.id != null && String(me.id) === String(data.id)) {
+        mergeIncomingCategories(data.categories, data.categoryMembers);
+    }
     renderOsuCollection();
     showShareToast(t('osu_share_link_imported', { n: added }));
 }
