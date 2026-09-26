@@ -4132,7 +4132,7 @@ async function comparePlayers() {
     } catch (e) {
         console.error('PP compare failed:', e);
         if (skeleton) skeleton.style.display = 'none';
-        status.innerText = 'Error';
+        status.innerText = t('osu_profile_import_fail');
         status.style.color = '#ff5252';
     }
 }
@@ -4645,7 +4645,7 @@ async function loadVisitorProfileById(input, isUsername) {
     } catch (e) {
         console.error('Visitor lookup failed:', e);
         if (skeleton) skeleton.style.display = 'none';
-        status.innerText = 'Error';
+        status.innerText = t('osu_profile_import_fail');
         status.style.color = '#ff5252';
     }
 }
