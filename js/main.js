@@ -260,9 +260,25 @@ function onGlobalShortcutKeydown(e) {
     if (typeof openGlobalSearch === 'function') openGlobalSearch();
 }
 
+/* Escape closes an open .pp-calc-modal-overlay dialog by clicking its own
+   ✕, so each dialog's close function runs (and resets whatever it resets)
+   exactly as it would from the button. The global search overlay has its
+   own Escape handler in js/global-search.js and is left to it. With two
+   dialogs stacked, only the later one in the DOM (the one on top) closes. */
+function onModalEscapeKeydown(e) {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    const open = [...document.querySelectorAll('.pp-calc-modal-overlay')]
+        .filter(m => m.id !== 'global-search-modal' && m.style.display === 'flex');
+    const close = open.length ? open[open.length - 1].querySelector('.pp-calc-close') : null;
+    if (!close) return;
+    e.preventDefault();
+    close.click();
+}
+
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', onGlobalShortcutKeydown);
+    document.addEventListener('keydown', onModalEscapeKeydown);
     if (typeof renderStaticIcons === 'function') renderStaticIcons();
     if (typeof wireModalHowto === 'function') wireModalHowto();
     if (typeof renderChangelogMenu === 'function') renderChangelogMenu();
