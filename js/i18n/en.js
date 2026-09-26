@@ -44,10 +44,10 @@ I18N.en = {
         <div class="howto-group" id="howto-global">
             <h3 class="howto-group-title">Site-wide</h3>
             <p class="howto-tab-desc">Controls available from any page, mostly clustered in the header's two corners.</p>
-            <div class="howto-feat"><b>Light / dark toggle</b><span>Top-left. Click the moon/sun icon to switch — your choice is remembered on future visits.</span></div>
+            <div class="howto-feat"><b>Theme colour</b><span>Top-right palette icon. Pick one of 12 preset colours or your own, and the whole site’s accent follows; “Reset to default” goes back to the default pink. Remembered in this browser.</span></div>
             <div class="howto-feat"><b>Add to home screen</b><span>Top-left, only shown where the browser supports it. Installs the site as an app icon with a basic offline screen.</span></div>
             <div class="howto-feat"><b>Site update available</b><span>Top-left / a floating bar at the bottom, only appears when a new version is detected — click it to reload.</span></div>
-            <div class="howto-feat"><b>Global search</b><span>Top-right magnifier, or press <b>/</b> or <b>Ctrl+K</b>. Searches your collection, the catalog, and World Cup mappools at once — clicking a result jumps to that tab with the search prefilled.</span></div>
+            <div class="howto-feat"><b>Global search</b><span>Top-right magnifier, or press <b>/</b> or <b>Ctrl+K</b>. Searches your collection, the catalog, and World Cup mappools at once. A collection result opens the page holding that map and highlights it; a catalog result filters by title and highlights that map; a mappool result opens that edition.</span></div>
             <div class="howto-feat"><b>Notification bell</b><span>Top-right. Tracked players' PP changes, tracked mappers' new maps, unread DMs, etc. show up here — with push notifications on, you'll get them even with the site closed.</span></div>
             <div class="howto-feat"><b>osu! login</b><span>Top-right. Sign in with your osu! account — chatting, DMs, publishing to the gallery, cloud skin backup, and one-click favorites/most-played import all need this first.</span></div>
             <div class="howto-feat"><b>Language switch</b><span>Top-right globe icon — 9 languages supported, remembered after you pick one.</span></div>

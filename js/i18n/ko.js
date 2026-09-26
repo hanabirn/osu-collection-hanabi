@@ -463,10 +463,10 @@ I18N.ko = {
         <div class="howto-group" id="howto-global">
             <h3 class="howto-group-title">사이트 전체</h3>
             <p class="howto-tab-desc">어느 페이지에서든 찾을 수 있는 컨트롤들로, 대부분 헤더 좌우 모서리에 모여 있습니다.</p>
-            <div class="howto-feat"><b>다크 / 라이트 전환</b><span>왼쪽 위. 달/해 아이콘을 클릭하면 전환되고, 다음 방문 때도 선택이 기억됩니다.</span></div>
+            <div class="howto-feat"><b>테마 색상</b><span>오른쪽 위 팔레트 아이콘. 12가지 기본 색상이나 원하는 색을 고르면 사이트 전체의 강조색이 바뀝니다. 「기본값으로 재설정」으로 기본 분홍색으로 돌아가며, 선택은 이 브라우저에 기억됩니다.</span></div>
             <div class="howto-feat"><b>홈 화면에 추가</b><span>왼쪽 위, 지원하는 브라우저에서만 표시. 사이트를 앱 아이콘으로 설치해 오프라인에서도 기본 화면을 열 수 있습니다.</span></div>
             <div class="howto-feat"><b>사이트 업데이트</b><span>왼쪽 위 / 화면 하단 플로팅 바. 새 버전이 감지될 때만 나타나며, 클릭하면 새로고침됩니다.</span></div>
-            <div class="howto-feat"><b>전체 검색</b><span>오른쪽 위 돋보기, 또는 <b>/</b> 나 <b>Ctrl+K</b>. 내 컬렉션·곡 분류·월드컵 맵풀을 동시에 검색하고, 결과를 클릭하면 검색어가 채워진 채로 해당 탭으로 이동합니다.</span></div>
+            <div class="howto-feat"><b>전체 검색</b><span>오른쪽 위 돋보기, 또는 <b>/</b> 나 <b>Ctrl+K</b>. 내 컬렉션·곡 분류·월드컵 맵풀을 동시에 검색합니다. 컬렉션 결과는 그 비트맵이 있는 페이지를 열어 강조하고, 곡 분류 결과는 곡명으로 걸러 그 비트맵을 강조하며, 맵풀 결과는 해당 대회를 엽니다.</span></div>
             <div class="howto-feat"><b>알림 벨</b><span>오른쪽 위. 추적 중인 플레이어의 PP 변화, 추적 중인 mapper의 신곡, 읽지 않은 DM 등이 여기 표시되며, 푸시 알림을 켜두면 사이트를 열지 않아도 받을 수 있습니다.</span></div>
             <div class="howto-feat"><b>osu! 로그인</b><span>오른쪽 위. osu! 계정으로 로그인——채팅 발언, DM, 갤러리에 컬렉션 발행, 스킨 클라우드 백업, 즐겨찾기/자주 플레이 원클릭 가져오기는 모두 로그인이 필요합니다.</span></div>
             <div class="howto-feat"><b>언어 전환</b><span>오른쪽 위 지구본 아이콘, 9개 언어 지원, 선택한 언어는 기억됩니다.</span></div>

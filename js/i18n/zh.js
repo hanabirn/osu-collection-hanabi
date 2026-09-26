@@ -492,10 +492,10 @@ I18N.zh = {
         <div class="howto-group" id="howto-global">
             <h3 class="howto-group-title">站台通用</h3>
             <p class="howto-tab-desc">不管在哪個分頁都找得到的控制項，大多集中在頁首左右兩角。</p>
-            <div class="howto-feat"><b>深色 / 淺色切換</b><span>左上角，點一下月亮／太陽圖示即可切換，之後每次造訪都會記住你的選擇。</span></div>
+            <div class="howto-feat"><b>主題色</b><span>右上角調色盤圖示。挑 12 種預設色之一或自訂顏色，整個網站的強調色會跟著換；「恢復預設」回到原本的粉紅色，選擇會記在這個瀏覽器。</span></div>
             <div class="howto-feat"><b>加到主畫面</b><span>左上角，僅支援的瀏覽器顯示。把網站安裝成一個 App 圖示，離線時仍可開啟基本畫面。</span></div>
             <div class="howto-feat"><b>網站有更新</b><span>左上角／畫面下方浮動條，偵測到新版本時才會出現，點一下就重新載入拿到最新版本。</span></div>
-            <div class="howto-feat"><b>全站搜尋</b><span>右上角放大鏡，或按 <b>/</b>、<b>Ctrl+K</b>。同時查「個人收藏」「曲庫分類」「世界盃圖池」三個資料庫，點一個結果就直接跳到那個分頁並帶入搜尋字。</span></div>
+            <div class="howto-feat"><b>全站搜尋</b><span>右上角放大鏡，或按 <b>/</b>、<b>Ctrl+K</b>。同時查「個人收藏」「曲庫分類」「世界盃圖池」三個資料庫。點收藏的結果會直接翻到那張圖所在的頁面並標示出來；曲庫的結果會依曲名篩選並標示那一張；圖池的結果會打開那一屆。</span></div>
             <div class="howto-feat"><b>通知鈴鐺</b><span>右上角。追蹤的玩家 PP 變化、追蹤的 mapper 出新圖、私訊未讀等都會出現在這裡；有開啟推播的話，沒開網頁也收得到。</span></div>
             <div class="howto-feat"><b>osu! 登入</b><span>右上角。用你的 osu! 帳號登入——聊天室發言、私訊、發布收藏到廣場、雲端備份皮膚、一鍵帶入最愛/常玩，這些都需要先登入。</span></div>
             <div class="howto-feat"><b>語言切換</b><span>右上角地球圖示，支援繁中／简中／英／日／韓／俄／法／西／德，選了會記住。</span></div>

@@ -463,10 +463,10 @@ I18N.de = {
         <div class="howto-group" id="howto-global">
             <h3 class="howto-group-title">Website-weit</h3>
             <p class="howto-tab-desc">Steuerelemente, die auf jeder Seite verfügbar sind, meist in den beiden oberen Ecken.</p>
-            <div class="howto-feat"><b>Hell-/Dunkel-Umschalter</b><span>Oben links. Mond-/Sonnensymbol antippen zum Umschalten — die Wahl wird für künftige Besuche gespeichert.</span></div>
+            <div class="howto-feat"><b>Themenfarbe</b><span>Palettensymbol oben rechts. Wähle eine der 12 Vorgabefarben oder eine eigene – die Akzentfarbe der ganzen Seite folgt; „Zurücksetzen“ kehrt zum ursprünglichen Rosa zurück. Die Wahl wird in diesem Browser gespeichert.</span></div>
             <div class="howto-feat"><b>Zum Startbildschirm hinzufügen</b><span>Oben links, nur bei unterstützten Browsern sichtbar. Installiert die Website als App-Symbol mit einfacher Offline-Ansicht.</span></div>
             <div class="howto-feat"><b>Website-Update verfügbar</b><span>Oben links / eine schwebende Leiste unten, erscheint nur bei einer neuen Version — anklicken zum Neuladen.</span></div>
-            <div class="howto-feat"><b>Websiteweite Suche</b><span>Lupe oben rechts, oder <b>/</b> bzw. <b>Ctrl+K</b> drücken. Durchsucht gleichzeitig deine Sammlung, den Katalog und die Weltmeisterschafts-Mappools — ein Klick auf ein Ergebnis springt zu diesem Tab mit vorausgefüllter Suche.</span></div>
+            <div class="howto-feat"><b>Websiteweite Suche</b><span>Lupe oben rechts, oder <b>/</b> bzw. <b>Ctrl+K</b> drücken. Durchsucht gleichzeitig deine Sammlung, den Katalog und die Weltmeisterschafts-Mappools. Ein Sammlungstreffer öffnet die Seite mit dieser Map und hebt sie hervor; ein Katalogtreffer filtert nach Titel und hebt die Map hervor; ein Mappool-Treffer öffnet diese Ausgabe.</span></div>
             <div class="howto-feat"><b>Benachrichtigungsglocke</b><span>Oben rechts. PP-Änderungen verfolgter Spieler, neue Karten verfolgter Mapper, ungelesene Nachrichten usw. erscheinen hier — mit aktivierten Push-Benachrichtigungen auch ohne geöffnete Seite.</span></div>
             <div class="howto-feat"><b>osu!-Login</b><span>Oben rechts. Mit deinem osu!-Konto anmelden — Chat, Nachrichten, Veröffentlichen in der Galerie, Cloud-Skin-Backup und One-Klick-Import von Favoriten/meistgespielten Karten benötigen das zuerst.</span></div>
             <div class="howto-feat"><b>Sprachumschalter</b><span>Globus-Symbol oben rechts — 9 Sprachen verfügbar, die Wahl wird gespeichert.</span></div>

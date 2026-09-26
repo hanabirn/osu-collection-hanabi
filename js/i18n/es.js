@@ -463,10 +463,10 @@ I18N.es = {
         <div class="howto-group" id="howto-global">
             <h3 class="howto-group-title">General del sitio</h3>
             <p class="howto-tab-desc">Controles disponibles desde cualquier página, agrupados en las dos esquinas del encabezado.</p>
-            <div class="howto-feat"><b>Modo claro / oscuro</b><span>Arriba a la izquierda. Toca el icono de luna/sol para cambiar — se recuerda tu elección.</span></div>
+            <div class="howto-feat"><b>Color del tema</b><span>Icono de paleta arriba a la derecha. Elige uno de los 12 colores predefinidos o el tuyo y el acento de todo el sitio cambia; «Restablecer» vuelve al rosa original. Se recuerda en este navegador.</span></div>
             <div class="howto-feat"><b>Añadir a inicio</b><span>Arriba a la izquierda, solo donde el navegador lo soporta. Instala el sitio como icono de app con una pantalla básica sin conexión.</span></div>
             <div class="howto-feat"><b>Actualización disponible</b><span>Arriba a la izquierda / barra flotante abajo, solo aparece con una versión nueva — haz clic para recargar.</span></div>
-            <div class="howto-feat"><b>Búsqueda global</b><span>Lupa arriba a la derecha, o pulsa <b>/</b> o <b>Ctrl+K</b>. Busca en tu colección, el catálogo y los mappools del Mundial a la vez — al hacer clic en un resultado salta a esa pestaña con la búsqueda ya rellenada.</span></div>
+            <div class="howto-feat"><b>Búsqueda global</b><span>Lupa arriba a la derecha, o pulsa <b>/</b> o <b>Ctrl+K</b>. Busca en tu colección, el catálogo y los mappools del Mundial a la vez. Un resultado de la colección abre la página con ese mapa y lo resalta; uno del catálogo filtra por título y resalta ese mapa; uno de mappool abre esa edición.</span></div>
             <div class="howto-feat"><b>Campana de notificaciones</b><span>Arriba a la derecha. Cambios de PP de jugadores seguidos, nuevos mapas de mappers seguidos, mensajes sin leer, etc. — con notificaciones push activadas, las recibes incluso con el sitio cerrado.</span></div>
             <div class="howto-feat"><b>Inicio de sesión osu!</b><span>Arriba a la derecha. Inicia sesión con tu cuenta osu! — chatear, mensajes directos, publicar en la galería, respaldo de skins en la nube, e importar favoritos/más jugados con un clic requieren esto primero.</span></div>
             <div class="howto-feat"><b>Cambio de idioma</b><span>Icono de globo arriba a la derecha — 9 idiomas disponibles, se recuerda tu elección.</span></div>
