@@ -34,7 +34,9 @@ if ('serviceWorker' in navigator) {
         // Re-check on return to the tab rather than only on page load, since
         // this is a single-page app a visitor may leave open for a long time.
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && swRegistration) swRegistration.update();
+            // update() rejects with InvalidStateError while a first install is
+            // still in progress; the next visibility change simply retries.
+            if (document.visibilityState === 'visible' && swRegistration) swRegistration.update().catch(() => {});
         });
 
         let reloadedForUpdate = false;
