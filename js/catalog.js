@@ -761,7 +761,7 @@ function renderCatalogList() {
         <div class="osu-card" data-set-id="${item.id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${item.id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
-            <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addCatalogToCollection(${item.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
+            <button class="card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addCatalogToCollection(${item.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
             <button class="osu-copy-btn" onclick="copyBeatmapId(${item.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
             <button class="osu-download-btn" onclick="downloadBeatmapset(${item.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
             <button class="osu-play-btn" onclick="playOsuPreview(${item.id}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
@@ -843,8 +843,7 @@ async function catalogRunMetaBurst() {
 }
 
 async function addCatalogToCollection(setId, event) {
-    if (event) event.stopPropagation();
-    await addOsuBeatmap(String(setId));
+    await addSetFromCardButton(setId, event);
     renderCatalogList();
 }
 

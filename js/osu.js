@@ -2651,14 +2651,20 @@ async function osuFetch(params, timeoutMs = 12000) {
     return data;
 }
 
-async function addOsuBeatmap(explicitId) {
+/* opts.isSet: explicitId is a beatmapset id (cards in the catalog, mappools,
+   trending, chat). A bare number is otherwise tried as a beatmap
+   (difficulty) id first, and a set id that happens to also be some other
+   map's difficulty id added that other song. */
+async function addOsuBeatmap(explicitId, opts = {}) {
     if (!await verifyOsuPassword()) return;
     const input = document.getElementById('osuInput');
     const status = document.getElementById('osu-status');
     const raw = explicitId !== undefined ? String(explicitId).trim() : input.value.trim();
     if (!raw) return;
 
-    const parsed = parseOsuInput(raw);
+    const parsed = opts.isSet
+        ? (/^\d+$/.test(raw) ? { type: 'id', id: raw, isSet: true } : null)
+        : parseOsuInput(raw);
     if (!parsed) {
         status.innerText = t('osu_input_error');
         status.style.color = '#ff5252';
@@ -2675,7 +2681,8 @@ async function addOsuBeatmap(explicitId) {
             beatmaps = await osuFetch(`s=${parsed.id}`);
         }
 
-        if (beatmaps.length === 0) {
+        // A set id that found nothing is not a difficulty id to retry with.
+        if (beatmaps.length === 0 && !parsed.isSet) {
             const byMap = await osuFetch(`b=${parsed.id}`);
             if (byMap.length > 0) {
                 beatmaps = await osuFetch(`s=${byMap[0].beatmapset_id}`);
@@ -2748,6 +2755,29 @@ async function addOsuBeatmap(explicitId) {
         console.error('osu! fetch error:', e);
         status.innerText = `連線失敗: ${e.message}`;
         status.style.color = '#ff5252';
+        // Card ＋ buttons call this from other tabs, where #osu-status is out of sight.
+        if (explicitId !== undefined && typeof showShareToast === 'function') showShareToast(status.innerText);
+    }
+}
+
+/* ＋ on catalog / mappool / trending cards. The lookup takes a few API calls,
+   so the button is locked meanwhile — otherwise a second click starts a
+   second add. Callers re-render their cards afterwards. */
+async function addSetFromCardButton(setId, event) {
+    if (event) event.stopPropagation();
+    const btn = event && event.currentTarget;
+    if (btn) {
+        if (btn.classList.contains('adding')) return;
+        btn.classList.add('adding');
+        btn.disabled = true;
+    }
+    try {
+        await addOsuBeatmap(String(setId), { isSet: true });
+    } finally {
+        if (btn) {
+            btn.classList.remove('adding');
+            btn.disabled = false;
+        }
     }
 }
 

@@ -427,7 +427,7 @@ function chatBeatmapCardHtml(p) {
             <div class="chat-beatmap-card-meta">${escapeHtmlOsu(p.artist || '')} · mapped by ${escapeHtmlOsu(p.creator || '')}</div>
             <div class="chat-beatmap-card-stats">${modesHtml}<span>${starRange}⭐</span></div>
         </div>
-        <button class="chat-beatmap-card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addOsuBeatmap(${p.beatmapsetId})"`}>
+        <button class="chat-beatmap-card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addOsuBeatmap(${p.beatmapsetId}, { isSet: true })"`}>
             ${icon(inCollection ? 'check' : 'plus', { extraClass: 'icon-label-gap' })}${t(inCollection ? 'farm_in_collection' : 'chat_add_to_collection_btn')}
         </button>
     </div>`;

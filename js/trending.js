@@ -35,14 +35,14 @@ function renderTrendingSongs() {
     );
     grid.innerHTML = trendingItems.map(it => {
         const inCollection = collectionSet.has(it.setId);
-        // Reuses .osu-card's own look (cover bg/overlay/info block/farm-add-btn
+        // Reuses .osu-card's own look (cover bg/overlay/info block/card-add-btn
         // "+" — same building blocks catalog.js's cards are made of) rather
         // than inventing a parallel card style.
         return `
         <div class="osu-card trending-card" onclick="window.open('https://osu.ppy.sh/beatmapsets/${it.setId}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${it.coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
-            <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addTrendingToCollection(${it.setId}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
+            <button class="card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addTrendingToCollection(${it.setId}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
             <div class="osu-card-info">
                 <div class="osu-card-title">${escHtml(it.title)}</div>
                 <div class="osu-card-artist">${escHtml(it.artist)}</div>
@@ -54,8 +54,7 @@ function renderTrendingSongs() {
 }
 
 async function addTrendingToCollection(setId, event) {
-    if (event) event.stopPropagation();
-    await addOsuBeatmap(String(setId));
+    await addSetFromCardButton(setId, event);
     renderTrendingSongs(); // flips the just-added card to its "in collection" state
 }
 

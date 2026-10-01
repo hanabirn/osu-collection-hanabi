@@ -33,7 +33,7 @@
    first-time visitor discovers this is a companion app, not a one-shot
    converter (the 12 tabs otherwise live only behind the ☰ drawer). */
 /* 熱門新曲: site-wide discovery row (js/trending.js) — reuses .osu-card's
-   own building blocks (bg/overlay/info/farm-add-btn), just with its own
+   own building blocks (bg/overlay/info/card-add-btn), just with its own
    grid sizing + a compact aspect ratio to suit the extra meta line. */
 .trending-row {
     margin-top: 28px;
@@ -1424,6 +1424,42 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .osu-download-btn.db-matched:hover {
     background: rgba(52,211,153,1);
 }
+/* ＋ 加入收藏 (top-left) on catalog / mappool / trending cards. Was named
+   .farm-add-btn and got deleted with the Farm Maps CSS while these three
+   still used it. */
+.card-add-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.6);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0;
+}
+.osu-card:hover .card-add-btn { opacity: 1; }
+.card-add-btn:hover {
+    color: #fff;
+    background: rgba(52,211,153,0.5);
+    transform: scale(1.1);
+}
+/* Already collected: always visible (it's information, not just an action). */
+.card-add-btn.in-collection {
+    opacity: 0.9;
+    color: #34d399;
+    background: rgba(52,211,153,0.18);
+    cursor: default;
+}
+.card-add-btn.in-collection:hover { transform: none; }
+.card-add-btn.adding { opacity: 1; cursor: progress; }
 .osu-play-btn {
     position: absolute;
     top: 50%;
@@ -1633,7 +1669,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    otherwise be permanently invisible and untappable — show them by default
    there instead (UX audit: "hover vs tap" + "touch target size", both High). */
 @media (hover: none) {
-    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-mp-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn {
+    .osu-delete-btn, .osu-fav-btn, .osu-copy-btn, .osu-mp-btn, .osu-play-btn, .osu-download-btn, .osu-ppcalc-btn, .osu-category-btn, .card-add-btn {
         opacity: 0.85;
     }
 }

@@ -196,7 +196,7 @@ function renderMappoolCard(mp, inCollection) {
     <div class="osu-card${mp.isTiebreaker ? ' mappool-tb' : ''}" onclick="window.open('${openUrl}','_blank')">
         <div class="osu-card-bg" style="background-image:url('${cover}')"></div>
         <div class="osu-card-overlay"></div>
-        <button class="farm-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addMappoolCardToCollection(${setId}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
+        <button class="card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addMappoolCardToCollection(${setId}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
         <button class="osu-copy-btn" onclick="copyBeatmapId(${setId}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
         <button class="osu-download-btn" onclick="downloadBeatmapset(${setId}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
         <button class="osu-play-btn" onclick="playOsuPreview(${setId}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
@@ -313,8 +313,7 @@ function mappoolEventSetIds() {
 }
 
 async function addMappoolCardToCollection(setId, event) {
-    if (event) event.stopPropagation();
-    await addOsuBeatmap(String(setId));
+    await addSetFromCardButton(setId, event);
     renderMappool();
 }
 
