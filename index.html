@@ -243,6 +243,12 @@
         <div id="collection-hero-v2" class="collection-hero-v2" hidden>
             <span class="hero-cover" aria-hidden="true"></span>
             <span class="hero-cover" aria-hidden="true"></span>
+            <div class="hero-banner-tools">
+                <input type="range" class="hero-banner-pos" id="hero-banner-pos" min="0" max="100" step="1" value="30" oninput="setHeroBannerPosition(this.value)" data-i18n-title="hero_banner_position" title="橫幅位置" hidden>
+                <button type="button" class="hero-banner-btn" id="hero-banner-reset" onclick="resetHeroBanner()" data-icon="cornerUpLeft" data-i18n-title="hero_banner_reset" title="恢復預設橫幅" hidden></button>
+                <button type="button" class="hero-banner-btn" onclick="document.getElementById('hero-banner-file').click()" data-icon="camera" data-i18n-title="hero_banner_change" title="更換橫幅"></button>
+                <input type="file" id="hero-banner-file" accept="image/*" hidden onchange="onHeroBannerFile(this)">
+            </div>
             <p class="eyebrow">MY COLLECTION</p>
             <p class="collection-hero-v2-line" data-i18n="site_tagline">一起來收藏你專屬的歌曲收藏庫吧!</p>
             <p class="collection-hero-v2-stat" id="collection-hero-v2-stat"></p>
@@ -1242,6 +1248,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/gallery-comments.js"></script>
 <script defer src="js/friend-compare.js"></script>
 <script defer src="js/year-recap.js"></script>
+<script defer src="js/hero-banner.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>

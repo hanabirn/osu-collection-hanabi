@@ -3450,6 +3450,7 @@ const heroCover = { urls: [], idx: 0, timer: null, io: null };
 
 function heroCoverAllowed() {
     return heroCover.urls.length > 1
+        && !(window.osuHeroBanner && window.osuHeroBanner.url)
         && window.matchMedia('(hover: hover)').matches
         && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
@@ -3461,7 +3462,11 @@ function stopHeroCover() {
 }
 
 function heroCoverTick(layers) {
+    // The visibilitychange listener armHeroCover adds is never removed, so a
+    // custom banner (js/hero-banner.js) set later must stop rotation here.
+    if (!heroCoverAllowed()) return;
     heroCover.timer = setTimeout(() => {
+        if (!heroCoverAllowed()) { heroCover.timer = null; return; }
         const curI = layers[0].classList.contains('active') ? 0 : 1;
         const nxtI = curI ? 0 : 1;
         heroCover.idx = (heroCover.idx + 1) % heroCover.urls.length;
@@ -3523,6 +3528,27 @@ function updateCollectionHeroV2() {
     }
     hero.hidden = false;
     hero.classList.add('has-cover');
+
+    // A visitor's own banner (js/hero-banner.js) replaces the rotating covers.
+    const banner = window.osuHeroBanner;
+    if (typeof syncHeroBannerTools === 'function') syncHeroBannerTools();
+    if (banner && banner.url) {
+        stopHeroCover();
+        heroCover.urls = [];
+        hero.classList.add('has-custom-banner');
+        if (layers[0]) {
+            layers[0].style.backgroundImage = `url("${banner.url}")`;
+            layers[0].style.backgroundPosition = `center ${banner.pos}%`;
+            layers[0].classList.add('active');
+        }
+        if (layers[1]) layers[1].classList.remove('active');
+        return;
+    }
+    if (hero.classList.contains('has-custom-banner')) {
+        hero.classList.remove('has-custom-banner');
+        if (layers[0]) layers[0].style.backgroundPosition = '';
+        heroCover.urls = [];   // forces a fresh shuffle below
+    }
 
     if (heroCover.urls.length !== sets.length) {
         const ids = sets.map(s => s.beatmapset_id);

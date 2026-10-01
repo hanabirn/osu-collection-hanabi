@@ -205,7 +205,10 @@
     --text: #f4f2f7;
     --text-dim: rgba(244,242,247,0.72);
     --pink: #ff7ac2;
-    min-height: 220px;
+    min-height: clamp(220px, 28vw, 320px);
+    /* A little wider than the page column (up to 1280px, never past the
+       viewport): negative margins on both sides. */
+    margin-inline: calc((100% - min(1280px, 100vw - 32px, 100% + 200px)) / 2);
 }
 /* Two stacked cover layers that cross-fade (js/osu.js updateCollectionHeroV2).
    opacity-only transition = compositor-only; JS pauses it off-screen. */
@@ -234,9 +237,43 @@
 @media (prefers-reduced-motion: reduce) {
     .collection-hero-v2 .hero-cover { transition: none; }
 }
+.collection-hero-v2 > .eyebrow { font-size: 0.78rem; }
+/* 自訂橫幅 controls (js/hero-banner.js), top-right over the cover. */
+.hero-banner-tools {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.55;
+    transition: opacity 0.2s var(--ease-out);
+}
+.collection-hero-v2:hover .hero-banner-tools,
+.hero-banner-tools:focus-within { opacity: 1; }
+.hero-banner-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: var(--line) solid rgba(255, 255, 255, 0.28);
+    background: rgba(10, 10, 16, 0.6);
+    color: #fff;
+    cursor: pointer;
+}
+.hero-banner-btn:hover { border-color: rgba(var(--pink-rgb), 0.8); background: rgba(10, 10, 16, 0.8); }
+.hero-banner-btn .icon-svg { width: 16px; height: 16px; }
+.hero-banner-pos { width: 110px; accent-color: var(--pink); }
+.hero-banner-pos[hidden], .hero-banner-btn[hidden] { display: none; }
+@media (hover: none) {
+    .hero-banner-tools { opacity: 0.9; }
+}
 .collection-hero-v2-line {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2.8vw, 1.6rem);
+    font-size: clamp(1.45rem, 4vw, 2.6rem);
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -244,7 +281,7 @@
 }
 .collection-hero-v2-stat {
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     letter-spacing: 0.08em;
     color: var(--text-dim);
     /* Reserve the line even before JS fills it, so the async stat text
