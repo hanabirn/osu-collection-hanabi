@@ -1505,8 +1505,10 @@ async function importOsuCollection(event) {
     }
 
     try {
+        // A backup file can come from anyone; keep only well-formed sets.
+        for (const m of OSU_MODES) data.collection[m] = data.collection[m].map(sanitizeIncomingOsuSet).filter(Boolean);
         saveOsuCollection(data.collection);
-        if (Array.isArray(data.favorites)) saveOsuFavorites(data.favorites);
+        if (Array.isArray(data.favorites)) saveOsuFavorites(data.favorites.filter(id => Number.isInteger(id) && id > 0));
 
         const rawCategories = Array.isArray(data.categories) ? data.categories : [];
         const rawMembers = (data.categoryMembers && typeof data.categoryMembers === 'object' && !Array.isArray(data.categoryMembers))
@@ -2601,12 +2603,58 @@ async function shareOsuCollectionLink() {
 /* Merges an incoming collection (from a share link or, later, a public
    gallery download) into the visitor's own — never overwrites, only adds
    beatmapsets they don't already have. Returns how many were added. */
+/* Rebuilds a set that came from someone else (a 收藏廣場 collection, a
+   share link, a JSON file, a friend comparison) with only the fields this
+   site uses, each of the right type. The publish endpoint checks little
+   more than the set id, and ids end up inside onclick handlers, so a
+   crafted collection could otherwise carry markup or script into the
+   importer's page. Returns null for a set without a usable id. */
+function sanitizeIncomingOsuSet(set) {
+    if (!set || typeof set !== 'object') return null;
+    const posInt = v => { const n = Number(v); return Number.isInteger(n) && n > 0 ? n : null; };
+    const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+    const str = (v, max = 300) => (typeof v === 'string' ? v.slice(0, max) : '');
+    const id = posInt(set.beatmapset_id);
+    if (!id) return null;
+    const meta = v => (v && typeof v === 'object' && posInt(v.id) != null ? { id: posInt(v.id), name: str(v.name, 60) } : null);
+    const beatmaps = (Array.isArray(set.beatmaps) ? set.beatmaps : [])
+        .map(b => (b && typeof b === 'object' ? {
+            beatmap_id: posInt(b.beatmap_id),
+            version: str(b.version, 200),
+            difficulty_rating: num(b.difficulty_rating),
+            hit_length: num(b.hit_length),
+            total_length: num(b.total_length),
+            bpm: num(b.bpm),
+            key_count: num(b.key_count),
+            mode_int: [0, 1, 2, 3].includes(Number(b.mode_int)) ? Number(b.mode_int) : undefined,
+        } : null))
+        .filter(b => b && b.beatmap_id);
+    if (!beatmaps.length) return null;
+    const out = {
+        beatmapset_id: id,
+        title: str(set.title),
+        artist: str(set.artist),
+        creator: str(set.creator, 100),
+        mode: [0, 1, 2, 3].includes(Number(set.mode)) ? Number(set.mode) : 0,
+        addedAt: typeof set.addedAt === 'string' && !isNaN(Date.parse(set.addedAt)) ? set.addedAt : new Date().toISOString(),
+        beatmaps,
+    };
+    const language = meta(set.language);
+    const genre = meta(set.genre);
+    if (language) out.language = language;
+    if (genre) out.genre = genre;
+    if (typeof set.source === 'string') out.source = str(set.source);
+    return out;
+}
+
 function mergeIncomingCollection(incoming) {
     const col = getOsuCollection();
     let added = 0;
     for (const mode of OSU_MODES) {
         const existingIds = new Set(col[mode].map(s => s.beatmapset_id));
-        for (const set of (incoming[mode] || [])) {
+        for (const raw of (incoming[mode] || [])) {
+            const set = sanitizeIncomingOsuSet(raw);
+            if (!set) continue;
             if (!existingIds.has(set.beatmapset_id)) {
                 col[mode].push(set);
                 existingIds.add(set.beatmapset_id);
@@ -3342,8 +3390,8 @@ function renderFeaturedBeatmap() {
         <button class="osu-play-btn featured-beatmap-play" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}">${playBtnIcon()}</button>
         <div class="featured-beatmap-info">
             <div class="featured-beatmap-label">${t('featured_beatmap_label')}</div>
-            <div class="featured-beatmap-title">${modeIconSvg(set.__mode)} ${set.title}</div>
-            <div class="featured-beatmap-artist">${set.artist} · ${t('mapped_by', { n: set.creator })}</div>
+            <div class="featured-beatmap-title">${modeIconSvg(set.__mode)} ${escHtml(set.title)}</div>
+            <div class="featured-beatmap-artist">${escHtml(set.artist)} · ${t('mapped_by', { n: escHtml(set.creator) })}</div>
         </div>
     `;
 }
@@ -3850,10 +3898,10 @@ function renderOsuCollection() {
             <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)} ⭐` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)} ⭐`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
             <div class="osu-play-status" id="play-status-${set.beatmapset_id}" style="display:none;"></div>
             <div class="osu-card-info">
-                <div class="osu-card-title">${set.title}</div>
+                <div class="osu-card-title">${escHtml(set.title)}</div>
                 ${diffIconsRow}
-                <div class="osu-card-artist">${set.artist}</div>
-                <div class="osu-card-mapper">${t('mapped_by', { n: set.creator })}</div>
+                <div class="osu-card-artist">${escHtml(set.artist)}</div>
+                <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(set.creator) })}</div>
             </div>
         </div>`;
     }).join('');
