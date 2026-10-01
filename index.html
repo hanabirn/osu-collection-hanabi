@@ -316,6 +316,7 @@
                             <span class="osu-tool-group-label" data-i18n="tools_group_tools">工具・設定</span>
                             <div class="osu-tool-group-btns">
                                 <button class="osu-refresh-all" onclick="refreshAllOsuSets()" data-i18n-title="osu_refresh_all_title" title="重新抓取所有圖的最新資料（星數、狀態）" data-icon="refreshCw"></button>
+                                <button class="osu-refresh-all" onclick="openFriendCompareModal()" data-i18n-title="fc_btn_title" title="和朋友比對收藏" data-icon="repeat"></button>
                                 <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="看收藏的星數 / 模式 / mapper 分佈圖表" data-icon="barChart3"></button>
                                 <button class="osu-refresh-all" onclick="openCollectionToolsModal()" data-i18n-title="ctools_btn_title" title="從你的 osu! 帳號生成分類，並做健康檢查" data-icon="sparkles"></button>
                                 <button class="osu-refresh-all" id="osu-check-played-btn" onclick="checkCollectionPlayedStatus()" data-i18n-title="check_played_btn_title" title="標出這頁哪些圖你已經打過（需登入）" data-icon="target" style="display:none;"></button>
@@ -1009,6 +1010,7 @@
         <div class="gallery-detail-actions">
             <button class="btn gallery-detail-download-btn" id="gallery-detail-download-btn" onclick="downloadGalleryDetailCollection()" data-icon="download" data-icon-gap><span data-i18n="gallery_download_btn_title">匯入這個收藏</span></button>
             <button class="btn" id="gallery-detail-share-btn" onclick="shareGalleryDetailLink()" data-icon="share2" data-icon-gap><span data-i18n="gallery_share_btn">分享連結</span></button>
+            <button class="btn" id="gallery-detail-compare-btn" onclick="friendCompareWithGalleryDetail()" style="display:none;" data-icon="repeat" data-icon-gap><span data-i18n="gallery_compare_btn">和我的收藏比對</span></button>
             <button class="btn" id="gallery-detail-embed-btn" onclick="embedGalleryDetailCollection()" data-icon="link2" data-icon-gap><span data-i18n="gallery_embed_btn">複製嵌入碼</span></button>
             <button class="btn" id="gallery-detail-scores-btn" onclick="overlayGalleryDetailScores()" style="display:none;" data-icon="target" data-icon-gap><span data-i18n="gallery_scores_btn">疊上我的成績</span></button>
         </div>
@@ -1143,6 +1145,24 @@
     </div>
 </div>
 
+<!-- Last on purpose: it opens on top of the gallery detail modal, and Esc
+     closes the last open overlay in document order. -->
+<div id="friend-compare-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeFriendCompareModal()">
+    <div class="pp-calc-modal friend-compare-modal" role="dialog" aria-labelledby="friend-compare-title">
+        <button class="pp-calc-close" onclick="closeFriendCompareModal()" data-icon="x"></button>
+        <h3 class="pp-calc-title" id="friend-compare-title" data-i18n="fc_title">和朋友比對收藏</h3>
+        <div id="friend-compare-form">
+            <p class="pp-calc-hint" data-i18n="fc_hint">輸入朋友的 osu! 名稱、ID 或收藏廣場連結。只能比對有發布到「收藏廣場」的收藏。</p>
+            <div class="input-group">
+                <input type="text" id="friend-compare-input" autocomplete="off" data-i18n-placeholder="fc_placeholder" placeholder="osu! 名稱、ID 或 /c/ 連結" onkeydown="if(event.key==='Enter')friendCompareFromInput()">
+                <button onclick="friendCompareFromInput()" data-i18n="fc_compare">比對</button>
+            </div>
+        </div>
+        <div id="friend-compare-status" class="status"></div>
+        <div id="friend-compare-result"></div>
+    </div>
+</div>
+
 <footer class="site-footer">
     <p>osu! 歌曲收藏 · osu! is a trademark of ppy Pty Ltd</p>
     <a class="footer-support-link" href="https://ko-fi.com/hanabirn" target="_blank" rel="noopener noreferrer" data-icon="heart" data-icon-gap><span>Support</span></a>
@@ -1207,6 +1227,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/local-db-match.js"></script>
 <script defer src="js/public-collections.js"></script>
 <script defer src="js/gallery-comments.js"></script>
+<script defer src="js/friend-compare.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>

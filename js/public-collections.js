@@ -396,6 +396,8 @@ async function openGalleryDetailModal(id) {
     if (shareBtn) shareBtn.style.display = 'none';
     const embedBtn = document.getElementById('gallery-detail-embed-btn');
     if (embedBtn) embedBtn.style.display = 'none';
+    const compareBtn = document.getElementById('gallery-detail-compare-btn');
+    if (compareBtn) compareBtn.style.display = 'none';
     modal.style.display = 'flex';
     // Independent of the collection fetch below — a comment thread on this
     // user's gallery post should still work even if, say, their collection
@@ -440,6 +442,7 @@ async function openGalleryDetailModal(id) {
         downloadBtn.style.display = '';
         if (shareBtn) shareBtn.style.display = '';
         if (embedBtn) embedBtn.style.display = '';
+        if (compareBtn) compareBtn.style.display = '';
         const scoresBtn = document.getElementById('gallery-detail-scores-btn');
         if (scoresBtn) {
             const loggedIn = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();

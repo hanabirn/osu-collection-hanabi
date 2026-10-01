@@ -5293,3 +5293,49 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .osu-note-star { transition: none; }
     .osu-note-star:hover { transform: none; }
 }
+
+/* ===== 和朋友比對收藏 (js/friend-compare.js) ===== */
+#friend-compare-modal .pp-calc-modal { max-width: 720px; }
+.fc-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 6px;
+}
+.fc-friend {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+}
+.fc-friend span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-friend-avatar { width: 40px; height: 40px; border-radius: 50%; flex: none; }
+.fc-sim { display: flex; flex-direction: column; align-items: flex-end; flex: none; }
+.fc-sim-value { font-size: 1.6rem; font-weight: 800; color: var(--accent-pink); line-height: 1.1; }
+.fc-sim-label { font-size: 0.72rem; color: var(--text-dim2); }
+.fc-detail { margin: 0 0 12px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+.fc-artists { margin-bottom: 12px; }
+.fc-artists-label { font-size: 0.75rem; color: var(--text-dim2); margin-bottom: 6px; }
+.fc-artist-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.fc-artist-chip {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--text);
+}
+.fc-artist-chip small { color: var(--text-dim2); margin-left: 2px; }
+.fc-tabs { flex-wrap: wrap; margin-bottom: 10px; }
+.fc-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.fc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
+}
+.fc-grid .card-add-btn { opacity: 1; width: 28px; height: 28px; top: 5px; left: 5px; }
+.fc-pagination { margin-top: 12px; }
