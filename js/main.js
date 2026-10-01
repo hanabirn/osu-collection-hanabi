@@ -45,7 +45,6 @@ function switchTab(tab, el) {
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
-    if (tab === 'mapper-tracking' && typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
@@ -234,7 +233,6 @@ function refreshDynamicContent() {
     if (typeof updatePublishButtonLabel === 'function') updatePublishButtonLabel();
     if (typeof renderTrackButtonState === 'function') renderTrackButtonState();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
-    if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
     if (typeof renderResourcesList === 'function') renderResourcesList();
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
     if (typeof renderFarmMapsList === 'function') renderFarmMapsList();

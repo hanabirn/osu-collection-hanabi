@@ -17,7 +17,7 @@ I18N.zh = {
     contact_info_title: '聯絡資訊', accent_picker_title: '自訂主題色', accent_picker_custom: '自訂顏色', accent_picker_reset: '恢復預設',
     notif_pp_changed_detail: '{sign}{delta}pp（目前 {pp}pp）', notif_tournament_new_title: '新賽事貼文',
     back_to_main: '返回 Hanabiの小天地',
-    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報', nav_mapper_tracking: '追蹤 Mapper', nav_tournaments: '賽事', nav_resources: '資源', nav_bbcode: 'BBCode', nav_feedback: '建議&改進', nav_menu_open: '開啟選單', nav_more: '更多', nav_menu_title: '選單', nav_group_core: '核心功能', nav_group_tools: '工具庫', nav_group_resources: '資源區',
+    nav_collection: '收藏', nav_lookup: 'PP 查詢', nav_skins: '皮膚', nav_updates: '更新情報',  nav_tournaments: '賽事', nav_resources: '資源', nav_bbcode: 'BBCode', nav_feedback: '建議&改進', nav_menu_open: '開啟選單', nav_more: '更多', nav_menu_title: '選單', nav_group_core: '核心功能', nav_group_tools: '工具庫', nav_group_resources: '資源區',
     lang_unspecified: '未指定', lang_english: '英文', lang_japanese: '日文', lang_chinese: '中文', lang_instrumental: '純音樂', lang_korean: '韓文', lang_french: '法文', lang_german: '德文', lang_swedish: '瑞典文', lang_spanish: '西班牙文', lang_italian: '義大利文', lang_russian: '俄文', lang_polish: '波蘭文', lang_other: '其他', lang_unknown: '未標記', osu_lang_filter_all: '全部語言', stats_dashboard_langs_title: '語言分佈',
     osu_genre_filter_all: '全部曲風', osu_source_filter_all: '全部來源', osu_source_filter_none: '（無來源）', genre_unspecified: '未指定', genre_video_game: '電子遊戲', genre_anime: '動畫', genre_rock: '搖滾', genre_pop: '流行', genre_other: '其他', genre_novelty: '惡搞', genre_hiphop: '嘻哈', genre_electronic: '電子', genre_metal: '金屬', genre_classical: '古典', genre_folk: '民謠', genre_jazz: '爵士',
     osu_artist_filter_all: '全部歌手',
@@ -61,8 +61,8 @@ I18N.zh = {
     explore_lookup_d: '查你的總 PP、每日進步曲線、和朋友比較',
     explore_farm_d: '依你分段整理的高 pp farm 圖清單',
     explore_gallery_d: '看別人公開的收藏，一鍵匯入你的',
-    explore_mapper_d: '喜歡的 mapper 出新圖時通知你',
-    explore_replay_d: '上傳 replay，看 UR、分段表現、pp',
+    
+    
     explore_tourney_d: '官方論壇 + wyBin 的社群賽事情報',
     osu_empty_fav: '還沒有最愛的歌曲', osu_empty_fav_hint: '在其他分類中點擊 ♥ 加入最愛！',
     osu_category_add_prompt: '輸入新分類名稱：', osu_category_rename_prompt: '重新命名分類：',
@@ -373,13 +373,13 @@ I18N.zh = {
 
     leaderboard_btn: '排行榜', leaderboard_title: '追蹤玩家排行榜',
 
-    tracked_mappers_title: '追蹤 Mapper', tracked_mappers_hint: '輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。',
-    mapper_track_placeholder: '輸入 mapper 用戶名...', mapper_track_btn: '追蹤',
-    mapper_already_tracked: '已經在追蹤這位 mapper 了', mapper_track_done: '已加入追蹤，有新圖上架時會通知你',
+     
+     
+     
     mapper_not_found: '找不到這位 osu! 玩家，請確認用戶名是否正確',
-    tracked_mappers_empty: '尚未追蹤任何 mapper', notif_mapper_new_title: '{name} 上架新圖了',
+     
     notif_achievement_new_title: '{n} 獲得新獎章', notif_achievement_detail: '新增了 {count} 個獎章，點此查看',
-    notif_mapper_graveyard_title: '{name} 有新的 Graveyard 圖', notif_mapper_loved_title: '{name} 的圖被加入 Loved！',
+     
     resources_title: '更多 osu! 資源', resources_hint: '一些沒必要自己做、但很推薦認識的社群工具：',
     h1_bbcode: 'BBCode 編輯器', bbcode_note: '完全在你的瀏覽器裡運作，不會傳送到任何地方。把結果複製貼到你的 osu! 個人頁或論壇貼文編輯器裡。', bbcode_source: 'BBCode', bbcode_preview: '預覽', bbcode_copy: '複製 BBCode', bbcode_clear: '清空', bbcode_placeholder: '在這裡輸入你的 BBCode…', bbcode_copied: '已複製！',
     resource_group_find: '找圖工具', resource_group_stats: '成績與數據', resource_group_make: '皮膚與製圖',
@@ -405,16 +405,16 @@ I18N.zh = {
     grade_history_filter_empty: '這個 grade 沒有符合的記錄',
     grade_history_filter_all: '全部',
     grade_history_truncated: '僅顯示最新 {n} / {total} 筆',
-    nav_replay_analyze: 'Replay 分析', replay_analyze_title: 'Replay 分析',
-    replay_analyze_hint: '上傳 .osr 檔案，查看成績摘要與擊打時間分佈圖。純粹在伺服器端解析檔案本身，不會產生影片、也不依賴第三方轉檔服務。',
-    replay_upload_btn: '選擇 .osr 檔案', replay_upload_drag_hint: '或把檔案拖曳到這裡',
-    replay_analyzing: '分析中...', replay_analyze_fail: '分析失敗，請確認檔案是有效的 .osr 檔',
-    replay_no_beatmap_match: '在 osu! 資料庫裡找不到這張圖，可能是還沒上架或是自製圖',
-    replay_score_summary_title: '成績摘要', replay_recalculated_pp_label: '重新計算 PP',
-    replay_hit_error_title: '擊打時間誤差分佈（近似值）', replay_hit_error_unsupported: '這個模式或這份 replay 不支援時間誤差分析',
-    replay_stat_accuracy: '準確率', replay_stat_combo: '最大 Combo', replay_stat_misses: 'Miss 數',
-    replay_stat_mods: 'Mods', replay_stat_rank: '評級', replay_stat_player: '玩家',
-    replay_approx_note: '時間誤差是用按鍵時間比對譜面音符估算出來的，不是完整的判定重現，僅供參考',
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     fc_sim_btn: 'FC 模擬', fc_sim_btn_title: '模擬這張圖 FC 後大概多少 PP',
     fc_sim_popover_title: 'FC 預估 PP', fc_sim_loading: '計算中...', fc_sim_error: '計算失敗，請稍後再試',
@@ -586,18 +586,6 @@ I18N.zh = {
                 <p class="howto-tab-desc">查任何一位玩家（包括你自己）的 PP 狀況，或兩位玩家並排比較。</p>
                 <div class="howto-feat"><b>查詢你的 osu! PP</b><span>輸入用戶名或 ID → 查詢。結果含四模式數據、PP 歷史曲線、追蹤按鈕、「產生戰績卡」；下方分頁：最近遊玩／最佳成績／PP 目標／獎章／成績歷史。</span></div>
                 <div class="howto-feat"><b>⚔ 雙人 PP 對比</b><span>兩個用戶名/ID 填好按「比較」：先看總覽跟 PP 曲線疊圖，下方「Top Play 對比」左右兩欄並排列出兩人成績。</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Replay 分析</div>
-                <p class="howto-tab-desc">上傳 .osr 檔看成績細節，純伺服器端解析檔案本身，不轉檔也不靠第三方服務。</p>
-                <div class="howto-feat"><b>上傳</b><span>拖曳或按「選擇 .osr 檔案」，上傳後顯示成績摘要與擊打時間分佈圖。</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 追蹤 Mapper</div>
-                <p class="howto-tab-desc">喜歡的 mapper 出新 ranked 圖時第一時間收到通知。</p>
-                <div class="howto-feat"><b>追蹤</b><span>輸入 mapper 的 osu! 用戶名，按「追蹤」；清單顯示在同一頁，可隨時取消。</span></div>
             </div>
         </div>
 

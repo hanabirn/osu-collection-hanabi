@@ -3731,8 +3731,7 @@ function osuPlayItemHtml(r, mode, bm, type) {
     const ppStr = type === 'best' && r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
     // rosu-pp-js (the FC-simulation backend) doesn't factor NF/SO
     // into difficulty/pp at all, so they're dropped from the mods
-    // string sent to it — same convention netlify/functions/
-    // replay-analyze.js already uses.
+    // string sent to it.
     const fcMods = mods.filter(m => m !== 'NF' && m !== 'SO').join('');
     return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
         <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>

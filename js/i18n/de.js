@@ -47,7 +47,7 @@ I18N.de = {
     contact_info_title: 'Kontaktinformationen', accent_picker_title: 'Akzentfarbe anpassen', accent_picker_custom: 'Eigene Farbe', accent_picker_reset: 'Zurücksetzen',
     notif_pp_changed_detail: '{sign}{delta}pp (jetzt {pp}pp)', notif_tournament_new_title: 'Neuer Turnier-Thread',
     back_to_main: 'Zurück zu Hanabiの小天地',
-    nav_collection: 'Sammlung', nav_lookup: 'PP-Suche', nav_skins: 'Skins', nav_updates: 'Neuigkeiten', nav_mapper_tracking: 'Beobachtete Mapper', nav_tournaments: 'Turniere', nav_resources: 'Ressourcen', nav_bbcode: 'BBCode', nav_feedback: 'Vorschläge', nav_menu_open: 'Menü öffnen', nav_more: 'Mehr', nav_menu_title: 'Menü', nav_group_core: 'Kern', nav_group_tools: 'Werkzeuge', nav_group_resources: 'Ressourcen',
+    nav_collection: 'Sammlung', nav_lookup: 'PP-Suche', nav_skins: 'Skins', nav_updates: 'Neuigkeiten',  nav_tournaments: 'Turniere', nav_resources: 'Ressourcen', nav_bbcode: 'BBCode', nav_feedback: 'Vorschläge', nav_menu_open: 'Menü öffnen', nav_more: 'Mehr', nav_menu_title: 'Menü', nav_group_core: 'Kern', nav_group_tools: 'Werkzeuge', nav_group_resources: 'Ressourcen',
     lang_unspecified: 'Nicht angegeben', lang_english: 'Englisch', lang_japanese: 'Japanisch', lang_chinese: 'Chinesisch', lang_instrumental: 'Instrumental', lang_korean: 'Koreanisch', lang_french: 'Französisch', lang_german: 'Deutsch', lang_swedish: 'Schwedisch', lang_spanish: 'Spanisch', lang_italian: 'Italienisch', lang_russian: 'Russisch', lang_polish: 'Polnisch', lang_other: 'Andere', lang_unknown: 'Ohne Kennzeichnung', osu_lang_filter_all: 'Alle Sprachen', stats_dashboard_langs_title: 'Sprachen',
     osu_genre_filter_all: 'Alle Genres', osu_source_filter_all: 'Alle Quellen', osu_source_filter_none: '(Ohne Quelle)', genre_unspecified: 'Nicht angegeben', genre_video_game: 'Videospiel', genre_anime: 'Anime', genre_rock: 'Rock', genre_pop: 'Pop', genre_other: 'Andere', genre_novelty: 'Novelty', genre_hiphop: 'Hip-Hop', genre_electronic: 'Electronic', genre_metal: 'Metal', genre_classical: 'Klassik', genre_folk: 'Folk', genre_jazz: 'Jazz',
     osu_artist_filter_all: 'Alle Interpreten',
@@ -101,8 +101,8 @@ I18N.de = {
     explore_lookup_d: 'Dein Gesamt-PP, eine tägliche Fortschrittskurve, Vergleich mit Freunden',
     explore_farm_d: 'Eine Liste von High-pp-Farm-Maps passend zu deinem Bereich',
     explore_gallery_d: 'Durchstöbere öffentliche Sammlungen, importiere eine mit einem Klick',
-    explore_mapper_d: 'Benachrichtigung, wenn ein verfolgter Mapper eine neue Map ranked',
-    explore_replay_d: 'Lade ein Replay hoch für UR, Abschnitts-Statistiken, pp',
+    
+    
     explore_tourney_d: 'Community-Turniere aus dem Forum + wyBin',
     osu_empty_fav: 'Noch keine Favoriten', osu_empty_fav_hint: 'Klicken Sie ♥ um hinzuzufügen!',
     osu_category_add_prompt: 'Name der neuen Kategorie eingeben:', osu_category_rename_prompt: 'Kategorie umbenennen:',
@@ -412,13 +412,13 @@ I18N.de = {
 
     leaderboard_btn: 'Bestenliste', leaderboard_title: 'Bestenliste beobachteter Spieler',
 
-    tracked_mappers_title: 'Beobachtete Mapper', tracked_mappers_hint: 'Gib den osu!-Benutzernamen eines Mappers ein — du wirst benachrichtigt, wenn er eine neue Map rankt.',
-    mapper_track_placeholder: 'Benutzername des Mappers...', mapper_track_btn: 'Verfolgen',
-    mapper_already_tracked: 'Du verfolgst diesen Mapper bereits', mapper_track_done: 'Zur Beobachtung hinzugefügt — du wirst über neue Maps benachrichtigt',
+     
+     
+     
     mapper_not_found: 'Dieser osu!-Spieler wurde nicht gefunden — bitte den Benutzernamen prüfen',
-    tracked_mappers_empty: 'Du beobachtest noch keine Mapper', notif_mapper_new_title: '{name} hat eine neue Map gerankt',
+     
     notif_achievement_new_title: '{n} hat ein neues Abzeichen erhalten', notif_achievement_detail: '{count} neue(s) Abzeichen — hier klicken',
-    notif_mapper_graveyard_title: '{name} hat eine neue Graveyard-Map', notif_mapper_loved_title: 'Eine Map von {name} wurde zu Loved hinzugefügt!',
+     
     resources_title: 'Weitere osu!-Ressourcen', resources_hint: 'Ein paar Community-Tools, die man kennen sollte, statt sie selbst zu bauen:',
     h1_bbcode: 'BBCode-Editor', bbcode_note: 'Läuft komplett in deinem Browser — es wird nichts irgendwohin gesendet. Kopiere das Ergebnis in deinen osu!-Profil-/Forumseditor.', bbcode_source: 'BBCode', bbcode_preview: 'Vorschau', bbcode_copy: 'BBCode kopieren', bbcode_clear: 'Leeren', bbcode_placeholder: 'Schreibe hier deinen BBCode…', bbcode_copied: 'Kopiert!',
     resource_group_find: 'Beatmaps finden', resource_group_stats: 'Statistiken & Tracking', resource_group_make: 'Skins & Mapping',
@@ -444,16 +444,16 @@ I18N.de = {
     grade_history_filter_empty: 'Keine Einträge für diesen Rang',
     grade_history_filter_all: 'Alle',
     grade_history_truncated: 'Zeige die neuesten {n} von {total}',
-    nav_replay_analyze: 'Replay-Analyse', replay_analyze_title: 'Replay-Analyse',
-    replay_analyze_hint: 'Lade eine .osr-Datei hoch, um eine Ergebniszusammenfassung und ein Trefferzeit-Diagramm zu sehen. Wird komplett serverseitig aus der Datei selbst analysiert — kein Videorendering, kein Drittanbieterdienst.',
-    replay_upload_btn: '.osr-Datei wählen', replay_upload_drag_hint: 'oder Datei hierher ziehen',
-    replay_analyzing: 'Analysiere...', replay_analyze_fail: 'Analyse fehlgeschlagen — stelle sicher, dass die Datei eine gültige .osr ist',
-    replay_no_beatmap_match: 'Diese Beatmap wurde in der osu!-Datenbank nicht gefunden (evtl. ungerankt oder eine eigene Map)',
-    replay_score_summary_title: 'Ergebniszusammenfassung', replay_recalculated_pp_label: 'Neu berechnete PP',
-    replay_hit_error_title: 'Trefferzeit-Verteilung (ungefähr)', replay_hit_error_unsupported: 'Trefferzeit-Analyse wird für diesen Modus oder dieses Replay nicht unterstützt',
-    replay_stat_accuracy: 'Genauigkeit', replay_stat_combo: 'Max. Combo', replay_stat_misses: 'Misses',
-    replay_stat_mods: 'Mods', replay_stat_rank: 'Rang', replay_stat_player: 'Spieler',
-    replay_approx_note: 'Die Trefferzeit wird geschätzt, indem Tastendrücke mit nahen Beatmap-Noten abgeglichen werden — keine vollständige Judgement-Nachbildung, nur ein Anhaltspunkt.',
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     site_howto_title: 'Was jede Seite und jeder Button macht', site_howto_label: 'Handbuch',
     nav_howto: 'Handbuch',
@@ -556,18 +556,6 @@ I18N.de = {
                 <p class="howto-tab-desc">Die PP eines beliebigen Spielers (auch deine eigene) nachschlagen, oder zwei nebeneinander vergleichen.</p>
                 <div class="howto-feat"><b>Deine osu!-PP nachschlagen</b><span>Benutzername oder ID eingeben und suchen. Ergebnisse enthalten Statistiken für alle Modi, ein PP-Verlaufsdiagramm, einen Verfolgen-Button und „Statistikkarte erstellen"; Tabs darunter: letzte Spiele / Top-Ergebnisse / PP-Ziel / Abzeichen / Notenverlauf.</span></div>
                 <div class="howto-feat"><b>⚔ Zwei-Spieler-Vergleich</b><span>Zwei Benutzernamen/IDs eingeben und Vergleichen klicken: zuerst Übersicht und überlagerte PP-Diagramme, dann darunter „Top-Play-Vergleich" mit den besten Ergebnissen beider Spieler nebeneinander.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Replay-Analyse</div>
-                <p class="howto-tab-desc">Eine .osr-Datei hochladen für Ergebnisdetails — komplett serverseitig geparst, keine Videokonvertierung oder Drittanbieter-Dienste.</p>
-                <div class="howto-feat"><b>Hochladen</b><span>Per Drag & Drop oder „.osr-Datei wählen" klicken — zeigt danach eine Ergebniszusammenfassung und ein Trefferzeit-Verteilungsdiagramm.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 Mapper verfolgen</div>
-                <p class="howto-tab-desc">Sofort benachrichtigt werden, sobald ein Mapper, den du magst, eine neue Karte rankt.</p>
-                <div class="howto-feat"><b>Verfolgen</b><span>Den osu!-Benutzernamen des Mappers eingeben und Verfolgen klicken; die Liste erscheint auf derselben Seite und kann jederzeit entfernt werden.</span></div>
             </div>
         </div>
 

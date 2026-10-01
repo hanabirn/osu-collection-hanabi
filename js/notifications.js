@@ -56,8 +56,7 @@ function clearAllNotifications() {
    last check produce a notification — never a flood on the very first
    check, since both are always seeded from real values at track-time (a
    player tracked before knownAchievementIds existed instead baselines it
-   silently here on the first check that sees it, same idea as
-   checkTrackedMappers()' lastMaxApprovedDate === null below).
+   silently here on the first check that sees it).
 
    PP and achievements are checked together in a single read-modify-write of
    getTrackedPlayers()/saveTrackedPlayers() rather than as two separate
@@ -180,122 +179,6 @@ async function checkNewTournamentPosts() {
     if (maxId > stored) localStorage.setItem(NOTIF_TOURNAMENTS_SEEN_KEY, String(maxId));
 }
 
-/* Tracked mappers (js/updates.js) get the exact same "baseline on first
-   check, then diff" treatment as checkNewTournamentPosts() below — a
-   prolific mapper's whole back catalog would otherwise fire as "new" the
-   moment someone starts tracking them. New-ranked-map detection diffs by
-   approved_date per beatmapset rather than by id, since get_beatmaps' `u=`
-   filter returns every difficulty of every set the mapper has ever made.
-   Graveyard/loved detection (via osu-mapper-status.js, which resolves the
-   tracked username to a numeric id server-side every call — see that
-   file's header comment for why nothing is cached client-side) is folded
-   into this same pass rather than a separate function/Promise.all entry:
-   both read-modify-write the same getTrackedMappers()/saveTrackedMappers()
-   list, and doing that from two independently-awaited functions meant
-   whichever saved last could silently clobber the other's update (the same
-   race checkTrackedPlayers() above avoids the same way). */
-async function checkTrackedMappers() {
-    if (typeof getTrackedMappers !== 'function') return;
-    const mappers = getTrackedMappers();
-    if (mappers.length === 0) return;
-
-    let anyUpdated = false;
-    for (const mapper of mappers) {
-        // Entries tracked before the avatar/flag/profile-link card existed
-        // have no id/country yet (js/updates.js trackMapperFromInput only
-        // started resolving those going forward) — backfill them lazily here
-        // since this loop already runs periodically over every tracked mapper.
-        if (!mapper.id) {
-            try {
-                const users = await osuFetch(`u=${encodeURIComponent(mapper.name)}&type=string`);
-                const u = Array.isArray(users) ? users[0] : null;
-                if (u) {
-                    mapper.id = u.user_id;
-                    mapper.country = u.country || null;
-                    mapper.name = u.username;
-                    anyUpdated = true;
-                }
-            } catch (e) {
-                console.error('Tracked mapper id backfill failed:', mapper.name, e);
-            }
-        }
-
-        try {
-            const beatmaps = await osuFetch(`mapper=${encodeURIComponent(mapper.name)}&mapper_type=string`);
-            if (Array.isArray(beatmaps) && beatmaps.length > 0) {
-                const bySet = new Map();
-                beatmaps.forEach(b => {
-                    if (!b.beatmapset_id || !b.approved_date) return;
-                    const existing = bySet.get(b.beatmapset_id);
-                    if (!existing || b.approved_date > existing.approved_date) bySet.set(b.beatmapset_id, b);
-                });
-                const sets = [...bySet.values()].sort((a, b) => b.approved_date.localeCompare(a.approved_date));
-
-                if (sets.length > 0) {
-                    if (mapper.lastMaxApprovedDate === null) {
-                        mapper.lastMaxApprovedDate = sets[0].approved_date;
-                        anyUpdated = true;
-                    } else {
-                        const newSets = sets.filter(b => b.approved_date > mapper.lastMaxApprovedDate).slice(0, 5);
-                        newSets.forEach(b => {
-                            addNotification({
-                                id: `mapper-${b.beatmapset_id}`,
-                                type: 'mapper',
-                                title: t('notif_mapper_new_title', { name: mapper.name }),
-                                detail: `${b.artist} - ${b.title}`,
-                                url: `https://osu.ppy.sh/beatmapsets/${b.beatmapset_id}`,
-                                createdAt: Date.now(),
-                                read: false,
-                            });
-                        });
-                        if (newSets.length > 0) { mapper.lastMaxApprovedDate = sets[0].approved_date; anyUpdated = true; }
-                    }
-                }
-            }
-        } catch (e) {
-            console.error('Tracked mapper check failed:', mapper.name, e);
-        }
-
-        try {
-            const res = await fetch(`/.netlify/functions/osu-mapper-status?username=${encodeURIComponent(mapper.name)}`);
-            if (res.ok) {
-                const data = await res.json();
-                [['graveyard', 'knownGraveyardIds', 'mapper-graveyard'], ['loved', 'knownLovedIds', 'mapper-loved']].forEach(([dataKey, storeKey, notifType]) => {
-                    const sets = data[dataKey] || [];
-                    const ids = sets.map(s => s.id);
-
-                    if (!Array.isArray(mapper[storeKey])) {
-                        mapper[storeKey] = ids;
-                        anyUpdated = true;
-                        return;
-                    }
-
-                    const known = new Set(mapper[storeKey]);
-                    const newSets = sets.filter(s => !known.has(s.id));
-                    newSets.forEach(s => {
-                        addNotification({
-                            id: `${notifType}-${s.id}`,
-                            type: notifType,
-                            title: t(dataKey === 'graveyard' ? 'notif_mapper_graveyard_title' : 'notif_mapper_loved_title', { name: mapper.name }),
-                            detail: `${s.artist} - ${s.title}`,
-                            url: `https://osu.ppy.sh/beatmapsets/${s.id}`,
-                            createdAt: Date.now(),
-                            read: false,
-                        });
-                    });
-                    if (newSets.length > 0) { mapper[storeKey] = ids; anyUpdated = true; }
-                });
-            }
-        } catch (e) {
-            console.error('Tracked mapper graveyard/loved check failed:', mapper.name, e);
-        }
-    }
-    if (anyUpdated) {
-        saveTrackedMappers(mappers);
-        if (typeof renderTrackedMappersList === 'function') renderTrackedMappersList();
-    }
-}
-
 async function checkForNotifications(force) {
     const last = parseInt(localStorage.getItem(NOTIF_LAST_CHECK_KEY), 10) || 0;
     if (!force && Date.now() - last < NOTIF_CHECK_INTERVAL_MS) return;
@@ -308,7 +191,7 @@ async function checkForNotifications(force) {
     // this same 15-min cycle for whenever the visitor isn't on the DM tab
     // itself (js/dm.js polls it directly, much faster, while that tab is open).
     await Promise.all([
-        checkTrackedPlayers(), checkNewTournamentPosts(), checkTrackedMappers(),
+        checkTrackedPlayers(), checkNewTournamentPosts(),
         typeof loadDmConversations === 'function' ? loadDmConversations() : Promise.resolve(),
     ]);
     renderNotificationBell();

@@ -47,7 +47,7 @@ I18N.fr = {
     contact_info_title: 'Coordonnées', accent_picker_title: 'Personnaliser la couleur d’accent', accent_picker_custom: 'Couleur personnalisée', accent_picker_reset: 'Réinitialiser',
     notif_pp_changed_detail: '{sign}{delta}pp (maintenant {pp}pp)', notif_tournament_new_title: 'Nouveau sujet de tournoi',
     back_to_main: 'Retour à Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités', nav_mapper_tracking: 'Mappers suivis', nav_tournaments: 'Tournois', nav_resources: 'Ressources', nav_bbcode: 'BBCode', nav_feedback: 'Suggestions', nav_menu_open: 'Ouvrir le menu', nav_more: 'Plus', nav_menu_title: 'Menu', nav_group_core: 'Essentiel', nav_group_tools: 'Outils', nav_group_resources: 'Ressources',
+    nav_collection: 'Collection', nav_lookup: 'Recherche PP', nav_skins: 'Skins', nav_updates: 'Actualités',  nav_tournaments: 'Tournois', nav_resources: 'Ressources', nav_bbcode: 'BBCode', nav_feedback: 'Suggestions', nav_menu_open: 'Ouvrir le menu', nav_more: 'Plus', nav_menu_title: 'Menu', nav_group_core: 'Essentiel', nav_group_tools: 'Outils', nav_group_resources: 'Ressources',
     lang_unspecified: 'Non spécifié', lang_english: 'Anglais', lang_japanese: 'Japonais', lang_chinese: 'Chinois', lang_instrumental: 'Instrumental', lang_korean: 'Coréen', lang_french: 'Français', lang_german: 'Allemand', lang_swedish: 'Suédois', lang_spanish: 'Espagnol', lang_italian: 'Italien', lang_russian: 'Russe', lang_polish: 'Polonais', lang_other: 'Autre', lang_unknown: 'Non étiqueté', osu_lang_filter_all: 'Toutes les langues', stats_dashboard_langs_title: 'Langues',
     osu_genre_filter_all: 'Tous les genres', osu_source_filter_all: 'Toutes les sources', osu_source_filter_none: '(Sans source)', genre_unspecified: 'Non spécifié', genre_video_game: 'Jeu vidéo', genre_anime: 'Anime', genre_rock: 'Rock', genre_pop: 'Pop', genre_other: 'Autre', genre_novelty: 'Novelty', genre_hiphop: 'Hip-hop', genre_electronic: 'Électronique', genre_metal: 'Metal', genre_classical: 'Classique', genre_folk: 'Folk', genre_jazz: 'Jazz',
     osu_artist_filter_all: 'Tous les artistes',
@@ -101,8 +101,8 @@ I18N.fr = {
     explore_lookup_d: 'Ton PP total, une courbe de progression quotidienne, comparaison entre amis',
     explore_farm_d: 'Une liste de maps farm à haut pp adaptée à ton niveau',
     explore_gallery_d: 'Parcours les collections publiques, importe-en une en un clic',
-    explore_mapper_d: 'Sois averti quand un mappeur que tu suis rank une nouvelle map',
-    explore_replay_d: 'Envoie un replay pour l’UR, les stats par section, le pp',
+    
+    
     explore_tourney_d: 'Tournois communautaires du forum + wyBin',
     osu_empty_fav: 'Pas encore de favoris', osu_empty_fav_hint: 'Cliquez ♥ pour ajouter!',
     osu_category_add_prompt: 'Entrez le nom de la nouvelle catégorie :', osu_category_rename_prompt: 'Renommer la catégorie :',
@@ -412,13 +412,13 @@ I18N.fr = {
 
     leaderboard_btn: 'Classement', leaderboard_title: 'Classement des joueurs suivis',
 
-    tracked_mappers_title: 'Mappers suivis', tracked_mappers_hint: "Entrez le pseudo osu! d'un mapper — vous serez averti quand il classera une nouvelle carte.",
-    mapper_track_placeholder: 'Pseudo du mapper...', mapper_track_btn: 'Suivre',
-    mapper_already_tracked: 'Vous suivez déjà ce mapper', mapper_track_done: 'Ajouté au suivi — vous serez averti des nouvelles cartes',
+     
+     
+     
     mapper_not_found: "Joueur osu! introuvable — vérifiez le nom d'utilisateur",
-    tracked_mappers_empty: "Vous ne suivez aucun mapper pour l'instant", notif_mapper_new_title: '{name} a classé une nouvelle carte',
+     
     notif_achievement_new_title: '{n} a obtenu un nouveau médaillon', notif_achievement_detail: '{count} nouveau(x) médaillon(s) — cliquez pour voir',
-    notif_mapper_graveyard_title: '{name} a une nouvelle carte en graveyard', notif_mapper_loved_title: 'Une carte de {name} est passée en Loved !',
+     
     resources_title: 'Plus de ressources osu!', resources_hint: "Quelques outils communautaires utiles, pas besoin de les refaire ici :",
     h1_bbcode: 'Éditeur BBCode', bbcode_note: "Fonctionne entièrement dans votre navigateur — rien n'est envoyé ailleurs. Copiez le résultat dans l'éditeur de votre profil/message de forum osu!.", bbcode_source: 'BBCode', bbcode_preview: 'Aperçu', bbcode_copy: 'Copier le BBCode', bbcode_clear: 'Effacer', bbcode_placeholder: 'Écrivez votre BBCode ici…', bbcode_copied: 'Copié !',
     resource_group_find: 'Trouver des maps', resource_group_stats: 'Stats et suivi', resource_group_make: 'Skins et mapping',
@@ -444,16 +444,16 @@ I18N.fr = {
     grade_history_filter_empty: 'Aucun enregistrement pour ce grade',
     grade_history_filter_all: 'Tous',
     grade_history_truncated: 'Affichage des {n} plus récents sur {total}',
-    nav_replay_analyze: 'Analyse de replay', replay_analyze_title: 'Analyse de replay',
-    replay_analyze_hint: "Téléversez un fichier .osr pour voir un résumé du score et un graphique de timing des frappes. Analysé entièrement côté serveur à partir du fichier lui-même — pas de rendu vidéo, pas de service tiers.",
-    replay_upload_btn: 'Choisir un fichier .osr', replay_upload_drag_hint: 'ou déposez un fichier ici',
-    replay_analyzing: 'Analyse en cours...', replay_analyze_fail: "Échec de l'analyse — vérifiez que le fichier est un .osr valide",
-    replay_no_beatmap_match: "Cette beatmap est introuvable dans la base osu! — elle est peut-être non classée ou personnalisée",
-    replay_score_summary_title: 'Résumé du score', replay_recalculated_pp_label: 'PP recalculé',
-    replay_hit_error_title: 'Distribution du timing des frappes (approximatif)', replay_hit_error_unsupported: "L'analyse du timing n'est pas prise en charge pour ce mode ou ce replay",
-    replay_stat_accuracy: 'Précision', replay_stat_combo: 'Combo max', replay_stat_misses: 'Miss',
-    replay_stat_mods: 'Mods', replay_stat_rank: 'Rang', replay_stat_player: 'Joueur',
-    replay_approx_note: "Le timing des frappes est estimé en comparant les appuis de touches aux notes proches de la beatmap — ce n'est pas une reproduction complète du jugement, juste une référence.",
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     site_howto_title: 'Ce que fait chaque page et chaque bouton', site_howto_label: "Guide d'utilisation",
     nav_howto: "Guide d'utilisation",
@@ -556,18 +556,6 @@ I18N.fr = {
                 <p class="howto-tab-desc">Consulte le PP de n'importe quel joueur (y compris le tien), ou compare-en deux côte à côte.</p>
                 <div class="howto-feat"><b>Consulter ton PP osu!</b><span>Entre un nom d'utilisateur ou un ID et cherche. Les résultats incluent les stats de tous les modes, un graphique d'historique PP, un bouton de suivi et « Générer une carte de stats » ; onglets en dessous : récents / meilleurs scores / objectif PP / médailles / historique des rangs.</span></div>
                 <div class="howto-feat"><b>⚔ Comparaison à deux</b><span>Remplis deux noms d'utilisateur/ID et clique sur Comparer : d'abord un aperçu et des graphiques PP superposés, puis en dessous « Comparaison des top plays » liste les meilleurs scores des deux joueurs côte à côte.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Analyse de Replay</div>
-                <p class="howto-tab-desc">Importe un fichier .osr pour voir les détails du score — analysé entièrement côté serveur, sans conversion vidéo ni service tiers.</p>
-                <div class="howto-feat"><b>Importer</b><span>Glisse-dépose, ou clique sur « Choisir un fichier .osr » — affiche ensuite un résumé du score et un graphique de distribution du timing des frappes.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 Suivre des Mappers</div>
-                <p class="howto-tab-desc">Sois notifié dès qu'un mapper que tu aimes range une nouvelle carte.</p>
-                <div class="howto-feat"><b>Suivre</b><span>Entre le nom d'utilisateur osu! du mapper et clique sur Suivre ; la liste s'affiche sur la même page et peut être modifiée à tout moment.</span></div>
             </div>
         </div>
 

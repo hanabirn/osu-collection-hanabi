@@ -47,7 +47,7 @@ I18N.es = {
     contact_info_title: 'Información de contacto', accent_picker_title: 'Personalizar color de acento', accent_picker_custom: 'Color personalizado', accent_picker_reset: 'Restablecer',
     notif_pp_changed_detail: '{sign}{delta}pp (ahora {pp}pp)', notif_tournament_new_title: 'Nuevo tema de torneo',
     back_to_main: 'Volver a Hanabiの小天地',
-    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias', nav_mapper_tracking: 'Mappers seguidos', nav_tournaments: 'Torneos', nav_resources: 'Recursos', nav_bbcode: 'BBCode', nav_feedback: 'Sugerencias', nav_menu_open: 'Abrir menú', nav_more: 'Más', nav_menu_title: 'Menú', nav_group_core: 'Principal', nav_group_tools: 'Herramientas', nav_group_resources: 'Recursos',
+    nav_collection: 'Colección', nav_lookup: 'Buscar PP', nav_skins: 'Skins', nav_updates: 'Noticias',  nav_tournaments: 'Torneos', nav_resources: 'Recursos', nav_bbcode: 'BBCode', nav_feedback: 'Sugerencias', nav_menu_open: 'Abrir menú', nav_more: 'Más', nav_menu_title: 'Menú', nav_group_core: 'Principal', nav_group_tools: 'Herramientas', nav_group_resources: 'Recursos',
     lang_unspecified: 'Sin especificar', lang_english: 'Inglés', lang_japanese: 'Japonés', lang_chinese: 'Chino', lang_instrumental: 'Instrumental', lang_korean: 'Coreano', lang_french: 'Francés', lang_german: 'Alemán', lang_swedish: 'Sueco', lang_spanish: 'Español', lang_italian: 'Italiano', lang_russian: 'Ruso', lang_polish: 'Polaco', lang_other: 'Otro', lang_unknown: 'Sin etiqueta', osu_lang_filter_all: 'Todos los idiomas', stats_dashboard_langs_title: 'Idiomas',
     osu_genre_filter_all: 'Todos los géneros', osu_source_filter_all: 'Todas las fuentes', osu_source_filter_none: '(Sin fuente)', genre_unspecified: 'Sin especificar', genre_video_game: 'Videojuego', genre_anime: 'Anime', genre_rock: 'Rock', genre_pop: 'Pop', genre_other: 'Otro', genre_novelty: 'Novelty', genre_hiphop: 'Hip-hop', genre_electronic: 'Electrónica', genre_metal: 'Metal', genre_classical: 'Clásica', genre_folk: 'Folk', genre_jazz: 'Jazz',
     osu_artist_filter_all: 'Todos los artistas',
@@ -101,8 +101,8 @@ I18N.es = {
     explore_lookup_d: 'Tu PP total, una curva de progreso diaria, comparar con amigos',
     explore_farm_d: 'Una lista de mapas farm de alto pp ajustada a tu nivel',
     explore_gallery_d: 'Explora colecciones públicas, importa una con un clic',
-    explore_mapper_d: 'Recibe aviso cuando un mapper que sigues rankee un mapa nuevo',
-    explore_replay_d: 'Sube un replay para ver UR, estadísticas por sección, pp',
+    
+    
     explore_tourney_d: 'Torneos de la comunidad del foro + wyBin',
     osu_empty_fav: 'Aún no hay favoritos', osu_empty_fav_hint: '¡Haga clic en ♥ para agregar!',
     osu_category_add_prompt: 'Introduce el nombre de la nueva categoría:', osu_category_rename_prompt: 'Renombrar categoría:',
@@ -412,13 +412,13 @@ I18N.es = {
 
     leaderboard_btn: 'Clasificación', leaderboard_title: 'Clasificación de Jugadores Seguidos',
 
-    tracked_mappers_title: 'Mappers Seguidos', tracked_mappers_hint: 'Introduce el nombre de usuario osu! de un mapper — te avisaremos cuando clasifique un mapa nuevo.',
-    mapper_track_placeholder: 'Nombre de usuario del mapper...', mapper_track_btn: 'Seguir',
-    mapper_already_tracked: 'Ya estás siguiendo a este mapper', mapper_track_done: 'Añadido al seguimiento — te avisaremos de mapas nuevos',
+     
+     
+     
     mapper_not_found: 'No se encontró ese jugador de osu! — comprueba el nombre de usuario',
-    tracked_mappers_empty: 'Todavía no sigues a ningún mapper', notif_mapper_new_title: '{name} ha clasificado un mapa nuevo',
+     
     notif_achievement_new_title: '{n} obtuvo una nueva medalla', notif_achievement_detail: '{count} medalla(s) nueva(s) — haz clic para ver',
-    notif_mapper_graveyard_title: '{name} tiene un nuevo mapa en graveyard', notif_mapper_loved_title: '¡Un mapa de {name} pasó a Loved!',
+     
     resources_title: 'Más recursos de osu!', resources_hint: 'Algunas herramientas de la comunidad que vale la pena conocer:',
     h1_bbcode: 'Editor de BBCode', bbcode_note: 'Funciona totalmente en tu navegador — no se envía nada a ningún sitio. Copia el resultado en el editor de tu perfil o publicación del foro de osu!.', bbcode_source: 'BBCode', bbcode_preview: 'Vista previa', bbcode_copy: 'Copiar BBCode', bbcode_clear: 'Borrar', bbcode_placeholder: 'Escribe tu BBCode aquí…', bbcode_copied: '¡Copiado!',
     resource_group_find: 'Buscar mapas', resource_group_stats: 'Estadísticas y seguimiento', resource_group_make: 'Skins y mapping',
@@ -444,16 +444,16 @@ I18N.es = {
     grade_history_filter_empty: 'No hay registros con este rango',
     grade_history_filter_all: 'Todos',
     grade_history_truncated: 'Mostrando los {n} más recientes de {total}',
-    nav_replay_analyze: 'Análisis de replay', replay_analyze_title: 'Análisis de replay',
-    replay_analyze_hint: 'Sube un archivo .osr para ver un resumen del puntaje y un gráfico de tiempo de golpes. Se analiza el archivo íntegramente en el servidor, sin renderizar vídeo ni depender de servicios externos.',
-    replay_upload_btn: 'Elegir archivo .osr', replay_upload_drag_hint: 'o arrastra un archivo aquí',
-    replay_analyzing: 'Analizando...', replay_analyze_fail: 'Error al analizar — comprueba que el archivo sea un .osr válido',
-    replay_no_beatmap_match: 'No se encontró este beatmap en la base de datos de osu! (puede ser no clasificado o personalizado)',
-    replay_score_summary_title: 'Resumen del puntaje', replay_recalculated_pp_label: 'PP recalculado',
-    replay_hit_error_title: 'Distribución del tiempo de golpes (aproximado)', replay_hit_error_unsupported: 'El análisis de tiempo no está disponible para este modo o replay',
-    replay_stat_accuracy: 'Precisión', replay_stat_combo: 'Combo máximo', replay_stat_misses: 'Fallos',
-    replay_stat_mods: 'Mods', replay_stat_rank: 'Rango', replay_stat_player: 'Jugador',
-    replay_approx_note: 'El tiempo de golpes se estima comparando las pulsaciones con las notas cercanas del beatmap — no es una recreación completa del juicio, solo una referencia.',
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     site_howto_title: 'Qué hace cada página y botón', site_howto_label: 'Guía de uso',
     nav_howto: 'Guía de uso',
@@ -556,18 +556,6 @@ I18N.es = {
                 <p class="howto-tab-desc">Consulta el PP de cualquier jugador (incluido el tuyo), o compara dos lado a lado.</p>
                 <div class="howto-feat"><b>Consulta tu PP osu!</b><span>Escribe un nombre de usuario o ID y busca. Los resultados incluyen estadísticas de todos los modos, un gráfico de historial de PP, un botón de seguir y "Generar tarjeta de estadísticas"; pestañas abajo: recientes / mejores puntajes / meta de PP / medallas / historial de rangos.</span></div>
                 <div class="howto-feat"><b>⚔ Comparación de dos jugadores</b><span>Escribe dos nombres de usuario/ID y pulsa Comparar: primero un resumen y gráficos de PP superpuestos, luego abajo "Comparación de mejores jugadas" lista los mejores puntajes de ambos jugadores lado a lado.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Análisis de Replay</div>
-                <p class="howto-tab-desc">Sube un archivo .osr para ver detalles del puntaje — analizado completamente en el servidor, sin conversión de video ni servicios de terceros.</p>
-                <div class="howto-feat"><b>Subir</b><span>Arrastra y suelta, o pulsa "Elegir archivo .osr" — muestra un resumen del puntaje y un gráfico de distribución del tiempo de golpes después.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 Seguir Mappers</div>
-                <p class="howto-tab-desc">Recibe notificación en el momento en que un mapper que te gusta rankea un nuevo mapa.</p>
-                <div class="howto-feat"><b>Seguir</b><span>Escribe el nombre de usuario osu! del mapper y pulsa Seguir; la lista aparece en la misma página y se puede dejar de seguir en cualquier momento.</span></div>
             </div>
         </div>
 

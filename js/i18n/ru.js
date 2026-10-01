@@ -47,7 +47,7 @@ I18N.ru = {
     contact_info_title: 'Контактная информация', accent_picker_title: 'Настроить акцентный цвет', accent_picker_custom: 'Свой цвет', accent_picker_reset: 'Сбросить',
     notif_pp_changed_detail: '{sign}{delta}pp (сейчас {pp}pp)', notif_tournament_new_title: 'Новая тема турнира',
     back_to_main: 'Назад на Hanabiの小天地',
-    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости', nav_mapper_tracking: 'Отслеживаемые мапперы', nav_tournaments: 'Турниры', nav_resources: 'Ресурсы', nav_bbcode: 'BBCode', nav_feedback: 'Предложения', nav_menu_open: 'Открыть меню', nav_more: 'Ещё', nav_menu_title: 'Меню', nav_group_core: 'Основное', nav_group_tools: 'Инструменты', nav_group_resources: 'Ресурсы',
+    nav_collection: 'Коллекция', nav_lookup: 'Поиск PP', nav_skins: 'Скины', nav_updates: 'Новости',  nav_tournaments: 'Турниры', nav_resources: 'Ресурсы', nav_bbcode: 'BBCode', nav_feedback: 'Предложения', nav_menu_open: 'Открыть меню', nav_more: 'Ещё', nav_menu_title: 'Меню', nav_group_core: 'Основное', nav_group_tools: 'Инструменты', nav_group_resources: 'Ресурсы',
     lang_unspecified: 'Не указано', lang_english: 'Английский', lang_japanese: 'Японский', lang_chinese: 'Китайский', lang_instrumental: 'Инструментал', lang_korean: 'Корейский', lang_french: 'Французский', lang_german: 'Немецкий', lang_swedish: 'Шведский', lang_spanish: 'Испанский', lang_italian: 'Итальянский', lang_russian: 'Русский', lang_polish: 'Польский', lang_other: 'Другой', lang_unknown: 'Без метки', osu_lang_filter_all: 'Все языки', stats_dashboard_langs_title: 'Языки',
     osu_genre_filter_all: 'Все жанры', osu_source_filter_all: 'Все источники', osu_source_filter_none: '(Без источника)', genre_unspecified: 'Не указано', genre_video_game: 'Видеоигра', genre_anime: 'Аниме', genre_rock: 'Рок', genre_pop: 'Поп', genre_other: 'Другое', genre_novelty: 'Новелти', genre_hiphop: 'Хип-хоп', genre_electronic: 'Электроника', genre_metal: 'Метал', genre_classical: 'Классика', genre_folk: 'Фолк', genre_jazz: 'Джаз',
     osu_artist_filter_all: 'Все исполнители',
@@ -101,8 +101,8 @@ I18N.ru = {
     explore_lookup_d: 'Ваш общий PP, график прогресса по дням, сравнение с друзьями',
     explore_farm_d: 'Список фарм-карт с высоким pp под ваш диапазон',
     explore_gallery_d: 'Смотрите чужие коллекции и импортируйте в один клик',
-    explore_mapper_d: 'Уведомим, когда маппер, за которым вы следите, зарангует карту',
-    explore_replay_d: 'Загрузите реплей — UR, статистика по секциям, pp',
+    
+    
     explore_tourney_d: 'Комьюнити-турниры с форума и платформы wyBin',
     osu_empty_fav: 'Избранных пока нет', osu_empty_fav_hint: 'Нажмите ♥ чтобы добавить!',
     osu_category_add_prompt: 'Введите название новой категории:', osu_category_rename_prompt: 'Переименовать категорию:',
@@ -412,13 +412,13 @@ I18N.ru = {
 
     leaderboard_btn: 'Таблица лидеров', leaderboard_title: 'Таблица лидеров отслеживаемых игроков',
 
-    tracked_mappers_title: 'Отслеживаемые мапперы', tracked_mappers_hint: 'Введите ник маппера на osu! — вы получите уведомление, когда он зарангует новую карту.',
-    mapper_track_placeholder: 'Введите ник маппера...', mapper_track_btn: 'Отслеживать',
-    mapper_already_tracked: 'Вы уже отслеживаете этого маппера', mapper_track_done: 'Добавлено в отслеживаемые — сообщим о новых картах',
+     
+     
+     
     mapper_not_found: 'Игрок osu! не найден — проверьте имя пользователя',
-    tracked_mappers_empty: 'Вы пока не отслеживаете ни одного маппера', notif_mapper_new_title: '{name} зарангал новую карту',
+     
     notif_achievement_new_title: '{n} получил новую медаль', notif_achievement_detail: 'Новых медалей: {count} — нажмите, чтобы посмотреть',
-    notif_mapper_graveyard_title: 'У {name} новая карта в graveyard', notif_mapper_loved_title: 'Карта {name} попала в Loved!',
+     
     resources_title: 'Больше ресурсов osu!', resources_hint: 'Полезные инструменты сообщества, которые незачем повторять здесь:',
     h1_bbcode: 'Редактор BBCode', bbcode_note: 'Полностью работает в вашем браузере — ничего никуда не отправляется. Скопируйте результат в редактор профиля/форума osu!.', bbcode_source: 'BBCode', bbcode_preview: 'Предпросмотр', bbcode_copy: 'Скопировать BBCode', bbcode_clear: 'Очистить', bbcode_placeholder: 'Введите здесь свой BBCode…', bbcode_copied: 'Скопировано!',
     resource_group_find: 'Поиск карт', resource_group_stats: 'Статистика и отслеживание', resource_group_make: 'Скины и маппинг',
@@ -444,16 +444,16 @@ I18N.ru = {
     grade_history_filter_empty: 'Нет записей с такой оценкой',
     grade_history_filter_all: 'Все',
     grade_history_truncated: 'Показаны последние {n} из {total}',
-    nav_replay_analyze: 'Анализ реплея', replay_analyze_title: 'Анализ реплея',
-    replay_analyze_hint: 'Загрузите файл .osr, чтобы увидеть сводку по результату и график тайминга попаданий. Файл разбирается только на сервере — без рендера видео и сторонних сервисов конвертации.',
-    replay_upload_btn: 'Выбрать файл .osr', replay_upload_drag_hint: 'или перетащите файл сюда',
-    replay_analyzing: 'Анализ...', replay_analyze_fail: 'Ошибка анализа — убедитесь, что файл является корректным .osr',
-    replay_no_beatmap_match: 'Эта карта не найдена в базе osu! — возможно, она неранкнутая или самодельная',
-    replay_score_summary_title: 'Сводка результата', replay_recalculated_pp_label: 'Пересчитанные PP',
-    replay_hit_error_title: 'Распределение тайминга попаданий (приблизительно)', replay_hit_error_unsupported: 'Анализ тайминга не поддерживается для этого режима или реплея',
-    replay_stat_accuracy: 'Точность', replay_stat_combo: 'Макс. комбо', replay_stat_misses: 'Промахи',
-    replay_stat_mods: 'Моды', replay_stat_rank: 'Ранг', replay_stat_player: 'Игрок',
-    replay_approx_note: 'Тайминг попаданий оценивается по сопоставлению нажатий клавиш с ближайшими нотами карты — это не полное воссоздание судейства, а лишь ориентир.',
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     site_howto_title: 'Что делает каждая страница и кнопка', site_howto_label: 'Руководство',
     nav_howto: 'Руководство',
@@ -556,18 +556,6 @@ I18N.ru = {
                 <p class="howto-tab-desc">Посмотрите PP любого игрока (включая себя) или сравните двоих бок о бок.</p>
                 <div class="howto-feat"><b>Проверить свой PP osu!</b><span>Введите имя пользователя или ID и найдите. Результаты включают статистику по всем режимам, график истории PP, кнопку отслеживания и «Создать карточку статистики»; вкладки ниже: недавние игры / лучшие результаты / цель по PP / медали / история оценок.</span></div>
                 <div class="howto-feat"><b>⚔ Сравнение двух игроков</b><span>Заполните два имени пользователя/ID и нажмите «Сравнить»: сначала обзор и наложенные графики PP, затем ниже «Сравнение лучших игр» показывает лучшие результаты обоих игроков рядом.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Анализ реплея</div>
-                <p class="howto-tab-desc">Загрузите файл .osr, чтобы увидеть детали результата — полностью разбирается на сервере, без конвертации видео или сторонних сервисов.</p>
-                <div class="howto-feat"><b>Загрузка</b><span>Перетащите файл или нажмите «Выбрать файл .osr» — после загрузки покажет сводку результата и график распределения тайминга попаданий.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 Отслеживание мапперов</div>
-                <p class="howto-tab-desc">Получайте уведомление, как только любимый маппер ранкает новую карту.</p>
-                <div class="howto-feat"><b>Отслеживать</b><span>Введите имя пользователя osu! маппера и нажмите «Отслеживать»; список отображается на той же странице, отслеживание можно снять в любой момент.</span></div>
             </div>
         </div>
 

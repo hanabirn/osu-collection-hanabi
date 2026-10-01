@@ -20,9 +20,6 @@
 # community-mappools / wc-mappool run as the Worker's scheduled handler
 # (wrangler.jsonc). The *-cron.js files stay, the Worker imports them.
 
-[functions."replay-analyze"]
-  included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
-
 # Shareable pretty URL for a published gallery collection — rewrite (200) so
 # /c/<id> stays in the address bar while collection-share-page.js serves the
 # OpenGraph meta (and bounces real browsers to /?c=<id>).

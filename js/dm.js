@@ -119,8 +119,7 @@ function updateDmBadge(totalUnread) {
     badge.style.display = totalUnread > 0 ? '' : 'none';
 }
 
-/* Same lookup-then-act shape as trackMapperFromInput (js/updates.js): the
-   input takes a username, resolved via the same v1 get_user proxy
+/* The input takes a username, resolved via the same v1 get_user proxy
    (osuFetch) every other username lookup on this site already uses — no
    new backend needed just to turn "a username" into "an id". */
 async function startDmConversationFromInput() {

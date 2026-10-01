@@ -203,8 +203,6 @@
             <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
             <button class="site-nav-btn" onclick="switchTab('cmpool', this)" data-i18n="nav_cmpool">社群賽圖分享</button>
             <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
-            <button class="site-nav-btn" onclick="switchTab('replay-analyze', this)" data-icon="barChart3" data-icon-gap><span data-i18n="nav_replay_analyze">Replay 分析</span></button>
-            <button class="site-nav-btn" onclick="switchTab('mapper-tracking', this)" data-icon="palette" data-icon-gap><span data-i18n="nav_mapper_tracking">追蹤 Mapper</span></button>
             <button class="site-nav-btn" onclick="switchTab('bbcode', this)" data-i18n="nav_bbcode">BBCode</button>
         </div>
         <div class="nav-drawer-group">
@@ -399,20 +397,10 @@
                     <span class="explore-card-t" data-i18n="nav_public_collections">收藏廣場</span>
                     <span class="explore-card-d" data-i18n="explore_gallery_d">看別人公開的收藏，一鍵匯入你的</span>
                 </button>
-                <button class="explore-card" onclick="switchTab('mapper-tracking')">
-                    <span class="explore-card-icon" data-icon="palette"></span>
-                    <span class="explore-card-t" data-i18n="nav_mapper_tracking">追蹤 Mapper</span>
-                    <span class="explore-card-d" data-i18n="explore_mapper_d">喜歡的 mapper 出新圖時通知你</span>
-                </button>
                 <button class="explore-card" onclick="switchTab('catalog')">
                     <span class="explore-card-icon" data-icon="tag"></span>
                     <span class="explore-card-t" data-i18n="nav_catalog">曲庫分類</span>
                     <span class="explore-card-d" data-i18n="explore_catalog_d">依歌手／語言／曲風瀏覽全 ranked 曲庫，一鍵成收藏</span>
-                </button>
-                <button class="explore-card" onclick="switchTab('replay-analyze')">
-                    <span class="explore-card-icon" data-icon="barChart3"></span>
-                    <span class="explore-card-t" data-i18n="nav_replay_analyze">Replay 分析</span>
-                    <span class="explore-card-d" data-i18n="explore_replay_d">上傳 replay，看 UR、分段表現、pp</span>
                 </button>
                 <button class="explore-card" onclick="switchTab('tournaments')">
                     <span class="explore-card-icon" data-icon="trophy"></span>
@@ -701,22 +689,6 @@
         </div>
     </section>
 
-    <section id="page-replay-analyze" class="site-page" style="display:none;">
-        <div class="osu-add-card replay-analyze-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="replay_analyze_title">Replay 分析</h3>
-            <p class="replay-analyze-hint" data-i18n="replay_analyze_hint">上傳 .osr 檔案，查看成績摘要與擊打時間分佈圖。純粹在伺服器端解析檔案本身，不會產生影片、也不依賴第三方轉檔服務。</p>
-            <div class="replay-upload-zone" id="replay-upload-zone" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleReplayDrop(event)">
-                <input type="file" id="replay-file-input" accept=".osr" style="display:none;" onchange="handleReplayFileSelected(this.files)">
-                <button class="btn" onclick="document.getElementById('replay-file-input').click()" data-icon="upload" data-icon-gap><span data-i18n="replay_upload_btn">選擇 .osr 檔案</span></button>
-                <p class="replay-upload-drag-hint" data-i18n="replay_upload_drag_hint">或把檔案拖曳到這裡</p>
-            </div>
-            <div id="replay-analyze-status" class="status"></div>
-            <div id="replay-analyze-result" style="display:none;"></div>
-        </div>
-    </section>
-
     <section id="page-skins" class="site-page" style="display:none;">
         <div class="osu-add-card skins-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
@@ -873,20 +845,6 @@
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
             <div id="osu-news-list" class="news-list"></div>
-        </div>
-    </section>
-
-    <section id="page-mapper-tracking" class="site-page" style="display:none;">
-        <div class="osu-add-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="tracked_mappers_title">追蹤 Mapper</h3>
-            <p class="skins-hint" data-i18n="tracked_mappers_hint">輸入 mapper 的 osu! 用戶名，他有新圖上架 ranked 時會通知你。</p>
-            <div class="input-group">
-                <input type="text" id="mapper-track-input" autocomplete="off" data-i18n-placeholder="mapper_track_placeholder" placeholder="輸入 mapper 用戶名..." onkeydown="if(event.key==='Enter')trackMapperFromInput()">
-                <button onclick="trackMapperFromInput()" data-i18n="mapper_track_btn">追蹤</button>
-            </div>
-            <div id="tracked-mappers-panel" class="tracked-players-panel"></div>
         </div>
     </section>
 
@@ -1222,7 +1180,6 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 </script>
 <script defer src="js/osu.js"></script>
 <script defer src="js/local-db-match.js"></script>
-<script defer src="js/replay-analyze.js"></script>
 <script defer src="js/public-collections.js"></script>
 <script defer src="js/gallery-comments.js"></script>
 <script defer src="js/catalog.js"></script>

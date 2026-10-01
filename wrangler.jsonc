@@ -51,13 +51,7 @@
         "crons": ["20,50 * * * *", "0 */6 * * *", "0 6 * * 1"],
     },
 
-    // osu-parsers 的 package.json exports 只在 "node" 條件下提供 require 入口，
-    // 而 Workers 的打包用的是瀏覽器條件，於是 require('osu-parsers') 解析不到。
-    // 直接指向它的 CJS 檔：裡面只用到 node:path（nodejs_compat 有提供），
-    // 且 replay-analyze 只呼叫 decodeFromBuffer / decodeFromString 這類純記憶體
-    // 操作，沒有檔案 I/O，所以行為與 Netlify 上完全一致。
     "alias": {
-        "osu-parsers": "./netlify/functions/node_modules/osu-parsers/lib/node.cjs",
         // rosu-pp-js 原版在模組載入時就 fs.readFileSync 它的 WASM，Workers 會直接
         // 炸 ReferenceError: __dirname is not defined。指向建置期產生的修補版，
         // 那份只換掉 WASM 載入方式（見 scripts/patch-rosu-wasm.mjs）。

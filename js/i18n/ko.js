@@ -47,7 +47,7 @@ I18N.ko = {
     contact_info_title: '연락처', accent_picker_title: '테마 색상 사용자 지정', accent_picker_custom: '사용자 지정 색상', accent_picker_reset: '기본값으로 재설정',
     notif_pp_changed_detail: '{sign}{delta}pp (현재 {pp}pp)', notif_tournament_new_title: '새 대회 게시글',
     back_to_main: 'Hanabiの小天地로 돌아가기',
-    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식', nav_mapper_tracking: '매퍼 추적', nav_tournaments: '대회', nav_resources: '리소스', nav_bbcode: 'BBCode', nav_feedback: '제안&개선', nav_menu_open: '메뉴 열기', nav_more: '더 보기', nav_menu_title: '메뉴', nav_group_core: '핵심 기능', nav_group_tools: '도구', nav_group_resources: '리소스',
+    nav_collection: '컬렉션', nav_lookup: 'PP 조회', nav_skins: '스킨', nav_updates: '업데이트 소식',  nav_tournaments: '대회', nav_resources: '리소스', nav_bbcode: 'BBCode', nav_feedback: '제안&개선', nav_menu_open: '메뉴 열기', nav_more: '더 보기', nav_menu_title: '메뉴', nav_group_core: '핵심 기능', nav_group_tools: '도구', nav_group_resources: '리소스',
     lang_unspecified: '미지정', lang_english: '영어', lang_japanese: '일본어', lang_chinese: '중국어', lang_instrumental: '연주곡', lang_korean: '한국어', lang_french: '프랑스어', lang_german: '독일어', lang_swedish: '스웨덴어', lang_spanish: '스페인어', lang_italian: '이탈리아어', lang_russian: '러시아어', lang_polish: '폴란드어', lang_other: '기타', lang_unknown: '미표시', osu_lang_filter_all: '모든 언어', stats_dashboard_langs_title: '언어 분포',
     osu_genre_filter_all: '모든 장르', osu_source_filter_all: '모든 출처', osu_source_filter_none: '（출처 없음）', genre_unspecified: '미지정', genre_video_game: '비디오 게임', genre_anime: '애니메이션', genre_rock: '록', genre_pop: '팝', genre_other: '기타', genre_novelty: '노벨티', genre_hiphop: '힙합', genre_electronic: '일렉트로닉', genre_metal: '메탈', genre_classical: '클래식', genre_folk: '포크', genre_jazz: '재즈',
     osu_artist_filter_all: '모든 아티스트',
@@ -101,8 +101,8 @@ I18N.ko = {
     explore_lookup_d: '총 PP, 일별 진행 곡선, 친구와 비교',
     explore_farm_d: '내 랭크대에 맞춘 고 pp farm 맵 목록',
     explore_gallery_d: '다른 사람의 공개 컬렉션을 보고 클릭 한 번으로 가져오기',
-    explore_mapper_d: '좋아하는 매퍼가 새 맵을 ranked 하면 알림',
-    explore_replay_d: '리플레이를 올려 UR, 구간별 기록, pp 확인',
+    
+    
     explore_tourney_d: '공식 포럼 + wyBin의 커뮤니티 대회 정보',
     osu_empty_fav: '즐겨찾기가 없습니다', osu_empty_fav_hint: '♥를 눌러 즐겨찾기에 추가!',
     osu_category_add_prompt: '새 카테고리 이름 입력:', osu_category_rename_prompt: '카테고리 이름 변경:',
@@ -412,13 +412,13 @@ I18N.ko = {
 
     leaderboard_btn: '순위표', leaderboard_title: '추적 중인 플레이어 순위표',
 
-    tracked_mappers_title: '매퍼 추적', tracked_mappers_hint: '매퍼의 osu! 유저명을 입력하면 새 맵이 랭크될 때 알려드립니다.',
-    mapper_track_placeholder: '매퍼 유저명 입력...', mapper_track_btn: '추적',
-    mapper_already_tracked: '이미 이 매퍼를 추적 중입니다', mapper_track_done: '추적 목록에 추가되었습니다. 새 맵이 나오면 알려드릴게요',
+     
+     
+     
     mapper_not_found: '이 osu! 플레이어를 찾을 수 없습니다. 사용자 이름을 확인해 주세요',
-    tracked_mappers_empty: '아직 추적 중인 매퍼가 없습니다', notif_mapper_new_title: '{name} 님이 새 맵을 랭크했습니다',
+     
     notif_achievement_new_title: '{n} 님이 새 메달을 획득했습니다', notif_achievement_detail: '새 메달 {count}개 — 클릭해서 보기',
-    notif_mapper_graveyard_title: '{name} 님의 새 Graveyard 맵', notif_mapper_loved_title: '{name} 님의 맵이 Loved에 등록되었습니다!',
+     
     resources_title: '더 많은 osu! 자료', resources_hint: '직접 만들 필요 없는, 알아두면 좋은 커뮤니티 도구들:',
     h1_bbcode: 'BBCode 편집기', bbcode_note: '전부 브라우저에서 실행되며 어디로도 전송되지 않습니다. 결과를 osu! 프로필/포럼 게시글 편집기에 붙여넣으세요.', bbcode_source: 'BBCode', bbcode_preview: '미리보기', bbcode_copy: 'BBCode 복사', bbcode_clear: '지우기', bbcode_placeholder: '여기에 BBCode를 입력하세요…', bbcode_copied: '복사했습니다!',
     resource_group_find: '맵 찾기', resource_group_stats: '성적 · 통계', resource_group_make: '스킨 · 매핑',
@@ -444,16 +444,16 @@ I18N.ko = {
     grade_history_filter_empty: '이 등급에 해당하는 기록이 없습니다',
     grade_history_filter_all: '전체',
     grade_history_truncated: '최신 {n} / {total}건만 표시',
-    nav_replay_analyze: 'Replay 분석', replay_analyze_title: 'Replay 분석',
-    replay_analyze_hint: '.osr 파일을 업로드하면 성적 요약과 타이밍 오차 분포를 볼 수 있습니다. 서버에서 파일 자체만 분석하며, 영상 렌더링이나 외부 변환 서비스에 의존하지 않습니다.',
-    replay_upload_btn: '.osr 파일 선택', replay_upload_drag_hint: '또는 여기로 파일을 드래그하세요',
-    replay_analyzing: '분석 중...', replay_analyze_fail: '분석 실패 — 유효한 .osr 파일인지 확인해 주세요',
-    replay_no_beatmap_match: 'osu! 데이터베이스에서 이 비트맵을 찾을 수 없습니다 (미랭크 또는 자작 비트맵일 수 있음)',
-    replay_score_summary_title: '성적 요약', replay_recalculated_pp_label: '재계산된 PP',
-    replay_hit_error_title: '타격 타이밍 오차 분포 (근사치)', replay_hit_error_unsupported: '이 모드 또는 이 replay는 타이밍 분석을 지원하지 않습니다',
-    replay_stat_accuracy: '정확도', replay_stat_combo: '최대 콤보', replay_stat_misses: 'Miss 수',
-    replay_stat_mods: 'Mods', replay_stat_rank: '랭크', replay_stat_player: '플레이어',
-    replay_approx_note: '타이밍 오차는 키 입력 시간을 비트맵 노트와 비교해 추정한 값으로, 완전한 판정 재현이 아닌 참고용입니다.',
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     site_howto_title: '각 페이지와 버튼의 기능 설명', site_howto_label: '사용 설명서',
     nav_howto: '사용 설명서',
@@ -556,18 +556,6 @@ I18N.ko = {
                 <p class="howto-tab-desc">자신을 포함한 어떤 플레이어의 PP 상태도 조회하거나, 두 명을 나란히 비교할 수 있습니다.</p>
                 <div class="howto-feat"><b>osu! PP 조회</b><span>유저명이나 ID를 입력해 조회. 결과에는 네 모드 데이터, PP 히스토리 차트, 추적 버튼, "전적 카드 생성"이 포함되며, 아래 탭: 최근 플레이/베스트 성적/PP 목표/메달/성적 히스토리.</span></div>
                 <div class="howto-feat"><b>⚔ 1:1 PP 비교</b><span>두 유저명/ID를 입력하고 "비교" 클릭: 먼저 개요와 겹친 PP 차트를 보고, 아래 "Top Play 비교"에서 두 사람의 베스트 성적을 좌우로 나란히 볼 수 있습니다.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Replay 분석</div>
-                <p class="howto-tab-desc">.osr 파일을 업로드해 성적 세부사항을 확인——완전히 서버 측에서 파일 자체를 분석하며, 영상 변환이나 외부 서비스에 의존하지 않습니다.</p>
-                <div class="howto-feat"><b>업로드</b><span>드래그 앤 드롭하거나 ".osr 파일 선택" 클릭. 업로드 후 성적 요약과 타격 타이밍 분포 차트가 표시됩니다.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 Mapper 추적</div>
-                <p class="howto-tab-desc">좋아하는 mapper가 새 ranked 맵을 낼 때 바로 알림을 받습니다.</p>
-                <div class="howto-feat"><b>추적</b><span>mapper의 osu! 유저명을 입력하고 "추적"을 누릅니다; 목록은 같은 페이지에 표시되며 언제든 해제할 수 있습니다.</span></div>
             </div>
         </div>
 

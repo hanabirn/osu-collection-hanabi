@@ -138,18 +138,6 @@ I18N.en = {
                 <div class="howto-feat"><b>Look up your osu! PP</b><span>Enter a username or ID and search. Results include all-mode stats, a PP history chart, a track button, and "Generate stats card"; tabs below: recent plays / top plays / PP goal / medals / grade history.</span></div>
                 <div class="howto-feat"><b>⚔ Two-player comparison</b><span>Fill in two usernames/IDs and click Compare: see an overview and overlaid PP charts first, then "Top play comparison" lists both players' best scores side by side below.</span></div>
             </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">Replay Analysis</div>
-                <p class="howto-tab-desc">Upload an .osr file to see score details — parsed entirely server-side, no video conversion or third-party service involved.</p>
-                <div class="howto-feat"><b>Upload</b><span>Drag and drop, or click "Choose .osr file" — shows a score summary and a hit-timing distribution chart afterward.</span></div>
-            </div>
-
-            <div class="howto-tab">
-                <div class="howto-tab-title">🎨 Track Mappers</div>
-                <p class="howto-tab-desc">Get notified the moment a mapper you like ranks a new map.</p>
-                <div class="howto-feat"><b>Track</b><span>Enter the mapper's osu! username and click Track; the list shows on the same page and can be untracked anytime.</span></div>
-            </div>
         </div>
 
         <div class="howto-group" id="howto-resources">
@@ -203,7 +191,7 @@ I18N.en = {
     contact_info_title: 'Contact info', accent_picker_title: 'Customise accent colour', accent_picker_custom: 'Custom colour', accent_picker_reset: 'Reset to default',
     notif_pp_changed_detail: '{sign}{delta}pp (now {pp}pp)', notif_tournament_new_title: 'New tournament post',
     back_to_main: 'Back to Hanabiの小天地',
-    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News', nav_mapper_tracking: 'Tracked Mappers', nav_tournaments: 'Tournaments', nav_resources: 'Resources', nav_bbcode: 'BBCode', nav_feedback: 'Suggestions', nav_menu_open: 'Open menu', nav_more: 'More', nav_menu_title: 'Menu', nav_group_core: 'Core', nav_group_tools: 'Tools', nav_group_resources: 'Resources',
+    nav_collection: 'Collection', nav_lookup: 'PP Lookup', nav_skins: 'Skins', nav_updates: 'News',  nav_tournaments: 'Tournaments', nav_resources: 'Resources', nav_bbcode: 'BBCode', nav_feedback: 'Suggestions', nav_menu_open: 'Open menu', nav_more: 'More', nav_menu_title: 'Menu', nav_group_core: 'Core', nav_group_tools: 'Tools', nav_group_resources: 'Resources',
     lang_unspecified: 'Unspecified', lang_english: 'English', lang_japanese: 'Japanese', lang_chinese: 'Chinese', lang_instrumental: 'Instrumental', lang_korean: 'Korean', lang_french: 'French', lang_german: 'German', lang_swedish: 'Swedish', lang_spanish: 'Spanish', lang_italian: 'Italian', lang_russian: 'Russian', lang_polish: 'Polish', lang_other: 'Other', lang_unknown: 'Unlabeled', osu_lang_filter_all: 'All languages', stats_dashboard_langs_title: 'Language mix',
     osu_genre_filter_all: 'All genres', osu_source_filter_all: 'All sources', osu_source_filter_none: '(No source)', genre_unspecified: 'Unspecified', genre_video_game: 'Video Game', genre_anime: 'Anime', genre_rock: 'Rock', genre_pop: 'Pop', genre_other: 'Other', genre_novelty: 'Novelty', genre_hiphop: 'Hip Hop', genre_electronic: 'Electronic', genre_metal: 'Metal', genre_classical: 'Classical', genre_folk: 'Folk', genre_jazz: 'Jazz',
     osu_artist_filter_all: 'All artists',
@@ -247,8 +235,8 @@ I18N.en = {
     explore_lookup_d: 'Your total PP, a daily progress curve, compare with friends',
     explore_farm_d: 'A high-pp farm-map list tuned to your bracket',
     explore_gallery_d: 'Browse public collections, import one with a click',
-    explore_mapper_d: 'Get notified when a mapper you like ranks a new map',
-    explore_replay_d: 'Upload a replay for UR, per-section stats, pp',
+    
+    
     explore_tourney_d: 'Community tournaments from the forum + wyBin',
     osu_empty_fav: 'No favorites yet', osu_empty_fav_hint: 'Click ♥ on beatmaps to add favorites!',
     osu_category_add_prompt: 'Enter new category name:', osu_category_rename_prompt: 'Rename category:',
@@ -559,13 +547,13 @@ I18N.en = {
 
     leaderboard_btn: 'Leaderboard', leaderboard_title: 'Tracked Players Leaderboard',
 
-    tracked_mappers_title: 'Tracked Mappers', tracked_mappers_hint: "Enter a mapper's osu! username — you'll be notified when they rank a new map.",
-    mapper_track_placeholder: "Enter mapper's username...", mapper_track_btn: 'Track',
-    mapper_already_tracked: "You're already tracking this mapper", mapper_track_done: "Tracking added — you'll be notified about new maps",
+     
+     
+     
     mapper_not_found: "Couldn't find that osu! player — check the username",
-    tracked_mappers_empty: "You're not tracking any mappers yet", notif_mapper_new_title: '{name} ranked a new map',
+     
     notif_achievement_new_title: '{n} earned a new medal', notif_achievement_detail: '{count} new medal(s) — click to view',
-    notif_mapper_graveyard_title: '{name} has a new graveyard map', notif_mapper_loved_title: "{name}'s map got Loved!",
+     
     resources_title: 'More osu! Resources', resources_hint: "A few community tools worth knowing about — no need to reinvent them here:",
     h1_bbcode: 'BBCode Editor', bbcode_note: 'Runs entirely in your browser — nothing is sent anywhere. Copy the result into your osu! profile/forum post editor.', bbcode_source: 'BBCode', bbcode_preview: 'Preview', bbcode_copy: 'Copy BBCode', bbcode_clear: 'Clear', bbcode_placeholder: 'Write your BBCode here…', bbcode_copied: 'Copied!',
     resource_group_find: 'Finding maps', resource_group_stats: 'Stats & tracking', resource_group_make: 'Skins & mapping',
@@ -591,16 +579,16 @@ I18N.en = {
     grade_history_filter_empty: 'No records match this grade',
     grade_history_filter_all: 'All',
     grade_history_truncated: 'Showing the latest {n} of {total}',
-    nav_replay_analyze: 'Replay Analyzer', replay_analyze_title: 'Replay Analyzer',
-    replay_analyze_hint: 'Upload a .osr file to see a score summary and hit-timing chart. Parsed entirely on the server from the file itself — no video rendering, no third-party render service.',
-    replay_upload_btn: 'Choose .osr file', replay_upload_drag_hint: 'or drop a file here',
-    replay_analyzing: 'Analyzing...', replay_analyze_fail: 'Analysis failed — make sure the file is a valid .osr',
-    replay_no_beatmap_match: "Couldn't find this beatmap in osu!'s database — it may be unranked or a custom map",
-    replay_score_summary_title: 'Score Summary', replay_recalculated_pp_label: 'Recalculated PP',
-    replay_hit_error_title: 'Hit timing distribution (approximate)', replay_hit_error_unsupported: 'Hit-timing analysis isn\'t supported for this mode or replay',
-    replay_stat_accuracy: 'Accuracy', replay_stat_combo: 'Max Combo', replay_stat_misses: 'Misses',
-    replay_stat_mods: 'Mods', replay_stat_rank: 'Rank', replay_stat_player: 'Player',
-    replay_approx_note: "Hit timing is estimated by matching key presses to nearby beatmap notes — it's not a full judgement replay, just a reference.",
+     
+    
+     
+     
+    
+     
+     
+      
+      
+    
 
     fc_sim_btn: 'FC sim', fc_sim_btn_title: 'Estimate PP if this map were FC\'d',
     fc_sim_popover_title: 'PP if FC', fc_sim_loading: 'Calculating...', fc_sim_error: 'Calculation failed, please try again later',

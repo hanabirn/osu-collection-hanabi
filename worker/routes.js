@@ -1,5 +1,5 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
- * 端點數: 60
+ * 端點數: 58
  * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
  *       Discord 3 個（延後）、死程式碼 1 個
  */
@@ -40,7 +40,6 @@ const ROUTES = {
     "osu-beatmapset": adapt(require('../netlify/functions/osu-beatmapset').handler),
     "osu-callback": adapt(require('../netlify/functions/osu-callback').handler),
     "osu-login": adapt(require('../netlify/functions/osu-login').handler),
-    "osu-mapper-status": adapt(require('../netlify/functions/osu-mapper-status').handler),
     "osu-news": adapt(require('../netlify/functions/osu-news').handler),
     "osu-pp": adapt(require('../netlify/functions/osu-pp').handler),
     "osu-pp-history": adapt(require('../netlify/functions/osu-pp-history').handler),
@@ -50,7 +49,6 @@ const ROUTES = {
     "osu-user-beatmapsets": adapt(require('../netlify/functions/osu-user-beatmapsets').handler),
     "push-config": adapt(require('../netlify/functions/push-config').handler),
     "push-subscribe": adapt(require('../netlify/functions/push-subscribe').handler),
-    "replay-analyze": adapt(require('../netlify/functions/replay-analyze').handler),
     "site-likes": adapt(require('../netlify/functions/site-likes').handler),
     "skin-screenshots-delete": adapt(require('../netlify/functions/skin-screenshots-delete').handler),
     "skin-screenshots-download": adapt(require('../netlify/functions/skin-screenshots-download').handler),
