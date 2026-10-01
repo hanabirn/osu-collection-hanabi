@@ -13,40 +13,12 @@
 [functions."osu-pp"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
 
-[functions."farm-crawl-cron"]
-  schedule = "*/10 * * * *"
-  included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
-
-# Web Push: re-check every subscriber's tracked players every 30 min and
-# send a push when PP moved. Inert until the VAPID_* env vars are set.
-[functions."push-cron"]
-  schedule = "*/30 * * * *"
-
-# Ranked-catalog metadata crawler (artist / language / genre / source index
-# for the Catalog tab) — one search page per loop, all rulesets in one pass,
-# see netlify/functions/_catalog-crawl-core.js. Every 30 min: the dataset is
-# already ~55k sets and only needs to keep pace with newly-ranked maps now.
-[functions."catalog-crawl-cron"]
-  schedule = "*/30 * * * *"
-
-# Official World Cup mappool index (OWC / TWC / MWC 4K+7K / CWC, every year),
-# parsed from the ppy/osu-wiki markdown — see netlify/functions/_wc-mappools-core.js.
-# Weekly: the data is ~annual and hash-compared, so most runs are a no-op.
-# Use wc-mappool-crawl-run.js (WC_MAPPOOL_CRAWL_SECRET) to force the initial fill.
-[functions."wc-mappool-crawl-cron"]
-  schedule = "0 6 * * 1"
-
-# 社群賽圖分享: auto-create community pools from wyBin tournaments that have
-# filled their pool in wyBin's own system — see crawlWybinMappools() in
-# _community-mappools-shared.js. Cursor-paged over wyBin's ~110-tournament
-# list, ~12/run, every 6h => a full sweep in roughly a day. Never touches an
-# existing pool. Kick a faster sweep via community-mappools-crawl-run.js
-# (WYBIN_MAPPOOL_CRAWL_SECRET).
-[functions."community-mappools-crawl-cron"]
-  schedule = "0 */6 * * *"
-
-[functions."farm-crawl-run"]
-  included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
+# No scheduled functions here any more. This Netlify copy is only the
+# rollback for osu.hanabirn.xyz (Cloudflare Workers) and the osu! API relay
+# (osu-relay.js), and its crons were still running on their own data and
+# credits: the catalog crawler now runs from GitHub Actions, and push /
+# community-mappools / wc-mappool run as the Worker's scheduled handler
+# (wrangler.jsonc). The *-cron.js files stay, the Worker imports them.
 
 [functions."replay-analyze"]
   included_files = ["netlify/functions/node_modules/rosu-pp-js/*.wasm"]
