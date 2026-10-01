@@ -50,7 +50,7 @@ I18N.zh = {
     digest_title: '為你更新', digest_pp: 'PP {d}（自 {from}）', digest_notifs: '{n} 則新消息',
     digest_practice: '{name} {d}pp · {hits}/{total} 進 top 100',
     digest_on_this_day: '{years} 年前的今天，你收藏了「{title}」',
-    digest_logged_out: '登入後這裡會顯示你的 PP 變化，以及追蹤玩家與 mapper 的動態',
+    digest_logged_out: '登入後這裡會顯示你的 PP 變化，以及追蹤玩家的動態',
     digest_welcome: '歡迎，{name}！已幫你追蹤自己，PP 有變化會通知你',
     digest_welcome_import: '一鍵匯入最愛 / 常玩',
     digest_streak: '連續 {n} 天有進步 🔥',
@@ -498,7 +498,7 @@ I18N.zh = {
             <div class="howto-feat"><b>加到主畫面</b><span>左上角，僅支援的瀏覽器顯示。把網站安裝成一個 App 圖示，離線時仍可開啟基本畫面。</span></div>
             <div class="howto-feat"><b>網站有更新</b><span>左上角／畫面下方浮動條，偵測到新版本時才會出現，點一下就重新載入拿到最新版本。</span></div>
             <div class="howto-feat"><b>全站搜尋</b><span>右上角放大鏡，或按 <b>/</b>、<b>Ctrl+K</b>。同時查「個人收藏」「曲庫分類」「世界盃圖池」三個資料庫。點收藏的結果會直接翻到那張圖所在的頁面並標示出來；曲庫的結果會依曲名篩選並標示那一張；圖池的結果會打開那一屆。</span></div>
-            <div class="howto-feat"><b>通知鈴鐺</b><span>右上角。追蹤的玩家 PP 變化、追蹤的 mapper 出新圖、私訊未讀等都會出現在這裡；有開啟推播的話，沒開網頁也收得到。</span></div>
+            <div class="howto-feat"><b>通知鈴鐺</b><span>右上角。追蹤的玩家 PP 變化、私訊未讀等都會出現在這裡；有開啟推播的話，沒開網頁也收得到。</span></div>
             <div class="howto-feat"><b>osu! 登入</b><span>右上角。用你的 osu! 帳號登入——聊天室發言、私訊、發布收藏到廣場、雲端備份皮膚、一鍵帶入最愛/常玩，這些都需要先登入。</span></div>
             <div class="howto-feat"><b>語言切換</b><span>右上角地球圖示，支援繁中／简中／英／日／韓／俄／法／西／德，選了會記住。</span></div>
             <div class="howto-feat"><b>☰ 選單</b><span>右上角，手機版主要導覽，列出全部分頁清單；桌面版寬螢幕會直接顯示常用分頁列，不用開選單。</span></div>

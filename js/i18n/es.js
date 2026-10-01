@@ -90,7 +90,7 @@ I18N.es = {
     digest_notifs: '{n} novedades',
     digest_practice: '{name} {d}pp · {hits}/{total} en tu top 100',
     digest_on_this_day: 'Hace {years} año(s), añadiste "{title}"',
-    digest_logged_out: 'Inicia sesión y aquí verás tus cambios de PP y la actividad de jugadores / mappers seguidos',
+    digest_logged_out: 'Inicia sesión y aquí verás tus cambios de PP y la actividad de jugadores seguidos',
     digest_welcome: '¡Bienvenido, {name}! Ahora te sigues a ti mismo — te avisaremos cuando cambie tu PP',
     digest_welcome_import: 'Importar favoritos / más jugados',
     digest_streak: '{n} días seguidos mejorando 🔥',
@@ -469,7 +469,7 @@ I18N.es = {
             <div class="howto-feat"><b>Añadir a inicio</b><span>Arriba a la izquierda, solo donde el navegador lo soporta. Instala el sitio como icono de app con una pantalla básica sin conexión.</span></div>
             <div class="howto-feat"><b>Actualización disponible</b><span>Arriba a la izquierda / barra flotante abajo, solo aparece con una versión nueva — haz clic para recargar.</span></div>
             <div class="howto-feat"><b>Búsqueda global</b><span>Lupa arriba a la derecha, o pulsa <b>/</b> o <b>Ctrl+K</b>. Busca en tu colección, el catálogo y los mappools del Mundial a la vez. Un resultado de la colección abre la página con ese mapa y lo resalta; uno del catálogo filtra por título y resalta ese mapa; uno de mappool abre esa edición.</span></div>
-            <div class="howto-feat"><b>Campana de notificaciones</b><span>Arriba a la derecha. Cambios de PP de jugadores seguidos, nuevos mapas de mappers seguidos, mensajes sin leer, etc. — con notificaciones push activadas, las recibes incluso con el sitio cerrado.</span></div>
+            <div class="howto-feat"><b>Campana de notificaciones</b><span>Arriba a la derecha. Cambios de PP de jugadores seguidos, mensajes sin leer, etc. — con notificaciones push activadas, las recibes incluso con el sitio cerrado.</span></div>
             <div class="howto-feat"><b>Inicio de sesión osu!</b><span>Arriba a la derecha. Inicia sesión con tu cuenta osu! — chatear, mensajes directos, publicar en la galería, respaldo de skins en la nube, e importar favoritos/más jugados con un clic requieren esto primero.</span></div>
             <div class="howto-feat"><b>Cambio de idioma</b><span>Icono de globo arriba a la derecha — 9 idiomas disponibles, se recuerda tu elección.</span></div>
             <div class="howto-feat"><b>Menú ☰</b><span>Arriba a la derecha, la navegación principal en móvil con todas las pestañas. En pantallas anchas de escritorio las pestañas comunes se muestran directamente.</span></div>

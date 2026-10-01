@@ -90,7 +90,7 @@ I18N.de = {
     digest_notifs: '{n} Neuigkeiten',
     digest_practice: '{name} {d}pp · {hits}/{total} in deinen Top 100',
     digest_on_this_day: 'Heute vor {years} Jahr(en) hast du „{title}" hinzugefügt',
-    digest_logged_out: 'Melde dich an, dann zeigt dies deine PP-Änderungen und die Aktivität verfolgter Spieler / Mapper',
+    digest_logged_out: 'Melde dich an, dann zeigt dies deine PP-Änderungen und die Aktivität verfolgter Spieler',
     digest_welcome: 'Willkommen, {name}! Du verfolgst jetzt dich selbst — wir benachrichtigen dich bei PP-Änderungen',
     digest_welcome_import: 'Favoriten / meistgespielte importieren',
     digest_streak: '{n} Tage in Folge verbessert 🔥',
@@ -469,7 +469,7 @@ I18N.de = {
             <div class="howto-feat"><b>Zum Startbildschirm hinzufügen</b><span>Oben links, nur bei unterstützten Browsern sichtbar. Installiert die Website als App-Symbol mit einfacher Offline-Ansicht.</span></div>
             <div class="howto-feat"><b>Website-Update verfügbar</b><span>Oben links / eine schwebende Leiste unten, erscheint nur bei einer neuen Version — anklicken zum Neuladen.</span></div>
             <div class="howto-feat"><b>Websiteweite Suche</b><span>Lupe oben rechts, oder <b>/</b> bzw. <b>Ctrl+K</b> drücken. Durchsucht gleichzeitig deine Sammlung, den Katalog und die Weltmeisterschafts-Mappools. Ein Sammlungstreffer öffnet die Seite mit dieser Map und hebt sie hervor; ein Katalogtreffer filtert nach Titel und hebt die Map hervor; ein Mappool-Treffer öffnet diese Ausgabe.</span></div>
-            <div class="howto-feat"><b>Benachrichtigungsglocke</b><span>Oben rechts. PP-Änderungen verfolgter Spieler, neue Karten verfolgter Mapper, ungelesene Nachrichten usw. erscheinen hier — mit aktivierten Push-Benachrichtigungen auch ohne geöffnete Seite.</span></div>
+            <div class="howto-feat"><b>Benachrichtigungsglocke</b><span>Oben rechts. PP-Änderungen verfolgter Spieler, ungelesene Nachrichten usw. erscheinen hier — mit aktivierten Push-Benachrichtigungen auch ohne geöffnete Seite.</span></div>
             <div class="howto-feat"><b>osu!-Login</b><span>Oben rechts. Mit deinem osu!-Konto anmelden — Chat, Nachrichten, Veröffentlichen in der Galerie, Cloud-Skin-Backup und One-Klick-Import von Favoriten/meistgespielten Karten benötigen das zuerst.</span></div>
             <div class="howto-feat"><b>Sprachumschalter</b><span>Globus-Symbol oben rechts — 9 Sprachen verfügbar, die Wahl wird gespeichert.</span></div>
             <div class="howto-feat"><b>☰ Menü</b><span>Oben rechts, die Hauptnavigation auf Mobilgeräten mit allen Tabs. Auf breiten Desktop-Bildschirmen werden die häufigen Tabs direkt angezeigt.</span></div>

@@ -90,7 +90,7 @@ I18N.fr = {
     digest_notifs: '{n} nouveautés',
     digest_practice: '{name} {d}pp · {hits}/{total} dans ton top 100',
     digest_on_this_day: 'Il y a {years} an(s) jour pour jour, tu as ajouté « {title} »',
-    digest_logged_out: 'Connecte-toi et cet encart affichera tes variations de PP et l’activité des joueurs / mappeurs suivis',
+    digest_logged_out: 'Connecte-toi et cet encart affichera tes variations de PP et l’activité des joueurs suivis',
     digest_welcome: 'Bienvenue, {name} ! Tu te suis maintenant toi-même — on te préviendra quand ton PP change',
     digest_welcome_import: 'Importer favoris / plus jouées',
     digest_streak: '{n} jours de progression d’affilée 🔥',
@@ -469,7 +469,7 @@ I18N.fr = {
             <div class="howto-feat"><b>Ajouter à l'écran d'accueil</b><span>En haut à gauche, visible seulement si le navigateur le permet. Installe le site comme une icône d'app avec un écran hors-ligne basique.</span></div>
             <div class="howto-feat"><b>Mise à jour disponible</b><span>En haut à gauche / une barre flottante en bas, apparaît seulement quand une nouvelle version est détectée — clique pour recharger.</span></div>
             <div class="howto-feat"><b>Recherche globale</b><span>Loupe en haut à droite, ou appuie sur <b>/</b> ou <b>Ctrl+K</b>. Cherche à la fois dans ta collection, le catalogue et les mappools de Coupe du monde. Un résultat de la collection ouvre la page qui contient cette map et la met en évidence ; un résultat du catalogue filtre par titre et met la map en évidence ; un résultat de mappool ouvre cette édition.</span></div>
-            <div class="howto-feat"><b>Cloche de notifications</b><span>En haut à droite. Changements de PP des joueurs suivis, nouvelles cartes des mappers suivis, messages non lus, etc. apparaissent ici — avec les notifications push activées, tu les reçois même site fermé.</span></div>
+            <div class="howto-feat"><b>Cloche de notifications</b><span>En haut à droite. Changements de PP des joueurs suivis, messages non lus, etc. apparaissent ici — avec les notifications push activées, tu les reçois même site fermé.</span></div>
             <div class="howto-feat"><b>Connexion osu!</b><span>En haut à droite. Connecte-toi avec ton compte osu! — chat, messages privés, publication dans la galerie, sauvegarde cloud de skins, et import en un clic des favoris/plus joués nécessitent ça d'abord.</span></div>
             <div class="howto-feat"><b>Changement de langue</b><span>Icône globe en haut à droite — 9 langues disponibles, mémorisées après le choix.</span></div>
             <div class="howto-feat"><b>Menu ☰</b><span>En haut à droite, la navigation principale sur mobile listant tous les onglets. Sur un grand écran de bureau, les onglets courants s'affichent directement.</span></div>

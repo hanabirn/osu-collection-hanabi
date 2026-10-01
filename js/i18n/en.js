@@ -48,7 +48,7 @@ I18N.en = {
             <div class="howto-feat"><b>Add to home screen</b><span>Top-left, only shown where the browser supports it. Installs the site as an app icon with a basic offline screen.</span></div>
             <div class="howto-feat"><b>Site update available</b><span>Top-left / a floating bar at the bottom, only appears when a new version is detected — click it to reload.</span></div>
             <div class="howto-feat"><b>Global search</b><span>Top-right magnifier, or press <b>/</b> or <b>Ctrl+K</b>. Searches your collection, the catalog, and World Cup mappools at once. A collection result opens the page holding that map and highlights it; a catalog result filters by title and highlights that map; a mappool result opens that edition.</span></div>
-            <div class="howto-feat"><b>Notification bell</b><span>Top-right. Tracked players' PP changes, tracked mappers' new maps, unread DMs, etc. show up here — with push notifications on, you'll get them even with the site closed.</span></div>
+            <div class="howto-feat"><b>Notification bell</b><span>Top-right. Tracked players' PP changes, unread DMs, etc. show up here — with push notifications on, you'll get them even with the site closed.</span></div>
             <div class="howto-feat"><b>osu! login</b><span>Top-right. Sign in with your osu! account — chatting, DMs, publishing to the gallery, cloud skin backup, and one-click favorites/most-played import all need this first.</span></div>
             <div class="howto-feat"><b>Language switch</b><span>Top-right globe icon — 9 languages supported, remembered after you pick one.</span></div>
             <div class="howto-feat"><b>☰ Menu</b><span>Top-right, the main nav on mobile, listing every tab. On a wide desktop screen the common tabs show directly, no need to open it.</span></div>
@@ -224,7 +224,7 @@ I18N.en = {
     digest_title: 'Since you were away', digest_pp: 'PP {d} (since {from})', digest_notifs: '{n} new updates',
     digest_practice: '{name} {d}pp · {hits}/{total} in your top 100',
     digest_on_this_day: '{years} year(s) ago today, you added "{title}"',
-    digest_logged_out: 'Log in and this shows your PP changes and tracked player / mapper activity',
+    digest_logged_out: 'Log in and this shows your PP changes and tracked player activity',
     digest_welcome: 'Welcome, {name}! You’re now tracking yourself — we’ll notify you when your PP changes',
     digest_welcome_import: 'Import favourites / most-played',
     digest_streak: '{n}-day improvement streak 🔥',

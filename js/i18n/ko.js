@@ -90,7 +90,7 @@ I18N.ko = {
     digest_notifs: '새 소식 {n}건',
     digest_practice: '{name} {d}pp · {hits}/{total} top 100 진입',
     digest_on_this_day: '{years}년 전 오늘, "{title}"을(를) 추가했어요',
-    digest_logged_out: '로그인하면 PP 변화와 추적 중인 플레이어 / 매퍼 활동이 여기에 표시됩니다',
+    digest_logged_out: '로그인하면 PP 변화와 추적 중인 플레이어 활동이 여기에 표시됩니다',
     digest_welcome: '환영합니다, {name}님! 자신을 추적에 추가했습니다 — PP가 변하면 알려드릴게요',
     digest_welcome_import: '즐겨찾기 / 자주 플레이 가져오기',
     digest_streak: '{n}일 연속 상승 🔥',
@@ -469,7 +469,7 @@ I18N.ko = {
             <div class="howto-feat"><b>홈 화면에 추가</b><span>왼쪽 위, 지원하는 브라우저에서만 표시. 사이트를 앱 아이콘으로 설치해 오프라인에서도 기본 화면을 열 수 있습니다.</span></div>
             <div class="howto-feat"><b>사이트 업데이트</b><span>왼쪽 위 / 화면 하단 플로팅 바. 새 버전이 감지될 때만 나타나며, 클릭하면 새로고침됩니다.</span></div>
             <div class="howto-feat"><b>전체 검색</b><span>오른쪽 위 돋보기, 또는 <b>/</b> 나 <b>Ctrl+K</b>. 내 컬렉션·곡 분류·월드컵 맵풀을 동시에 검색합니다. 컬렉션 결과는 그 비트맵이 있는 페이지를 열어 강조하고, 곡 분류 결과는 곡명으로 걸러 그 비트맵을 강조하며, 맵풀 결과는 해당 대회를 엽니다.</span></div>
-            <div class="howto-feat"><b>알림 벨</b><span>오른쪽 위. 추적 중인 플레이어의 PP 변화, 추적 중인 mapper의 신곡, 읽지 않은 DM 등이 여기 표시되며, 푸시 알림을 켜두면 사이트를 열지 않아도 받을 수 있습니다.</span></div>
+            <div class="howto-feat"><b>알림 벨</b><span>오른쪽 위. 추적 중인 플레이어의 PP 변화, 읽지 않은 DM 등이 여기 표시되며, 푸시 알림을 켜두면 사이트를 열지 않아도 받을 수 있습니다.</span></div>
             <div class="howto-feat"><b>osu! 로그인</b><span>오른쪽 위. osu! 계정으로 로그인——채팅 발언, DM, 갤러리에 컬렉션 발행, 스킨 클라우드 백업, 즐겨찾기/자주 플레이 원클릭 가져오기는 모두 로그인이 필요합니다.</span></div>
             <div class="howto-feat"><b>언어 전환</b><span>오른쪽 위 지구본 아이콘, 9개 언어 지원, 선택한 언어는 기억됩니다.</span></div>
             <div class="howto-feat"><b>☰ 메뉴</b><span>오른쪽 위, 모바일의 메인 내비게이션으로 전체 탭 목록을 표시. 넓은 데스크톱 화면에서는 자주 쓰는 탭이 바로 표시되어 메뉴를 열 필요가 없습니다.</span></div>
