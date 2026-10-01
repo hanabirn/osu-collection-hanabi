@@ -316,6 +316,7 @@
                             <span class="osu-tool-group-label" data-i18n="tools_group_tools">工具・設定</span>
                             <div class="osu-tool-group-btns">
                                 <button class="osu-refresh-all" onclick="refreshAllOsuSets()" data-i18n-title="osu_refresh_all_title" title="重新抓取所有圖的最新資料（星數、狀態）" data-icon="refreshCw"></button>
+                                <button class="osu-refresh-all" onclick="openYearRecapModal()" data-i18n-title="recap_btn_title" title="收藏年度回顧" data-icon="calendar"></button>
                                 <button class="osu-refresh-all" onclick="openFriendCompareModal()" data-i18n-title="fc_btn_title" title="和朋友比對收藏" data-icon="repeat"></button>
                                 <button class="osu-refresh-all" onclick="openStatsDashboardModal()" data-i18n-title="stats_dashboard_btn_title" title="看收藏的星數 / 模式 / mapper 分佈圖表" data-icon="barChart3"></button>
                                 <button class="osu-refresh-all" onclick="openCollectionToolsModal()" data-i18n-title="ctools_btn_title" title="從你的 osu! 帳號生成分類，並做健康檢查" data-icon="sparkles"></button>
@@ -1145,6 +1146,18 @@
     </div>
 </div>
 
+<div id="year-recap-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeYearRecapModal()">
+    <div class="pp-calc-modal year-recap-modal" role="dialog" aria-labelledby="year-recap-heading">
+        <button class="pp-calc-close" onclick="closeYearRecapModal()" data-icon="x"></button>
+        <h3 class="pp-calc-title" id="year-recap-heading" data-i18n="recap_btn_title">收藏年度回顧</h3>
+        <div class="year-recap-controls">
+            <select id="year-recap-year" onchange="renderYearRecap(this.value)" data-i18n-title="recap_year_label" title="年份"></select>
+            <button class="btn" id="year-recap-download" onclick="downloadYearRecapCard()" data-icon="download" data-icon-gap><span data-i18n="recap_download">下載圖卡</span></button>
+        </div>
+        <div id="year-recap-body"></div>
+    </div>
+</div>
+
 <!-- Last on purpose: it opens on top of the gallery detail modal, and Esc
      closes the last open overlay in document order. -->
 <div id="friend-compare-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeFriendCompareModal()">
@@ -1228,6 +1241,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/public-collections.js"></script>
 <script defer src="js/gallery-comments.js"></script>
 <script defer src="js/friend-compare.js"></script>
+<script defer src="js/year-recap.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>

@@ -1018,7 +1018,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     border-color: var(--accent-light-purple);
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
 }
-.osu-search-row select {
+.osu-search-row select,
+.year-recap-controls select {
     flex: 0 1 auto;
     width: auto;
     min-width: 124px;
@@ -1032,7 +1033,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     font-family: inherit;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
-.osu-search-row select:focus {
+.osu-search-row select:focus,
+.year-recap-controls select:focus {
     outline: none;
     border-color: var(--accent-light-purple);
     box-shadow: 0 0 15px rgba(192,132,252,0.25);
@@ -5339,3 +5341,83 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .fc-grid .card-add-btn { opacity: 1; width: 28px; height: 28px; top: 5px; left: 5px; }
 .fc-pagination { margin-top: 12px; }
+
+/* ===== 收藏年度回顧 (js/year-recap.js) ===== */
+#year-recap-modal .pp-calc-modal { max-width: 620px; }
+.year-recap-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.recap-card {
+    box-sizing: border-box;
+    padding: 24px 22px 16px;
+    border-radius: 18px;
+    background:
+        radial-gradient(120% 80% at 100% 0%, rgba(244, 114, 182, 0.28), transparent 60%),
+        radial-gradient(90% 70% at 0% 100%, rgba(192, 132, 252, 0.22), transparent 60%),
+        #15111d;
+    border: 1px solid rgba(244, 114, 182, 0.35);
+    color: #f4f2f7;
+    font-family: 'Segoe UI', 'Noto Sans TC', 'Noto Sans JP', sans-serif;
+}
+/* The copy html-to-image rasterises: fixed width, kept inside the viewport
+   but behind everything (see .share-card for why not off-screen). */
+.recap-card.recap-card--export {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -9999;
+    width: 560px;
+    pointer-events: none;
+    border-radius: 0;
+}
+.recap-head { text-align: center; margin-bottom: 14px; }
+.recap-kicker { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #f9a8d4; }
+.recap-title { font-size: 1.45rem; font-weight: 800; margin-top: 2px; }
+.recap-user { font-size: 0.82rem; color: rgba(244, 242, 247, 0.62); margin-top: 2px; }
+.recap-hero { text-align: center; margin-bottom: 16px; }
+.recap-big { font-size: 3.4rem; font-weight: 800; line-height: 1; color: #f472b6; }
+.recap-big-label { font-size: 0.85rem; color: rgba(244, 242, 247, 0.7); margin-top: 4px; }
+.recap-delta { display: inline-block; margin-top: 8px; padding: 2px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
+.recap-delta.up { background: rgba(52, 211, 153, 0.16); color: #34d399; }
+.recap-delta.down { background: rgba(248, 113, 113, 0.16); color: #f87171; }
+.recap-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.recap-tile { padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); min-width: 0; }
+.recap-tile-value { font-size: 0.98rem; font-weight: 700; overflow-wrap: anywhere; }
+.recap-tile-label { font-size: 0.72rem; color: rgba(244, 242, 247, 0.55); margin-top: 2px; }
+.recap-section { margin-bottom: 16px; min-width: 0; }
+.recap-section-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; color: #f9a8d4; margin-bottom: 8px; }
+.recap-months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; align-items: end; }
+.recap-month { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.recap-month-count { font-size: 0.62rem; color: rgba(244, 242, 247, 0.6); height: 14px; }
+.recap-month-track { width: 100%; height: 70px; display: flex; align-items: flex-end; }
+.recap-month-bar { width: 100%; border-radius: 4px 4px 2px 2px; background: rgba(244, 114, 182, 0.45); }
+.recap-month.top .recap-month-bar { background: #f472b6; }
+.recap-month-label { font-size: 0.6rem; color: rgba(244, 242, 247, 0.55); margin-top: 4px; white-space: nowrap; overflow: hidden; max-width: 100%; }
+.recap-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.recap-cols > :only-child { grid-column: 1 / -1; }
+.recap-artist { position: relative; display: flex; align-items: center; gap: 8px; padding: 4px 6px; margin-bottom: 4px; font-size: 0.82rem; }
+.recap-artist-bar { position: absolute; left: 0; top: 0; bottom: 0; z-index: 0; border-radius: 6px; background: rgba(192, 132, 252, 0.16); }
+.recap-artist > span { position: relative; z-index: 1; }
+.recap-rank { width: 14px; color: #f9a8d4; font-weight: 700; flex: none; }
+.recap-artist-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recap-artist-count { color: rgba(244, 242, 247, 0.6); flex: none; }
+.recap-lang-bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: rgba(255, 255, 255, 0.06); margin-bottom: 8px; }
+.recap-lang-bar span { display: block; height: 100%; }
+.recap-lang-legend { display: flex; flex-direction: column; gap: 4px; }
+.recap-lang { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; min-width: 0; }
+.recap-lang i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.recap-lang b { margin-left: auto; font-weight: 700; color: rgba(244, 242, 247, 0.75); }
+.recap-songs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.recap-song { padding: 8px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.recap-song-label { font-size: 0.7rem; color: rgba(244, 242, 247, 0.55); }
+.recap-song-name { font-size: 0.86rem; font-weight: 600; overflow-wrap: anywhere; }
+.recap-stars { color: #fbbf24; letter-spacing: 1px; }
+.recap-footer { text-align: center; font-size: 0.68rem; color: rgba(244, 242, 247, 0.4); }
+@media (max-width: 520px) {
+    .recap-cols { grid-template-columns: 1fr; gap: 0; }
+    .recap-big { font-size: 2.8rem; }
+}
