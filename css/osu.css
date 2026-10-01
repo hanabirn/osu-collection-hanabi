@@ -748,6 +748,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     flex-direction: column;
     align-items: center;
     gap: 6px;
+    max-width: 100%;
 }
 .osu-tool-group-label {
     font-size: 0.68rem;
@@ -755,9 +756,16 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     text-transform: uppercase;
     color: var(--text-dim2);
 }
+/* Wraps: the tools row has ten buttons, wider than the sidebar card. */
 .osu-tool-group-btns {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 8px;
+}
+/* Ten tool buttons: five a row (5 + 5) instead of 8 + 2. */
+.osu-tool-group--tools .osu-tool-group-btns {
+    max-width: calc(5 * 30px + 4 * 8px);
 }
 
 /* "怎麼用？" walkthrough inside the deeper modals (.db export, ✨ tools) */
