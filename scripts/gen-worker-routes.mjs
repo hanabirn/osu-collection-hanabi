@@ -24,6 +24,9 @@ const DEFERRED_DISCORD = new Set([
     'practice-generate', // 只有 discord-work-background 會呼叫
 ]);
 const DEAD = new Set(['preview-proxy']);
+/* 只給 Netlify 用：Worker 打 osu.ppy.sh 被擋時經它轉送（見 osu-relay.js），
+   Worker 自己掛這條路由沒有意義。 */
+const NETLIFY_ONLY = new Set(['osu-relay']);
 
 const files = (await readdir(FN_DIR)).filter((f) => f.endsWith('.js'));
 
@@ -33,6 +36,7 @@ const names = files
     .filter((n) => !n.endsWith('-cron'))
     .filter((n) => !DEFERRED_DISCORD.has(n))
     .filter((n) => !DEAD.has(n))
+    .filter((n) => !NETLIFY_ONLY.has(n))
     .sort();
 
 /* 全部排程都已可在 Workers 上執行。push-cron 曾因 web-push 依賴

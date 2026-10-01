@@ -20,6 +20,8 @@ import rosuWasmModule from '../netlify/functions/node_modules/rosu-pp-js/rosu_pp
 globalThis.__ROSU_WASM_MODULE__ = rosuWasmModule;
 
 const { runWithEnv } = require('../netlify/functions/_cf-env');
+/* 要在任何函式發出請求前裝好：對 osu.ppy.sh 的 fetch 改經 Netlify 轉送。 */
+require('./osu-relay-fetch').install();
 const { ROUTES, CRON_HANDLERS } = require('./routes');
 const {
     EXPENSIVE_MS,
