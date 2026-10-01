@@ -198,6 +198,12 @@ function onChangelogMenuOutsideClick(e) {
 function onChangelogMenuEscape(e) {
     if (e.key === 'Escape') toggleChangelogMenu(false);
 }
+/* Items are { lang: text } (see site-changelog-data.js); plain strings are
+   shown as-is. */
+function changelogItemText(item) {
+    if (typeof item === 'string') return item;
+    return item[siteLang] || item.en || item.zh || '';
+}
 function renderChangelogMenu() {
     const menu = document.getElementById('site-changelog-menu');
     if (!menu) return;
@@ -210,7 +216,7 @@ function renderChangelogMenu() {
         <div class="changelog-entry">
             <div class="changelog-entry-date">${escHtml(entry.date)}</div>
             <ul class="changelog-entry-list">
-                ${entry.items.map(item => `<li>${escHtml(item)}</li>`).join('')}
+                ${entry.items.map(item => `<li>${escHtml(changelogItemText(item))}</li>`).join('')}
             </ul>
         </div>`).join('');
 }
@@ -236,6 +242,7 @@ function refreshDynamicContent() {
     if (typeof refreshMappoolsLocalized === 'function') refreshMappoolsLocalized();
     if (typeof refreshGamesLocalized === 'function') refreshGamesLocalized();
     if (typeof refreshTrendingLocalized === 'function') refreshTrendingLocalized();
+    if (typeof renderChangelogMenu === 'function') renderChangelogMenu();
 }
 
 /* ===== Keyboard shortcuts =====

@@ -1,27 +1,130 @@
 /* Manually maintained release notes for the header's 更新內容 dropdown
    (see toggleChangelogMenu()/renderChangelogMenu() in js/main.js). Add one
-   new entry here whenever a user-visible change ships — newest first, plain
-   zh-Hant, no dev jargon or internal filenames. Skip internal-only work
-   (refactors, crawler tuning, infra) that a visitor wouldn't notice. */
+   new entry here whenever a user-visible change ships — newest first, no dev
+   jargon or internal filenames. Skip internal-only work (refactors, crawler
+   tuning, infra) that a visitor wouldn't notice.
+   Each item is { lang: text } for the site's 9 languages; the menu shows
+   the current language, falling back to en, then zh. A plain string still
+   works (shown as-is in every language). */
 const SITE_CHANGELOG = [
     {
         date: '2026-09-25',
         items: [
-            '網站搬新家了，網址改成 osu.hanabirn.xyz（舊網址會自動轉過來）',
-            '如果你之前把網站加到主畫面，請移除舊的重新加一次，才能正常登入',
-            '「Farm 圖」與「小遊戲」已下架',
-            '「曲庫分類」開始收錄 loved 圖，不再只有 ranked',
-            '調色盤選到很亮或很暗的顏色時，文字不會再看不見',
-            '修正「更新內容」選單會被標題蓋住的問題',
-            '修正今日推薦的音樂長條沒有貼齊底部、蓋到曲名的問題',
-            '修正「曲庫分類」的播放按鈕沒有置中的問題',
+            {
+                zh: '網站搬新家了，網址改成 osu.hanabirn.xyz（舊網址會自動轉過來）',
+                'zh-Hans': '网站搬新家了，网址改成 osu.hanabirn.xyz（旧网址会自动转过来）',
+                en: 'The site has moved to osu.hanabirn.xyz (the old address redirects automatically)',
+                ja: 'サイトが引っ越しました。新しいアドレスは osu.hanabirn.xyz です（旧アドレスは自動で転送されます）',
+                ko: '사이트가 이사했습니다. 새 주소는 osu.hanabirn.xyz 입니다 (이전 주소는 자동으로 연결됩니다)',
+                de: 'Die Seite ist umgezogen: neue Adresse osu.hanabirn.xyz (die alte leitet automatisch weiter)',
+                es: 'El sitio se ha mudado a osu.hanabirn.xyz (la dirección antigua redirige automáticamente)',
+                fr: 'Le site a déménagé à osu.hanabirn.xyz (l’ancienne adresse redirige automatiquement)',
+                ru: 'Сайт переехал на osu.hanabirn.xyz (старый адрес перенаправляет автоматически)',
+            },
+            {
+                zh: '如果你之前把網站加到主畫面，請移除舊的重新加一次，才能正常登入',
+                'zh-Hans': '如果你之前把网站加到主屏幕，请移除旧的重新添加一次，才能正常登录',
+                en: 'If you added the site to your home screen before, remove it and add it again so login works',
+                ja: '以前ホーム画面に追加していた場合は、一度削除して追加し直してください（ログインのため）',
+                ko: '이전에 홈 화면에 추가했다면 삭제 후 다시 추가해야 로그인이 정상적으로 됩니다',
+                de: 'Wenn du die Seite zum Startbildschirm hinzugefügt hast, entferne sie und füge sie neu hinzu, damit der Login funktioniert',
+                es: 'Si añadiste el sitio a la pantalla de inicio, quítalo y vuelve a añadirlo para poder iniciar sesión',
+                fr: 'Si vous aviez ajouté le site à l’écran d’accueil, supprimez-le puis ajoutez-le à nouveau pour pouvoir vous connecter',
+                ru: 'Если вы добавляли сайт на главный экран, удалите его и добавьте заново, чтобы вход работал',
+            },
+            {
+                zh: '「Farm 圖」與「小遊戲」已下架',
+                'zh-Hans': '「Farm 图」与「小游戏」已下架',
+                en: '"Farm Maps" and "Mini-games" have been removed',
+                ja: '「Farm 譜面」と「ミニゲーム」は終了しました',
+                ko: '「Farm 맵」과 「미니게임」이 종료되었습니다',
+                de: '„Farm-Maps“ und „Minispiele“ wurden entfernt',
+                es: 'Se han retirado «Mapas para farmear» y «Minijuegos»',
+                fr: '« Maps à farmer » et « Mini-jeux » ont été retirés',
+                ru: 'Разделы «Фарм-карты» и «Мини-игры» удалены',
+            },
+            {
+                zh: '「曲庫分類」開始收錄 loved 圖，不再只有 ranked',
+                'zh-Hans': '「曲库分类」开始收录 loved 图，不再只有 ranked',
+                en: 'The Catalog now includes loved maps, not just ranked ones',
+                ja: '「楽曲カタログ」に ranked だけでなく loved 譜面も収録されるようになりました',
+                ko: '「곡 카탈로그」에 ranked뿐 아니라 loved 맵도 수록됩니다',
+                de: 'Der Katalog enthält jetzt auch Loved-Maps, nicht nur Ranked',
+                es: 'El catálogo ahora incluye mapas loved, no solo ranked',
+                fr: 'Le catalogue inclut désormais les maps loved, pas seulement les ranked',
+                ru: 'В каталоге теперь есть и loved-карты, а не только ranked',
+            },
+            {
+                zh: '調色盤選到很亮或很暗的顏色時，文字不會再看不見',
+                'zh-Hans': '调色盘选到很亮或很暗的颜色时，文字不会再看不见',
+                en: 'Text stays readable when you pick a very light or very dark theme colour',
+                ja: 'テーマカラーにとても明るい色や暗い色を選んでも、文字が見えなくならないようになりました',
+                ko: '테마 색상을 아주 밝거나 어둡게 골라도 글자가 안 보이지 않습니다',
+                de: 'Text bleibt lesbar, auch wenn du eine sehr helle oder sehr dunkle Themenfarbe wählst',
+                es: 'El texto sigue siendo legible aunque elijas un color de tema muy claro o muy oscuro',
+                fr: 'Le texte reste lisible même avec une couleur de thème très claire ou très sombre',
+                ru: 'Текст остаётся читаемым при очень светлом или очень тёмном цвете темы',
+            },
+            {
+                zh: '修正「更新內容」選單會被標題蓋住的問題',
+                'zh-Hans': '修正「更新内容」菜单会被标题盖住的问题',
+                en: 'Fixed the "Updates" menu being covered by the title',
+                ja: '「更新内容」メニューがタイトルに隠れてしまう問題を修正しました',
+                ko: '「업데이트 내용」 메뉴가 제목에 가려지는 문제를 수정했습니다',
+                de: 'Behoben: Das Menü „Neuigkeiten“ wurde vom Titel verdeckt',
+                es: 'Corregido: el menú «Novedades» quedaba tapado por el título',
+                fr: 'Corrigé : le menu « Nouveautés » était masqué par le titre',
+                ru: 'Исправлено: меню «Обновления» перекрывалось заголовком',
+            },
+            {
+                zh: '修正今日推薦的音樂長條沒有貼齊底部、蓋到曲名的問題',
+                'zh-Hans': '修正今日推荐的音乐长条没有贴齐底部、盖到曲名的问题',
+                en: 'Fixed the music bars in today\'s pick not sitting at the bottom and covering the song title',
+                ja: '今日のおすすめの音楽バーが下に揃わず曲名に重なる問題を修正しました',
+                ko: '오늘의 추천에서 음악 막대가 아래에 붙지 않고 곡명을 가리던 문제를 수정했습니다',
+                de: 'Behoben: Die Musikbalken beim Tagestipp saßen nicht unten und verdeckten den Songtitel',
+                es: 'Corregido: las barras de música de la recomendación del día no quedaban abajo y tapaban el título',
+                fr: 'Corrigé : les barres musicales de la sélection du jour n’étaient pas en bas et masquaient le titre',
+                ru: 'Исправлено: музыкальные полосы в «Выборе дня» не прилегали к низу и закрывали название',
+            },
+            {
+                zh: '修正「曲庫分類」的播放按鈕沒有置中的問題',
+                'zh-Hans': '修正「曲库分类」的播放按钮没有居中的问题',
+                en: 'Fixed the play button in the Catalog not being centred',
+                ja: '「楽曲カタログ」の再生ボタンが中央に来ない問題を修正しました',
+                ko: '「곡 카탈로그」의 재생 버튼이 가운데에 오지 않던 문제를 수정했습니다',
+                de: 'Behoben: Der Abspielknopf im Katalog war nicht zentriert',
+                es: 'Corregido: el botón de reproducir del catálogo no estaba centrado',
+                fr: 'Corrigé : le bouton lecture du catalogue n’était pas centré',
+                ru: 'Исправлено: кнопка воспроизведения в каталоге была не по центру',
+            },
         ],
     },
     {
         date: '2026-09-13',
         items: [
-            '「收藏」卡片的語言標籤改放到右下角、難度色徽章旁邊',
-            '預覽播放的音樂視覺化長條變多了，會更明顯跟著節奏跳動',
+            {
+                zh: '「收藏」卡片的語言標籤改放到右下角、難度色徽章旁邊',
+                'zh-Hans': '「收藏」卡片的语言标签改放到右下角、难度色徽章旁边',
+                en: 'Collection cards now show the language tag at the bottom right, next to the difficulty badges',
+                ja: '「コレクション」カードの言語タグを右下の難易度バッジの隣に移動しました',
+                ko: '「컬렉션」 카드의 언어 태그를 오른쪽 아래 난이도 배지 옆으로 옮겼습니다',
+                de: 'Sammlungskarten zeigen das Sprach-Tag jetzt unten rechts neben den Schwierigkeits-Badges',
+                es: 'Las tarjetas de la colección muestran ahora la etiqueta de idioma abajo a la derecha, junto a las insignias de dificultad',
+                fr: 'Les cartes de la collection affichent désormais l’étiquette de langue en bas à droite, à côté des badges de difficulté',
+                ru: 'На карточках коллекции метка языка теперь справа внизу, рядом со значками сложности',
+            },
+            {
+                zh: '預覽播放的音樂視覺化長條變多了，會更明顯跟著節奏跳動',
+                'zh-Hans': '预览播放的音乐可视化长条变多了，会更明显地跟着节奏跳动',
+                en: 'The preview player has more visualiser bars that bounce more clearly with the beat',
+                ja: 'プレビュー再生のビジュアライザーのバーが増え、リズムに合わせてよりはっきり動くようになりました',
+                ko: '미리듣기 비주얼라이저 막대가 늘어나 리듬에 맞춰 더 뚜렷하게 움직입니다',
+                de: 'Die Vorschau hat mehr Visualizer-Balken, die deutlicher im Takt springen',
+                es: 'La vista previa tiene más barras de visualización que saltan con el ritmo de forma más clara',
+                fr: 'L’aperçu affiche plus de barres de visualisation qui suivent le rythme plus nettement',
+                ru: 'В превью больше полос визуализатора, и они заметнее прыгают в такт',
+            },
         ],
     },
 ];
