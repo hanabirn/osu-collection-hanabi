@@ -6,6 +6,7 @@
 const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const { setLocale, t } = require('./_discord-i18n');
+const { sanitizeOsuSet } = require('./_osu-set-sanitize');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 
@@ -135,20 +136,30 @@ exports.handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) };
     }
 
-    const collection = body && body.collection;
-    if (!collection || !OSU_MODES.every(m => Array.isArray(collection[m]))) {
+    const rawCollection = body && body.collection;
+    if (!rawCollection || !OSU_MODES.every(m => Array.isArray(rawCollection[m]))) {
         return { statusCode: 422, headers, body: JSON.stringify({ error: 'Invalid collection format' }) };
     }
+    const rawCount = OSU_MODES.reduce((n, m) => n + rawCollection[m].length, 0);
+    if (rawCount > MAX_SETS * 2) {
+        return { statusCode: 413, headers, body: JSON.stringify({ error: `Collection exceeds the ${MAX_SETS}-beatmap limit` }) };
+    }
 
+    /* Everything stored is rebuilt by sanitizeOsuSet (see _osu-set-sanitize.js):
+       this collection is served to everyone who opens or imports it, and the
+       text fields used to be stored exactly as sent. Malformed sets are
+       dropped rather than failing the whole publish. */
+    const collection = {};
     const seen = new Set();
     let maxRating = 0;
     let ratingSum = 0;
     let ratingCount = 0;
     for (const mode of OSU_MODES) {
-        for (const set of collection[mode]) {
-            if (typeof set.beatmapset_id !== 'number' || !Array.isArray(set.beatmaps)) {
-                return { statusCode: 422, headers, body: JSON.stringify({ error: 'Invalid collection format' }) };
-            }
+        collection[mode] = [];
+        for (const raw of rawCollection[mode]) {
+            const set = sanitizeOsuSet(raw);
+            if (!set) continue;
+            collection[mode].push(set);
             seen.add(set.beatmapset_id);
             for (const bm of set.beatmaps) {
                 if (typeof bm.difficulty_rating === 'number') {
@@ -186,11 +197,12 @@ exports.handler = async (event) => {
             return { statusCode: 413, headers, body: JSON.stringify({ error: `Exceeds the ${MAX_CATEGORIES}-category limit` }) };
         }
         for (const cat of body.categories) {
-            if (typeof cat.id !== 'string' || typeof cat.name !== 'string' || !cat.id || !cat.name) {
+            if (!cat || typeof cat.id !== 'string' || typeof cat.name !== 'string' || !cat.id || !cat.name.trim()) {
                 return { statusCode: 422, headers, body: JSON.stringify({ error: 'Invalid categories format' }) };
             }
         }
-        categories = body.categories.map(c => ({ id: c.id, name: c.name }));
+        // Names show up as gallery tags and in the Discord announcement.
+        categories = body.categories.map(c => ({ id: c.id.slice(0, 64), name: c.name.trim().slice(0, 60) }));
         const validIds = new Set(categories.map(c => c.id));
         for (const [categoryId, memberIds] of Object.entries(body.categoryMembers)) {
             if (!validIds.has(categoryId) || !Array.isArray(memberIds)) continue;
