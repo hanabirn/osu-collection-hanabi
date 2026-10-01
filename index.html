@@ -246,7 +246,7 @@
             <div class="hero-banner-tools">
                 <input type="range" class="hero-banner-pos" id="hero-banner-pos" min="0" max="100" step="1" value="30" oninput="setHeroBannerPosition(this.value)" data-i18n-title="hero_banner_position" title="橫幅位置" hidden>
                 <button type="button" class="hero-banner-btn" id="hero-banner-reset" onclick="resetHeroBanner()" data-icon="cornerUpLeft" data-i18n-title="hero_banner_reset" title="恢復預設橫幅" hidden></button>
-                <button type="button" class="hero-banner-btn" onclick="document.getElementById('hero-banner-file').click()" data-icon="camera" data-i18n-title="hero_banner_change" title="更換橫幅"></button>
+                <button type="button" class="hero-banner-btn hero-banner-btn--label" onclick="document.getElementById('hero-banner-file').click()" data-icon="camera" data-icon-gap><span data-i18n="hero_banner_change">更換橫幅</span></button>
                 <input type="file" id="hero-banner-file" accept="image/*" hidden onchange="onHeroBannerFile(this)">
             </div>
             <p class="eyebrow">MY COLLECTION</p>
