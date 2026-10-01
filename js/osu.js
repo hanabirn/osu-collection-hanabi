@@ -622,6 +622,12 @@ function osuSetMaxRating(set) {
 }
 
 function sortOsuSets(sets) {
+    if (osuSortMode === 'my-rating-desc') {
+        // Unrated sets keep their order after the rated ones (sort is stable).
+        const notes = getOsuSetNotes();
+        const r = s => (notes[s.beatmapset_id] ? notes[s.beatmapset_id].rating : 0);
+        return [...sets].sort((a, b) => r(b) - r(a));
+    }
     if (osuSortMode === 'rating-desc') return [...sets].sort((a, b) => osuSetMaxRating(b) - osuSetMaxRating(a));
     if (osuSortMode === 'rating-asc') return [...sets].sort((a, b) => osuSetMaxRating(a) - osuSetMaxRating(b));
     return sets;
@@ -1438,6 +1444,7 @@ function exportOsuCollection() {
         favorites: getOsuFavorites(),
         categories: getOsuCategories(),
         categoryMembers: getOsuCategoryMembers(),
+        notes: osuNotesForCollection(getOsuCollection()),
         exportedAt: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1507,6 +1514,8 @@ async function importOsuCollection(event) {
         const { categories, categoryMembers } = sanitizeImportedCategoryData(data.collection, rawCategories, rawMembers);
         saveOsuCategories(categories);
         saveOsuCategoryMembers(categoryMembers);
+        // Backups from before notes existed have no field: keep the current ones.
+        if (data.notes) saveOsuSetNotes({ ...getOsuSetNotes(), ...sanitizeOsuNotes(data.notes) });
 
         renderOsuCollection();
         showShareToast(t('osu_import_done'));
@@ -2578,6 +2587,7 @@ async function shareOsuCollectionLink() {
             collection: col,
             categories: getOsuCategories(),
             categoryMembers: getOsuCategoryMembers(),
+            notes: osuNotesForCollection(col),
         });
         const url = `${location.origin}${location.pathname}#import=${encoded}`;
         await navigator.clipboard.writeText(url);
@@ -2665,6 +2675,8 @@ async function checkImportFromHash() {
         // simply won't have this field — mergeIncomingCategories no-ops on
         // an empty/missing array, so this stays backward compatible.
         mergeIncomingCategories(data.categories, data.categoryMembers);
+        // Merge like the collection: a note this device already has wins.
+        if (data.notes) saveOsuSetNotes({ ...sanitizeOsuNotes(data.notes), ...getOsuSetNotes() });
         renderOsuCollection();
         showShareToast(t('osu_share_link_imported', { n: added }));
     } catch (e) {
@@ -3479,16 +3491,172 @@ function updateCollectionHeroV2() {
     if (heroCoverAllowed()) armHeroCover(hero, layers);
 }
 
+/* ===== 筆記與評分 — a private 1-5 star rating and note per set =====
+   Kept under its own key rather than on the set objects, so publishing a
+   collection to 收藏廣場 never carries them. JSON export/import and the
+   own-device share link do. Removing a set leaves its entry behind, so
+   adding the song back brings the note back. */
+const OSU_NOTES_KEY = 'osu_set_notes';
+const OSU_NOTE_MAX = 500;
+function getOsuSetNotes() {
+    try {
+        const v = JSON.parse(localStorage.getItem(OSU_NOTES_KEY));
+        return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+    } catch { return {}; }
+}
+function saveOsuSetNotes(notes) {
+    localStorage.setItem(OSU_NOTES_KEY, JSON.stringify(notes));
+}
+/* Normalises one entry (from storage, an import or the editor); null when
+   there's nothing worth keeping. */
+function cleanOsuNoteEntry(e) {
+    if (!e || typeof e !== 'object') return null;
+    const r = Math.round(Number(e.rating));
+    const rating = r >= 1 && r <= 5 ? r : 0;
+    const note = typeof e.note === 'string' ? e.note.trim().slice(0, OSU_NOTE_MAX) : '';
+    if (!rating && !note) return null;
+    return { rating, note, updatedAt: typeof e.updatedAt === 'string' ? e.updatedAt : new Date().toISOString() };
+}
+function sanitizeOsuNotes(raw) {
+    const out = {};
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+    for (const [id, e] of Object.entries(raw)) {
+        if (!/^\d+$/.test(id)) continue;
+        const clean = cleanOsuNoteEntry(e);
+        if (clean) out[id] = clean;
+    }
+    return out;
+}
+/* Notes for the sets currently in the collection — what export/share carry. */
+function osuNotesForCollection(col) {
+    const ids = new Set(OSU_MODES.flatMap(m => (col[m] || []).map(s => String(s.beatmapset_id))));
+    const notes = getOsuSetNotes();
+    return Object.fromEntries(Object.entries(notes).filter(([id]) => ids.has(id)));
+}
+
+function osuStarsText(rating) {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+}
+/* Bottom-right pill on a card: ★n and/or a pencil when there's a note; the
+   note itself is the tooltip. Opens the editor. */
+function osuNoteBadgeHtml(setId, entry) {
+    if (!entry) return '';
+    const tip = [entry.rating ? osuStarsText(entry.rating) : '', entry.note].filter(Boolean).join('\n');
+    return `<button class="osu-note-badge" onclick="openOsuNoteModal(${setId}, event)" data-tip="${escHtml(tip)}" aria-label="${escHtml(t('osu_note_btn_title'))}">${entry.rating ? `${icon('star', { filled: true })}<span>${entry.rating}</span>` : ''}${entry.note ? icon('pencil') : ''}</button>`;
+}
+
+let osuNoteEditingId = null;
+let osuNoteDraftRating = 0;
+function renderOsuNoteStars() {
+    const wrap = document.getElementById('osu-note-stars');
+    if (!wrap) return;
+    wrap.setAttribute('aria-label', t('osu_note_rating_label'));
+    wrap.innerHTML = [1, 2, 3, 4, 5].map(n => {
+        const on = n <= osuNoteDraftRating;
+        const label = t('osu_note_star_label', { n });
+        return `<button type="button" class="osu-note-star${on ? ' on' : ''}" role="radio" aria-checked="${n === osuNoteDraftRating}" aria-label="${escHtml(label)}" title="${escHtml(label)}" onclick="setOsuNoteDraftRating(${n})">${icon('star', { filled: on })}</button>`;
+    }).join('');
+}
+/* Clicking the current rating again clears it. */
+function setOsuNoteDraftRating(n) {
+    osuNoteDraftRating = osuNoteDraftRating === n ? 0 : n;
+    renderOsuNoteStars();
+}
+function updateOsuNoteCount() {
+    const ta = document.getElementById('osu-note-text');
+    const el = document.getElementById('osu-note-count');
+    if (ta && el) el.textContent = `${ta.value.length} / ${OSU_NOTE_MAX}`;
+}
+function openOsuNoteModal(setId, event) {
+    if (event) event.stopPropagation();
+    const col = getOsuCollection();
+    const set = OSU_MODES.flatMap(m => col[m]).find(s => s.beatmapset_id === setId);
+    const modal = document.getElementById('osu-note-modal');
+    if (!set || !modal) return;
+    const entry = getOsuSetNotes()[setId] || null;
+    osuNoteEditingId = setId;
+    osuNoteDraftRating = entry ? entry.rating : 0;
+    document.getElementById('osu-note-song').textContent = `${set.artist} - ${set.title}`;
+    const ta = document.getElementById('osu-note-text');
+    ta.value = entry ? entry.note : '';
+    renderOsuNoteStars();
+    updateOsuNoteCount();
+    modal.style.display = 'flex';
+    ta.focus();
+}
+function closeOsuNoteModal() {
+    const modal = document.getElementById('osu-note-modal');
+    if (modal) modal.style.display = 'none';
+    osuNoteEditingId = null;
+}
+/* Stores (or, for an empty entry, removes) the edited set's entry. */
+async function writeOsuNote(entry) {
+    const setId = osuNoteEditingId;
+    if (setId == null || !await verifyOsuPassword()) return;
+    const notes = getOsuSetNotes();
+    const clean = cleanOsuNoteEntry(entry);
+    if (clean) notes[setId] = clean;
+    else delete notes[setId];
+    saveOsuSetNotes(notes);
+    closeOsuNoteModal();
+    renderOsuCollection();
+    showShareToast(t(clean ? 'osu_note_saved' : 'osu_note_cleared'));
+}
+function saveOsuNoteFromModal() {
+    const note = document.getElementById('osu-note-text').value;
+    return writeOsuNote({ rating: osuNoteDraftRating, note, updatedAt: new Date().toISOString() });
+}
+function clearOsuNoteFromModal() {
+    return writeOsuNote(null);
+}
+
+/* 評分 filter: 'all' | '5' | '4' | '3' | '2' (at least n) | 'rated' |
+   'unrated' | 'noted'. The select only shows once some set in view has an
+   entry. */
+let osuRatingFilter = 'all';
+function switchOsuRatingFilter(v) {
+    osuRatingFilter = v;
+    osuPage = 0;
+    renderOsuCollection();
+}
+function renderOsuRatingFilterOptions(sets, notes) {
+    const sel = document.getElementById('osu-rating-filter');
+    if (!sel) return;
+    const any = sets.some(s => notes[s.beatmapset_id]);
+    sel.style.display = any || osuRatingFilter !== 'all' ? '' : 'none';
+    const opts = [
+        ['all', t('osu_rating_filter_all')],
+        ['5', '★5'],
+        ...[4, 3, 2].map(n => [String(n), t('osu_rating_filter_atleast', { n })]),
+        ['rated', t('osu_rating_filter_rated')],
+        ['unrated', t('osu_rating_filter_unrated')],
+        ['noted', t('osu_rating_filter_noted')],
+    ];
+    sel.innerHTML = opts.map(([v, label]) => `<option value="${v}">${escHtml(label)}</option>`).join('');
+    sel.value = osuRatingFilter;
+}
+function osuRatingFilterMatch(entry) {
+    const rating = entry ? entry.rating : 0;
+    switch (osuRatingFilter) {
+        case 'all': return true;
+        case 'rated': return rating > 0;
+        case 'unrated': return rating === 0;
+        case 'noted': return !!(entry && entry.note);
+        default: return rating >= Number(osuRatingFilter);
+    }
+}
+
 /* One cover-wall tile: osu!'s square list@2x cover; title/artist and the
    preview button show on hover (always on touch screens, see css). The
    card view's other actions stay in the card view. */
-function osuWallTileHtml(set, isFav, hardestDiff) {
+function osuWallTileHtml(set, isFav, hardestDiff, noteEntry) {
     const id = set.beatmapset_id;
     const label = `${set.artist} - ${set.title}`;
     return `
         <div class="osu-wall-tile" data-set-id="${id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${id}','_blank')" title="${escHtml(label)}">
             <img class="osu-wall-tile-cover" src="https://assets.ppy.sh/beatmaps/${id}/covers/list@2x.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">
             ${isFav ? `<span class="osu-wall-tile-fav" aria-hidden="true">${icon('heart', { filled: true })}</span>` : ''}
+            ${noteEntry && noteEntry.rating ? `<span class="osu-wall-tile-rating">${icon('star', { filled: true })}${noteEntry.rating}</span>` : ''}
             <button class="osu-play-btn" onclick="playOsuPreview(${id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}"${osuPreviewBeatStyle(hardestDiff.bpm)}>${playBtnIcon()}</button>
             <div class="osu-wall-tile-info">
                 <div class="osu-wall-tile-title">${escHtml(set.title)}</div>
@@ -3552,12 +3720,14 @@ function renderOsuCollection() {
         }).map(s => ({ ...s, __mode: osuCurrentTab }));
     }
 
+    const notes = getOsuSetNotes();
     if (osuSearchQuery) {
         const q = osuSearchQuery.toLowerCase();
         sets = sets.filter(s =>
             s.title.toLowerCase().includes(q) ||
             s.artist.toLowerCase().includes(q) ||
-            s.creator.toLowerCase().includes(q)
+            s.creator.toLowerCase().includes(q) ||
+            (notes[s.beatmapset_id] && notes[s.beatmapset_id].note.toLowerCase().includes(q))
         );
     }
 
@@ -3568,6 +3738,7 @@ function renderOsuCollection() {
     renderOsuGenreFilterOptions(sets);
     renderOsuSourceFilterOptions(sets);
     renderOsuArtistFilterOptions(sets);
+    renderOsuRatingFilterOptions(sets, notes);
     if (osuLangFilter === 'unknown') {
         sets = sets.filter(s => !s.language);
     } else if (osuLangFilter !== 'all') {
@@ -3585,6 +3756,9 @@ function renderOsuCollection() {
     }
     if (osuArtistFilter !== 'all') {
         sets = sets.filter(s => artistKeys(s.artist).includes(osuArtistFilter));
+    }
+    if (osuRatingFilter !== 'all') {
+        sets = sets.filter(s => osuRatingFilterMatch(notes[s.beatmapset_id]));
     }
 
     sets = sortOsuSets(sets);
@@ -3653,7 +3827,8 @@ function renderOsuCollection() {
         // hasn't been backfilled yet shows 🌐 未標記 until it fills in.
         const langLabel = osuLangName(set) || t('lang_unknown');
         const langBadge = `<span class="osu-lang-badge" data-tip="${escHtml(langLabel)}">${set.language ? osuLangFlag(set) : '🌐'} ${escHtml(langLabel)}</span>`;
-        if (wall) return header + osuWallTileHtml(set, isFav, hardestDiff);
+        const noteEntry = notes[set.beatmapset_id] || null;
+        if (wall) return header + osuWallTileHtml(set, isFav, hardestDiff, noteEntry);
         return header + `
         <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
@@ -3662,6 +3837,7 @@ function renderOsuCollection() {
             <div class="osu-card-actions">
                 <button class="osu-fav-btn ${isFav ? 'active' : ''}" onclick="toggleOsuFavorite(${set.beatmapset_id}, event)" title="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}" aria-label="${isFav ? t('osu_unfav_btn_title') : t('osu_fav_btn_title')}">${icon('heart', { filled: isFav })}</button>
                 <button class="osu-category-btn" onclick="toggleCategoryPicker(${set.beatmapset_id}, event)" title="${t('osu_category_btn_title')}" aria-label="${t('osu_category_btn_title')}">${icon('tag')}</button>
+                <button class="osu-note-btn${noteEntry ? ' active' : ''}" onclick="openOsuNoteModal(${set.beatmapset_id}, event)" title="${t('osu_note_btn_title')}" aria-label="${t('osu_note_btn_title')}">${icon('star', { filled: !!(noteEntry && noteEntry.rating) })}</button>
                 <button class="osu-ppcalc-btn" onclick="openPpCalcModal(${set.beatmapset_id}, event)" title="${t('pp_calc_btn_title')}" aria-label="${t('pp_calc_btn_title')}">${icon('barChart3')}</button>
                 <span class="osu-card-actions-sep" aria-hidden="true"></span>
                 <button class="osu-copy-btn" onclick="copyBeatmapId(${set.beatmapset_id}, event)" title="${t('mappools_copy_id')}" aria-label="${t('mappools_copy_id')}">${icon('copy')}</button>
@@ -3670,7 +3846,7 @@ function renderOsuCollection() {
                 <span class="osu-card-actions-sep" aria-hidden="true"></span>
                 <button class="osu-delete-btn" onclick="event.stopPropagation();removeOsuSet(${set.beatmapset_id})" title="${t('osu_delete_btn_title')}" aria-label="${t('osu_delete_btn_title')}">${icon('x')}</button>
             </div>
-            <div class="osu-card-lang-corner">${langBadge}</div>
+            <div class="osu-card-lang-corner">${osuNoteBadgeHtml(set.beatmapset_id, noteEntry)}${langBadge}</div>
             <div class="osu-card-mode-badge"><span class="mode-diff-icon" title="${escHtml((starsMin === starsMax ? `${starsMax.toFixed(2)} ⭐` : `${starsMin.toFixed(2)}~${starsMax.toFixed(2)} ⭐`) + (diffMode(hardestDiff) === 'mania' && hardestDiff.key_count ? ` [${Math.round(hardestDiff.key_count)}K]` : ''))}" onclick="event.stopPropagation();window.open('${diffUrl(hardestDiff.beatmap_id, diffMode(hardestDiff))}','_blank')" style="cursor:pointer">${modeIconSvg(diffMode(hardestDiff), starRatingColor(starsMax))}</span></div>
             <div class="osu-play-status" id="play-status-${set.beatmapset_id}" style="display:none;"></div>
             <div class="osu-card-info">

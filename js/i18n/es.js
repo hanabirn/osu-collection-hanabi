@@ -173,6 +173,7 @@ I18N.es = {
     osu_search_placeholder: 'Buscar por título o artista...', osu_search_empty: 'No se encontraron beatmaps',
     osu_sort_default: 'Orden predeterminado', osu_sort_rating_desc: 'Estrellas (mayor a menor)', osu_sort_rating_asc: 'Estrellas (menor a mayor)',
     osu_view_label: 'Vista', osu_view_cards: 'Tarjetas', osu_view_wall: 'Muro de portadas', osu_group_label: 'Agrupar', osu_group_none: 'Sin agrupar', osu_group_artist: 'Por artista', 
+    osu_note_btn_title: 'Nota y valoración', osu_note_title: 'Nota y valoración', osu_note_rating_label: 'Mi valoración', osu_note_star_label: '{n} estrellas', osu_note_placeholder: '¿Por qué guardaste esta canción? Escribe lo que quieras…', osu_note_save: 'Guardar', osu_note_clear: 'Borrar', osu_note_saved: 'Nota y valoración guardadas', osu_note_cleared: 'Nota y valoración borradas', osu_rating_filter_all: 'Todas las valoraciones', osu_rating_filter_atleast: '★{n} o más', osu_rating_filter_rated: 'Valoradas', osu_rating_filter_unrated: 'Sin valorar', osu_rating_filter_noted: 'Con nota', osu_sort_my_rating: 'Mi valoración (de mayor a menor)',
     osu_group_others: 'Otros artistas (1 canción cada uno)',
     pp_history_title: 'Evolución del PP', pp_history_empty: 'Aún no hay suficiente historial — vuelve más tarde para ver la tendencia.',
     osu_stats_total: 'Total recopilado', osu_stats_avg_rating: 'Dificultad media', osu_stats_max_rating: 'Dificultad máx.',

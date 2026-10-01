@@ -5187,3 +5187,109 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 @media (max-width: 900px) {
     .bbcode-editor { grid-template-columns: 1fr; }
 }
+
+/* ===== 筆記與評分 (openOsuNoteModal in js/osu.js) ===== */
+.osu-card-actions .osu-note-btn.active { color: var(--accent-yellow); }
+.osu-card-actions .osu-note-btn.active:hover { color: #fff; }
+.osu-card-lang-corner { gap: 6px; }
+.osu-note-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    flex: none;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(10, 10, 16, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--accent-yellow);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.4;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.osu-note-badge .icon-svg { width: 11px; height: 11px; }
+.osu-note-badge:hover { border-color: rgba(251, 191, 36, 0.6); }
+.osu-wall-tile-rating {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgba(10, 10, 16, 0.8);
+    color: var(--accent-yellow);
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+.osu-wall-tile-rating .icon-svg { width: 10px; height: 10px; }
+.osu-note-song {
+    margin: -4px 0 12px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+}
+.osu-note-stars {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+.osu-note-star {
+    display: flex;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--text-dim2);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.12s var(--ease-out), color 0.12s;
+}
+.osu-note-star .icon-svg { width: 28px; height: 28px; }
+.osu-note-star.on { color: var(--accent-yellow); }
+.osu-note-star:hover { transform: scale(1.12); }
+.osu-note-star:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 1px; }
+.osu-note-text {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 96px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    resize: vertical;
+}
+.osu-note-text:focus {
+    outline: none;
+    border-color: var(--accent-light-purple);
+}
+.osu-note-count {
+    margin-top: 4px;
+    text-align: right;
+    font-size: 0.72rem;
+    color: var(--text-dim2);
+}
+.osu-note-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+.osu-note-actions .osu-note-clear-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+@media (prefers-reduced-motion: reduce) {
+    .osu-note-star { transition: none; }
+    .osu-note-star:hover { transform: none; }
+}

@@ -173,6 +173,7 @@ I18N.ru = {
     osu_search_placeholder: 'Поиск по названию или автору...', osu_search_empty: 'Битмапы не найдены',
     osu_sort_default: 'По умолчанию', osu_sort_rating_desc: 'Звёзды (по убыванию)', osu_sort_rating_asc: 'Звёзды (по возрастанию)',
     osu_view_label: 'Вид', osu_view_cards: 'Карточки', osu_view_wall: 'Стена обложек', osu_group_label: 'Группировка', osu_group_none: 'Без группировки', osu_group_artist: 'По исполнителю', 
+    osu_note_btn_title: 'Заметка и оценка', osu_note_title: 'Заметка и оценка', osu_note_rating_label: 'Моя оценка', osu_note_star_label: '{n} из 5', osu_note_placeholder: 'Почему вы добавили эту песню? Пишите что угодно…', osu_note_save: 'Сохранить', osu_note_clear: 'Очистить', osu_note_saved: 'Заметка и оценка сохранены', osu_note_cleared: 'Заметка и оценка удалены', osu_rating_filter_all: 'Все оценки', osu_rating_filter_atleast: '★{n} и выше', osu_rating_filter_rated: 'С оценкой', osu_rating_filter_unrated: 'Без оценки', osu_rating_filter_noted: 'С заметкой', osu_sort_my_rating: 'Моя оценка (по убыванию)',
     osu_group_others: 'Другие исполнители (по 1 песне)',
     pp_history_title: 'Рост PP', pp_history_empty: 'Пока недостаточно данных — зайдите позже, чтобы накопить историю.',
     osu_stats_total: 'Всего собрано', osu_stats_avg_rating: 'Средняя сложность', osu_stats_max_rating: 'Макс. сложность',

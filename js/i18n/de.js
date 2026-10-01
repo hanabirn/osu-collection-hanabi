@@ -173,6 +173,7 @@ I18N.de = {
     osu_search_placeholder: 'Nach Titel oder Künstler suchen...', osu_search_empty: 'Keine passenden Beatmaps gefunden',
     osu_sort_default: 'Standardreihenfolge', osu_sort_rating_desc: 'Sterne (absteigend)', osu_sort_rating_asc: 'Sterne (aufsteigend)',
     osu_view_label: 'Ansicht', osu_view_cards: 'Karten', osu_view_wall: 'Cover-Wand', osu_group_label: 'Gruppierung', osu_group_none: 'Keine Gruppierung', osu_group_artist: 'Nach Künstler', 
+    osu_note_btn_title: 'Notiz & Bewertung', osu_note_title: 'Notiz & Bewertung', osu_note_rating_label: 'Meine Bewertung', osu_note_star_label: '{n} Sterne', osu_note_placeholder: 'Warum hast du diesen Song gesammelt? Schreib, was du willst…', osu_note_save: 'Speichern', osu_note_clear: 'Löschen', osu_note_saved: 'Notiz und Bewertung gespeichert', osu_note_cleared: 'Notiz und Bewertung gelöscht', osu_rating_filter_all: 'Alle Bewertungen', osu_rating_filter_atleast: '★{n} und mehr', osu_rating_filter_rated: 'Bewertet', osu_rating_filter_unrated: 'Nicht bewertet', osu_rating_filter_noted: 'Mit Notiz', osu_sort_my_rating: 'Meine Bewertung (hoch nach niedrig)',
     osu_group_others: 'Weitere Künstler (je 1 Song)',
     pp_history_title: 'PP-Entwicklung', pp_history_empty: 'Noch nicht genug Verlauf — komm später wieder, um den Trend aufzubauen.',
     osu_stats_total: 'Gesamt gesammelt', osu_stats_avg_rating: 'Ø Schwierigkeit', osu_stats_max_rating: 'Max. Schwierigkeit',

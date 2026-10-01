@@ -173,6 +173,7 @@ I18N.ko = {
     osu_search_placeholder: '곡명 또는 아티스트로 검색...', osu_search_empty: '일치하는 비트맵을 찾을 수 없습니다',
     osu_sort_default: '기본 정렬', osu_sort_rating_desc: '난이도 (높은순)', osu_sort_rating_asc: '난이도 (낮은순)',
     osu_view_label: '보기 방식', osu_view_cards: '카드', osu_view_wall: '커버 월', osu_group_label: '그룹', osu_group_none: '그룹 없음', osu_group_artist: '아티스트별', 
+    osu_note_btn_title: '메모와 평점', osu_note_title: '메모와 평점', osu_note_rating_label: '내 평점', osu_note_star_label: '별 {n}개', osu_note_placeholder: '이 곡을 모은 이유는? 무엇이든 적어 보세요…', osu_note_save: '저장', osu_note_clear: '지우기', osu_note_saved: '메모와 평점을 저장했습니다', osu_note_cleared: '메모와 평점을 지웠습니다', osu_rating_filter_all: '모든 평점', osu_rating_filter_atleast: '★{n} 이상', osu_rating_filter_rated: '평가함', osu_rating_filter_unrated: '평가 안 함', osu_rating_filter_noted: '메모 있음', osu_sort_my_rating: '내 평점 (높은 순)',
     osu_group_others: '기타 아티스트 (각 1곡)',
     pp_history_title: 'PP 성장 추이', pp_history_empty: '아직 기록이 부족합니다. 다시 방문하면 추이가 쌓입니다.',
     osu_stats_total: '총 수집 수', osu_stats_avg_rating: '평균 난이도', osu_stats_max_rating: '최고 난이도',

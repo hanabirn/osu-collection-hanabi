@@ -307,6 +307,7 @@ I18N.en = {
     osu_search_placeholder: 'Search by title or artist...', osu_search_empty: 'No matching beatmaps found',
     osu_sort_default: 'Default Order', osu_sort_rating_desc: 'Star Rating (High to Low)', osu_sort_rating_asc: 'Star Rating (Low to High)',
     osu_view_label: 'View', osu_view_cards: 'Cards', osu_view_wall: 'Cover wall', osu_group_label: 'Grouping', osu_group_none: 'No grouping', osu_group_artist: 'Group by artist', 
+    osu_note_btn_title: 'Note & rating', osu_note_title: 'Note & rating', osu_note_rating_label: 'My rating', osu_note_star_label: '{n} stars', osu_note_placeholder: 'Why did you collect this one? Write anything…', osu_note_save: 'Save', osu_note_clear: 'Clear', osu_note_saved: 'Note and rating saved', osu_note_cleared: 'Note and rating cleared', osu_rating_filter_all: 'All ratings', osu_rating_filter_atleast: '★{n} and up', osu_rating_filter_rated: 'Rated', osu_rating_filter_unrated: 'Unrated', osu_rating_filter_noted: 'Has a note', osu_sort_my_rating: 'My rating (high to low)',
     osu_group_others: 'Other artists (1 song each)',
     pp_history_title: 'PP Growth', pp_history_empty: 'Not enough history yet — visit again later to build up the trend.',
     osu_stats_total: 'Total Collected', osu_stats_avg_rating: 'Avg Rating', osu_stats_max_rating: 'Max Rating',

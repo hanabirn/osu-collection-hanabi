@@ -347,10 +347,12 @@
                     <select id="osu-artist-filter" onchange="switchOsuArtistFilter(this.value)" style="display:none;">
                         <option value="all" data-i18n="osu_artist_filter_all">全部歌手</option>
                     </select>
+                    <select id="osu-rating-filter" onchange="switchOsuRatingFilter(this.value)" style="display:none;"></select>
                     <select id="osu-sort-select" onchange="switchOsuSort(this.value)">
                         <option value="default" data-i18n="osu_sort_default">預設排序</option>
                         <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>
                         <option value="rating-asc" data-i18n="osu_sort_rating_asc">星數（低到高）</option>
+                        <option value="my-rating-desc" data-i18n="osu_sort_my_rating">我的評分（高到低）</option>
                     </select>
                     <select id="osu-view-select" onchange="switchOsuView(this.value)" data-i18n-title="osu_view_label" title="顯示方式">
                         <option value="cards" data-i18n="osu_view_cards">卡片</option>
@@ -1027,6 +1029,21 @@
             <button class="btn" onclick="addOsuCategoryFromModal()" data-i18n="osu_category_add_title">新增</button>
         </div>
         <div id="osu-category-manage-list"></div>
+    </div>
+</div>
+
+<div id="osu-note-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeOsuNoteModal()">
+    <div class="pp-calc-modal osu-note-modal" role="dialog" aria-labelledby="osu-note-modal-title">
+        <button class="pp-calc-close" onclick="closeOsuNoteModal()" data-icon="x"></button>
+        <h3 class="pp-calc-title" id="osu-note-modal-title" data-i18n="osu_note_title">筆記與評分</h3>
+        <p class="osu-note-song" id="osu-note-song"></p>
+        <div class="osu-note-stars" id="osu-note-stars" role="radiogroup"></div>
+        <textarea id="osu-note-text" class="osu-note-text" rows="4" maxlength="500" data-i18n-placeholder="osu_note_placeholder" placeholder="為什麼收這首？想記什麼都可以…" oninput="updateOsuNoteCount()" onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))saveOsuNoteFromModal()"></textarea>
+        <div class="osu-note-count" id="osu-note-count"></div>
+        <div class="osu-note-actions">
+            <button class="btn osu-note-clear-btn" onclick="clearOsuNoteFromModal()" data-i18n="osu_note_clear">清除</button>
+            <button class="btn" onclick="saveOsuNoteFromModal()" data-i18n="osu_note_save">儲存</button>
+        </div>
     </div>
 </div>
 

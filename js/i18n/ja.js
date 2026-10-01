@@ -173,6 +173,7 @@ I18N.ja = {
     osu_search_placeholder: '曲名またはアーティストで検索...', osu_search_empty: '該当するビートマップが見つかりません',
     osu_sort_default: 'デフォルト順', osu_sort_rating_desc: '星評価（高い順）', osu_sort_rating_asc: '星評価（低い順）',
     osu_view_label: '表示方法', osu_view_cards: 'カード', osu_view_wall: 'ジャケット一覧', osu_group_label: 'グループ', osu_group_none: 'グループなし', osu_group_artist: 'アーティスト別', 
+    osu_note_btn_title: 'メモと評価', osu_note_title: 'メモと評価', osu_note_rating_label: '自分の評価', osu_note_star_label: '星 {n}', osu_note_placeholder: 'この曲を集めた理由は？何でも書けます…', osu_note_save: '保存', osu_note_clear: 'クリア', osu_note_saved: 'メモと評価を保存しました', osu_note_cleared: 'メモと評価を消去しました', osu_rating_filter_all: 'すべての評価', osu_rating_filter_atleast: '★{n} 以上', osu_rating_filter_rated: '評価済み', osu_rating_filter_unrated: '未評価', osu_rating_filter_noted: 'メモあり', osu_sort_my_rating: '自分の評価（高い順）',
     osu_group_others: 'その他のアーティスト（各 1 曲）',
     pp_history_title: 'PP成長推移', pp_history_empty: 'まだ記録が少ないです。また訪れると推移グラフが増えていきます。',
     osu_stats_total: '収集数', osu_stats_avg_rating: '平均難易度', osu_stats_max_rating: '最高難易度',

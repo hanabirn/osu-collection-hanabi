@@ -133,6 +133,7 @@ I18N.zh = {
     osu_search_placeholder: '搜尋曲名或作者...', osu_search_empty: '找不到符合的 Beatmap',
     osu_sort_default: '預設排序', osu_sort_rating_desc: '星數（高到低）', osu_sort_rating_asc: '星數（低到高）',
     osu_view_label: '顯示方式', osu_view_cards: '卡片', osu_view_wall: '封面牆', osu_group_label: '分組', osu_group_none: '不分組', osu_group_artist: '依歌手分組', 
+    osu_note_btn_title: '筆記與評分', osu_note_title: '筆記與評分', osu_note_rating_label: '我的評分', osu_note_star_label: '{n} 顆星', osu_note_placeholder: '為什麼收這首？想記什麼都可以…', osu_note_save: '儲存', osu_note_clear: '清除', osu_note_saved: '已儲存筆記與評分', osu_note_cleared: '已清除筆記與評分', osu_rating_filter_all: '全部評分', osu_rating_filter_atleast: '★{n} 以上', osu_rating_filter_rated: '已評分', osu_rating_filter_unrated: '未評分', osu_rating_filter_noted: '有筆記', osu_sort_my_rating: '我的評分（高到低）',
     osu_group_others: '其他歌手（各 1 首）',
     pp_history_title: 'PP 成長趨勢', pp_history_empty: '還沒有足夠的紀錄，多來看看就會累積趨勢圖！',
     osu_stats_total: '收藏總數', osu_stats_avg_rating: '平均星數', osu_stats_max_rating: '最高星數',
