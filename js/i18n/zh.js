@@ -518,14 +518,18 @@ I18N.zh = {
                 <p class="howto-tab-desc">整理你自己的 osu! 圖庫：新增、分類、匯出回遊戲、跟別人比較差異。</p>
                 <div class="howto-feat"><b>新增 Beatmap</b><span>貼上圖的 ID 或 osu! 網址（beatmapsets/... 或 /b/... 都吃），按「新增」加進收藏。</span></div>
                 <div class="howto-feat"><b>收藏進出（6 個按鈕）</b><span>由左到右：匯出 JSON 下載整個收藏當備份 → 匯入 JSON 從備份還原 → 複製分享連結 → 下載收藏預覽圖 PNG → 匯出成 collection.db 直接複製到 osu! 資料夾使用 → ⚔ 差異比較，上傳舊備份看新增/移除了哪些圖。</span></div>
-                <div class="howto-feat"><b>工具・設定（7 個按鈕）</b><span>重新整理全部圖資料 → 📊 統計儀表板（含 8 個收藏成就徽章）→ ✨ 收藏整理精靈（見下方說明）→ 標記已玩過／一鍵帶入最愛常玩（需登入）→ 📁 上傳 osu!.db，標出哪些圖已經下載過（僅 osu! stable）→ 🔒 設定密碼，之後編輯/發布動作都要輸入這組密碼確認。</span></div>
+                <div class="howto-feat"><b>工具・設定</b><span>重新整理全部圖資料 → 📅 收藏年度回顧 → ⇄ 和朋友比對收藏 → 📊 統計儀表板（含 8 個收藏成就徽章）→ ✨ 收藏整理精靈（見下方說明）→ 標記已玩過／一鍵帶入最愛常玩（需登入）→ 📁 上傳 osu!.db，標出哪些圖已經下載過（僅 osu! stable）→ 🔒 設定密碼，之後編輯/發布動作都要輸入這組密碼確認。</span></div>
                 <div class="howto-feat"><b>搜尋 / 篩選 / 排序</b><span>輸入框可搜曲名或作者；下拉選單可依語言、曲風、來源、歌手篩選，也能切換星數排序。</span></div>
                 <div class="howto-feat"><b>批量下載此清單圖檔</b><span>把目前分頁（含搜尋/篩選結果、跨所有分頁）的每張圖依序下載成 .osz，免登入鏡像站直連、無需安裝任何 App。下載中可以按同一顆按鈕暫停／繼續，不會中斷正在下載的那張圖。下載完在檔案總管全選，一次拖進 osu! 視窗即可批量匯入遊戲。</span></div>
                 <div class="howto-feat"><b>下載本機還沒有的圖檔</b><span>選過 osu!.db 之後才會出現，按鈕上會寫目前清單有幾張是你的 osu! 還沒有的。只下載那些圖，已經有的會自動略過，一樣可以暫停／繼續。匯入 osu! 之後重新選一次 osu!.db，數字就會更新。</span></div>
                 <div class="howto-feat"><b>複製 !mp map</b><span>每張卡片都有一顆 ⚔ 按鈕，複製這張圖的 <code>!mp map</code> 指令 —— 在 osu! 多人房當房主貼上去就能換圖。Discord bot 的 <code>/map</code> 也會顯示同一行。</span></div>
                 <div class="howto-feat"><b>分類籤</b><span>最愛／全部歌曲／Standard／Taiko／Catch／Mania 六個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
-                <div class="howto-feat"><b>探索更多</b><span>頁面最下方 7 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
-                <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是三組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。三組都只會合併加入，不會覆蓋現有收藏。</span></div>
+                <div class="howto-feat"><b>探索更多</b><span>頁面最下方 4 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
+                <div class="howto-feat"><b>顯示方式／分組</b><span>排序選單旁可以切換「卡片」或「封面牆」（只看封面，一頁 40 張，滑鼠移上去顯示曲名），也能「依歌手分組」：收 2 首以上的歌手各一組，其他歸到「其他歌手」。選擇會記在這台裝置。</span></div>
+                <div class="howto-feat"><b>★ 筆記與評分</b><span>卡片上的 ★ 按鈕可以幫這首歌打 1–5 星、寫一段筆記（為什麼收這首都可以記）。有評分或筆記的卡片右下角會顯示 ★；能用「評分」篩選、依「我的評分」排序，搜尋也會找筆記內容。筆記只存在你的瀏覽器，發布到收藏廣場不會帶出去，JSON 備份會一起存。</span></div>
+                <div class="howto-feat"><b>📅 收藏年度回顧</b><span>選一個年份，看那一年收了幾首、跟前一年比、收最多的月份和那一天、最常收的歌手、語言比例、每月收藏量、第一首和最後一首；按「下載圖卡」存成 PNG 分享。</span></div>
+                <div class="howto-feat"><b>⇄ 和朋友比對收藏</b><span>輸入朋友的 osu! 名稱、ID 或收藏廣場連結（對方要先發布到收藏廣場），看相似度、你們都愛的歌手，以及「他有你沒有」「共同收藏」「你有他沒有」三份清單；他有你沒有的歌可以一首一首或全部加入。收藏廣場的詳細視窗也有「和我的收藏比對」。</span></div>
+                <div class="howto-feat"><b>✨ 收藏整理精靈</b><span>其實是兩組工具：① 從帳號生成分類（最愛／常玩／最佳成績／最近／指定 mapper）② 健康檢查（掃出重複、已刪除、非 ranked、難度數變動的圖）。兩組都只會合併加入，不會覆蓋現有收藏。</span></div>
             </div>
 
             <div class="howto-tab">
