@@ -128,7 +128,7 @@ a:hover { text-decoration: underline; }
     background: var(--bg);
     /* The main structural line between the header and the page — 2px of the
        strong border token so it reads clearly on the near-black shell. */
-    border-bottom: 2px solid var(--border-strong);
+    border-bottom: var(--line-divider) solid var(--border-strong);
 }
 /* (The 2026 redesign removed the whole-header cover carousel #bg-carousel,
    its .site-header-overlay wash, and the .has-cover-banner light-on-dark
@@ -204,7 +204,7 @@ a:hover { text-decoration: underline; }
     height: 42px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     font-size: 1.2rem;
     cursor: pointer;
@@ -402,7 +402,7 @@ a:hover { text-decoration: underline; }
     font-weight: 600;
     color: #fff;
     background: rgba(18, 12, 30, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: var(--line) solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
     -webkit-backdrop-filter: blur(10px) saturate(140%);
     backdrop-filter: blur(10px) saturate(140%);
@@ -457,7 +457,7 @@ a:hover { text-decoration: underline; }
 
 .lang-pill {
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     padding: 5px 13px;
     border-radius: 14px;
@@ -515,7 +515,7 @@ a:hover { text-decoration: underline; }
     height: 36px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     font-size: 1rem;
     cursor: pointer;
@@ -572,7 +572,7 @@ a:hover { text-decoration: underline; }
     max-width: 85vw;
     border-radius: 14px;
     background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
@@ -590,7 +590,7 @@ a:hover { text-decoration: underline; }
     align-items: center;
     justify-content: space-between;
     padding: 12px 14px;
-    border-bottom: 1px solid var(--border-card);
+    border-bottom: var(--line) solid var(--border-card);
     font-size: 0.85rem;
     font-weight: bold;
     color: var(--text);
@@ -613,7 +613,7 @@ a:hover { text-decoration: underline; }
     width: 100%;
     padding: 10px 14px;
     border: none;
-    border-bottom: 1px solid var(--border-card);
+    border-bottom: var(--line) solid var(--border-card);
     background: transparent;
     color: var(--text-dim2);
     font: inherit;
@@ -669,7 +669,7 @@ a:hover { text-decoration: underline; }
     height: 36px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     font-size: 1.05rem;
     cursor: pointer;
@@ -700,7 +700,7 @@ a:hover { text-decoration: underline; }
     height: 36px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     font-size: 1.05rem;
     cursor: pointer;
@@ -732,7 +732,7 @@ a:hover { text-decoration: underline; }
     padding: 8px;
     border-radius: 14px;
     background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
@@ -787,7 +787,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     padding: 12px;
     border-radius: 14px;
     background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     text-align: left;
     opacity: 0;
@@ -821,7 +821,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .changelog-entry + .changelog-entry {
     padding-top: 10px;
-    border-top: 1px solid var(--border-card);
+    border-top: var(--line) solid var(--border-card);
 }
 .changelog-empty {
     font-size: 0.82rem;
@@ -844,7 +844,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
        an icon, so it needs to read clearly as a control on its own rather
        than blend into the row. */
     background: rgba(var(--accent-purple-rgb), 0.16);
-    border: 1px solid rgba(var(--accent-purple-rgb), 0.45);
+    border: var(--line) solid rgba(var(--accent-purple-rgb), 0.45);
     color: var(--text);
     font-size: 0.85rem;
     font-weight: 600;
@@ -882,7 +882,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     padding: 8px;
     border-radius: 14px;
     background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
@@ -923,7 +923,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .theme-toggle-btn {
     position: relative;
     background: var(--theme-toggle-bg);
-    border: 1px solid var(--theme-toggle-border);
+    border: var(--line) solid var(--theme-toggle-border);
     border-radius: 50%;
     /* 42px to match the notif bell / login / language corner controls. */
     width: 42px;
@@ -956,7 +956,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     height: 36px;
     border-radius: 50%;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     font-size: 1.05rem;
     cursor: pointer;
@@ -988,7 +988,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     padding: 12px;
     border-radius: 14px;
     background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
@@ -1027,13 +1027,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-size: 0.82rem;
     color: var(--text-secondary);
     padding-top: 4px;
-    border-top: 1px solid var(--border-card);
+    border-top: var(--line) solid var(--border-card);
 }
 .accent-picker-custom-row input[type="color"] {
     width: 30px;
     height: 30px;
     padding: 0;
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     border-radius: 8px;
     background: none;
     cursor: pointer;
@@ -1041,7 +1041,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .accent-picker-reset {
     padding: 7px 10px;
     border-radius: 10px;
-    border: 1px solid var(--border-card);
+    border: var(--line) solid var(--border-card);
     background: var(--bg-stat);
     color: var(--text-secondary);
     font-family: inherit;
@@ -1075,7 +1075,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     padding: 0 14px;
     border-radius: 17px;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     font-size: 0.85rem;
     font-weight: 500;
@@ -1096,7 +1096,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     padding: 0 6px 0 4px;
     border-radius: 17px;
     background: var(--lang-pill-bg);
-    border: 1px solid var(--lang-pill-border);
+    border: var(--line) solid var(--lang-pill-border);
 }
 .osu-logged-in-avatar {
     width: 24px;
@@ -1182,7 +1182,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     display: flex;
     flex-direction: column;
     background: var(--bg-modal);
-    border-left: 1px solid var(--border-strong);
+    border-left: var(--line) solid var(--border-strong);
     box-shadow: -16px 0 48px rgba(0, 0, 0, 0.5);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -1201,7 +1201,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--line) solid var(--border);
 }
 .nav-drawer-close {
     display: flex;
@@ -1211,7 +1211,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     height: 32px;
     border-radius: 50%;
     background: var(--surface-1);
-    border: 1px solid var(--border);
+    border: var(--line) solid var(--border);
     color: var(--text-dim);
     cursor: pointer;
     transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), transform 0.2s var(--ease-spring);
@@ -1239,7 +1239,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--text-dim2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: var(--line) solid rgba(255, 255, 255, 0.08);
     margin-bottom: 4px;
 }
 
@@ -1287,7 +1287,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
         gap: 8px;
         margin: -2px 0 12px;
         padding-bottom: 10px;
-        border-bottom: 1px solid var(--border-card);
+        border-bottom: var(--line-divider) solid var(--border-card);
     }
     /* the drawer's own ☰ trigger is redundant once the bar is visible */
     #nav-menu-btn { display: none !important; }
@@ -1296,7 +1296,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     display: inline-flex;
     align-items: center;
     background: transparent;
-    border: none;
+    border: var(--line) solid var(--border-strong);
     border-radius: 999px;
     color: rgba(255, 255, 255, 0.78);
     padding: 11px 20px;
@@ -1304,11 +1304,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
+    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out), border-color 0.15s var(--ease-out);
 }
-.site-topnav-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.site-topnav-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.32); }
 .site-topnav-btn.active {
     background: rgba(var(--accent-pink-rgb), 0.14);
+    border-color: rgba(var(--accent-pink-rgb), 0.7);
     color: var(--pink-text, var(--pink));
     font-weight: 700;
 }
@@ -1416,7 +1417,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     min-width: 0;   /* let it shrink below the placeholder's width instead of shoving the button off-screen */
     padding: 11px 14px;
     border-radius: 10px;
-    border: 1px solid var(--border-input);
+    border: var(--line) solid var(--border-input);
     background-color: var(--bg-input);
     color: var(--text);
     font-size: 0.9rem;
@@ -1454,7 +1455,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     flex: 1;
     padding: 11px 14px;
     border-radius: 10px;
-    border: 1px solid var(--border-input);
+    border: var(--line) solid var(--border-input);
     background-color: var(--bg-input);
     color: var(--text);
     font-size: 0.9rem;
@@ -1564,7 +1565,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     flex-wrap: wrap;
     padding: 10px 40px 10px 16px;
     background: linear-gradient(90deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.1));
-    border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+    border-bottom: var(--line) solid rgba(251, 191, 36, 0.35);
     color: var(--accent-yellow);
     font-size: 0.85rem;
     text-align: center;
@@ -1613,7 +1614,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     letter-spacing: 0.01em;
     color: #fff;
     background: rgba(20, 16, 35, 0.86);
-    border: 1px solid rgba(255, 102, 170, 0.4);
+    border: var(--line) solid rgba(255, 102, 170, 0.4);
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4), 0 0 14px rgba(255, 102, 170, 0.18);
     -webkit-backdrop-filter: blur(8px) saturate(1.4);
     backdrop-filter: blur(8px) saturate(1.4);
@@ -1652,13 +1653,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .app-tooltip[data-placement="top"] .app-tooltip-arrow {
     bottom: -5px;
-    border-right: 1px solid rgba(255, 102, 170, 0.4);
-    border-bottom: 1px solid rgba(255, 102, 170, 0.4);
+    border-right: var(--line) solid rgba(255, 102, 170, 0.4);
+    border-bottom: var(--line) solid rgba(255, 102, 170, 0.4);
 }
 .app-tooltip[data-placement="bottom"] .app-tooltip-arrow {
     top: -5px;
-    border-left: 1px solid rgba(255, 102, 170, 0.4);
-    border-top: 1px solid rgba(255, 102, 170, 0.4);
+    border-left: var(--line) solid rgba(255, 102, 170, 0.4);
+    border-top: var(--line) solid rgba(255, 102, 170, 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {

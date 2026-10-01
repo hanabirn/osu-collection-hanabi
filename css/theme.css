@@ -13,6 +13,10 @@
     --surface-2:     rgba(255,255,255,0.055);
     --border:        rgba(255,255,255,0.08);
     --border-strong: rgba(255,255,255,0.16);
+    /* Line weights: --line for every component border, --line-divider for
+       the section dividers (header bottom, explore row, separators). */
+    --line:          2px;
+    --line-divider:  3px;
     --text-dim:      rgba(244,242,247,0.62);
     --text-faint:    rgba(244,242,247,0.42);
     --pink:          #f472b6;
