@@ -60,6 +60,7 @@
 <body>
 
 <header class="site-header">
+    <div class="site-header-banner" id="site-header-banner" aria-hidden="true"></div>
     <div class="header-corner-left">
         <button id="pwa-install-btn" class="theme-toggle-btn header-ctl" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
         <button id="site-update-btn" class="theme-toggle-btn site-update-btn header-ctl" onclick="applySiteUpdate()" style="display:none;" data-i18n-title="site_update_btn_title" title="網站有更新，點擊更新" data-icon="refreshCw"></button>
@@ -180,6 +181,12 @@
             </div>
         </div>
     </div>
+    <div class="header-banner-tools">
+        <input type="range" class="header-banner-pos" id="header-banner-pos" min="0" max="100" step="1" value="50" oninput="setHeaderBannerPosition(this.value)" data-i18n-title="hero_banner_position" title="橫幅位置" hidden>
+        <button type="button" class="header-banner-btn" id="header-banner-reset" onclick="resetHeaderBanner()" data-icon="cornerUpLeft" data-i18n-title="hero_banner_reset" title="恢復預設橫幅" hidden></button>
+        <button type="button" class="header-banner-btn header-banner-btn--label" onclick="document.getElementById('header-banner-file').click()" data-icon="camera" data-icon-gap><span data-i18n="hero_banner_change">更換橫幅</span></button>
+        <input type="file" id="header-banner-file" accept="image/*" hidden onchange="onHeaderBannerFile(this)">
+    </div>
 </header>
 
 <div class="nav-drawer-scrim" id="nav-drawer-scrim" onclick="closeNavDrawer()" hidden></div>
@@ -243,12 +250,6 @@
         <div id="collection-hero-v2" class="collection-hero-v2" hidden>
             <span class="hero-cover" aria-hidden="true"></span>
             <span class="hero-cover" aria-hidden="true"></span>
-            <div class="hero-banner-tools">
-                <input type="range" class="hero-banner-pos" id="hero-banner-pos" min="0" max="100" step="1" value="30" oninput="setHeroBannerPosition(this.value)" data-i18n-title="hero_banner_position" title="橫幅位置" hidden>
-                <button type="button" class="hero-banner-btn" id="hero-banner-reset" onclick="resetHeroBanner()" data-icon="cornerUpLeft" data-i18n-title="hero_banner_reset" title="恢復預設橫幅" hidden></button>
-                <button type="button" class="hero-banner-btn hero-banner-btn--label" onclick="document.getElementById('hero-banner-file').click()" data-icon="camera" data-icon-gap><span data-i18n="hero_banner_change">更換橫幅</span></button>
-                <input type="file" id="hero-banner-file" accept="image/*" hidden onchange="onHeroBannerFile(this)">
-            </div>
             <p class="eyebrow">MY COLLECTION</p>
             <p class="collection-hero-v2-line" data-i18n="site_tagline">一起來收藏你專屬的歌曲收藏庫吧!</p>
             <p class="collection-hero-v2-stat" id="collection-hero-v2-stat"></p>
@@ -1248,7 +1249,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/gallery-comments.js"></script>
 <script defer src="js/friend-compare.js"></script>
 <script defer src="js/year-recap.js"></script>
-<script defer src="js/hero-banner.js"></script>
+<script defer src="js/header-banner.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>

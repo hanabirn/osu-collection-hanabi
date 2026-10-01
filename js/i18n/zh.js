@@ -498,6 +498,7 @@ I18N.zh = {
         <div class="howto-group" id="howto-global">
             <h3 class="howto-group-title">站台通用</h3>
             <p class="howto-tab-desc">不管在哪個分頁都找得到的控制項，大多集中在頁首左右兩角。</p>
+            <div class="howto-feat"><b>🖼 自訂頁首橫幅</b><span>網站最上方的頁首右下角有「更換橫幅」，可以放一張自己喜歡的圖片當頁首背景（會自動縮小，最大 15 MB），旁邊的滑桿調整圖片顯示的上下位置，↶ 恢復預設。圖片只存在這台裝置的瀏覽器裡。</span></div>
             <div class="howto-feat"><b>主題色</b><span>右上角調色盤圖示。挑 12 種預設色之一或自訂顏色，整個網站的強調色會跟著換；「恢復預設」回到原本的粉紅色，選擇會記在這個瀏覽器。</span></div>
             <div class="howto-feat"><b>加到主畫面</b><span>左上角，僅支援的瀏覽器顯示。把網站安裝成一個 App 圖示，離線時仍可開啟基本畫面。</span></div>
             <div class="howto-feat"><b>網站有更新</b><span>左上角／畫面下方浮動條，偵測到新版本時才會出現，點一下就重新載入拿到最新版本。</span></div>
@@ -526,7 +527,6 @@ I18N.zh = {
                 <div class="howto-feat"><b>複製 !mp map</b><span>每張卡片都有一顆 ⚔ 按鈕，複製這張圖的 <code>!mp map</code> 指令 —— 在 osu! 多人房當房主貼上去就能換圖。Discord bot 的 <code>/map</code> 也會顯示同一行。</span></div>
                 <div class="howto-feat"><b>分類籤</b><span>最愛／全部歌曲／Standard／Taiko／Catch／Mania 六個固定籤之外，右邊齒輪可以「管理分類」新增自訂籤。</span></div>
                 <div class="howto-feat"><b>探索更多</b><span>頁面最下方 4 張捷徑卡，一鍵跳到其他常用分頁。</span></div>
-                <div class="howto-feat"><b>🖼 自訂橫幅</b><span>收藏頁最上方的橫幅預設會輪播你收藏裡的封面。按右上角的相機可以換成自己喜歡的圖片（會自動縮小，最大 15 MB），旁邊的滑桿調整圖片顯示的上下位置，↶ 恢復預設。圖片只存在這台裝置的瀏覽器裡。</span></div>
                 <div class="howto-feat"><b>顯示方式／分組</b><span>排序選單旁可以切換「卡片」或「封面牆」（只看封面，一頁 40 張，滑鼠移上去顯示曲名），也能「依歌手分組」：收 2 首以上的歌手各一組，其他歸到「其他歌手」。選擇會記在這台裝置。</span></div>
                 <div class="howto-feat"><b>★ 筆記與評分</b><span>卡片上的 ★ 按鈕可以幫這首歌打 1–5 星、寫一段筆記（為什麼收這首都可以記）。有評分或筆記的卡片右下角會顯示 ★；能用「評分」篩選、依「我的評分」排序，搜尋也會找筆記內容。筆記只存在你的瀏覽器，發布到收藏廣場不會帶出去，JSON 備份會一起存。</span></div>
                 <div class="howto-feat"><b>📅 收藏年度回顧</b><span>選一個年份，看那一年收了幾首、跟前一年比、收最多的月份和那一天、最常收的歌手、語言比例、每月收藏量、第一首和最後一首；按「下載圖卡」存成 PNG 分享。</span></div>

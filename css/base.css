@@ -121,7 +121,8 @@ a:hover { text-decoration: underline; }
     z-index: 5;
     overflow: visible;
     width: 100%;
-    padding: 14px clamp(16px, 4vw, 24px);
+    padding: 22px clamp(16px, 4vw, 24px);
+    min-height: clamp(150px, 15vw, 230px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -130,6 +131,56 @@ a:hover { text-decoration: underline; }
        strong border token so it reads clearly on the near-black shell. */
     border-bottom: var(--line-divider) solid var(--border-strong);
 }
+/* 自訂頁首橫幅 (js/header-banner.js): the visitor's picture behind the
+   header, under a dark wash so the title and controls stay readable. */
+.site-header-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center 50%;
+    pointer-events: none;
+}
+.site-header.has-banner .site-header-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 11, 16, 0.45) 0%, rgba(11, 11, 16, 0.6) 60%, rgba(11, 11, 16, 0.85) 100%);
+}
+.site-header.has-banner .site-title-block h1 { text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); }
+.header-banner-tools {
+    position: absolute;
+    right: clamp(12px, 3vw, 24px);
+    bottom: 12px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.header-banner-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: var(--line) solid rgba(255, 255, 255, 0.24);
+    background: rgba(10, 10, 16, 0.6);
+    color: var(--text);
+    cursor: pointer;
+}
+.header-banner-btn:hover { border-color: rgba(var(--pink-rgb), 0.8); }
+.header-banner-btn .icon-svg { width: 16px; height: 16px; }
+.header-banner-btn--label { width: auto; gap: 6px; padding: 0 12px; font: inherit; font-size: 0.82rem; font-weight: 600; }
+.header-banner-pos { width: 110px; accent-color: var(--pink); }
+.header-banner-pos[hidden], .header-banner-btn[hidden] { display: none; }
+/* Phones: the header is a stacked column, so the tools join the flow under
+   the title instead of floating over the share buttons. */
+@media (max-width: 600px) {
+    .header-banner-tools { position: relative; right: auto; bottom: auto; justify-content: center; margin-top: 10px; }
+}
+
 /* (The 2026 redesign removed the whole-header cover carousel #bg-carousel,
    its .site-header-overlay wash, and the .has-cover-banner light-on-dark
    overrides — no cover behind the header any more. See
@@ -298,7 +349,7 @@ a:hover { text-decoration: underline; }
     .tn-2, .tn-5 { font-size: 1.15rem; }
     .tn-3, .tn-4 { font-size: 1.55rem; }
     .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: 1rem; padding: 0 8px; }
-    .site-title-block h1 { font-size: clamp(1.7rem, 7.4vw, 2.2rem); letter-spacing: -0.02em; }
+    .site-title-block h1 { font-size: clamp(2rem, 9vw, 2.6rem); letter-spacing: -0.02em; }
     .header-logo { gap: 6px; }
 }
 
@@ -330,7 +381,7 @@ a:hover { text-decoration: underline; }
     filter: drop-shadow(0 0 8px rgba(var(--pink-rgb), 0.5));
     animation: none;
 }
-.logo-icon svg { width: 52px; height: 52px; display: block; }
+.logo-icon svg { width: 64px; height: 64px; display: block; }
 .logo-icon::after { display: none; }
 /* Amplitude roughly doubled (0.8–1.3 vs the old 0.86–1.14) and more
    ring-down steps for an elastic, on-the-beat feel. */
@@ -353,7 +404,7 @@ a:hover { text-decoration: underline; }
     /* Redesign: compact header wordmark. Sized to sit level with the
        flanking music notes (≈ .tn-3). Near-white, tight, no gradient-clip. */
     font-family: var(--font-display);
-    font-size: clamp(2rem, 5.2vw, 2.75rem);
+    font-size: clamp(2.3rem, 6vw, 3.6rem);
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: -0.02em;
