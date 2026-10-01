@@ -172,6 +172,8 @@ I18N.de = {
     pp_compare_title: 'Zwei Spieler vergleichen', pp_compare_placeholder_a: 'Spieler A: Name oder ID', pp_compare_placeholder_b: 'Spieler B: Name oder ID', pp_compare_btn: 'Vergleichen', pp_compare_topplays_title: 'Top-Play-Vergleich', pp_compare_topplays_empty: 'Keine Ergebnisse in diesem Modus',
     osu_search_placeholder: 'Nach Titel oder Künstler suchen...', osu_search_empty: 'Keine passenden Beatmaps gefunden',
     osu_sort_default: 'Standardreihenfolge', osu_sort_rating_desc: 'Sterne (absteigend)', osu_sort_rating_asc: 'Sterne (aufsteigend)',
+    osu_view_label: 'Ansicht', osu_view_cards: 'Karten', osu_view_wall: 'Cover-Wand', osu_group_label: 'Gruppierung', osu_group_none: 'Keine Gruppierung', osu_group_artist: 'Nach Künstler', 
+    osu_group_others: 'Weitere Künstler (je 1 Song)',
     pp_history_title: 'PP-Entwicklung', pp_history_empty: 'Noch nicht genug Verlauf — komm später wieder, um den Trend aufzubauen.',
     osu_stats_total: 'Gesamt gesammelt', osu_stats_avg_rating: 'Ø Schwierigkeit', osu_stats_max_rating: 'Max. Schwierigkeit',
     featured_beatmap_label: 'Heute empfohlen',

@@ -172,6 +172,8 @@ I18N.fr = {
     pp_compare_title: 'Comparer deux joueurs', pp_compare_placeholder_a: 'Joueur A : pseudo ou ID', pp_compare_placeholder_b: 'Joueur B : pseudo ou ID', pp_compare_btn: 'Comparer', pp_compare_topplays_title: 'Comparaison des meilleurs scores', pp_compare_topplays_empty: 'Aucun score dans ce mode',
     osu_search_placeholder: 'Rechercher par titre ou artiste...', osu_search_empty: 'Aucune beatmap trouvée',
     osu_sort_default: 'Ordre par défaut', osu_sort_rating_desc: 'Étoiles (décroissant)', osu_sort_rating_asc: 'Étoiles (croissant)',
+    osu_view_label: 'Affichage', osu_view_cards: 'Cartes', osu_view_wall: 'Mur de pochettes', osu_group_label: 'Regroupement', osu_group_none: 'Sans regroupement', osu_group_artist: 'Par artiste', 
+    osu_group_others: 'Autres artistes (1 titre chacun)',
     pp_history_title: 'Évolution du PP', pp_history_empty: "Pas encore assez d'historique — revenez plus tard pour voir la tendance.",
     osu_stats_total: 'Total collectionné', osu_stats_avg_rating: 'Difficulté moy.', osu_stats_max_rating: 'Difficulté max.',
     featured_beatmap_label: 'Sélection du jour',

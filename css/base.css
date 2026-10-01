@@ -1588,6 +1588,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-header-top { flex-direction: column; }
     .osu-profile-stats { grid-template-columns: repeat(2, 1fr) !important; }
     .osu-collection { grid-template-columns: 1fr !important; }
+    /* The cover wall keeps several small squares per row on phones. */
+    .osu-collection.osu-collection--wall { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)) !important; }
 }
 
 /* ===== Styled tooltip =====

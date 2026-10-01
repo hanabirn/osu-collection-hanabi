@@ -352,6 +352,14 @@
                         <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>
                         <option value="rating-asc" data-i18n="osu_sort_rating_asc">星數（低到高）</option>
                     </select>
+                    <select id="osu-view-select" onchange="switchOsuView(this.value)" data-i18n-title="osu_view_label" title="顯示方式">
+                        <option value="cards" data-i18n="osu_view_cards">卡片</option>
+                        <option value="wall" data-i18n="osu_view_wall">封面牆</option>
+                    </select>
+                    <select id="osu-group-select" onchange="switchOsuGroup(this.value)" data-i18n-title="osu_group_label" title="分組">
+                        <option value="none" data-i18n="osu_group_none">不分組</option>
+                        <option value="artist" data-i18n="osu_group_artist">依歌手分組</option>
+                    </select>
                     <button class="btn" id="osu-batch-dl-btn" onclick="batchDownloadCollectionView()" data-i18n="batch_dl_btn">批量下載此清單圖檔</button>
                     <button class="btn" id="osu-batch-dl-missing-btn" onclick="batchDownloadMissingSets()" style="display:none;"></button>
                 </div>

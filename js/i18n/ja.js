@@ -172,6 +172,8 @@ I18N.ja = {
     pp_compare_title: '2人のPP比較', pp_compare_placeholder_a: 'プレイヤーA：ユーザー名またはID', pp_compare_placeholder_b: 'プレイヤーB：ユーザー名またはID', pp_compare_btn: '比較する', pp_compare_topplays_title: 'Top Play 比較', pp_compare_topplays_empty: 'このモードには記録がありません',
     osu_search_placeholder: '曲名またはアーティストで検索...', osu_search_empty: '該当するビートマップが見つかりません',
     osu_sort_default: 'デフォルト順', osu_sort_rating_desc: '星評価（高い順）', osu_sort_rating_asc: '星評価（低い順）',
+    osu_view_label: '表示方法', osu_view_cards: 'カード', osu_view_wall: 'ジャケット一覧', osu_group_label: 'グループ', osu_group_none: 'グループなし', osu_group_artist: 'アーティスト別', 
+    osu_group_others: 'その他のアーティスト（各 1 曲）',
     pp_history_title: 'PP成長推移', pp_history_empty: 'まだ記録が少ないです。また訪れると推移グラフが増えていきます。',
     osu_stats_total: '収集数', osu_stats_avg_rating: '平均難易度', osu_stats_max_rating: '最高難易度',
     featured_beatmap_label: '本日のおすすめ',

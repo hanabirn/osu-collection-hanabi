@@ -1108,6 +1108,99 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     gap: 16px;
 }
 
+/* 封面牆 (osuWallTileHtml in js/osu.js): square covers, title on hover. */
+.osu-collection.osu-collection--wall {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+}
+.osu-wall-tile {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border);
+    transition: transform 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.osu-wall-tile:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--pink-rgb), 0.45);
+}
+.osu-wall-tile-cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.osu-wall-tile-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 18px 7px 6px;
+    background: linear-gradient(180deg, rgba(10,10,22,0) 0%, rgba(10,10,22,0.85) 70%);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+.osu-wall-tile:hover .osu-wall-tile-info,
+.osu-wall-tile:focus-within .osu-wall-tile-info { opacity: 1; }
+.osu-wall-tile-title,
+.osu-wall-tile-artist {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+.osu-wall-tile-title { font-size: 0.72rem; font-weight: 600; }
+.osu-wall-tile-artist { font-size: 0.66rem; color: rgba(255,255,255,0.75); }
+.osu-wall-tile .osu-play-btn { width: 32px; height: 32px; }
+.osu-wall-tile:hover .osu-play-btn { opacity: 1; }
+.osu-wall-tile-fav {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 2;
+    display: flex;
+    color: var(--accent-pink);
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7));
+}
+.osu-wall-tile-fav .icon-svg { width: 14px; height: 14px; }
+@media (hover: none) {
+    .osu-wall-tile-info { opacity: 1; }
+}
+
+/* 依歌手分組: one header row per artist, spanning the whole grid. */
+.osu-group-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+.osu-group-header:first-child { margin-top: 0; }
+.osu-group-header-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.osu-group-header-count {
+    flex: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-dim2);
+}
+
 .osu-empty {
     grid-column: 1 / -1;
     text-align: center;
@@ -1175,7 +1268,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 /* flashOsuCard() in js/osu.js: points out the map a global-search jump
    landed on. The ring fades rather than blinking. */
-.osu-card.osu-card-flash {
+.osu-card.osu-card-flash,
+.osu-wall-tile.osu-card-flash {
     border-color: rgb(var(--pink-rgb));
     animation: osu-card-flash 1.8s var(--ease-out) forwards;
 }
@@ -1184,7 +1278,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     100% { box-shadow: 0 0 0 3px rgba(var(--pink-rgb), 0), 0 0 24px rgba(var(--pink-rgb), 0); }
 }
 @media (prefers-reduced-motion: reduce) {
-    .osu-card.osu-card-flash { animation: none; box-shadow: 0 0 0 3px rgb(var(--pink-rgb)); }
+    .osu-card.osu-card-flash, .osu-wall-tile.osu-card-flash { animation: none; box-shadow: 0 0 0 3px rgb(var(--pink-rgb)); }
 }
 
 .osu-card-bg {

@@ -310,9 +310,9 @@ function jumpToOsuSet(setId) {
     if (indexInView() < 0) showTab('all');
     const idx = indexInView();
     if (idx < 0) return false;
-    const page = Math.floor(idx / OSU_PAGE_SIZE);
+    const page = Math.floor(idx / osuPageSize());
     if (page !== osuPage) { osuPage = page; renderOsuCollection(); }
-    flashOsuCard(document.querySelector(`#osu-collection .osu-card[data-set-id="${setId}"]`));
+    flashOsuCard(document.querySelector(`#osu-collection [data-set-id="${setId}"]`));
     return true;
 }
 
@@ -320,6 +320,61 @@ function switchOsuSort(mode) {
     osuSortMode = mode;
     osuPage = 0;
     renderOsuCollection();
+}
+
+/* 顯示方式 (cards / cover wall) and 分組 (none / by artist), remembered per
+   browser. The wall shows small square covers, so it pages 40 at a time. */
+const OSU_VIEW_KEY = 'osu_collection_view';
+const OSU_GROUP_KEY = 'osu_collection_group';
+const OSU_WALL_PAGE_SIZE = 40;
+function readOsuPref(key, allowed) {
+    try {
+        const v = localStorage.getItem(key);
+        return allowed.includes(v) ? v : allowed[0];
+    } catch { return allowed[0]; }
+}
+let osuViewMode = readOsuPref(OSU_VIEW_KEY, ['cards', 'wall']);
+let osuGroupMode = readOsuPref(OSU_GROUP_KEY, ['none', 'artist']);
+function osuPageSize() {
+    return osuViewMode === 'wall' ? OSU_WALL_PAGE_SIZE : OSU_PAGE_SIZE;
+}
+function switchOsuView(mode) {
+    osuViewMode = mode === 'wall' ? 'wall' : 'cards';
+    try { localStorage.setItem(OSU_VIEW_KEY, osuViewMode); } catch {}
+    osuPage = 0;
+    renderOsuCollection();
+}
+function switchOsuGroup(mode) {
+    osuGroupMode = mode === 'artist' ? 'artist' : 'none';
+    try { localStorage.setItem(OSU_GROUP_KEY, osuGroupMode); } catch {}
+    osuPage = 0;
+    renderOsuCollection();
+}
+
+/* Groups by lead artist (feat./CV parts dropped, case-insensitive), biggest
+   group first, then by name; the current sort order is kept inside each
+   group. Artists with a single song share one 其他歌手 group at the end
+   (otherwise most of a big collection is one-tile rows), and so does an
+   unknown artist. Each set gets __groupKey/__groupLabel/__groupSize for the
+   headers. */
+const OSU_GROUP_OTHERS = '\u0000others';
+function groupOsuSetsByArtist(sets) {
+    const groups = new Map();
+    for (const s of sets) {
+        const lead = primaryArtist(s.artist);
+        const key = lead.toLowerCase();
+        if (!groups.has(key)) groups.set(key, { label: lead, sets: [] });
+        groups.get(key).sets.push(s);
+    }
+    const named = [];
+    const others = [];
+    for (const [key, g] of groups) {
+        if (key && g.sets.length > 1) named.push([key, g]);
+        else others.push(...g.sets);
+    }
+    named.sort(([, a], [, b]) => (b.sets.length - a.sets.length) || a.label.localeCompare(b.label));
+    if (others.length) named.push([OSU_GROUP_OTHERS, { label: t('osu_group_others'), sets: others }]);
+    return named.flatMap(([key, g]) => g.sets.map(s => ({ ...s, __groupKey: key, __groupLabel: g.label, __groupSize: g.sets.length })));
 }
 
 function switchOsuLangFilter(v) {
@@ -903,11 +958,11 @@ let osuPreviewLoop = false;
 // playOsuPreview's 8 call sites (Catalog/Farm/mini-games/gallery/…) — the
 // cover URL alone is always derivable from setId, so that part never fails.
 function osuPreviewItemFromButton(btn, setId) {
-    const card = btn.closest('.osu-card, .gallery-detail-item, .gq-card') || btn.parentElement;
+    const card = btn.closest('.osu-card, .osu-wall-tile, .gallery-detail-item, .gq-card') || btn.parentElement;
     let title = '', artist = '';
     if (card) {
-        const titleEl = card.querySelector('.osu-card-title, .gallery-detail-item-title, .map-title');
-        const artistEl = card.querySelector('.osu-card-artist, .map-artist');
+        const titleEl = card.querySelector('.osu-card-title, .osu-wall-tile-title, .gallery-detail-item-title, .map-title');
+        const artistEl = card.querySelector('.osu-card-artist, .osu-wall-tile-artist, .map-artist');
         if (titleEl) title = titleEl.textContent.trim();
         if (artistEl) artist = artistEl.textContent.trim();
     }
@@ -3424,10 +3479,32 @@ function updateCollectionHeroV2() {
     if (heroCoverAllowed()) armHeroCover(hero, layers);
 }
 
+/* One cover-wall tile: osu!'s square list@2x cover; title/artist and the
+   preview button show on hover (always on touch screens, see css). The
+   card view's other actions stay in the card view. */
+function osuWallTileHtml(set, isFav, hardestDiff) {
+    const id = set.beatmapset_id;
+    const label = `${set.artist} - ${set.title}`;
+    return `
+        <div class="osu-wall-tile" data-set-id="${id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${id}','_blank')" title="${escHtml(label)}">
+            <img class="osu-wall-tile-cover" src="https://assets.ppy.sh/beatmaps/${id}/covers/list@2x.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">
+            ${isFav ? `<span class="osu-wall-tile-fav" aria-hidden="true">${icon('heart', { filled: true })}</span>` : ''}
+            <button class="osu-play-btn" onclick="playOsuPreview(${id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}"${osuPreviewBeatStyle(hardestDiff.bpm)}>${playBtnIcon()}</button>
+            <div class="osu-wall-tile-info">
+                <div class="osu-wall-tile-title">${escHtml(set.title)}</div>
+                <div class="osu-wall-tile-artist">${escHtml(set.artist)}</div>
+            </div>
+        </div>`;
+}
+
 function renderOsuCollection() {
     const container = document.getElementById('osu-collection');
     const paginationEl = document.getElementById('osu-pagination');
     if (!container || !paginationEl) return;
+    const viewSel = document.getElementById('osu-view-select');
+    if (viewSel) viewSel.value = osuViewMode;
+    const groupSel = document.getElementById('osu-group-select');
+    if (groupSel) groupSel.value = osuGroupMode;
     updateCollectionHeroVisibility();
     updateCollectionHeroV2();
     renderOsuStats();
@@ -3511,6 +3588,7 @@ function renderOsuCollection() {
     }
 
     sets = sortOsuSets(sets);
+    if (osuGroupMode === 'artist') sets = groupOsuSetsByArtist(sets);
     osuCurrentViewSets = sets;
     updateOsuBatchMissingButton();
 
@@ -3527,10 +3605,13 @@ function renderOsuCollection() {
         return;
     }
 
-    const totalPages = Math.ceil(sets.length / OSU_PAGE_SIZE);
+    const pageSize = osuPageSize();
+    const totalPages = Math.ceil(sets.length / pageSize);
     if (osuPage >= totalPages) osuPage = totalPages - 1;
     if (osuPage < 0) osuPage = 0;
-    const pageSets = sets.slice(osuPage * OSU_PAGE_SIZE, (osuPage + 1) * OSU_PAGE_SIZE);
+    const pageSets = sets.slice(osuPage * pageSize, (osuPage + 1) * pageSize);
+    const wall = osuViewMode === 'wall';
+    container.classList.toggle('osu-collection--wall', wall);
 
     // Repopulated on every render so "checkCollectionPlayedStatus()" (the
     // 已遊玩 button) always checks exactly the sets currently on screen —
@@ -3539,7 +3620,12 @@ function renderOsuCollection() {
     // difficulty (a set can have a dozen).
     osuPageCheckTargets = [];
 
-    container.innerHTML = pageSets.map(set => {
+    container.innerHTML = pageSets.map((set, i) => {
+        // Group header before the first set of each artist (repeated at the
+        // top of a page that continues a group).
+        const header = osuGroupMode === 'artist' && (i === 0 || pageSets[i - 1].__groupKey !== set.__groupKey)
+            ? `<div class="osu-group-header"><span class="osu-group-header-name">${escHtml(set.__groupLabel)}</span><span class="osu-group-header-count">${set.__groupSize}</span></div>`
+            : '';
         const coverUrl = `https://assets.ppy.sh/beatmaps/${set.beatmapset_id}/covers/card.jpg`;
         const isFav = isOsuFavorited(set.beatmapset_id);
         const isLocalDl = typeof isLocalDbMatched === 'function' && isLocalDbMatched(set.beatmapset_id);
@@ -3567,7 +3653,8 @@ function renderOsuCollection() {
         // hasn't been backfilled yet shows 🌐 未標記 until it fills in.
         const langLabel = osuLangName(set) || t('lang_unknown');
         const langBadge = `<span class="osu-lang-badge" data-tip="${escHtml(langLabel)}">${set.language ? osuLangFlag(set) : '🌐'} ${escHtml(langLabel)}</span>`;
-        return `
+        if (wall) return header + osuWallTileHtml(set, isFav, hardestDiff);
+        return header + `
         <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
