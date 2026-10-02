@@ -175,11 +175,6 @@ a:hover { text-decoration: underline; }
 .header-banner-btn--label { width: auto; gap: 6px; padding: 0 12px; font: inherit; font-size: 0.82rem; font-weight: 600; }
 .header-banner-pos { width: 110px; accent-color: var(--pink); }
 .header-banner-pos[hidden], .header-banner-btn[hidden] { display: none; }
-/* Phones: the header is a stacked column, so the tools join the flow under
-   the title instead of floating over the share buttons. */
-@media (max-width: 600px) {
-    .header-banner-tools { position: relative; right: auto; bottom: auto; justify-content: center; margin-top: 10px; }
-}
 
 /* (The 2026 redesign removed the whole-header cover carousel #bg-carousel,
    its .site-header-overlay wash, and the .has-cover-banner light-on-dark
@@ -197,7 +192,8 @@ a:hover { text-decoration: underline; }
 .site-header.lang-menu-open,
 .site-header.notif-menu-open,
 .site-header.contact-menu-open,
-.site-header.changelog-menu-open {
+.site-header.changelog-menu-open,
+.site-header.accent-picker-open {
     overflow: visible;
     z-index: 60;
 }
@@ -1716,4 +1712,40 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
     .app-tooltip { transition: opacity 0.12s linear; transform: none; }
     .app-tooltip[data-placement="bottom"] { transform: none; }
+}
+
+/* ===== Compact phone header =====
+   The stacked header took about half of a phone's first screen (391px),
+   pushing the collection pitch below the fold. Title first, then every
+   control (corner clusters and banner tools dissolved with display:contents)
+   wraps together as small buttons: about 200px. Last in the file so it
+   wins over the earlier phone rules for the same elements. */
+@media (max-width: 600px) {
+    .site-header {
+        padding: 12px;
+        min-height: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+    }
+    .site-header-top { order: -1; width: 100%; gap: 8px; margin-bottom: 4px; }
+    .header-corner-actions,
+    .header-corner-left,
+    .header-banner-tools { display: contents; }
+    .logo-icon svg { width: 40px; height: 40px; }
+    .site-title-block h1 { font-size: 1.85rem; }
+    .site-header .header-ctl,
+    .site-header .header-banner-btn { width: 36px; height: 36px; min-width: 36px; padding: 0; }
+    .site-header .lang-globe-btn { width: auto; padding: 0 8px; }
+    .site-header .osu-login-btn { height: 36px; padding: 0 12px; font-size: 0.85rem; }
+    .site-social { gap: 6px; }
+    .site-social-btn { padding: 6px 10px; font-size: 0.78rem; }
+    .header-banner-btn--label span { display: none; }
+    .header-banner-btn--label { width: 36px; padding: 0; }
+    /* Their buttons now sit anywhere in the wrapped row, so pin these two
+       to the screen like the language / notification / contact menus. */
+    .accent-picker-menu { position: fixed; top: 12px; right: 12px; left: auto; z-index: 220; }
+    .site-changelog-menu { position: fixed; top: 12px; left: 50%; max-height: calc(100dvh - 24px); z-index: 220; }
 }
