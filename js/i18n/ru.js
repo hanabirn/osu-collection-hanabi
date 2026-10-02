@@ -78,7 +78,7 @@ I18N.ru = {
     local_db_none: 'В этом файле не найдено карт',
     local_db_done: 'Сверено с локальной базой: найдено {n} битмапсетов',
     local_db_matched_title: 'Уже есть в вашем локальном osu!.db',
-    osu_all_songs: 'Все песни', osu_fav: 'Избранное', osu_empty_collection: 'Битмапов пока нет', osu_empty_hint: 'Введите ID выше!', osu_empty_banner_hint: 'Когда добавите несколько, баннер и фон страницы покажут обложки ваших карт.',
+    osu_all_songs: 'Все песни', osu_fav: 'Избранное', osu_empty_collection: 'Битмапов пока нет', osu_empty_hint: 'Введите ID выше!', osu_empty_banner_hint: 'Когда добавите несколько, вверху коллекции появится баннер из обложек ваших карт.',
     hero_pitch: 'Одно место для вашей коллекции osu!: импорт из игры, авто-категории по вашим результатам, экспорт обратно в игру.',
     hero_feat_import: 'Импорт игрового collection.db / .osdb', hero_feat_generate: 'Категории из вашего аккаунта osu!', hero_feat_share: 'Делитесь коллекциями (с карточками-превью)',
     hero_stat_collections: 'публичных коллекций: {n}', hero_stat_likes: '❤ {n}',

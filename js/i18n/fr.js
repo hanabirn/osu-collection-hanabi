@@ -78,7 +78,7 @@ I18N.fr = {
     local_db_none: 'Aucune map trouvée dans ce fichier',
     local_db_done: 'Comparé à ta base locale : {n} beatmapsets trouvés',
     local_db_matched_title: 'Déjà dans ton osu!.db local',
-    osu_all_songs: 'Tous les titres', osu_fav: 'Favoris', osu_empty_collection: 'Pas encore de beatmaps', osu_empty_hint: 'Entrez un ID ci-dessus!', osu_empty_banner_hint: 'Une fois que vous en ajoutez, la bannière et le fond de page affichent vos covers.',
+    osu_all_songs: 'Tous les titres', osu_fav: 'Favoris', osu_empty_collection: 'Pas encore de beatmaps', osu_empty_hint: 'Entrez un ID ci-dessus!', osu_empty_banner_hint: 'Une fois que tu en ajoutes, une bannière faite de tes covers apparaît en haut de la collection.',
     hero_pitch: "Un seul endroit pour organiser votre collection osu! : import depuis le jeu, catégories auto d'après vos scores, export direct vers le jeu.",
     hero_feat_import: 'Importer le collection.db / .osdb du jeu', hero_feat_generate: 'Générer des catégories depuis votre compte osu!', hero_feat_share: 'Partager des collections (avec cartes de prévisualisation)',
     hero_stat_collections: '{n} collections publiques', hero_stat_likes: '❤ {n}',

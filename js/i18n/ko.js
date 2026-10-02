@@ -78,7 +78,7 @@ I18N.ko = {
     local_db_none: '이 파일에서 비트맵을 찾지 못했습니다',
     local_db_done: '로컬 데이터베이스와 비교 완료: {n}개 비트맵셋 발견',
     local_db_matched_title: '이미 로컬 osu!.db에 있습니다',
-    osu_all_songs: '전체 곡', osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 헤더 배너와 페이지 배경이 내 커버 이미지로 바뀝니다.',
+    osu_all_songs: '전체 곡', osu_fav: '즐겨찾기', osu_empty_collection: '비트맵이 없습니다', osu_empty_hint: '위에 ID를 입력하세요!', osu_empty_banner_hint: '비트맵을 모으면 컬렉션 위쪽에 내 커버 이미지로 만든 배너가 나타납니다.',
     hero_pitch: 'osu! 컬렉션을 한곳에서 정리: 게임에서 가져오고, 점수로 카테고리를 자동 생성하고, 게임으로 바로 내보내기.',
     hero_feat_import: '게임의 collection.db / .osdb 가져오기', hero_feat_generate: 'osu! 계정에서 카테고리 생성', hero_feat_share: '컬렉션 공유 (미리보기 카드 포함)',
     hero_stat_collections: '공개 컬렉션 {n}개', hero_stat_likes: '❤ {n}',

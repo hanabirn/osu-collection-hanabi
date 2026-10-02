@@ -78,7 +78,7 @@ I18N.de = {
     local_db_none: 'In dieser Datei wurden keine Beatmaps gefunden',
     local_db_done: 'Mit deiner lokalen Datenbank abgeglichen: {n} Beatmapsets gefunden',
     local_db_matched_title: 'Bereits in deiner lokalen osu!.db',
-    osu_all_songs: 'Alle Songs', osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!', osu_empty_banner_hint: 'Sobald du welche sammelst, zeigen Banner und Seitenhintergrund deine Beatmap-Cover.',
+    osu_all_songs: 'Alle Songs', osu_fav: 'Favoriten', osu_empty_collection: 'Noch keine Beatmaps', osu_empty_hint: 'ID oben eingeben!', osu_empty_banner_hint: 'Sobald du welche sammelst, erscheint oben in der Sammlung ein Banner aus deinen Beatmap-Covern.',
     hero_pitch: 'Ein Ort für deine osu!-Sammlung: aus dem Spiel importieren, Kategorien aus deinen Scores erzeugen, direkt zurück ins Spiel exportieren.',
     hero_feat_import: 'collection.db / .osdb aus dem Spiel importieren', hero_feat_generate: 'Kategorien aus deinem osu!-Konto erzeugen', hero_feat_share: 'Sammlungen teilen (mit Vorschaukarten)',
     hero_stat_collections: '{n} öffentliche Sammlungen', hero_stat_likes: '❤ {n}',

@@ -78,7 +78,7 @@ I18N.ja = {
     local_db_none: 'このファイルに譜面が見つかりませんでした',
     local_db_done: 'ローカルデータベースと照合しました：{n} 個のビートマップセットを検出',
     local_db_matched_title: 'すでにローカルの osu!.db にあります',
-    osu_all_songs: 'すべての曲', osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、ヘッダーとページ背景があなたのカバー画像に変わります。',
+    osu_all_songs: 'すべての曲', osu_fav: 'お気に入り', osu_empty_collection: 'まだビートマップがありません', osu_empty_hint: '上にIDを入力して始めましょう！', osu_empty_banner_hint: 'ビートマップを集めると、コレクションの上部にあなたのカバー画像のバナーが表示されます。',
     hero_pitch: 'osu! のコレクションをまとめて整理：ゲームから取り込み、スコアからカテゴリを自動生成、ゲームへそのまま書き出し。',
     hero_feat_import: 'ゲームの collection.db／.osdb を取り込み', hero_feat_generate: 'osu! アカウントからカテゴリを生成', hero_feat_share: 'コレクションを共有（プレビューカード付き）',
     hero_stat_collections: '公開コレクション {n} 件', hero_stat_likes: '❤ {n}',
