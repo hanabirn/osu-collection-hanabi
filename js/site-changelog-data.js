@@ -8,6 +8,44 @@
    works (shown as-is in every language). */
 const SITE_CHANGELOG = [
     {
+        date: '2026-10-02',
+        items: [
+            {
+                zh: '第一次來不用先知道 Beatmap ID：直接從熱門新曲按 ＋ 加入第一首歌，也能先逛曲庫或看別人的收藏',
+                'zh-Hans': '第一次来不用先知道 Beatmap ID：直接从热门新曲按 ＋ 加入第一首歌，也能先逛曲库或看别人的收藏',
+                en: 'New here? No beatmap ID needed: add your first song with the ＋ on a trending song, or browse the catalog or other people’s collections first',
+                ja: '初めてでもビートマップ ID は不要に：話題の新曲の ＋ で最初の 1 曲を追加したり、カタログや他の人のコレクションを先に見たりできます',
+                ko: '처음 와도 비트맵 ID가 필요 없습니다: 인기 신곡의 ＋ 로 첫 곡을 추가하거나, 먼저 카탈로그나 다른 사람의 컬렉션을 둘러볼 수 있습니다',
+                de: 'Neu hier? Keine Beatmap-ID nötig: Füge deinen ersten Song mit dem ＋ bei einem angesagten Song hinzu oder stöbere zuerst im Katalog und in Sammlungen anderer',
+                es: '¿Eres nuevo? No hace falta un ID de beatmap: añade tu primera canción con el ＋ de una canción en tendencia, o explora antes el catálogo o las colecciones de otros',
+                fr: 'Nouveau ? Pas besoin d’ID de beatmap : ajoute ton premier titre avec le ＋ d’un titre tendance, ou parcours d’abord le catalogue ou les collections des autres',
+                ru: 'Впервые здесь? ID карты не нужен: добавьте первую песню кнопкой ＋ на популярной новинке или сначала загляните в каталог и чужие коллекции',
+            },
+            {
+                zh: '手機版頁首變精簡，第一眼就看得到主要內容',
+                'zh-Hans': '手机版页首变精简，第一眼就看得到主要内容',
+                en: 'A more compact header on phones, so the main content shows on the first screen',
+                ja: 'スマホ版のヘッダーをコンパクトにし、最初の画面でメインの内容が見えるようにしました',
+                ko: '모바일 헤더를 간결하게 해 첫 화면에서 주요 내용이 보입니다',
+                de: 'Kompaktere Kopfzeile auf dem Handy, damit der Hauptinhalt gleich sichtbar ist',
+                es: 'Una cabecera más compacta en el móvil para que el contenido principal se vea en la primera pantalla',
+                fr: 'Un en-tête plus compact sur mobile, pour voir le contenu principal dès le premier écran',
+                ru: 'Шапка на телефоне стала компактнее, и основное содержимое видно сразу',
+            },
+            {
+                zh: '修正手機上「最愛」「全部歌曲」分頁的文字被擠成一字一行的問題',
+                'zh-Hans': '修正手机上「最爱」「全部歌曲」分页的文字被挤成一字一行的问题',
+                en: 'Fixed the Favorites and All songs tabs squeezing their labels to one character per line on phones',
+                ja: 'スマホで「お気に入り」「すべての曲」タブの文字が 1 文字ずつ改行される問題を修正しました',
+                ko: '모바일에서 「즐겨찾기」「전체 곡」 탭 글자가 한 글자씩 줄바꿈되던 문제를 수정했습니다',
+                de: 'Behoben: Die Tabs „Favoriten“ und „Alle Songs“ brachen auf dem Handy ihre Beschriftung Zeichen für Zeichen um',
+                es: 'Corregido: en el móvil las pestañas Favoritos y Todas las canciones partían su texto letra a letra',
+                fr: 'Corrigé : sur mobile, les onglets Favoris et Tous les titres coupaient leur texte lettre par lettre',
+                ru: 'Исправлено: на телефоне вкладки «Избранное» и «Все песни» переносили текст по одной букве',
+            },
+        ],
+    },
+    {
         date: '2026-10-01',
         items: [
             {
