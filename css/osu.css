@@ -840,6 +840,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 .osu-tab {
     flex: 1;
+    /* Never narrower than its label: on phones a squeezed tab used to break
+       its text one character per line; it wraps to the next row instead. */
+    min-width: max-content;
+    white-space: nowrap;
     background: var(--bg-card);
     color: var(--text-accent);
     border: var(--line) solid var(--border-card);
