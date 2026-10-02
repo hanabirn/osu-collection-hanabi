@@ -5433,3 +5433,42 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .recap-cols { grid-template-columns: 1fr; gap: 0; }
     .recap-big { font-size: 2.8rem; }
 }
+
+/* ===== First visit: empty collection (renderOsuCollection in js/osu.js) =====
+   Tools that need songs are hidden, and the starter block holds 熱門新曲. */
+#page-collection.collection-is-empty [data-needs-sets] { display: none !important; }
+.osu-start { padding: 8px 0 4px; }
+.osu-start-title { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+.osu-start-desc { margin: 6px 0 14px; color: var(--text-secondary); font-size: 0.9rem; }
+.osu-start-slot .trending-row { margin-top: 0; text-align: left; }
+.osu-start-slot .trending-row h3 { display: none; }
+.osu-start-slot .trending-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+/* Taller than the strip version so the always-on ＋ clears the title. */
+.osu-start-slot #trending-grid .osu-card { aspect-ratio: auto; min-height: 128px; }
+/* The ＋ is the whole point here, so it doesn't wait for hover. */
+#page-collection.collection-is-empty .trending-card .card-add-btn { opacity: 1; }
+.osu-start .osu-empty-sub { margin-top: 10px; }
+
+/* 逛曲庫 / 看別人的收藏 next to the login CTA in the first-visit pitch. */
+.collection-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+.collection-hero-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 18px;
+    border-radius: 999px;
+    border: var(--line) solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+.collection-hero-secondary:hover { border-color: rgba(var(--pink-rgb), 0.7); background: rgba(var(--pink-rgb), 0.08); }

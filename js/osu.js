@@ -3713,10 +3713,27 @@ function osuWallTileHtml(set, isFav, hardestDiff, noteEntry) {
         </div>`;
 }
 
+/* First visit (whole collection empty): the page hides the tools that need
+   songs (css: .collection-is-empty [data-needs-sets]) and the 熱門新曲 row is
+   moved into the empty grid as the place to pick a first song. It always
+   goes back to its own spot first, since the grid's innerHTML is replaced
+   on every render and would take the row with it. */
+let trendingHome = null;
+function placeTrendingRow(slot) {
+    const row = document.getElementById('trending-row');
+    if (!row) return;
+    if (!trendingHome) trendingHome = { parent: row.parentElement, next: row.nextElementSibling };
+    if (slot) slot.appendChild(row);
+    else if (row.parentElement !== trendingHome.parent) trendingHome.parent.insertBefore(row, trendingHome.next);
+}
+
 function renderOsuCollection() {
     const container = document.getElementById('osu-collection');
     const paginationEl = document.getElementById('osu-pagination');
     if (!container || !paginationEl) return;
+    placeTrendingRow(null);
+    const collectionEmpty = OSU_MODES.every(m => (getOsuCollection()[m] || []).length === 0);
+    document.getElementById('page-collection')?.classList.toggle('collection-is-empty', collectionEmpty);
     const viewSel = document.getElementById('osu-view-select');
     if (viewSel) viewSel.value = osuViewMode;
     const groupSel = document.getElementById('osu-group-select');
@@ -3813,6 +3830,21 @@ function renderOsuCollection() {
     if (osuGroupMode === 'artist') sets = groupOsuSetsByArtist(sets);
     osuCurrentViewSets = sets;
     updateOsuBatchMissingButton();
+
+    if (collectionEmpty) {
+        container.innerHTML = `
+            <div class="osu-empty osu-start">
+                <div class="osu-start-title">${escHtml(t('start_title'))}</div>
+                <p class="osu-start-desc">${escHtml(t('start_desc'))}</p>
+                <div class="osu-start-slot"></div>
+                <p class="osu-empty-sub">${escHtml(t('start_paste_hint'))}</p>
+                <p class="osu-empty-sub">${escHtml(t('osu_empty_banner_hint'))}</p>
+            </div>`;
+        paginationEl.innerHTML = '';
+        placeTrendingRow(container.querySelector('.osu-start-slot'));
+        if (typeof loadTrendingSongs === 'function') loadTrendingSongs();
+        return;
+    }
 
     if (sets.length === 0) {
         const msg = osuSearchQuery
