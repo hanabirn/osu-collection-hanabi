@@ -20,7 +20,7 @@
    `npm run discord:register` after changing them. */
 const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { getOsuToken } = require('./_osu-auth');
-const { setLocale, t, LANG_NAMES, KNOWN_KEYS } = require('./_discord-i18n');
+const { setLocale, runWithLocale, t, LANG_NAMES, KNOWN_KEYS } = require('./_discord-i18n');
 const { buildOsdb, MODE_INT } = require('./_osdb');
 const { messageWithFile } = require('./_discord-attach');
 const L = require('./_discord-lib');
@@ -318,17 +318,28 @@ async function cmdCollectChannel(options, interaction, origin) {
         });
     };
 
+    // All lookups in parallel: on Cloudflare each osu! call goes through
+    // the Netlify relay, and up to 6 batches + 15 sets one after another
+    // could pass Discord's 3 s window. Results are pushed in the original
+    // order so the collection matches the channel's.
     const bmIds = [...all.beatmapIds];
-    for (let i = 0; i < bmIds.length; i += 50) {
-        const q = new URLSearchParams();
-        bmIds.slice(i, i + 50).forEach(id => q.append('ids[]', id));
-        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps?${q}`, auth);
-        if (r.ok) for (const bm of (await r.json()).beatmaps || []) push(bm, bm.beatmapset);
-    }
-    for (const sid of [...all.setIds].slice(0, 15)) {
-        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${sid}`, auth);
-        if (!r.ok) continue;
-        const set = await r.json();
+    const batches = [];
+    for (let i = 0; i < bmIds.length; i += 50) batches.push(bmIds.slice(i, i + 50));
+    const [batchResults, setResults] = await Promise.all([
+        Promise.all(batches.map(async ids => {
+            const q = new URLSearchParams();
+            ids.forEach(id => q.append('ids[]', id));
+            const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps?${q}`, auth);
+            return r.ok ? ((await r.json()).beatmaps || []) : [];
+        })),
+        Promise.all([...all.setIds].slice(0, 15).map(async sid => {
+            const r = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${sid}`, auth);
+            return r.ok ? r.json() : null;
+        })),
+    ]);
+    for (const list of batchResults) for (const bm of list) push(bm, bm.beatmapset);
+    for (const set of setResults) {
+        if (!set) continue;
         const hardest = (set.beatmaps || []).slice().sort((a, b) => b.difficulty_rating - a.difficulty_rating)[0];
         push(hardest, set);
     }
@@ -400,29 +411,6 @@ async function cmdFollowing(interaction) {
     return L.ephemeral(t('following_list', { names: names.join(', ') }));
 }
 
-/* --- deferred (slow) commands ------------------------------------------- *
-   A command whose work can't finish inside Discord's 3 s window: hand it to
-   the discord-work-background.js background function, then answer with a
-   deferred ("Bot is thinking…") response. The background fn PATCHes the
-   result in (see _discord-followup.js). `/practice` is the first — its
-   getOsuToken -> 2 osu! API calls -> farm-maps-list chain is ~2–4 s. */
-async function dispatchDeferred(command, { interaction, options, origin, lang }) {
-    const accepted = await fetch(`${origin}/.netlify/functions/discord-work-background`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-work-secret': process.env.DISCORD_WORK_SECRET || '' },
-        body: JSON.stringify({
-            command, lang,
-            appId: interaction.application_id,
-            token: interaction.token,
-            invokerId: L.invokerId(interaction),
-            options, origin,
-        }),
-    }).then(r => r.ok || r.status === 202).catch(() => false);
-
-    if (!accepted) return L.ephemeral(t('deferred_timeout'));
-    return L.json({ type: L.R.DEFERRED_MESSAGE, data: { flags: L.EPHEMERAL } });
-}
-
 /* --- /map ----------------------------------------------------------------- */
 
 function parseBeatmapId(raw) {
@@ -470,11 +458,9 @@ async function cmdMap(options, origin) {
         }
     } catch { /* pp is a nice-to-have */ }
 
-    // Mod-combo PP comparison at SS (matches the farm dataset's own
-    // convention — _farm-constants.js COMPUTE_ACCURACY). Mania's score mods
-    // don't change pp except DT's rate change (same domain knowledge as
-    // _farm-crawl-core.js's easeWeight()), so only NM/DT are worth showing
-    // there — HD/HR/HDDT/HDHR would just repeat the NM number.
+    // Mod-combo PP comparison at SS. Mania's score mods don't change pp
+    // except DT's rate change, so only NM/DT are worth showing there —
+    // HD/HR/HDDT/HDHR would just repeat the NM number.
     const modCombos = bm.mode === 'mania' ? ['', 'DT'] : ['', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'];
     let modPpLine = null;
     try {
@@ -976,119 +962,6 @@ async function cmdGallery(options, origin) {
     });
 }
 
-// The precomputed mod combos the farm dataset carries pp/stars for.
-const FARM_MODS = ['NM', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'];
-
-// One farm pick at position `index` (pp-desc) within a mode/mods/pp-band
-// filter, plus ◀ 🎲 ▶ buttons that re-run this via a component interaction.
-// index < 0 = pick a random position. Returns { error } or { embed, components }.
-async function farmView({ mode, mods, ppMin, ppMax, index }, origin) {
-    // mania pp doesn't scale with mods (and HR/EZ aren't mania mods at all),
-    // so the mods filter is meaningless there — pin it to NM.
-    if (mode === 'mania') mods = 'NM';
-    const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
-    if (ppMin) qs.set('ppMin', String(ppMin));
-    if (ppMax) qs.set('ppMax', String(ppMax));
-    // One round-trip: farm-maps-list resolves the random/absolute index
-    // server-side and returns just that record + its position. Two fetches
-    // here used to blow past Discord's 3s window on an uncached pp band.
-    qs.set('pick', index < 0 ? 'random' : String(index));
-    const any = t('farm_unlimited');
-    const band = t('pp_band', { lo: ppMin || any, hi: ppMax || any });
-
-    const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}`);
-    if (!r.ok) return { error: t('farm_query_fail') };
-    const d = await r.json();
-    const total = d.total || 0;
-    if (!total) return { error: t('farm_none', { mode: L.MODE_LABEL[mode], mods, band }) };
-
-    const idx = d.pickIndex >= 0 ? d.pickIndex : 0;
-    const m = (d.items || [])[0];
-    if (!m) return { error: t('farm_pick_fail') };
-
-    const setId = m.beatmapset_id || null;
-    const mapId = m.beatmap_id || null;
-    const mt = L.modeTag(mode);
-    const modChips = mods !== 'NM' ? L.modsTag(mods.match(/../g)) : '';
-    const name = `${m.artist || ''} - ${m.title || ''}`.trim() || `Beatmapset ${setId || ''}`.trim();
-    const cid = (i) => `farm|${mode}|${mods}|${ppMin}|${ppMax}|${i}`;
-
-    return {
-        embed: {
-            title: `${mt ? mt + ' ' : ''}${name}${m.version ? ` [${m.version}]` : ''}`.slice(0, 250),
-            url: mapId ? `https://osu.ppy.sh/b/${mapId}` : (setId ? `https://osu.ppy.sh/s/${setId}` : `${origin}/`),
-            description: [modChips, m.creator ? t('mapper', { n: m.creator }) : null].filter(Boolean).join('\n') || undefined,
-            color: L.srColor(m.star),
-            image: setId ? { url: `https://assets.ppy.sh/beatmaps/${setId}/covers/cover.jpg` } : undefined,
-            fields: [
-                { name: t('farm_f_pp', { mods }), value: m.pp != null ? `~${Math.round(m.pp)}pp` : '—', inline: true },
-                { name: t('f_stars'), value: m.star != null ? `${Number(m.star).toFixed(2)}★` : '—', inline: true },
-                { name: 'BPM', value: m.bpm != null ? String(Math.round(m.bpm)) : '—', inline: true },
-                { name: t('f_length'), value: m.total_length ? L.fmtLen(m.total_length) : '—', inline: true },
-                { name: 'AR / OD / CS', value: `${m.ar ?? '—'} / ${m.od ?? '—'} / ${m.cs ?? '—'}`, inline: true },
-            ],
-            footer: L.siteFooter(`${t('farm_footer', { band })} · ${idx + 1}/${L.fmtNum(total)}`),
-        },
-        components: [
-            {
-                type: 1,
-                components: [
-                    { type: 2, style: 2, label: t('farm_btn_prev'), custom_id: cid(idx - 1) },
-                    { type: 2, style: 1, label: t('farm_btn_random'), custom_id: cid(-1) },
-                    { type: 2, style: 2, label: t('farm_btn_next'), custom_id: cid(idx + 1) },
-                ],
-            },
-            {
-                type: 1,
-                components: [
-                    { type: 2, style: 2, label: t('btn_export_osdb'), custom_id: `farmx|${mode}|${mods}|${ppMin}|${ppMax}` },
-                ],
-            },
-        ],
-    };
-}
-
-// Pull up to `cap` maps of a farm filter across pages -> one .osdb collection.
-async function farmBandToCollection(mode, mods, ppMin, ppMax, origin, cap = 120) {
-    if (mode === 'mania') mods = 'NM';
-    const qs = new URLSearchParams({ mode, mods, sort: 'pp_desc', farmOnly: '1' });
-    if (ppMin) qs.set('ppMin', String(ppMin));
-    if (ppMax) qs.set('ppMax', String(ppMax));
-    // One fetch: farm-maps-list clamps `limit` to 200 server-side and `cap`
-    // is 120, so the whole band fits in a single page.
-    const beatmaps = [];
-    const r = await fetch(`${origin}/.netlify/functions/farm-maps-list?${qs}&limit=${cap}&page=0`);
-    if (r.ok) {
-        for (const m of ((await r.json()).items || [])) {
-            beatmaps.push({
-                mapId: m.beatmap_id, mapSetId: m.beatmapset_id || 0,
-                artist: m.artist || '', title: m.title || '', diff: m.version || '',
-                md5: '', mode: MODE_INT[mode] || 0, stars: m.star || 0,
-            });
-            if (beatmaps.length >= cap) break;
-        }
-    }
-    const any = t('farm_unlimited');
-    const band = t('pp_band', { lo: ppMin || any, hi: ppMax || any });
-    return beatmaps.length ? [{ name: `Farm ${mods} ${band}`, beatmaps }] : [];
-}
-
-async function cmdFarm(options, origin) {
-    // farm-maps-list keys datasets by the API ruleset name (osu/taiko/fruits/
-    // mania). API_MODE maps both "catch" and "fruits" -> "fruits", so an old
-    // "catch" value still resolves instead of silently falling back to osu.
-    const mode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
-    const mods = FARM_MODS.includes(L.optVal(options, 'mods')) ? L.optVal(options, 'mods') : 'NM';
-    let ppMin = Math.max(0, Number(L.optVal(options, 'pp_min')) || 0);
-    let ppMax = Math.max(0, Number(L.optVal(options, 'pp_max')) || 0);
-    if (ppMin && ppMax && ppMax < ppMin) [ppMin, ppMax] = [ppMax, ppMin];
-    if (ppMin && !ppMax) ppMax = Math.round(ppMin * 1.4);
-
-    const v = await farmView({ mode, mods, ppMin, ppMax, index: -1 }, origin);
-    if (v.error) return L.ephemeral(v.error);
-    return L.message(v.embed, v.components);
-}
-
 /* --- .osdb export response -------------------------------------------- */
 
 function osdbResponse(collections, baseName) {
@@ -1147,21 +1020,10 @@ async function handleComponent(interaction, origin) {
         return osdbResponse(cols, base);
     }
 
-    // .osdb export of a farm filter band: farmx|<mode>|<mods>|<ppMin>|<ppMax>
-    if (id.startsWith('farmx|')) {
-        const [, mode, mods, ppMinS, ppMaxS] = id.split('|');
-        const cols = await farmBandToCollection(mode, mods, Number(ppMinS) || 0, Number(ppMaxS) || 0, origin);
-        return osdbResponse(cols, `Farm ${mode} ${mods}`);
-    }
-
-    // /farm browse: farm|<mode>|<mods>|<ppMin>|<ppMax>|<index>  (index -1 = random)
-    if (id.startsWith('farm|')) {
-        const [, mode, mods, ppMinS, ppMaxS, idxS] = id.split('|');
-        const v = await farmView({
-            mode, mods, ppMin: Number(ppMinS) || 0, ppMax: Number(ppMaxS) || 0, index: Number(idxS),
-        }, origin);
-        if (v.error) return L.updateMessage({ title: v.error, color: PINK });
-        return L.updateMessage(v.embed, v.components);
+    // Buttons on old /farm messages (farm|… browse, farmx|… export): the
+    // feature was retired with the site's Farm Maps tab.
+    if (id.startsWith('farm|') || id.startsWith('farmx|')) {
+        return L.updateMessage({ title: t('feature_retired'), color: PINK });
     }
 
     // /mappool round pagination: mp|<folder>|<roundIdx>|<page>  (folder can
@@ -1245,7 +1107,11 @@ async function handleComponent(interaction, origin) {
 
 /* --- handler ---------------------------------------------------------- */
 
-exports.handler = async (event) => {
+// Each interaction gets its own locale slot (see runWithLocale): on
+// Cloudflare one isolate answers several interactions at once.
+exports.handler = (event) => runWithLocale(() => handleInteraction(event));
+
+async function handleInteraction(event) {
     if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method not allowed' };
 
     const rawBody = event.isBase64Encoded
@@ -1253,7 +1119,7 @@ exports.handler = async (event) => {
         : (event.body || '');
 
     const h = event.headers || {};
-    const ok = L.verifySignature(
+    const ok = await L.verifySignature(
         rawBody,
         h['x-signature-ed25519'] || h['X-Signature-Ed25519'],
         h['x-signature-timestamp'] || h['X-Signature-Timestamp'],
@@ -1297,13 +1163,13 @@ exports.handler = async (event) => {
                 case 'collection': return await cmdCollection(options, origin);
                 case 'gallery': return await cmdGallery(options, origin);
                 case 'pp': return await cmdPp(options, interaction);
-                case 'farm': return await cmdFarm(options, origin);
+                // Retired with the site's Farm Maps tab; answers until the
+                // command list is re-registered without them.
+                case 'farm':
+                case 'practice': return L.ephemeral(t('feature_retired'));
                 case 'recent': return await cmdRecent(options, interaction);
                 case 'top': return await cmdTop(options, interaction);
                 case 'map': return await cmdMap(options, origin);
-                case 'practice': return await dispatchDeferred('practice', {
-                    interaction, options, origin, lang: savedLang || interaction.locale,
-                });
                 case 'collect-channel': return await cmdCollectChannel(options, interaction, origin);
                 case 'follow': return await cmdFollow(options, interaction);
                 case 'unfollow': return await cmdUnfollow(options, interaction);
@@ -1322,4 +1188,4 @@ exports.handler = async (event) => {
     } catch (err) {
         return L.ephemeral(t('error_generic', { msg: String((err && err.message) || err).slice(0, 200) }));
     }
-};
+}

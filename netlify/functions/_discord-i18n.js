@@ -25,13 +25,36 @@ const LANG_NAMES = {
 };
 const KNOWN_KEYS = new Set(Object.keys(LANG_NAMES));
 
+/* The locale is per request. On Netlify each invocation was its own
+   process, so a module variable was enough; on Cloudflare one isolate
+   serves several interactions at once, and two users answered in parallel
+   would read each other's language. runWithLocale() gives a request its own
+   slot (AsyncLocalStorage, like _cf-env.js); setLocale/getLocale use that
+   slot when there is one and the module variable otherwise (the publish
+   announcements, which run outside any interaction). */
 let current = 'en';
+let localeAls = null;
+try {
+    const { AsyncLocalStorage } = require('node:async_hooks');
+    localeAls = new AsyncLocalStorage();
+} catch {
+    localeAls = null;
+}
+function runWithLocale(fn) {
+    return localeAls ? localeAls.run({ current: 'en' }, fn) : fn();
+}
 // Accepts either one of our keys ("zh", "en", …) as stored by /language, or
 // a raw Discord locale code ("zh-TW", "en-US", …) from interaction.locale.
 function setLocale(x) {
-    current = KNOWN_KEYS.has(x) ? x : (LOCALE_MAP[x] || 'en');
+    const key = KNOWN_KEYS.has(x) ? x : (LOCALE_MAP[x] || 'en');
+    const slot = localeAls && localeAls.getStore();
+    if (slot) slot.current = key;
+    else current = key;
 }
-function getLocale() { return current; }
+function getLocale() {
+    const slot = localeAls && localeAls.getStore();
+    return slot ? slot.current : current;
+}
 
 // key -> { en, zh, zhs, ja, fr, de, ru, es, ko }. `{x}` / `{n}` / `{name}`
 // etc. are filled from the params object.
@@ -44,6 +67,7 @@ const S = {
     sr_avg: { en: 'avg {x}★', zh: '平均 {x}★', zhs: '平均 {x}★', ja: '平均 {x}★', fr: 'moy. {x}★', de: 'Ø {x}★', ru: 'сред. {x}★', es: 'media {x}★', ko: '평균 {x}★' },
     mapper: { en: 'mapper: {n}', zh: 'mapper：{n}', zhs: 'mapper：{n}', ja: 'mapper：{n}', fr: 'mappeur : {n}', de: 'Mapper: {n}', ru: 'маппер: {n}', es: 'mapper: {n}', ko: '매퍼: {n}' },
     not_passed: { en: 'failed', zh: '未通過', zhs: '未通过', ja: '未クリア', fr: 'échoué', de: 'nicht bestanden', ru: 'провалено', es: 'fallado', ko: '실패' },
+    feature_retired: { en: 'This feature has been retired.', zh: '這個功能已經下架了。', zhs: '这个功能已经下架了。', ja: 'この機能は終了しました。', fr: 'Cette fonctionnalité a été retirée.', de: 'Diese Funktion wurde eingestellt.', ru: 'Эта функция больше не доступна.', es: 'Esta función se ha retirado.', ko: '이 기능은 종료되었습니다.' },
     unknown_command: { en: 'Unknown command.', zh: '未知指令。', zhs: '未知指令。', ja: '不明なコマンドです。', fr: 'Commande inconnue.', de: 'Unbekannter Befehl.', ru: 'Неизвестная команда.', es: 'Comando desconocido.', ko: '알 수 없는 명령어입니다.' },
     error_generic: { en: 'Something went wrong: {msg}', zh: '發生錯誤：{msg}', zhs: '发生错误：{msg}', ja: 'エラーが発生しました：{msg}', fr: 'Une erreur est survenue : {msg}', de: 'Ein Fehler ist aufgetreten: {msg}', ru: 'Произошла ошибка: {msg}', es: 'Algo salió mal: {msg}', ko: '오류가 발생했습니다: {msg}' },
     user_not_found: { en: 'Player "{name}" not found.', zh: '找不到玩家「{name}」。', zhs: '找不到玩家「{name}」。', ja: 'プレイヤー「{name}」が見つかりません。', fr: 'Joueur « {name} » introuvable.', de: 'Spieler „{name}" nicht gefunden.', ru: 'Игрок «{name}» не найден.', es: 'Jugador "{name}" no encontrado.', ko: '플레이어 "{name}" 를 찾을 수 없습니다.' },
@@ -217,7 +241,7 @@ const S = {
 
 function t(key, params) {
     const row = S[key];
-    let str = row ? (row[current] || row.en) : key;
+    let str = row ? (row[getLocale()] || row.en) : key;
     if (params) {
         for (const k of Object.keys(params)) {
             str = str.split('{' + k + '}').join(String(params[k]));
@@ -226,4 +250,4 @@ function t(key, params) {
     return str;
 }
 
-module.exports = { setLocale, getLocale, t, LOCALE_MAP, LANG_NAMES, KNOWN_KEYS };
+module.exports = { setLocale, getLocale, runWithLocale, t, LOCALE_MAP, LANG_NAMES, KNOWN_KEYS };

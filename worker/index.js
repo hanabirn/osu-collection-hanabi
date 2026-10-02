@@ -8,8 +8,7 @@
  *   /c/<id>                      -> collection-share-page?id=<id>   （rewrite，網址列不變）
  *   /gallery.xml                 -> gallery-feed
  *   /chat-media/<id>             -> chat-media（函式從路徑尾端讀 id）
- *   /discord                     -> 尚未移植，回 503 而不是 404，
- *                                   免得 Discord 以為端點不存在而關閉整合
+ *   /discord                     -> discord-interactions（Discord bot 的互動端點）
  *   其他                          -> 靜態資源（env.ASSETS）
  */
 /* rosu-pp 的 WASM 必須在任何 require 之前就緒。ESM 的 import 保證先於
@@ -23,6 +22,8 @@ const { runWithEnv } = require('../netlify/functions/_cf-env');
 /* 要在任何函式發出請求前裝好：對 osu.ppy.sh 的 fetch 改經 Netlify 轉送。 */
 require('./osu-relay-fetch').install();
 const { ROUTES, CRON_HANDLERS } = require('./routes');
+/* 在轉送之後裝：打自己 /.netlify/functions/* 的 fetch 直接呼叫函式（見 internal-fetch.js）。 */
+require('./internal-fetch').install(ROUTES);
 const {
     EXPENSIVE_MS,
     parseMaxAge,
@@ -34,31 +35,19 @@ const { serveCatalogData } = require('./catalog-data');
 
 const FN_PREFIX = '/.netlify/functions/';
 
-/* Discord 尚未移植。回 503 + Retry-After 而非 404：
-   Discord 對持續 404 的 Interactions Endpoint 會停用整合，
-   503 則被視為暫時性故障。 */
-function discordNotPorted() {
-    return new Response(JSON.stringify({ error: 'discord integration not migrated yet' }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' },
-    });
-}
-
 function resolveRoute(url) {
     const path = url.pathname;
 
     if (path.startsWith(FN_PREFIX)) {
         const name = path.slice(FN_PREFIX.length).replace(/\/$/, '');
-        if (name === 'discord-interactions' || name === 'discord-work-background') {
-            return { special: discordNotPorted };
-        }
         /* 直接串流 R2，不經 adapter、不進回應快取（見 catalog-data.js）。 */
         if (name === 'catalog-data') return { direct: serveCatalogData };
         const fn = ROUTES[name];
         return fn ? { fn } : null;
     }
 
-    if (path === '/discord') return { special: discordNotPorted };
+    /* Discord 的 Interactions Endpoint（Discord 開發者後台登記的網址）。 */
+    if (path === '/discord') return { fn: ROUTES['discord-interactions'] };
 
     /* 以下三條對應 netlify.toml 的 [[redirects]] status=200（rewrite）。
        用 200 rewrite 而不是轉址，網址列要保持原樣。 */
@@ -114,7 +103,6 @@ export default {
         const route = resolveRoute(url);
 
         if (!route) return env.ASSETS.fetch(request);
-        if (route.special) return route.special();
         if (route.direct) {
             try {
                 return await route.direct(request, env, url);
@@ -178,7 +166,7 @@ export default {
 
         try {
             const startedAt = Date.now();
-            const response = await runWithEnv(env, ctx, () => route.fn(request, effectiveUrl));
+            const response = await runWithEnv(env, ctx, () => route.fn(request, effectiveUrl), url.host);
             const elapsed = Date.now() - startedAt;
 
             if (isCacheable && response.status === 200) {

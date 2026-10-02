@@ -20,10 +20,16 @@ try {
     als = null;
 }
 
-/* Workers 上呼叫；handler 在這個 callback 裡跑，期間 getEnv() 拿得到 env。 */
-function runWithEnv(env, ctx, fn) {
+/* Workers 上呼叫；handler 在這個 callback 裡跑，期間 getEnv() 拿得到 env。
+   host 是這個請求自己的主機名（worker/internal-fetch.js 用來認出「打自己」的
+   fetch）；排程沒有請求，就不帶。 */
+function runWithEnv(env, ctx, fn, host = null) {
     if (!als) return fn();
-    return als.run({ env, ctx }, fn);
+    return als.run({ env, ctx, host }, fn);
+}
+
+function getRequestHost() {
+    return als?.getStore()?.host ?? null;
 }
 
 function getEnv() {
@@ -38,4 +44,4 @@ function getCtx() {
 
 const onCloudflare = () => getEnv() != null;
 
-module.exports = { runWithEnv, getEnv, getCtx, onCloudflare };
+module.exports = { runWithEnv, getEnv, getCtx, getRequestHost, onCloudflare };

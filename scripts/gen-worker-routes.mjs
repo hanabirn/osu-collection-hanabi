@@ -18,11 +18,9 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const FN_DIR = join(ROOT, 'netlify/functions');
 const OUT = join(ROOT, 'worker/routes.js');
 
-const DEFERRED_DISCORD = new Set([
-    'discord-interactions',
-    'discord-work-background',
-    'practice-generate', // 只有 discord-work-background 會呼叫
-]);
+/* Discord bot：2026-10 移植到 Worker（discord-interactions 會掛上路由），
+   原本只給 /practice 用的背景函式已隨 Farm 一起移除，所以這裡是空的。 */
+const DEFERRED_DISCORD = new Set([]);
 const DEAD = new Set(['preview-proxy']);
 /* 只給 Netlify 用：Worker 打 osu.ppy.sh 被擋時經它轉送（見 osu-relay.js），
    Worker 自己掛這條路由沒有意義。 */

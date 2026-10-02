@@ -117,8 +117,21 @@ function modsTag(mods) {
 
 const ED25519_SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex');
 
-function verifySignature(rawBody, signatureHex, timestamp, publicKeyHex) {
+/* Async: WebCrypto Ed25519 (Cloudflare Workers and Node 20+ both have it),
+   with the old node:crypto path kept as a fallback. */
+async function verifySignature(rawBody, signatureHex, timestamp, publicKeyHex) {
     if (!signatureHex || !timestamp || !publicKeyHex) return false;
+    if (!/^[0-9a-f]{128}$/i.test(signatureHex) || !/^[0-9a-f]{64}$/i.test(publicKeyHex)) return false;
+    const subtle = globalThis.crypto && globalThis.crypto.subtle;
+    if (subtle) {
+        try {
+            const bytes = hex => Uint8Array.from(hex.match(/../g), b => parseInt(b, 16));
+            const key = await subtle.importKey('raw', bytes(publicKeyHex), { name: 'Ed25519' }, false, ['verify']);
+            return await subtle.verify({ name: 'Ed25519' }, key, bytes(signatureHex), new TextEncoder().encode(timestamp + rawBody));
+        } catch {
+            // fall through to node:crypto
+        }
+    }
     try {
         const key = crypto.createPublicKey({
             key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKeyHex, 'hex')]),

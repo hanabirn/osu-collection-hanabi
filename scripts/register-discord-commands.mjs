@@ -99,10 +99,6 @@ const commands = [
     { name: 'top', ...d('cmd_top'), options: [usernameOpt, modeOpt, { type: 4, name: 'index', required: false, ...d('opt_top_index') }] },
     { name: 'map', ...d('cmd_map'), options: [{ type: 3, name: 'query', required: true, ...d('opt_map_query') }] },
     {
-        name: 'practice', ...d('cmd_practice'),
-        options: [usernameOpt, modeOpt, { type: 4, name: 'target_pp', required: false, ...d('opt_practice_target') }],
-    },
-    {
         name: 'mappool', ...d('cmd_mappool'),
         options: [
             { type: 3, name: 'edition', required: true, autocomplete: true, ...d('opt_mappool_edition') },
@@ -138,15 +134,8 @@ const commands = [
         ],
     },
     { name: 'skin', ...d('cmd_skin'), options: [{ type: 3, name: 'query', required: true, ...d('opt_skin_query') }] },
-    {
-        name: 'farm', ...d('cmd_farm'),
-        options: [
-            modeOpt,
-            { type: 3, name: 'mods', required: false, choices: ['NM', 'HD', 'HR', 'DT', 'HDDT', 'HDHR'].map(m => ({ name: m, value: m })), ...d('opt_farm_mods') },
-            { type: 4, name: 'pp_min', required: false, ...d('opt_pp_min') },
-            { type: 4, name: 'pp_max', required: false, ...d('opt_pp_max') },
-        ],
-    },
+    // /farm and /practice were retired with the site's Farm Maps tab
+    // (2026-10); registering without them removes them from Discord.
     { name: 'collect-channel', ...d('cmd_collect_channel'), options: [{ type: 4, name: 'count', required: false, ...d('opt_collect_count') }] },
     { name: 'follow', ...d('cmd_follow'), options: [{ type: 3, name: 'query', required: true, autocomplete: true, ...d('opt_follow_query') }] },
     { name: 'unfollow', ...d('cmd_unfollow'), options: [{ type: 3, name: 'query', required: true, autocomplete: true, ...d('opt_follow_query') }] },
