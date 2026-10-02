@@ -205,10 +205,7 @@
     --text: #f4f2f7;
     --text-dim: rgba(244,242,247,0.72);
     --pink: #ff7ac2;
-    min-height: clamp(220px, 28vw, 320px);
-    /* A little wider than the page column (up to 1280px, never past the
-       viewport): negative margins on both sides. */
-    margin-inline: calc((100% - min(1280px, 100vw - 32px, 100% + 200px)) / 2);
+    min-height: 220px;
 }
 /* Two stacked cover layers that cross-fade (js/osu.js updateCollectionHeroV2).
    opacity-only transition = compositor-only; JS pauses it off-screen. */
@@ -237,10 +234,9 @@
 @media (prefers-reduced-motion: reduce) {
     .collection-hero-v2 .hero-cover { transition: none; }
 }
-.collection-hero-v2 > .eyebrow { font-size: 0.78rem; }
 .collection-hero-v2-line {
     font-family: var(--font-display);
-    font-size: clamp(1.45rem, 4vw, 2.6rem);
+    font-size: clamp(1.1rem, 2.8vw, 1.6rem);
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -248,7 +244,7 @@
 }
 .collection-hero-v2-stat {
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     letter-spacing: 0.08em;
     color: var(--text-dim);
     /* Reserve the line even before JS fills it, so the async stat text
