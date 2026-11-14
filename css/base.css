@@ -30,6 +30,13 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
 }
+/* Form controls don't inherit the page font by default, so any button a
+   component forgot to give `font-family: inherit` rendered in Arial (the
+   探索更多 cards and the 新增 button did). One reset for all of them. */
+button, input, select, textarea { font: inherit; }
+/* Not on <select>: its option list would take the light text colour onto
+   the browser's light popup. */
+button { color: inherit; }
 /* Per-language CJK font: html[lang] is kept in sync with the active UI
    language by applyLang() in js/i18n.js, so this swaps the CJK face to
    match rather than rendering Japanese/Korean through a Chinese font. */
@@ -76,7 +83,7 @@ a:hover { text-decoration: underline; }
 }
 .eyebrow {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: var(--fs-11);
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -121,8 +128,8 @@ a:hover { text-decoration: underline; }
     z-index: 5;
     overflow: visible;
     width: 100%;
-    padding: 22px clamp(16px, 4vw, 24px);
-    min-height: clamp(150px, 15vw, 230px);
+    padding: 18px clamp(16px, 4vw, 24px);
+    min-height: clamp(120px, 10vw, 168px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -171,7 +178,7 @@ a:hover { text-decoration: underline; }
     justify-content: center;
     width: 34px;
     height: 34px;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     border: var(--line) solid rgba(255, 255, 255, 0.24);
     background: rgba(10, 10, 16, 0.6);
     color: var(--text);
@@ -179,7 +186,7 @@ a:hover { text-decoration: underline; }
 }
 .header-banner-btn:hover { border-color: rgba(var(--pink-rgb), 0.8); }
 .header-banner-btn .icon-svg { width: 16px; height: 16px; }
-.header-banner-btn--label { width: auto; gap: 6px; padding: 0 12px; font: inherit; font-size: 0.82rem; font-weight: 600; }
+.header-banner-btn--label { width: auto; gap: 6px; padding: 0 12px; font: inherit; font-size: var(--fs-13); font-weight: 600; }
 .header-banner-pos { width: 110px; accent-color: var(--pink); }
 .header-banner-pos[hidden], .header-banner-btn[hidden] { display: none; }
 
@@ -260,10 +267,10 @@ a:hover { text-decoration: underline; }
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 1.2rem;
+    font-size: var(--fs-20);
     cursor: pointer;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out),
-        color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out),
+        color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .nav-menu-btn:hover {
     border-color: var(--accent-pink);
@@ -325,9 +332,9 @@ a:hover { text-decoration: underline; }
 }
 /* Tapered so the notes nearest the title roughly match its cap height,
    trailing off smaller outward — a tidy compact lockup, not a hero. */
-.tn-1, .tn-6 { font-size: 1.05rem; }
-.tn-2, .tn-5 { font-size: 1.45rem; }
-.tn-3, .tn-4 { font-size: 1.95rem; }
+.tn-1, .tn-6 { font-size: var(--fs-16); }
+.tn-2, .tn-5 { font-size: var(--fs-24); }
+.tn-3, .tn-4 { font-size: var(--fs-32); }
 
 .tn-1, .tn-4 { color: var(--pink-text, var(--pink)); }
 .tn-2, .tn-5 { color: var(--text-pink); }
@@ -349,9 +356,9 @@ a:hover { text-decoration: underline; }
 }
 @media (max-width: 600px) {
     .tn-1, .tn-6 { display: none; }
-    .tn-2, .tn-5 { font-size: 1.15rem; }
-    .tn-3, .tn-4 { font-size: 1.55rem; }
-    .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: 1rem; padding: 0 8px; }
+    .tn-2, .tn-5 { font-size: var(--fs-18); }
+    .tn-3, .tn-4 { font-size: var(--fs-24); }
+    .lang-globe-btn { width: auto; min-width: 32px; height: 32px; font-size: var(--fs-16); padding: 0 8px; }
     .site-title-block h1 { font-size: clamp(2rem, 9vw, 2.6rem); letter-spacing: -0.02em; }
     .header-logo { gap: 6px; }
 }
@@ -427,7 +434,7 @@ a:hover { text-decoration: underline; }
     .site-page.page-fade-in { animation: none; }
 }
 .site-tagline {
-    font-size: 0.76rem;
+    font-size: var(--fs-12);
     font-weight: 500;
     letter-spacing: 0.1em;
     color: var(--text-dim);
@@ -452,7 +459,7 @@ a:hover { text-decoration: underline; }
     padding: 7px 14px;
     border-radius: 999px;
     font-family: inherit;
-    font-size: 0.82rem;
+    font-size: var(--fs-13);
     font-weight: 600;
     color: #fff;
     background: rgba(18, 12, 30, 0.55);
@@ -461,8 +468,8 @@ a:hover { text-decoration: underline; }
     -webkit-backdrop-filter: blur(10px) saturate(140%);
     backdrop-filter: blur(10px) saturate(140%);
     cursor: pointer;
-    transition: transform 0.2s var(--ease-out), background 0.2s var(--ease-out),
-        border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+    transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 .site-social-btn .icon-svg {
     width: 1.05em;
@@ -506,7 +513,7 @@ a:hover { text-decoration: underline; }
 }
 @media (max-width: 480px) {
     .site-social { margin-top: 10px; flex-wrap: wrap; }
-    .site-social-btn { font-size: 0.78rem; padding: 6px 12px; }
+    .site-social-btn { font-size: var(--fs-12); padding: 6px 12px; }
 }
 
 .lang-pill {
@@ -514,12 +521,12 @@ a:hover { text-decoration: underline; }
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
     padding: 5px 13px;
-    border-radius: 14px;
-    font-size: 0.8rem;
+    border-radius: var(--r-card);
+    font-size: var(--fs-13);
     cursor: pointer;
     text-align: left;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out),
-        color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out),
+        color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 /* Inline-SVG flags (emoji flags don't render on Windows). ~3:2, clipped to
    a small rounded chip. Kept in .lang-pill and mirrored in the header
@@ -571,12 +578,12 @@ a:hover { text-decoration: underline; }
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 1rem;
+    font-size: var(--fs-16);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .notif-bell-btn:hover,
 .notif-bell.open .notif-bell-btn {
@@ -590,14 +597,14 @@ a:hover { text-decoration: underline; }
 .header-corner-actions .notif-bell-btn {
     width: 42px;
     height: 42px;
-    font-size: 1.2rem;
+    font-size: var(--fs-20);
 }
 .header-corner-actions .notif-badge {
     top: -3px;
     right: -3px;
     min-width: 19px;
     height: 19px;
-    font-size: 0.72rem;
+    font-size: var(--fs-12);
     line-height: 19px;
 }
 .notif-badge {
@@ -610,7 +617,7 @@ a:hover { text-decoration: underline; }
     border-radius: 999px;
     background: var(--accent-pink);
     color: var(--on-accent, #fff);
-    font-size: 0.62rem;
+    font-size: var(--fs-10);
     font-weight: bold;
     line-height: 16px;
     text-align: center;
@@ -624,14 +631,14 @@ a:hover { text-decoration: underline; }
     flex-direction: column;
     width: 300px;
     max-width: 85vw;
-    border-radius: 14px;
+    border-radius: var(--r-card);
     background: var(--bg-card);
     border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
-    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
     z-index: 210;
 }
 .notif-bell.open .notif-bell-menu {
@@ -645,7 +652,7 @@ a:hover { text-decoration: underline; }
     justify-content: space-between;
     padding: 12px 14px;
     border-bottom: var(--line) solid var(--border-card);
-    font-size: 0.85rem;
+    font-size: var(--fs-14);
     font-weight: bold;
     color: var(--text);
 }
@@ -653,7 +660,7 @@ a:hover { text-decoration: underline; }
     border: none;
     background: transparent;
     color: var(--text-dim2);
-    font-size: 0.72rem;
+    font-size: var(--fs-12);
     cursor: pointer;
     padding: 2px 4px;
 }
@@ -671,10 +678,10 @@ a:hover { text-decoration: underline; }
     background: transparent;
     color: var(--text-dim2);
     font: inherit;
-    font-size: 0.78rem;
+    font-size: var(--fs-12);
     text-align: left;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast);
 }
 .notif-push-row:hover { background: var(--bg-stat); color: var(--text); }
 .notif-push-row.on { color: var(--accent-pink-text, var(--accent-pink)); }
@@ -686,26 +693,26 @@ a:hover { text-decoration: underline; }
 .notif-empty {
     padding: 20px 10px;
     text-align: center;
-    font-size: 0.82rem;
+    font-size: var(--fs-13);
     color: var(--text-dim2);
 }
 .notif-item {
     display: flex;
     gap: 10px;
     padding: 9px 8px;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background var(--dur-fast);
 }
 .notif-item:hover { background: var(--bg-stat); }
 .notif-item.unread { background: rgba(var(--accent-pink-rgb), 0.08); }
-.notif-item-icon { font-size: 1.1rem; flex: 0 0 auto; }
+.notif-item-icon { font-size: var(--fs-18); flex: 0 0 auto; }
 .notif-item-body { min-width: 0; }
-.notif-item-title { font-size: 0.82rem; font-weight: bold; color: var(--text); }
+.notif-item-title { font-size: var(--fs-13); font-weight: bold; color: var(--text); }
 .notif-item-detail {
-    font-size: 0.78rem;
+    font-size: var(--fs-12);
     color: var(--text-dim2);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -713,7 +720,7 @@ a:hover { text-decoration: underline; }
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
-.notif-item-time { font-size: 0.68rem; color: var(--text-dim2); opacity: 0.7; margin-top: 2px; }
+.notif-item-time { font-size: var(--fs-11); color: var(--text-dim2); opacity: 0.7; margin-top: 2px; }
 
 .contact-info {
     position: relative;
@@ -725,12 +732,12 @@ a:hover { text-decoration: underline; }
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 1.05rem;
+    font-size: var(--fs-16);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .contact-info-btn:hover,
 .contact-info.open .contact-info-btn {
@@ -744,7 +751,7 @@ a:hover { text-decoration: underline; }
 .header-corner-actions .contact-info-btn {
     width: 42px;
     height: 42px;
-    font-size: 1.2rem;
+    font-size: var(--fs-20);
 }
 /* Same sizing pattern as .contact-info-btn/.notif-bell-btn — .header-ctl
    only owns the frosted-chip color treatment, not shape (see the comment
@@ -756,12 +763,12 @@ a:hover { text-decoration: underline; }
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 1.05rem;
+    font-size: var(--fs-16);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .global-search-btn:hover {
     background: rgba(var(--accent-pink-rgb), 0.14);
@@ -772,7 +779,7 @@ a:hover { text-decoration: underline; }
 .header-corner-actions .global-search-btn {
     width: 42px;
     height: 42px;
-    font-size: 1.2rem;
+    font-size: var(--fs-20);
 }
 
 .contact-info-menu {
@@ -784,14 +791,14 @@ a:hover { text-decoration: underline; }
     gap: 4px;
     min-width: 240px;
     padding: 8px;
-    border-radius: 14px;
+    border-radius: var(--r-card);
     background: var(--bg-card);
     border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
-    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
     z-index: 210;
 }
 .contact-info.open .contact-info-menu {
@@ -804,10 +811,10 @@ a:hover { text-decoration: underline; }
     align-items: center;
     gap: 4px;
     padding: 8px 10px;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     color: var(--text);
-    font-size: 0.85rem;
-    transition: background 0.15s;
+    font-size: var(--fs-14);
+    transition: background var(--dur-fast);
 }
 a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .contact-info-item-static { cursor: default; }
@@ -839,14 +846,14 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     max-height: 360px;
     overflow-y: auto;
     padding: 12px;
-    border-radius: 14px;
+    border-radius: var(--r-card);
     background: var(--bg-card);
     border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     text-align: left;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
     z-index: 210;
 }
 .site-changelog.open .site-changelog-menu {
@@ -855,7 +862,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     transform: translateX(-50%) translateY(0);
 }
 .changelog-entry-date {
-    font-size: 0.72rem;
+    font-size: var(--fs-12);
     font-weight: 700;
     letter-spacing: 0.03em;
     color: var(--text-pink);
@@ -869,7 +876,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     gap: 3px;
 }
 .changelog-entry-list li {
-    font-size: 0.82rem;
+    font-size: var(--fs-13);
     color: var(--text);
     line-height: 1.4;
 }
@@ -878,7 +885,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border-top: var(--line) solid var(--border-card);
 }
 .changelog-empty {
-    font-size: 0.82rem;
+    font-size: var(--fs-13);
     color: var(--text-dim2);
     padding: 4px 2px;
 }
@@ -892,7 +899,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .lang-globe-btn {
     height: 36px;
     padding: 0 12px;
-    border-radius: 18px;
+    border-radius: var(--r-modal);
     /* Stronger than the plain .lang-pill-bg/-border used elsewhere in the
        header — this button now carries a language name as text, not just
        an icon, so it needs to read clearly as a control on its own rather
@@ -900,12 +907,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: rgba(var(--accent-purple-rgb), 0.16);
     border: var(--line) solid rgba(var(--accent-purple-rgb), 0.45);
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: var(--fs-14);
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .lang-globe-btn:hover,
 .lang-globe.open .lang-globe-btn {
@@ -919,7 +926,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .header-corner-actions .lang-globe-btn {
     height: 42px;
     padding: 0 14px;
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
 }
 .lang-globe-menu {
     position: absolute;
@@ -934,14 +941,14 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     padding: 8px;
-    border-radius: 14px;
+    border-radius: var(--r-card);
     background: var(--bg-card);
     border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
-    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
     z-index: 210;
 }
 /* On a phone these header menus are anchored to a control that's now near
@@ -983,10 +990,10 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     width: 42px;
     height: 42px;
     cursor: pointer;
-    font-size: 1.15rem;
+    font-size: var(--fs-18);
     color: var(--text);
-    transition: transform 0.35s var(--ease-spring), border-color 0.25s var(--ease-out),
-        box-shadow 0.25s var(--ease-out), background 0.25s var(--ease-out);
+    transition: transform var(--dur) var(--ease-spring), border-color var(--dur) var(--ease-out),
+        box-shadow var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
 }
 .theme-toggle-btn:hover {
     transform: scale(1.15) rotate(15deg);
@@ -1012,12 +1019,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 1.05rem;
+    font-size: var(--fs-16);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .accent-picker-btn:hover,
 .accent-picker.open .accent-picker-btn {
@@ -1029,7 +1036,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .header-corner-actions .accent-picker-btn {
     width: 42px;
     height: 42px;
-    font-size: 1.2rem;
+    font-size: var(--fs-20);
 }
 .accent-picker-menu {
     position: absolute;
@@ -1040,14 +1047,14 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     gap: 10px;
     width: 220px;
     padding: 12px;
-    border-radius: 14px;
+    border-radius: var(--r-card);
     background: var(--bg-card);
     border: var(--line) solid var(--border-card);
     box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
-    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
     z-index: 210;
 }
 .accent-picker.open .accent-picker-menu {
@@ -1067,7 +1074,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border: 2px solid transparent;
     padding: 0;
     cursor: pointer;
-    transition: transform 0.15s var(--ease-out);
+    transition: transform var(--dur-fast) var(--ease-out);
 }
 .accent-swatch:hover { transform: scale(1.15); }
 .accent-swatch.active {
@@ -1078,7 +1085,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.82rem;
+    font-size: var(--fs-13);
     color: var(--text-secondary);
     padding-top: 4px;
     border-top: var(--line) solid var(--border-card);
@@ -1088,20 +1095,20 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     height: 30px;
     padding: 0;
     border: var(--line) solid var(--border-card);
-    border-radius: 8px;
+    border-radius: var(--r-ctl);
     background: none;
     cursor: pointer;
 }
 .accent-picker-reset {
     padding: 7px 10px;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     border: var(--line) solid var(--border-card);
     background: var(--bg-stat);
     color: var(--text-secondary);
     font-family: inherit;
-    font-size: 0.8rem;
+    font-size: var(--fs-13);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast);
 }
 .accent-picker-reset:hover { background: rgba(var(--accent-pink-rgb), 0.12); color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
@@ -1127,15 +1134,15 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     align-items: center;
     height: 34px;
     padding: 0 14px;
-    border-radius: 17px;
+    border-radius: var(--r-card);
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
     color: var(--lang-pill-text);
-    font-size: 0.85rem;
+    font-size: var(--fs-14);
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
-    transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+    transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
 }
 .osu-login-btn:hover {
     background: rgba(var(--accent-pink-rgb), 0.14);
@@ -1148,7 +1155,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     gap: 6px;
     height: 34px;
     padding: 0 6px 0 4px;
-    border-radius: 17px;
+    border-radius: var(--r-card);
     background: var(--lang-pill-bg);
     border: var(--line) solid var(--lang-pill-border);
 }
@@ -1159,7 +1166,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     object-fit: cover;
 }
 .osu-logged-in-name {
-    font-size: 0.82rem;
+    font-size: var(--fs-13);
     font-weight: 600;
     color: var(--text);
     max-width: 110px;
@@ -1171,11 +1178,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: transparent;
     border: none;
     color: var(--text-secondary);
-    font-size: 0.75rem;
+    font-size: var(--fs-12);
     cursor: pointer;
     padding: 4px;
     line-height: 1;
-    transition: color 0.2s var(--ease-out);
+    transition: color var(--dur-fast) var(--ease-out);
 }
 .osu-logout-btn:hover { color: var(--accent-pink-text, var(--accent-pink)); }
 
@@ -1186,8 +1193,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .osu-login-btn-large {
     height: 42px;
     padding: 0 20px;
-    border-radius: 21px;
-    font-size: 0.95rem;
+    border-radius: var(--r-modal);
+    font-size: var(--fs-16);
     font-weight: bold;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     border-color: transparent;
@@ -1201,10 +1208,10 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .osu-logged-in-pill-large {
     height: 42px;
     padding: 0 10px 0 6px;
-    border-radius: 21px;
+    border-radius: var(--r-modal);
 }
 .osu-logged-in-pill-large .osu-logged-in-avatar { width: 30px; height: 30px; }
-.osu-logged-in-pill-large .osu-logged-in-name { font-size: 0.9rem; max-width: 140px; }
+.osu-logged-in-pill-large .osu-logged-in-name { font-size: var(--fs-14); max-width: 140px; }
 
 /* ===== Slide-in navigation drawer =====
    Replaces the old horizontal .site-nav tab bar (chronically overcrowded).
@@ -1221,7 +1228,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     opacity: 0;
-    transition: opacity 0.3s var(--ease-out);
+    transition: opacity var(--dur) var(--ease-out);
 }
 .nav-drawer-scrim.open { opacity: 1; }
 .nav-drawer-scrim[hidden] { display: none; }
@@ -1242,7 +1249,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     -webkit-backdrop-filter: none;
     color: var(--text);
     transform: translateX(100%);
-    transition: transform 0.32s var(--ease-out);
+    transition: transform var(--dur) var(--ease-out);
 }
 .nav-drawer.open { transform: translateX(0); }
 .nav-drawer[hidden] { display: none; }
@@ -1252,7 +1259,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     align-items: center;
     justify-content: space-between;
     padding: 18px 20px;
-    font-size: 1.05rem;
+    font-size: var(--fs-16);
     font-weight: 700;
     letter-spacing: 0.04em;
     border-bottom: var(--line) solid var(--border);
@@ -1268,7 +1275,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border: var(--line) solid var(--border);
     color: var(--text-dim);
     cursor: pointer;
-    transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), transform 0.2s var(--ease-spring);
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
 }
 .nav-drawer-close:hover { background: var(--surface-2); color: var(--text); }
 .nav-drawer-close:active { transform: scale(0.9); }
@@ -1288,7 +1295,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .nav-drawer-group-label {
     padding: 4px 12px 8px;
-    font-size: 0.72rem;
+    font-size: var(--fs-12);
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -1307,14 +1314,14 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     width: 100%;
     background: transparent;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     color: rgba(255, 255, 255, 0.82);
     padding: 12px 14px;
-    font-size: 0.98rem;
+    font-size: var(--fs-16);
     text-align: left;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), transform 0.15s var(--ease-out);
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .site-nav-btn:hover {
     color: var(--text);
@@ -1338,35 +1345,51 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 4px;
         margin: -2px 0 12px;
-        padding-bottom: 10px;
+        padding-bottom: 8px;
         border-bottom: var(--line-divider) solid var(--border-card);
     }
     /* the drawer's own ☰ trigger is redundant once the bar is visible */
     #nav-menu-btn { display: none !important; }
 }
+/* osu-web style tabs: plain text, a fill on hover, and the current tab
+   marked by a bar along the nav's bottom divider instead of a bordered pill. */
 .site-topnav-btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     background: transparent;
-    border: var(--line) solid var(--border-strong);
-    border-radius: 999px;
-    color: rgba(255, 255, 255, 0.78);
-    padding: 11px 20px;
-    font-size: 1.05rem;
+    border: 0;
+    border-radius: var(--r-ctl);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    font-size: var(--fs-16);
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out), border-color 0.15s var(--ease-out);
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
-.site-topnav-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.32); }
+.site-topnav-btn::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: -11px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--pink);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.site-topnav-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.site-topnav-btn:hover::after { opacity: 0.35; transform: scaleX(1); }
 .site-topnav-btn.active {
-    background: rgba(var(--accent-pink-rgb), 0.14);
-    border-color: rgba(var(--accent-pink-rgb), 0.7);
-    color: var(--pink-text, var(--pink));
+    color: var(--text);
     font-weight: 700;
 }
+.site-topnav-btn.active::after { opacity: 1; transform: scaleX(1); }
 .site-topnav-more { opacity: 0.85; }
 
 /* Beatmap-preview volume — used to be a persistent bottom-right FAB
@@ -1438,7 +1461,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     text-align: center;
     padding: 20px;
     color: var(--text-secondary);
-    font-size: 0.75rem;
+    font-size: var(--fs-12);
 }
 /* Low-key Ko-fi link — muted until hover, then the coral brand colour. */
 .footer-support-link {
@@ -1446,8 +1469,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     align-items: center;
     margin-top: 6px;
     color: var(--text-label);
-    font-size: 0.75rem;
-    transition: color 0.2s var(--ease-out);
+    font-size: var(--fs-12);
+    transition: color var(--dur-fast) var(--ease-out);
 }
 .footer-support-link:hover {
     color: #ff5e5b;
@@ -1457,7 +1480,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 
 .status {
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: var(--fs-14);
     text-align: center;
     padding: 4px 0;
 }
@@ -1470,11 +1493,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     flex: 1;
     min-width: 0;   /* let it shrink below the placeholder's width instead of shoving the button off-screen */
     padding: 11px 14px;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     border: var(--line) solid var(--border-input);
     background-color: var(--bg-input);
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
     font-family: inherit;
 }
 .input-group input:focus {
@@ -1490,13 +1513,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     color: var(--on-accent, #14101c);
     border: none;
     padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 0.9rem;
+    border-radius: var(--r-ctl);
+    font-size: var(--fs-14);
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     box-shadow: none;
-    transition: background 0.18s var(--ease-out), transform 0.12s var(--ease-out), box-shadow 0.18s var(--ease-out);
+    transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 .input-group button::after, .btn::after { content: none; }
 .input-group button:hover, .btn:hover {
@@ -1508,11 +1531,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .guestbook-input {
     flex: 1;
     padding: 11px 14px;
-    border-radius: 10px;
+    border-radius: var(--r-card);
     border: var(--line) solid var(--border-input);
     background-color: var(--bg-input);
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
     font-family: inherit;
 }
 
@@ -1539,12 +1562,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     color: #fff;
     padding: 12px 28px;
-    border-radius: 24px;
-    font-size: 0.95rem;
+    border-radius: var(--r-modal);
+    font-size: var(--fs-16);
     font-weight: 600;
     opacity: 0;
     pointer-events: none;
-    transition: all 0.35s ease;
+    transition: all var(--dur) ease;
     z-index: 9999;
     box-shadow: 0 4px 20px rgba(139,92,246,0.4);
     white-space: nowrap;
@@ -1597,7 +1620,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .undo-toast-btn {
     flex-shrink: 0;
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--r-ctl);
     padding: 6px 14px;
     background: rgba(255, 255, 255, 0.22);
     color: #fff;
@@ -1621,7 +1644,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     background: linear-gradient(90deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.1));
     border-bottom: var(--line) solid rgba(251, 191, 36, 0.35);
     color: var(--accent-yellow);
-    font-size: 0.85rem;
+    font-size: var(--fs-14);
     text-align: center;
 }
 .maintenance-banner-close {
@@ -1661,8 +1684,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     align-items: center;      /* keep emoji (⭐) + text visually centred on one line */
     max-width: 260px;
     padding: 7px 11px;
-    border-radius: 8px;
-    font-size: 0.8rem;
+    border-radius: var(--r-ctl);
+    font-size: var(--fs-13);
     font-weight: 600;
     line-height: 1.35;
     letter-spacing: 0.01em;
@@ -1675,7 +1698,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     pointer-events: none;
     opacity: 0;
     transform: translateY(4px);
-    transition: opacity 0.16s var(--ease-out), transform 0.16s var(--ease-out);
+    transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .app-tooltip[data-placement="bottom"] { transform: translateY(-4px); }
 .app-tooltip.visible { opacity: 1; transform: translateY(0); }
@@ -1717,7 +1740,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .app-tooltip { transition: opacity 0.12s linear; transform: none; }
+    .app-tooltip { transition: opacity var(--dur-fast) linear; transform: none; }
     .app-tooltip[data-placement="bottom"] { transform: none; }
 }
 
@@ -1742,13 +1765,13 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .header-corner-left,
     .header-banner-tools { display: contents; }
     .logo-icon svg { width: 40px; height: 40px; }
-    .site-title-block h1 { font-size: 1.85rem; }
+    .site-title-block h1 { font-size: var(--fs-28); }
     .site-header .header-ctl,
     .site-header .header-banner-btn { width: 36px; height: 36px; min-width: 36px; padding: 0; }
     .site-header .lang-globe-btn { width: auto; padding: 0 8px; }
-    .site-header .osu-login-btn { height: 36px; padding: 0 12px; font-size: 0.85rem; }
+    .site-header .osu-login-btn { height: 36px; padding: 0 12px; font-size: var(--fs-14); }
     .site-social { gap: 6px; }
-    .site-social-btn { padding: 6px 10px; font-size: 0.78rem; }
+    .site-social-btn { padding: 6px 10px; font-size: var(--fs-12); }
     .header-banner-btn--label span { display: none; }
     .header-banner-btn--label { width: 36px; padding: 0; }
     /* Their buttons now sit anywhere in the wrapped row, so pin these two

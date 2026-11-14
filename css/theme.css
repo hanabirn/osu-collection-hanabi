@@ -20,8 +20,10 @@
     --border-strong: rgba(255,255,255,0.16);
     /* Line weights: --line for every component border, --line-divider for
        the section dividers (header bottom, explore row, separators). */
-    --line:          2px;
-    --line-divider:  3px;
+    /* 1px like osu-web: layers are told apart by fill (page < card <
+       input), not by outlines, so borders only need to be hairlines. */
+    --line:          1px;
+    --line-divider:  2px;
     --text-dim:      rgba(244,242,247,0.62);
     --text-faint:    rgba(244,242,247,0.42);
     --pink:          #f472b6;
@@ -32,9 +34,30 @@
     --good: #34d399;
     --warn: #fbbf24;
     --bad:  #f87171;
+    /* Radius scale: controls, cards, modals; pills/circles only for tags,
+       badges, avatars and header controls. */
+    --r-ctl:   6px;
     --r-card:  12px;
     --r-modal: 18px;
     --r-pill:  999px;
+    /* Type scale in px steps (as rem, so a larger browser font still
+       scales). Use these instead of ad-hoc rem values like 0.82rem. */
+    --fs-10: 0.625rem;
+    --fs-11: 0.6875rem;
+    --fs-12: 0.75rem;
+    --fs-13: 0.8125rem;
+    --fs-14: 0.875rem;
+    --fs-16: 1rem;
+    --fs-18: 1.125rem;
+    --fs-20: 1.25rem;
+    --fs-22: 1.375rem;
+    --fs-24: 1.5rem;
+    --fs-28: 1.75rem;
+    --fs-32: 2rem;
+    --fs-48: 3rem;
+    --fs-56: 3.5rem;
+    /* Two durations: small controls, and larger surfaces. */
+    --dur-fast: 150ms;
     --dur:  220ms;
 
     /* --- legacy names, remapped --- */
@@ -88,7 +111,7 @@
 
 /* Colour-prop tween (kept narrow) — also smooths an accent-colour change. */
 *, *::before, *::after {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease, box-shadow var(--dur) ease;
 }
 
 /* ===== Ambient vignette =====
