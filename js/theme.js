@@ -14,12 +14,13 @@ const ACCENT_SWATCHES = [
 // blends the chosen accent into these, it never replaces them outright, so
 // the shell stays dark regardless of how bright a colour is picked.
 const ACCENT_BG_BASE = {
-    '--bg': '#0b0b10',
-    '--bg-body-1': '#0b0b10',
-    '--bg-body-2': '#0b0b10',
-    '--bg-body-3': '#0c0c12',
-    '--bg-card': '#17141c',
-    '--bg-input': '#1c1922',
+    '--bg': '#1b171a',
+    '--bg-header': '#141114',
+    '--bg-body-1': '#1b171a',
+    '--bg-body-2': '#1b171a',
+    '--bg-body-3': '#1f1a1e',
+    '--bg-card': '#2a2428',
+    '--bg-input': '#322b30',
     '--border': 'rgba(255,255,255,0.08)',
     '--border-card': 'rgba(255,255,255,0.11)',
 };
@@ -37,7 +38,7 @@ const ACCENT_TEXT_PROPS = ['--pink-text', '--pink-bright-text', '--accent-pink-t
    whoever picks the colour.
 
    Relative luminance and the 4.5:1 target are WCAG's (AA, normal text). */
-const SHELL_BG = [11, 11, 16]; // --bg, the darkest surface text sits on
+const SHELL_BG = [20, 17, 20]; // --bg-header, the darkest surface text sits on
 
 function hexToRgb(hex) {
     const m = /^#([0-9a-f]{6})$/i.exec(hex || '');

@@ -7,8 +7,13 @@
    any still-purple selector re-colors without a hunt. */
 :root {
     /* --- new shell tokens --- */
-    --bg:            #0b0b10;
-    --bg-modal:      #121218;
+    /* Warm, pink-leaning dark grays in steps (page < card < input), the way
+       osu-web tints its grays per section, instead of one flat near-black.
+       The header sits a step darker than the page. Keep in sync with
+       js/theme.js ACCENT_BG_BASE and the inline copy in index.html. */
+    --bg:            #1b171a;
+    --bg-header:     #141114;
+    --bg-modal:      #241f23;
     --surface-1:     rgba(255,255,255,0.03);
     --surface-2:     rgba(255,255,255,0.055);
     --border:        rgba(255,255,255,0.08);
@@ -33,12 +38,12 @@
     --dur:  220ms;
 
     /* --- legacy names, remapped --- */
-    --bg-body-1: #0b0b10;
-    --bg-body-2: #0b0b10;
-    --bg-body-3: #0c0c12;
-    --bg-card: #17141c;
+    --bg-body-1: #1b171a;
+    --bg-body-2: #1b171a;
+    --bg-body-3: #1f1a1e;
+    --bg-card: #2a2428;
     --bg-card-alt: rgba(255,255,255,0.05);
-    --bg-input: #1c1922;
+    --bg-input: #322b30;
     --bg-stat: rgba(255,255,255,0.05);
     --text: #f4f2f7;
     --text-secondary: rgba(244,242,247,0.62);

@@ -126,7 +126,14 @@ a:hover { text-decoration: underline; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: var(--bg);
+    /* A soft band of colour along the top edge, like the blurred art behind
+       osu-web's header: the accent from the left, a violet-shifted copy of it
+       from the right, both fading out before the title. Static; follows the
+       accent picker since both read --pink. A custom banner covers it. */
+    background:
+        radial-gradient(55% 150% at 15% -30%, color-mix(in srgb, var(--pink) 22%, transparent), transparent 70%),
+        radial-gradient(50% 140% at 88% -35%, color-mix(in srgb, color-mix(in oklch, var(--pink) 45%, #7c3aed) 20%, transparent), transparent 70%),
+        var(--bg-header, var(--bg));
     /* The main structural line between the header and the page — 2px of the
        strong border token so it reads clearly on the near-black shell. */
     border-bottom: var(--line-divider) solid var(--border-strong);
@@ -146,7 +153,7 @@ a:hover { text-decoration: underline; }
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(11, 11, 16, 0.45) 0%, rgba(11, 11, 16, 0.6) 60%, rgba(11, 11, 16, 0.85) 100%);
+    background: linear-gradient(180deg, rgba(20, 17, 20, 0.45) 0%, rgba(20, 17, 20, 0.6) 60%, rgba(20, 17, 20, 0.85) 100%);
 }
 .site-header.has-banner .site-title-block h1 { text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); }
 .header-banner-tools {

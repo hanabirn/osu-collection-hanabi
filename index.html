@@ -31,7 +31,7 @@
     var _ac = localStorage.getItem('osu_accent_color');
     if (_ac && /^#[0-9a-f]{6}$/i.test(_ac)) {
         var _root = document.documentElement.style;
-        var _base = {'--bg':'#0b0b10','--bg-body-1':'#0b0b10','--bg-body-2':'#0b0b10','--bg-body-3':'#0c0c12','--bg-card':'#17141c','--bg-input':'#1c1922','--border':'rgba(255,255,255,0.08)','--border-card':'rgba(255,255,255,0.11)'};
+        var _base = {'--bg':'#1b171a','--bg-header':'#141114','--bg-body-1':'#1b171a','--bg-body-2':'#1b171a','--bg-body-3':'#1f1a1e','--bg-card':'#2a2428','--bg-input':'#322b30','--border':'rgba(255,255,255,0.08)','--border-card':'rgba(255,255,255,0.11)'};
         ['--pink','--pink-bright','--text-pink','--accent-pink','--accent-purple'].forEach(function(p){_root.setProperty(p,_ac);});
         _root.setProperty('--accent-light-purple','color-mix(in srgb, '+_ac+' 65%, white)');
         var _n = parseInt(_ac.slice(1),16), _rgb = ((_n>>16)&255)+', '+((_n>>8)&255)+', '+(_n&255);
