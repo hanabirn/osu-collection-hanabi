@@ -1267,14 +1267,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* Gallery and skin plaza pages hold 20 (server page size), the catalog 12:
    on a wide page, column counts that divide those so the last row is full. */
 @media (min-width: 1300px) {
-    #public-collections-list.osu-collection,
-    #skin-screenshots-list.osu-collection { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     /* #page-catalog in front: the base 3-column rule comes later in this file */
     #page-catalog #catalog-list.osu-collection { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-@media (min-width: 1600px) {
+/* Gallery / skin cards carry tags and three stats: 4 across (~340px each)
+   is as narrow as they read well, so no 5th column even on the widest pages. */
+@media (min-width: 1450px) {
     #public-collections-list.osu-collection,
-    #skin-screenshots-list.osu-collection { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    #skin-screenshots-list.osu-collection { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 /* 封面牆 (osuWallTileHtml in js/osu.js): square covers, title on hover. */
@@ -4185,10 +4185,15 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .pcc-tag:hover { border-color: rgba(var(--accent-pink-rgb), 0.4); color: var(--text); }
 .pcc-tag.active { background: rgba(var(--accent-pink-rgb), 0.18); border-color: rgba(var(--accent-pink-rgb), 0.6); color: var(--text-pink); }
 
+.public-collection-card { min-width: 0; }
+/* A long category name is cut with … rather than running out of the card. */
+.pcc-tag { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
+/* Equal columns: at narrower card widths the old space-between row wrapped
+   and the numbers ran into each other. */
 .pcc-stats {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     gap: 4px 10px;
     font-size: var(--fs-14);
     color: var(--text-pink);

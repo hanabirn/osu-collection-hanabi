@@ -129,6 +129,9 @@ function renderPublicCollectionsList() {
     const loggedInUser = getLoggedInOsuUser();
     const freshCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
+    // Reserve the chart band on cards without one only when another card on
+    // this page has a chart; otherwise it is just an empty strip on every card.
+    const anySpread = publicCollectionsItems.some(i => Array.isArray(i.diffSpread));
     listEl.innerHTML = publicCollectionsItems.map(item => {
         const isNew = item.updatedAt && Date.parse(item.updatedAt) >= freshCutoff;
         const isOwnCard = loggedInUser && String(loggedInUser.id) === String(item.id);
@@ -142,7 +145,7 @@ function renderPublicCollectionsList() {
 
         return `
         <div class="public-collection-card" onclick="openGalleryDetailModal(${item.id})">
-            ${(Array.isArray(item.diffSpread) && renderDiffSpread(item.diffSpread, { compact: true })) || '<div class="diff-spread diff-spread--compact diff-spread--empty" aria-hidden="true"></div>'}
+            ${(Array.isArray(item.diffSpread) && renderDiffSpread(item.diffSpread, { compact: true })) || (anySpread ? '<div class="diff-spread diff-spread--compact diff-spread--empty" aria-hidden="true"></div>' : '')}
             <div class="pcc-header">
                 <div class="avatar-with-flag">
                     <img class="pcc-avatar" src="${osuAvatarUrl(item.id)}" alt="" onerror="this.style.visibility='hidden';">
