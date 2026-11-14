@@ -3876,11 +3876,14 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* ===== Collection overview stats ===== */
 .osu-stats-panel {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    /* four number tiles, then the difficulty-spread chart as a wider fifth */
+    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.8fr);
     gap: 8px;
     margin-bottom: 20px;
 }
-.osu-stat-spread { grid-column: 1 / -1; padding: 12px 14px 10px; }
+.osu-stat-spread { padding: 8px 12px 6px; display: flex; flex-direction: column; justify-content: flex-end; }
+.osu-stat-spread .diff-spread { height: 40px; gap: 3px; margin-bottom: 4px; }
+.osu-stat-spread .osu-stat-label { margin-top: 0; }
 
 /* ===== Difficulty spread (js/osu.js renderDiffSpread) =====
    One bar per whole-star band, coloured with the site's star-rating scale. */
@@ -3913,7 +3916,6 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .diff-spread-bar {
     display: block;
     width: 100%;
-    max-width: 22px;
     border-radius: 3px 3px 1px 1px;
 }
 .diff-spread-tick {
@@ -4359,6 +4361,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 @media (max-width: 480px) {
     .osu-stats-panel { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .osu-stat-spread { grid-column: 1 / -1; }
 }
 
 /* ===== PP calculator card trigger button ===== */
