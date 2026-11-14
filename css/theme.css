@@ -102,7 +102,46 @@
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    /* Second header glow (right side): a violet-shifted copy of the accent
+       by default; each section below swaps in its own hue. */
+    --glow-2: color-mix(in oklch, var(--pink) 45%, #7c3aed);
 }
+
+/* ===== Section hues =====
+   osu-web derives every gray from one per-section hue (beatmaps blue,
+   rankings green), so you can tell where you are by colour alone. Same
+   here: js/main.js switchTab() sets <html data-section>, and each area
+   re-tints the shell at the same low saturation as the default pink-gray.
+   收藏 (the home section) keeps the default.
+   A visitor who picked an accent colour keeps their own shell: applyAccent()
+   writes these tokens as inline styles on <html>, which win over this
+   sheet. Only the header glow (--glow-2) still follows the section. */
+:root[data-section] {
+    --section-h:   318; /* the default pink-gray; pages without a hue keep it */
+    --bg:          hsl(var(--section-h) 8% 10%);
+    --bg-header:   hsl(var(--section-h) 9% 7.5%);
+    --bg-body-1:   hsl(var(--section-h) 8% 10%);
+    --bg-body-2:   hsl(var(--section-h) 8% 10%);
+    --bg-body-3:   hsl(var(--section-h) 8% 11%);
+    --bg-modal:    hsl(var(--section-h) 8% 13%);
+    --bg-card:     hsl(var(--section-h) 8% 15%);
+    --bg-input:    hsl(var(--section-h) 8% 18%);
+}
+:root[data-section="catalog"]            { --section-h: 265; }
+:root[data-section="public-collections"] { --section-h: 32; }
+:root[data-section="lookup"]             { --section-h: 205; }
+:root[data-section="chat"],
+:root[data-section="dm"]                 { --section-h: 172; }
+:root[data-section="tournaments"],
+:root[data-section="mappools"],
+:root[data-section="cmpool"]             { --section-h: 130; }
+:root[data-section="skins"],
+:root[data-section="skin-screenshots"]   { --section-h: 290; }
+/* Hued sections also colour the right-hand header glow. */
+:root[data-section="catalog"], :root[data-section="public-collections"], :root[data-section="lookup"],
+:root[data-section="chat"], :root[data-section="dm"], :root[data-section="tournaments"],
+:root[data-section="mappools"], :root[data-section="cmpool"], :root[data-section="skins"],
+:root[data-section="skin-screenshots"] { --glow-2: hsl(var(--section-h) 75% 62%); }
 
 /* Light theme was removed 2026-09-13 in favour of a catch-tracker-style
    accent colour picker (js/theme.js applyAccent()) — the site is dark-only

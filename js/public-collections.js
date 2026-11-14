@@ -142,6 +142,7 @@ function renderPublicCollectionsList() {
 
         return `
         <div class="public-collection-card" onclick="openGalleryDetailModal(${item.id})">
+            ${(Array.isArray(item.diffSpread) && renderDiffSpread(item.diffSpread, { compact: true })) || '<div class="diff-spread diff-spread--compact diff-spread--empty" aria-hidden="true"></div>'}
             <div class="pcc-header">
                 <div class="avatar-with-flag">
                     <img class="pcc-avatar" src="${osuAvatarUrl(item.id)}" alt="" onerror="this.style.visibility='hidden';">
@@ -391,6 +392,15 @@ async function openGalleryDetailModal(id) {
     titleEl.textContent = (item && item.username) || `#${id}`;
     tabsEl.innerHTML = '';
     bodyEl.innerHTML = `<p class="osu-empty">${t('gallery_loading')}</p>`;
+    // Filled in once the collection loads (see below); computed here from the
+    // full data, so it works for collections published before diffSpread existed.
+    let spreadEl = document.getElementById('gallery-detail-spread');
+    if (!spreadEl) {
+        spreadEl = document.createElement('div');
+        spreadEl.id = 'gallery-detail-spread';
+        tabsEl.parentNode.insertBefore(spreadEl, tabsEl);
+    }
+    spreadEl.innerHTML = '';
     downloadBtn.style.display = 'none';
     const shareBtn = document.getElementById('gallery-detail-share-btn');
     if (shareBtn) shareBtn.style.display = 'none';
@@ -410,6 +420,7 @@ async function openGalleryDetailModal(id) {
         const data = await res.json();
         galleryDetailData = data;
         if (data.username) titleEl.textContent = data.username;
+        spreadEl.innerHTML = renderDiffSpread(computeDiffSpread(OSU_MODES.flatMap(m => data.collection[m] || [])));
 
         const modesWithItems = OSU_MODES.filter(m => (data.collection[m] || []).length > 0);
         // Categories are browse/filter-only here — never merged into the

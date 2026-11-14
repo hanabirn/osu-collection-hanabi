@@ -3019,6 +3019,39 @@ async function refreshAllOsuSets() {
 
 /* ===== Collection overview stats (total sets / favorites / star range) —
    purely derived from localStorage, no API calls needed. ===== */
+/* ===== Difficulty spread =====
+   An osu!Collector-style bar chart: how many difficulties fall in each
+   whole-star band, 1★ (anything under 2★) up to 10★ (10★ and above). Used by
+   the collection stats panel, the gallery detail modal, and gallery cards
+   (whose counts collections-publish.js stores as `diffSpread`). */
+function computeDiffSpread(sets) {
+    const counts = new Array(10).fill(0);
+    for (const s of sets || []) {
+        for (const b of (s && s.beatmaps) || []) {
+            const r = Number(b.difficulty_rating);
+            if (!(r > 0)) continue;
+            counts[Math.min(10, Math.max(1, Math.floor(r))) - 1]++;
+        }
+    }
+    return counts;
+}
+
+function renderDiffSpread(counts, { compact = false } = {}) {
+    if (!Array.isArray(counts) || counts.length !== 10) return '';
+    const nums = counts.map(n => Math.max(0, Number(n) || 0));
+    const max = Math.max(...nums);
+    if (!max) return '';
+    const label = `${t('diff_spread_title')}: ` + nums.map((n, i) => `${i + 1}★ ${n}`).join(', ');
+    const bars = nums.map((n, i) => {
+        const h = n ? Math.max(4, Math.round((n / max) * 100)) : 0;
+        return `<span class="diff-spread-col" title="${i + 1}★ · ${n}">
+            <span class="diff-spread-track"><span class="diff-spread-bar" style="height:${h}%;background:${starRatingColor(i + 1.5)}"></span></span>
+            ${compact ? '' : `<span class="diff-spread-tick">${i + 1}</span>`}
+        </span>`;
+    }).join('');
+    return `<div class="diff-spread${compact ? ' diff-spread--compact' : ''}" role="img" aria-label="${escHtml(label)}">${bars}</div>`;
+}
+
 function renderOsuStats() {
     const el = document.getElementById('osu-stats-panel');
     if (!el) return;
@@ -3058,7 +3091,35 @@ function renderOsuStats() {
             <div class="osu-stat-value">${maxRating.toFixed(2)}⭐</div>
             <div class="osu-stat-label">${t('osu_stats_max_rating')}</div>
         </div>
+        <div class="osu-stat osu-stat-spread">
+            ${renderDiffSpread(computeDiffSpread(allSets))}
+            <div class="osu-stat-label">${t('diff_spread_title')}</div>
+        </div>
     `;
+    applyAddCardCoverBackdrop(allSets);
+}
+
+/* ===== Cover behind the 新增 Beatmap panel =====
+   osu-web's search panel sits on a heavily dimmed beatmap cover. Same idea
+   here, with a cover from the visitor's own collection: picked once per
+   page load so it doesn't change under them on every re-render. */
+let addCardCoverSetId = null;
+function applyAddCardCoverBackdrop(allSets) {
+    const card = document.querySelector('#page-collection .osu-add-card');
+    if (!card) return;
+    if (!allSets.length) {
+        card.classList.remove('has-cover-backdrop');
+        card.style.removeProperty('--panel-cover');
+        addCardCoverSetId = null;
+        return;
+    }
+    if (!allSets.some(s => s.beatmapset_id === addCardCoverSetId)) {
+        addCardCoverSetId = allSets[Math.floor(Math.random() * allSets.length)].beatmapset_id;
+    }
+    const id = Number(addCardCoverSetId);
+    if (!Number.isInteger(id) || id <= 0) return;
+    card.style.setProperty('--panel-cover', `url("https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg")`);
+    card.classList.add('has-cover-backdrop');
 }
 
 /* ===== Collection achievements — a small set of milestone badges, all

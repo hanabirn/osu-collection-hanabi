@@ -155,6 +155,9 @@ exports.handler = async (event) => {
     let maxRating = 0;
     let ratingSum = 0;
     let ratingCount = 0;
+    // Difficulties per whole-star band (1★..10★), for the gallery card's
+    // bar chart; same banding as js/osu.js computeDiffSpread().
+    const diffSpread = new Array(10).fill(0);
     for (const mode of OSU_MODES) {
         collection[mode] = [];
         for (const raw of rawCollection[mode]) {
@@ -167,6 +170,7 @@ exports.handler = async (event) => {
                     if (bm.difficulty_rating > maxRating) maxRating = bm.difficulty_rating;
                     ratingSum += bm.difficulty_rating;
                     ratingCount++;
+                    if (bm.difficulty_rating > 0) diffSpread[Math.min(10, Math.max(1, Math.floor(bm.difficulty_rating))) - 1]++;
                 }
             }
         }
@@ -251,6 +255,7 @@ exports.handler = async (event) => {
             totalSets: seen.size,
             maxRating,
             avgRating,
+            diffSpread,
             updatedAt,
             tags,
             country,

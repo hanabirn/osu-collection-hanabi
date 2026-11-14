@@ -180,7 +180,7 @@ I18N.fr = {
     osu_note_btn_title: 'Note et évaluation', osu_note_title: 'Note et évaluation', osu_note_rating_label: 'Mon évaluation', osu_note_star_label: '{n} étoiles', osu_note_placeholder: 'Pourquoi avoir gardé ce titre ? Écrivez ce que vous voulez…', osu_note_save: 'Enregistrer', osu_note_clear: 'Effacer', osu_note_saved: 'Note et évaluation enregistrées', osu_note_cleared: 'Note et évaluation effacées', osu_rating_filter_all: 'Toutes les évaluations', osu_rating_filter_atleast: '★{n} et plus', osu_rating_filter_rated: 'Évaluées', osu_rating_filter_unrated: 'Non évaluées', osu_rating_filter_noted: 'Avec une note', osu_sort_my_rating: 'Mon évaluation (décroissante)',
     osu_group_others: 'Autres artistes (1 titre chacun)',
     pp_history_title: 'Évolution du PP', pp_history_empty: "Pas encore assez d'historique — revenez plus tard pour voir la tendance.",
-    osu_stats_total: 'Total collectionné', osu_stats_avg_rating: 'Difficulté moy.', osu_stats_max_rating: 'Difficulté max.',
+    diff_spread_title: 'Répartition des difficultés', osu_stats_total: 'Total collectionné', osu_stats_avg_rating: 'Difficulté moy.', osu_stats_max_rating: 'Difficulté max.',
     featured_beatmap_label: 'Sélection du jour',
     osu_export: 'Télécharger ta collection en sauvegarde JSON', osu_import: 'Restaurer une collection depuis une sauvegarde JSON\nChoisis un .json téléchargé plus tôt via « Exporter » — ajoute ses maps et catégories',
     osu_export_done: 'Collection exportée !', osu_import_done: 'Collection importée !', osu_import_fail: "Échec de l'import. Vérifiez le format du fichier",

@@ -42,6 +42,9 @@ function switchTab(tab, el) {
     // Keep the persistent desktop top-nav highlight in sync however the tab
     // was switched (drawer button, explore card, deep link, …).
     document.querySelectorAll('#site-topnav [data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    // Section hue (css/theme.css [data-section]): each area tints the shell
+    // its own colour, the way osu-web does per section.
+    document.documentElement.dataset.section = tab;
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
