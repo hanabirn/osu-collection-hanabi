@@ -9,7 +9,9 @@
    cookie; osu-callback.js refuses a callback whose state doesn't match the
    cookie. Without it, someone could send a visitor a callback link carrying
    the attacker's own code and silently log them in as the attacker
-   (login CSRF). SameSite=Lax is enough: the callback is a top-level GET. */
+   (login CSRF). SameSite=Lax is enough: the callback is a top-level GET.
+   An hour, not minutes: a visitor can leave the consent page open a while
+   (a 10-minute cookie expired on a real login, 2026-11-14). */
 const crypto = require('crypto');
 const { OAUTH_STATE_COOKIE } = require('./_oauth-state');
 
@@ -27,7 +29,7 @@ exports.handler = async () => {
         statusCode: 302,
         headers: {
             Location: `https://osu.ppy.sh/oauth/authorize?${params.toString()}`,
-            'Set-Cookie': `${OAUTH_STATE_COOKIE}=${state}; Path=/; Max-Age=600; HttpOnly; Secure; SameSite=Lax`,
+            'Set-Cookie': `${OAUTH_STATE_COOKIE}=${state}; Path=/; Max-Age=3600; HttpOnly; Secure; SameSite=Lax`,
             'Cache-Control': 'no-store',
         },
         body: '',
