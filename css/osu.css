@@ -384,7 +384,7 @@
 .collection-panel .collection-filters { gap: 6px; }
 /* Equal shares of the row instead of each select sizing to its longest
    option (a long source or artist name made some very wide). */
-.collection-panel .collection-filters select { flex: 1 1 110px; min-width: 0; max-width: none; padding: 6px 10px; }
+.collection-panel .collection-filters select { flex: 1 1 110px; min-width: 0; max-width: 200px; padding: 6px 10px; }
 /* The other .osu-mode-tabs rule centres them; here they line up under the label. */
 .collection-panel .osu-mode-tabs { justify-content: flex-start; }
 /* 34 categories don't fit one line: it scrolls (wheel works too, see
@@ -1260,10 +1260,22 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
 }
-/* The collection list has the full width now (layout A): 4 across, then 3, then 2. */
-#osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 1100px) { #osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 800px) { #osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* The collection list has the full width (layout A): as many 250px+ columns
+   as fit (4 at 1120px, 6 on a wide screen). js/osu.js osuPageSize() reads
+   the column count back, so a page is always whole rows. */
+#osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+/* Gallery and skin plaza pages hold 20 (server page size), the catalog 12:
+   on a wide page, column counts that divide those so the last row is full. */
+@media (min-width: 1300px) {
+    #public-collections-list.osu-collection,
+    #skin-screenshots-list.osu-collection { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* #page-catalog in front: the base 3-column rule comes later in this file */
+    #page-catalog #catalog-list.osu-collection { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1600px) {
+    #public-collections-list.osu-collection,
+    #skin-screenshots-list.osu-collection { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
 
 /* 封面牆 (osuWallTileHtml in js/osu.js): square covers, title on hover. */
 .osu-collection.osu-collection--wall {

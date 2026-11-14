@@ -336,9 +336,39 @@ function readOsuPref(key, allowed) {
 }
 let osuViewMode = readOsuPref(OSU_VIEW_KEY, ['cards', 'wall']);
 let osuGroupMode = readOsuPref(OSU_GROUP_KEY, ['none', 'artist']);
-function osuPageSize() {
-    return osuViewMode === 'wall' ? OSU_WALL_PAGE_SIZE : OSU_PAGE_SIZE;
+/* Card view: the grid fits as many columns as the width allows (css/osu.css
+   #osu-collection), so a page is 3 rows of however many that is, and never
+   fewer than OSU_PAGE_SIZE: 12 on a 4-column page, 18 on a wide screen's 6. */
+const OSU_PAGE_ROWS = 3;
+let osuGridCols = 0;
+function osuGridColumns() {
+    const el = document.getElementById('osu-collection');
+    if (!el || !el.offsetParent || el.classList.contains('osu-collection--wall')) return osuGridCols || 4;
+    const n = getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
+    return n > 0 ? n : 4;
 }
+function osuPageSize() {
+    if (osuViewMode === 'wall') return OSU_WALL_PAGE_SIZE;
+    osuGridCols = osuGridColumns();
+    return Math.max(OSU_PAGE_SIZE, osuGridCols * OSU_PAGE_ROWS);
+}
+/* Re-page when the column count changes (window resized, or the list was
+   first drawn while its tab was hidden), keeping the first card on screen. */
+function watchOsuGridColumns() {
+    const el = document.getElementById('osu-collection');
+    if (!el || typeof ResizeObserver !== 'function') return;
+    new ResizeObserver(() => {
+        if (osuViewMode === 'wall' || !el.offsetParent) return;
+        const prevCols = osuGridCols;
+        const cols = osuGridColumns();
+        if (!prevCols || cols === prevCols) return;
+        const firstIndex = osuPage * Math.max(OSU_PAGE_SIZE, prevCols * OSU_PAGE_ROWS);
+        osuPage = Math.floor(firstIndex / Math.max(OSU_PAGE_SIZE, cols * OSU_PAGE_ROWS));
+        renderOsuCollection();
+    }).observe(el);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchOsuGridColumns);
+else watchOsuGridColumns();
 function switchOsuView(mode) {
     osuViewMode = mode === 'wall' ? 'wall' : 'cards';
     try { localStorage.setItem(OSU_VIEW_KEY, osuViewMode); } catch {}
@@ -3924,13 +3954,15 @@ function renderOsuCollection() {
         return;
     }
 
+    // Set the view class first: osuPageSize() counts the grid's columns, and
+    // the wall's narrow columns must not be counted as card columns.
+    const wall = osuViewMode === 'wall';
+    container.classList.toggle('osu-collection--wall', wall);
     const pageSize = osuPageSize();
     const totalPages = Math.ceil(sets.length / pageSize);
     if (osuPage >= totalPages) osuPage = totalPages - 1;
     if (osuPage < 0) osuPage = 0;
     const pageSets = sets.slice(osuPage * pageSize, (osuPage + 1) * pageSize);
-    const wall = osuViewMode === 'wall';
-    container.classList.toggle('osu-collection--wall', wall);
 
     // Repopulated on every render so "checkCollectionPlayedStatus()" (the
     // 已遊玩 button) always checks exactly the sets currently on screen —

@@ -1425,6 +1425,17 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     border-top: none;
     box-shadow: none;
 }
+/* Card-grid pages use a wide screen's width: more cards per row instead of
+   two empty margins. Pages you read (手冊, 更新內容 ...) keep 1120px, where
+   lines stay a readable length. The section comes from <html data-section>
+   (js/main.js switchTab); with none set yet, the page is 收藏. */
+:root:not([data-section]) .site-main,
+:root[data-section="collection"] .site-main,
+:root[data-section="catalog"] .site-main,
+:root[data-section="public-collections"] .site-main,
+:root[data-section="skin-screenshots"] .site-main {
+    max-width: 1640px;
+}
 
 /* ===== Per-tab gradient border =====
    Every .site-page section gets a static subtle outline (this rule's own
