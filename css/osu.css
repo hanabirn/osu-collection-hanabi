@@ -382,7 +382,22 @@
 .collection-panel .osu-category-tabs-row,
 .collection-panel .collection-filters { margin: 0; gap: 4px; }
 .collection-panel .collection-filters { gap: 6px; }
-.collection-panel .collection-filters select { min-width: 0; padding: 6px 10px; }
+/* Equal shares of the row instead of each select sizing to its longest
+   option (a long source or artist name made some very wide). */
+.collection-panel .collection-filters select { flex: 1 1 110px; min-width: 0; max-width: none; padding: 6px 10px; }
+/* The other .osu-mode-tabs rule centres them; here they line up under the label. */
+.collection-panel .osu-mode-tabs { justify-content: flex-start; }
+/* 34 categories don't fit one line: it scrolls (wheel works too, see
+   initCategoryTabsWheelScroll), with a thin dark scrollbar instead of the
+   browser's white one. */
+.collection-panel .osu-category-tabs-row {
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+.collection-panel .osu-category-tabs-row::-webkit-scrollbar { height: 6px; }
+.collection-panel .osu-category-tabs-row::-webkit-scrollbar-track { background: transparent; }
+.collection-panel .osu-category-tabs-row::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 3px; }
 /* Mode and category tabs read as osu-web's filter links: plain until
    hovered or current. */
 .collection-panel .osu-tab {
