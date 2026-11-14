@@ -204,7 +204,30 @@
     --text: #f4f2f7;
     --text-dim: rgba(244,242,247,0.72);
     --pink: #ff7ac2;
-    min-height: 220px;
+    /* Layout A: a strip, not a banner. Title on the left, the collection's
+       numbers and difficulty spread on the right. */
+    min-height: 96px;
+    padding: 18px 24px;
+    margin-bottom: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+.collection-hero-v2-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.collection-hero-v2-text > * { margin: 0; }
+.collection-hero-v2 .osu-stats-panel {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin: 0;
+}
+.collection-hero-v2 .osu-stat { background: none; border: 0; padding: 0; }
+.collection-hero-v2 .osu-stat-value { font-size: var(--fs-20); }
+.collection-hero-v2 .osu-stat-spread { width: 200px; padding: 0; }
+@media (max-width: 900px) {
+    .collection-hero-v2.has-cover { flex-direction: column; align-items: flex-start; }
+    .collection-hero-v2 .osu-stats-panel { flex-wrap: wrap; gap: 14px 22px; }
 }
 /* Two stacked cover layers that cross-fade (js/osu.js updateCollectionHeroV2).
    opacity-only transition = compositor-only; JS pauses it off-screen. */
@@ -225,11 +248,12 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(180deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.80) 70%, var(--bg) 100%);
+    /* left-to-right scrim: darkest behind the title, lighter in the middle
+       so the cover still shows, dark again behind the numbers */
+    background: linear-gradient(90deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.50) 55%, rgba(0,0,0,0.72) 100%);
 }
-.collection-hero-v2 > .eyebrow,
-.collection-hero-v2 > .collection-hero-v2-line,
-.collection-hero-v2 > .collection-hero-v2-stat { position: relative; z-index: 2; margin: 0; }
+.collection-hero-v2 > .collection-hero-v2-text,
+.collection-hero-v2 > .osu-stats-panel { position: relative; z-index: 2; }
 @media (prefers-reduced-motion: reduce) {
     .collection-hero-v2 .hero-cover { transition: none; }
 }
@@ -313,23 +337,127 @@
 }
 .collection-hero-cta:hover { transform: translateY(-2px); }
 @media (prefers-reduced-motion: reduce) { .collection-hero-cta { transition: none; } .collection-hero-cta:hover { transform: none; } }
-.collection-layout-left {
-    min-width: 0;
+/* ===== Collection control panel (layout A, after osu-web's beatmap listing) =====
+   Search, add and tools on the first line; then labelled rows for mode,
+   category and filters, so everything that changes the list sits right
+   above it. */
+.collection-panel {
+    position: relative;
+    /* above the grid that follows, so the 工具 menu isn't painted under the cards */
+    z-index: 5;
+    background: var(--bg-card);
+    border: var(--line) solid var(--border);
+    border-radius: var(--r-card);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-.collection-layout-right {
-    min-width: 0;
+.collection-panel-top {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
 }
-@media (min-width: 900px) {
-    .collection-layout {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-    .collection-layout-left {
-        flex: 0 0 340px;
-    }
-    .collection-layout-right {
-        flex: 1 1 0;
-    }
+.collection-panel-top .collection-search { flex: 1 1 0; margin: 0; min-width: 0; }
+.collection-panel-top .collection-search input[type="text"] { padding: 9px 14px; border-radius: var(--r-ctl); }
+.collection-panel-top .collection-add { flex: 0 1 380px; min-width: 0; }
+.collection-panel-top .collection-add input { padding: 9px 12px; border-radius: var(--r-ctl); }
+#page-collection.collection-is-empty .collection-panel-top .collection-add { flex: 1 1 auto; }
+.collection-panel > .status:empty { display: none; }
+.collection-panel-rows {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 8px;
+    align-items: center;
+}
+.collection-panel-row { display: contents; }
+.collection-panel-row--cats:has(> .osu-category-tabs-row:empty) { display: none; }
+.collection-panel-label {
+    font-size: var(--fs-12);
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+}
+.collection-panel .osu-mode-tabs,
+.collection-panel .osu-category-tabs-row,
+.collection-panel .collection-filters { margin: 0; gap: 4px; }
+.collection-panel .collection-filters { gap: 6px; }
+.collection-panel .collection-filters select { min-width: 0; padding: 6px 10px; }
+/* Mode and category tabs read as osu-web's filter links: plain until
+   hovered or current. */
+.collection-panel .osu-tab {
+    flex: 0 0 auto; /* left-aligned links, not tabs stretched across the row */
+    padding: 6px 12px;
+    font-size: var(--fs-13);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+.collection-panel .osu-tab:hover { background: rgba(255, 255, 255, 0.06); border-color: transparent; }
+.collection-panel .osu-tab.active {
+    background: rgba(var(--pink-rgb), 0.16);
+    border-color: transparent;
+    color: var(--pink-text, var(--pink));
+    font-weight: 700;
+}
+/* 工具 menu: the former 16 tool buttons and batch download, behind one button. */
+.collection-tools { position: relative; flex: 0 0 auto; }
+.collection-tools-btn {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: var(--r-ctl);
+    background: var(--bg-input);
+    border: var(--line) solid var(--border-input);
+    font-size: var(--fs-14);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.collection-tools-btn::-webkit-details-marker { display: none; }
+.collection-tools-btn::after { content: "\25BE"; margin-left: 6px; opacity: 0.6; }
+.collection-tools[open] .collection-tools-btn { border-color: var(--border-strong); }
+.collection-tools-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 30;
+    width: min(360px, 86vw);
+    padding: 14px;
+    border-radius: var(--r-card);
+    background: var(--bg-modal);
+    border: var(--line) solid var(--border-strong);
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.collection-tools-menu .osu-tool-groups { margin: 0; }
+.collection-tools-batch { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: var(--line) solid var(--border); }
+.collection-tools-batch .pp-calc-hint { margin: 0; }
+/* List head: how many sets match, and the pager again above the grid. */
+.collection-list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-height: 36px;
+}
+.collection-list-count { font-size: var(--fs-13); color: var(--text-dim); }
+.osu-pagination.osu-pagination--top { margin: 0; }
+.osu-pagination--top:empty { display: none; }
+@media (max-width: 700px) {
+    .collection-panel-top { flex-wrap: wrap; }
+    .collection-panel-top .collection-search { flex-basis: 100%; }
+    .collection-panel-top .collection-add { flex: 1 1 0; }
+    .collection-panel-rows { grid-template-columns: minmax(0, 1fr); }
+    .collection-panel-label { margin-top: 4px; }
+    .collection-panel .osu-mode-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .collection-panel .osu-mode-tabs::-webkit-scrollbar { display: none; }
 }
 
 .osu-add-card {
@@ -1117,6 +1245,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
 }
+/* The collection list has the full width now (layout A): 4 across, then 3, then 2. */
+#osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1100px) { #osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 800px) { #osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* 封面牆 (osuWallTileHtml in js/osu.js): square covers, title on hover. */
 .osu-collection.osu-collection--wall {
@@ -3935,15 +4067,18 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .diff-spread--empty { display: block; }
 #gallery-detail-spread .diff-spread { height: 56px; margin: 4px 0 12px; }
 
-/* ===== Cover behind the 新增 Beatmap panel (js/osu.js applyAddCardCoverBackdrop) =====
+/* ===== Cover behind the collection control panel (js/osu.js applyAddCardCoverBackdrop) =====
    A cover from the visitor's collection, dimmed hard and faded toward the
-   bottom so the input and buttons stay on a plain card. */
-.osu-add-card.has-cover-backdrop { isolation: isolate; overflow: hidden; }
-.osu-add-card.has-cover-backdrop::before {
+   bottom so the filter rows stay on a plain card. */
+/* No overflow:hidden here: the panel's 工具 menu hangs below its edge. The
+   backdrop rounds its own corners instead. */
+.collection-panel.has-cover-backdrop { isolation: isolate; }
+.collection-panel.has-cover-backdrop::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
+    border-radius: inherit;
     background:
         linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 55%, transparent) 0%, var(--bg-card) 78%),
         var(--panel-cover) center 30% / cover no-repeat;

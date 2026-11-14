@@ -250,7 +250,8 @@ let osuLangFilter = 'all';     // 'all' | 'unknown' | '<language id>'
 let osuGenreFilter = 'all';    // 'all' | 'unknown' | '<genre id>'
 let osuSourceFilter = 'all';   // 'all' | 'none' | '<source string>'
 let osuArtistFilter = 'all';   // 'all' | '<primary artist string>'
-const OSU_PAGE_SIZE = 8;
+// 12 fills 4, 3 or 2 columns evenly (the grid drops columns as the page narrows).
+const OSU_PAGE_SIZE = 12;
 // Populated by renderOsuCollection() on every render — the current page's
 // sets, one representative (hardest-visible-difficulty) beatmap id + mode
 // each, for checkCollectionPlayedStatus() to check against. See its own
@@ -3099,13 +3100,13 @@ function renderOsuStats() {
     applyAddCardCoverBackdrop(allSets);
 }
 
-/* ===== Cover behind the 新增 Beatmap panel =====
+/* ===== Cover behind the collection's control panel =====
    osu-web's search panel sits on a heavily dimmed beatmap cover. Same idea
    here, with a cover from the visitor's own collection: picked once per
    page load so it doesn't change under them on every re-render. */
 let addCardCoverSetId = null;
 function applyAddCardCoverBackdrop(allSets) {
-    const card = document.querySelector('#page-collection .osu-add-card');
+    const card = document.querySelector('#page-collection .collection-panel');
     if (!card) return;
     if (!allSets.length) {
         card.classList.remove('has-cover-backdrop');
@@ -3904,7 +3905,7 @@ function renderOsuCollection() {
                 <p class="osu-empty-sub">${escHtml(t('start_paste_hint'))}</p>
                 <p class="osu-empty-sub">${escHtml(t('osu_empty_banner_hint'))}</p>
             </div>`;
-        paginationEl.innerHTML = '';
+        setOsuPagination('', 0);
         placeTrendingRow(container.querySelector('.osu-start-slot'));
         if (typeof loadTrendingSongs === 'function') loadTrendingSongs();
         return;
@@ -3919,7 +3920,7 @@ function renderOsuCollection() {
                     ? t('osu_empty_category')
                     : `${t('osu_empty_collection')}<br><span>${t('osu_empty_hint')}</span><br><span class="osu-empty-sub">${t('osu_empty_banner_hint')}</span>`;
         container.innerHTML = smartCategoryBannerHtml() + `<div class="osu-empty">${msg}</div>`;
-        paginationEl.innerHTML = '';
+        setOsuPagination('', 0);
         return;
     }
 
@@ -4006,7 +4007,7 @@ function renderOsuCollection() {
     if (smartBanner) container.insertAdjacentHTML('afterbegin', smartBanner);
 
     if (totalPages <= 1) {
-        paginationEl.innerHTML = '';
+        setOsuPagination('', sets.length);
     } else {
         let pages = '';
         pages += `<button class="osu-page-btn" onclick="osuPage=0;renderOsuCollection()" ${osuPage===0?'disabled':''}>«</button>`;
@@ -4014,9 +4015,35 @@ function renderOsuCollection() {
         pages += buildPaginationPageButtons(osuPage, totalPages, (i) => `osuPage=${i};renderOsuCollection()`);
         pages += `<button class="osu-page-btn" onclick="osuPage=Math.min(${totalPages-1},osuPage+1);renderOsuCollection()" ${osuPage>=totalPages-1?'disabled':''}>›</button>`;
         pages += `<button class="osu-page-btn" onclick="osuPage=${totalPages-1};renderOsuCollection()" ${osuPage>=totalPages-1?'disabled':''}>»</button>`;
-        paginationEl.innerHTML = pages;
+        setOsuPagination(pages, sets.length);
     }
 }
+
+/* The pager is drawn twice, above and below the grid (layout A), and the
+   list head shows how many sets the current tab/filters match. */
+function setOsuPagination(html, count) {
+    const bottom = document.getElementById('osu-pagination');
+    const top = document.getElementById('osu-pagination-top');
+    if (bottom) bottom.innerHTML = html;
+    if (top) top.innerHTML = html;
+    const countEl = document.getElementById('osu-list-count');
+    if (countEl) countEl.textContent = count ? t('list_count', { n: count.toLocaleString() }) : '';
+}
+
+/* 工具 menu (a <details> in the collection panel): close it on a click
+   outside, on Escape, or once one of its tools has been picked. */
+document.addEventListener('click', (e) => {
+    document.querySelectorAll('details.collection-tools[open]').forEach((d) => {
+        if (!d.contains(e.target) || e.target.closest('.collection-tools-menu button')) d.open = false;
+    });
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('details.collection-tools[open]').forEach((d) => {
+        d.open = false;
+        d.querySelector('summary')?.focus();
+    });
+});
 
 /* ===== 收藏 vs 已遊玩比對 — cross-references the current page's collected
    sets against the logged-in osu! account's actual scores, via get_scores'
