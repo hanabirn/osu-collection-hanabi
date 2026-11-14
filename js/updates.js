@@ -69,5 +69,7 @@ function renderOsuNews(items) {
 function escapeHtmlOsu(str) {
     const div = document.createElement('div');
     div.textContent = str;
-    return div.innerHTML;
+    // innerHTML leaves quotes alone; escape them too so the result is also
+    // safe inside an attribute value, not just element text.
+    return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }

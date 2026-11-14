@@ -7,6 +7,7 @@ const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 const { setLocale, t } = require('./_discord-i18n');
 const { sanitizeOsuSet } = require('./_osu-set-sanitize');
+const { normalizeCategoryIds } = require('./_category-id');
 
 const OSU_MODES = ['standard', 'taiko', 'catch', 'mania'];
 
@@ -202,10 +203,14 @@ exports.handler = async (event) => {
             }
         }
         // Names show up as gallery tags and in the Discord announcement.
-        categories = body.categories.map(c => ({ id: c.id.slice(0, 64), name: c.name.trim().slice(0, 60) }));
-        const validIds = new Set(categories.map(c => c.id));
-        for (const [categoryId, memberIds] of Object.entries(body.categoryMembers)) {
-            if (!validIds.has(categoryId) || !Array.isArray(memberIds)) continue;
+        // Ids are rendered into other visitors' HTML: anything that isn't a
+        // plain token is swapped for a fresh one (see _category-id.js).
+        const normalized = normalizeCategoryIds(
+            body.categories.map(c => ({ id: c.id, name: c.name.trim().slice(0, 60) })),
+            body.categoryMembers,
+        );
+        categories = normalized.categories;
+        for (const [categoryId, memberIds] of Object.entries(normalized.categoryMembers)) {
             categoryMembers[categoryId] = memberIds.filter(id => seen.has(id));
         }
     }

@@ -17,6 +17,7 @@ export default [
     {
         ignores: [
             'dist/**',
+            '.wrangler/**', // wrangler dev's generated bundles
             'node_modules/**',
             '**/node_modules/**',
             'js/i18n/zh-Hans.js', // generated at build time

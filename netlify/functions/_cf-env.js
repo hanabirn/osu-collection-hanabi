@@ -13,7 +13,6 @@
  */
 let als = null;
 try {
-    // eslint-disable-next-line n/no-unsupported-features/node-builtins
     const { AsyncLocalStorage } = require('node:async_hooks');
     als = new AsyncLocalStorage();
 } catch {

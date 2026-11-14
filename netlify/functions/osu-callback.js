@@ -16,18 +16,25 @@
    need real proof of identity before writing public data under someone's
    name. */
 const { signAuthToken } = require('./_auth-token');
+const { stateMatches, CLEAR_STATE_COOKIE } = require('./_oauth-state');
 
 /* `stage` is echoed in the failure redirect (?osu_login_error=<stage>) and
    logged, so an opaque login failure can be diagnosed without guessing:
-   no_code | env | token_exchange | me | sign. */
+   no_code | state | env | token_exchange | me | sign. */
 function fail(stage, detail) {
     console.error(`osu-callback failed at "${stage}": ${detail || ''}`);
-    return { statusCode: 302, headers: { Location: `/?osu_login_error=${encodeURIComponent(stage)}` }, body: '' };
+    return {
+        statusCode: 302,
+        headers: { Location: `/?osu_login_error=${encodeURIComponent(stage)}`, 'Set-Cookie': CLEAR_STATE_COOKIE, 'Cache-Control': 'no-store' },
+        body: '',
+    };
 }
 
 exports.handler = async (event) => {
     const code = event.queryStringParameters && event.queryStringParameters.code;
     if (!code) return fail('no_code');
+    /* Must be the state osu-login.js put in this browser's cookie (login CSRF). */
+    if (!stateMatches(event.headers, event.queryStringParameters.state)) return fail('state');
 
     for (const k of ['OSU_CLIENT_ID', 'OSU_CLIENT_SECRET', 'OSU_REDIRECT_URI', 'OSU_AUTH_SECRET']) {
         if (!process.env[k]) return fail('env', `${k} is not set`);
@@ -81,5 +88,12 @@ exports.handler = async (event) => {
         osu_login_name: me.username,
         osu_login_token: token,
     });
-    return { statusCode: 302, headers: { Location: `/?${params.toString()}` }, body: '' };
+    /* In the fragment, not the query: a fragment is never sent to a server,
+       never appears in a Referer, and is not part of the URL the service
+       worker caches the page under. js/osu.js checkOsuLoginFromUrl() reads it. */
+    return {
+        statusCode: 302,
+        headers: { Location: `/#${params.toString()}`, 'Set-Cookie': CLEAR_STATE_COOKIE, 'Cache-Control': 'no-store' },
+        body: '',
+    };
 };

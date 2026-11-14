@@ -434,7 +434,7 @@ async function openGalleryDetailModal(id) {
         }).join('');
         const categoryTabsHtml = categoriesWithItems.map(c => {
             const count = data.categoryMembers[c.id].length;
-            return `<button class="osu-mode-tab ${c.id === galleryDetailMode ? 'active' : ''}" data-mode="${c.id}" onclick="switchGalleryDetailMode('${c.id}')">${icon('tag', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(c.name)} (${count})</button>`;
+            return `<button class="osu-mode-tab ${c.id === galleryDetailMode ? 'active' : ''}" data-mode="${escapeHtmlOsu(c.id)}" onclick="switchGalleryDetailMode(this.dataset.mode)">${icon('tag', { extraClass: 'icon-label-gap' })}${escapeHtmlOsu(c.name)} (${count})</button>`;
         }).join('');
         tabsEl.innerHTML = modeTabsHtml + categoryTabsHtml;
 

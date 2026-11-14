@@ -19,7 +19,11 @@ const LIKERS_KEY = 'likers';
 
 function clientIpHash(event) {
     const h = event.headers || {};
-    const ip = h['x-nf-client-connection-ip']
+    // cf-connecting-ip first: on the Cloudflare Worker it is set by
+    // Cloudflare itself, while a client could send x-nf-* or
+    // x-forwarded-for with any value it likes.
+    const ip = h['cf-connecting-ip']
+        || h['x-nf-client-connection-ip']
         || (h['x-forwarded-for'] || '').split(',')[0].trim()
         || 'unknown';
     return crypto.createHash('sha256').update(ip + '|osu-site-like').digest('hex').slice(0, 16);

@@ -1268,7 +1268,7 @@ function renderOsuCategoryTabsRow() {
     if (!row) return;
     const cats = getOsuCategories();
     row.innerHTML = cats.map(c =>
-        `<button class="osu-tab ${c.id === osuCurrentTab ? 'active' : ''}" data-mode="${c.id}" onclick="switchOsuTab('${c.id}', this)">${icon('tag', { extraClass: 'icon-label-gap' })}${escHtml(c.name)}</button>`
+        `<button class="osu-tab ${c.id === osuCurrentTab ? 'active' : ''}" data-mode="${escHtml(c.id)}" onclick="switchOsuTab(this.dataset.mode, this)">${icon('tag', { extraClass: 'icon-label-gap' })}${escHtml(c.name)}</button>`
     ).join('');
     initCategoryTabsWheelScroll();
 }
@@ -1309,8 +1309,8 @@ function renderCategoryManageList() {
             <div class="osu-category-manage-item">
                 <span class="osu-category-manage-name">${escHtml(c.name)}</span>
                 <span class="osu-category-manage-actions">
-                    <button class="osu-cat-rename" onclick="renameOsuCategory('${c.id}', event)" title="${t('osu_category_rename_title')}">${icon('pencil')}</button>
-                    <button class="osu-cat-delete" onclick="deleteOsuCategory('${c.id}', event)" title="${t('osu_category_delete_title')}">${icon('trash2')}</button>
+                    <button class="osu-cat-rename" data-cat-id="${escHtml(c.id)}" onclick="renameOsuCategory(this.dataset.catId, event)" title="${t('osu_category_rename_title')}">${icon('pencil')}</button>
+                    <button class="osu-cat-delete" data-cat-id="${escHtml(c.id)}" onclick="deleteOsuCategory(this.dataset.catId, event)" title="${t('osu_category_delete_title')}">${icon('trash2')}</button>
                 </span>
             </div>`).join('');
 }
@@ -1398,7 +1398,7 @@ function renderCategoryPickerContent(setId) {
     el.innerHTML = `<div class="osu-category-picker-title">${t('osu_category_picker_title')}</div>` +
         cats.map(c => `
         <label class="osu-category-picker-item">
-            <input type="checkbox" ${(members[c.id] || []).includes(setId) ? 'checked' : ''} onchange="toggleCategoryMembership('${c.id}', ${setId})">
+            <input type="checkbox" ${(members[c.id] || []).includes(setId) ? 'checked' : ''} data-cat-id="${escHtml(c.id)}" onchange="toggleCategoryMembership(this.dataset.catId, ${setId})">
             <span>${escHtml(c.name)}</span>
         </label>`).join('');
 }
@@ -1467,17 +1467,20 @@ function exportOsuCollection() {
 function sanitizeImportedCategoryData(collection, categories, categoryMembers) {
     const validSetIds = new Set(OSU_MODES.flatMap(m => (collection[m] || []).map(s => s.beatmapset_id)));
     const seenIds = new Set();
-    const cleanCategories = categories.filter(c => {
-        if (!c || typeof c.id !== 'string' || typeof c.name !== 'string') return false;
-        if (seenIds.has(c.id)) return false;
-        seenIds.add(c.id);
-        return true;
-    });
+    const cleanCategories = [];
     const cleanMembers = {};
-    for (const catId of seenIds) {
-        const ids = Array.isArray(categoryMembers[catId]) ? categoryMembers[catId] : [];
-        const filtered = ids.filter(id => validSetIds.has(id));
-        if (filtered.length) cleanMembers[catId] = filtered;
+    for (const c of categories) {
+        if (!c || typeof c.id !== 'string' || typeof c.name !== 'string') continue;
+        if (seenIds.has(c.id)) continue;
+        seenIds.add(c.id);
+        // The id is rendered into HTML attributes, and a backup file can come
+        // from anyone: anything but a plain token gets a fresh id. Its members
+        // are still read under the original id below.
+        const id = /^[A-Za-z0-9_-]{1,64}$/.test(c.id) ? c.id : crypto.randomUUID();
+        cleanCategories.push({ id, name: c.name });
+        const ids = Array.isArray(categoryMembers[c.id]) ? categoryMembers[c.id] : [];
+        const filtered = ids.filter(setId => validSetIds.has(setId));
+        if (filtered.length) cleanMembers[id] = filtered;
     }
     return { categories: cleanCategories, categoryMembers: cleanMembers };
 }
@@ -5409,14 +5412,20 @@ function applyLoggedInOsuUser() {
 
 function checkOsuLoginFromUrl() {
     const params = new URLSearchParams(location.search);
-    const id = params.get('osu_login');
+    /* osu-callback.js hands the result back in the fragment, which never
+       reaches a server, a Referer or the service worker's cache. The query
+       form is still read so a login started before that change completes. */
+    const hashParams = new URLSearchParams(location.hash.startsWith('#osu_login') ? location.hash.slice(1) : '');
+    const fromHash = hashParams.has('osu_login');
+    const src = fromHash ? hashParams : params;
+    const id = src.get('osu_login');
     const loginFailed = params.get('osu_login_error');
 
     if (id) {
         localStorage.setItem(OSU_LOGIN_STORAGE_KEY, JSON.stringify({
             id,
-            username: params.get('osu_login_name') || '',
-            token: params.get('osu_login_token') || null,
+            username: src.get('osu_login_name') || '',
+            token: src.get('osu_login_token') || null,
         }));
     }
     if (id || loginFailed) {
@@ -5425,7 +5434,7 @@ function checkOsuLoginFromUrl() {
         params.delete('osu_login_token');
         params.delete('osu_login_error');
         const qs = params.toString();
-        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + (fromHash ? '' : location.hash));
         if (loginFailed) showShareToast(t('osu_login_fail'));
     }
 

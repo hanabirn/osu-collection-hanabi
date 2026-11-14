@@ -166,7 +166,9 @@ function chatFormatTime(iso) {
 /* Renders message text: HTML-escape first (XSS-safe), THEN swap the few
    ASCII emoticons for emoji on that already-safe string. */
 function chatRenderContent(text) {
-    let html = escapeHtmlOsu(text || '');
+    // Element text only, so quotes stay literal: escapeHtmlOsu() turns ' into
+    // &#39;, which would stop :'( matching and make the ;) rule fire on it.
+    let html = String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     for (const [re, ch] of CHAT_EMOTICONS) html = html.replace(re, ch);
     return html;
 }
