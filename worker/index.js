@@ -32,6 +32,7 @@ const {
     writeToKv,
 } = require('./response-cache');
 const { serveCatalogData } = require('./catalog-data');
+const { matchScoreCardPng, serveScoreCardPng } = require('./score-card-png');
 
 const FN_PREFIX = '/.netlify/functions/';
 
@@ -45,6 +46,9 @@ function resolveRoute(url) {
         const fn = ROUTES[name];
         return fn ? { fn } : null;
     }
+
+    /* 成績卡圖片：Discord 機器人用，雲端瀏覽器截圖網站自己的成績卡（score-card-png.js）。 */
+    if (matchScoreCardPng(path)) return { direct: serveScoreCardPng };
 
     /* Discord 的 Interactions Endpoint（Discord 開發者後台登記的網址）。 */
     if (path === '/discord') return { fn: ROUTES['discord-interactions'] };
@@ -105,7 +109,7 @@ export default {
         if (!route) return env.ASSETS.fetch(request);
         if (route.direct) {
             try {
-                return await route.direct(request, env, url);
+                return await route.direct(request, env, url, ctx);
             } catch (err) {
                 console.error('direct route failed:', url.pathname, err?.stack || err);
                 return new Response(JSON.stringify({ error: 'internal error' }), {

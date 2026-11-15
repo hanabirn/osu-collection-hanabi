@@ -154,6 +154,7 @@ async function openScoreCard({ score, beatmapId, mode = 0, lbRank = null }) {
     document.documentElement.classList.add('score-card-open');
     fitScoreCard();
     overlay.querySelector('.score-card-close').focus();
+    delete card.dataset.ready;
     card.innerHTML = `<p class="sc-loading">${escHtml(t('gallery_loading'))}</p>`;
 
     const mods = decodeOsuMods(score.enabled_mods);
@@ -287,7 +288,54 @@ async function openScoreCard({ score, beatmapId, mode = 0, lbRank = null }) {
     const osuLink = document.getElementById('score-card-osu');
     if (osuLink) osuLink.href = `https://osu.ppy.sh/beatmapsets/${encodeURIComponent(setId)}#${OSU_API_MODE[modeName] || 'osu'}/${encodeURIComponent(beatmapId)}`;
     overlay.dataset.filename = `osu-score-${(score.username || score.user_id)}-${beatmapId}.png`.replace(/[^\w.-]+/g, '_');
+    await scWaitForImages(card, cover);
+    if (req === scoreCardReq) card.dataset.ready = '1';
 }
+
+/* Resolve once the card's <img>s and its cover (a CSS background) have
+   loaded or failed, or after 10 s: the Discord bot's screenshot waits for
+   data-ready, so it never captures a half-drawn card. */
+function scWaitForImages(card, coverUrl) {
+    const one = (img) => (img.complete ? Promise.resolve() : new Promise((r) => {
+        img.addEventListener('load', r, { once: true });
+        img.addEventListener('error', r, { once: true });
+    }));
+    const cover = new Image();
+    cover.src = coverUrl;
+    const all = Promise.all([...card.querySelectorAll('img')].map(one).concat(one(cover)));
+    return Promise.race([all, new Promise((r) => setTimeout(r, 10000))]);
+}
+
+/* ?scorecard=<osu! score id>[&m=<ruleset> for a legacy id][&lang=xx][&bare]: open that score's card on
+   load, a shareable link to a score. With &bare the page shows only the
+   card at 1280x720, nothing else: what the Discord bot screenshots
+   (worker/score-card-png.js). */
+async function openScoreCardFromUrl() {
+    const q = new URLSearchParams(location.search);
+    const id = q.get('scorecard');
+    if (!/^\d{1,20}$/.test(id || '')) return;
+    const lang = q.get('lang');
+    if (lang && typeof SUPPORTED_LANGS !== 'undefined' && SUPPORTED_LANGS.includes(lang) && lang !== siteLang) applyLang(lang);
+    if (q.has('bare')) document.documentElement.classList.add('card-only');
+    try {
+        const m = q.get('m');
+        const res = await fetch(`/.netlify/functions/osu-score?id=${id}${/^(osu|taiko|fruits|mania)$/.test(m || '') ? `&m=${m}` : ''}`);
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        await openScoreCard({ score: data.score, beatmapId: data.beatmapId, mode: data.mode || 0 });
+    } catch (e) {
+        console.error('Score card from URL failed:', e);
+        const overlay = document.getElementById('score-card');
+        const card = document.getElementById('score-card-body');
+        if (overlay) overlay.hidden = false;
+        if (card) {
+            card.innerHTML = `<p class="sc-loading">${escHtml(t('updates_load_fail'))}</p>`;
+            card.dataset.ready = 'error';
+        }
+    }
+}
+// After main.js has set the page up.
+window.addEventListener('load', () => setTimeout(openScoreCardFromUrl, 0));
 
 /* Scale the 1280x720 card to the space the window leaves (computers only;
    phones get the one-column layout from css/osu.css). */
@@ -296,7 +344,9 @@ function fitScoreCard() {
     const fit = document.getElementById('score-card-fit');
     if (!overlay || overlay.hidden || !fit) return;
     const frame = fit.parentElement;
-    const k = Math.min(1, frame.clientWidth / 1280, (window.innerHeight - 90) / 720);
+    const k = document.documentElement.classList.contains('card-only')
+        ? 1
+        : Math.min(1, frame.clientWidth / 1280, (window.innerHeight - 90) / 720);
     fit.style.setProperty('--sc-k', String(Math.max(0.3, k)));
 }
 window.addEventListener('resize', fitScoreCard);
@@ -307,6 +357,8 @@ function closeScoreCard() {
     scoreCardReq++;
     overlay.hidden = true;
     document.documentElement.classList.remove('score-card-open');
+    // A shared ?scorecard= link: drop the param so a reload shows the site.
+    if (new URLSearchParams(location.search).has('scorecard')) history.replaceState(null, '', location.pathname);
     if (scoreCardOpener && document.contains(scoreCardOpener)) scoreCardOpener.focus();
     scoreCardOpener = null;
 }

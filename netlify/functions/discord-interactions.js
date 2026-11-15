@@ -20,7 +20,8 @@
    `npm run discord:register` after changing them. */
 const { getCollectionsStore, getDiscordBotStore } = require('./_blobs-store');
 const { getOsuToken } = require('./_osu-auth');
-const { setLocale, runWithLocale, t, LANG_NAMES, KNOWN_KEYS } = require('./_discord-i18n');
+const { setLocale, getLocale, runWithLocale, t, LANG_NAMES, KNOWN_KEYS } = require('./_discord-i18n');
+const { getCtx, getEnv } = require('./_cf-env');
 const { buildOsdb, MODE_INT } = require('./_osdb');
 const { messageWithFile } = require('./_discord-attach');
 const L = require('./_discord-lib');
@@ -129,6 +130,89 @@ async function cmdPp(options, interaction) {
 
 /* --- /recent & /top ------------------------------------------------------- */
 
+/* --- 成績卡 / 加入收藏 ------------------------------------------------
+   Buttons under a score: 🖼 posts the site's score card as an image
+   (rendered by worker/score-card-png.js), ➕ queues the map for the
+   linked osu! account's site collection (picked up on the next sign-in,
+   see netlify/functions/discord-inbox.js), and a link opens the card on
+   the site. A score from /users/{id}/scores carries a legacy id, so the
+   ruleset travels with it (m=). */
+
+// bot locale -> site language for the card's labels
+const SITE_LANG = { zh: 'zh', zhs: 'zh-Hans', en: 'en', ja: 'ja', fr: 'fr', de: 'de', ru: 'ru', es: 'es', ko: 'ko' };
+
+function scoreCardSiteUrl(origin, scoreId, apiMode) {
+    return `${origin}/?scorecard=${scoreId}${apiMode ? `&m=${apiMode}` : ''}`;
+}
+
+function scoreActionRow(score, apiMode, origin) {
+    const setId = (score.beatmapset && score.beatmapset.id) || (score.beatmap && score.beatmap.beatmapset_id);
+    const btns = [];
+    if (score.id) btns.push({ type: 2, style: 1, label: t('btn_card'), custom_id: `card|${apiMode}|${score.id}` });
+    if (setId) btns.push({ type: 2, style: 2, label: t('btn_fav'), custom_id: `fav|${setId}` });
+    if (score.id && origin) btns.push({ type: 2, style: 5, label: t('btn_site'), url: scoreCardSiteUrl(origin, score.id, apiMode) });
+    return btns.length ? [{ type: 1, components: btns }] : [];
+}
+
+/* Answer at once ("thinking…"), then render the card and replace the
+   placeholder with it: Discord allows 3 s for the first answer, the
+   render takes several. */
+function startScoreCard(interaction, origin, apiMode, scoreId) {
+    const work = renderScoreCardInto(interaction, origin, apiMode, scoreId, getLocale());
+    const ctx = getCtx();
+    if (ctx && ctx.waitUntil) ctx.waitUntil(work);
+    return L.json({ type: L.R.DEFERRED_MESSAGE });
+}
+
+async function renderScoreCardInto(interaction, origin, apiMode, scoreId, locale) {
+    const hook = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`;
+    const say = (content) => fetch(hook, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
+    }).catch(() => null);
+    try {
+        let serve = null;
+        try { ({ serveScoreCardPng: serve } = require('../../worker/score-card-png')); } catch { serve = null; }
+        const env = getEnv();
+        if (!serve || !env) return say(t('card_unavailable'));
+        const lang = SITE_LANG[locale] || 'en';
+        const url = new URL(`${origin}/card/${scoreId}.png?lang=${lang}${apiMode ? `&m=${apiMode}` : ''}`);
+        const res = await serve(new Request(url.toString()), env, url, getCtx());
+        if (res.status === 503) return say(t('card_unavailable'));
+        if (!res.ok) return say(t('card_fail'));
+        const png = await res.arrayBuffer();
+        const form = new FormData();
+        form.append('payload_json', JSON.stringify({
+            content: '',
+            embeds: [{ color: PINK, image: { url: 'attachment://score.png' }, footer: L.siteFooter() }],
+            attachments: [{ id: 0, filename: 'score.png' }],
+            components: [{ type: 1, components: [{ type: 2, style: 5, label: t('btn_site'), url: scoreCardSiteUrl(origin, scoreId, apiMode) }] }],
+            allowed_mentions: { parse: [] },
+        }));
+        form.append('files[0]', new Blob([png], { type: 'image/png' }), 'score.png');
+        await fetch(hook, { method: 'PATCH', body: form });
+    } catch (err) {
+        console.error('score card for discord failed:', err && (err.stack || err));
+        await say(t('card_fail'));
+    }
+}
+
+/* ➕ 加入收藏: queue the beatmapset under the caller's linked osu! id. */
+async function addToCollectionInbox(interaction, setId) {
+    const link = await getLink(L.invokerId(interaction));
+    if (!link) return L.ephemeral(t('fav_need_link'));
+    const store = getDiscordBotStore();
+    const key = `inbox:${link.osuUserId}`;
+    let list = [];
+    try { list = (await store.get(key, { type: 'json' })) || []; } catch { list = []; }
+    const id = Number(setId);
+    if (list.some((x) => x.s === id)) return L.ephemeral(t('fav_already', { name: link.osuUsername }));
+    list.push({ s: id, at: Date.now() });
+    await store.setJSON(key, list.slice(-200));
+    return L.ephemeral(t('fav_added', { name: link.osuUsername }));
+}
+
 function scoreEmbed(score, user, apiMode) {
     const bs = score.beatmapset || {};
     const bm = score.beatmap || {};
@@ -205,17 +289,30 @@ function topPage(u, apiMode, scores, page) {
     }
 
     const cid = (p) => `top|${u.id}|${apiMode}|${Math.max(0, p)}|${encodeURIComponent(u.username)}`;
-    const components = [{
+    const pageScores = scores.slice(start, start + TOP_PER_PAGE);
+    const components = [];
+    if (pageScores.some((x) => x.id)) {
+        components.push({ type: 1, components: [{
+            type: 3,
+            custom_id: 'cardsel',
+            placeholder: t('card_pick'),
+            options: pageScores.map((x, i) => ({ x, n: start + i + 1 })).filter((o) => o.x.id).map(({ x, n }) => ({
+                label: `#${n} ${(x.beatmapset && x.beatmapset.title) || ''} [${(x.beatmap && x.beatmap.version) || ''}]`.slice(0, 100),
+                value: `${apiMode}|${x.id}`,
+            })),
+        }] });
+    }
+    components.push({
         type: 1,
         components: [
             { type: 2, style: 2, label: t('page_prev'), custom_id: cid(page - 1), disabled: page === 0 },
             { type: 2, style: 2, label: t('page_next'), custom_id: cid(page + 1), disabled: page >= pages - 1 },
         ],
-    }];
+    });
     return { embeds, components };
 }
 
-async function cmdRecent(options, interaction) {
+async function cmdRecent(options, interaction, origin) {
     const who = await resolveWho(options, interaction);
     if (!who) return L.ephemeral(t('need_name_or_link'));
     const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
@@ -228,10 +325,10 @@ async function cmdRecent(options, interaction) {
     const scores = await fetchScores(token, u.id, 'recent', apiMode, idx, true);
     if (!scores.length) return L.ephemeral(t('recent_none', { name: u.username, mode: L.MODE_LABEL[apiMode] }));
     const score = scores[Math.min(idx, scores.length) - 1];
-    return L.message(scoreEmbed(score, u, apiMode));
+    return L.message(scoreEmbed(score, u, apiMode), scoreActionRow(score, apiMode, origin));
 }
 
-async function cmdTop(options, interaction) {
+async function cmdTop(options, interaction, origin) {
     const who = await resolveWho(options, interaction);
     if (!who) return L.ephemeral(t('need_name_or_link'));
     const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
@@ -247,7 +344,7 @@ async function cmdTop(options, interaction) {
         if (scores.length < idx) return L.ephemeral(t('top_no_nth', { name: u.username, idx, mode: L.MODE_LABEL[apiMode] }));
         const e = scoreEmbed(scores[idx - 1], u, apiMode);
         e.title = `#${idx} · ${e.title}`;
-        return L.message(e);
+        return L.message(e, scoreActionRow(scores[idx - 1], apiMode, origin));
     }
 
     const scores = await fetchScores(token, u.id, 'best', apiMode, TOP_MAX, false);
@@ -423,6 +520,68 @@ function parseBeatmapId(raw) {
     if (m) return { setId: m[1] };
     if (/^\d+$/.test(s)) return { beatmapId: s };
     return {};
+}
+
+/* --- /leaderboard <map> [mode]: the map's global top 10 with grade and
+   mod emojis, a menu to open any of them as a score card, and ➕. --- */
+async function cmdLeaderboard(options) {
+    const { beatmapId, setId } = parseBeatmapId(L.optVal(options, 'query'));
+    const token = await getOsuToken();
+    let bm;
+    if (beatmapId) {
+        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps/${beatmapId}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (r.status === 404) return L.ephemeral(t('map_not_found'));
+        if (!r.ok) return L.ephemeral(t('api_fail'));
+        bm = await r.json();
+    } else if (setId) {
+        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${setId}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!r.ok) return L.ephemeral(t('map_set_not_found'));
+        const set = await r.json();
+        bm = (set.beatmaps || []).slice().sort((a, b) => b.difficulty_rating - a.difficulty_rating)[0];
+        if (!bm) return L.ephemeral(t('map_set_no_diffs'));
+        bm.beatmapset = set;
+    } else {
+        return L.ephemeral(t('map_need_link'));
+    }
+    const apiMode = L.API_MODE[L.optVal(options, 'mode')] || L.API_MODE[bm.mode] || 'osu';
+    const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps/${bm.id}/scores?mode=${apiMode}&limit=10`, {
+        headers: { Authorization: `Bearer ${token}`, 'x-api-version': '20220705' },
+    });
+    if (!r.ok) return L.ephemeral(t('api_fail'));
+    const scores = ((await r.json()).scores || []).slice(0, 10);
+    const bs = bm.beatmapset || {};
+    const covers = bs.covers || {};
+    const head = {
+        title: `${L.modeTag(apiMode) ? L.modeTag(apiMode) + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+        url: `https://osu.ppy.sh/b/${bm.id}`,
+        color: L.srColor(bm.difficulty_rating),
+        thumbnail: { url: covers['list@2x'] || covers.list || undefined },
+    };
+    if (!scores.length) return L.message({ ...head, description: t('lb_none'), footer: L.siteFooter() });
+    const tick = String.fromCharCode(96);
+    const lines = scores.map((sc, i) => {
+        const name = (sc.user && sc.user.username) || `#${sc.user_id}`;
+        const flag = sc.user && sc.user.country_code ? L.flagEmoji(sc.user.country_code) + ' ' : '';
+        const acc = sc.accuracy != null ? `${(sc.accuracy * 100).toFixed(2)}%` : '—';
+        const value = sc.pp != null ? `**${Math.round(sc.pp)}pp**` : `**${L.fmtNum(sc.legacy_total_score || sc.total_score)}**`;
+        const mods = L.modsTag(sc.mods);
+        return `${tick}#${String(i + 1).padStart(2, ' ')}${tick} ${L.gradeTag(sc.rank)} ${flag}**${name}**${mods ? ' ' + mods : ''} · ${acc} · ${L.fmtNum(sc.max_combo)}x · ${value}`;
+    });
+    const components = [{ type: 1, components: [{
+        type: 3,
+        custom_id: 'cardsel',
+        placeholder: t('card_pick'),
+        options: scores.filter((sc) => sc.id).map((sc, i) => ({
+            label: `#${i + 1} ${(sc.user && sc.user.username) || sc.user_id}${sc.pp != null ? ` — ${Math.round(sc.pp)}pp` : ''}`.slice(0, 100),
+            value: `|${sc.id}`,
+        })),
+    }] }];
+    if (bs.id) components.push({ type: 1, components: [{ type: 2, style: 2, label: t('btn_fav'), custom_id: `fav|${bs.id}` }] });
+    return L.message({
+        ...head,
+        description: lines.join('\n'),
+        footer: L.siteFooter(`${t('lb_title')} · ${Number(bm.difficulty_rating || 0).toFixed(2)}★`),
+    }, components);
 }
 
 async function cmdMap(options, origin) {
@@ -985,6 +1144,21 @@ function osdbResponse(collections, baseName) {
 async function handleComponent(interaction, origin) {
     const id = (interaction.data && interaction.data.custom_id) || '';
 
+    // 🖼 score card: card|<ruleset or ''>|<scoreId>, or a pick from a
+    // /top or /leaderboard menu (value <ruleset or ''>|<scoreId>).
+    if (id.startsWith('card|') || id === 'cardsel') {
+        const raw = id === 'cardsel' ? String(((interaction.data && interaction.data.values) || [])[0] || '') : id.slice(5);
+        const [mode, scoreId] = raw.split('|');
+        if (!/^\d{1,20}$/.test(scoreId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
+        return startScoreCard(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
+    }
+    // ➕ 加入收藏: fav|<beatmapsetId>
+    if (id.startsWith('fav|')) {
+        const setId = id.slice(4);
+        if (!/^\d{1,10}$/.test(setId)) return L.json({ type: L.R.DEFERRED_UPDATE });
+        return addToCollectionInbox(interaction, setId);
+    }
+
     // /top pagination: top|<userId>|<mode>|<page>|<usernameEncoded>. No fresh
     // osu! user lookup here — the username came along in the custom_id and
     // a.ppy.sh/<id> is a stable avatar URL, so this is one osu! API call.
@@ -1167,8 +1341,9 @@ async function handleInteraction(event) {
                 // command list is re-registered without them.
                 case 'farm':
                 case 'practice': return L.ephemeral(t('feature_retired'));
-                case 'recent': return await cmdRecent(options, interaction);
-                case 'top': return await cmdTop(options, interaction);
+                case 'recent': return await cmdRecent(options, interaction, origin);
+                case 'top': return await cmdTop(options, interaction, origin);
+                case 'leaderboard': return await cmdLeaderboard(options);
                 case 'map': return await cmdMap(options, origin);
                 case 'collect-channel': return await cmdCollectChannel(options, interaction, origin);
                 case 'follow': return await cmdFollow(options, interaction);

@@ -5588,6 +5588,8 @@ function applyLoggedInOsuUser() {
     const input = document.getElementById('visitor-lookup-input');
     if (input) input.value = user.id;
     loadVisitorProfileById(user.id, false);
+    // Maps queued from the Discord bot (js/discord-inbox.js).
+    if (typeof checkDiscordInbox === 'function') setTimeout(checkDiscordInbox, 1500);
 }
 
 function checkOsuLoginFromUrl() {
