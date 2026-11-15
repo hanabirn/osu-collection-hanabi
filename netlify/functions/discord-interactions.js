@@ -227,7 +227,9 @@ function scoreEmbed(score, user, apiMode) {
         title: `${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
         url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
         description: [
-            `${L.gradeTag(score.rank)}${modStr ? ' ' + modStr : ''} · ${acc} · **${pp}**`,
+            // ### heading: Discord sizes emojis with the text, so the grade and
+            // mod badges come out larger than on a normal line.
+            `### ${L.gradeTag(score.rank)}${modStr ? ' ' + modStr : ''} · ${acc} · ${pp}`,
             `${L.fmtNum(score.score)} · ${combo}`,
             `${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'}★ · ${L.ago(score.created_at)}`,
         ].join('\n'),
