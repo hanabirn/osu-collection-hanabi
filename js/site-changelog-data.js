@@ -55,6 +55,17 @@ const SITE_CHANGELOG = [
                 de: "In den Map-Details im Katalog eine Schwierigkeit wählen, um PP bei 95–100 % und die globalen Top 50 zu sehen",
             },
             {
+                zh: "點排行榜上的成績會打開成績卡：玩家資訊、難度曲線、譜面數據、評級、PP、判定一次看完，還能下載成圖片",
+                'zh-Hans': "点排行榜上的成绩会打开成绩卡：玩家信息、难度曲线、谱面数据、评级、PP、判定一次看完，还能下载成图片",
+                en: "Click a leaderboard score to open its score card: player, difficulty curve, map stats, grade, PP and judgements at a glance, and save it as an image",
+                ja: "ランキングのスコアをクリックするとスコアカードが開きます：プレイヤー、難易度曲線、譜面データ、ランク、PP、判定をまとめて表示し、画像として保存もできます",
+                ko: "순위의 기록을 누르면 기록 카드가 열립니다: 플레이어, 난이도 곡선, 맵 정보, 랭크, PP, 판정을 한눈에 보고 이미지로 저장할 수 있어요",
+                ru: "Клик по результату в рейтинге открывает карточку: игрок, кривая сложности, параметры карты, оценка, PP и попадания, с сохранением в картинку",
+                fr: "Clique sur un score du classement pour ouvrir sa carte : joueur, courbe de difficulté, stats de la map, rang, PP et jugements, à enregistrer en image",
+                es: "Haz clic en una puntuación de la clasificación para abrir su tarjeta: jugador, curva de dificultad, datos del mapa, rango, PP y juicios, y guárdala como imagen",
+                de: "Ein Klick auf einen Score der Bestenliste öffnet seine Score-Karte: Spieler, Schwierigkeitsverlauf, Map-Werte, Rang, PP und Bewertungen, als Bild speicherbar",
+            },
+            {
                 zh: "PP 查詢新增「依實力推薦」：根據最佳成績的難度，推薦還沒收藏的新圖",
                 'zh-Hans': "PP 查询新增「依实力推荐」：根据最佳成绩的难度，推荐还没收藏的新图",
                 en: "PP lookup adds “Picks for your level”: new maps in the star range of your best scores that you haven’t collected yet",
