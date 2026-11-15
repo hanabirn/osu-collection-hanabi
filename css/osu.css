@@ -6390,8 +6390,11 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     position: relative;
     font-size: 250px;
     font-weight: 800;
-    line-height: 0.9;
-    letter-spacing: -0.05em;
+    line-height: 1;
+    /* background-clip:text only paints inside the text box: room on both
+       sides (and no negative tracking) so the glyph edges aren't cut off. */
+    padding: 0.04em 0.12em;
+    letter-spacing: 0;
     color: var(--g1);
     background: linear-gradient(180deg, var(--g1) 15%, var(--g2) 85%);
     -webkit-background-clip: text;
