@@ -47,7 +47,8 @@ const SITE_SECTIONS = [
     // 私訊 lives inside the chat page's sidebar now (switchTab maps 'dm' to 'chat').
     { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { action: 'focusDiscordCard()', label: 'discord_bot_title' }] },
     { id: 'more', label: 'nav_more', tabs: [
-        { tab: 'howto', label: 'nav_howto' }, { tab: 'updates', label: 'nav_updates' }, { tab: 'resources', label: 'nav_resources' },
+        { tab: 'howto', label: 'nav_howto' }, { tab: 'updates', label: 'nav_updates' }, { tab: 'changelog', label: 'nav_changelog' },
+        { tab: 'resources', label: 'nav_resources' },
         { tab: 'bbcode', label: 'nav_bbcode' }, { tab: 'feedback', label: 'nav_feedback' },
     ] },
 ];
@@ -329,53 +330,31 @@ function onContactMenuEscape(e) {
     if (e.key === 'Escape') toggleContactMenu(false);
 }
 
-/* ===== ✨ Changelog dropdown ===== (same open/outside-click/Escape pattern
-   as the language/contact dropdowns above). Content is the manually
-   maintained SITE_CHANGELOG list — see js/site-changelog-data.js. */
-function toggleChangelogMenu(forceOpen) {
-    const wrap = document.getElementById('site-changelog');
-    const btn = document.getElementById('site-changelog-btn');
-    const header = document.querySelector('.site-header');
-    if (!wrap || !btn) return;
-    const open = typeof forceOpen === 'boolean' ? forceOpen : !wrap.classList.contains('open');
-    wrap.classList.toggle('open', open);
-    btn.setAttribute('aria-expanded', String(open));
-    if (header) header.classList.toggle('changelog-menu-open', open);
-    if (open) {
-        document.addEventListener('click', onChangelogMenuOutsideClick);
-        document.addEventListener('keydown', onChangelogMenuEscape);
-    } else {
-        document.removeEventListener('click', onChangelogMenuOutsideClick);
-        document.removeEventListener('keydown', onChangelogMenuEscape);
-    }
-}
-function onChangelogMenuOutsideClick(e) {
-    if (!e.target.closest('#site-changelog')) toggleChangelogMenu(false);
-}
-function onChangelogMenuEscape(e) {
-    if (e.key === 'Escape') toggleChangelogMenu(false);
-}
-/* Items are { lang: text } (see site-changelog-data.js); plain strings are
+/* ===== 更新紀錄 =====
+   Content is the manually maintained SITE_CHANGELOG list in
+   js/site-changelog-data.js. Items are { lang: text }; plain strings are
    shown as-is. */
 function changelogItemText(item) {
     if (typeof item === 'string') return item;
     return item[siteLang] || item.en || item.zh || '';
 }
-function renderChangelogMenu() {
-    const menu = document.getElementById('site-changelog-menu');
-    if (!menu) return;
+/* 更新紀錄 page: one row per release, the date on the left and what
+   changed on the right, newest first (the newest is marked). */
+function renderChangelogPage() {
+    const list = document.getElementById('changelog-timeline');
+    if (!list) return;
     const entries = typeof SITE_CHANGELOG !== 'undefined' ? SITE_CHANGELOG : [];
     if (!entries.length) {
-        menu.innerHTML = `<div class="changelog-empty">${escHtml(t('site_changelog_title'))}</div>`;
+        list.innerHTML = `<li class="changelog-empty">${escHtml(t('site_changelog_title'))}</li>`;
         return;
     }
-    menu.innerHTML = entries.map(entry => `
-        <div class="changelog-entry">
-            <div class="changelog-entry-date">${escHtml(entry.date)}</div>
-            <ul class="changelog-entry-list">
+    list.innerHTML = entries.map((entry, i) => `
+        <li class="changelog-release${i === 0 ? ' is-latest' : ''}">
+            <div class="changelog-release-date"><time datetime="${escHtml(entry.date)}">${escHtml(entry.date)}</time>${i === 0 ? `<span class="changelog-latest">${escHtml(t('changelog_latest'))}</span>` : ''}</div>
+            <ul class="changelog-release-list">
                 ${entry.items.map(item => `<li>${escHtml(changelogItemText(item))}</li>`).join('')}
             </ul>
-        </div>`).join('');
+        </li>`).join('');
 }
 
 /* ===== Re-render already-rendered dynamic content after a language switch =====
@@ -398,7 +377,7 @@ function refreshDynamicContent() {
     if (typeof refreshMappoolsLocalized === 'function') refreshMappoolsLocalized();
     if (typeof refreshGamesLocalized === 'function') refreshGamesLocalized();
     if (typeof refreshTrendingLocalized === 'function') refreshTrendingLocalized();
-    if (typeof renderChangelogMenu === 'function') renderChangelogMenu();
+    if (typeof renderChangelogPage === 'function') renderChangelogPage();
     if (typeof refreshHomeLocalized === 'function') refreshHomeLocalized();
 }
 
@@ -523,6 +502,13 @@ function styleFilePickers() {
    the update toast's) that appears once you're 1.5 screens down. Back at
    the top, focus moves to the current tab in the top nav, so a keyboard
    user lands somewhere sensible rather than on a button that just vanished. */
+/* Footer links (更新內容, 使用手冊) open a page from the bottom of another:
+   start the new page at its top, not at the old scroll position. */
+function openPageFromFooter(tab) {
+    switchTab(tab);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
 function initBackToTop() {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -569,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', onModalEscapeKeydown);
     if (typeof renderStaticIcons === 'function') renderStaticIcons();
     if (typeof wireModalHowto === 'function') wireModalHowto();
-    if (typeof renderChangelogMenu === 'function') renderChangelogMenu();
+    if (typeof renderChangelogPage === 'function') renderChangelogPage();
     applyLang(siteLang);
     initMaintenanceBanner();
     // Top up language/genre for collection sets saved before that feature —

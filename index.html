@@ -229,6 +229,7 @@
             <p class="nav-drawer-group-label" data-i18n="nav_more"></p>
             <button class="site-nav-btn" onclick="switchTab('howto', this)" data-i18n="nav_howto"></button>
             <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates"></button>
+            <button class="site-nav-btn" onclick="switchTab('changelog', this)" data-i18n="nav_changelog"></button>
             <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources"></button>
             <button class="site-nav-btn" onclick="switchTab('bbcode', this)" data-i18n="nav_bbcode"></button>
             <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback"></button>
@@ -1027,6 +1028,14 @@
         </div>
     </section>
 
+    <!-- 更新紀錄 (js/main.js renderChangelogPage, data in js/site-changelog-data.js):
+         what changed on this site, newest first, after osu-web's changelog. -->
+    <section id="page-changelog" class="site-page" style="display:none;">
+        <h2 class="osu-page-title" data-i18n="nav_changelog">更新紀錄</h2>
+        <p class="tournaments-hint" data-i18n="changelog_page_hint">這個網站每次上線改了什麼，新的在最上面。</p>
+        <ol class="changelog-timeline" id="changelog-timeline"></ol>
+    </section>
+
     <section id="page-feedback" class="site-page" style="display:none;">
         <p class="eyebrow">FEEDBACK</p>
         <h2 class="osu-page-title" data-i18n="feedback_title">建議&改進</h2>
@@ -1319,13 +1328,10 @@
             <span data-i18n="site_like_label">讚</span>
             <span class="site-like-count" id="site-like-count" aria-hidden="true">–</span>
         </button>
-        <div class="site-changelog" id="site-changelog">
-            <button class="site-social-btn site-changelog-btn" id="site-changelog-btn" type="button" onclick="toggleChangelogMenu()" aria-haspopup="true" aria-expanded="false" data-icon="sparkles" data-i18n-title="site_changelog_title" title="這次部署更新了什麼">
-                <span data-i18n="site_changelog_label">更新內容</span>
-            </button>
-            <div class="site-changelog-menu" id="site-changelog-menu"></div>
-        </div>
-        <button class="site-social-btn" type="button" onclick="switchTab('howto')" data-icon="bookOpen" data-i18n-title="site_howto_title" title="每個分頁跟按鈕的用途說明">
+        <button class="site-social-btn site-changelog-btn" id="site-changelog-btn" type="button" onclick="openPageFromFooter('changelog')" data-icon="sparkles" data-i18n-title="site_changelog_title" title="這次部署更新了什麼">
+            <span data-i18n="site_changelog_label">更新內容</span>
+        </button>
+        <button class="site-social-btn" type="button" onclick="openPageFromFooter('howto')" data-icon="bookOpen" data-i18n-title="site_howto_title" title="每個分頁跟按鈕的用途說明">
             <span data-i18n="site_howto_label">使用手冊</span>
         </button>
         <button class="site-social-btn site-share-btn" id="site-share-btn" type="button" onclick="shareSite()" data-icon="share2" data-i18n-title="site_share_title" title="把這個網站分享給朋友">

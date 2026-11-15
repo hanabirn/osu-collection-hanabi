@@ -1,5 +1,5 @@
-/* Manually maintained release notes for the header's 更新內容 dropdown
-   (see toggleChangelogMenu()/renderChangelogMenu() in js/main.js). Add one
+/* Manually maintained release notes for the 更新紀錄 page under 更多
+   (renderChangelogPage() in js/main.js; the footer's 更新內容 opens it). Add one
    new entry here whenever a user-visible change ships — newest first, no dev
    jargon or internal filenames. Skip internal-only work (refactors, crawler
    tuning, infra) that a visitor wouldn't notice.
@@ -7,6 +7,77 @@
    the current language, falling back to en, then zh. A plain string still
    works (shown as-is in every language). */
 const SITE_CHANGELOG = [
+    {
+        date: '2026-11-14',
+        items: [
+            {
+                zh: "全新版面：上方改成首頁、收藏、探索、玩家、社群、更多六個分區，每個分區有自己的標題列和分頁",
+                'zh-Hans': "全新版面：上方改成首页、收藏、探索、玩家、社群、更多六个分区，每个分区有自己的标题栏和分页",
+                en: "New layout: the top bar now has six sections (Home, Collection, Explore, Players, Community, More), each with its own title bar and tabs",
+                ja: "新しいレイアウト：上部をホーム・コレクション・探す・プレイヤー・コミュニティ・その他の 6 つに整理し、それぞれに見出しとタブを付けました",
+                ko: "새 레이아웃: 상단을 홈, 컬렉션, 탐색, 플레이어, 커뮤니티, 더 보기 6개 섹션으로 나누고 섹션마다 제목 줄과 탭을 두었습니다",
+                ru: "Новый макет: вверху шесть разделов (Главная, Коллекция, Обзор, Игроки, Сообщество, Ещё), у каждого своя строка заголовка и вкладки",
+                fr: "Nouvelle mise en page : six sections en haut (Accueil, Collection, Explorer, Joueurs, Communauté, Plus), chacune avec son titre et ses onglets",
+                es: "Nuevo diseño: seis secciones arriba (Inicio, Colección, Explorar, Jugadores, Comunidad, Más), cada una con su barra de título y pestañas",
+                de: "Neues Layout: oben sechs Bereiche (Start, Sammlung, Entdecken, Spieler, Community, Mehr), jeder mit eigener Titelleiste und Tabs",
+            },
+            {
+                zh: "新的首頁：一眼看到你的收藏和 PP、追蹤中的玩家、最新賽事、osu! 官方新聞和今日推薦",
+                'zh-Hans': "新的首页：一眼看到你的收藏和 PP、追踪中的玩家、最新赛事、osu! 官方新闻和今日推荐",
+                en: "New home page: your collection and PP, tracked players, upcoming tournaments, osu! news and today’s pick at a glance",
+                ja: "新しいホーム：コレクションと PP、フォロー中のプレイヤー、最新の大会、osu! ニュース、今日のおすすめをひと目で",
+                ko: "새 홈: 내 컬렉션과 PP, 추적 중인 플레이어, 최신 대회, osu! 뉴스, 오늘의 추천을 한눈에",
+                ru: "Новая главная: ваша коллекция и PP, отслеживаемые игроки, турниры, новости osu! и карта дня — всё сразу",
+                fr: "Nouvel accueil : ta collection et tes PP, les joueurs suivis, les tournois, les news osu! et la map du jour d’un coup d’œil",
+                es: "Nueva página de inicio: tu colección y PP, jugadores seguidos, torneos, noticias de osu! y la recomendación del día de un vistazo",
+                de: "Neue Startseite: deine Sammlung und PP, verfolgte Spieler, Turniere, osu!-News und die Map des Tages auf einen Blick",
+            },
+            {
+                zh: "在曲庫點譜面會從右邊打開詳情：看難度、BPM、長度，還能試聽、加入收藏、下載",
+                'zh-Hans': "在曲库点谱面会从右边打开详情：看难度、BPM、长度，还能试听、加入收藏、下载",
+                en: "Clicking a map in the catalog opens its details on the right: difficulties, BPM and length, with preview, add and download",
+                ja: "カタログで譜面をクリックすると右側に詳細が開きます：難易度・BPM・長さの確認、試聴、追加、ダウンロード",
+                ko: "카탈로그에서 맵을 누르면 오른쪽에 상세 정보가 열립니다: 난이도, BPM, 길이와 미리 듣기, 추가, 다운로드",
+                ru: "Клик по карте в каталоге открывает справа подробности: сложности, BPM и длина, прослушивание, добавление и загрузка",
+                fr: "Cliquer sur une map du catalogue ouvre ses détails à droite : difficultés, BPM et durée, avec écoute, ajout et téléchargement",
+                es: "Al hacer clic en un mapa del catálogo se abren sus detalles a la derecha: dificultades, BPM y duración, con vista previa, añadir y descargar",
+                de: "Ein Klick auf eine Map im Katalog öffnet rechts die Details: Schwierigkeiten, BPM und Länge, mit Vorschau, Hinzufügen und Download",
+            },
+            {
+                zh: "PP 查詢新增「依實力推薦」：根據最佳成績的難度，推薦還沒收藏的新圖",
+                'zh-Hans': "PP 查询新增「依实力推荐」：根据最佳成绩的难度，推荐还没收藏的新图",
+                en: "PP lookup adds “Picks for your level”: new maps in the star range of your best scores that you haven’t collected yet",
+                ja: "PP 検索に「実力に合わせたおすすめ」を追加：ベストスコアの難易度帯から、まだ収集していない新しい譜面を紹介",
+                ko: "PP 조회에 ‘실력 맞춤 추천’ 추가: 최고 기록의 난이도대에서 아직 모으지 않은 새 맵을 추천",
+                ru: "В поиске PP появилось «Под ваш уровень»: новые карты в диапазоне звёзд ваших лучших результатов, которых нет в коллекции",
+                fr: "La recherche PP ajoute « Pour ton niveau » : de nouvelles maps dans la plage d’étoiles de tes meilleurs scores, pas encore collectées",
+                es: "La consulta de PP añade «Para tu nivel»: mapas nuevos en el rango de estrellas de tus mejores puntuaciones que aún no tienes",
+                de: "Die PP-Abfrage zeigt jetzt „Passend zu deinem Level“: neue Maps im Sternbereich deiner besten Scores, die du noch nicht hast",
+            },
+            {
+                zh: "聊天室和私訊合併成「社群」一頁，還可以把 Discord 機器人邀請到自己的伺服器；更新紀錄也改成獨立的一頁",
+                'zh-Hans': "聊天室和私信合并成「社群」一页，还可以把 Discord 机器人邀请到自己的服务器；更新记录也改成独立的一页",
+                en: "Chat and private messages are now one Community page, where you can also invite the Discord bot to your server; this changelog has its own page too",
+                ja: "チャットと DM を「コミュニティ」1 ページにまとめ、Discord ボットを自分のサーバーに招待できるように。更新履歴も専用ページになりました",
+                ko: "채팅과 DM을 ‘커뮤니티’ 한 페이지로 합치고, Discord 봇을 내 서버에 초대할 수 있게 했습니다. 업데이트 내역도 별도 페이지가 되었습니다",
+                ru: "Чат и личные сообщения теперь на одной странице «Сообщество», откуда можно пригласить Discord-бота на свой сервер; у списка изменений тоже своя страница",
+                fr: "Le chat et les messages privés forment maintenant la page Communauté, d’où tu peux inviter le bot Discord sur ton serveur ; les nouveautés ont aussi leur page",
+                es: "El chat y los mensajes privados ahora son una sola página de Comunidad, desde donde puedes invitar el bot de Discord a tu servidor; los cambios también tienen su propia página",
+                de: "Chat und Privatnachrichten sind jetzt eine Community-Seite, von der aus du den Discord-Bot auf deinen Server einladen kannst; die Änderungen haben jetzt auch eine eigene Seite",
+            },
+            {
+                zh: "英文、德文、西班牙文等語言的版面不再被擠到，手機和電腦都一樣",
+                'zh-Hans': "英文、德文、西班牙文等语言的版面不再被挤到，手机和电脑都一样",
+                en: "Layout no longer gets squeezed in English, German, Spanish and other languages, on phones and computers alike",
+                ja: "英語・ドイツ語・スペイン語などでレイアウトが詰まらないように修正（スマホ・PC とも）",
+                ko: "영어, 독일어, 스페인어 등에서 레이아웃이 찌그러지지 않도록 수정했습니다 (휴대폰, PC 모두)",
+                ru: "Макет больше не сжимается на английском, немецком, испанском и других языках — и на телефоне, и на компьютере",
+                fr: "La mise en page n’est plus tassée en anglais, allemand, espagnol et autres langues, sur mobile comme sur ordinateur",
+                es: "El diseño ya no se aprieta en inglés, alemán, español y otros idiomas, tanto en móvil como en ordenador",
+                de: "Das Layout wird auf Englisch, Deutsch, Spanisch und in anderen Sprachen nicht mehr gequetscht – auf Handy und Computer",
+            },
+        ],
+    },
     {
         date: '2026-10-02',
         items: [

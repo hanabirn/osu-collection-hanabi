@@ -206,7 +206,6 @@ a:hover { text-decoration: underline; }
 .site-header.lang-menu-open,
 .site-header.notif-menu-open,
 .site-header.contact-menu-open,
-.site-header.changelog-menu-open,
 .site-header.accent-picker-open {
     overflow: visible;
     z-index: 60;
@@ -831,67 +830,6 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 /* ✨ Changelog dropdown — sits inline in the centered .site-social row (not
    a header corner), so its menu is centred under the button rather than
    right-aligned like .contact-info-menu. */
-.site-changelog {
-    position: relative;
-}
-.site-changelog-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(-8px);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: min(320px, calc(100vw - 24px));
-    max-height: 360px;
-    overflow-y: auto;
-    padding: 12px;
-    border-radius: var(--r-card);
-    background: var(--bg-card);
-    border: var(--line) solid var(--border-card);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-    text-align: left;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
-    z-index: 210;
-}
-.site-changelog.open .site-changelog-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-}
-.changelog-entry-date {
-    font-size: var(--fs-12);
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: var(--text-pink);
-    margin-bottom: 4px;
-}
-.changelog-entry-list {
-    margin: 0;
-    padding-left: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-.changelog-entry-list li {
-    font-size: var(--fs-13);
-    color: var(--text);
-    line-height: 1.4;
-}
-.changelog-entry + .changelog-entry {
-    padding-top: 10px;
-    border-top: var(--line) solid var(--border-card);
-}
-.changelog-empty {
-    font-size: var(--fs-13);
-    color: var(--text-dim2);
-    padding: 4px 2px;
-}
-@media (max-width: 480px) {
-    .site-changelog-menu { width: min(300px, calc(100vw - 24px)); }
-}
 
 .lang-globe {
     position: relative;
@@ -1837,7 +1775,6 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     /* Their buttons now sit anywhere in the wrapped row, so pin these two
        to the screen like the language / notification / contact menus. */
     .accent-picker-menu { position: fixed; top: 12px; right: 12px; left: auto; z-index: 220; }
-    .site-changelog-menu { position: fixed; top: 12px; left: 50%; max-height: calc(100dvh - 24px); z-index: 220; }
 }
 
 /* ===== Slim header + section band (redesign, after osu-web) =====
@@ -1971,8 +1908,6 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 
 /* 讚 / 更新內容 / 使用手冊 / 分享, moved down from the header. */
 .site-footer .site-social { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
-.site-footer .site-changelog { position: relative; }
-.site-footer .site-changelog-menu { top: auto; bottom: calc(100% + 8px); }
 
 @media (max-width: 899px) {
     .site-nav { display: none; }
@@ -2088,3 +2023,35 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 /* Band tabs never break a label over two lines; on phones the row scrolls. */
 .section-band-tab, .section-band-choice button { white-space: nowrap; }
+
+/* ===== 更新紀錄 page (js/main.js renderChangelogPage) =====
+   After osu-web's changelog: the date in a narrow column, the changes beside
+   it, a rule between releases; the newest release carries a 最新 tag. */
+.changelog-timeline { list-style: none; margin: 16px 0 0; padding: 0; }
+.changelog-release {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 8px 24px;
+    padding: 20px 0;
+    border-top: var(--line) solid var(--border);
+}
+.changelog-release:first-child { border-top: 0; padding-top: 4px; }
+.changelog-release-date { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.changelog-release-date time { font-family: var(--font-display); font-size: var(--fs-16); font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.changelog-latest {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: var(--fs-12);
+    font-weight: 700;
+    color: var(--on-accent, #fff);
+    background: var(--pink);
+}
+.changelog-release-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
+.changelog-release-list li { font-size: var(--fs-14); line-height: 1.6; color: var(--text); }
+.changelog-release-list li::marker { color: var(--pink); }
+.changelog-release:not(.is-latest) .changelog-release-list li { color: var(--text-dim); }
+.changelog-empty { color: var(--text-dim); font-size: var(--fs-14); }
+@media (max-width: 600px) {
+    .changelog-release { grid-template-columns: minmax(0, 1fr); padding: 16px 0; }
+    .changelog-release-date { flex-direction: row; align-items: center; }
+}
