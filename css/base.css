@@ -2045,3 +2045,11 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-header { flex-wrap: nowrap; align-items: center; }
     .site-header-top { order: -1; margin: 0 auto 0 0; }
 }
+/* Computer: the banner band on 首頁 and 收藏 is twice as tall (72 → 144px),
+   with the title, tabs and tools along its bottom edge so the picture shows
+   above them. Phones keep the short band. */
+@media (min-width: 900px) {
+    :root[data-site-section="home"] .section-band-in,
+    :root[data-site-section="collection"] .section-band-in,
+    :root:not([data-site-section]) .section-band-in { min-height: 144px; align-items: flex-end; align-content: flex-end; padding-bottom: 16px; }
+}
