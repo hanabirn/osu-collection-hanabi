@@ -178,7 +178,9 @@ async function openScoreCard({ score, beatmapId, mode = 0, lbRank = null }) {
     }
 
     const setId = map.beatmapset_id;
-    const cover = `https://assets.ppy.sh/beatmaps/${encodeURIComponent(setId)}/covers/cover@2x.jpg`;
+    // Through this site's own proxy: assets.ppy.sh has no CORS headers, so
+    // "下載圖片" couldn't draw a cover loaded straight from there.
+    const cover = `/.netlify/functions/osu-cover?id=${encodeURIComponent(setId)}`;
     const rate = scModRate(mods);
     const baseStars = parseFloat(map.difficultyrating) || 0;
     const stars = ppRes && ppRes.stars != null ? ppRes.stars : baseStars;
