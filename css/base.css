@@ -1434,7 +1434,8 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 :root[data-section="catalog"] .site-main,
 :root[data-section="public-collections"] .site-main,
 :root[data-section="skin-screenshots"] .site-main,
-:root[data-section="lookup"] .site-main {
+:root[data-section="lookup"] .site-main,
+:root[data-section="chat"] .site-main {
     max-width: 1640px;
 }
 
@@ -1904,6 +1905,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 :root[data-section="public-collections"] .section-band-in,
 :root[data-section="skin-screenshots"] .section-band-in,
 :root[data-section="lookup"] .section-band-in,
+:root[data-section="chat"] .section-band-in,
 :root[data-section="home"] .site-main { max-width: 1640px; }
 .section-band-title {
     margin: 0;

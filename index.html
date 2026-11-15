@@ -881,33 +881,81 @@
         <p class="eyebrow">COMMUNITY</p>
         <h2 class="osu-page-title" data-i18n="chat_page_title">聊天室</h2>
         <p class="tournaments-hint" data-i18n="chat_page_hint">跟其他玩家聊聊天、約圖分享——貼上 osu! 圖面網址會自動變成可以一鍵加入收藏的卡片。</p>
+        <!-- 社群 (after osu-web's chat): channels and private messages on the
+             left, the open conversation in the middle, the Discord bot on the
+             right. 私訊 was its own page; its list and thread views moved here
+             unchanged (js/dm.js keeps driving them by id). -->
+        <div class="community-layout">
+            <aside class="community-side">
+                <button type="button" class="community-channel active" id="community-public-btn" onclick="openPublicChat()"><span aria-hidden="true">#</span> <span data-i18n="chat_page_title">聊天室</span></button>
+                <p class="community-side-label" data-i18n="nav_dm">私訊</p>
+                <div class="osu-add-card chat-card" id="dm-list-view">
+                    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+                    <div class="card-corner bl"></div><div class="card-corner br"></div>
+                    <div id="dm-login-required" class="chat-login-required" style="display:none;">
+                        <span data-i18n="dm_login_required">登入 osu! 才能使用私訊</span>
+                        <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
+                    </div>
+                    <div id="dm-new-row" class="input-group" style="display:none;">
+                        <input type="text" id="dm-new-username" autocomplete="off" data-i18n-placeholder="dm_new_username_placeholder" placeholder="輸入用戶名開始對話..." onkeydown="if(event.key==='Enter'){event.preventDefault();startDmConversationFromInput();}">
+                        <button onclick="startDmConversationFromInput()" data-i18n="dm_start_btn">開始對話</button>
+                    </div>
+                    <div id="dm-conversations-list" class="dm-conversations-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
+                </div>
+            </aside>
+            <div class="community-main">
+                <div class="osu-add-card chat-card" id="chat-public-view">
+                    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+                    <div class="card-corner bl"></div><div class="card-corner br"></div>
+                    <div id="chat-messages-list" class="chat-messages-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
 
-        <div class="osu-add-card chat-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <div id="chat-messages-list" class="chat-messages-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
-
-            <div id="chat-reply-banner" class="chat-reply-banner" style="display:none;">
-                <span id="chat-reply-banner-text"></span>
-                <button onclick="clearChatReplyTarget()" data-i18n-title="chat_reply_cancel_title" title="取消回覆" data-icon="x"></button>
+                    <div id="chat-reply-banner" class="chat-reply-banner" style="display:none;">
+                        <span id="chat-reply-banner-text"></span>
+                        <button onclick="clearChatReplyTarget()" data-i18n-title="chat_reply_cancel_title" title="取消回覆" data-icon="x"></button>
+                    </div>
+                    <div id="chat-login-required" class="chat-login-required" style="display:none;">
+                        <span data-i18n="chat_login_required">登入 osu! 才能在聊天室發言</span>
+                        <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
+                    </div>
+                    <div id="chat-media-preview" class="chat-media-preview" hidden>
+                        <img id="chat-media-preview-img" alt="">
+                        <button type="button" id="chat-media-preview-remove" onclick="clearChatPendingMedia()" data-i18n-title="chat_media_remove_title" title="移除圖片" data-icon="x"></button>
+                    </div>
+                    <div id="chat-input-row" class="input-group chat-input-row" style="display:none;">
+                        <div id="chat-emoji-panel" class="chat-emoji-panel" hidden></div>
+                        <input type="text" id="chat-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
+                        <button type="button" id="chat-emoji-btn" class="chat-emoji-btn" onclick="toggleChatEmojiPicker()" data-i18n-title="chat_emoji_btn_title" title="表情符號">😊</button>
+                        <button type="button" id="chat-attach-btn" class="chat-emoji-btn" onclick="document.getElementById('chat-file-input').click()" data-i18n-title="chat_attach_btn_title" title="附加圖片／GIF">📎</button>
+                        <input type="file" id="chat-file-input" accept="image/png,image/jpeg,image/gif,image/webp" hidden onchange="onChatFilePicked(this.files[0]); this.value='';">
+                        <button onclick="sendChatMessage()" data-i18n="chat_send_btn">送出</button>
+                    </div>
+                </div>
+                <div class="osu-add-card chat-card" id="dm-thread-view" style="display:none;">
+                    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+                    <div class="card-corner bl"></div><div class="card-corner br"></div>
+                    <div class="dm-thread-header">
+                        <button class="dm-back-btn" onclick="closeDmThread()" data-icon="arrowLeft" data-icon-gap><span data-i18n="dm_back_btn">返回</span></button>
+                        <div id="dm-thread-partner" class="dm-thread-partner"></div>
+                    </div>
+                    <div id="dm-thread-messages" class="chat-messages-list"></div>
+                    <div class="input-group">
+                        <input type="text" id="dm-thread-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDmMessage();}">
+                        <button onclick="sendDmMessage()" data-i18n="chat_send_btn">送出</button>
+                    </div>
+                </div>
             </div>
-            <div id="chat-login-required" class="chat-login-required" style="display:none;">
-                <span data-i18n="chat_login_required">登入 osu! 才能在聊天室發言</span>
-                <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
-            </div>
-            <div id="chat-media-preview" class="chat-media-preview" hidden>
-                <img id="chat-media-preview-img" alt="">
-                <button type="button" id="chat-media-preview-remove" onclick="clearChatPendingMedia()" data-i18n-title="chat_media_remove_title" title="移除圖片" data-icon="x"></button>
-            </div>
-            <div id="chat-input-row" class="input-group chat-input-row" style="display:none;">
-                <div id="chat-emoji-panel" class="chat-emoji-panel" hidden></div>
-                <input type="text" id="chat-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
-                <button type="button" id="chat-emoji-btn" class="chat-emoji-btn" onclick="toggleChatEmojiPicker()" data-i18n-title="chat_emoji_btn_title" title="表情符號">😊</button>
-                <button type="button" id="chat-attach-btn" class="chat-emoji-btn" onclick="document.getElementById('chat-file-input').click()" data-i18n-title="chat_attach_btn_title" title="附加圖片／GIF">📎</button>
-                <input type="file" id="chat-file-input" accept="image/png,image/jpeg,image/gif,image/webp" hidden onchange="onChatFilePicked(this.files[0]); this.value='';">
-                <button onclick="sendChatMessage()" data-i18n="chat_send_btn">送出</button>
-            </div>
+            <aside class="community-discord" id="community-discord">
+                <h3 data-i18n="discord_bot_title">Discord 機器人</h3>
+                <p data-i18n="discord_bot_desc">把網站帶進你的 Discord 伺服器：查 PP 和最近成績、看別人的收藏、查圖池，還能追蹤玩家的收藏更新。</p>
+                <ul class="community-discord-cmds">
+                    <li><code>/pp</code> <code>/recent</code> <code>/top</code></li>
+                    <li><code>/collection</code> <code>/gallery</code> <code>/map</code></li>
+                    <li><code>/mappool</code> <code>/follow</code> <code>/collect-channel</code></li>
+                </ul>
+                <a class="btn" id="discord-invite-btn" href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="discord_bot_invite">邀請到我的伺服器</a>
+            </aside>
         </div>
+
     </section>
 
     <section id="page-dm" class="site-page" style="display:none;">
@@ -915,33 +963,7 @@
         <h2 class="osu-page-title" data-i18n="dm_page_title">私訊</h2>
         <p class="tournaments-hint" data-i18n="dm_page_hint">跟其他玩家一對一聊天。</p>
 
-        <div class="osu-add-card chat-card" id="dm-list-view">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <div id="dm-login-required" class="chat-login-required" style="display:none;">
-                <span data-i18n="dm_login_required">登入 osu! 才能使用私訊</span>
-                <a class="btn" href="/.netlify/functions/osu-login" data-i18n="osu_login_btn">osu! 登入</a>
-            </div>
-            <div id="dm-new-row" class="input-group" style="display:none;">
-                <input type="text" id="dm-new-username" autocomplete="off" data-i18n-placeholder="dm_new_username_placeholder" placeholder="輸入用戶名開始對話..." onkeydown="if(event.key==='Enter'){event.preventDefault();startDmConversationFromInput();}">
-                <button onclick="startDmConversationFromInput()" data-i18n="dm_start_btn">開始對話</button>
-            </div>
-            <div id="dm-conversations-list" class="dm-conversations-list"><p class="osu-empty" data-i18n="gallery_loading">載入中...</p></div>
-        </div>
 
-        <div class="osu-add-card chat-card" id="dm-thread-view" style="display:none;">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <div class="dm-thread-header">
-                <button class="dm-back-btn" onclick="closeDmThread()" data-icon="arrowLeft" data-icon-gap><span data-i18n="dm_back_btn">返回</span></button>
-                <div id="dm-thread-partner" class="dm-thread-partner"></div>
-            </div>
-            <div id="dm-thread-messages" class="chat-messages-list"></div>
-            <div class="input-group">
-                <input type="text" id="dm-thread-input" maxlength="300" autocomplete="off" data-i18n-placeholder="chat_input_placeholder" placeholder="輸入訊息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDmMessage();}">
-                <button onclick="sendDmMessage()" data-i18n="chat_send_btn">送出</button>
-            </div>
-        </div>
     </section>
 
     <section id="page-updates" class="site-page" style="display:none;">

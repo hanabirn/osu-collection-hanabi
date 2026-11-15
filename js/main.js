@@ -44,7 +44,8 @@ const SITE_SECTIONS = [
         { tab: 'skin-screenshots', label: 'nav_skins', choices: [['skin-screenshots', 'nav_skin_screenshots'], ['skins', 'nav_my_skins']] },
     ] },
     { id: 'player', label: 'nav_player', tabs: [{ tab: 'lookup', label: 'nav_lookup' }, { tab: 'tournaments', label: 'nav_tournaments' }] },
-    { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { tab: 'dm', label: 'nav_dm' }] },
+    // 私訊 lives inside the chat page's sidebar now (switchTab maps 'dm' to 'chat').
+    { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { action: 'focusDiscordCard()', label: 'discord_bot_title' }] },
     { id: 'more', label: 'nav_more', tabs: [
         { tab: 'howto', label: 'nav_howto' }, { tab: 'updates', label: 'nav_updates' }, { tab: 'resources', label: 'nav_resources' },
         { tab: 'bbcode', label: 'nav_bbcode' }, { tab: 'feedback', label: 'nav_feedback' },
@@ -105,6 +106,30 @@ function renderSectionBand(tab) {
     if (sec.id === 'collection' && stats) extra.appendChild(stats);
 }
 
+/* ===== 社群 ===== */
+/* The bot's invite link (Discord Developer Portal > the app > OAuth2 >
+   URL Generator, scope bot + applications.commands). Empty: the button stays
+   hidden rather than pointing somewhere wrong. */
+const DISCORD_BOT_INVITE_URL = '';
+function setupDiscordInvite() {
+    const a = document.getElementById('discord-invite-btn');
+    if (!a || !DISCORD_BOT_INVITE_URL.startsWith('https://discord.com/')) return;
+    a.href = DISCORD_BOT_INVITE_URL;
+    a.hidden = false;
+}
+function focusDiscordCard() {
+    const card = document.getElementById('community-discord');
+    if (!card) return;
+    card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    card.classList.add('flash');
+    setTimeout(() => card.classList.remove('flash'), 1200);
+}
+/* 「# 聊天室」 in the sidebar: leave any open private thread for the public room. */
+function openPublicChat() {
+    if (typeof dmView !== 'undefined' && dmView === 'thread' && typeof closeDmThread === 'function') closeDmThread();
+    document.getElementById('chat-input')?.focus();
+}
+
 /* 工具 in the 收藏 band: open the collection panel's tools menu. */
 function openCollectionToolsMenu() {
     const d = document.querySelector('details.collection-tools');
@@ -119,6 +144,8 @@ function openCollectionToolsMenu() {
 
 /* ===== Tab switching ===== */
 function switchTab(tab, el) {
+    // 私訊 was its own page; its list and threads now sit in 社群's chat page.
+    if (tab === 'dm') tab = 'chat';
     document.querySelectorAll('.site-page').forEach(p => p.style.display = 'none');
     const page = document.getElementById('page-' + tab);
     page.style.display = 'block';
@@ -158,8 +185,8 @@ function switchTab(tab, el) {
     // Same start/stop-on-tab-switch reasoning as chat above — dm.js decides
     // internally whether that means polling the conversation list or an
     // open thread.
-    if (tab === 'dm' && typeof ensureDmLoaded === 'function') ensureDmLoaded();
-    if (tab !== 'dm' && typeof stopDmPolling === 'function') stopDmPolling();
+    if (tab === 'chat' && typeof ensureDmLoaded === 'function') ensureDmLoaded();
+    if (tab !== 'chat' && typeof stopDmPolling === 'function') stopDmPolling();
     // Tab buttons now live in the slide-in drawer — picking one should also
     // dismiss it.
     if (typeof closeNavDrawer === 'function') closeNavDrawer();
@@ -501,6 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstPage = [...document.querySelectorAll('.site-page')].find((p) => p.style.display !== 'none');
     if (firstPage) renderSectionBand(firstPage.id.replace(/^page-/, ''));
     styleFilePickers();
+    setupDiscordInvite();
     initBackToTop();
     document.addEventListener('keydown', onGlobalShortcutKeydown);
     document.addEventListener('keydown', onModalEscapeKeydown);

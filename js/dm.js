@@ -34,7 +34,7 @@ function dmPollTick() {
 }
 // Same pause-when-backgrounded idea as js/chat.js.
 document.addEventListener('visibilitychange', () => {
-    const dmPage = document.getElementById('page-dm');
+    const dmPage = document.getElementById('page-chat'); // DMs live in the chat page now
     if (!dmPage || dmPage.style.display === 'none') return;
     if (document.visibilityState === 'hidden') stopDmPolling();
     else startDmPolling();
@@ -65,11 +65,12 @@ async function loadDmConversations() {
         const data = await res.json();
         updateDmBadge(data.totalUnread || 0);
         dmConversationsEverLoaded = true;
-        if (dmView !== 'list' || !listEl) return;
+        // The list sits in the 社群 sidebar beside an open thread, so it redraws either way.
+        if (!listEl) return;
         renderDmConversationsList(data.conversations || []);
     } catch (e) {
         console.error('DM conversations load failed:', e);
-        if (!dmConversationsEverLoaded && listEl && dmView === 'list') {
+        if (!dmConversationsEverLoaded && listEl) {
             listEl.innerHTML = `<p class="osu-empty">${t('chat_load_fail')}</p>`;
         }
     }
@@ -151,7 +152,11 @@ async function openDmThread(partnerId, partnerUsername, partnerCountry) {
     dmCurrentPartner = { id: String(partnerId), username: partnerUsername, country: partnerCountry };
     dmLastId = 0;
 
-    document.getElementById('dm-list-view').style.display = 'none';
+    // 社群 layout: the conversation list stays in the sidebar; the thread
+    // takes the public room's place in the middle column.
+    const publicView = document.getElementById('chat-public-view');
+    if (publicView) publicView.style.display = 'none';
+    document.getElementById('community-public-btn')?.classList.remove('active');
     const threadView = document.getElementById('dm-thread-view');
     threadView.style.display = 'block';
 
@@ -197,7 +202,9 @@ function closeDmThread() {
     dmView = 'list';
     dmCurrentPartner = null;
     document.getElementById('dm-thread-view').style.display = 'none';
-    document.getElementById('dm-list-view').style.display = 'block';
+    const publicView = document.getElementById('chat-public-view');
+    if (publicView) publicView.style.display = '';
+    document.getElementById('community-public-btn')?.classList.add('active');
     loadDmConversations();
 }
 

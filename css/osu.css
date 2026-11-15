@@ -6001,3 +6001,64 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .gallery-sort-chip { padding: 6px 12px; border: 0; border-radius: 4px; background: transparent; color: var(--text-dim); font-size: var(--fs-13); cursor: pointer; }
 .gallery-sort-chip:hover { color: var(--text); }
 .gallery-sort-chip.active { background: rgba(var(--pink-rgb), 0.16); color: var(--pink-text, var(--pink)); font-weight: 700; }
+
+/* ===== 社群: channels + private messages | conversation | Discord bot =====
+   (index.html .community-layout; js/dm.js swaps the middle column between
+   the public room and a private thread.) */
+.community-layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr) 280px;
+    gap: 16px;
+    align-items: start;
+}
+.community-side,
+.community-discord {
+    position: sticky;
+    top: 16px;
+    padding: 12px;
+    border-radius: var(--r-card);
+    border: var(--line) solid var(--border);
+    background: var(--bg-card);
+}
+.community-channel {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: var(--r-ctl);
+    background: transparent;
+    color: var(--text);
+    font-size: var(--fs-14);
+    text-align: left;
+    cursor: pointer;
+}
+.community-channel:hover { background: rgba(255, 255, 255, 0.05); }
+.community-channel.active { background: rgba(var(--pink-rgb), 0.14); color: var(--pink-text, var(--pink)); font-weight: 700; }
+.community-side-label { margin: 14px 4px 6px; font-size: var(--fs-12); color: var(--text-faint); letter-spacing: 0.04em; }
+/* the DM list was a full card on its own page; in the sidebar it's just a list */
+.community-side #dm-list-view { margin: 0; max-width: none; padding: 0; border: 0; background: none; box-shadow: none; }
+.community-side #dm-new-row { flex-wrap: wrap; }
+.community-side #dm-new-row input { flex: 1 1 100%; }
+.community-side #dm-new-row button { flex: 1 1 100%; }
+.community-main .chat-card { max-width: none; margin: 0; border-width: var(--line); }
+.community-main .chat-messages-list { max-height: calc(100vh - 320px); min-height: 420px; }
+#page-chat > .tournaments-hint { max-width: none; }
+.community-discord h3 { margin: 0 0 8px; font-family: var(--font-display); font-size: var(--fs-16); }
+.community-discord p { margin: 0 0 10px; font-size: var(--fs-13); color: var(--text-dim); line-height: 1.6; }
+.community-discord-cmds { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.community-discord-cmds code { font-size: var(--fs-12); padding: 2px 6px; border-radius: 4px; background: var(--bg-input); }
+.community-discord .btn { display: flex; justify-content: center; text-decoration: none; }
+.community-discord.flash { box-shadow: 0 0 0 2px var(--pink); transition: box-shadow var(--dur) var(--ease-out); }
+@media (max-width: 1100px) {
+    .community-layout { grid-template-columns: 240px minmax(0, 1fr); }
+    .community-discord { grid-column: 1 / -1; position: static; }
+}
+@media (max-width: 760px) {
+    .community-layout { grid-template-columns: minmax(0, 1fr); }
+    .community-side { position: static; }
+}
+.community-discord .btn[hidden] { display: none; }
+/* Signed out: the sign-in prompt already says it; don't repeat it from the empty list. */
+.community-side #dm-list-view:has(#dm-login-required:not([style*="none"])) #dm-conversations-list { display: none; }
