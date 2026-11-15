@@ -52,18 +52,26 @@ async function serveScoreCardPng(request, env, url, ctx) {
     if (!check.ok) return jsonError(check.status === 404 ? 404 : 502, 'score not found');
 
     const page = `${url.origin}/?scorecard=${id}${mq}&bare&lang=${encodeURIComponent(lang)}`;
-    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/browser-rendering/screenshot`, {
+    // Browser Rendering was renamed Browser Run (April 2026); the API
+    // reference still lists /browser-rendering/, newer docs /browser-run/.
+    // Try the documented path, then the new one if it 404s.
+    const shoot = (product) => fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/${product}/screenshot`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${env.CF_BROWSER_TOKEN}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            url: page,
-            viewport: { width: 1280, height: 720, deviceScaleFactor: 1 },
-            gotoOptions: { waitUntil: 'networkidle2', timeout: 30000 },
-            waitForSelector: { selector: '#score-card-body[data-ready="1"]', timeout: 20000 },
-            selector: '#score-card-body',
-            screenshotOptions: { type: 'png' },
-        }),
+        body: shotBody,
     });
+    // Kept well inside the ~30 s a Worker may keep working after answering
+    // Discord: the page marks data-ready itself once its images are in.
+    const shotBody = JSON.stringify({
+        url: page,
+        viewport: { width: 1280, height: 720, deviceScaleFactor: 1 },
+        gotoOptions: { waitUntil: 'domcontentloaded', timeout: 15000 },
+        waitForSelector: { selector: '#score-card-body[data-ready="1"]', timeout: 15000 },
+        selector: '#score-card-body',
+        screenshotOptions: { type: 'png' },
+    });
+    let res = await shoot('browser-rendering');
+    if (res.status === 404) res = await shoot('browser-run');
     const type = res.headers.get('content-type') || '';
     if (!res.ok || !type.startsWith('image/')) {
         const detail = (await res.text().catch(() => '')).slice(0, 300);
