@@ -6128,7 +6128,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .beatmap-drawer-diff-link:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
 .beatmap-drawer-sr { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .beatmap-drawer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.beatmap-drawer-actions .btn { display: inline-flex; justify-content: center; align-items: center; text-decoration: none; }
+/* Two narrow columns: a long label (German, Spanish...) wraps inside its button instead of running out of it. */
+.beatmap-drawer-actions .btn { display: inline-flex; justify-content: center; align-items: center; min-width: 0; min-height: 40px; padding-left: 10px; padding-right: 10px; text-align: center; white-space: normal; line-height: 1.25; overflow-wrap: anywhere; text-decoration: none; }
 .beatmap-drawer-body > .btn { margin: 0 16px; display: flex; justify-content: center; text-decoration: none; }
 
 /* BBCode pane head: buttons keep their label on one line; with a long
@@ -6151,7 +6152,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .beatmap-drawer-lb-item.is-extra { display: none; }
 .beatmap-drawer-lb.show-all .beatmap-drawer-lb-item.is-extra { display: block; }
 .beatmap-drawer-lb-row {
-    width: 100%; display: grid; grid-template-columns: 34px 28px minmax(0, 1fr) auto auto; align-items: center; gap: 8px;
+    width: 100%; display: grid; grid-template-columns: 30px 28px minmax(0, 1fr) auto 26px auto; align-items: center; gap: 8px;
     padding: 6px 4px; border: 0; border-radius: var(--r-ctl); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .beatmap-drawer-lb-row:hover { background: rgba(255, 255, 255, 0.05); }
@@ -6404,13 +6405,13 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     filter: drop-shadow(0 0 30px var(--glow)) drop-shadow(0 8px 0 rgba(0, 0, 0, 0.35));
     --g1: #c0c8d4; --g2: #6b7280; --glow: rgba(150, 160, 180, 0.4);
 }
-.sc-grade.grade-ss { --g1: #fff6c4; --g2: #ffbf1f; --glow: rgba(255, 205, 70, 0.6); }
-.sc-grade.grade-s { --g1: #ffe98f; --g2: #ffaa14; --glow: rgba(255, 190, 60, 0.55); }
-.sc-grade.silver { --g1: #ffffff; --g2: #a9b9cc; --glow: rgba(210, 225, 245, 0.6); }
-.sc-grade.grade-a { --g1: #a5ffda; --g2: #1fc983; --glow: rgba(70, 230, 160, 0.55); }
-.sc-grade.grade-b { --g1: #b2dbff; --g2: #2d7dff; --glow: rgba(80, 150, 255, 0.55); }
-.sc-grade.grade-c { --g1: #efc9ff; --g2: #a248ff; --glow: rgba(180, 100, 255, 0.55); }
-.sc-grade.grade-d { --g1: #ffb4b4; --g2: #ff3d3d; --glow: rgba(255, 80, 80, 0.55); }
+:is(.sc-grade, .lb-grade).grade-ss { --g1: #fff6c4; --g2: #ffbf1f; --glow: rgba(255, 205, 70, 0.6); }
+:is(.sc-grade, .lb-grade).grade-s { --g1: #ffe98f; --g2: #ffaa14; --glow: rgba(255, 190, 60, 0.55); }
+:is(.sc-grade, .lb-grade).silver { --g1: #ffffff; --g2: #a9b9cc; --glow: rgba(210, 225, 245, 0.6); }
+:is(.sc-grade, .lb-grade).grade-a { --g1: #a5ffda; --g2: #1fc983; --glow: rgba(70, 230, 160, 0.55); }
+:is(.sc-grade, .lb-grade).grade-b { --g1: #b2dbff; --g2: #2d7dff; --glow: rgba(80, 150, 255, 0.55); }
+:is(.sc-grade, .lb-grade).grade-c { --g1: #efc9ff; --g2: #a248ff; --glow: rgba(180, 100, 255, 0.55); }
+:is(.sc-grade, .lb-grade).grade-d { --g1: #ffb4b4; --g2: #ff3d3d; --glow: rgba(255, 80, 80, 0.55); }
 
 /* mods: hexagons by category, plus a FULL COMBO tag */
 .sc-mods { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; min-height: 34px; margin-bottom: 12px; }
@@ -6494,3 +6495,23 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .resources-credit { margin: 12px 4px 0; font-size: var(--fs-12); color: var(--text-dim); }
 .resources-credit a { color: inherit; }
 .sc-pp-est { align-self: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; color: #3a2600; background: #ffd65c; cursor: help; }
+
+/* Leaderboard rows: lazer mod badges (small) and the score card's grade letter. */
+.beatmap-drawer-lb-mods { display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; }
+.beatmap-drawer-lb-mods:empty { display: none; }
+.beatmap-drawer-lb-mods .sc-mod { width: 30px; height: 22px; filter: none; }
+.beatmap-drawer-lb-mods .sc-mod path { stroke-width: 6; }
+.lb-grade {
+    --g1: #c0c8d4; --g2: #6b7280; --glow: rgba(150, 160, 180, 0.4);
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 0 0.12em;
+    text-align: center;
+    background: linear-gradient(180deg, var(--g1) 15%, var(--g2) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 6px var(--glow));
+}

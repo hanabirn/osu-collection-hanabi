@@ -90,7 +90,7 @@ async function openBeatmapDrawer(setId) {
         <div class="beatmap-drawer-actions">
             <button type="button" class="btn btn-ghost" onclick="playOsuPreview(${id}, event)">${icon('play', { extraClass: 'icon-label-gap' })}${escHtml(t('mappools_preview'))}</button>
             <button type="button" class="btn" ${inCollection ? 'disabled' : `onclick="drawerAddToCollection(${id}, this)"`}>${escHtml(t(inCollection ? 'farm_in_collection' : 'drawer_add'))}</button>
-            <button type="button" class="btn btn-ghost" onclick="downloadBeatmapset(${id}, event)">${icon('download', { extraClass: 'icon-label-gap' })}${escHtml(t('osu_download_btn_title'))}</button>
+            <button type="button" class="btn btn-ghost" onclick="downloadBeatmapset(${id}, event)" title="${escHtml(t('osu_download_btn_title'))}">${icon('download', { extraClass: 'icon-label-gap' })}${escHtml(t('drawer_download'))}</button>
             <a class="btn btn-ghost" href="https://osu.ppy.sh/beatmapsets/${id}" target="_blank" rel="noopener noreferrer">${escHtml(t('drawer_open_osu'))}</a>
         </div>`;
     const hardest = diffs[diffs.length - 1];
@@ -168,9 +168,10 @@ function drawerScoreRowHtml(s, rank, mode) {
         <img class="beatmap-drawer-lb-avatar" src="https://a.ppy.sh/${uid}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
         <span class="beatmap-drawer-lb-who">
             <span class="beatmap-drawer-lb-name">${escHtml(s.username || '#' + s.user_id)}</span>
-            <small>${acc}% · ${escHtml(String(s.maxcombo || 0))}x${Number(s.countmiss) ? ' · ' + escHtml(String(s.countmiss)) + '❌' : ''}${mods.length ? ' · +' + escHtml(mods.join('')) : ''}</small>
+            <small>${acc}% · ${escHtml(String(s.maxcombo || 0))}x${Number(s.countmiss) ? ' · ' + escHtml(String(s.countmiss)) + '❌' : ''}</small>
         </span>
-        <span class="osu-recent-rank beatmap-drawer-lb-grade rank-${OSU_RANK_CLASS[grade] || 'f'}">${escHtml(grade.replace('H', '').replace('X', 'SS') || '—')}</span>
+        <span class="beatmap-drawer-lb-mods">${mods.map(scModBadge).join('')}</span>
+        <span class="lb-grade grade-${OSU_RANK_CLASS[grade] || 'f'}${grade === 'XH' || grade === 'SH' ? ' silver' : ''}">${escHtml(SC_GRADE_LABEL[grade] || grade || '—')}</span>
         <span class="beatmap-drawer-lb-pp">${pp}</span>
     </button></li>`;
 }
