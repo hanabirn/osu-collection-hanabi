@@ -211,7 +211,9 @@ async function openScoreCard({ score, beatmapId, mode = 0, lbRank = null }) {
     card.style.setProperty('--sc-accent', SC_GRADE_ACCENT[gradeKey.split(' ').pop() === 'silver' ? 'silver' : (OSU_RANK_CLASS[grade] || 'f')]);
     const strainLines = ppRes && ppRes.strains && mode === 0 && ppRes.strains.aim ? [{ key: 'aim', values: ppRes.strains.aim }, { key: 'speed', values: ppRes.strains.speed || [] }].filter((l) => l.values.length > 3) : [];
     card.innerHTML = `
+        <div class="sc-bg" aria-hidden="true"></div>
         <header class="sc-top">
+            <div class="sc-top-cover" aria-hidden="true"></div>
             <a class="sc-player" href="https://osu.ppy.sh/users/${uid}" target="_blank" rel="noopener noreferrer">
                 <img class="sc-avatar" src="${osuAvatarUrl(score.user_id)}" alt="" onerror="this.style.visibility='hidden'">
                 <span class="sc-player-text">

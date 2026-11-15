@@ -6210,8 +6210,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     flex-direction: column;
     isolation: isolate;
 }
-/* layer 1: blurred cover + vignette + accent light */
-.sc-card::before {
+/* layer 1: blurred cover + vignette + accent light. Real elements (.sc-bg,
+   .sc-top-cover), not ::before: html-to-image doesn't inline a
+   pseudo-element's background image, so saved cards came out black. */
+.sc-bg {
     content: "";
     position: absolute;
     inset: -40px;
@@ -6244,8 +6246,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     gap: 12px;
     padding: 24px 28px 0;
 }
-.sc-top::before {
-    content: "";
+.sc-top-cover {
     position: absolute;
     inset: 0;
     z-index: -1;
