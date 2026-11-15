@@ -3566,6 +3566,13 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .lookup-side .tracked-player-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lookup-side .tracked-players-empty { margin: 0; text-align: left; }
 .lookup-main #visitor-recent-mode-tabs { justify-content: flex-start; }
+/* Score cards keep a 4:1.4 cover shape, so one per row in this wide column
+   made each ~290px tall. A grid keeps them card-sized: 3 across at 1640px. */
+.lookup-main #visitor-recent-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 10px;
+}
 /* Score tabs as osu-web profile tabs: text with an underline on the current one. */
 .lookup-main .osu-plays-type-tabs {
     justify-content: flex-start;
