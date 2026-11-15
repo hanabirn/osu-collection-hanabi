@@ -247,6 +247,20 @@
     <div class="beatmap-drawer-body" id="beatmap-drawer-body"></div>
 </aside>
 
+<!-- 成績卡 (js/score-card.js): one score as a full card, opened from the
+     beatmap drawer's leaderboard. -->
+<div class="score-card" id="score-card" role="dialog" aria-modal="true" data-i18n-aria="sc_dialog" aria-label="成績詳情" hidden>
+    <div class="score-card-scrim" onclick="closeScoreCard()"></div>
+    <div class="score-card-frame">
+        <div class="score-card-tools">
+            <button type="button" class="btn btn-ghost" onclick="downloadScoreCard(this)" data-icon="download" data-icon-gap><span data-i18n="sc_download">下載圖片</span></button>
+            <a class="btn btn-ghost" id="score-card-osu" href="#" target="_blank" rel="noopener noreferrer" data-i18n="drawer_open_osu">在 osu! 開啟</a>
+            <button type="button" class="score-card-close" onclick="closeScoreCard()" data-i18n-aria="close_label" aria-label="關閉" data-icon="x"></button>
+        </div>
+        <div class="sc-fit" id="score-card-fit"><article class="sc-card" id="score-card-body"></article></div>
+    </div>
+</div>
+
 <div id="maintenance-banner" class="maintenance-banner" style="display:none;">
     <span data-icon="settings" data-icon-gap></span>
     <span data-i18n="maintenance_banner_text">目前該網頁正在修改中，如果有任何疑問或 bug 的話請聯絡我！</span>
@@ -1419,6 +1433,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/notifications.js"></script>
 <script defer src="js/feedback.js"></script>
 <script defer src="js/beatmap-drawer.js"></script>
+<script defer src="js/score-card.js"></script>
 <script defer src="js/home.js"></script>
 <script defer src="js/main.js"></script>
 <script defer src="js/site-likes.js"></script>

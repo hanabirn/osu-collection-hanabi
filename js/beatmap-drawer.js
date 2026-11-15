@@ -101,6 +101,11 @@ async function openBeatmapDrawer(setId) {
    combo) and its global top 50 (the osu proxy's get_scores). Both load in
    parallel; a newer pick or a closed drawer drops the older answers. */
 let beatmapDrawerDiffReq = 0;
+let drawerLbScores = null; // { beatmapId, mode, scores } behind the rows shown
+function openDrawerScore(i) {
+    if (!drawerLbScores || !drawerLbScores.scores[i]) return;
+    openScoreCard({ score: drawerLbScores.scores[i], beatmapId: drawerLbScores.beatmapId, mode: drawerLbScores.mode, lbRank: i + 1 });
+}
 const DRAWER_LB_SHOWN = 10;
 async function selectDrawerDiff(beatmapId, mode) {
     const req = ++beatmapDrawerDiffReq;
@@ -142,6 +147,7 @@ async function selectDrawerDiff(beatmapId, mode) {
                 lb.innerHTML = `<li class="beatmap-drawer-lb-note">${escHtml(t('drawer_lb_empty'))}</li>`;
                 return;
             }
+            drawerLbScores = { beatmapId, mode, scores };
             lb.innerHTML = scores.map((s, i) => drawerScoreRowHtml(s, i + 1, mode)).join('');
             if (scores.length > DRAWER_LB_SHOWN) {
                 more.textContent = t('drawer_lb_more', { n: scores.length });
@@ -157,16 +163,16 @@ function drawerScoreRowHtml(s, rank, mode) {
     const grade = s.rank || '';
     const pp = s.pp != null && s.pp !== '' ? Math.round(parseFloat(s.pp)).toLocaleString() + 'pp' : Number(s.score || 0).toLocaleString();
     const uid = encodeURIComponent(s.user_id);
-    return `<li class="beatmap-drawer-lb-row${rank > DRAWER_LB_SHOWN ? ' is-extra' : ''}">
+    return `<li class="beatmap-drawer-lb-item${rank > DRAWER_LB_SHOWN ? ' is-extra' : ''}"><button type="button" class="beatmap-drawer-lb-row" onclick="openDrawerScore(${rank - 1})" aria-label="${escHtml(t('sc_open', { n: s.username || '#' + s.user_id, r: rank }))}">
         <span class="beatmap-drawer-lb-rank">#${rank}</span>
         <img class="beatmap-drawer-lb-avatar" src="https://a.ppy.sh/${uid}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
         <span class="beatmap-drawer-lb-who">
-            <a href="https://osu.ppy.sh/users/${uid}" target="_blank" rel="noopener noreferrer">${escHtml(s.username || '#' + s.user_id)}</a>
+            <span class="beatmap-drawer-lb-name">${escHtml(s.username || '#' + s.user_id)}</span>
             <small>${acc}% · ${escHtml(String(s.maxcombo || 0))}x${Number(s.countmiss) ? ' · ' + escHtml(String(s.countmiss)) + '❌' : ''}${mods.length ? ' · +' + escHtml(mods.join('')) : ''}</small>
         </span>
         <span class="osu-recent-rank beatmap-drawer-lb-grade rank-${OSU_RANK_CLASS[grade] || 'f'}">${escHtml(grade.replace('H', '').replace('X', 'SS') || '—')}</span>
         <span class="beatmap-drawer-lb-pp">${pp}</span>
-    </li>`;
+    </button></li>`;
 }
 
 /* Add from the drawer, then show it as added (the shared card helper would
