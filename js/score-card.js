@@ -264,7 +264,7 @@ async function openScoreCard({ score, beatmapId, mode = 0, lbRank = null }) {
             </div>
             <div class="sc-col">
                 <section class="sc-panel sc-pp">
-                    <div class="sc-pp-row"><b class="sc-pp-num">${scorePp != null ? Math.round(scorePp).toLocaleString() : '—'}<small>PP</small></b>${fcPp != null && !isFc ? `<span class="sc-pp-fc">/ ${escHtml(t('sc_fc', { n: Math.round(fcPp).toLocaleString() }))}</span>` : ''}</div>
+                    <div class="sc-pp-row"><b class="sc-pp-num">${scorePp != null ? Math.round(scorePp).toLocaleString() : '—'}<small>PP</small></b>${needScorePp && scorePp != null ? `<span class="sc-pp-est" title="${escHtml(t('sc_pp_est_title'))}">${escHtml(t('sc_pp_est'))}</span>` : ''}${fcPp != null && !isFc ? `<span class="sc-pp-fc">/ ${escHtml(t('sc_fc', { n: Math.round(fcPp).toLocaleString() }))}</span>` : ''}</div>
                     <div class="sc-bar sc-bar-pp"><i style="width:${scorePp != null && ssPp ? Math.min(100, (scorePp / ssPp) * 100).toFixed(1) : 0}%"></i></div>
                     <p class="sc-pp-ss">${ssPp != null ? escHtml(t('sc_ss', { n: Math.round(ssPp).toLocaleString() })) : ''}</p>
                 </section>

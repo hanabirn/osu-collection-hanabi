@@ -6472,7 +6472,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .score-card { padding: 8px; align-items: stretch; }
     .score-card-frame { height: 100%; }
     .sc-fit { width: auto; height: auto; flex: 1; overflow: auto; }
-    .sc-card { position: relative; width: auto; height: auto; min-height: 100%; transform: none; overflow: visible; }
+    /* clip, not visible: the blurred cover layer reaches 40px past the edges */
+    .sc-card { position: relative; width: auto; height: auto; min-height: 100%; transform: none; overflow: clip; }
+    .sc-player-name { font-size: 19px; }
+    .sc-player { gap: 6px 12px; padding: 10px 14px 10px 10px; }
     .sc-top { height: auto; padding: 14px 14px 30px; flex-direction: column; }
     .sc-top-right { flex-direction: row; align-items: center; }
     .sc-player { min-width: 0; width: 100%; }
@@ -6489,3 +6492,4 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .sc-stat-base s { color: rgba(255, 255, 255, 0.5); text-decoration-thickness: 1px; }
 .resources-credit { margin: 12px 4px 0; font-size: var(--fs-12); color: var(--text-dim); }
 .resources-credit a { color: inherit; }
+.sc-pp-est { align-self: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; color: #3a2600; background: #ffd65c; cursor: help; }
