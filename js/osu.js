@@ -5569,6 +5569,7 @@ function applyLoggedInOsuUser() {
 
     loginBtn.style.display = user ? 'none' : '';
     pill.style.display = user ? '' : 'none';
+    if (typeof queueFitSiteHeader === 'function') queueFitSiteHeader();
     const checkPlayedBtn = document.getElementById('osu-check-played-btn');
     if (checkPlayedBtn) checkPlayedBtn.style.display = user ? '' : 'none';
     const profileImportBtn = document.getElementById('osu-import-profile-btn');
@@ -5581,6 +5582,7 @@ function applyLoggedInOsuUser() {
     if (!user) return;
 
     document.getElementById('osu-logged-in-name').textContent = user.username || `#${user.id}`;
+    if (typeof queueFitSiteHeader === 'function') queueFitSiteHeader();
     document.getElementById('osu-logged-in-avatar').src = osuAvatarUrl(user.id);
 
     const input = document.getElementById('visitor-lookup-input');

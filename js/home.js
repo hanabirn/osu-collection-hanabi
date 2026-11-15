@@ -175,3 +175,21 @@ function setupHomeNewMaps() {
     }, { rootMargin: '200px' });
     io.observe(box);
 }
+
+/* Language switch (js/main.js refreshDynamicContent): redraw the parts of
+   首頁 built from t() strings. News and tournament rows are the sources'
+   own titles, so they stay as they are. */
+function refreshHomeLocalized() {
+    if (!homeLoaded) return;
+    renderHomeHero();
+    renderHomeTracked();
+    const box = document.getElementById('home-new');
+    if (box && !box.hidden) {
+        const smart = Object.entries(getSmartCategories()).find(([, meta]) => meta && meta.facet);
+        if (smart) {
+            const cat = (getOsuCategories() || []).find((c) => c.id === smart[0]);
+            document.getElementById('home-new-title').textContent = t('home_new_for_cat', { label: (cat && cat.name) || smart[1].label || '' });
+            document.getElementById('home-new-sub').textContent = t('home_new_sub');
+        }
+    }
+}

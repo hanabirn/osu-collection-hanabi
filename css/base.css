@@ -2053,3 +2053,38 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     :root[data-site-section="collection"] .section-band-in,
     :root:not([data-site-section]) .section-band-in { min-height: 216px; align-items: flex-end; align-content: flex-end; padding-bottom: 16px; }
 }
+
+/* ===== Header fit (js/main.js fitSiteHeader) =====
+   Steps taken only when the section links don't fit in this language. */
+.site-header.fit-notitle .site-title-block h1 {
+    position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+.site-header.fit-tight .site-nav-sec { padding: 0 8px; font-size: var(--fs-14); }
+.site-header.fit-tight .lang-globe-btn { padding: 0 8px; gap: 0; }
+.site-header.fit-tight .lang-globe-btn > .icon-svg { display: none; }
+.site-header.fit-nonav .site-nav { visibility: hidden; flex: 1; width: 0; overflow: hidden; }
+.site-header.fit-nonav #nav-menu-btn { display: inline-flex !important; }
+/* Phone: the short login label still has to share the row with five icons. */
+@media (max-width: 600px) {
+    .site-header .osu-login-btn-large { padding: 0 8px; }
+}
+/* Phone, signed in: the pill keeps the avatar and the log-out button; the
+   name (any length) stays for screen readers. */
+@media (max-width: 600px) {
+    .site-header .osu-logged-in-pill-large { height: 32px; padding: 0 4px 0 3px; gap: 2px; flex: none; }
+    .site-header .osu-logged-in-pill-large .osu-logged-in-avatar { width: 26px; height: 26px; }
+    .site-header .osu-logged-in-pill-large .osu-logged-in-name {
+        position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+}
+/* Narrow phones (under 380px): the sign-in button is just its key icon;
+   the label stays for screen readers and in the tooltip. */
+@media (max-width: 379px) {
+    .site-header .osu-login-btn-large { width: 32px; min-width: 32px; padding: 0; justify-content: center; }
+    .site-header .osu-login-btn-large > .icon-svg { margin: 0; }
+    .site-header .osu-login-btn-large > span {
+        position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+}
+/* Band tabs never break a label over two lines; on phones the row scrolls. */
+.section-band-tab, .section-band-choice button { white-space: nowrap; }

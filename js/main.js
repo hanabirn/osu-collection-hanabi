@@ -113,6 +113,37 @@ function renderSectionBand(tab) {
 // View Channels + Send Messages + Embed Links + Read Message History (1024+2048+16384+65536);
 // /collect-channel reads history, /follow and the gallery post embeds.
 const DISCORD_BOT_INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1546350631881801758&permissions=84992&scope=bot+applications.commands';
+/* The header row has to hold the section links in every language (German
+   or Spanish labels run half again as wide as Chinese). When the links
+   don't fit, give way one step at a time: hide the wordmark, tighten the
+   links, and finally fold them into the ☰ drawer. Re-run on resize, on a
+   language switch and when the login pill changes. */
+const HEADER_FIT_STEPS = ['fit-notitle', 'fit-tight', 'fit-nonav'];
+function fitSiteHeader() {
+    const header = document.querySelector('.site-header');
+    const nav = document.getElementById('site-nav');
+    if (!header || !nav) return;
+    header.classList.remove(...HEADER_FIT_STEPS);
+    if (getComputedStyle(nav).display === 'none') return; // phone layout: links already in ☰
+    const over = () => nav.scrollWidth > nav.clientWidth + 1;
+    for (const step of HEADER_FIT_STEPS) {
+        if (!over()) return;
+        header.classList.add(step);
+    }
+}
+let fitSiteHeaderQueued = false;
+function queueFitSiteHeader() {
+    if (fitSiteHeaderQueued) return;
+    fitSiteHeaderQueued = true;
+    setTimeout(() => { fitSiteHeaderQueued = false; fitSiteHeader(); }, 0);
+}
+window.addEventListener('resize', queueFitSiteHeader);
+// Labels change width when a web font or a locale's glyphs finish loading.
+if (document.fonts) {
+    if (document.fonts.ready) document.fonts.ready.then(queueFitSiteHeader);
+    if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', queueFitSiteHeader);
+}
+
 function setupDiscordInvite() {
     const a = document.getElementById('discord-invite-btn');
     if (!a || !DISCORD_BOT_INVITE_URL.startsWith('https://discord.com/')) return;
@@ -368,6 +399,7 @@ function refreshDynamicContent() {
     if (typeof refreshGamesLocalized === 'function') refreshGamesLocalized();
     if (typeof refreshTrendingLocalized === 'function') refreshTrendingLocalized();
     if (typeof renderChangelogMenu === 'function') renderChangelogMenu();
+    if (typeof refreshHomeLocalized === 'function') refreshHomeLocalized();
 }
 
 /* ===== Keyboard shortcuts =====

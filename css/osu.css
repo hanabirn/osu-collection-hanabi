@@ -3551,7 +3551,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 #page-lookup .visitor-lookup-card h3 { font-size: var(--fs-14); margin-bottom: 10px; }
 .lookup-side .lookup-mode-toggle { display: flex; margin-bottom: 10px; }
-.lookup-side .lookup-mode-btn { flex: 1; }
+.lookup-side .lookup-mode-toggle { width: 100%; box-sizing: border-box; }
+/* Narrow column: tighter padding so French or German labels stay on one line. */
+.lookup-side .lookup-mode-btn { flex: 1 1 0; min-width: 0; padding: 6px 8px; line-height: 1.25; }
 .lookup-side .pp-compare-input-row .btn { flex: 1 1 100%; }
 /* Tracked players: a list in the sidebar instead of a row of pills. */
 .lookup-side .tracked-players-panel {
@@ -6117,3 +6119,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .beatmap-drawer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .beatmap-drawer-actions .btn { display: inline-flex; justify-content: center; align-items: center; text-decoration: none; }
 .beatmap-drawer-body > .btn { margin: 0 16px; display: flex; justify-content: center; text-decoration: none; }
+
+/* BBCode pane head: buttons keep their label on one line; with a long
+   label (Russian) the button row moves under the pane title instead. */
+.bbcode-pane-head { flex-wrap: wrap; row-gap: 6px; }
+.bbcode-pane-actions .bbcode-action-btn { white-space: nowrap; }

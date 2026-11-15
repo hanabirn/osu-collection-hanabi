@@ -98,6 +98,8 @@ function applyLangDom(lang) {
     }
     if (t.title) document.title = t.title;
     if (typeof refreshDynamicContent === 'function') refreshDynamicContent();
+    // Re-fit the header once the new labels are in (js/main.js).
+    if (typeof queueFitSiteHeader === 'function') setTimeout(queueFitSiteHeader, 0);
 }
 
 /* ===== i18n helpers for dynamic content =====
