@@ -1533,6 +1533,30 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 .input-group button::after, .btn::after { content: none; }
+
+/* File pickers (js/main.js styleFilePickers): the real input stays in the
+   tab order but is hidden; its <label> is the visible button. */
+.file-native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+.file-pick-btn { display: inline-flex; align-items: center; }
+.file-native:focus-visible + .file-pick-btn { outline: 2px solid var(--accent-light-purple); outline-offset: 2px; }
+.file-pick-name {
+    align-self: center;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-size: var(--fs-13);
+    color: var(--text-dim);
+    overflow-wrap: anywhere;
+}
 .input-group button:hover, .btn:hover {
     background: var(--pink-bright);
     box-shadow: 0 0 18px rgba(var(--pink-rgb), 0.3);

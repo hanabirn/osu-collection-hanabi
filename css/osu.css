@@ -415,6 +415,41 @@
     color: var(--pink-text, var(--pink));
     font-weight: 700;
 }
+/* ===== .filter-panel: the same control panel on other pages (曲庫, 賽事) =====
+   One card holding a page's search / mode / filter controls, with mode
+   tabs as plain text links, matching the collection page's panel. */
+.filter-panel {
+    background: var(--bg-card);
+    border: var(--line) solid var(--border);
+    border-radius: var(--r-card);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.filter-panel > *,
+.filter-panel > .catalog-star-filter { margin-top: 0; margin-bottom: 0; }
+.filter-panel .osu-search-row,
+.filter-panel .osu-mode-tabs { margin: 0; }
+.filter-panel .osu-mode-tabs { justify-content: flex-start; gap: 4px; }
+.filter-panel .osu-tab,
+.collection-panel .osu-tab {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: var(--fs-13);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+.filter-panel .osu-tab:hover { background: rgba(255, 255, 255, 0.06); border-color: transparent; }
+.filter-panel .osu-tab.active {
+    background: rgba(var(--pink-rgb), 0.16);
+    border-color: transparent;
+    color: var(--pink-text, var(--pink));
+    font-weight: 700;
+}
+
 /* 工具 menu: the former 16 tool buttons and batch download, behind one button. */
 .collection-tools { position: relative; flex: 0 0 auto; }
 .collection-tools-btn {
@@ -2991,9 +3026,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .osu-play-status.rank-ss { background: linear-gradient(135deg, #f4d03f, #f7ecb5); color: #6b5900; }
 .osu-play-status.rank-s { background: linear-gradient(135deg, #f4c542, #e8a628); color: #5c3d00; }
 .osu-play-status.rank-a { background: #6ee7b7; color: #064e3b; }
-.osu-play-status.rank-b { background: #60a5fa; color: #1e3a8a; }
+.osu-play-status.rank-b { background: #60a5fa; color: #172554; }
 .osu-play-status.rank-c { background: #c084fc; color: #3b0764; }
-.osu-play-status.rank-d { background: #f87171; color: #7f1d1d; }
+.osu-play-status.rank-d { background: #f87171; color: #450a0a; }
 .osu-play-status.rank-f { background: #94a3b8; color: #1e293b; }
 .osu-card.has-play-status .osu-card-info { padding-left: 44px; }
 
@@ -3342,9 +3377,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .osu-recent-rank.rank-ss { background: linear-gradient(135deg, #f4d03f, #f7ecb5); color: #6b5900; }
 .osu-recent-rank.rank-s { background: linear-gradient(135deg, #f4c542, #e8a628); color: #5c3d00; }
 .osu-recent-rank.rank-a { background: #6ee7b7; color: #064e3b; }
-.osu-recent-rank.rank-b { background: #60a5fa; color: #1e3a8a; }
+.osu-recent-rank.rank-b { background: #60a5fa; color: #172554; }
 .osu-recent-rank.rank-c { background: #c084fc; color: #3b0764; }
-.osu-recent-rank.rank-d { background: #f87171; color: #7f1d1d; }
+.osu-recent-rank.rank-d { background: #f87171; color: #450a0a; }
 .osu-recent-rank.rank-f { background: #94a3b8; color: #1e293b; }
 .osu-recent-info {
     position: absolute;
@@ -3962,7 +3997,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     cursor: pointer;
     transition: border-color var(--dur-fast), transform var(--dur-fast);
 }
-.tracked-player-card:hover { border-color: rgba(var(--accent-pink-rgb), 0.5); transform: translateY(-2px); }
+.tracked-player-card:hover { border-color: rgba(var(--accent-pink-rgb), 0.5); }
 .tracked-player-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
 .tracked-player-name { font-size: var(--fs-13); font-weight: bold; color: var(--text); }
 .tracked-player-pp { font-size: var(--fs-12); color: var(--text-pink); font-weight: bold; }

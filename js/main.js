@@ -283,8 +283,87 @@ function onModalEscapeKeydown(e) {
     close.click();
 }
 
+/* ===== Keyboard access for clickable cards =====
+   Several card templates (beatmap cards on 收藏 / 曲庫 / 圖池, gallery
+   cards and tags, tracked players, per-difficulty icons) are <div>/<span>
+   with an onclick, which Tab never reaches. Rather than rewrite each
+   template, every such element that appears gets tabindex, a role and a
+   short name, and Enter (Space too, for buttons) clicks it. Cards that open
+   an osu! page are links; the rest act in place, so they are buttons. */
+const CLICKABLE_CARDS = [
+    { sel: '.osu-card[onclick]', role: 'link', name: (el) => [el.querySelector('.osu-card-title'), el.querySelector('.osu-card-artist')].map((n) => n && n.textContent.trim()).filter(Boolean).join(' - ') },
+    { sel: '.mode-diff-icon[onclick]', role: 'link', name: (el) => el.getAttribute('title') || '' },
+    { sel: '.public-collection-card[onclick]', role: 'button', name: (el) => (el.querySelector('.pcc-name')?.textContent || '').trim() },
+    { sel: '.pcc-tag[onclick]', role: 'button', name: (el) => el.textContent.trim() },
+    { sel: '.tracked-player-card[onclick]', role: 'button', name: (el) => el.textContent.trim().split(/\s+/)[0] || '' },
+];
+const CLICKABLE_SEL = CLICKABLE_CARDS.map((c) => c.sel).join(',');
+function makeCardsFocusable(root) {
+    if (!root || root.nodeType !== 1) return;
+    const found = root.matches(CLICKABLE_SEL) ? [root] : [];
+    found.push(...root.querySelectorAll(CLICKABLE_SEL));
+    for (const el of found) {
+        if (el.hasAttribute('tabindex')) continue;
+        const spec = CLICKABLE_CARDS.find((c) => el.matches(c.sel));
+        el.tabIndex = 0;
+        el.setAttribute('role', spec.role);
+        const name = spec.name(el);
+        if (name && !el.hasAttribute('aria-label')) el.setAttribute('aria-label', name);
+    }
+}
+document.addEventListener('keydown', (e) => {
+    const el = e.target;
+    if (!(el instanceof Element) || !el.matches(CLICKABLE_SEL)) return;
+    const isButton = el.getAttribute('role') === 'button';
+    if (e.key === 'Enter' || (isButton && e.key === ' ')) {
+        e.preventDefault();
+        el.click();
+    }
+});
+new MutationObserver((records) => {
+    for (const r of records) r.addedNodes.forEach(makeCardsFocusable);
+}).observe(document.documentElement, { childList: true, subtree: true });
+
+/* ===== File pickers =====
+   A visible <input type="file"> renders the browser's own "Choose File / No
+   file chosen", in the browser's language and unstyled. Each one gets the
+   site's button (a <label> for it) and a line naming the chosen file; the
+   input itself stays, visually hidden but focusable, so its onchange and
+   keyboard use are unchanged. Inputs the page already hides (opened from
+   another button) are left alone. */
+function styleFilePickers() {
+    document.querySelectorAll('input[type="file"]').forEach((input) => {
+        if (input.hidden || input.style.display === 'none' || input.dataset.picker || !input.id) return;
+        input.dataset.picker = '1';
+        input.classList.add('file-native');
+        const label = document.createElement('label');
+        label.htmlFor = input.id;
+        label.className = 'btn file-pick-btn';
+        // Say what the input takes, so two pickers on one form don't read alike.
+        const accept = (input.accept || '').toLowerCase();
+        const key = accept.startsWith('image/') ? 'file_pick_image' : accept === '.osk' ? 'file_pick_osk' : accept === '.db' ? 'file_pick_db' : 'file_pick_btn';
+        label.dataset.i18n = key;
+        label.textContent = t(key);
+        const name = document.createElement('span');
+        name.className = 'file-pick-name';
+        name.setAttribute('aria-live', 'polite');
+        const update = () => {
+            const n = input.files ? input.files.length : 0;
+            name.textContent = n === 0 ? t('file_pick_none') : n === 1 ? input.files[0].name : t('file_pick_many', { n });
+            // Only the empty state is a fixed string, so only it follows a language switch.
+            if (n === 0) name.dataset.i18n = 'file_pick_none';
+            else delete name.dataset.i18n;
+        };
+        input.addEventListener('change', update);
+        update();
+        input.after(label, name);
+    });
+}
+
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
+    makeCardsFocusable(document.body);
+    styleFilePickers();
     document.addEventListener('keydown', onGlobalShortcutKeydown);
     document.addEventListener('keydown', onModalEscapeKeydown);
     if (typeof renderStaticIcons === 'function') renderStaticIcons();

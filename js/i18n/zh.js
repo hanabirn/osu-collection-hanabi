@@ -140,7 +140,7 @@ I18N.zh = {
     osu_note_btn_title: '筆記與評分', osu_note_title: '筆記與評分', osu_note_rating_label: '我的評分', osu_note_star_label: '{n} 顆星', osu_note_placeholder: '為什麼收這首？想記什麼都可以…', osu_note_save: '儲存', osu_note_clear: '清除', osu_note_saved: '已儲存筆記與評分', osu_note_cleared: '已清除筆記與評分', osu_rating_filter_all: '全部評分', osu_rating_filter_atleast: '★{n} 以上', osu_rating_filter_rated: '已評分', osu_rating_filter_unrated: '未評分', osu_rating_filter_noted: '有筆記', osu_sort_my_rating: '我的評分（高到低）',
     osu_group_others: '其他歌手（各 1 首）',
     pp_history_title: 'PP 成長趨勢', pp_history_empty: '還沒有足夠的紀錄，多來看看就會累積趨勢圖！',
-    col_tools: '工具', col_panel_mode: '模式', col_panel_cats: '分類', col_panel_filters: '篩選', list_count: '{n} 張圖', diff_spread_title: '難度分布', osu_stats_total: '收藏總數', osu_stats_avg_rating: '平均星數', osu_stats_max_rating: '最高星數',
+    close_label: '關閉', pp_calc_diff_label: '難度', file_pick_btn: '選擇檔案', file_pick_image: '選擇圖片', file_pick_osk: '選擇 .osk 檔案', file_pick_db: '選擇 .db 檔案', file_pick_none: '尚未選擇檔案', file_pick_many: '已選擇 {n} 個檔案', star_min_label: '最低星數', col_tools: '工具', col_panel_mode: '模式', col_panel_cats: '分類', col_panel_filters: '篩選', list_count: '{n} 張圖', diff_spread_title: '難度分布', osu_stats_total: '收藏總數', osu_stats_avg_rating: '平均星數', osu_stats_max_rating: '最高星數',
     featured_beatmap_label: '今日推薦',
     osu_export: '下載收藏成 JSON 備份檔', osu_import: '從 JSON 備份還原收藏\n選一個你先前用「匯出」下載的 .json 檔，把圖和分類補回來',
     osu_export_done: '已匯出收藏！', osu_import_done: '已匯入收藏！', osu_import_fail: '匯入失敗，請確認檔案格式正確',

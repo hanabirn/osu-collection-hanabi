@@ -68,6 +68,22 @@ function applyLangDom(lang) {
             if (el.hasAttribute('aria-label')) el.setAttribute('aria-label', t[key]);
         }
     });
+    // An accessible name with no visible text of its own (sliders, icon controls).
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria');
+        if (t[key]) el.setAttribute('aria-label', t[key]);
+    });
+    // A <select> without a <label> is named by its first option ("全部語言",
+    // "預設排序"), which says what it controls. Re-run here so the name
+    // follows the language; only names this code set itself are replaced.
+    document.querySelectorAll('select').forEach(sel => {
+        if (sel.labels && sel.labels.length) return;
+        if (sel.hasAttribute('aria-label') && !sel.hasAttribute('data-auto-aria')) return;
+        const first = sel.options[0];
+        if (!first) return;
+        sel.setAttribute('aria-label', first.textContent.trim());
+        sel.setAttribute('data-auto-aria', '');
+    });
     document.querySelectorAll('.lang-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });

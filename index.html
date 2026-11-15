@@ -395,7 +395,7 @@
                             <select id="osu-artist-filter" onchange="switchOsuArtistFilter(this.value)" style="display:none;">
                                 <option value="all" data-i18n="osu_artist_filter_all">全部歌手</option>
                             </select>
-                            <select id="osu-rating-filter" onchange="switchOsuRatingFilter(this.value)" style="display:none;"></select>
+                            <select id="osu-rating-filter" onchange="switchOsuRatingFilter(this.value)" style="display:none;" data-i18n-aria="osu_rating_filter_all" aria-label="全部評分"></select>
                             <select id="osu-sort-select" onchange="switchOsuSort(this.value)">
                                 <option value="default" data-i18n="osu_sort_default">預設排序</option>
                                 <option value="rating-desc" data-i18n="osu_sort_rating_desc">星數（高到低）</option>
@@ -496,6 +496,8 @@
         <h2 class="osu-page-title" data-i18n="catalog_page_title">曲庫分類</h2>
         <p class="tournaments-hint" data-i18n="catalog_hint">依歌手／語言／曲風／來源／feat. 瀏覽整個 ranked 曲庫，選定一個分類後可一鍵建立成收藏分類。資料由本站背景爬蟲持續建立，尚未涵蓋全部 ranked 圖。</p>
 
+        <!-- Same control panel as the collection page (css/osu.css .filter-panel). -->
+        <div class="filter-panel">
         <div class="osu-search-row">
             <input type="text" id="catalog-search-input" autocomplete="off" data-i18n-placeholder="catalog_search_placeholder" placeholder="搜尋曲名／歌手／來源..." oninput="searchCatalog(this.value)">
             <select id="catalog-sort-select" onchange="switchCatalogSort(this.value)">
@@ -545,10 +547,11 @@
                 <div class="catalog-star-track" id="catalog-star-track"></div>
                 <div class="catalog-star-dim catalog-star-dim-before" id="catalog-star-dim-before"></div>
                 <div class="catalog-star-dim catalog-star-dim-after" id="catalog-star-dim-after"></div>
-                <input type="range" class="catalog-star-input" id="catalog-star-min" min="0" max="10" step="0.1" value="0" oninput="onCatalogStarInput()" aria-label="最低星數">
-                <input type="range" class="catalog-star-input" id="catalog-star-max" min="0" max="10" step="0.1" value="10" oninput="onCatalogStarInput()" aria-label="最高星數">
+                <input type="range" class="catalog-star-input" id="catalog-star-min" data-i18n-aria="star_min_label" aria-label="最低星數" min="0" max="10" step="0.1" value="0" oninput="onCatalogStarInput()" aria-label="最低星數">
+                <input type="range" class="catalog-star-input" id="catalog-star-max" data-i18n-aria="osu_stats_max_rating" aria-label="最高星數" min="0" max="10" step="0.1" value="10" oninput="onCatalogStarInput()" aria-label="最高星數">
             </div>
             <span class="catalog-star-filter-value" id="catalog-star-filter-value">0.0 - 10.0+ ⭐</span>
+        </div>
         </div>
 
         <div id="catalog-coverage" class="farm-coverage"></div>
@@ -618,6 +621,8 @@
     </section>
 
     <section id="page-lookup" class="site-page" style="display:none;">
+        <p class="eyebrow">PROFILE</p>
+        <h2 class="osu-page-title" data-i18n="nav_lookup">PP 查詢</h2>
         <div id="tracked-players-panel" class="tracked-players-panel"></div>
         <div class="visitor-lookup-card" id="visitor-lookup-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
@@ -736,10 +741,11 @@
     </section>
 
     <section id="page-skins" class="site-page" style="display:none;">
+        <p class="eyebrow">SKINS</p>
+        <h2 class="osu-page-title" data-i18n="nav_skins">皮膚</h2>
         <div class="osu-add-card skins-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="skins_title">&#127925; 我的皮膚 &#127925;</h3>
             <p class="skins-hint" data-i18n="skins_hint">上傳你想收藏的 osu! 皮膚檔案（.osk），之後隨時可以下載回來。檔案只存在你目前這個瀏覽器裡，不會上傳到任何伺服器，換裝置或清除瀏覽器資料就會遺失。登入 osu! 帳號後可以選擇性把 4MB 以下的皮膚備份到雲端。</p>
             <div class="skin-upload-row">
                 <input type="file" id="skin-file-input" accept=".osk" multiple onchange="handleSkinUpload(event)">
@@ -762,6 +768,7 @@
     </section>
 
     <section id="page-skin-screenshots" class="site-page" style="display:none;">
+        <p class="eyebrow">SKINS</p>
         <h2 class="osu-page-title" data-i18n="ssc_page_title">皮膚截圖廣場</h2>
         <p class="tournaments-hint" data-i18n="ssc_page_hint">分享你實際遊玩時的皮膚截圖給其他人參考——下載連結或 .osk 檔案至少擇一，這樣別人才能下載到這個皮膚。</p>
 
@@ -899,6 +906,7 @@
         <h2 class="osu-page-title" data-i18n="tournaments_title">賽事</h2>
         <p class="tournaments-hint" data-i18n="tournaments_hint">整合官方論壇「Tournaments」版貼文與 wyBin 平台的社群賽事，非官方主辦活動，報名前請自行確認主辦方規則。</p>
         <p class="tournaments-hint" data-i18n="tournaments_filter_hint">遊戲模式由標題關鍵字判斷，無法辨識的標題只會出現在「全部」。</p>
+        <div class="filter-panel">
         <div class="osu-mode-tabs tournament-mode-filter">
             <button class="osu-tab active" onclick="filterOsuTournamentsByMode('all', this)" data-i18n="osu_filter_all">全部</button>
             <button class="osu-tab" onclick="filterOsuTournamentsByMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
@@ -907,8 +915,9 @@
             <button class="osu-tab" onclick="filterOsuTournamentsByMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
         </div>
         <div class="tournament-rank-filter-row">
-            <span data-i18n="tournament_rank_label">參賽排名</span>
+            <label for="tournament-rank-filter" data-i18n="tournament_rank_label">參賽排名</label>
             <select id="tournament-rank-filter" onchange="filterOsuTournamentsByRank(this.value)"></select>
+        </div>
         </div>
         <div class="tournaments-columns">
             <div class="osu-add-card tournaments-column-card">
@@ -927,10 +936,11 @@
     </section>
 
     <section id="page-feedback" class="site-page" style="display:none;">
+        <p class="eyebrow">FEEDBACK</p>
+        <h2 class="osu-page-title" data-i18n="feedback_title">建議&改進</h2>
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="feedback_title">建議&改進</h3>
             <p class="feedback-hint" data-i18n="feedback_hint">覺得網站有哪裡可以做得更好嗎？在這裡告訴我，只有我看得到你的訊息，其他訪客不會看見。</p>
             <form class="feedback-form" onsubmit="return handleFeedbackSubmit(event)">
                 <textarea class="feedback-textarea" name="message" data-i18n-placeholder="feedback_placeholder" placeholder="寫下你的建議..." rows="5" required></textarea>
@@ -942,10 +952,11 @@
     </section>
 
     <section id="page-resources" class="site-page" style="display:none;">
+        <p class="eyebrow">RESOURCES</p>
+        <h2 class="osu-page-title" data-i18n="resources_title">更多 osu! 資源</h2>
         <div class="osu-add-card resources-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="resources_title">更多 osu! 資源</h3>
             <p class="resources-hint" data-i18n="resources_hint">一些沒必要自己做、但很推薦認識的社群工具：</p>
             <div class="resources-list" id="resources-list"></div>
         </div>
@@ -1010,10 +1021,10 @@
 
 <div id="pp-calc-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closePpCalcModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closePpCalcModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closePpCalcModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" id="pp-calc-title"></h3>
         <p class="pp-calc-hint" data-i18n="pp_calc_hint">選擇難度、勾選 Mods、輸入準確率後按「計算」，即可重新試算星數與 PP，並顯示這張圖的難度曲線。</p>
-        <select class="pp-calc-diff-select" id="pp-calc-diff-select" onchange="selectPpCalcDiff(this.value)"></select>
+        <select class="pp-calc-diff-select" id="pp-calc-diff-select" data-i18n-aria="pp_calc_diff_label" aria-label="難度" onchange="selectPpCalcDiff(this.value)"></select>
         <div class="pp-calc-section-label" data-i18n="pp_calc_mods_label">Mods</div>
         <div class="pp-calc-mods-row" id="pp-calc-mods-row"></div>
         <div class="pp-calc-acc-row">
@@ -1038,7 +1049,7 @@
 
 <div id="gallery-detail-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeGalleryDetailModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeGalleryDetailModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeGalleryDetailModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" id="gallery-detail-title"></h3>
         <div class="osu-mode-tabs" id="gallery-detail-mode-tabs"></div>
         <div id="gallery-detail-body"></div>
@@ -1059,7 +1070,7 @@
 
 <div id="category-manage-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCategoryManageModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeCategoryManageModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeCategoryManageModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="osu_category_manage_title">管理分類</h3>
         <div class="osu-category-manage-add-row">
             <input type="text" id="osu-category-manage-input" autocomplete="off" data-i18n-placeholder="osu_category_add_prompt" placeholder="輸入新分類名稱..." onkeydown="if(event.key==='Enter')addOsuCategoryFromModal()">
@@ -1071,7 +1082,7 @@
 
 <div id="osu-note-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeOsuNoteModal()">
     <div class="pp-calc-modal osu-note-modal" role="dialog" aria-labelledby="osu-note-modal-title">
-        <button class="pp-calc-close" onclick="closeOsuNoteModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeOsuNoteModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" id="osu-note-modal-title" data-i18n="osu_note_title">筆記與評分</h3>
         <p class="osu-note-song" id="osu-note-song"></p>
         <div class="osu-note-stars" id="osu-note-stars" role="radiogroup"></div>
@@ -1086,7 +1097,7 @@
 
 <div id="collection-db-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCollectionDbModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeCollectionDbModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeCollectionDbModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="collection_io_title">osu! 遊戲收藏（匯入 / 匯出）</h3>
 
         <details class="modal-howto" data-howto-key="db">
@@ -1104,7 +1115,7 @@
 
         <p class="pp-calc-hint" data-i18n="collection_db_hint">會依照你的分類（含「最愛」）產生 osu! 遊戲讀得懂的 collection.db，下載後複製到你的 osu! 資料夾即可匯入。這會取代你電腦上原本的 collection.db——若想保留現有的收藏，可以先在下面上傳它一起合併（同名分類會被這裡的資料覆蓋，其他分類不受影響）。.osdb 則帶有 beatmap ID，用 Collection Manager／osu!Stats 匯入遊戲，不需要每張圖的雜湊。</p>
         <div class="collection-db-upload-row">
-            <label data-i18n="collection_db_merge_label">合併現有 collection.db（可略過）</label>
+            <label for="collection-db-merge-input" data-i18n="collection_db_merge_label">合併現有 collection.db（可略過）</label>
             <input type="file" id="collection-db-merge-input" accept=".db">
         </div>
         <div class="collection-io-export-btns">
@@ -1117,7 +1128,7 @@
 
 <div id="collection-compare-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCollectionCompareModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeCollectionCompareModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeCollectionCompareModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="collection_compare_title">收藏差異比較</h3>
         <p class="pp-calc-hint" data-i18n="collection_compare_hint">上傳一份之前用「下載收藏成 JSON 備份檔」匯出的舊檔案，看跟現在的收藏比起來新增、移除了哪些圖——純比較，不會動到你現在的收藏。</p>
         <div id="collection-compare-body"></div>
@@ -1126,7 +1137,7 @@
 
 <div id="collection-tools-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCollectionToolsModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeCollectionToolsModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeCollectionToolsModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="ctools_title">收藏整理</h3>
 
         <details class="modal-howto" data-howto-key="ctools">
@@ -1157,7 +1168,7 @@
 
 <div id="stats-dashboard-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeStatsDashboardModal()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeStatsDashboardModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeStatsDashboardModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="stats_dashboard_title">收藏統計儀表板</h3>
         <div id="stats-dashboard-body"></div>
     </div>
@@ -1165,7 +1176,7 @@
 
 <div id="global-search-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeGlobalSearch()">
     <div class="pp-calc-modal global-search-modal">
-        <button class="pp-calc-close" onclick="closeGlobalSearch()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeGlobalSearch()" data-icon="x"></button>
         <input type="text" id="global-search-input" class="guestbook-input global-search-input" autocomplete="off" data-i18n-placeholder="global_search_placeholder" placeholder="搜尋歌曲、圖池、我的收藏..." oninput="onGlobalSearchInput(this.value)">
         <div id="global-search-results" class="global-search-results"></div>
     </div>
@@ -1173,7 +1184,7 @@
 
 <div id="leaderboard-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeTrackedLeaderboard()">
     <div class="pp-calc-modal">
-        <button class="pp-calc-close" onclick="closeTrackedLeaderboard()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeTrackedLeaderboard()" data-icon="x"></button>
         <h3 class="pp-calc-title" data-i18n="leaderboard_title">追蹤玩家排行榜</h3>
         <div id="leaderboard-list" class="leaderboard-list"></div>
         <div id="tracked-leaderboard-chart" class="pp-history-panel"></div>
@@ -1182,7 +1193,7 @@
 
 <div id="year-recap-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeYearRecapModal()">
     <div class="pp-calc-modal year-recap-modal" role="dialog" aria-labelledby="year-recap-heading">
-        <button class="pp-calc-close" onclick="closeYearRecapModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeYearRecapModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" id="year-recap-heading" data-i18n="recap_btn_title">收藏年度回顧</h3>
         <div class="year-recap-controls">
             <select id="year-recap-year" onchange="renderYearRecap(this.value)" data-i18n-title="recap_year_label" title="年份"></select>
@@ -1196,7 +1207,7 @@
      closes the last open overlay in document order. -->
 <div id="friend-compare-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeFriendCompareModal()">
     <div class="pp-calc-modal friend-compare-modal" role="dialog" aria-labelledby="friend-compare-title">
-        <button class="pp-calc-close" onclick="closeFriendCompareModal()" data-icon="x"></button>
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeFriendCompareModal()" data-icon="x"></button>
         <h3 class="pp-calc-title" id="friend-compare-title" data-i18n="fc_title">和朋友比對收藏</h3>
         <div id="friend-compare-form">
             <p class="pp-calc-hint" data-i18n="fc_hint">輸入朋友的 osu! 名稱、ID 或收藏廣場連結。只能比對有發布到「收藏廣場」的收藏。</p>
