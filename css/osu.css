@@ -5976,3 +5976,28 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .section-band .osu-stat-spread .diff-spread { height: 30px; }
 .section-band-extra:has(> .osu-stats-panel) { margin-left: auto; }
 @media (max-width: 899px) { .section-band .osu-stats-panel { flex-wrap: wrap; gap: 10px 16px; } }
+
+/* ===== 收藏廣場: one-line publish status + one toolbar row ===== */
+.gallery-publish-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    border-radius: var(--r-card);
+    border: var(--line) solid var(--border);
+    background: var(--bg-card);
+}
+.gallery-publish-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); flex: none; }
+.gallery-publish-dot.on { background: var(--good); }
+.gallery-publish-status { flex: 1; min-width: 200px; font-size: var(--fs-14); color: var(--text-dim); }
+.gallery-publish-bar .btn { padding: 7px 14px; font-size: var(--fs-13); }
+.btn.btn-ghost { background: var(--bg-input); color: var(--text); font-weight: 500; }
+.btn.btn-ghost:hover { background: var(--bg-card); box-shadow: none; }
+.gallery-toolbar { align-items: center; flex-wrap: wrap; }
+.gallery-toolbar input[type="text"] { flex: 1 1 320px; }
+.gallery-sort-chips { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: var(--r-ctl); background: var(--bg-card); }
+.gallery-sort-chip { padding: 6px 12px; border: 0; border-radius: 4px; background: transparent; color: var(--text-dim); font-size: var(--fs-13); cursor: pointer; }
+.gallery-sort-chip:hover { color: var(--text); }
+.gallery-sort-chip.active { background: rgba(var(--pink-rgb), 0.16); color: var(--pink-text, var(--pink)); font-weight: 700; }

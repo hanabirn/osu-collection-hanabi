@@ -127,21 +127,15 @@
     --bg-card:     hsl(var(--section-h) 8% 15%);
     --bg-input:    hsl(var(--section-h) 8% 18%);
 }
-:root[data-section="catalog"]            { --section-h: 265; }
-:root[data-section="public-collections"] { --section-h: 32; }
-:root[data-section="lookup"]             { --section-h: 205; }
-:root[data-section="chat"],
-:root[data-section="dm"]                 { --section-h: 172; }
-:root[data-section="tournaments"],
-:root[data-section="mappools"],
-:root[data-section="cmpool"]             { --section-h: 130; }
-:root[data-section="skins"],
-:root[data-section="skin-screenshots"]   { --section-h: 290; }
+/* One hue per site section (js/main.js SITE_SECTIONS sets data-site-section),
+   so every page of 探索 shares its colour: 探索 violet, 玩家 blue, 社群 teal;
+   首頁, 收藏 and 更多 keep the default pink-gray. */
+:root[data-site-section="explore"][data-section]   { --section-h: 265; }
+:root[data-site-section="player"][data-section]    { --section-h: 205; }
+:root[data-site-section="community"][data-section] { --section-h: 172; }
 /* Hued sections also colour the right-hand header glow. */
-:root[data-section="catalog"], :root[data-section="public-collections"], :root[data-section="lookup"],
-:root[data-section="chat"], :root[data-section="dm"], :root[data-section="tournaments"],
-:root[data-section="mappools"], :root[data-section="cmpool"], :root[data-section="skins"],
-:root[data-section="skin-screenshots"] { --glow-2: hsl(var(--section-h) 75% 62%); }
+:root[data-site-section="explore"], :root[data-site-section="player"],
+:root[data-site-section="community"] { --glow-2: hsl(var(--section-h) 75% 62%); }
 
 /* Light theme was removed 2026-09-13 in favour of a catch-tracker-style
    accent colour picker (js/theme.js applyAccent()) — the site is dark-only

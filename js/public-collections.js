@@ -36,7 +36,25 @@ function getLastPublishedAt() {
 function updatePublishButtonLabel() {
     const label = document.getElementById('publish-collection-label');
     if (!label) return;
-    label.textContent = getLastPublishedAt() ? t('publish_update_btn') : t('publish_btn');
+    const at = getLastPublishedAt();
+    label.textContent = at ? t('publish_update_btn') : t('publish_btn');
+    // The one-line status bar: whether (as far as this browser knows) your
+    // collection is up, and since when; 取消發布 only when there is something to take down.
+    const status = document.getElementById('gallery-publish-status');
+    if (status) status.textContent = at ? t('gallery_publish_on', { date: String(at).slice(0, 10) }) : t('gallery_publish_off');
+    document.getElementById('gallery-publish-dot')?.classList.toggle('on', !!at);
+    const unpub = document.getElementById('unpublish-collection-btn');
+    if (unpub) unpub.hidden = !at;
+}
+
+/* Sort chips (index.html .gallery-sort-chips): one pressed at a time. */
+function setGallerySort(sort, btn) {
+    document.querySelectorAll('.gallery-sort-chip').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+    });
+    switchPublicCollectionsSort(sort);
 }
 
 function switchPublicCollectionsSort(sort) {

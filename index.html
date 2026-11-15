@@ -494,31 +494,29 @@
         <p class="eyebrow">GALLERY</p>
         <h2 class="osu-page-title" data-i18n="gallery_page_title">玩家收藏廣場</h2>
 
-        <div class="osu-add-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <div class="osu-volume">
-                <button class="btn" id="publish-collection-btn" onclick="publishMyCollection()" data-icon="upload" data-icon-gap><span id="publish-collection-label">發布我的收藏</span></button>
-                <button class="btn" onclick="unpublishMyCollection()" data-icon="trash2" data-icon-gap><span data-i18n="unpublish_btn">取消發布</span></button>
-            </div>
+        <!-- One line for your own publish state, then search + sort chips in one row
+             (js/public-collections.js updatePublishButtonLabel / setGallerySort). -->
+        <div class="gallery-publish-bar">
+            <span class="gallery-publish-dot" id="gallery-publish-dot" aria-hidden="true"></span>
+            <span class="gallery-publish-status" id="gallery-publish-status"></span>
+            <button class="btn" id="publish-collection-btn" onclick="publishMyCollection()" data-icon="upload" data-icon-gap><span id="publish-collection-label">發布我的收藏</span></button>
+            <button class="btn btn-ghost" id="unpublish-collection-btn" onclick="unpublishMyCollection()" data-icon="trash2" data-icon-gap><span data-i18n="unpublish_btn">取消發布</span></button>
         </div>
 
-        <div class="osu-search-row">
+        <div class="osu-search-row gallery-toolbar">
             <input type="text" id="gallery-search-input" autocomplete="off" data-i18n-placeholder="gallery_search_placeholder" placeholder="搜尋玩家名稱或標籤..." oninput="searchPublicCollections(this.value)">
-            <select id="gallery-sort-select" onchange="switchPublicCollectionsSort(this.value)">
-                <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
-                <option value="likes" data-i18n="gallery_sort_likes">❤ 最熱門</option>
-                <option value="sets" data-i18n="gallery_sort_sets">收藏數量</option>
-                <option value="rating" data-i18n="gallery_sort_rating">最高星數</option>
-            </select>
-        </div>
-        <div class="osu-search-row gallery-filter-row">
+            <div class="gallery-sort-chips" role="group" data-i18n-aria="gallery_sort_label" aria-label="排序">
+                <button type="button" class="gallery-sort-chip active" aria-pressed="true" onclick="setGallerySort('recent', this)" data-i18n="gallery_sort_recent">最新發布</button>
+                <button type="button" class="gallery-sort-chip" aria-pressed="false" onclick="setGallerySort('likes', this)" data-i18n="gallery_sort_likes">❤ 最熱門</button>
+                <button type="button" class="gallery-sort-chip" aria-pressed="false" onclick="setGallerySort('sets', this)" data-i18n="gallery_sort_sets">收藏數量</button>
+                <button type="button" class="gallery-sort-chip" aria-pressed="false" onclick="setGallerySort('rating', this)" data-i18n="gallery_sort_rating">最高星數</button>
+            </div>
             <label class="gallery-liked-only-label">
                 <input type="checkbox" id="gallery-liked-only-checkbox" onchange="toggleGalleryLikedOnly(this.checked)">
                 <span data-i18n="gallery_liked_only">只看我按讚的</span>
             </label>
-            <div id="gallery-active-tag" class="gallery-active-tag" style="display:none;"></div>
         </div>
+            <div id="gallery-active-tag" class="gallery-active-tag" style="display:none;"></div>
 
         <div id="public-collections-list" class="osu-collection"></div>
         <div id="public-collections-pagination" class="osu-pagination"></div>
