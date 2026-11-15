@@ -18,6 +18,9 @@
  * score doesn't change), and the score id is checked against osu! first
  * so random ids can't spend browser time. */
 
+const { runWithEnv } = require('../netlify/functions/_cf-env');
+const osuScore = require('../netlify/functions/osu-score');
+
 const ID_RE = /^\/card\/(\d{1,20})\.png$/;
 const LANGS = new Set(['zh', 'zh-Hans', 'en', 'ja', 'ko', 'ru', 'fr', 'es', 'de']);
 
@@ -47,9 +50,14 @@ async function serveScoreCardPng(request, env, url, ctx) {
 
     if (!env.CF_ACCOUNT_ID || !env.CF_BROWSER_TOKEN) return jsonError(503, 'card rendering is not configured');
 
-    // The score must exist (osu-score is itself cached for a day).
-    const check = await fetch(`${url.origin}/.netlify/functions/osu-score?id=${id}${mq}`);
-    if (!check.ok) return jsonError(check.status === 404 ? 404 : 502, 'score not found');
+    // The score must exist. Called in-process: a Worker's fetch to its own
+    // custom domain doesn't come back to it, and this direct route runs
+    // outside the env wrapper internal-fetch.js relies on.
+    const check = await runWithEnv(env, ctx, () => osuScore.handler({
+        httpMethod: 'GET',
+        queryStringParameters: m ? { id, m } : { id },
+    }), url.hostname);
+    if (!check || check.statusCode !== 200) return jsonError(check && check.statusCode === 404 ? 404 : 502, 'score not found');
 
     const page = `${url.origin}/?scorecard=${id}${mq}&bare&lang=${encodeURIComponent(lang)}`;
     // Browser Rendering was renamed Browser Run (April 2026); the API
