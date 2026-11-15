@@ -85,7 +85,13 @@ exports.handler = async (event) => {
             aim: diffAttrs.aim != null ? diffAttrs.aim : null,
             speed: diffAttrs.speed != null ? diffAttrs.speed : null,
             pp,
-            strains: { sectionLength: strainsRaw.sectionLength, values: strainValues },
+            // osu!std also sends aim and speed apart, for the score card's
+            // two-line difficulty curve (js/score-card.js).
+            strains: {
+                sectionLength: strainsRaw.sectionLength,
+                values: strainValues,
+                ...(strainsRaw.aim && strainsRaw.speed ? { aim: Array.from(strainsRaw.aim), speed: Array.from(strainsRaw.speed) } : {}),
+            },
             attrs: { ar: beatmapAttrs.ar, od: beatmapAttrs.od, cs: beatmapAttrs.cs, hp: beatmapAttrs.hp },
         });
         return { statusCode: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' }, body };
