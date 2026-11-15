@@ -28,15 +28,15 @@ const EPHEMERAL = 64;
 const API_MODE = { osu: 'osu', taiko: 'taiko', fruits: 'fruits', catch: 'fruits', mania: 'mania' };
 const MODE_LABEL = { osu: 'osu!', taiko: 'osu!taiko', fruits: 'osu!catch', mania: 'osu!mania' };
 
-// Application emojis (uploaded by scripts/upload-discord-emojis.mjs — osu!web
-// legacy score-rank PNGs). Usable by this app in any server. Keyed by the
-// osu! API `rank` value; falls back to bold text if an id is missing.
+// Application emojis (uploaded by scripts/upload-discord-emojis.mjs from
+// assets/discord-emoji/): the score card's own grade letters. Usable by this
+// app in any server. Keyed by the osu! API `rank` value; falls back to bold
+// text if an id is missing.
 const GRADE_EMOJI = {
-    X: '<:grade_ss:1546376385117814784>', SS: '<:grade_ss:1546376385117814784>',
-    XH: '<:grade_ssh:1546376388062224427>', SSH: '<:grade_ssh:1546376388062224427>',
-    S: '<:grade_s:1546376391585693699>', SH: '<:grade_sh:1546376394961846272>',
-    A: '<:grade_a:1546376398283870228>', B: '<:grade_b:1546376402914254938>',
-    C: '<:grade_c:1546376406123155577>', D: '<:grade_d:1546376409717547019>', F: '',
+    X: '<:g_ss:1571451498850680832>', SS: '<:g_ss:1571451498850680832>',
+    XH: '<:g_ssh:1571451501866389574>', SSH: '<:g_ssh:1571451501866389574>',
+    S: '<:g_s:1571451504727036024>', SH: '<:g_sh:1571451507566706698>',
+    A: '<:g_a:1571451510141878282>', B: '<:g_b:1571451513073573959>', C: '<:g_c:1571451515716243556>', D: '<:g_d:1571451529465036810>', F: '',
 };
 const gradeTag = (rank) => GRADE_EMOJI[rank] || `**${rank || '?'}**`;
 
@@ -48,20 +48,22 @@ const MODE_EMOJI = {
 };
 const modeTag = (apiMode) => MODE_EMOJI[apiMode] || '';
 
+// osu!lazer mod glyphs (ppy/osu-resources, CC BY-NC 4.0) on a hexagon in the
+// mod type's colour, as the score card draws them (assets/discord-emoji/).
 const MOD_EMOJI = {
-    NM: '<:mod_nm:1546378674310348863>', NF: '<:mod_nf:1546378682954940439>',
-    EZ: '<:mod_ez:1546378692203249734>', HT: '<:mod_ht:1546378702034829374>',
-    DC: '<:mod_dc:1546378711387996291>', HD: '<:mod_hd:1546378722263699566>',
-    HR: '<:mod_hr:1546378731344367656>', SD: '<:mod_sd:1546378741691981864>',
-    PF: '<:mod_pf:1546378750692696198>', DT: '<:mod_dt:1546378759614111805>',
-    NC: '<:mod_nc:1546378768711426128>', FL: '<:mod_fl:1546378778060791888>',
-    BL: '<:mod_bl:1546378787480932405>', SO: '<:mod_so:1546378796683235348>',
-    RX: '<:mod_rx:1546378806246506566>', AP: '<:mod_ap:1546378815432036413>',
-    MR: '<:mod_mr:1546378824235622470>', RD: '<:mod_rd:1546378834113462404>',
-    FI: '<:mod_fi:1546378843059781673>', CL: '<:mod_cl:1546378855051173939>',
-    '4K': '<:mod_4k:1546378864467378286>', '5K': '<:mod_5k:1546378874173132870>',
-    '6K': '<:mod_6k:1546378882922582106>', '7K': '<:mod_7k:1546378891571241000>',
-    '8K': '<:mod_8k:1546378901863800855>', '9K': '<:mod_9k:1546378911351308318>',
+    NM: '<:m_nm:1571451550067593248>', NF: '<:m_nf:1571451552684576788>',
+    EZ: '<:m_ez:1571451555322789958>', HT: '<:m_ht:1571451557545902103>',
+    DC: '<:m_dc:1571451560553357362>', HD: '<:m_hd:1571451563140980736>',
+    HR: '<:m_hr:1571451565728989364>', SD: '<:m_sd:1571451571005558854>',
+    PF: '<:m_pf:1571451573542850640>', DT: '<:m_dt:1571451576013557902>',
+    NC: '<:m_nc:1571451578655707237>', FL: '<:m_fl:1571451581335871558>',
+    BL: '<:m_bl:1571451583625961533>', FI: '<:m_fi:1571451586511638548>',
+    SO: '<:m_so:1571451589322084482>', RX: '<:m_rx:1571451592417484940>',
+    AP: '<:m_ap:1571451595281928353>', MR: '<:m_mr:1571451597446189088>',
+    RD: '<:m_rd:1571451600600567878>', CL: '<:m_cl:1571451603129471020>',
+    '4K': '<:m_4k:1571451606191575040>', '5K': '<:m_5k:1571451609056026646>',
+    '6K': '<:m_6k:1571451611857821826>', '7K': '<:m_7k:1571451614227865602>',
+    '8K': '<:m_8k:1571451617348423800>', '9K': '<:m_9k:1571451620015997068>',
 };
 
 // A World Cup mappool bracket label -> the matching mod hexagon emoji, like

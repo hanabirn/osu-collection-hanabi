@@ -11,9 +11,15 @@
    once created.
 
    Sources:
-   - grades: ppy/osu-web legacy score-rank PNGs (used as-is)
+   - grades: assets/discord-emoji/g_*.png, the site's score-card grade
+     letters (our own artwork: Space Grotesk with the card's gradients)
+   - mods: assets/discord-emoji/m_*.png, osu!lazer's mod glyphs from
+     ppy/osu-resources (CC BY-NC 4.0, © ppy Pty Ltd) on a hexagon in the
+     mod type's colour, as the score card draws them
    - rulesets: this repo's assets/icons/mode-*.svg, recoloured pink
-   - mods: ppy/osu-web badges/mods/mod-*.svg, composited onto a slate badge
+   The grade and mod PNGs are drawn once in the browser (see
+   assets/discord-emoji/README.md) and uploaded as-is. They replaced the
+   earlier osu-web (AGPL) grade and mod images.
    SVGs are rasterised to 128px PNG via `npx @resvg/resvg-js-cli` (no repo
    dependency added — it runs from the npm cache). */
 import { readFile, writeFile, mkdtemp, rm } from 'node:fs/promises';
@@ -36,14 +42,12 @@ async function loadDotEnv() {
     } catch { /* no .env */ }
 }
 
-const OSUWEB = 'https://raw.githubusercontent.com/ppy/osu-web/master';
 
 // name -> osu-web legacy PNG (downloaded, uploaded as-is)
+// emoji name -> assets/discord-emoji/<name>.png
 const GRADES = [
-    ['grade_ss', 'legacy-ranking-X.png'], ['grade_ssh', 'legacy-ranking-XH.png'],
-    ['grade_s', 'legacy-ranking-S.png'], ['grade_sh', 'legacy-ranking-SH.png'],
-    ['grade_a', 'legacy-ranking-A.png'], ['grade_b', 'legacy-ranking-B.png'],
-    ['grade_c', 'legacy-ranking-C.png'], ['grade_d', 'legacy-ranking-D.png'],
+    ['g_ss', 'X'], ['g_ssh', 'XH'], ['g_s', 'S'], ['g_sh', 'SH'],
+    ['g_a', 'A'], ['g_b', 'B'], ['g_c', 'C'], ['g_d', 'D'],
 ];
 
 // emoji name -> local ruleset svg basename
@@ -53,17 +57,11 @@ const MODES = [
 ];
 
 // emoji name -> osu-web mod-badge svg basename (the score-embed-relevant set)
-const MODS = [
-    ['mod_nm', 'mod-no-mod'], ['mod_nf', 'mod-no-fail'], ['mod_ez', 'mod-easy'],
-    ['mod_ht', 'mod-half-time'], ['mod_dc', 'mod-daycore'], ['mod_hd', 'mod-hidden'],
-    ['mod_hr', 'mod-hard-rock'], ['mod_sd', 'mod-sudden-death'], ['mod_pf', 'mod-perfect'],
-    ['mod_dt', 'mod-double-time'], ['mod_nc', 'mod-nightcore'], ['mod_fl', 'mod-flashlight'],
-    ['mod_bl', 'mod-blinds'], ['mod_so', 'mod-spun-out'], ['mod_rx', 'mod-relax'],
-    ['mod_ap', 'mod-autopilot'], ['mod_mr', 'mod-mirror'], ['mod_rd', 'mod-random'],
-    ['mod_fi', 'mod-fade-in'], ['mod_cl', 'mod-classic'],
-    ['mod_4k', 'mod-four-keys'], ['mod_5k', 'mod-five-keys'], ['mod_6k', 'mod-six-keys'],
-    ['mod_7k', 'mod-seven-keys'], ['mod_8k', 'mod-eight-keys'], ['mod_9k', 'mod-nine-keys'],
-];
+// emoji name (m_<acronym>) -> assets/discord-emoji/<name>.png
+const MODS = ['NM', 'NF', 'EZ', 'HT', 'DC', 'HD', 'HR', 'SD', 'PF', 'DT', 'NC', 'FL', 'BL', 'FI',
+    'SO', 'RX', 'AP', 'MR', 'RD', 'CL', '4K', '5K', '6K', '7K', '8K', '9K'].map((a) => [`m_${a.toLowerCase()}`, a]);
+
+const localPng = (name) => readFile(new URL(`../assets/discord-emoji/${name}.png`, import.meta.url));
 
 let TMP;
 async function rasterize(svg) {
@@ -82,19 +80,6 @@ async function pngForMode(basename) {
     return rasterize(svg);
 }
 
-async function pngForMod(basename) {
-    const res = await fetch(`${OSUWEB}/public/images/badges/mods/${basename}.svg`);
-    if (!res.ok) throw new Error(`${basename}: HTTP ${res.status}`);
-    const inner = (await res.text()).replace(/^<\?xml[^>]*>\s*/, '');
-    // The osu-web badge svgs are the 120x84 foreground glyph only; drop a
-    // slate rounded-rect behind it so a white glyph stays visible on both
-    // Discord themes.
-    const composited = inner.replace(
-        /(<svg[^>]*>)/,
-        '$1<rect x="0" y="0" width="120" height="84" rx="18" fill="#3b4252"/>',
-    );
-    return rasterize(composited);
-}
 
 async function main() {
     await loadDotEnv();
@@ -133,18 +118,14 @@ async function main() {
 
     try {
         if (!only || only === 'grades') {
-            for (const [name, file] of GRADES) {
-                const img = await fetch(`${OSUWEB}/resources/images/scores/${file}`);
-                if (!img.ok) { console.error(`  ! ${file}: ${img.status}`); continue; }
-                await put(name, Buffer.from(await img.arrayBuffer()));
-            }
+            for (const [name] of GRADES) await put(name, await localPng(name));
         }
         if (!only || only === 'modes') {
             for (const [name, basename] of MODES) await put(name, await pngForMode(basename));
         }
         if (!only || only === 'mods') {
-            for (const [name, basename] of MODS) {
-                try { await put(name, await pngForMod(basename)); }
+            for (const [name] of MODS) {
+                try { await put(name, await localPng(name)); }
                 catch (e) { console.error(`  ! ${name}: ${e.message}`); }
             }
         }
@@ -156,13 +137,13 @@ async function main() {
     const line = (pairs) => pairs.map(([k, n]) => `    ${k}: '${tag(n)}',`).join('\n');
     console.log('\n--- paste into netlify/functions/_discord-lib.js ---\n');
     if (!only || only === 'grades') console.log(`const GRADE_EMOJI = {
-    X: '${tag('grade_ss')}', SS: '${tag('grade_ss')}',
-    XH: '${tag('grade_ssh')}', SSH: '${tag('grade_ssh')}',
-    S: '${tag('grade_s')}', SH: '${tag('grade_sh')}',
-    A: '${tag('grade_a')}', B: '${tag('grade_b')}', C: '${tag('grade_c')}', D: '${tag('grade_d')}', F: '',
+    X: '${tag('g_ss')}', SS: '${tag('g_ss')}',
+    XH: '${tag('g_ssh')}', SSH: '${tag('g_ssh')}',
+    S: '${tag('g_s')}', SH: '${tag('g_sh')}',
+    A: '${tag('g_a')}', B: '${tag('g_b')}', C: '${tag('g_c')}', D: '${tag('g_d')}', F: '',
 };`);
     if (!only || only === 'modes') console.log(`const MODE_EMOJI = {\n${line([['osu', 'mode_osu'], ['taiko', 'mode_taiko'], ['fruits', 'mode_catch'], ['mania', 'mode_mania']])}\n};`);
-    if (!only || only === 'mods') console.log(`const MOD_EMOJI = {\n${line(MODS.map(([n]) => [n.slice(4).toUpperCase(), n]))}\n};`);
+    if (!only || only === 'mods') console.log(`const MOD_EMOJI = {\n${line(MODS.map(([n, a]) => [/^\d/.test(a) ? `'${a}'` : a, n]))}\n};`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
