@@ -360,10 +360,51 @@ function styleFilePickers() {
     });
 }
 
+/* ===== 回到頂端 =====
+   For the long pages (賽事 ~4500px, 更新內容, 手冊, 圖池): a button in the
+   bottom-left corner (bottom-right is the preview player's, bottom-centre
+   the update toast's) that appears once you're 1.5 screens down. Back at
+   the top, focus moves to the current tab in the top nav, so a keyboard
+   user lands somewhere sensible rather than on a button that just vanished. */
+function initBackToTop() {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'back-to-top';
+    btn.hidden = true;
+    btn.dataset.i18nAria = 'back_to_top';
+    btn.dataset.i18nTitle = 'back_to_top';
+    btn.setAttribute('aria-label', t('back_to_top'));
+    btn.title = t('back_to_top');
+    btn.innerHTML = icon('chevronsUp');
+    btn.addEventListener('click', () => {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        // Pages only reachable from 更多 (手冊, 更新內容 ...) have no current tab
+        // in the top nav: the page's own heading takes focus instead.
+        const page = [...document.querySelectorAll('.site-page')].find((p) => p.style.display !== 'none');
+        const target = document.querySelector('#site-topnav .site-topnav-btn.active') || page?.querySelector('h2');
+        if (target) {
+            if (!target.matches('button, a, [tabindex]')) target.tabIndex = -1;
+            target.focus({ preventScroll: true });
+        }
+    });
+    document.body.appendChild(btn);
+    let queued = false;
+    window.addEventListener('scroll', () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+            btn.hidden = window.scrollY < window.innerHeight * 1.5;
+            queued = false;
+        });
+    }, { passive: true });
+}
+
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
     makeCardsFocusable(document.body);
     styleFilePickers();
+    initBackToTop();
     document.addEventListener('keydown', onGlobalShortcutKeydown);
     document.addEventListener('keydown', onModalEscapeKeydown);
     if (typeof renderStaticIcons === 'function') renderStaticIcons();

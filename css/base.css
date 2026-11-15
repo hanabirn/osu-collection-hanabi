@@ -1535,6 +1535,29 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .input-group button::after, .btn::after { content: none; }
 
+/* 回到頂端 (js/main.js initBackToTop): bottom-left, clear of the preview
+   player (bottom-right) and the update toast (bottom-centre). */
+.back-to-top {
+    position: fixed;
+    left: max(20px, env(safe-area-inset-left, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    z-index: 400;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: var(--line) solid var(--border-strong);
+    background: var(--bg-modal);
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.7);
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.back-to-top[hidden] { display: none; }
+.back-to-top:hover { background: var(--bg-card); border-color: rgba(var(--pink-rgb), 0.6); color: var(--pink-text, var(--pink)); }
+
 /* File pickers (js/main.js styleFilePickers): the real input stays in the
    tab order but is hidden; its <label> is the visible button. */
 .file-native {
