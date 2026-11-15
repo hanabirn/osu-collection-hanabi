@@ -22,6 +22,76 @@ function dismissMaintenanceBanner() {
     if (banner) banner.style.display = 'none';
 }
 
+/* ===== Sections =====
+   Sixteen pages grouped into five sections plus 更多, after osu-web: the
+   slim header picks a section, the section band under it picks a page.
+   A sub-tab with `choices` covers two pages that do the same job (世界盃 /
+   社群 pools, skin screenshots / my skins); the band shows a switch between
+   them. Pages keep their own ids, so switchTab() and every deep link work
+   as before. */
+const SITE_SECTIONS = [
+    { id: 'home', label: 'nav_home', tabs: [{ tab: 'home', label: 'nav_home' }] },
+    { id: 'collection', label: 'nav_collection', tabs: [{ tab: 'collection', label: 'nav_collection' }] },
+    { id: 'explore', label: 'nav_explore', tabs: [
+        { tab: 'catalog', label: 'nav_catalog' },
+        { tab: 'public-collections', label: 'nav_public_collections' },
+        { tab: 'mappools', label: 'nav_pools', choices: [['mappools', 'nav_pools_wc'], ['cmpool', 'nav_pools_community']] },
+        { tab: 'skin-screenshots', label: 'nav_skins', choices: [['skin-screenshots', 'nav_skin_screenshots'], ['skins', 'nav_my_skins']] },
+    ] },
+    { id: 'player', label: 'nav_player', tabs: [{ tab: 'lookup', label: 'nav_lookup' }, { tab: 'tournaments', label: 'nav_tournaments' }] },
+    { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { tab: 'dm', label: 'nav_dm' }] },
+    { id: 'more', label: 'nav_more', tabs: [
+        { tab: 'howto', label: 'nav_howto' }, { tab: 'updates', label: 'nav_updates' }, { tab: 'resources', label: 'nav_resources' },
+        { tab: 'bbcode', label: 'nav_bbcode' }, { tab: 'feedback', label: 'nav_feedback' },
+    ] },
+];
+const lastTabInSection = {};
+let currentSiteTab = null;
+/* Labels come from t(), so a language switch redraws the band (js/i18n.js applyLang). */
+function refreshSectionBand() { if (currentSiteTab) renderSectionBand(currentSiteTab); }
+
+function sectionOfTab(tab) {
+    for (const sec of SITE_SECTIONS) {
+        for (const st of sec.tabs) {
+            if (st.tab === tab || (st.choices && st.choices.some(([c]) => c === tab))) return { sec, st };
+        }
+    }
+    return { sec: SITE_SECTIONS[0], st: SITE_SECTIONS[0].tabs[0] };
+}
+
+function goSection(id) {
+    const sec = SITE_SECTIONS.find((s) => s.id === id) || SITE_SECTIONS[0];
+    switchTab(lastTabInSection[id] || sec.tabs[0].tab);
+}
+
+function renderSectionBand(tab) {
+    const { sec, st } = sectionOfTab(tab);
+    currentSiteTab = tab;
+    lastTabInSection[sec.id] = tab;
+    document.documentElement.dataset.siteSection = sec.id;
+    document.querySelectorAll('#site-nav .site-nav-sec').forEach((b) => {
+        const on = b.dataset.section === sec.id;
+        b.classList.toggle('active', on);
+        if (on) b.setAttribute('aria-current', 'page');
+        else b.removeAttribute('aria-current');
+    });
+    const title = document.getElementById('section-band-title');
+    const tabs = document.getElementById('section-band-tabs');
+    const extra = document.getElementById('section-band-extra');
+    if (!title || !tabs || !extra) return;
+    title.textContent = t(sec.label);
+    tabs.innerHTML = sec.tabs.length > 1
+        ? sec.tabs.map((x) => {
+            const on = x === st;
+            return `<button type="button" class="section-band-tab${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''} onclick="switchTab('${x.tab}')">${escHtml(t(x.label))}</button>`;
+        }).join('')
+        : '';
+    extra.innerHTML = st.choices
+        ? `<div class="section-band-choice" role="group" aria-label="${escHtml(t(st.label))}">${st.choices.map(([c, label]) =>
+            `<button type="button"${c === tab ? ' class="active" aria-pressed="true"' : ' aria-pressed="false"'} onclick="switchTab('${c}')">${escHtml(t(label))}</button>`).join('')}</div>`
+        : '';
+}
+
 /* ===== Tab switching ===== */
 function switchTab(tab, el) {
     document.querySelectorAll('.site-page').forEach(p => p.style.display = 'none');
@@ -33,18 +103,18 @@ function switchTab(tab, el) {
     void page.offsetWidth;
     page.classList.add('page-fade-in');
     document.querySelectorAll('.site-nav-btn').forEach(b => b.classList.remove('active'));
-    if (el) {
-        el.classList.add('active');
-        if (!el.classList.contains('site-topnav-btn')) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-    }
-    // Keep the persistent desktop top-nav highlight in sync however the tab
-    // was switched (drawer button, explore card, deep link, …).
-    document.querySelectorAll('#site-topnav [data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    // Drawer (phone nav): highlight this page's button however the tab was
+    // switched (header, band, explore card, deep link, ...).
+    document.querySelectorAll('.site-nav-btn').forEach((b) => {
+        if ((b.getAttribute('onclick') || '').includes(`switchTab('${tab}'`)) b.classList.add('active');
+    });
+    if (el && el.classList.contains('site-nav-btn')) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    // Header section + band of sub-tabs.
+    renderSectionBand(tab);
     // Section hue (css/theme.css [data-section]): each area tints the shell
     // its own colour, the way osu-web does per section.
     document.documentElement.dataset.section = tab;
+    if (tab === 'home' && typeof ensureHomeLoaded === 'function') ensureHomeLoaded();
     if (tab === 'skins' && typeof renderSkinsList === 'function') renderSkinsList();
     if (tab === 'skins' && typeof renderCloudSkinsList === 'function') renderCloudSkinsList();
     if (tab === 'updates') ensureUpdatesLoaded();
@@ -379,10 +449,9 @@ function initBackToTop() {
     btn.addEventListener('click', () => {
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-        // Pages only reachable from 更多 (手冊, 更新內容 ...) have no current tab
-        // in the top nav: the page's own heading takes focus instead.
+        // The current sub-tab in the section band, else the section in the header.
         const page = [...document.querySelectorAll('.site-page')].find((p) => p.style.display !== 'none');
-        const target = document.querySelector('#site-topnav .site-topnav-btn.active') || page?.querySelector('h2');
+        const target = document.querySelector('#section-band-tabs .section-band-tab.active, #site-nav .site-nav-sec.active') || page?.querySelector('h2');
         if (target) {
             if (!target.matches('button, a, [tabindex]')) target.tabIndex = -1;
             target.focus({ preventScroll: true });
@@ -403,6 +472,9 @@ function initBackToTop() {
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
     makeCardsFocusable(document.body);
+    // Band for whichever page is showing on load (deep links switch again later).
+    const firstPage = [...document.querySelectorAll('.site-page')].find((p) => p.style.display !== 'none');
+    if (firstPage) renderSectionBand(firstPage.id.replace(/^page-/, ''));
     styleFilePickers();
     initBackToTop();
     document.addEventListener('keydown', onGlobalShortcutKeydown);
@@ -420,6 +492,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof checkGalleryDeepLink === 'function') checkGalleryDeepLink();
     if (typeof checkCmpoolDeepLink === 'function') checkCmpoolDeepLink();
     if (typeof checkGamesDeepLink === 'function') checkGamesDeepLink();
+    // 首頁 is the landing page: fill it once sign-in state is known (above).
+    if (typeof ensureHomeLoaded === 'function' && document.getElementById('page-home')?.style.display !== 'none') ensureHomeLoaded();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof initNotifications === 'function') initNotifications();
     // "為你更新" digest — runs after notifications so it can count what just

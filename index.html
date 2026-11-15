@@ -60,7 +60,6 @@
 <body>
 
 <header class="site-header">
-    <div class="site-header-banner" id="site-header-banner" aria-hidden="true"></div>
     <div class="header-corner-left">
         <button id="pwa-install-btn" class="theme-toggle-btn header-ctl" onclick="promptPwaInstall()" style="display:none;" data-i18n-title="pwa_install_btn_title" title="加到主畫面" data-icon="download"></button>
         <button id="site-update-btn" class="theme-toggle-btn site-update-btn header-ctl" onclick="applySiteUpdate()" style="display:none;" data-i18n-title="site_update_btn_title" title="網站有更新，點擊更新" data-icon="refreshCw"></button>
@@ -161,33 +160,36 @@
                 </div>
                 <h1 data-i18n="site_title">osu! 歌曲收藏</h1>
             </div>
-            <div class="site-social">
-                <button class="site-social-btn site-like-btn" id="site-like-btn" type="button" onclick="toggleSiteLike()" aria-pressed="false" data-icon="heart" data-i18n-title="site_like_title" title="喜歡這個網站的話，幫我按個讚吧！">
-                    <span data-i18n="site_like_label">讚</span>
-                    <span class="site-like-count" id="site-like-count" aria-hidden="true">–</span>
-                </button>
-                <div class="site-changelog" id="site-changelog">
-                    <button class="site-social-btn site-changelog-btn" id="site-changelog-btn" type="button" onclick="toggleChangelogMenu()" aria-haspopup="true" aria-expanded="false" data-icon="sparkles" data-i18n-title="site_changelog_title" title="這次部署更新了什麼">
-                        <span data-i18n="site_changelog_label">更新內容</span>
-                    </button>
-                    <div class="site-changelog-menu" id="site-changelog-menu"></div>
-                </div>
-                <button class="site-social-btn" type="button" onclick="switchTab('howto')" data-icon="bookOpen" data-i18n-title="site_howto_title" title="每個分頁跟按鈕的用途說明">
-                    <span data-i18n="site_howto_label">使用手冊</span>
-                </button>
-                <button class="site-social-btn site-share-btn" id="site-share-btn" type="button" onclick="shareSite()" data-icon="share2" data-i18n-title="site_share_title" title="把這個網站分享給朋友">
-                    <span data-i18n="site_share_label">分享</span>
-                </button>
-            </div>
         </div>
     </div>
-    <div class="header-banner-tools">
-        <input type="range" class="header-banner-pos" id="header-banner-pos" min="0" max="100" step="1" value="50" oninput="setHeaderBannerPosition(this.value)" data-i18n-title="hero_banner_position" title="橫幅位置" hidden>
-        <button type="button" class="header-banner-btn" id="header-banner-reset" onclick="resetHeaderBanner()" data-icon="cornerUpLeft" data-i18n-title="hero_banner_reset" title="恢復預設橫幅" hidden></button>
-        <button type="button" class="header-banner-btn header-banner-btn--label" onclick="document.getElementById('header-banner-file').click()" data-icon="camera" data-icon-gap><span data-i18n="hero_banner_change">更換橫幅</span></button>
-        <input type="file" id="header-banner-file" accept="image/*" hidden onchange="onHeaderBannerFile(this)">
-    </div>
+    <!-- Five sections (js/main.js SITE_SECTIONS); each opens its own band of sub-tabs. -->
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <button class="site-nav-sec" type="button" data-section="home" onclick="goSection('home')" data-i18n="nav_home">首頁</button>
+        <button class="site-nav-sec" type="button" data-section="collection" onclick="goSection('collection')" data-i18n="nav_collection">收藏</button>
+        <button class="site-nav-sec" type="button" data-section="explore" onclick="goSection('explore')" data-i18n="nav_explore">探索</button>
+        <button class="site-nav-sec" type="button" data-section="player" onclick="goSection('player')" data-i18n="nav_player">玩家</button>
+        <button class="site-nav-sec" type="button" data-section="community" onclick="goSection('community')" data-i18n="nav_community">社群</button>
+        <button class="site-nav-sec" type="button" data-section="more" onclick="goSection('more')" data-i18n="nav_more">更多</button>
+    </nav>
 </header>
+
+<!-- Section band (after osu-web's per-section header): the section's name and
+     sub-tabs, tinted with its hue. On 首頁 and 收藏 the visitor's custom banner
+     (js/header-banner.js) shows behind it, with its tools on the right. -->
+<div class="section-band" id="section-band">
+    <div class="site-header-banner" id="site-header-banner" aria-hidden="true"></div>
+    <div class="section-band-in">
+        <h2 class="section-band-title" id="section-band-title"></h2>
+        <nav class="section-band-tabs" id="section-band-tabs" aria-label="Section"></nav>
+        <div class="section-band-extra" id="section-band-extra"></div>
+        <div class="header-banner-tools">
+            <input type="range" class="header-banner-pos" id="header-banner-pos" min="0" max="100" step="1" value="50" oninput="setHeaderBannerPosition(this.value)" data-i18n-title="hero_banner_position" title="橫幅位置" hidden>
+            <button type="button" class="header-banner-btn" id="header-banner-reset" onclick="resetHeaderBanner()" data-icon="cornerUpLeft" data-i18n-title="hero_banner_reset" title="恢復預設橫幅" hidden></button>
+            <button type="button" class="header-banner-btn header-banner-btn--label" onclick="document.getElementById('header-banner-file').click()" data-icon="camera" data-icon-gap><span data-i18n="hero_banner_change">更換橫幅</span></button>
+            <input type="file" id="header-banner-file" accept="image/*" hidden onchange="onHeaderBannerFile(this)">
+        </div>
+    </div>
+</div>
 
 <div class="nav-drawer-scrim" id="nav-drawer-scrim" onclick="closeNavDrawer()" hidden></div>
 <aside class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-labelledby="nav-drawer-title" hidden>
@@ -197,29 +199,39 @@
     </div>
     <nav class="nav-drawer-body">
         <div class="nav-drawer-group">
-            <p class="nav-drawer-group-label" data-i18n="nav_group_core">核心功能</p>
-            <button class="site-nav-btn active" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
-            <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_public_collections">收藏廣場</span></button>
-            <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-icon="globe" data-icon-gap><span data-i18n="nav_skin_screenshots">皮膚廣場</span></button>
-            <button class="site-nav-btn" onclick="switchTab('chat', this)" data-icon="messageCircle" data-icon-gap><span data-i18n="nav_chat">聊天室</span></button>
+            <p class="nav-drawer-group-label" data-i18n="nav_home"></p>
+            <button class="site-nav-btn" onclick="switchTab('home', this)" data-i18n="nav_home"></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_collection"></p>
+            <button class="site-nav-btn" onclick="switchTab('collection', this)" data-i18n="nav_collection"></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_explore"></p>
+            <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog"></button>
+            <button class="site-nav-btn" onclick="switchTab('public-collections', this)" data-i18n="nav_public_collections"></button>
+            <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools"></button>
+            <button class="site-nav-btn" onclick="switchTab('cmpool', this)" data-i18n="nav_cmpool"></button>
+            <button class="site-nav-btn" onclick="switchTab('skin-screenshots', this)" data-i18n="nav_skin_screenshots"></button>
+            <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_my_skins"></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_player"></p>
+            <button class="site-nav-btn" onclick="switchTab('lookup', this)" id="nav-btn-lookup" data-i18n="nav_lookup"></button>
+            <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments"></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_community"></p>
+            <button class="site-nav-btn" onclick="switchTab('chat', this)" data-i18n="nav_chat"></button>
             <button class="site-nav-btn" onclick="switchTab('dm', this)" data-icon="mail" data-icon-gap><span data-i18n="nav_dm">私訊</span><span class="dm-nav-badge" id="dm-nav-badge" style="display:none;">0</span></button>
         </div>
         <div class="nav-drawer-group">
-            <p class="nav-drawer-group-label" data-i18n="nav_group_tools">工具庫</p>
-            <button class="site-nav-btn" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
-            <button class="site-nav-btn" onclick="switchTab('mappools', this)" data-i18n="nav_mappools">世界盃圖池</button>
-            <button class="site-nav-btn" onclick="switchTab('cmpool', this)" data-i18n="nav_cmpool">社群賽圖分享</button>
-            <button class="site-nav-btn" id="nav-btn-lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
-            <button class="site-nav-btn" onclick="switchTab('bbcode', this)" data-i18n="nav_bbcode">BBCode</button>
-        </div>
-        <div class="nav-drawer-group">
-            <p class="nav-drawer-group-label" data-i18n="nav_group_resources">資源區</p>
-            <button class="site-nav-btn" onclick="switchTab('skins', this)" data-i18n="nav_skins">皮膚</button>
-            <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates">更新情報</button>
-            <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments">賽事</button>
-            <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources">資源</button>
-            <button class="site-nav-btn" onclick="switchTab('howto', this)" data-icon="bookOpen" data-icon-gap><span data-i18n="nav_howto">使用手冊</span></button>
-            <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback">建議&改進</button>
+            <p class="nav-drawer-group-label" data-i18n="nav_more"></p>
+            <button class="site-nav-btn" onclick="switchTab('howto', this)" data-i18n="nav_howto"></button>
+            <button class="site-nav-btn" onclick="switchTab('updates', this)" data-i18n="nav_updates"></button>
+            <button class="site-nav-btn" onclick="switchTab('resources', this)" data-i18n="nav_resources"></button>
+            <button class="site-nav-btn" onclick="switchTab('bbcode', this)" data-i18n="nav_bbcode"></button>
+            <button class="site-nav-btn" onclick="switchTab('feedback', this)" data-i18n="nav_feedback"></button>
         </div>
     </nav>
 </aside>
@@ -232,21 +244,73 @@
 
 <main class="site-main">
 
-<!-- Persistent horizontal nav for desktop — the ☰ drawer is the only nav
-     on mobile, but on a wide screen the primary tabs should just be visible.
-     Six primary tabs + 更多 (opens the drawer for the full list). Sits at
-     the top of the frosted panel so the header overlap doesn't cover it. -->
-<nav id="site-topnav" aria-label="Primary">
-    <button class="site-topnav-btn active" data-tab="collection" onclick="switchTab('collection', this)" data-i18n="nav_collection">收藏</button>
-    <button class="site-topnav-btn" data-tab="catalog" onclick="switchTab('catalog', this)" data-i18n="nav_catalog">曲庫分類</button>
-    <button class="site-topnav-btn" data-tab="public-collections" onclick="switchTab('public-collections', this)" data-i18n="nav_public_collections">收藏廣場</button>
-    <button class="site-topnav-btn" data-tab="lookup" onclick="switchTab('lookup', this)" data-i18n="nav_lookup">PP 查詢</button>
-    <button class="site-topnav-btn" data-tab="chat" onclick="switchTab('chat', this)" data-i18n="nav_chat">聊天室</button>
-    <button class="site-topnav-btn site-topnav-more" onclick="openNavDrawer()" data-icon="menu" data-icon-gap><span data-i18n="nav_more">更多</span></button>
-</nav>
 
 
-    <section id="page-collection" class="site-page">
+    <!-- 首頁 (after osu-web's signed-in home): what changed since last time,
+         then things to do next. Filled by js/home.js; the digest, 今日推薦,
+         熱門新曲 and 探索更多 blocks moved here unchanged from 收藏. -->
+    <section id="page-home" class="site-page">
+        <div class="home-top">
+            <div class="home-hero" id="home-hero"></div>
+            <div class="home-card home-tracked">
+                <h3 class="home-h"><span data-i18n="tracked_players_title">追蹤中的玩家</span><button type="button" class="home-more" onclick="switchTab('lookup')" data-i18n="home_see_all">全部</button></h3>
+                <div id="home-tracked" class="home-list"></div>
+            </div>
+        </div>
+        <div id="collection-digest"></div>
+
+        <div class="home-card home-new" id="home-new" hidden>
+            <h3 class="home-h"><span id="home-new-title"></span><button type="button" class="home-more" onclick="switchTab('catalog')" data-i18n="home_see_all">全部</button></h3>
+            <p class="home-sub" id="home-new-sub"></p>
+            <div id="home-new-maps" class="osu-collection home-maps"></div>
+        </div>
+        <div class="home-row">
+            <div class="home-card">
+                <h3 class="home-h"><span data-i18n="home_tournaments">最新賽事</span><button type="button" class="home-more" onclick="switchTab('tournaments')" data-i18n="home_see_all">全部</button></h3>
+                <div id="home-tournaments" class="home-list"></div>
+            </div>
+            <div class="home-card">
+                <h3 class="home-h"><span data-i18n="home_news">osu! 官方新聞</span><a class="home-more" href="https://osu.ppy.sh/home/news" target="_blank" rel="noopener noreferrer" data-i18n="home_see_all">全部</a></h3>
+                <div id="home-news" class="home-list"></div>
+            </div>
+            <div class="home-card home-featured">
+                <h3 class="home-h" data-i18n="home_featured">今日推薦</h3>
+                <div class="featured-beatmap-banner" id="featured-beatmap-banner" style="display:none;"></div>
+
+            </div>
+        </div>
+        <section class="trending-row" id="trending-row" style="display:none;" aria-labelledby="trending-title">
+            <h3 id="trending-title" data-i18n="trending_title">熱門新曲</h3>
+            <div class="trending-grid" id="trending-grid"></div>
+        </section>
+        <section class="explore-row" aria-labelledby="explore-title">
+            <h3 id="explore-title" data-i18n="explore_title">探索更多</h3>
+            <div class="explore-grid">
+                <button class="explore-card" onclick="switchTab('lookup')">
+                    <span class="explore-card-icon" data-icon="trendingUp"></span>
+                    <span class="explore-card-t" data-i18n="nav_lookup">PP 查詢</span>
+                    <span class="explore-card-d" data-i18n="explore_lookup_d">查你的總 PP、每日進步曲線、和朋友比較</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('public-collections')">
+                    <span class="explore-card-icon" data-icon="globe"></span>
+                    <span class="explore-card-t" data-i18n="nav_public_collections">收藏廣場</span>
+                    <span class="explore-card-d" data-i18n="explore_gallery_d">看別人公開的收藏，一鍵匯入你的</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('catalog')">
+                    <span class="explore-card-icon" data-icon="tag"></span>
+                    <span class="explore-card-t" data-i18n="nav_catalog">曲庫分類</span>
+                    <span class="explore-card-d" data-i18n="explore_catalog_d">依歌手／語言／曲風瀏覽全 ranked 曲庫，一鍵成收藏</span>
+                </button>
+                <button class="explore-card" onclick="switchTab('tournaments')">
+                    <span class="explore-card-icon" data-icon="trophy"></span>
+                    <span class="explore-card-t" data-i18n="nav_tournaments">賽事</span>
+                    <span class="explore-card-d" data-i18n="explore_tourney_d">官方論壇 + wyBin 的社群賽事情報</span>
+                </button>
+            </div>
+        </section>
+    </section>
+
+    <section id="page-collection" class="site-page" style="display:none;">
         <div id="collection-hero-v2" class="collection-hero-v2" hidden>
             <span class="hero-cover" aria-hidden="true"></span>
             <span class="hero-cover" aria-hidden="true"></span>
@@ -257,7 +321,6 @@
             </div>
             <div class="osu-stats-panel" id="osu-stats-panel" style="display:none;"></div>
         </div>
-        <div id="collection-digest"></div>
         <!-- Visible by default: this is the empty-collection landing state a
              first-time visitor (and Lighthouse) sees, and #page-collection
              paints at FCP. updateCollectionHeroVisibility() sets .hidden on
@@ -422,39 +485,9 @@
             <div id="osu-collection" class="osu-collection"></div>
             <div id="osu-pagination" class="osu-pagination"></div>
 
-            <div class="featured-beatmap-banner" id="featured-beatmap-banner" style="display:none;"></div>
         </div>
 
-        <section class="trending-row" id="trending-row" style="display:none;" aria-labelledby="trending-title">
-            <h3 id="trending-title" data-i18n="trending_title">熱門新曲</h3>
-            <div class="trending-grid" id="trending-grid"></div>
-        </section>
 
-        <section class="explore-row" aria-labelledby="explore-title">
-            <h3 id="explore-title" data-i18n="explore_title">探索更多</h3>
-            <div class="explore-grid">
-                <button class="explore-card" onclick="switchTab('lookup')">
-                    <span class="explore-card-icon" data-icon="trendingUp"></span>
-                    <span class="explore-card-t" data-i18n="nav_lookup">PP 查詢</span>
-                    <span class="explore-card-d" data-i18n="explore_lookup_d">查你的總 PP、每日進步曲線、和朋友比較</span>
-                </button>
-                <button class="explore-card" onclick="switchTab('public-collections')">
-                    <span class="explore-card-icon" data-icon="globe"></span>
-                    <span class="explore-card-t" data-i18n="nav_public_collections">收藏廣場</span>
-                    <span class="explore-card-d" data-i18n="explore_gallery_d">看別人公開的收藏，一鍵匯入你的</span>
-                </button>
-                <button class="explore-card" onclick="switchTab('catalog')">
-                    <span class="explore-card-icon" data-icon="tag"></span>
-                    <span class="explore-card-t" data-i18n="nav_catalog">曲庫分類</span>
-                    <span class="explore-card-d" data-i18n="explore_catalog_d">依歌手／語言／曲風瀏覽全 ranked 曲庫，一鍵成收藏</span>
-                </button>
-                <button class="explore-card" onclick="switchTab('tournaments')">
-                    <span class="explore-card-icon" data-icon="trophy"></span>
-                    <span class="explore-card-t" data-i18n="nav_tournaments">賽事</span>
-                    <span class="explore-card-d" data-i18n="explore_tourney_d">官方論壇 + wyBin 的社群賽事情報</span>
-                </button>
-            </div>
-        </section>
     </section>
 
     <section id="page-public-collections" class="site-page" style="display:none;">
@@ -1244,6 +1277,24 @@
 </div>
 
 <footer class="site-footer">
+    <div class="site-social">
+        <button class="site-social-btn site-like-btn" id="site-like-btn" type="button" onclick="toggleSiteLike()" aria-pressed="false" data-icon="heart" data-i18n-title="site_like_title" title="喜歡這個網站的話，幫我按個讚吧！">
+            <span data-i18n="site_like_label">讚</span>
+            <span class="site-like-count" id="site-like-count" aria-hidden="true">–</span>
+        </button>
+        <div class="site-changelog" id="site-changelog">
+            <button class="site-social-btn site-changelog-btn" id="site-changelog-btn" type="button" onclick="toggleChangelogMenu()" aria-haspopup="true" aria-expanded="false" data-icon="sparkles" data-i18n-title="site_changelog_title" title="這次部署更新了什麼">
+                <span data-i18n="site_changelog_label">更新內容</span>
+            </button>
+            <div class="site-changelog-menu" id="site-changelog-menu"></div>
+        </div>
+        <button class="site-social-btn" type="button" onclick="switchTab('howto')" data-icon="bookOpen" data-i18n-title="site_howto_title" title="每個分頁跟按鈕的用途說明">
+            <span data-i18n="site_howto_label">使用手冊</span>
+        </button>
+        <button class="site-social-btn site-share-btn" id="site-share-btn" type="button" onclick="shareSite()" data-icon="share2" data-i18n-title="site_share_title" title="把這個網站分享給朋友">
+            <span data-i18n="site_share_label">分享</span>
+        </button>
+    </div>
     <p>osu! 歌曲收藏 · osu! is a trademark of ppy Pty Ltd</p>
     <a class="footer-support-link" href="https://ko-fi.com/hanabirn" target="_blank" rel="noopener noreferrer" data-icon="heart" data-icon-gap><span>Support</span></a>
     <a class="footer-support-link" href="/gallery.xml" target="_blank" rel="noopener noreferrer"><span>Gallery RSS</span></a>
@@ -1327,6 +1378,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/celebrate.js"></script>
 <script defer src="js/notifications.js"></script>
 <script defer src="js/feedback.js"></script>
+<script defer src="js/home.js"></script>
 <script defer src="js/main.js"></script>
 <script defer src="js/site-likes.js"></script>
 <script defer src="js/tooltip.js"></script>

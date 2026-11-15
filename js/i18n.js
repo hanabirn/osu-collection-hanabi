@@ -84,6 +84,7 @@ function applyLangDom(lang) {
         sel.setAttribute('aria-label', first.textContent.trim());
         sel.setAttribute('data-auto-aria', '');
     });
+    if (typeof refreshSectionBand === 'function') refreshSectionBand();
     document.querySelectorAll('.lang-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });

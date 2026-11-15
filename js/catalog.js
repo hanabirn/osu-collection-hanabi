@@ -729,6 +729,38 @@ function renderCatalogCompletion() {
     updateCatalogCreateBtn(facet, have, total);
 }
 
+/* One catalog card (also used by the 首頁 "新上榜" row, js/home.js). */
+function catalogCardHtml(item, collectionSet) {
+    const coverUrl = `https://assets.ppy.sh/beatmaps/${item.id}/covers/card.jpg`;
+    const inCollection = collectionSet.has(item.id);
+    const langEntry = item.language_id != null ? OSU_LANGUAGES[item.language_id] : null;
+    const langBadge = langEntry ? `<span title="${escHtml(t(langEntry.key))}">${langEntry.flag} ${escHtml(t(langEntry.key))}</span>` : '';
+    const genreBadge = item.genre_id && OSU_GENRES[item.genre_id] ? `<span>${escHtml(t(OSU_GENRES[item.genre_id]))}</span>` : '';
+    const sourceBadge = item.source ? `<span class="catalog-source-badge" title="${escHtml(item.source)}">${escHtml(item.source)}</span>` : '';
+    const stars = (item.star_min != null && item.star_max != null)
+        ? (item.star_min === item.star_max ? item.star_min.toFixed(2) : `${item.star_min.toFixed(2)}–${item.star_max.toFixed(2)}`)
+        : '';
+    return `
+    <div class="osu-card" data-set-id="${item.id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${item.id}','_blank')">
+        <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="osu-card-overlay"></div>
+        <button class="card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addCatalogToCollection(${item.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
+        <button class="osu-copy-btn" onclick="copyBeatmapId(${item.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
+        <button class="osu-download-btn" onclick="downloadBeatmapset(${item.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
+        <button class="osu-play-btn" onclick="playOsuPreview(${item.id}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
+        ${catalogStatusBadge(item.status)}
+        <div class="osu-card-info">
+            <div class="osu-card-title">${escHtml(item.title || '')}</div>
+            <div class="osu-card-artist">${escHtml(item.artist || '')}</div>
+            <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(item.creator || '') })}</div>
+            <div class="catalog-card-meta">
+                ${stars ? `<span>${stars}★ · ${item.diff_count}譜</span>` : ''}
+                ${langBadge}${genreBadge}${sourceBadge}
+            </div>
+        </div>
+    </div>`;
+}
+
 function renderCatalogList() {
     const listEl = document.getElementById('catalog-list');
     const pageEl = document.getElementById('catalog-pagination');
@@ -747,36 +779,7 @@ function renderCatalogList() {
         OSU_MODES.flatMap(m => (getOsuCollection()[m] || []).map(s => s.beatmapset_id))
     );
 
-    listEl.innerHTML = catalogItems.map(item => {
-        const coverUrl = `https://assets.ppy.sh/beatmaps/${item.id}/covers/card.jpg`;
-        const inCollection = collectionSet.has(item.id);
-        const langEntry = item.language_id != null ? OSU_LANGUAGES[item.language_id] : null;
-        const langBadge = langEntry ? `<span title="${escHtml(t(langEntry.key))}">${langEntry.flag} ${escHtml(t(langEntry.key))}</span>` : '';
-        const genreBadge = item.genre_id && OSU_GENRES[item.genre_id] ? `<span>${escHtml(t(OSU_GENRES[item.genre_id]))}</span>` : '';
-        const sourceBadge = item.source ? `<span class="catalog-source-badge" title="${escHtml(item.source)}">${escHtml(item.source)}</span>` : '';
-        const stars = (item.star_min != null && item.star_max != null)
-            ? (item.star_min === item.star_max ? item.star_min.toFixed(2) : `${item.star_min.toFixed(2)}–${item.star_max.toFixed(2)}`)
-            : '';
-        return `
-        <div class="osu-card" data-set-id="${item.id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${item.id}','_blank')">
-            <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
-            <div class="osu-card-overlay"></div>
-            <button class="card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addCatalogToCollection(${item.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>
-            <button class="osu-copy-btn" onclick="copyBeatmapId(${item.id}, event)" title="${t('mappools_copy_id')}">${icon('copy')}</button>
-            <button class="osu-download-btn" onclick="downloadBeatmapset(${item.id}, event)" title="${t('osu_download_btn_title')}">${icon('download')}</button>
-            <button class="osu-play-btn" onclick="playOsuPreview(${item.id}, event)" title="${t('mappools_preview')}">${playBtnIcon()}</button>
-            ${catalogStatusBadge(item.status)}
-            <div class="osu-card-info">
-                <div class="osu-card-title">${escHtml(item.title || '')}</div>
-                <div class="osu-card-artist">${escHtml(item.artist || '')}</div>
-                <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(item.creator || '') })}</div>
-                <div class="catalog-card-meta">
-                    ${stars ? `<span>${stars}★ · ${item.diff_count}譜</span>` : ''}
-                    ${langBadge}${genreBadge}${sourceBadge}
-                </div>
-            </div>
-        </div>`;
-    }).join('');
+    listEl.innerHTML = catalogItems.map(item => catalogCardHtml(item, collectionSet)).join('');
 
     if (!pageEl) return;
     const totalPages = Math.max(1, Math.ceil(catalogTotal / CATALOG_PAGE_SIZE));

@@ -43,7 +43,8 @@ async function headerBannerIdb(mode, op) {
 /* Paints the current banner (or none) and shows the slider/reset only
    while one is set. */
 function renderHeaderBanner() {
-    const header = document.querySelector('.site-header');
+    // The banner now lives behind the section band (index.html #section-band).
+    const header = document.getElementById('section-band');
     const layer = document.getElementById('site-header-banner');
     const pos = document.getElementById('header-banner-pos');
     const reset = document.getElementById('header-banner-reset');

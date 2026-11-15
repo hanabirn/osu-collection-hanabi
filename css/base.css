@@ -1838,3 +1838,145 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .accent-picker-menu { position: fixed; top: 12px; right: 12px; left: auto; z-index: 220; }
     .site-changelog-menu { position: fixed; top: 12px; left: 50%; max-height: calc(100dvh - 24px); z-index: 220; }
 }
+
+/* ===== Slim header + section band (redesign, after osu-web) =====
+   The header is one 60px row: brand, the five sections, then the existing
+   controls. Under it, the section band carries the section's name and
+   sub-tabs in its hue (css/theme.css section hues). Last in the file so it
+   wins over the old banner-sized header rules above. */
+.site-header {
+    min-height: 60px;
+    padding: 0 clamp(16px, 3vw, 32px);
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 20px;
+    background: var(--bg-header, var(--bg));
+    border-bottom: var(--line) solid var(--border-strong);
+}
+.site-header-top { order: 0; display: flex; align-items: center; margin: 0; }
+.site-header .site-title-block { display: flex; align-items: center; }
+.site-header .header-logo { gap: 10px; }
+.site-header .logo-icon svg { width: 30px; height: 30px; }
+.site-header .site-title-block h1 { font-size: var(--fs-18); font-weight: 700; letter-spacing: 0; white-space: nowrap; margin: 0; }
+.site-nav { order: 1; flex: 1; display: flex; align-items: stretch; gap: 2px; min-width: 0; }
+.site-nav-sec {
+    padding: 0 14px;
+    border: 0;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: var(--fs-16);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.site-nav-sec:hover { color: var(--text); box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.2); }
+.site-nav-sec.active { color: var(--text); font-weight: 700; box-shadow: inset 0 -3px 0 var(--pink); }
+.header-corner-left { position: static; order: 2; display: flex; align-items: center; gap: 8px; }
+.header-corner-actions { position: static; order: 3; flex-direction: row; align-items: center; }
+#nav-menu-btn { order: 4; align-self: center; }
+.site-header .header-ctl { width: 36px; height: 36px; }
+.site-header .osu-login-btn-large,
+.site-header .osu-logged-in-pill-large { height: 36px; }
+
+.section-band {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, hsl(var(--section-h, 318) 26% 15%), hsl(var(--section-h, 318) 16% 10%));
+    border-bottom: var(--line) solid var(--border);
+}
+.section-band-in {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    margin: 0 auto;
+    min-height: 72px;
+    padding: 10px clamp(16px, 4vw, 32px);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+}
+:root:not([data-section]) .section-band-in,
+:root[data-section="home"] .section-band-in,
+:root[data-section="collection"] .section-band-in,
+:root[data-section="catalog"] .section-band-in,
+:root[data-section="public-collections"] .section-band-in,
+:root[data-section="skin-screenshots"] .section-band-in,
+:root[data-section="lookup"] .section-band-in,
+:root[data-section="home"] .site-main { max-width: 1640px; }
+.section-band-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-22);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.section-band-title::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: hsl(var(--section-h, 318) 75% 62%);
+}
+.section-band-tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+.section-band-tab,
+.section-band-choice button {
+    padding: 7px 12px;
+    border: 0;
+    border-radius: var(--r-ctl);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: var(--fs-14);
+    cursor: pointer;
+}
+.section-band-tab:hover,
+.section-band-choice button:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.section-band-tab.active { color: var(--text); font-weight: 700; background: rgba(255, 255, 255, 0.09); }
+.section-band-extra:empty { display: none; }
+.section-band-choice { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--r-ctl); background: rgba(0, 0, 0, 0.25); }
+.section-band-choice button { padding: 5px 10px; font-size: var(--fs-13); }
+.section-band-choice button.active { color: var(--pink-text, var(--pink)); background: rgba(var(--pink-rgb), 0.16); font-weight: 700; }
+/* The visitor's banner (js/header-banner.js) shows behind 首頁 and 收藏 only. */
+.section-band .site-header-banner { display: none; }
+:root[data-site-section="home"] .section-band.has-banner .site-header-banner,
+:root[data-site-section="collection"] .section-band.has-banner .site-header-banner,
+:root:not([data-site-section]) .section-band.has-banner .site-header-banner { display: block; }
+.section-band.has-banner .site-header-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(20, 17, 20, 0.85) 0%, rgba(20, 17, 20, 0.55) 60%, rgba(20, 17, 20, 0.75) 100%);
+}
+.section-band .header-banner-tools { position: static; margin-left: auto; display: none; }
+:root[data-site-section="home"] .section-band .header-banner-tools,
+:root[data-site-section="collection"] .section-band .header-banner-tools,
+:root:not([data-site-section]) .section-band .header-banner-tools { display: flex; }
+/* The band names the page now: the old per-page eyebrow + title stay for
+   screen readers and in-page links only. */
+.site-page > .eyebrow { display: none; }
+.site-page > .osu-page-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+.site-main { padding-top: clamp(16px, 2.5vw, 24px); }
+
+/* 讚 / 更新內容 / 使用手冊 / 分享, moved down from the header. */
+.site-footer .site-social { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.site-footer .site-changelog { position: relative; }
+.site-footer .site-changelog-menu { top: auto; bottom: calc(100% + 8px); }
+
+@media (max-width: 899px) {
+    .site-nav { display: none; }
+    .site-header { flex-wrap: wrap; padding: 8px 12px; gap: 8px; }
+    .section-band-in { min-height: 0; padding: 10px 16px; }
+    .section-band-title { font-size: var(--fs-18); }
+    .section-band-tabs { width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .section-band-tabs::-webkit-scrollbar { display: none; }
+}
