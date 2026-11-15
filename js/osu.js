@@ -4735,13 +4735,18 @@ function switchLookupMode(mode, btn) {
     const toCompare = mode === 'compare';
     single.hidden = toCompare;
     compare.hidden = !toCompare;
+    // The inputs for each mode live in the sidebar (layout X+Y), apart from
+    // the results they fill, so swap those too.
+    document.querySelectorAll('[data-lookup-pane]').forEach((pane) => {
+        pane.hidden = pane.dataset.lookupPane !== (toCompare ? 'compare' : 'single');
+    });
     const btns = btn && btn.parentElement ? btn.parentElement.querySelectorAll('.lookup-mode-btn') : [];
     btns.forEach(b => {
         const on = b === btn;
         b.classList.toggle('active', on);
         b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    const focus = (toCompare ? compare : single).querySelector('input');
+    const focus = document.querySelector(`[data-lookup-pane="${toCompare ? 'compare' : 'single'}"] input`);
     if (focus) focus.focus();
 }
 
@@ -5242,6 +5247,8 @@ async function loadVisitorProfileById(input, isUsername) {
 
         status.innerText = '';
         document.getElementById('visitor-avatar').src = osuAvatarUrl(u.user_id);
+        // The banner's backdrop is the same avatar, blurred (css/osu.css .lookup-banner-top).
+        document.getElementById('visitor-lookup-banner')?.style.setProperty('--banner-img', `url("${osuAvatarUrl(u.user_id)}")`);
         document.getElementById('visitor-result-name').textContent = u.username;
         document.getElementById('visitor-result-country').textContent = COUNTRY_NAMES[u.country] || u.country;
         const flagEl = document.getElementById('visitor-flag');

@@ -3466,6 +3466,144 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* ===== Visitor Lookup ===== */
 /* 個人查詢 and 雙人對比 are two modes of one card now (switchLookupMode),
    toggled by .lookup-mode-toggle — was two competing side-by-side cards. */
+/* ===== PP 查詢: layout X+Y (index.html #page-lookup) =====
+   A full-width banner for the player (blurred-avatar backdrop, name,
+   actions, total and per-mode PP), then a sidebar that stays on screen
+   beside the chart and score lists. */
+.lookup-banner {
+    display: none;
+    margin-bottom: 16px;
+    border-radius: var(--r-card);
+    border: var(--line) solid var(--border);
+    background: var(--bg-card);
+    overflow: hidden;
+}
+/* Shown exactly when a single-player result is: the existing JS sets the
+   result's inline display, so no new JS has to track the banner. */
+#page-lookup:has(#visitor-lookup-result[style*="block"]):not(:has(#lookup-mode-single[hidden])) .lookup-banner { display: block; }
+.lookup-banner-top {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 44px 24px 18px;
+}
+.lookup-banner-top::before {
+    content: '';
+    position: absolute;
+    inset: -40px;
+    z-index: -2;
+    background: var(--banner-img, none) center / cover no-repeat;
+    filter: blur(30px) saturate(1.2);
+    opacity: 0.6;
+}
+.lookup-banner-top::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.55) 100%);
+}
+.lookup-banner .visitor-result-header { justify-content: flex-start; gap: 16px; margin: 0; }
+.lookup-banner .visitor-result-header > div:nth-child(2) { flex: 1; min-width: 0; }
+.lookup-banner #visitor-avatar { width: 88px; height: 88px; border-radius: 20px; object-fit: cover; }
+.lookup-banner .visitor-result-name { font-family: var(--font-display); font-size: var(--fs-28); line-height: 1.15; }
+.lookup-banner .visitor-result-country { color: rgba(244, 242, 247, 0.75); }
+.lookup-banner .stats-card-btn { display: inline-flex; align-items: center; width: auto; margin: 0; padding: 7px 14px; font-size: var(--fs-13); }
+.lookup-banner-stats { display: flex; align-items: stretch; gap: 12px; padding: 14px 24px; }
+.lookup-banner .osu-total-pp {
+    flex: 0 0 200px;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    font-size: var(--fs-12);
+}
+.lookup-banner .osu-total-pp-value { font-family: var(--font-display); font-size: var(--fs-28); line-height: 1.1; }
+.lookup-banner .visitor-modes-grid { flex: 1; min-width: 0; margin: 0; gap: 8px; }
+.lookup-banner .visitor-mode-mini { text-align: left; padding: 8px 12px; border-radius: var(--r-ctl); }
+.lookup-banner .visitor-mode-pp { font-size: var(--fs-18); color: var(--text); }
+
+.lookup-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+.lookup-side {
+    position: sticky;
+    top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.lookup-main { min-width: 0; }
+#page-lookup .visitor-lookup-card {
+    max-width: none;
+    margin: 0;
+    padding: 16px;
+    text-align: left;
+    border-radius: var(--r-card);
+    background: var(--bg-card);
+    border-color: var(--border);
+}
+#page-lookup .visitor-lookup-card h3 { font-size: var(--fs-14); margin-bottom: 10px; }
+.lookup-side .lookup-mode-toggle { display: flex; margin-bottom: 10px; }
+.lookup-side .lookup-mode-btn { flex: 1; }
+.lookup-side .pp-compare-input-row .btn { flex: 1 1 100%; }
+/* Tracked players: a list in the sidebar instead of a row of pills. */
+.lookup-side .tracked-players-panel {
+    padding: 12px;
+    border-radius: var(--r-card);
+    border: var(--line) solid var(--border);
+    background: var(--bg-card);
+}
+.lookup-side .tracked-players-list { flex-direction: column; flex-wrap: nowrap; gap: 4px; margin: 0; }
+.lookup-side .tracked-player-card { border-radius: var(--r-ctl); background: transparent; border-color: transparent; }
+.lookup-side .tracked-player-card:hover { background: rgba(255, 255, 255, 0.05); border-color: transparent; }
+.lookup-side .tracked-player-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lookup-side .tracked-players-empty { margin: 0; text-align: left; }
+.lookup-main #visitor-recent-mode-tabs { justify-content: flex-start; }
+/* Score tabs as osu-web profile tabs: text with an underline on the current one. */
+.lookup-main .osu-plays-type-tabs {
+    justify-content: flex-start;
+    gap: 4px;
+    margin-bottom: 12px;
+    border-bottom: var(--line-divider) solid var(--border);
+}
+.lookup-main .osu-plays-type-tabs .osu-tab {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-dim);
+    font-size: var(--fs-14);
+}
+.lookup-main .osu-plays-type-tabs .osu-tab:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+.lookup-main .osu-plays-type-tabs .osu-tab.active {
+    color: var(--text);
+    font-weight: 700;
+    background: transparent;
+    box-shadow: inset 0 -3px 0 var(--pink);
+}
+.lookup-main .pp-history-panel { margin-top: 0; }
+@media (max-width: 900px) {
+    .lookup-layout { grid-template-columns: minmax(0, 1fr); }
+    .lookup-side { position: static; }
+    .lookup-banner-top { padding: 28px 16px 14px; }
+    .lookup-banner .visitor-result-header { flex-wrap: wrap; }
+    .lookup-banner #visitor-avatar { width: 64px; height: 64px; }
+    /* name beside the avatar takes the rest of the line, so the buttons wrap below it */
+    .lookup-banner .visitor-result-header > div:nth-child(2) { flex: 1 1 calc(100% - 96px); }
+    .lookup-banner .visitor-result-name { font-size: var(--fs-22); overflow-wrap: anywhere; }
+    .lookup-banner-stats { flex-direction: column; padding: 12px 16px; }
+    .lookup-banner .osu-total-pp { flex-basis: auto; }
+}
+
 .visitor-lookup-card {
     position: relative;
     max-width: 600px;

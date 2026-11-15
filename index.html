@@ -623,41 +623,17 @@
     <section id="page-lookup" class="site-page" style="display:none;">
         <p class="eyebrow">PROFILE</p>
         <h2 class="osu-page-title" data-i18n="nav_lookup">PP 查詢</h2>
-        <div id="tracked-players-panel" class="tracked-players-panel"></div>
-        <div class="visitor-lookup-card" id="visitor-lookup-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="visitor_lookup_title">查詢你的 osu! PP</h3>
-            <div class="lookup-mode-toggle" role="tablist">
-                <button class="lookup-mode-btn active" type="button" role="tab" aria-selected="true" onclick="switchLookupMode('single', this)" data-i18n="lookup_mode_single">個人查詢</button>
-                <button class="lookup-mode-btn" type="button" role="tab" aria-selected="false" onclick="switchLookupMode('compare', this)" data-i18n="lookup_mode_compare">雙人對比</button>
-            </div>
-            <div id="lookup-mode-single">
-            <div class="visitor-lookup-input-row">
-                <input type="text" id="visitor-lookup-input" autocomplete="off" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input" oninput="onVisitorLookupInputChange()" onkeydown="if(event.key==='Enter')lookupVisitorProfile()">
-                <button class="btn" onclick="lookupVisitorProfile()" data-i18n="visitor_lookup_btn">查詢</button>
-            </div>
-            <div id="visitor-lookup-status" class="status"></div>
-            <div id="visitor-lookup-skeleton" style="display:none;">
-                <div class="visitor-skeleton-header">
-                    <div class="skeleton skeleton-circle" style="width:48px;height:48px;"></div>
-                    <div class="visitor-skeleton-lines">
-                        <div class="skeleton skeleton-line" style="width:45%;"></div>
-                        <div class="skeleton skeleton-line" style="width:25%;height:10px;"></div>
-                    </div>
-                </div>
-                <div class="visitor-skeleton-modes">
-                    <div class="skeleton"></div>
-                    <div class="skeleton"></div>
-                    <div class="skeleton"></div>
-                    <div class="skeleton"></div>
-                </div>
-                <div class="skeleton" style="height:32px;"></div>
-            </div>
-            <div id="visitor-lookup-result" style="display:none;">
+
+        <!-- Layout X+Y (after osu-web's profile page): the player's banner and
+             PP numbers across the full width, then a sidebar that stays on
+             screen (search + tracked players) beside the chart and scores.
+             The banner shows exactly when #visitor-lookup-result does (CSS
+             :has, see css/osu.css), so the JS that shows results is unchanged. -->
+        <div class="lookup-banner" id="visitor-lookup-banner">
+            <div class="lookup-banner-top">
                 <div class="visitor-result-header">
                     <div class="avatar-with-flag">
-                        <img id="visitor-avatar" class="osu-avatar" alt="avatar" style="width:48px;height:48px;" onerror="this.style.display='none';">
+                        <img id="visitor-avatar" class="osu-avatar" alt="avatar" onerror="this.style.display='none';">
                         <img id="visitor-flag" class="avatar-flag-badge" alt="" style="display:none;" onerror="this.style.display='none';">
                     </div>
                     <div>
@@ -665,78 +641,124 @@
                         <div class="visitor-result-country" id="visitor-result-country"></div>
                     </div>
                     <button class="btn visitor-track-btn" id="visitor-track-btn" onclick="toggleTrackVisitorPlayer()" style="display:none;">+ 追蹤</button>
+                    <button class="btn stats-card-btn" onclick="downloadVisitorStatsCard()" data-icon="camera" data-icon-gap><span data-i18n="stats_card_btn">產生戰績卡</span></button>
                 </div>
-                <div class="visitor-modes-grid" id="visitor-modes-grid"></div>
+            </div>
+            <div class="lookup-banner-stats">
                 <div class="osu-total-pp" id="visitor-total-pp">
                     <span data-i18n="osu_total_pp">全模式 PP</span>
                     <span class="osu-total-pp-value" id="visitor-total-pp-value">—</span>
                 </div>
-                <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
-                <div class="osu-mode-tabs" id="visitor-recent-mode-tabs">
-                    <button class="osu-mode-tab active" data-mode="0" onclick="switchVisitorRecentMode(0,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
-                    <button class="osu-mode-tab" data-mode="1" onclick="switchVisitorRecentMode(1,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
-                    <button class="osu-mode-tab" data-mode="2" onclick="switchVisitorRecentMode(2,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
-                    <button class="osu-mode-tab" data-mode="3" onclick="switchVisitorRecentMode(3,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
-                </div>
-                <button class="btn stats-card-btn" onclick="downloadVisitorStatsCard()" data-icon="camera" data-icon-gap><span data-i18n="stats_card_btn">產生戰績卡</span></button>
-                <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
-                    <div class="osu-mode-tabs osu-plays-type-tabs">
-                        <button class="osu-tab active" onclick="switchVisitorPlaysType('recent', this)" data-icon="gamepad2" data-icon-gap><span data-i18n="osu_recent_title">最近遊玩</span></button>
-                        <button class="osu-tab" onclick="switchVisitorPlaysType('best', this)" data-icon="trophy" data-icon-gap><span data-i18n="osu_top_title">最佳成績</span></button>
-                        <button class="osu-tab" onclick="switchVisitorPlaysType('goal', this)" data-icon="target" data-icon-gap><span data-i18n="pp_goal_tab">PP 目標</span></button>
-                        <button class="osu-tab" onclick="switchVisitorPlaysType('medals', this)" data-icon="award" data-icon-gap><span data-i18n="nav_medals">獎章</span></button>
-                        <button class="osu-tab" onclick="switchVisitorPlaysType('gradehistory', this)" data-icon="star" data-icon-gap><span data-i18n="grade_history_tab">成績歷史</span></button>
-                    </div>
-                    <div class="osu-recent-list" id="visitor-recent-list"></div>
-                    <div id="pp-goal-planner" class="pp-goal-planner" style="display:none;"></div>
-                    <div id="medals-gallery" class="medals-gallery" style="display:none;"></div>
-                    <div id="grade-history-panel" class="grade-history-panel" style="display:none;"></div>
-                </div>
+                <div class="visitor-modes-grid" id="visitor-modes-grid"></div>
             </div>
-            </div><!-- /#lookup-mode-single -->
+        </div>
 
-            <div id="lookup-mode-compare" hidden>
-            <div class="pp-compare-input-row">
-                <input type="text" id="pp-compare-input-a" autocomplete="off" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
-                <input type="text" id="pp-compare-input-b" autocomplete="off" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
-                <button class="btn" onclick="comparePlayers()" data-i18n="pp_compare_btn">比較</button>
+        <div class="lookup-layout">
+            <aside class="lookup-side">
+                <div class="visitor-lookup-card" id="visitor-lookup-card">
+                    <h3 data-i18n="visitor_lookup_title">查詢你的 osu! PP</h3>
+                    <div class="lookup-mode-toggle" role="tablist">
+                        <button class="lookup-mode-btn active" type="button" role="tab" aria-selected="true" onclick="switchLookupMode('single', this)" data-i18n="lookup_mode_single">個人查詢</button>
+                        <button class="lookup-mode-btn" type="button" role="tab" aria-selected="false" onclick="switchLookupMode('compare', this)" data-i18n="lookup_mode_compare">雙人對比</button>
+                    </div>
+                    <div data-lookup-pane="single">
+                        <div class="visitor-lookup-input-row">
+                            <input type="text" id="visitor-lookup-input" autocomplete="off" data-i18n-placeholder="visitor_lookup_placeholder" placeholder="輸入 osu! 用戶名或 ID" class="guestbook-input" oninput="onVisitorLookupInputChange()" onkeydown="if(event.key==='Enter')lookupVisitorProfile()">
+                            <button class="btn" onclick="lookupVisitorProfile()" data-i18n="visitor_lookup_btn">查詢</button>
+                        </div>
+                        <div id="visitor-lookup-status" class="status"></div>
+                    </div>
+                    <div data-lookup-pane="compare" hidden>
+                        <div class="pp-compare-input-row">
+                            <input type="text" id="pp-compare-input-a" autocomplete="off" data-i18n-placeholder="pp_compare_placeholder_a" placeholder="玩家 A：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
+                            <input type="text" id="pp-compare-input-b" autocomplete="off" data-i18n-placeholder="pp_compare_placeholder_b" placeholder="玩家 B：用戶名或 ID" class="guestbook-input" oninput="onPpCompareInputChange()" onkeydown="if(event.key==='Enter')comparePlayers()">
+                            <button class="btn" onclick="comparePlayers()" data-i18n="pp_compare_btn">比較</button>
+                        </div>
+                        <div id="pp-compare-status" class="status"></div>
+                    </div>
+                </div>
+                <div id="tracked-players-panel" class="tracked-players-panel"></div>
+            </aside>
+
+            <div class="lookup-main">
+                <div id="lookup-mode-single">
+                    <div id="visitor-lookup-skeleton" style="display:none;">
+                        <div class="visitor-skeleton-header">
+                            <div class="skeleton skeleton-circle" style="width:48px;height:48px;"></div>
+                            <div class="visitor-skeleton-lines">
+                                <div class="skeleton skeleton-line" style="width:45%;"></div>
+                                <div class="skeleton skeleton-line" style="width:25%;height:10px;"></div>
+                            </div>
+                        </div>
+                        <div class="visitor-skeleton-modes">
+                            <div class="skeleton"></div>
+                            <div class="skeleton"></div>
+                            <div class="skeleton"></div>
+                            <div class="skeleton"></div>
+                        </div>
+                        <div class="skeleton" style="height:32px;"></div>
+                    </div>
+                    <div id="visitor-lookup-result" style="display:none;">
+                        <div class="osu-mode-tabs" id="visitor-recent-mode-tabs">
+                            <button class="osu-mode-tab active" data-mode="0" onclick="switchVisitorRecentMode(0,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+                            <button class="osu-mode-tab" data-mode="1" onclick="switchVisitorRecentMode(1,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+                            <button class="osu-mode-tab" data-mode="2" onclick="switchVisitorRecentMode(2,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+                            <button class="osu-mode-tab" data-mode="3" onclick="switchVisitorRecentMode(3,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+                        </div>
+                        <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
+                        <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
+                            <div class="osu-mode-tabs osu-plays-type-tabs">
+                                <button class="osu-tab active" onclick="switchVisitorPlaysType('recent', this)" data-icon="gamepad2" data-icon-gap><span data-i18n="osu_recent_title">最近遊玩</span></button>
+                                <button class="osu-tab" onclick="switchVisitorPlaysType('best', this)" data-icon="trophy" data-icon-gap><span data-i18n="osu_top_title">最佳成績</span></button>
+                                <button class="osu-tab" onclick="switchVisitorPlaysType('goal', this)" data-icon="target" data-icon-gap><span data-i18n="pp_goal_tab">PP 目標</span></button>
+                                <button class="osu-tab" onclick="switchVisitorPlaysType('medals', this)" data-icon="award" data-icon-gap><span data-i18n="nav_medals">獎章</span></button>
+                                <button class="osu-tab" onclick="switchVisitorPlaysType('gradehistory', this)" data-icon="star" data-icon-gap><span data-i18n="grade_history_tab">成績歷史</span></button>
+                            </div>
+                            <div class="osu-recent-list" id="visitor-recent-list"></div>
+                            <div id="pp-goal-planner" class="pp-goal-planner" style="display:none;"></div>
+                            <div id="medals-gallery" class="medals-gallery" style="display:none;"></div>
+                            <div id="grade-history-panel" class="grade-history-panel" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div><!-- /#lookup-mode-single -->
+
+                <div id="lookup-mode-compare" hidden>
+                    <div id="pp-compare-skeleton" class="pp-compare-skeleton" style="display:none;">
+                        <div class="pp-compare-skeleton-side">
+                            <div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div>
+                            <div class="skeleton skeleton-line" style="width:80%;"></div>
+                            <div class="skeleton skeleton-line" style="width:55%;height:10px;"></div>
+                        </div>
+                        <div class="pp-compare-vs">VS</div>
+                        <div class="pp-compare-skeleton-side">
+                            <div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div>
+                            <div class="skeleton skeleton-line" style="width:80%;"></div>
+                            <div class="skeleton skeleton-line" style="width:55%;height:10px;"></div>
+                        </div>
+                    </div>
+                    <div id="pp-compare-result" style="display:none;">
+                        <div class="pp-compare-summary">
+                            <div class="pp-compare-side pp-compare-side-a" id="pp-compare-side-a"></div>
+                            <div class="pp-compare-vs">VS</div>
+                            <div class="pp-compare-side pp-compare-side-b" id="pp-compare-side-b"></div>
+                        </div>
+                        <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
+                    </div>
+                    <div id="pp-compare-topplays" style="display:none;">
+                        <h4 class="pp-compare-topplays-title" data-i18n="pp_compare_topplays_title">Top Play 對比</h4>
+                        <div class="osu-mode-tabs" id="pp-compare-topplays-tabs">
+                            <button class="osu-mode-tab active" data-mode="standard" onclick="switchPpCompareTopPlaysMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
+                            <button class="osu-mode-tab" data-mode="taiko" onclick="switchPpCompareTopPlaysMode('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
+                            <button class="osu-mode-tab" data-mode="catch" onclick="switchPpCompareTopPlaysMode('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
+                            <button class="osu-mode-tab" data-mode="mania" onclick="switchPpCompareTopPlaysMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
+                        </div>
+                        <div class="pp-compare-topplays-columns">
+                            <div class="osu-recent-list pp-compare-topplays-col" id="pp-compare-topplays-a"></div>
+                            <div class="osu-recent-list pp-compare-topplays-col" id="pp-compare-topplays-b"></div>
+                        </div>
+                    </div>
+                </div><!-- /#lookup-mode-compare -->
             </div>
-            <div id="pp-compare-status" class="status"></div>
-            <div id="pp-compare-skeleton" class="pp-compare-skeleton" style="display:none;">
-                <div class="pp-compare-skeleton-side">
-                    <div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div>
-                    <div class="skeleton skeleton-line" style="width:80%;"></div>
-                    <div class="skeleton skeleton-line" style="width:55%;height:10px;"></div>
-                </div>
-                <div class="pp-compare-vs">VS</div>
-                <div class="pp-compare-skeleton-side">
-                    <div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div>
-                    <div class="skeleton skeleton-line" style="width:80%;"></div>
-                    <div class="skeleton skeleton-line" style="width:55%;height:10px;"></div>
-                </div>
-            </div>
-            <div id="pp-compare-result" style="display:none;">
-                <div class="pp-compare-summary">
-                    <div class="pp-compare-side pp-compare-side-a" id="pp-compare-side-a"></div>
-                    <div class="pp-compare-vs">VS</div>
-                    <div class="pp-compare-side pp-compare-side-b" id="pp-compare-side-b"></div>
-                </div>
-                <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
-            </div>
-            <div id="pp-compare-topplays" style="display:none;">
-                <h4 class="pp-compare-topplays-title" data-i18n="pp_compare_topplays_title">Top Play 對比</h4>
-                <div class="osu-mode-tabs" id="pp-compare-topplays-tabs">
-                    <button class="osu-mode-tab active" data-mode="standard" onclick="switchPpCompareTopPlaysMode('standard', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="22" fill="currentColor" stroke="none"/></svg> Standard</button>
-                    <button class="osu-mode-tab" data-mode="taiko" onclick="switchPpCompareTopPlaysMode('taiko', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="29"/><line x1="50" y1="21" x2="50" y2="79"/></svg> Taiko</button>
-                    <button class="osu-mode-tab" data-mode="catch" onclick="switchPpCompareTopPlaysMode('catch', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
-                    <button class="osu-mode-tab" data-mode="mania" onclick="switchPpCompareTopPlaysMode('mania', this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
-                </div>
-                <div class="pp-compare-topplays-columns">
-                    <div class="osu-recent-list pp-compare-topplays-col" id="pp-compare-topplays-a"></div>
-                    <div class="osu-recent-list pp-compare-topplays-col" id="pp-compare-topplays-b"></div>
-                </div>
-            </div>
-            </div><!-- /#lookup-mode-compare -->
         </div>
     </section>
 
