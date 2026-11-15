@@ -110,7 +110,9 @@ function renderSectionBand(tab) {
 /* The bot's invite link (Discord Developer Portal > the app > OAuth2 >
    URL Generator, scope bot + applications.commands). Empty: the button stays
    hidden rather than pointing somewhere wrong. */
-const DISCORD_BOT_INVITE_URL = '';
+// View Channels + Send Messages + Embed Links + Read Message History (1024+2048+16384+65536);
+// /collect-channel reads history, /follow and the gallery post embeds.
+const DISCORD_BOT_INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1546350631881801758&permissions=84992&scope=bot+applications.commands';
 function setupDiscordInvite() {
     const a = document.getElementById('discord-invite-btn');
     if (!a || !DISCORD_BOT_INVITE_URL.startsWith('https://discord.com/')) return;
