@@ -77,6 +77,8 @@
     // 成績卡截圖（worker/score-card-png.js）呼叫 Cloudflare Browser Rendering
     // 的 REST API 要用的帳號 ID。帳號 ID 不是機密；API 金鑰另外用
     // `wrangler secret put CF_BROWSER_TOKEN` 設成機密，不寫在這裡。
+    // keep_vars: deploy must not drop plain variables set in the dashboard.
+    "keep_vars": true,
     "vars": {
         "CF_ACCOUNT_ID": "235a361b807ea77d2acd6c642d1688e6",
     },
