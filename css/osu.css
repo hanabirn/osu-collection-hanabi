@@ -5959,6 +5959,10 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 @media (max-width: 600px) {
     .home-hero { flex-wrap: wrap; padding: 16px; }
+    /* avatar and text on one line, the button on its own full-width line */
+    .home-hero-avatar { width: 52px; height: 52px; border-radius: 14px; }
+    .home-hero-text { flex: 1 1 0; }
+    .home-hero .btn { flex: 1 1 100%; text-align: center; justify-content: center; }
     .home-summary { font-size: var(--fs-20); }
 }
 

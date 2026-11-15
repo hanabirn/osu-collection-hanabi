@@ -1994,3 +1994,54 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .site-header .osu-login-btn-large { height: 32px; padding: 0 10px; font-size: var(--fs-12); }
     .site-header .lang-globe-btn { padding: 0 6px; }
 }
+
+/* ===== Header polish =====
+   One page width shared by header, band and content (--page-max), so the
+   logo lines up with the band title and the page below on every page: the
+   card-grid pages are 1640px, the reading pages 1120px. */
+:root { --page-max: 1120px; --page-pad: clamp(16px, 4vw, 32px); }
+:root:not([data-section]),
+:root[data-section="home"], :root[data-section="collection"], :root[data-section="catalog"],
+:root[data-section="public-collections"], :root[data-section="skin-screenshots"],
+:root[data-section="lookup"], :root[data-section="chat"] { --page-max: 1640px; }
+.site-header { padding-inline: max(var(--page-pad), calc((100% - var(--page-max)) / 2 + var(--page-pad))); }
+.section-band-in { max-width: var(--page-max); padding-inline: var(--page-pad); }
+/* Brand: a 40px mark, centred in the 60px bar, beside a larger wordmark. */
+.site-header-top { align-self: center; }
+.site-header .header-logo { gap: 12px; align-items: center; }
+.site-header .logo-icon svg { width: 40px; height: 40px; }
+.site-header .site-title-block h1 { font-size: var(--fs-20); font-weight: 800; line-height: 1; }
+.site-nav { margin-left: 12px; }
+/* Section links: a rounded ring inside the bar for keyboard focus, not a tall box. */
+.site-nav-sec:focus-visible { outline: 2px solid var(--pink); outline-offset: -10px; border-radius: 12px; }
+/* The language button holds a globe and a flag: let it size to them. */
+.site-header .lang-globe-btn { width: auto; min-width: 36px; padding: 0 10px; gap: 6px; display: inline-flex; align-items: center; }
+.header-corner-left:empty { display: none; }
+@media (max-width: 600px) {
+    .site-header { padding-inline: 10px; }
+    .site-header .logo-icon svg { width: 34px; height: 34px; }
+    .site-nav { margin-left: 0; }
+}
+/* The mark as a filled disc (like osu!'s own) so it reads at a glance,
+   not a thin ring with small type. */
+.site-header .logo-icon svg { width: 44px; height: 44px; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--pink) 45%, transparent)); }
+.site-header .logo-icon circle { fill: var(--pink); stroke: #fff; stroke-width: 5; }
+.site-header .logo-icon text { fill: #fff; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+@media (max-width: 600px) { .site-header .logo-icon svg { width: 36px; height: 36px; } }
+/* Phone: the language button shows only its flag, so the menu button keeps its place. */
+@media (max-width: 600px) {
+    .site-header .lang-globe-btn { min-width: 32px; padding: 0 6px; gap: 0; }
+    .site-header .lang-globe-btn > .icon-svg { display: none; }
+}
+/* Mid widths: the wordmark gives way before the section links do, and
+   without the links (under 900px) the header still stays one row. */
+@media (max-width: 1199px) {
+    .site-header .site-title-block h1 {
+        position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+    .site-nav-sec { padding: 0 12px; }
+}
+@media (max-width: 899px) {
+    .site-header { flex-wrap: nowrap; align-items: center; }
+    .site-header-top { order: -1; margin: 0 auto 0 0; }
+}
