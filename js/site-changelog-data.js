@@ -44,6 +44,17 @@ const SITE_CHANGELOG = [
                 de: "Ein Klick auf eine Map im Katalog öffnet rechts die Details: Schwierigkeiten, BPM und Länge, mit Vorschau, Hinzufügen und Download",
             },
             {
+                zh: "曲庫的譜面詳情可以點選難度，下方會顯示該難度的 PP 試算（95%～100%）和全球前 50 名排行榜",
+                'zh-Hans': "曲库的谱面详情可以点选难度，下方会显示该难度的 PP 试算（95%～100%）和全球前 50 名排行榜",
+                en: "In the catalog’s map details, pick a difficulty to see its PP at 95–100% accuracy and the global top 50",
+                ja: "カタログの譜面詳細で難易度を選ぶと、95〜100% の PP 試算と世界トップ 50 が表示されます",
+                ko: "카탈로그 맵 상세에서 난이도를 고르면 95~100% PP 계산과 글로벌 상위 50위가 표시됩니다",
+                ru: "В подробностях карты в каталоге выберите сложность — увидите PP при точности 95–100% и мировой топ-50",
+                fr: "Dans les détails d’une map du catalogue, choisis une difficulté pour voir ses PP de 95 à 100 % et le top 50 mondial",
+                es: "En los detalles de un mapa del catálogo, elige una dificultad para ver sus PP del 95 al 100 % y el top 50 mundial",
+                de: "In den Map-Details im Katalog eine Schwierigkeit wählen, um PP bei 95–100 % und die globalen Top 50 zu sehen",
+            },
+            {
                 zh: "PP 查詢新增「依實力推薦」：根據最佳成績的難度，推薦還沒收藏的新圖",
                 'zh-Hans': "PP 查询新增「依实力推荐」：根据最佳成绩的难度，推荐还没收藏的新图",
                 en: "PP lookup adds “Picks for your level”: new maps in the star range of your best scores that you haven’t collected yet",

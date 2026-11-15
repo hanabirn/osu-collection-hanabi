@@ -99,7 +99,10 @@ exports.handler = async (event) => {
                 params.set('type', qs.scoreUserType === 'string' ? 'string' : 'id');
             }
             if (qs.m !== undefined) params.set('m', qs.m);
-            params.set('limit', '1');
+            // One player's score, or (no scoreUser) the map's leaderboard top
+            // N for the beatmap details drawer — capped at 50.
+            const lbLimit = Math.min(50, Math.max(1, parseInt(qs.limit, 10) || 1));
+            params.set('limit', qs.scoreUser ? '1' : String(lbLimit));
             const res = await apiFetch(`https://osu.ppy.sh/api/get_scores?${params.toString()}`, 'get_scores');
             const data = await readApiJson(res, 'get_scores');
             return { statusCode: 200, headers, body: JSON.stringify(data) };

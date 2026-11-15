@@ -6108,13 +6108,24 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .beatmap-drawer-stats { display: flex; gap: 18px; font-size: var(--fs-13); color: var(--text-dim); }
 .beatmap-drawer-stats b { color: var(--text); font-size: var(--fs-16); }
 .beatmap-drawer-diffs { list-style: none; padding: 0; margin-top: 0; margin-bottom: 0; }
-.beatmap-drawer-diffs li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: var(--line) solid var(--border); font-size: var(--fs-14); }
+.beatmap-drawer-diffs li { display: flex; align-items: center; gap: 4px; border-bottom: var(--line) solid var(--border); font-size: var(--fs-14); }
 .beatmap-drawer-diffs li:last-child { border-bottom: 0; }
 .beatmap-drawer-dot { display: inline-flex; width: 16px; justify-content: center; }
 .beatmap-drawer-dot i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .beatmap-drawer-dot svg { width: 16px; height: 16px; }
-.beatmap-drawer-diff { flex: 1; min-width: 0; color: var(--text); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.beatmap-drawer-diff:hover { color: var(--pink-text, var(--pink)); }
+/* Each difficulty is a button that picks it for PP 試算 and the leaderboard
+   below; the small arrow beside it opens that difficulty on osu!. */
+.beatmap-drawer-diff {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+    padding: 8px 8px; margin: 2px 0; border: 0; border-radius: var(--r-ctl);
+    background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+.beatmap-drawer-diff:hover { background: rgba(255, 255, 255, 0.05); }
+.beatmap-drawer-diff[aria-pressed="true"] { background: rgba(var(--pink-rgb), 0.14); box-shadow: inset 3px 0 0 var(--pink); }
+.beatmap-drawer-diff-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beatmap-drawer-diff-link { flex: none; display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: var(--r-ctl); color: var(--text-dim); }
+.beatmap-drawer-diff-link:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
 .beatmap-drawer-sr { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .beatmap-drawer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .beatmap-drawer-actions .btn { display: inline-flex; justify-content: center; align-items: center; text-decoration: none; }
@@ -6124,3 +6135,30 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    label (Russian) the button row moves under the pane title instead. */
 .bbcode-pane-head { flex-wrap: wrap; row-gap: 6px; }
 .bbcode-pane-actions .bbcode-action-btn { white-space: nowrap; }
+
+/* PP 試算 and 全球排行榜 for the picked difficulty. */
+.beatmap-drawer-section { margin: 4px 16px 0; }
+.beatmap-drawer-h { margin: 0 0 8px; font-size: var(--fs-14); font-weight: 700; color: var(--text); }
+.beatmap-drawer-h small { margin-left: 6px; font-size: var(--fs-12); font-weight: 400; color: var(--text-dim); }
+.beatmap-drawer-pp { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.beatmap-drawer-pp-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border-radius: var(--r-ctl); background: var(--bg-input); }
+.beatmap-drawer-pp-cell span { font-size: var(--fs-12); color: var(--text-dim); }
+.beatmap-drawer-pp-cell b { font-size: var(--fs-14); font-variant-numeric: tabular-nums; }
+.beatmap-drawer-pp-cell:last-child b { color: var(--pink-text, var(--pink)); }
+.beatmap-drawer-lb { list-style: none; margin: 0; padding: 0; }
+.beatmap-drawer-lb-row { display: grid; grid-template-columns: 34px 28px minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 6px 0; border-bottom: var(--line) solid var(--border); }
+.beatmap-drawer-lb-row:last-child { border-bottom: 0; }
+.beatmap-drawer-lb-row.is-extra { display: none; }
+.beatmap-drawer-lb.show-all .beatmap-drawer-lb-row.is-extra { display: grid; }
+.beatmap-drawer-lb-rank { font-size: var(--fs-12); color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.beatmap-drawer-lb-row:nth-child(-n+3) .beatmap-drawer-lb-rank { color: var(--pink-text, var(--pink)); font-weight: 700; }
+.beatmap-drawer-lb-avatar { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: var(--bg-input); }
+.beatmap-drawer-lb-who { min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.beatmap-drawer-lb-who a { color: var(--text); font-size: var(--fs-13); font-weight: 600; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beatmap-drawer-lb-who a:hover { color: var(--pink-text, var(--pink)); }
+.beatmap-drawer-lb-who small { font-size: var(--fs-12); color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beatmap-drawer-lb-grade.osu-recent-rank { position: static; min-width: 30px; padding: 2px 6px; font-size: var(--fs-12); text-align: center; }
+.beatmap-drawer-lb-pp { min-width: 52px; text-align: right; font-size: var(--fs-13); font-weight: 700; font-variant-numeric: tabular-nums; }
+.beatmap-drawer-lb-note { padding: 8px 0; color: var(--text-dim); font-size: var(--fs-13); }
+.beatmap-drawer-lb-more { width: 100%; margin-top: 8px; justify-content: center; }
+.beatmap-drawer-lb-more[hidden] { display: none; }
