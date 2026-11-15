@@ -6354,7 +6354,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     background: color-mix(in srgb, var(--c) 16%, transparent);
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent);
 }
-.sc-stat-icon { width: 20px; height: 20px; }
+.sc-stat-icon { width: 20px; height: 20px; object-fit: contain; }
 .sc-stat-main { min-width: 0; }
 .sc-stat-top { display: flex; align-items: baseline; gap: 6px; }
 .sc-stat-label { font-size: 11px; font-weight: 800; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.6); }
@@ -6413,14 +6413,19 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 
 /* mods: hexagons by category, plus a FULL COMBO tag */
 .sc-mods { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; min-height: 34px; margin-bottom: 12px; }
-.sc-mod { --c: #8c66ff; position: relative; width: 58px; height: 40px; display: inline-flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); }
+/* osu!lazer's mod type colours (OsuColour.ForModType); the glyph is the
+   official white PNG drawn dark on top. */
+.sc-mod { --c: #8c66ff; position: relative; width: 62px; height: 46px; display: inline-flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); }
 .sc-mod svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.sc-mod path { fill: color-mix(in srgb, var(--c) 85%, #000); stroke: color-mix(in srgb, var(--c) 60%, #fff); stroke-width: 2.5; }
-.sc-mod b { position: relative; font-size: 16px; font-weight: 900; letter-spacing: 0.04em; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
-.sc-mod-down { --c: #6fbf3a; }
-.sc-mod-up { --c: #e8455a; }
-.sc-mod-auto { --c: #3b9cf0; }
-.sc-mod-fun { --c: #d05bd6; }
+.sc-mod path { fill: var(--c); stroke: color-mix(in srgb, var(--c) 55%, #fff); stroke-width: 3; }
+.sc-mod img { position: relative; height: 62%; width: auto; filter: brightness(0); opacity: 0.72; }
+.sc-mod b { position: relative; font-size: 16px; font-weight: 900; letter-spacing: 0.04em; color: rgba(0, 0, 0, 0.72); }
+.sc-mod-down { --c: #b2ff66; }
+.sc-mod-up { --c: #ff6666; }
+.sc-mod-conv { --c: #8c66ff; }
+.sc-mod-auto { --c: #66ccff; }
+.sc-mod-fun { --c: #ff66aa; }
+.sc-mod-system { --c: #ffcc22; }
 .sc-fc-tag { padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 900; letter-spacing: 0.08em; color: #3a2600; background: linear-gradient(135deg, #fff1a8, #ffb547); box-shadow: 0 0 18px rgba(255, 200, 80, 0.5); }
 
 /* song plate */
@@ -6482,3 +6487,5 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .sc-curve { min-height: 150px; }
 }
 .sc-stat-base s { color: rgba(255, 255, 255, 0.5); text-decoration-thickness: 1px; }
+.resources-credit { margin: 12px 4px 0; font-size: var(--fs-12); color: var(--text-dim); }
+.resources-credit a { color: inherit; }

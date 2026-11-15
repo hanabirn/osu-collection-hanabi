@@ -21,6 +21,7 @@ const SC_MOD_GROUP = {
     EZ: 'down', NF: 'down', HT: 'down',
     HR: 'up', SD: 'up', PF: 'up', DT: 'up', NC: 'up', HD: 'up', FL: 'up',
     RX: 'auto', AP: 'auto', SO: 'auto',
+    TD: 'system', V2: 'system',
 };
 
 /* "6.23" -> 6<small>.23</small>, the way score panels set big numbers. */
@@ -108,20 +109,12 @@ function scStrainSvg(strains, lengthSec) {
     </div>`;
 }
 
-/* Our own stat glyphs (24px grid, stroke icons), after the ideas osu-web's
-   beatmap page uses: a stopwatch for length, a gauge for BPM; then a
-   shrinking circle for CS, an approach ring for AR, a target for OD and a
-   heart for HP. Drawn here rather than copied: osu-web's artwork is AGPL. */
-const SC_STAT_ICON = {
-    bpm: '<path d="M4.5 16.5a8 8 0 1 1 15 0"/><path d="M12 13.5l4-4.5"/><circle cx="12" cy="13.5" r="1.4" fill="currentColor"/><path d="M12 5.5v1.6M6.4 7.9l1.1 1.1M17.6 7.9l-1.1 1.1"/>',
-    length: '<circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V9.5M10 3.5h4M12 3.5v3M18 7.5l1.4-1.4"/>',
-    cs: '<circle cx="12" cy="12" r="4"/><path d="M3.5 12h3M17.5 12h3M12 3.5v3M12 17.5v3"/><path d="M5.5 10.5L7 12l-1.5 1.5M18.5 10.5L17 12l1.5 1.5"/>',
-    ar: '<circle cx="12" cy="12" r="3.2" fill="currentColor"/><circle cx="12" cy="12" r="8" stroke-dasharray="2.4 2.2"/>',
-    od: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
-    hp: '<path d="M12 19.5s-7-4.3-7-9.4A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.1c0 5.1-7 9.4-7 9.4z"/><path d="M8.5 12.5h2l1-2 1.5 4 1-2h1.5"/>',
-};
+/* Stat and mod icons are osu!lazer's own, from ppy/osu-resources
+   (CC BY-NC 4.0, © ppy Pty Ltd; credited on the 資源 page and in
+   assets/osu-resources/README.md): white glyphs the game tints. */
+const SC_STAT_ICON = { bpm: 'bpm', length: 'length', cs: 'size', ar: 'approach-rate', od: 'overall-difficulty', hp: 'hp-drain' };
 function scStatIcon(key) {
-    return `<svg class="sc-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SC_STAT_ICON[key] || ''}</svg>`;
+    return `<img class="sc-stat-icon" src="assets/osu-resources/stats/${SC_STAT_ICON[key]}.png" alt="">`;
 }
 
 function scStatRow(key, label, value, base, max, digits = 1, unit = '') {
@@ -138,10 +131,17 @@ function scStatRow(key, label, value, base, max, digits = 1, unit = '') {
     </div>`;
 }
 
-/* Mod badges: a hexagon tinted by the mod's lazer category (difficulty
-   reduction / increase / automation), our own shape and colours. */
+/* Mod badges as lazer draws them: a rounded hexagon in the mod type's
+   colour with the mod's glyph in a dark tone on top. */
+const SC_MOD_FILE = {
+    NF: 'no-fail', EZ: 'easy', HD: 'hidden', HR: 'hard-rock', SD: 'sudden-death', PF: 'perfect',
+    DT: 'double-time', NC: 'nightcore', HT: 'half-time', FL: 'flashlight', RX: 'relax', AP: 'autopilot',
+    SO: 'spun-out', TD: 'touch-device', V2: 'score-v2',
+};
 function scModBadge(m) {
-    return `<span class="sc-mod sc-mod-${SC_MOD_GROUP[m] || 'fun'}"><svg viewBox="0 0 64 44" aria-hidden="true"><path d="M14 2h36l12 20-12 20H14L2 22z"/></svg><b>${escHtml(m)}</b></span>`;
+    const file = SC_MOD_FILE[m];
+    const glyph = file ? `<img src="assets/osu-resources/mods/mod-${file}.png" alt="${escHtml(m)}">` : `<b>${escHtml(m)}</b>`;
+    return `<span class="sc-mod sc-mod-${SC_MOD_GROUP[m] || 'fun'}" title="${escHtml(m)}"><svg viewBox="0 0 135 100" aria-hidden="true"><path d="M36 6h63a10 10 0 0 1 8.6 5l20 34a10 10 0 0 1 0 10l-20 34a10 10 0 0 1-8.6 5H36a10 10 0 0 1-8.6-5l-20-34a10 10 0 0 1 0-10l20-34A10 10 0 0 1 36 6z"/></svg>${glyph}</span>`;
 }
 
 async function openScoreCard({ score, beatmapId, mode = 0, lbRank = null }) {
