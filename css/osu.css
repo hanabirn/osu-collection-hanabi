@@ -5961,3 +5961,18 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .home-hero { flex-wrap: wrap; padding: 16px; }
     .home-summary { font-size: var(--fs-20); }
 }
+
+/* ===== 收藏 in the section band =====
+   The band names the section and carries the numbers (#osu-stats-panel is
+   moved there by js/main.js renderSectionBand), so the old MY COLLECTION
+   strip would only repeat it. The empty-collection welcome stays. */
+#collection-hero-v2 { display: none !important; }
+.section-band .osu-stats-panel { display: flex; align-items: center; gap: 20px; margin: 0; }
+.section-band .osu-stats-panel[style*="none"] { display: none; }
+.section-band .osu-stat { background: none; border: 0; padding: 0; }
+.section-band .osu-stat-value { font-size: var(--fs-18); }
+.section-band .osu-stat-label { font-size: var(--fs-11); }
+.section-band .osu-stat-spread { width: 170px; padding: 0; }
+.section-band .osu-stat-spread .diff-spread { height: 30px; }
+.section-band-extra:has(> .osu-stats-panel) { margin-left: auto; }
+@media (max-width: 899px) { .section-band .osu-stats-panel { flex-wrap: wrap; gap: 10px 16px; } }

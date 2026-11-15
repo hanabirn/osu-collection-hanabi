@@ -31,7 +31,12 @@ function dismissMaintenanceBanner() {
    as before. */
 const SITE_SECTIONS = [
     { id: 'home', label: 'nav_home', tabs: [{ tab: 'home', label: 'nav_home' }] },
-    { id: 'collection', label: 'nav_collection', tabs: [{ tab: 'collection', label: 'nav_collection' }] },
+    // 統計 and 工具 open things rather than pages: an `action` runs instead of switching.
+    { id: 'collection', label: 'nav_collection', tabs: [
+        { tab: 'collection', label: 'nav_my_collection' },
+        { action: 'openStatsDashboardModal()', label: 'col_stats' },
+        { action: 'openCollectionToolsMenu()', label: 'col_tools' },
+    ] },
     { id: 'explore', label: 'nav_explore', tabs: [
         { tab: 'catalog', label: 'nav_catalog' },
         { tab: 'public-collections', label: 'nav_public_collections' },
@@ -53,7 +58,7 @@ function refreshSectionBand() { if (currentSiteTab) renderSectionBand(currentSit
 function sectionOfTab(tab) {
     for (const sec of SITE_SECTIONS) {
         for (const st of sec.tabs) {
-            if (st.tab === tab || (st.choices && st.choices.some(([c]) => c === tab))) return { sec, st };
+            if (st.tab && (st.tab === tab || (st.choices && st.choices.some(([c]) => c === tab)))) return { sec, st };
         }
     }
     return { sec: SITE_SECTIONS[0], st: SITE_SECTIONS[0].tabs[0] };
@@ -61,7 +66,7 @@ function sectionOfTab(tab) {
 
 function goSection(id) {
     const sec = SITE_SECTIONS.find((s) => s.id === id) || SITE_SECTIONS[0];
-    switchTab(lastTabInSection[id] || sec.tabs[0].tab);
+    switchTab(lastTabInSection[id] || sec.tabs.find((x) => x.tab).tab);
 }
 
 function renderSectionBand(tab) {
@@ -83,13 +88,33 @@ function renderSectionBand(tab) {
     tabs.innerHTML = sec.tabs.length > 1
         ? sec.tabs.map((x) => {
             const on = x === st;
-            return `<button type="button" class="section-band-tab${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''} onclick="switchTab('${x.tab}')">${escHtml(t(x.label))}</button>`;
+            const run = x.action || `switchTab('${x.tab}')`;
+            return `<button type="button" class="section-band-tab${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''} onclick="${run}">${escHtml(t(x.label))}</button>`;
         }).join('')
         : '';
+    // 收藏's numbers and difficulty spread sit in the band (#osu-stats-panel is
+    // moved, not copied, so renderOsuStats() keeps updating it); park the
+    // panel in its hero again before the band is redrawn for another section.
+    const stats = document.getElementById('osu-stats-panel');
+    const statsHome = document.getElementById('collection-hero-v2');
+    if (stats && statsHome && stats.parentElement === extra) statsHome.appendChild(stats);
     extra.innerHTML = st.choices
         ? `<div class="section-band-choice" role="group" aria-label="${escHtml(t(st.label))}">${st.choices.map(([c, label]) =>
             `<button type="button"${c === tab ? ' class="active" aria-pressed="true"' : ' aria-pressed="false"'} onclick="switchTab('${c}')">${escHtml(t(label))}</button>`).join('')}</div>`
         : '';
+    if (sec.id === 'collection' && stats) extra.appendChild(stats);
+}
+
+/* 工具 in the 收藏 band: open the collection panel's tools menu. */
+function openCollectionToolsMenu() {
+    const d = document.querySelector('details.collection-tools');
+    if (!d) return;
+    // After this click has finished bubbling: the menu closes on clicks outside it.
+    setTimeout(() => {
+        d.open = true;
+        d.querySelector('summary')?.focus();
+        d.scrollIntoView({ block: 'nearest' });
+    }, 0);
 }
 
 /* ===== Tab switching ===== */
