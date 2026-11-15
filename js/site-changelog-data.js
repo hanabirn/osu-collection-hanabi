@@ -1,5 +1,5 @@
 /* Manually maintained release notes for the 更新紀錄 page under 更多
-   (renderChangelogPage() in js/main.js; the footer's 更新內容 opens it). Add one
+   (renderChangelogPage() in js/main.js). Add one
    new entry here whenever a user-visible change ships — newest first, no dev
    jargon or internal filenames. Skip internal-only work (refactors, crawler
    tuning, infra) that a visitor wouldn't notice.

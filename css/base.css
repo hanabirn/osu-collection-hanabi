@@ -1906,7 +1906,7 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 }
 .site-main { padding-top: clamp(16px, 2.5vw, 24px); }
 
-/* 讚 / 更新內容 / 使用手冊 / 分享, moved down from the header. */
+/* 讚 / 使用手冊 / 分享, moved down from the header. */
 .site-footer .site-social { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
 
 @media (max-width: 899px) {
