@@ -741,7 +741,7 @@ function catalogCardHtml(item, collectionSet) {
         ? (item.star_min === item.star_max ? item.star_min.toFixed(2) : `${item.star_min.toFixed(2)}–${item.star_max.toFixed(2)}`)
         : '';
     return `
-    <div class="osu-card" data-set-id="${item.id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${item.id}','_blank')">
+    <div class="osu-card" data-set-id="${item.id}" onclick="openBeatmapDrawer(${item.id})">
         <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
         <div class="osu-card-overlay"></div>
         <button class="card-add-btn${inCollection ? ' in-collection' : ''}" ${inCollection ? 'disabled' : `onclick="addCatalogToCollection(${item.id}, event)"`} title="${inCollection ? t('farm_in_collection') : t('farm_add_btn_title')}">${icon(inCollection ? 'check' : 'plus')}</button>

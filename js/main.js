@@ -413,7 +413,8 @@ function onModalEscapeKeydown(e) {
    short name, and Enter (Space too, for buttons) clicks it. Cards that open
    an osu! page are links; the rest act in place, so they are buttons. */
 const CLICKABLE_CARDS = [
-    { sel: '.osu-card[onclick]', role: 'link', name: (el) => [el.querySelector('.osu-card-title'), el.querySelector('.osu-card-artist')].map((n) => n && n.textContent.trim()).filter(Boolean).join(' - ') },
+    // A card that opens osu.ppy.sh is a link; one that opens the details drawer acts in place.
+    { sel: '.osu-card[onclick]', role: (el) => ((el.getAttribute('onclick') || '').includes('window.open') ? 'link' : 'button'), name: (el) => [el.querySelector('.osu-card-title'), el.querySelector('.osu-card-artist')].map((n) => n && n.textContent.trim()).filter(Boolean).join(' - ') },
     { sel: '.mode-diff-icon[onclick]', role: 'link', name: (el) => el.getAttribute('title') || '' },
     { sel: '.public-collection-card[onclick]', role: 'button', name: (el) => (el.querySelector('.pcc-name')?.textContent || '').trim() },
     { sel: '.pcc-tag[onclick]', role: 'button', name: (el) => el.textContent.trim() },
@@ -428,7 +429,7 @@ function makeCardsFocusable(root) {
         if (el.hasAttribute('tabindex')) continue;
         const spec = CLICKABLE_CARDS.find((c) => el.matches(c.sel));
         el.tabIndex = 0;
-        el.setAttribute('role', spec.role);
+        el.setAttribute('role', typeof spec.role === 'function' ? spec.role(el) : spec.role);
         const name = spec.name(el);
         if (name && !el.hasAttribute('aria-label')) el.setAttribute('aria-label', name);
     }

@@ -6062,3 +6062,54 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .community-discord .btn[hidden] { display: none; }
 /* Signed out: the sign-in prompt already says it; don't repeat it from the empty list. */
 .community-side #dm-list-view:has(#dm-login-required:not([style*="none"])) #dm-conversations-list { display: none; }
+.lookup-recs { margin: 14px 0; padding: 14px 16px; border-radius: var(--r-card); border: var(--line) solid var(--border); background: var(--bg-card); }
+.lookup-recs[hidden] { display: none; }
+#lookup-recs-list.osu-collection { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+
+/* ===== Beatmap details drawer (js/beatmap-drawer.js) ===== */
+.beatmap-drawer-scrim { position: fixed; inset: 0; z-index: 190; background: rgba(0, 0, 0, 0.45); }
+.beatmap-drawer-scrim[hidden] { display: none; }
+.beatmap-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 191;
+    width: min(420px, 100vw);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-modal);
+    border-left: var(--line) solid var(--border-strong);
+    box-shadow: -24px 0 48px -24px rgba(0, 0, 0, 0.8);
+    transform: translateX(100%);
+    transition: transform var(--dur) var(--ease-out);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.beatmap-drawer.open { transform: none; }
+.beatmap-drawer[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .beatmap-drawer { transition: none; } }
+.beatmap-drawer-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: var(--line) solid var(--border); }
+.beatmap-drawer-title { flex: 1; min-width: 0; margin: 0; font-family: var(--font-display); font-size: var(--fs-18); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beatmap-drawer-close { width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--bg-input); color: var(--text); cursor: pointer; }
+.beatmap-drawer-body { flex: 1; overflow-y: auto; padding: 0 0 16px; display: flex; flex-direction: column; gap: 12px; }
+.beatmap-drawer-cover { height: 150px; flex: none; background: var(--bg-card) center / cover no-repeat; }
+.beatmap-drawer-head, .beatmap-drawer-stats, .beatmap-drawer-diffs, .beatmap-drawer-actions, .beatmap-drawer-note { margin-left: 16px; margin-right: 16px; }
+.beatmap-drawer-head p { margin: 0; }
+.beatmap-drawer-artist { font-size: var(--fs-16); font-weight: 700; }
+.beatmap-drawer-mapper { font-size: var(--fs-13); color: var(--text-dim); }
+.beatmap-drawer-note { margin-top: 0; margin-bottom: 0; color: var(--text-dim); font-size: var(--fs-14); }
+.beatmap-drawer-stats { display: flex; gap: 18px; font-size: var(--fs-13); color: var(--text-dim); }
+.beatmap-drawer-stats b { color: var(--text); font-size: var(--fs-16); }
+.beatmap-drawer-diffs { list-style: none; padding: 0; margin-top: 0; margin-bottom: 0; }
+.beatmap-drawer-diffs li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: var(--line) solid var(--border); font-size: var(--fs-14); }
+.beatmap-drawer-diffs li:last-child { border-bottom: 0; }
+.beatmap-drawer-dot { display: inline-flex; width: 16px; justify-content: center; }
+.beatmap-drawer-dot i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.beatmap-drawer-dot svg { width: 16px; height: 16px; }
+.beatmap-drawer-diff { flex: 1; min-width: 0; color: var(--text); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beatmap-drawer-diff:hover { color: var(--pink-text, var(--pink)); }
+.beatmap-drawer-sr { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.beatmap-drawer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.beatmap-drawer-actions .btn { display: inline-flex; justify-content: center; align-items: center; text-decoration: none; }
+.beatmap-drawer-body > .btn { margin: 0 16px; display: flex; justify-content: center; text-decoration: none; }

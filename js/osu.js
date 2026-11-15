@@ -4866,11 +4866,61 @@ let visitorPlaysType = 'recent';
 let visitorModeData = [];
 let visitorCurrentMode = 0;
 
+/* ===== 依實力推薦 =====
+   After osu!track / osu!skills: take the stars of this player's 10 best
+   plays in the current mode (the same get_user_best + get_beatmaps calls the
+   最佳成績 list makes), use the 25th–75th percentile widened by 0.2★, and
+   list the newest catalog maps in that range that aren't in your
+   collection or among those plays. Needs the ~2 MB catalog, so it only
+   loads once the card is on screen. */
+let skillRecsObserver = null;
+function loadSkillRecommendations(userId, mode) {
+    const box = document.getElementById('lookup-recs');
+    const list = document.getElementById('lookup-recs-list');
+    const sub = document.getElementById('lookup-recs-sub');
+    if (!box || !list || typeof catalogFetchLocal !== 'function') return;
+    box.hidden = false;
+    sub.textContent = t('recs_loading');
+    list.innerHTML = '';
+    if (skillRecsObserver) skillRecsObserver.disconnect();
+    const run = async () => {
+        try {
+            const plays = await osuFetch(`best=${userId}&limit=10&m=${mode}`);
+            if (!plays || !plays.length) { sub.textContent = t('recs_none_plays'); return; }
+            const ids = [...new Set(plays.map((p) => p.beatmap_id))];
+            const maps = (await Promise.all(ids.map((id) => osuFetch(`b=${id}`).catch(() => null)))).map((r) => r && r[0]).filter(Boolean);
+            const stars = maps.map((m) => parseFloat(m.difficultyrating)).filter((x) => x > 0).sort((a, b) => a - b);
+            if (!stars.length) { sub.textContent = t('recs_none_plays'); return; }
+            const q = (p) => stars[Math.min(stars.length - 1, Math.floor(p * (stars.length - 1)))];
+            const lo = Math.max(0, q(0.25) - 0.2);
+            const hi = q(0.75) + 0.2;
+            const skip = new Set(OSU_MODES.flatMap((m) => (getOsuCollection()[m] || []).map((x) => x.beatmapset_id)));
+            maps.forEach((m) => skip.add(Number(m.beatmapset_id)));
+            const params = new URLSearchParams({ sort: 'ranked_desc', page: '0', pageSize: '40', mode: String(mode), starMin: lo.toFixed(2), starMax: hi.toFixed(2) });
+            const data = await catalogFetchLocal(params);
+            const picks = (data.items || []).filter((it) => !skip.has(it.id)).slice(0, 5);
+            sub.textContent = t('recs_sub', { lo: lo.toFixed(1), hi: hi.toFixed(1) });
+            list.innerHTML = picks.length
+                ? picks.map((it) => catalogCardHtml(it, skip)).join('')
+                : `<p class="home-empty">${escHtml(t('catalog_empty'))}</p>`;
+        } catch (e) {
+            console.error('Skill recommendations failed:', e);
+            sub.textContent = t('updates_load_fail');
+        }
+    };
+    if (typeof IntersectionObserver !== 'function') { run(); return; }
+    skillRecsObserver = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) { skillRecsObserver.disconnect(); run(); }
+    }, { rootMargin: '200px' });
+    skillRecsObserver.observe(box);
+}
+
 function switchVisitorRecentMode(mode, el) {
     document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     visitorCurrentMode = mode;
     if (!visitorLookupUserId) return;
+    loadSkillRecommendations(visitorLookupUserId, mode);
     if (visitorPlaysType === 'goal') renderPpGoalPlannerUI();
     else if (visitorPlaysType === 'gradehistory') ensureGradeHistoryLoaded();
     else renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
@@ -5283,6 +5333,7 @@ async function loadVisitorProfileById(input, isUsername) {
         document.getElementById('visitor-recent-list').style.display = '';
         document.getElementById('pp-goal-planner').style.display = 'none';
         renderOsuPlaysList(u.user_id, 0, 'recent', 'visitor-recent-list', 'visitor-recent-plays');
+        loadSkillRecommendations(u.user_id, 0);
 
         if (totalPP > 0) {
             const key = ppHistoryKeyFor(u.user_id);

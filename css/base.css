@@ -1982,3 +1982,15 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .section-band-tabs { width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
     .section-band-tabs::-webkit-scrollbar { display: none; }
 }
+/* Phone: one header row (logo, controls, ☰). The site name stays for screen readers. */
+@media (max-width: 600px) {
+    .site-header { flex-wrap: nowrap; align-items: center; gap: 4px; padding: 8px 10px; min-height: 52px; }
+    .site-header-top { order: -1; width: auto; margin: 0 auto 0 0; }
+    .site-header .site-title-block h1 {
+        position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+    .site-header .header-corner-actions { margin-left: auto; }
+    .site-header .header-ctl { width: 32px; height: 32px; min-width: 32px; }
+    .site-header .osu-login-btn-large { height: 32px; padding: 0 10px; font-size: var(--fs-12); }
+    .site-header .lang-globe-btn { padding: 0 6px; }
+}
