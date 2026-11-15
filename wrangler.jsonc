@@ -74,6 +74,13 @@
         { "binding": "KV_RESP_CACHE", "id": "46b04544b0424429b1b52d1f024c331b" },
     ],
 
+    // 成績卡截圖（worker/score-card-png.js）呼叫 Cloudflare Browser Rendering
+    // 的 REST API 要用的帳號 ID。帳號 ID 不是機密；API 金鑰另外用
+    // `wrangler secret put CF_BROWSER_TOKEN` 設成機密，不寫在這裡。
+    "vars": {
+        "CF_ACCOUNT_ID": "235a361b807ea77d2acd6c642d1688e6",
+    },
+
     // 大型資料集與二進位。dataset:osu 已 14.2 MiB 且會隨新圖上架成長，
     // 超過 KV 的 25 MiB 單值上限只是時間問題，所以放 R2。
     // 繫結名稱對應 _cf-store.js 的 R2_BINDINGS。
