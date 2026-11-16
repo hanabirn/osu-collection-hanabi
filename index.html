@@ -237,15 +237,14 @@
     </nav>
 </aside>
 
-<!-- Beatmap details (js/beatmap-drawer.js): opened from catalog cards. -->
+<!-- Beatmap details (js/beatmap-drawer.js): a centred window opened from
+     catalog cards: the set's header, its difficulties, the picked
+     difficulty's stats / PP / curve and its global top 50 side by side. -->
 <div class="beatmap-drawer-scrim" id="beatmap-drawer-scrim" onclick="closeBeatmapDrawer()" hidden></div>
-<aside class="beatmap-drawer" id="beatmap-drawer" role="dialog" aria-modal="true" aria-labelledby="beatmap-drawer-title" hidden>
-    <div class="beatmap-drawer-top">
-        <h2 class="beatmap-drawer-title" id="beatmap-drawer-title"></h2>
-        <button type="button" class="beatmap-drawer-close" onclick="closeBeatmapDrawer()" data-i18n-aria="close_label" aria-label="關閉" data-icon="x"></button>
-    </div>
+<div class="beatmap-drawer" id="beatmap-drawer" role="dialog" aria-modal="true" aria-labelledby="beatmap-drawer-title" hidden>
+    <button type="button" class="beatmap-drawer-close" onclick="closeBeatmapDrawer()" data-i18n-aria="close_label" aria-label="關閉" data-icon="x"></button>
     <div class="beatmap-drawer-body" id="beatmap-drawer-body"></div>
-</aside>
+</div>
 
 <!-- 成績卡 (js/score-card.js): one score as a full card, opened from the
      beatmap drawer's leaderboard. -->

@@ -1,20 +1,36 @@
-/* ===== Beatmap details drawer =====
-   After osu-web's beatmap page and osu!Collector: a catalog card (曲庫, the
-   首頁 new-maps row, 依實力推薦) opens this panel on the right instead of
-   leaving for osu.ppy.sh. It shows the set's difficulties, BPM and length
-   (one get_beatmaps call through the existing v1 proxy) with preview, add,
-   download and "open on osu!".
+/* ===== Beatmap details window =====
+   After osu-web's beatmap page: a catalog card (曲庫, the 首頁 new-maps
+   row, 依實力推薦) opens this centred window instead of leaving for
+   osu.ppy.sh. Everything fits one screen on a computer:
 
-   A real dialog: focus moves to its close button, Esc or the backdrop
-   closes it, and focus goes back to the card that opened it. */
+     header      cover, title, artist, mapper, status, BPM, length,
+                 favourites, plays, and preview / add / download / osu!
+     difficulty  one chip per difficulty, coloured by stars
+     left        the picked difficulty: stars, CS / AR / OD / HP, max
+                 combo, objects, pass rate, PP 試算 and the difficulty curve
+     right       its global top 50 as a table (only the table scrolls);
+                 a row opens that score's card (js/score-card.js)
+
+   Data: get_beatmaps (one v1 call for the whole set, which carries every
+   difficulty's stats), osu-pp (PP and strain curve, Aim/Speed for std) and
+   get_scores (top 50). A real dialog: focus moves to its close button, Esc
+   or the backdrop closes it, focus returns to the card that opened it.
+   (The element ids keep the old "drawer" names other scripts use.) */
 
 let beatmapDrawerOpener = null;
 let beatmapDrawerReq = 0;
+let beatmapDrawerMaps = []; // the open set's difficulties (get_beatmaps rows)
+let beatmapDrawerSetId = 0;
+
+const BM_STATUS = { '4': 'Loved', '3': 'Qualified', '2': 'Approved', '1': 'Ranked', '0': 'Pending', '-1': 'WIP', '-2': 'Graveyard' };
 
 function fmtMapLength(sec) {
     const s = Math.max(0, Math.round(Number(sec) || 0));
     return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
+
+const bmNum = (v) => Number(v || 0).toLocaleString();
+const bmCover = (id) => `https://assets.ppy.sh/beatmaps/${id}/covers/cover@2x.jpg`;
 
 async function openBeatmapDrawer(setId) {
     const id = Number(setId);
@@ -27,12 +43,13 @@ async function openBeatmapDrawer(setId) {
     }
     beatmapDrawerOpener = document.activeElement;
     const req = ++beatmapDrawerReq;
+    beatmapDrawerSetId = id;
     document.getElementById('beatmap-drawer-scrim').hidden = false;
     drawer.hidden = false;
+    document.documentElement.classList.add('beatmap-modal-open');
     requestAnimationFrame(() => drawer.classList.add('open'));
     drawer.querySelector('.beatmap-drawer-close').focus();
-    body.innerHTML = `<div class="beatmap-drawer-cover" style="background-image:url('https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg')"></div>
-        <p class="beatmap-drawer-note">${escHtml(t('gallery_loading'))}</p>`;
+    body.innerHTML = `<header class="bm-head" style="--bm-cover:url('${bmCover(id)}')"><div class="bm-head-text"><h2 class="bm-title" id="beatmap-drawer-title">${escHtml(t('gallery_loading'))}</h2></div></header>`;
 
     let maps;
     try {
@@ -42,97 +59,158 @@ async function openBeatmapDrawer(setId) {
     }
     if (req !== beatmapDrawerReq) return; // another card was opened meanwhile
     if (!Array.isArray(maps) || !maps.length) {
-        body.innerHTML = `<div class="beatmap-drawer-cover" style="background-image:url('https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg')"></div>
-            <p class="beatmap-drawer-note">${escHtml(t('updates_load_fail'))}</p>
-            <a class="btn" href="https://osu.ppy.sh/beatmapsets/${id}" target="_blank" rel="noopener noreferrer">${escHtml(t('drawer_open_osu'))}</a>`;
+        body.innerHTML = `<header class="bm-head" style="--bm-cover:url('${bmCover(id)}')"><div class="bm-head-text">
+                <h2 class="bm-title" id="beatmap-drawer-title">${escHtml(t('updates_load_fail'))}</h2>
+                <a class="btn" href="https://osu.ppy.sh/beatmapsets/${id}" target="_blank" rel="noopener noreferrer">${escHtml(t('drawer_open_osu'))}</a>
+            </div></header>`;
         return;
     }
     const first = maps[0];
-    const diffs = [...maps].sort((a, b) => parseFloat(a.difficultyrating) - parseFloat(b.difficultyrating));
+    const diffs = [...maps].sort((a, b) => (Number(a.mode) - Number(b.mode)) || (parseFloat(a.difficultyrating) - parseFloat(b.difficultyrating)));
+    beatmapDrawerMaps = diffs;
     const inCollection = OSU_MODES.some((m) => (getOsuCollection()[m] || []).some((s) => s.beatmapset_id === id));
     const modes = new Set(diffs.map((d) => String(d.mode)));
-    document.getElementById('beatmap-drawer-title').textContent = first.title || '';
+    const status = BM_STATUS[String(first.approved)] || '';
+    const plays = diffs.reduce((n, d) => n + (Number(d.playcount) || 0), 0);
 
     body.innerHTML = `
-        <div class="beatmap-drawer-cover" style="background-image:url('https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg')"></div>
-        <div class="beatmap-drawer-head">
-            <p class="beatmap-drawer-artist">${escHtml(first.artist || '')}</p>
-            <p class="beatmap-drawer-mapper">${t('mapped_by', { n: escHtml(first.creator || '') })}</p>
-        </div>
-        <div class="beatmap-drawer-stats">
-            <span><b>${Math.round(parseFloat(first.bpm) || 0)}</b> BPM</span>
-            <span><b>${fmtMapLength(first.total_length)}</b> ${escHtml(t('drawer_length'))}</span>
-            <span><b>${diffs.length}</b> ${escHtml(t('drawer_diffs'))}</span>
-        </div>
-        <ul class="beatmap-drawer-diffs" aria-label="${escHtml(t('drawer_pick_diff'))}">
+        <header class="bm-head" style="--bm-cover:url('${bmCover(id)}')">
+            <div class="bm-head-text">
+                ${status ? `<span class="bm-status bm-status-${status.toLowerCase()}">${status}</span>` : ''}
+                <h2 class="bm-title" id="beatmap-drawer-title">${escHtml(first.title || '')}</h2>
+                <p class="bm-artist">${escHtml(first.artist || '')}</p>
+                <p class="bm-meta">
+                    <span>${t('mapped_by', { n: `<b>${escHtml(first.creator || '')}</b>` })}</span>
+                    <span><b>${Math.round(parseFloat(first.bpm) || 0)}</b> BPM</span>
+                    <span><b>${fmtMapLength(first.total_length)}</b> ${escHtml(t('drawer_length'))}</span>
+                    <span>${icon('heart')} <b>${bmNum(first.favourite_count)}</b></span>
+                    <span>${icon('play')} <b>${bmNum(plays)}</b> ${escHtml(t('bm_plays'))}</span>
+                </p>
+            </div>
+            <div class="bm-actions">
+                <button type="button" class="btn btn-ghost" onclick="playOsuPreview(${id}, event)">${icon('play', { extraClass: 'icon-label-gap' })}${escHtml(t('mappools_preview'))}</button>
+                <button type="button" class="btn" ${inCollection ? 'disabled' : `onclick="drawerAddToCollection(${id}, this)"`}>${escHtml(t(inCollection ? 'farm_in_collection' : 'drawer_add'))}</button>
+                <button type="button" class="btn btn-ghost" onclick="downloadBeatmapset(${id}, event)" title="${escHtml(t('osu_download_btn_title'))}">${icon('download', { extraClass: 'icon-label-gap' })}${escHtml(t('drawer_download'))}</button>
+                <a class="btn btn-ghost" href="https://osu.ppy.sh/beatmapsets/${id}" target="_blank" rel="noopener noreferrer">${icon('externalLink', { extraClass: 'icon-label-gap' })}${escHtml(t('drawer_open_osu'))}</a>
+            </div>
+        </header>
+        <nav class="bm-diffs" aria-label="${escHtml(t('drawer_pick_diff'))}">
             ${diffs.map((d) => {
                 const sr = parseFloat(d.difficultyrating) || 0;
                 const mode = OSU_MODES[Number(d.mode)] || 'standard';
-                return `<li>
-                    <button type="button" class="beatmap-drawer-diff" data-beatmap-id="${Number(d.beatmap_id)}" aria-pressed="false" onclick="selectDrawerDiff(${Number(d.beatmap_id)}, ${Number(d.mode) || 0})">
-                        <span class="beatmap-drawer-dot" aria-hidden="true">${modes.size > 1 ? modeIconSvg(mode, starRatingColor(sr)) : `<i style="background:${starRatingColor(sr)}"></i>`}</span>
-                        <span class="beatmap-drawer-diff-name">${escHtml(d.version || '')}</span>
-                        <span class="beatmap-drawer-sr">${sr.toFixed(2)}★</span>
-                    </button>
-                    <a class="beatmap-drawer-diff-link" href="https://osu.ppy.sh/beatmapsets/${id}#${OSU_API_MODE[mode] || 'osu'}/${encodeURIComponent(d.beatmap_id)}" target="_blank" rel="noopener noreferrer" aria-label="${escHtml(t('drawer_open_diff', { n: d.version || '' }))}" title="${escHtml(t('drawer_open_diff', { n: d.version || '' }))}">${icon('externalLink')}</a>
-                </li>`;
+                const dot = modes.size > 1 ? modeIconSvg(mode, starRatingColor(sr)) : `<i style="background:${starRatingColor(sr)}"></i>`;
+                return `<button type="button" class="bm-diff" data-beatmap-id="${Number(d.beatmap_id)}" aria-pressed="false" onclick="selectDrawerDiff(${Number(d.beatmap_id)}, ${Number(d.mode) || 0})">
+                    <span class="bm-diff-dot" aria-hidden="true">${dot}</span>
+                    <span class="bm-diff-name">${escHtml(d.version || '')}</span>
+                    <span class="bm-diff-sr">${sr.toFixed(2)}★</span>
+                </button>`;
             }).join('')}
-        </ul>
-        <section class="beatmap-drawer-section" aria-labelledby="bd-pp-h">
-            <h3 class="beatmap-drawer-h" id="bd-pp-h">${escHtml(t('drawer_pp_title'))} <small>${escHtml(t('drawer_pp_note'))}</small></h3>
-            <div class="beatmap-drawer-pp" id="beatmap-drawer-pp"></div>
-        </section>
-        <section class="beatmap-drawer-section" aria-labelledby="bd-lb-h">
-            <h3 class="beatmap-drawer-h" id="bd-lb-h">${escHtml(t('drawer_lb_title'))}</h3>
-            <ol class="beatmap-drawer-lb" id="beatmap-drawer-lb"></ol>
-            <button type="button" class="btn btn-ghost beatmap-drawer-lb-more" id="beatmap-drawer-lb-more" hidden onclick="this.hidden = true; document.getElementById('beatmap-drawer-lb').classList.add('show-all')"></button>
-        </section>
-        <div class="beatmap-drawer-actions">
-            <button type="button" class="btn btn-ghost" onclick="playOsuPreview(${id}, event)">${icon('play', { extraClass: 'icon-label-gap' })}${escHtml(t('mappools_preview'))}</button>
-            <button type="button" class="btn" ${inCollection ? 'disabled' : `onclick="drawerAddToCollection(${id}, this)"`}>${escHtml(t(inCollection ? 'farm_in_collection' : 'drawer_add'))}</button>
-            <button type="button" class="btn btn-ghost" onclick="downloadBeatmapset(${id}, event)" title="${escHtml(t('osu_download_btn_title'))}">${icon('download', { extraClass: 'icon-label-gap' })}${escHtml(t('drawer_download'))}</button>
-            <a class="btn btn-ghost" href="https://osu.ppy.sh/beatmapsets/${id}" target="_blank" rel="noopener noreferrer">${escHtml(t('drawer_open_osu'))}</a>
+        </nav>
+        <div class="bm-main">
+            <section class="bm-side" id="bm-side" aria-live="polite"></section>
+            <section class="bm-lb" aria-labelledby="bd-lb-h">
+                <h3 class="bm-h" id="bd-lb-h">${escHtml(t('drawer_lb_title'))} <small id="bm-lb-count"></small></h3>
+                <div class="bm-lb-table">
+                    <div class="bm-lb-headrow" aria-hidden="true">${[0, 1].map((i) => `
+                        <div class="bm-lb-headcols${i ? ' is-second' : ''}">
+                            <span>#</span><span>${escHtml(t('bm_col_player'))}</span><span></span>
+                            <span>${escHtml(t('bm_col_acc'))}</span><span class="bm-lb-combo">Combo</span><span class="bm-lb-miss">Miss</span>
+                            <span>Mods</span><span class="bm-lb-pp">PP</span><span class="bm-lb-date">${escHtml(t('bm_col_date'))}</span>
+                        </div>`).join('')}
+                    </div>
+                    <ol class="bm-lb-list" id="beatmap-drawer-lb"></ol>
+                </div>
+            </section>
         </div>`;
-    const hardest = diffs[diffs.length - 1];
+    const hardest = diffs.filter((d) => String(d.mode) === String(first.mode)).pop() || diffs[diffs.length - 1];
     selectDrawerDiff(Number(hardest.beatmap_id), Number(hardest.mode) || 0);
 }
 
-/* One difficulty's PP 試算 (osu-pp: rosu-pp on the .osu file, no mods, full
-   combo) and its global top 50 (the osu proxy's get_scores). Both load in
-   parallel; a newer pick or a closed drawer drops the older answers. */
+/* The picked difficulty: its stats at once (they came with the set), then
+   PP 試算 + curve (osu-pp) and the top 50 (get_scores) in parallel; a newer
+   pick or a closed window drops the older answers. */
 let beatmapDrawerDiffReq = 0;
 let drawerLbScores = null; // { beatmapId, mode, scores } behind the rows shown
 function openDrawerScore(i) {
     if (!drawerLbScores || !drawerLbScores.scores[i]) return;
     openScoreCard({ score: drawerLbScores.scores[i], beatmapId: drawerLbScores.beatmapId, mode: drawerLbScores.mode, lbRank: i + 1 });
 }
-const DRAWER_LB_SHOWN = 10;
+
+function bmStatRow(label, value, max, cls) {
+    const v = Number(value) || 0;
+    return `<div class="bm-stat ${cls}">
+        <span class="bm-stat-label">${escHtml(label)}</span>
+        <span class="bm-bar"><i style="width:${Math.max(2, Math.min(100, (v / max) * 100)).toFixed(1)}%"></i></span>
+        <b>${Number.isInteger(v) ? v : v.toFixed(1)}</b>
+    </div>`;
+}
+
+function bmSideHtml(d) {
+    const mode = Number(d.mode) || 0;
+    const sr = parseFloat(d.difficultyrating) || 0;
+    const objects = (Number(d.count_normal) || 0) + (Number(d.count_slider) || 0) + (Number(d.count_spinner) || 0);
+    const plays = Number(d.playcount) || 0;
+    const pass = plays ? `${((Number(d.passcount) || 0) / plays * 100).toFixed(1)}%` : '—';
+    const rows = [];
+    if (mode === 0 || mode === 2) rows.push(bmStatRow('CS', d.diff_size, 10, 'is-cs'));
+    if (mode === 3) rows.push(bmStatRow(t('bm_keys'), d.diff_size, 10, 'is-cs'));
+    if (mode === 0 || mode === 2) rows.push(bmStatRow('AR', d.diff_approach, 11, 'is-ar'));
+    rows.push(bmStatRow('OD', d.diff_overall, 11, 'is-od'));
+    rows.push(bmStatRow('HP', d.diff_drain, 10, 'is-hp'));
+    return `
+        <div class="bm-star">
+            <span class="bm-star-num" style="--sr:${starRatingColor(sr)}">★ ${sr.toFixed(2)}</span>
+            <span class="bm-star-diff">${escHtml(d.version || '')}</span>
+            <a class="bm-diff-link" href="https://osu.ppy.sh/beatmapsets/${beatmapDrawerSetId}#${OSU_API_MODE[OSU_MODES[mode]] || 'osu'}/${encodeURIComponent(d.beatmap_id)}" target="_blank" rel="noopener noreferrer" aria-label="${escHtml(t('drawer_open_diff', { n: d.version || '' }))}" title="${escHtml(t('drawer_open_diff', { n: d.version || '' }))}">${icon('externalLink')}</a>
+        </div>
+        <div class="bm-stats">${rows.join('')}</div>
+        <dl class="bm-facts">
+            <div><dt>${escHtml(t('bm_max_combo'))}</dt><dd>${d.max_combo ? bmNum(d.max_combo) + 'x' : '—'}</dd></div>
+            <div><dt>${escHtml(t('bm_objects'))}</dt><dd>${objects ? bmNum(objects) : '—'}</dd></div>
+            <div><dt>${escHtml(t('bm_pass_rate'))}</dt><dd>${pass}</dd></div>
+        </dl>
+        <h3 class="bm-h">${escHtml(t('drawer_pp_title'))} <small>${escHtml(t('drawer_pp_note'))}</small></h3>
+        <div class="bm-pp" id="beatmap-drawer-pp">${[95, 98, 99, 100].map((a) => `<div class="bm-pp-cell"><span>${a}%</span><b class="skeleton-text">···</b></div>`).join('')}</div>
+        <h3 class="bm-h">${escHtml(t('sc_strain'))}<span class="bm-curve-legend" id="bm-curve-legend" hidden><i class="is-aim"></i>Aim<i class="is-speed"></i>Speed</span></h3>
+        <div class="bm-curve" id="bm-curve"><p class="bm-note">${escHtml(t('gallery_loading'))}</p></div>`;
+}
+
 async function selectDrawerDiff(beatmapId, mode) {
     const req = ++beatmapDrawerDiffReq;
     const drawerReq = beatmapDrawerReq;
-    document.querySelectorAll('#beatmap-drawer .beatmap-drawer-diff').forEach((b) => {
+    document.querySelectorAll('#beatmap-drawer .bm-diff').forEach((b) => {
         b.setAttribute('aria-pressed', String(Number(b.dataset.beatmapId) === beatmapId));
     });
-    const ppBox = document.getElementById('beatmap-drawer-pp');
+    const side = document.getElementById('bm-side');
     const lb = document.getElementById('beatmap-drawer-lb');
-    const more = document.getElementById('beatmap-drawer-lb-more');
-    if (!ppBox || !lb) return;
+    const count = document.getElementById('bm-lb-count');
+    const d = beatmapDrawerMaps.find((m) => Number(m.beatmap_id) === beatmapId);
+    if (!side || !lb || !d) return;
+    side.innerHTML = bmSideHtml(d);
+    lb.innerHTML = `<li class="bm-note">${escHtml(t('gallery_loading'))}</li>`;
+    count.textContent = '';
     const stale = () => req !== beatmapDrawerDiffReq || drawerReq !== beatmapDrawerReq;
     const accs = [95, 98, 99, 100];
-    ppBox.innerHTML = accs.map((a) => `<div class="beatmap-drawer-pp-cell"><span>${a}%</span><b class="skeleton-text">···</b></div>`).join('');
-    lb.classList.remove('show-all');
-    lb.innerHTML = `<li class="beatmap-drawer-lb-note">${escHtml(t('gallery_loading'))}</li>`;
-    more.hidden = true;
 
     const ppJob = fetch(`/.netlify/functions/osu-pp?id=${beatmapId}&acc=${accs.join(',')}`)
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null)
         .then((data) => {
             if (stale()) return;
-            ppBox.innerHTML = accs.map((a) => {
-                const v = data && data.pp ? data.pp[a] : null;
-                return `<div class="beatmap-drawer-pp-cell"><span>${a}%</span><b>${v != null ? Math.round(v).toLocaleString() + 'pp' : '—'}</b></div>`;
-            }).join('');
+            const ppBox = document.getElementById('beatmap-drawer-pp');
+            if (ppBox) {
+                ppBox.innerHTML = accs.map((a) => {
+                    const v = data && data.pp ? data.pp[a] : null;
+                    return `<div class="bm-pp-cell"><span>${a}%</span><b>${v != null ? Math.round(v).toLocaleString() + 'pp' : '—'}</b></div>`;
+                }).join('');
+            }
+            const curve = document.getElementById('bm-curve');
+            const st = data && data.strains;
+            const lines = st && mode === 0 && st.aim && st.speed ? [{ key: 'aim', values: st.aim }, { key: 'speed', values: st.speed }] : [];
+            const svg = st && typeof scStrainSvg === 'function' ? scStrainSvg({ values: st.values, lines }, Number(d.total_length) || 0) : '';
+            if (curve) curve.innerHTML = svg || `<p class="bm-note">—</p>`;
+            const legend = document.getElementById('bm-curve-legend');
+            if (legend) legend.hidden = !lines.length;
         });
 
     const lbJob = osuFetch(`scoreBeatmap=${beatmapId}&m=${mode}&limit=50`)
@@ -140,19 +218,16 @@ async function selectDrawerDiff(beatmapId, mode) {
         .then((scores) => {
             if (stale()) return;
             if (!Array.isArray(scores)) {
-                lb.innerHTML = `<li class="beatmap-drawer-lb-note">${escHtml(t('updates_load_fail'))}</li>`;
+                lb.innerHTML = `<li class="bm-note">${escHtml(t('updates_load_fail'))}</li>`;
                 return;
             }
             if (!scores.length) {
-                lb.innerHTML = `<li class="beatmap-drawer-lb-note">${escHtml(t('drawer_lb_empty'))}</li>`;
+                lb.innerHTML = `<li class="bm-note">${escHtml(t('drawer_lb_empty'))}</li>`;
                 return;
             }
             drawerLbScores = { beatmapId, mode, scores };
+            count.textContent = `${scores.length}`;
             lb.innerHTML = scores.map((s, i) => drawerScoreRowHtml(s, i + 1, mode)).join('');
-            if (scores.length > DRAWER_LB_SHOWN) {
-                more.textContent = t('drawer_lb_more', { n: scores.length });
-                more.hidden = false;
-            }
         });
     await Promise.all([ppJob, lbJob]);
 }
@@ -161,22 +236,26 @@ function drawerScoreRowHtml(s, rank, mode) {
     const acc = calcOsuAccuracy(s, mode);
     const mods = decodeOsuMods(s.enabled_mods);
     const grade = s.rank || '';
-    const pp = s.pp != null && s.pp !== '' ? Math.round(parseFloat(s.pp)).toLocaleString() + 'pp' : Number(s.score || 0).toLocaleString();
+    const hasPp = s.pp != null && s.pp !== '';
+    const value = hasPp ? `${Math.round(parseFloat(s.pp)).toLocaleString()}pp` : Number(s.score || 0).toLocaleString();
     const uid = encodeURIComponent(s.user_id);
-    return `<li class="beatmap-drawer-lb-item${rank > DRAWER_LB_SHOWN ? ' is-extra' : ''}"><button type="button" class="beatmap-drawer-lb-row" onclick="openDrawerScore(${rank - 1})" aria-label="${escHtml(t('sc_open', { n: s.username || '#' + s.user_id, r: rank }))}">
-        <span class="beatmap-drawer-lb-rank">#${rank}</span>
-        <img class="beatmap-drawer-lb-avatar" src="https://a.ppy.sh/${uid}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-        <span class="beatmap-drawer-lb-who">
-            <span class="beatmap-drawer-lb-name">${escHtml(s.username || '#' + s.user_id)}</span>
-            <small>${acc}% · ${escHtml(String(s.maxcombo || 0))}x${Number(s.countmiss) ? ' · ' + escHtml(String(s.countmiss)) + '❌' : ''}</small>
-        </span>
-        <span class="beatmap-drawer-lb-mods">${mods.map(scModBadge).join('')}</span>
+    const d = new Date(String(s.date || '').replace(' ', 'T') + 'Z');
+    const date = isNaN(d) ? '' : d.toLocaleDateString(siteLang === 'zh' ? 'zh-TW' : (siteLang || undefined), { year: 'numeric', month: 'numeric', day: 'numeric' });
+    const miss = Number(s.countmiss) || 0;
+    return `<li><button type="button" class="bm-lb-row" onclick="openDrawerScore(${rank - 1})" aria-label="${escHtml(t('sc_open', { n: s.username || '#' + s.user_id, r: rank }))}">
+        <span class="bm-lb-rank">#${rank}</span>
+        <span class="bm-lb-player"><img src="https://a.ppy.sh/${uid}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span>${escHtml(s.username || '#' + s.user_id)}</span></span>
         <span class="lb-grade grade-${OSU_RANK_CLASS[grade] || 'f'}${grade === 'XH' || grade === 'SH' ? ' silver' : ''}">${escHtml(SC_GRADE_LABEL[grade] || grade || '—')}</span>
-        <span class="beatmap-drawer-lb-pp">${pp}</span>
+        <span class="bm-lb-acc">${acc}%</span>
+        <span class="bm-lb-combo">${bmNum(s.maxcombo)}x</span>
+        <span class="bm-lb-miss${miss ? ' has-miss' : ''}">${miss}</span>
+        <span class="bm-lb-mods">${mods.map(scModBadge).join('')}</span>
+        <span class="bm-lb-pp${hasPp ? '' : ' is-score'}">${value}</span>
+        <span class="bm-lb-date">${escHtml(date)}</span>
     </button></li>`;
 }
 
-/* Add from the drawer, then show it as added (the shared card helper would
+/* Add from the window, then show it as added (the shared card helper would
    re-enable the button when it finishes). */
 async function drawerAddToCollection(id, btn) {
     btn.disabled = true;
@@ -192,6 +271,7 @@ function closeBeatmapDrawer() {
     drawer.classList.remove('open');
     document.getElementById('beatmap-drawer-scrim').hidden = true;
     drawer.hidden = true;
+    document.documentElement.classList.remove('beatmap-modal-open');
     if (beatmapDrawerOpener && document.contains(beatmapDrawerOpener)) beatmapDrawerOpener.focus();
     beatmapDrawerOpener = null;
 }
