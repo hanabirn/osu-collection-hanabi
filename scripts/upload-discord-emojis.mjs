@@ -91,6 +91,9 @@ async function main() {
     }
     const force = process.argv.includes('--force');
     const only = process.argv.find(a => ['grades', 'modes', 'mods'].includes(a));
+    // --suffix=2 uploads g_ss2, m_hd2...: a redrawn set goes up beside the
+    // live one, so the bot keeps working until the new ids are deployed.
+    const sfx = (process.argv.find(a => a.startsWith('--suffix=')) || '').slice(9).replace(/[^a-z0-9_]/gi, '');
     const auth = { Authorization: `Bot ${botToken}` };
     const base = `https://discord.com/api/v10/applications/${appId}/emojis`;
 
@@ -118,14 +121,14 @@ async function main() {
 
     try {
         if (!only || only === 'grades') {
-            for (const [name] of GRADES) await put(name, await localPng(name));
+            for (const [name] of GRADES) await put(name + sfx, await localPng(name));
         }
         if (!only || only === 'modes') {
             for (const [name, basename] of MODES) await put(name, await pngForMode(basename));
         }
         if (!only || only === 'mods') {
             for (const [name] of MODS) {
-                try { await put(name, await localPng(name)); }
+                try { await put(name + sfx, await localPng(name)); }
                 catch (e) { console.error(`  ! ${name}: ${e.message}`); }
             }
         }
@@ -133,7 +136,7 @@ async function main() {
         await rm(TMP, { recursive: true, force: true });
     }
 
-    const tag = (n) => `<:${n}:${result[n] || '0'}>`;
+    const tag = (n) => (/^(g|m)_/.test(n) ? `<:${n}${sfx}:${result[n + sfx] || '0'}>` : `<:${n}:${result[n] || '0'}>`);
     const line = (pairs) => pairs.map(([k, n]) => `    ${k}: '${tag(n)}',`).join('\n');
     console.log('\n--- paste into netlify/functions/_discord-lib.js ---\n');
     if (!only || only === 'grades') console.log(`const GRADE_EMOJI = {
