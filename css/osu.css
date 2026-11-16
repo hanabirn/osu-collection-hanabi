@@ -6205,7 +6205,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .bm-lb .bm-h small { padding: 1px 8px; border-radius: 999px; background: var(--bg-input); font-weight: 700; }
 .bm-lb .bm-h small:empty { display: none; }
 .bm-lb-table { flex: 1; min-height: 0; display: flex; flex-direction: column; border: var(--line) solid var(--border); border-radius: var(--r-card); overflow: hidden; }
-.bm-lb { --lb-cols: 40px minmax(120px, 1.6fr) 34px 70px 76px 44px minmax(64px, 1fr) 76px 92px; container-type: inline-size; }
+.bm-lb { --lb-cols: 40px minmax(120px, 1.6fr) 34px 70px 76px 44px 100px 76px 92px; container-type: inline-size; }
 .bm-lb-headcols, .bm-lb-row {
     display: grid;
     grid-template-columns: var(--lb-cols);
@@ -6248,7 +6248,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
    PP; the score card has the rest). Narrower, it is one scrolling column
    with every field. */
 @container (min-width: 780px) {
-    .bm-lb-table { --lb-cols: 30px minmax(0, 1fr) 22px 58px minmax(52px, auto) 60px; }
+    /* fixed widths so every row lines up, whatever its mods (3 badges fit) */
+    .bm-lb-table { --lb-cols: 30px minmax(0, 1fr) 22px 58px 74px 60px; }
     .bm-lb-headrow { grid-template-columns: 1fr 1fr; }
     .bm-lb-headcols.is-second { display: grid; border-left: var(--line) solid var(--border); }
     .bm-lb-headcols { height: 28px; }
@@ -6637,3 +6638,20 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* 收藏收件匣 notice (js/discord-inbox.js), when the collection has a password. */
 .discord-inbox-note { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 250; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px); padding: 10px 10px 10px 16px; border-radius: var(--r-card); background: var(--bg-card); border: var(--line) solid var(--border-strong); box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8); font-size: var(--fs-14); }
 .discord-inbox-close { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: var(--text-dim); cursor: pointer; }
+
+/* 我的成績 in the beatmap window (signed in) */
+.bm-me[hidden] { display: none; }
+.bm-me { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; border-radius: var(--r-card); background: rgba(var(--pink-rgb), 0.1); border: var(--line) solid rgba(var(--pink-rgb), 0.35); font-size: var(--fs-13); }
+.bm-me-card { width: 100%; display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.bm-me:has(.bm-me-card) { padding: 0; }
+.bm-me-card { padding: 8px 12px; border-radius: inherit; }
+.bm-me-card:hover { background: rgba(var(--pink-rgb), 0.08); }
+.bm-me-label { font-size: var(--fs-12); font-weight: 800; color: var(--pink-text, var(--pink)); white-space: nowrap; }
+.bm-me-none { color: var(--text-dim); }
+.bm-me .lb-grade { font-size: 22px; }
+.bm-me-main { min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.bm-me-main b { font-size: var(--fs-16); font-variant-numeric: tabular-nums; }
+.bm-me-main small { color: var(--text-dim); font-size: var(--fs-12); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm-me-rank { display: flex; flex-direction: column; align-items: flex-end; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.bm-me-rank small { font-size: var(--fs-12); font-weight: 600; color: var(--text-dim); }
+.bm-lb-row.is-me { background: rgba(var(--pink-rgb), 0.18) !important; box-shadow: inset 3px 0 0 var(--pink); }

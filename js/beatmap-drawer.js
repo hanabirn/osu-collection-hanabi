@@ -169,6 +169,7 @@ function bmSideHtml(d) {
             <div><dt>${escHtml(t('bm_objects'))}</dt><dd>${objects ? bmNum(objects) : '—'}</dd></div>
             <div><dt>${escHtml(t('bm_pass_rate'))}</dt><dd>${pass}</dd></div>
         </dl>
+        <div class="bm-me" id="bm-me" hidden></div>
         <h3 class="bm-h">${escHtml(t('drawer_pp_title'))} <small>${escHtml(t('drawer_pp_note'))}</small></h3>
         <div class="bm-pp" id="beatmap-drawer-pp">${[95, 98, 99, 100].map((a) => `<div class="bm-pp-cell"><span>${a}%</span><b class="skeleton-text">···</b></div>`).join('')}</div>
         <h3 class="bm-h">${escHtml(t('sc_strain'))}<span class="bm-curve-legend" id="bm-curve-legend" hidden><i class="is-aim"></i>Aim<i class="is-speed"></i>Speed</span></h3>
@@ -228,8 +229,59 @@ async function selectDrawerDiff(beatmapId, mode) {
             drawerLbScores = { beatmapId, mode, scores };
             count.textContent = `${scores.length}`;
             lb.innerHTML = scores.map((s, i) => drawerScoreRowHtml(s, i + 1, mode)).join('');
+            return scores;
         });
-    await Promise.all([ppJob, lbJob]);
+
+    // 我的成績: the signed-in player's best on this difficulty (get_scores
+    // with u), its place if it is in the top 50, and the gap to #1.
+    const me = typeof getLoggedInOsuUser === 'function' ? getLoggedInOsuUser() : null;
+    const meJob = me && me.id
+        ? Promise.all([osuFetch(`scoreBeatmap=${beatmapId}&scoreUser=${encodeURIComponent(me.id)}&m=${mode}`).catch(() => null), lbJob])
+            .then(([mine, top]) => {
+                if (stale()) return;
+                renderMyBest(Array.isArray(mine) ? mine[0] : null, Array.isArray(top) ? top : [], beatmapId, mode, me);
+            })
+        : Promise.resolve();
+    await Promise.all([ppJob, lbJob, meJob]);
+}
+
+let drawerMyScore = null;
+function openMyDrawerScore() {
+    if (drawerMyScore) openScoreCard(drawerMyScore);
+}
+
+function renderMyBest(score, top, beatmapId, mode, me) {
+    const box = document.getElementById('bm-me');
+    if (!box) return;
+    box.hidden = false;
+    if (!score) {
+        drawerMyScore = null;
+        box.innerHTML = `<span class="bm-me-label">${escHtml(t('bm_my_best'))}</span><span class="bm-me-none">${escHtml(t('bm_my_none'))}</span>`;
+        return;
+    }
+    const idx = top.findIndex((s) => String(s.user_id) === String(me.id));
+    const rank = idx >= 0 ? idx + 1 : null;
+    drawerMyScore = { score, beatmapId, mode, lbRank: rank };
+    const grade = score.rank || '';
+    const hasPp = score.pp != null && score.pp !== '';
+    const value = hasPp ? `${Math.round(parseFloat(score.pp)).toLocaleString()}pp` : Number(score.score || 0).toLocaleString();
+    // gap to #1, in the leaderboard's own unit (pp when ranked, else score)
+    let gap = '';
+    const first = top[0];
+    if (first && rank !== 1) {
+        const a = hasPp ? parseFloat(first.pp) - parseFloat(score.pp) : Number(first.score) - Number(score.score);
+        if (a > 0) gap = t('bm_my_gap', { n: hasPp ? `${Math.round(a).toLocaleString()}pp` : Math.round(a).toLocaleString() });
+    }
+    box.innerHTML = `<button type="button" class="bm-me-card" onclick="openMyDrawerScore()" aria-label="${escHtml(t('bm_my_best'))}">
+        <span class="bm-me-label">${escHtml(t('bm_my_best'))}</span>
+        <span class="lb-grade grade-${OSU_RANK_CLASS[grade] || 'f'}${grade === 'XH' || grade === 'SH' ? ' silver' : ''}">${escHtml(SC_GRADE_LABEL[grade] || grade || '—')}</span>
+        <span class="bm-me-main"><b>${value}</b><small>${calcOsuAccuracy(score, mode)}% · ${bmNum(score.maxcombo)}x${decodeOsuMods(score.enabled_mods).length ? ' · +' + escHtml(decodeOsuMods(score.enabled_mods).join('')) : ''}</small></span>
+        <span class="bm-me-rank">${rank ? `#${rank}` : escHtml(t('bm_my_out'))}${gap ? `<small>${escHtml(gap)}</small>` : ''}</span>
+    </button>`;
+    if (rank) {
+        const row = document.querySelectorAll('#beatmap-drawer-lb .bm-lb-row')[rank - 1];
+        if (row) row.classList.add('is-me');
+    }
 }
 
 function drawerScoreRowHtml(s, rank, mode) {
