@@ -3277,7 +3277,9 @@ function closeStatsDashboardModal() {
 async function renderStatsDashboardCharts(col, allSets) {
     if (typeof Chart === 'undefined') { try { await ensureCharts(); } catch (e) { return; } }
     const colors = ppChartColors();
-    const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
+    // Player B is blue everywhere in 雙人對比 (face-off bars, radar, table);
+    // the theme's purple can be pink, which made both lines look the same.
+    const purple = '#4ea3ff';
     statsDashboardCharts.forEach(c => c.destroy());
     statsDashboardCharts = [];
 
@@ -4961,6 +4963,7 @@ function switchVisitorRecentMode(mode, el) {
     if (typeof loadSkillRadar === 'function') loadSkillRadar(visitorLookupUserId, mode);
     if (visitorPlaysType === 'goal') renderPpGoalPlannerUI();
     else if (visitorPlaysType === 'gradehistory') ensureGradeHistoryLoaded();
+    else if (visitorPlaysType === 'medals' || visitorPlaysType === 'recs') { /* not per mode / already reloaded above */ }
     else renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
 }
 
@@ -4976,6 +4979,9 @@ function switchVisitorPlaysType(type, el) {
     goalEl.style.display = type === 'goal' ? '' : 'none';
     medalsEl.style.display = type === 'medals' ? '' : 'none';
     gradeHistoryEl.style.display = type === 'gradehistory' ? '' : 'none';
+    // 依實力推薦 is a tab of its own in the dashboard's right column.
+    document.getElementById('lookup-recs')?.classList.toggle('is-tab-hidden', type !== 'recs');
+    if (type === 'recs') return;
     if (type === 'goal') {
         renderPpGoalPlannerUI();
     } else if (type === 'medals') {

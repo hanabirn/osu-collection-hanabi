@@ -765,13 +765,6 @@
                         <div class="lookup-dash-left">
                         <div class="lookup-radar" id="lookup-radar" hidden></div>
                         <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
-                        <!-- 依實力推薦 (js/osu.js loadSkillRecommendations): maps in the star range of
-                             this player's best scores that aren't in your collection yet. -->
-                        <div class="lookup-recs" id="lookup-recs" hidden>
-                            <h3 class="home-h" data-i18n="recs_title">依實力推薦</h3>
-                            <p class="home-sub" id="lookup-recs-sub"></p>
-                            <div id="lookup-recs-list" class="osu-collection home-maps"></div>
-                        </div>
                         </div>
                         <div class="lookup-dash-right">
                         <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
@@ -781,11 +774,19 @@
                                 <button class="osu-tab" onclick="switchVisitorPlaysType('goal', this)" data-icon="target" data-icon-gap><span data-i18n="pp_goal_tab">PP 目標</span></button>
                                 <button class="osu-tab" onclick="switchVisitorPlaysType('medals', this)" data-icon="award" data-icon-gap><span data-i18n="nav_medals">獎章</span></button>
                                 <button class="osu-tab" onclick="switchVisitorPlaysType('gradehistory', this)" data-icon="star" data-icon-gap><span data-i18n="grade_history_tab">成績歷史</span></button>
+                                <button class="osu-tab" onclick="switchVisitorPlaysType('recs', this)" data-icon="sparkles" data-icon-gap><span data-i18n="recs_title">依實力推薦</span></button>
                             </div>
                             <div class="osu-recent-list" id="visitor-recent-list"></div>
                             <div id="pp-goal-planner" class="pp-goal-planner" style="display:none;"></div>
                             <div id="medals-gallery" class="medals-gallery" style="display:none;"></div>
                             <div id="grade-history-panel" class="grade-history-panel" style="display:none;"></div>
+                        <!-- 依實力推薦 (js/osu.js loadSkillRecommendations): maps in the star range of
+                             this player's best scores that aren't in your collection yet. -->
+                        <div class="lookup-recs is-tab-hidden" id="lookup-recs" hidden>
+                            <h3 class="home-h" data-i18n="recs_title">依實力推薦</h3>
+                            <p class="home-sub" id="lookup-recs-sub"></p>
+                            <div id="lookup-recs-list" class="osu-collection home-maps"></div>
+                        </div>
                         </div>
                         </div>
                         </div>

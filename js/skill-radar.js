@@ -211,7 +211,7 @@ async function loadSkillRadar(userId, mode) {
     const p = await computeSkillProfile(userId, mode);
     if (req !== skillRadarReq) return;
     box.innerHTML = p
-        ? `<h3 class="home-h">${escHtml(t('sr_title'))}</h3><p class="home-sub">${escHtml(t('sr_sub', { n: p.plays }))}</p>
+        ? `<h3 class="home-h" title="${escHtml(t('sr_sub', { n: p.plays }))}">${escHtml(t('sr_title'))} <span class="sr-info" aria-hidden="true">ⓘ</span></h3><p class="home-sub">${escHtml(t('sr_sub', { n: p.plays }))}</p>
            <div class="sr-wrap">${skillRadarSvg([p])}${skillRadarDetails([p])}</div>`
         : `<h3 class="home-h">${escHtml(t('sr_title'))}</h3><p class="home-sub">${escHtml(t('recs_none_plays'))}</p>`;
 }

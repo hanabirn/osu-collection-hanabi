@@ -6825,3 +6825,47 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .lookup-dash .grade-history-panel .osu-recent-rank { top: 50%; transform: translateY(-50%); left: 12px; width: 32px; height: 32px; font-size: var(--fs-14); }
 .lookup-dash .grade-history-panel .osu-recent-info { top: 0; bottom: 0; left: 56px; display: flex; flex-direction: column; justify-content: center; padding: 6px 12px 6px 0; }
 .lookup-dash .grade-history-panel .osu-recent-overlay { background: linear-gradient(90deg, rgba(14, 11, 15, 0.92) 0%, rgba(14, 11, 15, 0.75) 55%, rgba(14, 11, 15, 0.45) 100%); }
+/* One screen: the right column's long lists (scores, 成績歷史, medals) scroll
+   inside their own box, sized to the window, so the page stays short and the
+   radar / trend on the left stay in view. */
+.lookup-dash #visitor-recent-list,
+.lookup-dash .grade-history-panel .osu-recent-list,
+.lookup-dash #medals-gallery {
+    max-height: calc(100dvh - 190px);
+    min-height: 240px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+}
+@media (max-width: 900px) {
+    .lookup-dash #visitor-recent-list,
+    .lookup-dash .grade-history-panel .osu-recent-list,
+    .lookup-dash #medals-gallery { max-height: 70dvh; }
+}
+/* rows keep their 60px inside a height-limited box (flex would squash them) */
+.lookup-dash .osu-recent-list > .osu-recent-item,
+.pp-compare-topplays-col > .osu-recent-item { flex: none; }
+
+/* One screen, tuned: 依實力推薦 is a tab on the right; the radar is smaller
+   with its values in a 3-column grid; the right column's lists fill what
+   the window has left below the banner and search row. */
+.lookup-recs.is-tab-hidden { display: none !important; }
+.lookup-dash-right .lookup-recs { margin-top: 10px; }
+.lookup-dash-right .lookup-recs > .home-h { display: none; }
+.lookup-dash-right #lookup-recs-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; max-height: calc(100dvh - 470px); min-height: 240px; overflow-y: auto; }
+.lookup-dash-right #lookup-recs-list > :nth-child(n+4) { display: block; }
+.lookup-dash .sr-svg { max-width: 250px; }
+.lookup-dash .sr-details { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.lookup-dash .sr-details dd { font-size: var(--fs-12); }
+.lookup-dash .lookup-radar .home-sub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lookup-dash #visitor-recent-list, .lookup-dash #medals-gallery { max-height: calc(100dvh - 430px); }
+.lookup-dash .grade-history-panel .osu-recent-list { max-height: calc(100dvh - 530px); }
+/* One screen, measured at 1920x1080: the dashboard starts ~500px down, so
+   the left column (radar + trend) and the right column's list boxes are
+   sized to end inside the window. */
+.lookup-dash .sr-svg { max-width: 205px; }
+.lookup-dash .lookup-radar .home-sub { display: none; }
+.lookup-dash #visitor-recent-list, .lookup-dash #medals-gallery { max-height: calc(100dvh - 580px); min-height: 300px; }
+.lookup-dash .grade-history-panel .osu-recent-list { max-height: calc(100dvh - 690px); min-height: 240px; }
+.lookup-dash-right #lookup-recs-list { max-height: calc(100dvh - 600px); }
+.sr-info { font-size: var(--fs-12); color: var(--text-dim); cursor: help; }
