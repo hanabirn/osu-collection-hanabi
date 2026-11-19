@@ -6819,3 +6819,9 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .pp-compare-topplays-col .osu-recent-info { top: 0; bottom: 0; left: 50px; display: flex; flex-direction: column; justify-content: center; padding: 6px 10px 6px 0; }
 .pp-compare-topplays-col .osu-recent-overlay { background: linear-gradient(90deg, rgba(14, 11, 15, 0.92) 0%, rgba(14, 11, 15, 0.75) 55%, rgba(14, 11, 15, 0.45) 100%); }
 .pp-compare-topplays-col .fc-sim-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
+/* 成績歷史 in the dashboard: the same compact rows as 最佳成績. */
+.lookup-dash .grade-history-panel .osu-recent-list { display: flex; flex-direction: column; gap: 6px; }
+.lookup-dash .grade-history-panel .osu-recent-item { aspect-ratio: auto; height: 60px; }
+.lookup-dash .grade-history-panel .osu-recent-rank { top: 50%; transform: translateY(-50%); left: 12px; width: 32px; height: 32px; font-size: var(--fs-14); }
+.lookup-dash .grade-history-panel .osu-recent-info { top: 0; bottom: 0; left: 56px; display: flex; flex-direction: column; justify-content: center; padding: 6px 12px 6px 0; }
+.lookup-dash .grade-history-panel .osu-recent-overlay { background: linear-gradient(90deg, rgba(14, 11, 15, 0.92) 0%, rgba(14, 11, 15, 0.75) 55%, rgba(14, 11, 15, 0.45) 100%); }
