@@ -58,31 +58,61 @@ async function srFetchMaps(ids) {
     await Promise.all(Array.from({ length: 8 }, worker));
 }
 
+/* Official difficulty attributes for each play's map with its own mods
+   (netlify/functions/osu-attrs.js -> osu! API v2), 8 at a time. */
+const skillAttrCache = new Map(); // `${beatmapId}:${mods}:${mode}` -> attributes | null
+const SR_RULESET = ['osu', 'taiko', 'fruits', 'mania'];
+async function srFetchAttrs(plays, mode) {
+    const keys = [...new Set(plays.map((p) => `${p.beatmap_id}:${decodeOsuMods(p.enabled_mods).join('')}:${mode}`))]
+        .filter((k) => !skillAttrCache.has(k));
+    let i = 0;
+    const worker = async () => {
+        while (i < keys.length) {
+            const k = keys[i++];
+            const [id, mods] = k.split(':');
+            try {
+                const r = await fetch(`/.netlify/functions/osu-attrs?id=${id}&mods=${mods}&m=${SR_RULESET[mode]}`);
+                skillAttrCache.set(k, r.ok ? await r.json() : null);
+            } catch {
+                skillAttrCache.set(k, null);
+            }
+        }
+    };
+    await Promise.all(Array.from({ length: 8 }, worker));
+}
+
 async function computeSkillProfile(userId, mode) {
     const key = `${userId}:${mode}`;
     if (skillRadarCache.has(key)) return skillRadarCache.get(key);
     const plays = await osuFetch(`best=${encodeURIComponent(userId)}&limit=50&m=${mode}`).catch(() => null);
     if (!Array.isArray(plays) || !plays.length) { skillRadarCache.set(key, null); return null; }
-    await srFetchMaps([...new Set(plays.map((p) => String(p.beatmap_id)))]);
+    await Promise.all([srFetchMaps([...new Set(plays.map((p) => String(p.beatmap_id)))]), srFetchAttrs(plays, mode)]);
 
     let wSum = 0;
-    const acc = { aim: 0, speed: 0, stars: 0, acc: 0, od: 0, ar: 0, len: 0, combo: 0, bpm: 0, density: 0, hd: 0, fl: 0 };
+    let official = 0;
+    const acc = { aim: 0, speed: 0, stars: 0, acc: 0, od: 0, ar: 0, len: 0, combo: 0, bpm: 0, density: 0, hd: 0, fl: 0, fld: 0 };
     plays.forEach((p, idx) => {
         const m = skillMapCache.get(String(p.beatmap_id));
         if (!m) return;
         const w = Math.pow(0.95, idx);
         const mods = decodeOsuMods(p.enabled_mods);
         const rate = srRate(mods);
-        const rateStar = Math.pow(rate, 0.9); // rough: harder at DT, easier at HT
-        const hrBoost = mods.includes('HR') ? 1.06 : 1;
         const hit = (Number(m.hit_length) || Number(m.total_length) || 1) / rate;
         const objects = (Number(m.count_normal) || 0) + (Number(m.count_slider) || 0) + (Number(m.count_spinner) || 0);
-        acc.aim += w * (parseFloat(m.diff_aim) || 0) * rateStar * hrBoost;
-        acc.speed += w * (parseFloat(m.diff_speed) || 0) * rateStar;
-        acc.stars += w * (parseFloat(m.difficultyrating) || 0) * rateStar * hrBoost;
+        // osu!'s own numbers for this map with these mods; the old estimate
+        // (nomod v1 values scaled by the clock rate) only if they're missing.
+        const a = skillAttrCache.get(`${p.beatmap_id}:${mods.join('')}:${mode}`);
+        if (a) official++;
+        const rateStar = Math.pow(rate, 0.9);
+        const hrBoost = mods.includes('HR') ? 1.06 : 1;
+        const num = (x, fallback) => (Number.isFinite(Number(x)) && x !== null ? Number(x) : fallback);
+        acc.aim += w * num(a && a.aim_difficulty, (parseFloat(m.diff_aim) || 0) * rateStar * hrBoost);
+        acc.speed += w * num(a && a.speed_difficulty, (parseFloat(m.diff_speed) || 0) * rateStar);
+        acc.stars += w * num(a && a.star_rating, (parseFloat(m.difficultyrating) || 0) * rateStar * hrBoost);
+        acc.fld += w * num(a && a.flashlight_difficulty, 0);
         acc.acc += w * parseFloat(calcOsuAccuracy(p, mode));
-        acc.od += w * srEffOd(parseFloat(m.diff_overall) || 0, mods, rate);
-        acc.ar += w * srEffAr(parseFloat(m.diff_approach) || 0, mods, rate);
+        acc.od += w * num(a && a.overall_difficulty, srEffOd(parseFloat(m.diff_overall) || 0, mods, rate));
+        acc.ar += w * num(a && a.approach_rate, srEffAr(parseFloat(m.diff_approach) || 0, mods, rate));
         acc.len += w * hit;
         acc.combo += w * (Number(p.maxcombo) || 0);
         acc.bpm += w * (parseFloat(m.bpm) || 0) * rate;
@@ -98,10 +128,12 @@ async function computeSkillProfile(userId, mode) {
     const accScore = 0.7 * clamp01((v.acc - 88) / 12) + 0.3 * clamp01((v.od - 7) / 4);
     const axes = mode === 0
         ? [
-            ['aim', clamp01(v.aim / 5.5), `${v.aim.toFixed(2)}★`],
-            ['speed', clamp01(v.speed / 4.5), `${v.speed.toFixed(2)}★`],
+            // aim / speed difficulty are parts of the star rating, always well
+            // below it, so they get no ★; the average stars sit beside them.
+            ['aim', clamp01(v.aim / 5.5), `${v.aim.toFixed(2)} · ${t('sr_avg_stars', { n: v.stars.toFixed(2) })}`],
+            ['speed', clamp01(v.speed / 4.5), v.speed.toFixed(2)],
             ['acc', accScore, `${v.acc.toFixed(2)}% · OD ${v.od.toFixed(1)}`],
-            ['read', clamp01((v.ar - 8) / 3 + 0.15 * v.hd + 0.25 * v.fl), `AR ${v.ar.toFixed(1)}${v.hd > 0.05 ? ` · HD ${Math.round(v.hd * 100)}%` : ''}`],
+            ['read', clamp01((v.ar - 8) / 3 + 0.15 * v.hd + 0.25 * v.fl), `AR ${v.ar.toFixed(1)}${v.hd > 0.05 ? ` · HD ${Math.round(v.hd * 100)}%` : ''}${v.fl > 0.05 ? ` · FL ${Math.round(v.fl * 100)}%` : ''}`],
             ['stamina', stamina, `${fmtMapLength(v.len)} · ${Math.round(v.combo).toLocaleString()}x`],
             ['bpm', clamp01((v.bpm - 140) / 160), `${Math.round(v.bpm)} BPM`],
         ]
@@ -113,7 +145,7 @@ async function computeSkillProfile(userId, mode) {
             ['stamina', stamina, `${fmtMapLength(v.len)} · ${Math.round(v.combo).toLocaleString()}x`],
             ['bpm', clamp01((v.bpm - 120) / 180), `${Math.round(v.bpm)} BPM`],
         ];
-    const profile = { mode, plays: plays.length, axes };
+    const profile = { mode, plays: plays.length, axes, official };
     skillRadarCache.set(key, profile);
     return profile;
 }
