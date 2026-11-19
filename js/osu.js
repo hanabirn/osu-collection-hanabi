@@ -3277,9 +3277,7 @@ function closeStatsDashboardModal() {
 async function renderStatsDashboardCharts(col, allSets) {
     if (typeof Chart === 'undefined') { try { await ensureCharts(); } catch (e) { return; } }
     const colors = ppChartColors();
-    // Player B is blue everywhere in 雙人對比 (face-off bars, radar, table);
-    // the theme's purple can be pink, which made both lines look the same.
-    const purple = '#4ea3ff';
+    const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
     statsDashboardCharts.forEach(c => c.destroy());
     statsDashboardCharts = [];
 
@@ -4596,7 +4594,7 @@ async function renderPpCompareChart(playerA, playerB, panelId) {
     `;
     const canvas = el.querySelector('canvas');
     const colors = ppChartColors();
-    const purple = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple').trim() || '#a855f7';
+    const purple = '#4ea3ff'; // player B: blue, like the rest of 雙人對比
     const seriesFor = (history) => {
         const byDate = new Map(history.map(p => [p.date, p.pp]));
         return dates.map(d => byDate.has(d) ? byDate.get(d) : null);
