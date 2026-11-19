@@ -35,6 +35,7 @@ const SITE_SECTIONS = [
     { id: 'collection', label: 'nav_collection', tabs: [
         { tab: 'collection', label: 'nav_my_collection' },
         { action: 'openStatsDashboardModal()', label: 'col_stats' },
+        { action: 'openClearProgressModal()', label: 'col_clear' },
         { action: 'openCollectionToolsMenu()', label: 'col_tools' },
     ] },
     { id: 'explore', label: 'nav_explore', tabs: [
