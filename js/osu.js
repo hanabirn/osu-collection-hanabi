@@ -4515,7 +4515,8 @@ async function fetchPlayerTotalPpAndHistory(input, isUsername) {
     if (totalPP > 0) recordPpSnapshot(totalPP, key);
     const remote = await fetchOsuTrackHistory(u.user_id);
     const history = mergePpHistory(remote, getPpHistory(key));
-    return { id: u.user_id, username: u.username, country: u.country, totalPP, history };
+    const modes = modeData.map((m) => (m && m.pp_raw != null ? parseFloat(m.pp_raw) : 0));
+    return { id: u.user_id, username: u.username, country: u.country, totalPP, modes, history };
 }
 
 /* flagcdn.com serves flags keyed by lowercase ISO 3166-1 alpha-2 — exactly
@@ -4536,6 +4537,26 @@ function renderPpCompareSide(elId, player) {
         <div class="pp-compare-side-name">${escHtml(player.username)}</div>
         <div class="pp-compare-side-pp">${Math.round(player.totalPP).toLocaleString()}pp</div>
     `;
+}
+
+/* 雙人對比 face-off: each mode's pp as two bars growing from the middle,
+   the higher side lit. */
+function renderPpCompareModes(a, b) {
+    const box = document.getElementById('pp-compare-modes');
+    if (!box) return;
+    const fmt = (n) => (n ? Math.round(n).toLocaleString() : '—');
+    box.innerHTML = OSU_MODE_LABELS.map((label, i) => {
+        const pa = (a.modes && a.modes[i]) || 0;
+        const pb = (b.modes && b.modes[i]) || 0;
+        const max = Math.max(pa, pb, 1);
+        return `<div class="pcm-row">
+            <span class="pcm-val${pa > pb ? ' is-win' : ''}">${fmt(pa)}</span>
+            <span class="pcm-bar is-a"><i style="width:${((pa / max) * 100).toFixed(1)}%"></i></span>
+            <span class="pcm-mode">${modeIconSvg(OSU_MODES[i])}${escHtml(label)}</span>
+            <span class="pcm-bar is-b"><i style="width:${((pb / max) * 100).toFixed(1)}%"></i></span>
+            <span class="pcm-val${pb > pa ? ' is-win' : ''}">${fmt(pb)}</span>
+        </div>`;
+    }).join('');
 }
 
 let ppCompareChart = null;
@@ -4774,6 +4795,7 @@ async function comparePlayers() {
         status.innerText = '';
         renderPpCompareSide('pp-compare-side-a', a);
         renderPpCompareSide('pp-compare-side-b', b);
+        renderPpCompareModes(a, b);
         renderPpCompareChart(a, b, 'pp-compare-chart-panel');
         result.style.display = 'block';
         loadPpCompareTopPlays(a.id, b.id);
@@ -4918,7 +4940,12 @@ function loadSkillRecommendations(userId, mode) {
 
 function switchVisitorRecentMode(mode, el) {
     document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
+    if (el) el.classList.add('active');
+    document.querySelectorAll('#visitor-modes-grid .visitor-mode-mini').forEach((b) => {
+        const on = Number(b.dataset.mode) === mode;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+    });
     visitorCurrentMode = mode;
     if (!visitorLookupUserId) return;
     loadSkillRecommendations(visitorLookupUserId, mode);
@@ -5313,10 +5340,11 @@ async function loadVisitorProfileById(input, isUsername) {
         }
 
         const grid = document.getElementById('visitor-modes-grid');
+        // The four mode boxes double as the mode tabs (one-glance dashboard).
         grid.innerHTML = modeData.map((m, i) => {
             const label = `${modeIconSvg(OSU_MODES[i])} ${OSU_MODE_LABELS[i]}`;
-            if (!m || m.pp_raw == null) return `<div class="visitor-mode-mini"><div class="visitor-mode-name">${label}</div><div class="visitor-mode-pp">—</div></div>`;
-            return `<div class="visitor-mode-mini"><div class="visitor-mode-name">${label}</div><div class="visitor-mode-pp">${Math.round(parseFloat(m.pp_raw)).toLocaleString()}</div></div>`;
+            const pp = !m || m.pp_raw == null ? '—' : Math.round(parseFloat(m.pp_raw)).toLocaleString();
+            return `<button type="button" class="visitor-mode-mini${i === 0 ? ' is-active' : ''}" data-mode="${i}" aria-pressed="${i === 0}" onclick="switchVisitorRecentMode(${i}, document.querySelector('#visitor-recent-mode-tabs .osu-mode-tab[data-mode=&quot;${i}&quot;]'))"><span class="visitor-mode-name">${label}</span><span class="visitor-mode-pp">${pp}</span></button>`;
         }).join('');
 
         const totalPP = modeData.reduce((sum, m) => sum + (m && m.pp_raw != null ? parseFloat(m.pp_raw) : 0), 0);
@@ -5330,11 +5358,11 @@ async function loadVisitorProfileById(input, isUsername) {
         renderTrackButtonState();
         document.querySelectorAll('#visitor-recent-mode-tabs .osu-mode-tab').forEach(t => t.classList.remove('active'));
         document.querySelector('#visitor-recent-mode-tabs .osu-mode-tab[data-mode="0"]').classList.add('active');
-        visitorPlaysType = 'recent';
+        visitorPlaysType = 'best';
         document.querySelectorAll('.osu-plays-type-tabs .osu-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
         document.getElementById('visitor-recent-list').style.display = '';
         document.getElementById('pp-goal-planner').style.display = 'none';
-        renderOsuPlaysList(u.user_id, 0, 'recent', 'visitor-recent-list', 'visitor-recent-plays');
+        renderOsuPlaysList(u.user_id, 0, 'best', 'visitor-recent-list', 'visitor-recent-plays');
         loadSkillRecommendations(u.user_id, 0);
         if (typeof loadSkillRadar === 'function') loadSkillRadar(u.user_id, 0);
 

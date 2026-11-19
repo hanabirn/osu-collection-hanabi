@@ -6721,3 +6721,88 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .sr-wrap { grid-template-columns: minmax(0, 1fr); }
     .sr-svg { max-width: 340px; margin: 0 auto; }
 }
+
+/* ===== PP 查詢 as a dashboard =====
+   Search and tracked players in one row on top; the banner's four mode
+   boxes are the mode tabs; below, two columns: radar, PP trend and picks on
+   the left, the score tabs (最佳成績 first) on the right, scores as compact
+   rows so ten fit on screen. 雙人對比: face-off bars per mode, the radar
+   beside an A | axis | B table, then the trend and Top Play side by side. */
+#page-lookup .lookup-layout { display: block; }
+#page-lookup .lookup-side { position: static; flex-direction: row; flex-wrap: wrap; align-items: stretch; gap: 12px; margin-bottom: 16px; }
+#page-lookup .lookup-side .visitor-lookup-card { flex: 1 1 560px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; }
+#page-lookup .lookup-side .visitor-lookup-card > h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#page-lookup .lookup-side .lookup-mode-toggle { width: auto; flex: none; margin: 0; }
+#page-lookup .lookup-side .lookup-mode-btn { flex: none; padding: 6px 14px; }
+#page-lookup .lookup-side .visitor-lookup-input-row, #page-lookup .lookup-side .pp-compare-input-row { flex: 1 1 320px; margin: 0; }
+#page-lookup .lookup-side .pp-compare-input-row .btn { flex: none; }
+#page-lookup .lookup-side .visitor-lookup-card .status:empty { display: none; }
+#page-lookup .lookup-side .tracked-players-panel { flex: 1 1 280px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 12px; }
+#page-lookup .lookup-side .tracked-players-list { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+#page-lookup .lookup-side .tracked-player-card { padding: 4px 10px; border: var(--line) solid var(--border); border-radius: 999px; }
+
+/* mode boxes as tabs */
+#visitor-modes-grid .visitor-mode-mini { font: inherit; color: inherit; text-align: left; cursor: pointer; transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+#visitor-modes-grid .visitor-mode-mini:hover { border-color: var(--border-strong); }
+#visitor-modes-grid .visitor-mode-mini.is-active { border-color: var(--pink); background: rgba(var(--pink-rgb), 0.12); box-shadow: inset 0 -3px 0 var(--pink); }
+#visitor-modes-grid .visitor-mode-name, #visitor-modes-grid .visitor-mode-pp { display: block; }
+#page-lookup #visitor-recent-mode-tabs { display: none; }
+
+.lookup-dash { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.lookup-dash-left, .lookup-dash-right { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.lookup-dash-left > * { margin-top: 0 !important; }
+.lookup-dash-left > *:not([hidden]):not(:empty) { padding: 14px; border-radius: var(--r-card); background: var(--bg-card); border: var(--line) solid var(--border); }
+.lookup-dash .lookup-radar .home-sub { font-size: var(--fs-12); }
+.lookup-dash .sr-wrap { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.lookup-dash .sr-svg { max-width: 300px; margin: 0 auto; }
+.lookup-dash .sr-details { gap: 6px; }
+.lookup-dash .sr-details > div { padding: 6px 10px; }
+.lookup-dash #lookup-recs-list { display: flex; flex-direction: column; gap: 8px; }
+.lookup-dash #lookup-recs-list > :nth-child(n+4) { display: none; }
+.lookup-dash-right .osu-recent-plays { margin-top: 0; }
+/* scores as compact rows: grade, title, then pp / acc / combo / mods */
+.lookup-dash #visitor-recent-list { display: flex; flex-direction: column; gap: 6px; }
+.lookup-dash #visitor-recent-list .osu-recent-item { aspect-ratio: auto; height: 60px; }
+.lookup-dash #visitor-recent-list .osu-recent-rank { top: 50%; transform: translateY(-50%); left: 12px; width: 32px; height: 32px; font-size: var(--fs-14); }
+.lookup-dash #visitor-recent-list .osu-recent-info { top: 0; bottom: 0; left: 56px; display: flex; flex-direction: column; justify-content: center; padding: 6px 12px 6px 0; }
+.lookup-dash #visitor-recent-list .osu-recent-overlay { background: linear-gradient(90deg, rgba(14, 11, 15, 0.92) 0%, rgba(14, 11, 15, 0.75) 55%, rgba(14, 11, 15, 0.45) 100%); }
+.lookup-dash #visitor-recent-list .fc-sim-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); }
+
+/* 雙人對比 */
+.pp-compare-modes { display: flex; flex-direction: column; gap: 6px; margin: 14px 0 4px; padding: 14px; border-radius: var(--r-card); background: var(--bg-card); border: var(--line) solid var(--border); }
+.pcm-row { display: grid; grid-template-columns: 76px minmax(0, 1fr) 110px minmax(0, 1fr) 76px; align-items: center; gap: 10px; font-size: var(--fs-13); }
+.pcm-mode { display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-dim); font-weight: 700; }
+.pcm-mode svg { width: 16px; height: 16px; }
+.pcm-val { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-dim); }
+.pcm-row .pcm-val:first-child { text-align: right; }
+.pcm-val.is-win { color: var(--text); }
+.pcm-bar { height: 10px; border-radius: 999px; background: var(--bg-input); overflow: hidden; display: flex; }
+.pcm-bar.is-a { justify-content: flex-end; }
+.pcm-bar i { display: block; height: 100%; border-radius: inherit; }
+.pcm-bar.is-a i { background: var(--pink); }
+.pcm-bar.is-b i { background: #4ea3ff; }
+.pp-compare-radar { padding: 14px; border-radius: var(--r-card); background: var(--bg-card); border: var(--line) solid var(--border); }
+.pp-compare-radar .sr-wrap { grid-template-columns: minmax(240px, 320px) minmax(0, 1fr); }
+.sr-h2h { display: flex; flex-direction: column; gap: 8px; }
+.sr-h2h-row { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(40px, 1.2fr) 70px minmax(40px, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 8px; }
+.sr-h2h-val { display: flex; flex-direction: column; line-height: 1.2; color: var(--text-dim); }
+.sr-h2h-val b { font-size: var(--fs-16); font-variant-numeric: tabular-nums; }
+.sr-h2h-val small { font-size: var(--fs-12); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sr-h2h-val.is-a { text-align: right; align-items: flex-end; }
+.sr-h2h-val.is-a.is-win { color: var(--pink-text, var(--pink)); }
+.sr-h2h-val.is-b.is-win { color: #7cc0ff; }
+.sr-h2h-axis { text-align: center; font-size: var(--fs-13); font-weight: 800; }
+.sr-h2h-bar { height: 8px; border-radius: 999px; background: var(--bg-input); overflow: hidden; display: flex; }
+.sr-h2h-bar.is-a { justify-content: flex-end; }
+.sr-h2h-bar i { display: block; height: 100%; border-radius: inherit; }
+.sr-h2h-bar.is-a i { background: var(--pink); }
+.sr-h2h-bar.is-b i { background: #4ea3ff; }
+
+@media (max-width: 900px) {
+    .lookup-dash { grid-template-columns: minmax(0, 1fr); }
+    .lookup-dash-right { order: -1; }
+    .pp-compare-radar .sr-wrap { grid-template-columns: minmax(0, 1fr); }
+    .pcm-row { grid-template-columns: 60px minmax(0, 1fr) 80px minmax(0, 1fr) 60px; gap: 6px; }
+    .sr-h2h-row { grid-template-columns: 1fr 64px 1fr; }
+    .sr-h2h-bar { display: none; }
+}

@@ -760,9 +760,11 @@
                             <button class="osu-mode-tab" data-mode="2" onclick="switchVisitorRecentMode(2,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><circle cx="50" cy="38" r="7" fill="currentColor" stroke="none"/><circle cx="38" cy="60" r="5.5" fill="currentColor" stroke="none"/><circle cx="62" cy="60" r="5.5" fill="currentColor" stroke="none"/></svg> Catch</button>
                             <button class="osu-mode-tab" data-mode="3" onclick="switchVisitorRecentMode(3,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
                         </div>
-                        <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
-                        <!-- 技能雷達 (js/skill-radar.js): what this player is good at, from their best 50. -->
+                        <!-- Dashboard (css/osu.css .lookup-dash): left = radar, PP trend, picks; right = the score tabs. -->
+                        <div class="lookup-dash">
+                        <div class="lookup-dash-left">
                         <div class="lookup-radar" id="lookup-radar" hidden></div>
+                        <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
                         <!-- 依實力推薦 (js/osu.js loadSkillRecommendations): maps in the star range of
                              this player's best scores that aren't in your collection yet. -->
                         <div class="lookup-recs" id="lookup-recs" hidden>
@@ -770,10 +772,12 @@
                             <p class="home-sub" id="lookup-recs-sub"></p>
                             <div id="lookup-recs-list" class="osu-collection home-maps"></div>
                         </div>
+                        </div>
+                        <div class="lookup-dash-right">
                         <div class="osu-recent-plays" id="visitor-recent-plays" style="display:none;">
                             <div class="osu-mode-tabs osu-plays-type-tabs">
-                                <button class="osu-tab active" onclick="switchVisitorPlaysType('recent', this)" data-icon="gamepad2" data-icon-gap><span data-i18n="osu_recent_title">最近遊玩</span></button>
-                                <button class="osu-tab" onclick="switchVisitorPlaysType('best', this)" data-icon="trophy" data-icon-gap><span data-i18n="osu_top_title">最佳成績</span></button>
+                                <button class="osu-tab active" onclick="switchVisitorPlaysType('best', this)" data-icon="trophy" data-icon-gap><span data-i18n="osu_top_title">最佳成績</span></button>
+                                <button class="osu-tab" onclick="switchVisitorPlaysType('recent', this)" data-icon="gamepad2" data-icon-gap><span data-i18n="osu_recent_title">最近遊玩</span></button>
                                 <button class="osu-tab" onclick="switchVisitorPlaysType('goal', this)" data-icon="target" data-icon-gap><span data-i18n="pp_goal_tab">PP 目標</span></button>
                                 <button class="osu-tab" onclick="switchVisitorPlaysType('medals', this)" data-icon="award" data-icon-gap><span data-i18n="nav_medals">獎章</span></button>
                                 <button class="osu-tab" onclick="switchVisitorPlaysType('gradehistory', this)" data-icon="star" data-icon-gap><span data-i18n="grade_history_tab">成績歷史</span></button>
@@ -782,6 +786,8 @@
                             <div id="pp-goal-planner" class="pp-goal-planner" style="display:none;"></div>
                             <div id="medals-gallery" class="medals-gallery" style="display:none;"></div>
                             <div id="grade-history-panel" class="grade-history-panel" style="display:none;"></div>
+                        </div>
+                        </div>
                         </div>
                     </div>
                 </div><!-- /#lookup-mode-single -->
@@ -806,8 +812,9 @@
                             <div class="pp-compare-vs">VS</div>
                             <div class="pp-compare-side pp-compare-side-b" id="pp-compare-side-b"></div>
                         </div>
-                        <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
+                        <div class="pp-compare-modes" id="pp-compare-modes"></div>
                         <div class="pp-compare-radar" id="pp-compare-radar" hidden></div>
+                        <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
                     </div>
                     <div id="pp-compare-topplays" style="display:none;">
                         <h4 class="pp-compare-topplays-title" data-i18n="pp_compare_topplays_title">Top Play 對比</h4>

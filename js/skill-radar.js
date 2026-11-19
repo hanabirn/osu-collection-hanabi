@@ -183,6 +183,23 @@ function skillRadarDetails(profiles, names) {
     return `<dl class="sr-details">${axes.map((ax, i) => `<div><dt>${escHtml(t(`sr_${ax[0]}`))}</dt>${profiles.map((p, k) => `<dd class="${k ? 'is-b' : 'is-a'}">${names && names[k] ? `<small>${escHtml(names[k])}</small>` : ''}${escHtml(p.axes[i][2])}</dd>`).join('')}</div>`).join('')}</dl>`;
 }
 
+/* 雙人對比: A | axis | B per row, the higher side lit, the score bar
+   between the value and the axis name. */
+function skillRadarHeadToHead(pa, pb, nameA, nameB) {
+    const rows = pa.axes.map((ax, i) => {
+        const sa = ax[1];
+        const sb = pb.axes[i][1];
+        return `<div class="sr-h2h-row">
+            <span class="sr-h2h-val is-a${sa > sb + 0.005 ? ' is-win' : ''}"><b>${Math.round(sa * 100)}</b><small>${escHtml(ax[2])}</small></span>
+            <span class="sr-h2h-bar is-a"><i style="width:${(sa * 100).toFixed(1)}%"></i></span>
+            <span class="sr-h2h-axis">${escHtml(t(`sr_${ax[0]}`))}</span>
+            <span class="sr-h2h-bar is-b"><i style="width:${(sb * 100).toFixed(1)}%"></i></span>
+            <span class="sr-h2h-val is-b${sb > sa + 0.005 ? ' is-win' : ''}"><b>${Math.round(sb * 100)}</b><small>${escHtml(pb.axes[i][2])}</small></span>
+        </div>`;
+    }).join('');
+    return `<div class="sr-h2h" aria-label="${escHtml(`${nameA} / ${nameB}`)}">${rows}</div>`;
+}
+
 /* PP 查詢, one player: the card above 依實力推薦, following the mode tabs. */
 let skillRadarReq = 0;
 async function loadSkillRadar(userId, mode) {
@@ -215,6 +232,6 @@ async function loadCompareRadar(a, b, mode = 0) {
     box.innerHTML = `<h4 class="pp-compare-topplays-title">${escHtml(t('sr_title'))}</h4><div class="osu-mode-tabs">${tabs}</div>`
         + (both.length
             ? `<p class="sr-legend">${pa ? `<span class="is-a">${escHtml(a.username)}</span>` : ''}${pb ? `<span class="is-b">${escHtml(b.username)}</span>` : ''}</p>
-               <div class="sr-wrap">${skillRadarSvg(both)}${skillRadarDetails(both, names)}</div>`
+               <div class="sr-wrap">${skillRadarSvg(both)}${pa && pb ? skillRadarHeadToHead(pa, pb, a.username, b.username) : skillRadarDetails(both, names)}</div>`
             : `<p class="home-sub">${escHtml(t('recs_none_plays'))}</p>`);
 }
