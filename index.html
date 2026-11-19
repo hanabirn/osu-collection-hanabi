@@ -761,6 +761,8 @@
                             <button class="osu-mode-tab" data-mode="3" onclick="switchVisitorRecentMode(3,this)"><svg class="mode-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><circle cx="50" cy="50" r="41"/><rect x="31" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/><rect x="42" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="53" y="31" width="8" height="38" rx="4" fill="currentColor" stroke="none"/><rect x="64" y="39" width="8" height="22" rx="4" fill="currentColor" stroke="none"/></svg> Mania</button>
                         </div>
                         <div class="pp-history-panel" id="visitor-pp-history-panel"></div>
+                        <!-- 技能雷達 (js/skill-radar.js): what this player is good at, from their best 50. -->
+                        <div class="lookup-radar" id="lookup-radar" hidden></div>
                         <!-- 依實力推薦 (js/osu.js loadSkillRecommendations): maps in the star range of
                              this player's best scores that aren't in your collection yet. -->
                         <div class="lookup-recs" id="lookup-recs" hidden>
@@ -805,6 +807,7 @@
                             <div class="pp-compare-side pp-compare-side-b" id="pp-compare-side-b"></div>
                         </div>
                         <div class="pp-history-panel" id="pp-compare-chart-panel"></div>
+                        <div class="pp-compare-radar" id="pp-compare-radar" hidden></div>
                     </div>
                     <div id="pp-compare-topplays" style="display:none;">
                         <h4 class="pp-compare-topplays-title" data-i18n="pp_compare_topplays_title">Top Play 對比</h4>
@@ -1436,6 +1439,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/beatmap-drawer.js"></script>
 <script defer src="js/score-card.js"></script>
 <script defer src="js/clear-progress.js"></script>
+<script defer src="js/skill-radar.js"></script>
 <script defer src="js/discord-inbox.js"></script>
 <script defer src="js/home.js"></script>
 <script defer src="js/main.js"></script>

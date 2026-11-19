@@ -6694,3 +6694,30 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 .cp-buttons { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 .cp-warn { margin: 0; padding: 8px 12px; border-radius: var(--r-ctl); background: rgba(255, 194, 61, 0.12); color: #ffd27a; font-size: var(--fs-13); }
+
+/* ===== 技能雷達 (js/skill-radar.js) ===== */
+.lookup-radar[hidden], .pp-compare-radar[hidden] { display: none; }
+.lookup-radar, .pp-compare-radar { margin-top: 18px; }
+.sr-wrap { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 20px; align-items: center; }
+.sr-svg { width: 100%; height: auto; overflow: visible; }
+.sr-ring { fill: none; stroke: var(--border); stroke-width: 1; }
+.sr-ring:last-of-type { stroke: var(--border-strong); }
+.sr-axis { stroke: var(--border); stroke-width: 1; }
+.sr-poly { fill: color-mix(in srgb, var(--c) 22%, transparent); stroke: var(--c); stroke-width: 2; stroke-linejoin: round; }
+.sr-label { fill: var(--text); font-size: 11.5px; font-weight: 700; }
+.sr-val { font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sr-details { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.sr-details > div { padding: 8px 12px; border-radius: var(--r-ctl); background: var(--bg-input); }
+.sr-details dt { font-size: var(--fs-12); font-weight: 700; color: var(--text-dim); }
+.sr-details dd { margin: 2px 0 0; font-size: var(--fs-14); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sr-details dd small { display: block; font-size: var(--fs-12); font-weight: 400; color: var(--text-dim); }
+.sr-details dd.is-a { color: var(--pink-text, var(--pink)); }
+.sr-details dd.is-b { color: #7cc0ff; }
+.sr-legend { display: flex; gap: 16px; margin: 8px 0 0; font-size: var(--fs-13); font-weight: 700; }
+.sr-legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 6px; border-radius: 3px; vertical-align: -1px; }
+.sr-legend .is-a::before { background: var(--pink); }
+.sr-legend .is-b::before { background: #4ea3ff; }
+@media (max-width: 720px) {
+    .sr-wrap { grid-template-columns: minmax(0, 1fr); }
+    .sr-svg { max-width: 340px; margin: 0 auto; }
+}

@@ -4777,6 +4777,7 @@ async function comparePlayers() {
         renderPpCompareChart(a, b, 'pp-compare-chart-panel');
         result.style.display = 'block';
         loadPpCompareTopPlays(a.id, b.id);
+        if (typeof loadCompareRadar === 'function') loadCompareRadar(a, b, 0);
     } catch (e) {
         console.error('PP compare failed:', e);
         if (skeleton) skeleton.style.display = 'none';
@@ -4921,6 +4922,7 @@ function switchVisitorRecentMode(mode, el) {
     visitorCurrentMode = mode;
     if (!visitorLookupUserId) return;
     loadSkillRecommendations(visitorLookupUserId, mode);
+    if (typeof loadSkillRadar === 'function') loadSkillRadar(visitorLookupUserId, mode);
     if (visitorPlaysType === 'goal') renderPpGoalPlannerUI();
     else if (visitorPlaysType === 'gradehistory') ensureGradeHistoryLoaded();
     else renderOsuPlaysList(visitorLookupUserId, mode, visitorPlaysType, 'visitor-recent-list', 'visitor-recent-plays');
@@ -5334,6 +5336,7 @@ async function loadVisitorProfileById(input, isUsername) {
         document.getElementById('pp-goal-planner').style.display = 'none';
         renderOsuPlaysList(u.user_id, 0, 'recent', 'visitor-recent-list', 'visitor-recent-plays');
         loadSkillRecommendations(u.user_id, 0);
+        if (typeof loadSkillRadar === 'function') loadSkillRadar(u.user_id, 0);
 
         if (totalPP > 0) {
             const key = ppHistoryKeyFor(u.user_id);
