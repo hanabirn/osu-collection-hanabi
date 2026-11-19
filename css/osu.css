@@ -6806,3 +6806,16 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .sr-h2h-row { grid-template-columns: 1fr 64px 1fr; }
     .sr-h2h-bar { display: none; }
 }
+
+/* Score rows: sharp covers in the right shape (js/osu.js osuPlayCoverStyle). */
+.osu-recent-bg { background-image: var(--cover-card); }
+.lookup-dash .osu-recent-list .osu-recent-bg,
+.lookup-dash .grade-history-panel .osu-recent-bg { background-image: var(--cover-slim, var(--cover-card)); background-position: center 40%; }
+/* 雙人對比 Top Play: the same compact rows as the dashboard, A and B side by side. */
+.pp-compare-topplays-col { display: flex; flex-direction: column; gap: 6px; }
+.pp-compare-topplays-col .osu-recent-item { aspect-ratio: auto; height: 60px; }
+.pp-compare-topplays-col .osu-recent-bg { background-image: var(--cover-slim, var(--cover-card)); background-position: center 40%; }
+.pp-compare-topplays-col .osu-recent-rank { top: 50%; transform: translateY(-50%); left: 10px; width: 30px; height: 30px; font-size: var(--fs-13); }
+.pp-compare-topplays-col .osu-recent-info { top: 0; bottom: 0; left: 50px; display: flex; flex-direction: column; justify-content: center; padding: 6px 10px 6px 0; }
+.pp-compare-topplays-col .osu-recent-overlay { background: linear-gradient(90deg, rgba(14, 11, 15, 0.92) 0%, rgba(14, 11, 15, 0.75) 55%, rgba(14, 11, 15, 0.45) 100%); }
+.pp-compare-topplays-col .fc-sim-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }

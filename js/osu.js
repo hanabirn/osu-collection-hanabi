@@ -4185,9 +4185,18 @@ function playsListSkeletonHTML(count) {
 /* One .osu-recent-item card's markup — pulled out of renderOsuPlaysList so
    the two-player Top Play comparison (loadPpCompareTopPlays below) can
    build the exact same card for each side without duplicating this. */
+/* A score row's background: the sharp 2x cover in the shape it is shown
+   at. Cards (4:1.4) use card@2x (800x280, same shape); the PP 查詢
+   dashboard's wide, short rows use slimcover@2x (1920x360). CSS picks the
+   variable, so the browser only downloads the one on screen. */
+function osuPlayCoverStyle(bm) {
+    if (!bm || !bm.beatmapset_id) return '';
+    const base = `https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers`;
+    return `--cover-card:url('${base}/card@2x.jpg');--cover-slim:url('${base}/slimcover@2x.jpg')`;
+}
+
 function osuPlayItemHtml(r, mode, bm, type) {
     const title = bm ? `${bm.title} [${bm.version}]` : `Beatmap #${r.beatmap_id}`;
-    const coverUrl = bm ? `https://assets.ppy.sh/beatmaps/${bm.beatmapset_id}/covers/card.jpg` : '';
     const acc = calcOsuAccuracy(r, mode);
     const rankClass = OSU_RANK_CLASS[r.rank] || 'f';
     const mods = decodeOsuMods(r.enabled_mods);
@@ -4200,7 +4209,7 @@ function osuPlayItemHtml(r, mode, bm, type) {
     // string sent to it.
     const fcMods = mods.filter(m => m !== 'NF' && m !== 'SO').join('');
     return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
-        <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="osu-recent-bg" style="${osuPlayCoverStyle(bm)}"></div>
         <div class="osu-recent-overlay"></div>
         <span class="osu-recent-rank rank-${rankClass}">${r.rank || '—'}</span>
         <div class="osu-recent-info">
@@ -5209,7 +5218,6 @@ async function renderGradeHistoryList() {
 
 function gradeHistoryItemHtml(r, bm) {
     const title = bm ? `${bm.title} [${bm.version}]` : `Beatmap #${r.beatmap_id}`;
-    const coverUrl = bm ? `https://assets.ppy.sh/beatmaps/${bm.beatmapset_id}/covers/card.jpg` : '';
     const rankClass = OSU_RANK_CLASS[r.rank] || 'f';
     const mods = decodeOsuMods(r.mods);
     const modsStr = mods.length > 0 ? ' · ' + mods.join(',') : '';
@@ -5217,7 +5225,7 @@ function gradeHistoryItemHtml(r, bm) {
     const dateStr = isNaN(d) ? '' : `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
     const ppStr = r.pp != null ? `${Math.round(parseFloat(r.pp)).toLocaleString()}pp · ` : '';
     return `<a class="osu-recent-item" href="https://osu.ppy.sh/b/${r.beatmap_id}" target="_blank" rel="noopener noreferrer">
-        <div class="osu-recent-bg" style="background-image:url('${coverUrl}')"></div>
+        <div class="osu-recent-bg" style="${osuPlayCoverStyle(bm)}"></div>
         <div class="osu-recent-overlay"></div>
         <span class="osu-recent-rank rank-${rankClass}">${r.rank || '—'}</span>
         <div class="osu-recent-info">
