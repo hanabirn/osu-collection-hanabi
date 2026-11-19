@@ -1,5 +1,5 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
- * 端點數: 59
+ * 端點數: 62
  * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
  *       Discord 0 個（延後）、死程式碼 1 個
  */
@@ -24,6 +24,7 @@ const ROUTES = {
     "community-mappools-crawl-run": adapt(require('../netlify/functions/community-mappools-crawl-run').handler),
     "community-mappools-edit": adapt(require('../netlify/functions/community-mappools-edit').handler),
     "community-mappools-list": adapt(require('../netlify/functions/community-mappools-list').handler),
+    "discord-inbox": adapt(require('../netlify/functions/discord-inbox').handler),
     "discord-interactions": adapt(require('../netlify/functions/discord-interactions').handler),
     "dm-conversations": adapt(require('../netlify/functions/dm-conversations').handler),
     "dm-messages": adapt(require('../netlify/functions/dm-messages').handler),
@@ -40,10 +41,12 @@ const ROUTES = {
     "osu-avatar": adapt(require('../netlify/functions/osu-avatar').handler),
     "osu-beatmapset": adapt(require('../netlify/functions/osu-beatmapset').handler),
     "osu-callback": adapt(require('../netlify/functions/osu-callback').handler),
+    "osu-cover": adapt(require('../netlify/functions/osu-cover').handler),
     "osu-login": adapt(require('../netlify/functions/osu-login').handler),
     "osu-news": adapt(require('../netlify/functions/osu-news').handler),
     "osu-pp": adapt(require('../netlify/functions/osu-pp').handler),
     "osu-pp-history": adapt(require('../netlify/functions/osu-pp-history').handler),
+    "osu-score": adapt(require('../netlify/functions/osu-score').handler),
     "osu-score-history": adapt(require('../netlify/functions/osu-score-history').handler),
     "osu-tournaments": adapt(require('../netlify/functions/osu-tournaments').handler),
     "osu-user-achievements": adapt(require('../netlify/functions/osu-user-achievements').handler),
