@@ -6692,3 +6692,5 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
     .cp-bar, .cp-legend { display: none; }
     .cp-head > :nth-child(2) { display: none; }
 }
+.cp-buttons { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.cp-warn { margin: 0; padding: 8px 12px; border-radius: var(--r-ctl); background: rgba(255, 194, 61, 0.12); color: #ffd27a; font-size: var(--fs-13); }

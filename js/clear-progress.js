@@ -7,13 +7,69 @@
    已遊玩 button checks), with one get_scores lookup each. A big collection
    is thousands of sets, so the scan runs 4 at a time in the background,
    can be stopped, and resumes; results are kept in this browser
-   (osu_clear_cache_v1) and only rechecked after a while (never for SS).
-   Collection cards show the cached grade badge without a click. */
+   (osu_clear_cache_v1). Collection cards show the cached grade badge.
+
+   Keeping it current without rescanning: a score only changes when the
+   player plays, so on sign-in (and when the window opens) the site reads
+   their recent plays (last 24 h, 50 per mode) and top 100 per mode, 8
+   requests in all, and updates the sets those maps belong to
+   (syncClearRecent). New sets in the collection are scanned on their own;
+   removed ones simply drop out of the counts. The full recheck is only a
+   30-day safety net, and the window warns when more than a day passed
+   since the last sync (plays in that gap may be missed). */
 
 const CLEAR_CACHE_KEY = 'osu_clear_cache_v1';
-const CLEAR_RECHECK_MS = { none: 3 * 864e5, played: 7 * 864e5 }; // unplayed: 3 days, not-SS: 7 days
+const CLEAR_SYNC_KEY = 'osu_clear_synced_at';
+const CLEAR_RECHECK_MS = { none: 30 * 864e5, played: 30 * 864e5 }; // safety net; recent-play sync does the rest
 const CLEAR_S_PLUS = new Set(['S', 'SH', 'X', 'XH']);
+const CLEAR_RANK_ORDER = ['F', 'D', 'C', 'B', 'A', 'S', 'SH', 'X', 'XH'];
 let clearScan = null; // { stop: bool, done, total } while scanning
+let clearSyncing = null; // the running syncClearRecent() promise
+
+/* Update the cache from the player's recent plays and top 100 (per mode):
+   a better grade or a new full combo on a collected set's hardest
+   difficulty replaces what was stored. Throttled to once per 10 minutes. */
+async function syncClearRecent(force = false) {
+    const user = getLoggedInOsuUser();
+    if (!user) return 0;
+    if (clearSyncing) return clearSyncing;
+    const last = Number(localStorage.getItem(CLEAR_SYNC_KEY)) || 0;
+    if (!force && Date.now() - last < 10 * 60e3) return 0;
+    clearSyncing = (async () => {
+        const byMap = new Map(clearTargets().map((x) => [String(x.beatmapId), x.setId]));
+        const cache = getClearCache();
+        let changed = 0;
+        const lists = await Promise.all([0, 1, 2, 3].flatMap((m) => [
+            osuFetch(`recent=${encodeURIComponent(user.id)}&m=${m}&limit=50`).catch(() => null),
+            osuFetch(`best=${encodeURIComponent(user.id)}&m=${m}&limit=100`).catch(() => null),
+        ]));
+        for (const list of lists) {
+            for (const s of Array.isArray(list) ? list : []) {
+                const setId = byMap.get(String(s.beatmap_id));
+                if (!setId || !s.rank || s.rank === 'F') continue;
+                const cur = cache[setId];
+                const fc = String(s.perfect) === '1';
+                if (!cur || !cur.r || CLEAR_RANK_ORDER.indexOf(s.rank) > CLEAR_RANK_ORDER.indexOf(cur.r)) {
+                    cache[setId] = { r: s.rank, fc: fc || !!(cur && cur.fc), t: Date.now() };
+                    changed++;
+                } else if (fc && !cur.fc) {
+                    cur.fc = true;
+                    changed++;
+                }
+            }
+        }
+        if (changed) saveClearCache(cache);
+        if (lists.some(Array.isArray)) localStorage.setItem(CLEAR_SYNC_KEY, String(Date.now()));
+        applyCachedPlayStatus();
+        return changed;
+    })();
+    try { return await clearSyncing; } finally { clearSyncing = null; }
+}
+
+// On sign-in / page load, quietly bring the stored grades up to date.
+window.addEventListener('load', () => setTimeout(() => {
+    if (getLoggedInOsuUser() && Object.keys(getClearCache()).length) syncClearRecent();
+}, 4000));
 
 function getClearCache() {
     try { return JSON.parse(localStorage.getItem(CLEAR_CACHE_KEY)) || {}; } catch { return {}; }
@@ -80,11 +136,12 @@ if (typeof renderOsuCollection === 'function') {
     };
 }
 
-async function scanClearProgress() {
+async function scanClearProgress(opts = {}) {
     const user = getLoggedInOsuUser();
     if (!user || clearScan) return;
     const cache = getClearCache();
-    const todo = clearTargets().filter((x) => !clearIsFresh(cache[x.setId]));
+    const todo = clearTargets().filter((x) => (opts.full ? true : opts.onlyNew ? !cache[x.setId] : !clearIsFresh(cache[x.setId])));
+    if (!todo.length) { renderClearProgress(); return; }
     clearScan = { stop: false, done: 0, total: todo.length };
     renderClearProgress();
     let i = 0;
@@ -177,6 +234,9 @@ function renderClearProgress() {
         .filter(([, ids]) => ids.length)
         .map(([name, ids]) => clearRowHtml(name, clearTally(ids, cache)));
     const at = Number(localStorage.getItem('osu_clear_scanned_at')) || 0;
+    const synced = Number(localStorage.getItem(CLEAR_SYNC_KEY)) || 0;
+    const fmt = (ms) => new Date(ms).toLocaleString(siteLang === 'zh' ? 'zh-TW' : (siteLang || undefined), { dateStyle: 'medium', timeStyle: 'short' });
+    const gap = all.checked && synced && Date.now() - synced > 864e5;
     const scanning = !!clearScan;
     const status = scanning
         ? t('cp_scanning', { n: clearScan.done.toLocaleString(), t: clearScan.total.toLocaleString() })
@@ -184,11 +244,13 @@ function renderClearProgress() {
 
     body.innerHTML = `
         <div class="cp-controls">
-            <span class="cp-status">${escHtml(status)}${at && !scanning ? ` · ${escHtml(t('cp_last', { d: new Date(at).toLocaleString(siteLang === 'zh' ? 'zh-TW' : (siteLang || undefined), { dateStyle: 'medium', timeStyle: 'short' }) }))}` : ''}</span>
-            ${scanning
+            <span class="cp-status">${escHtml(status)}${at && !scanning ? ` · ${escHtml(t('cp_last', { d: fmt(at) }))}` : ''}${synced && !scanning ? `<br>${escHtml(t('cp_synced', { d: fmt(synced) }))}` : ''}</span>
+            <span class="cp-buttons">${scanning
                 ? `<button type="button" class="btn btn-ghost" onclick="stopClearScan()">${escHtml(t('cp_stop'))}</button>`
-                : `<button type="button" class="btn" onclick="scanClearProgress()" ${stale ? '' : 'disabled'}>${escHtml(t(all.checked ? 'cp_continue' : 'cp_scan'))}</button>`}
+                : `${all.checked ? `<button type="button" class="btn btn-ghost" onclick="scanClearProgress({ full: true })" title="${escHtml(t('cp_full_title'))}">${escHtml(t('cp_full'))}</button>` : ''}
+                   <button type="button" class="btn" onclick="scanClearProgress()" ${stale ? '' : 'disabled'}>${escHtml(t(all.checked ? 'cp_continue' : 'cp_scan'))}</button>`}</span>
         </div>
+        ${gap && !scanning ? `<p class="cp-warn">${escHtml(t('cp_sync_gap'))}</p>` : ''}
         ${scanning ? `<div class="cp-scanbar"><i style="width:${clearScan.total ? (clearScan.done / clearScan.total) * 100 : 0}%"></i></div>` : ''}
         <div class="cp-table">
             <div class="cp-row cp-head"><span></span><span class="cp-legend"><i class="is-passed"></i>${escHtml(t('cp_passed'))}<i class="is-s"></i>${escHtml(t('cp_s'))}<i class="is-fc"></i>FC</span>
@@ -221,6 +283,14 @@ function openClearProgressModal() {
     document.getElementById('cp-title').textContent = t('col_clear');
     renderClearProgress();
     m.querySelector('.cp-close').focus();
+    // Bring it up to date: recent plays first, then any sets added since.
+    if (getLoggedInOsuUser() && Object.keys(getClearCache()).length) {
+        syncClearRecent().then(() => {
+            renderClearProgress();
+            const cache = getClearCache();
+            if (clearTargets().some((x) => !cache[x.setId])) scanClearProgress({ onlyNew: true });
+        });
+    }
 }
 
 function closeClearProgressModal() {
