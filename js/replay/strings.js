@@ -1,0 +1,62 @@
+/* ===== Replay player: its text in every site language =====
+   Keyed by the Chinese (zh) wording used in the code; replayText(zh) picks
+   the visitor's language (siteLang) and falls back to the Chinese. */
+(function () {
+    const T = {
+        '重播播放器': { 'zh-Hans': '回放播放器', en: 'Replay player', ja: 'リプレイプレイヤー', ko: '리플레이 플레이어', de: 'Replay-Player', es: 'Reproductor de replays', fr: 'Lecteur de replays', ru: 'Проигрыватель реплеев' },
+        '關閉': { 'zh-Hans': '关闭', en: 'Close', ja: '閉じる', ko: '닫기', de: 'Schließen', es: 'Cerrar', fr: 'Fermer', ru: 'Закрыть' },
+        '把 .osr 重播檔拖到這裡，或點一下選擇檔案': { 'zh-Hans': '把 .osr 回放文件拖到这里，或点击选择文件', en: 'Drop an .osr replay here, or click to choose one', ja: '.osr リプレイをここにドロップ、またはクリックして選択', ko: '.osr 리플레이를 여기에 끌어다 놓거나 클릭해서 선택하세요', de: '.osr-Replay hierher ziehen oder klicken, um eine auszuwählen', es: 'Suelta aquí un replay .osr o haz clic para elegir uno', fr: 'Dépose un replay .osr ici, ou clique pour en choisir un', ru: 'Перетащите сюда реплей .osr или нажмите, чтобы выбрать' },
+        '目前支援 osu!mania。譜面和音樂會自動從 osu.direct 下載。': { 'zh-Hans': '目前支持 osu!mania。谱面和音乐会自动从 osu.direct 下载。', en: 'osu!mania for now. The beatmap and music download automatically from osu.direct.', ja: '現在は osu!mania に対応。譜面と音楽は osu.direct から自動でダウンロードされます。', ko: '현재 osu!mania를 지원합니다. 비트맵과 음악은 osu.direct에서 자동으로 받아옵니다.', de: 'Vorerst osu!mania. Beatmap und Musik werden automatisch von osu.direct geladen.', es: 'Por ahora, osu!mania. El mapa y la música se descargan solos desde osu.direct.', fr: 'osu!mania pour l’instant. La map et la musique se téléchargent depuis osu.direct.', ru: 'Пока только osu!mania. Карта и музыка загружаются с osu.direct автоматически.' },
+        '讀取重播檔': { 'zh-Hans': '读取回放文件', en: 'Reading the replay', ja: 'リプレイを読み込み中', ko: '리플레이 읽는 중', de: 'Replay wird gelesen', es: 'Leyendo el replay', fr: 'Lecture du replay', ru: 'Чтение реплея' },
+        '查詢譜面': { 'zh-Hans': '查询谱面', en: 'Finding the beatmap', ja: '譜面を検索中', ko: '비트맵 찾는 중', de: 'Beatmap wird gesucht', es: 'Buscando el mapa', fr: 'Recherche de la map', ru: 'Поиск карты' },
+        '下載譜面和音樂': { 'zh-Hans': '下载谱面和音乐', en: 'Downloading beatmap and music', ja: '譜面と音楽をダウンロード中', ko: '비트맵과 음악 받는 중', de: 'Beatmap und Musik werden geladen', es: 'Descargando mapa y música', fr: 'Téléchargement de la map et de la musique', ru: 'Загрузка карты и музыки' },
+        '解壓縮': { 'zh-Hans': '解压缩', en: 'Unpacking', ja: '展開中', ko: '압축 해제 중', de: 'Entpacken', es: 'Descomprimiendo', fr: 'Décompression', ru: 'Распаковка' },
+        '計算判定': { 'zh-Hans': '计算判定', en: 'Working out judgements', ja: '判定を計算中', ko: '판정 계산 중', de: 'Bewertungen werden berechnet', es: 'Calculando juicios', fr: 'Calcul des jugements', ru: 'Подсчёт попаданий' },
+        '這個重播不是 osu!mania（目前只支援 Mania）': { 'zh-Hans': '这个回放不是 osu!mania（目前只支持 Mania）', en: 'This replay isn’t osu!mania (only mania for now)', ja: 'このリプレイは osu!mania ではありません（現在は mania のみ対応）', ko: '이 리플레이는 osu!mania가 아닙니다 (현재 mania만 지원)', de: 'Dieses Replay ist kein osu!mania (vorerst nur mania)', es: 'Este replay no es de osu!mania (por ahora solo mania)', fr: 'Ce replay n’est pas en osu!mania (mania uniquement pour l’instant)', ru: 'Это не реплей osu!mania (пока поддерживается только mania)' },
+        '找不到這張譜面：可能已經更新過、被刪除，或還沒上架': { 'zh-Hans': '找不到这张谱面：可能已更新、被删除或尚未上架', en: 'Beatmap not found: it may have been updated, deleted, or not be submitted', ja: '譜面が見つかりません：更新・削除された、または未投稿の可能性があります', ko: '비트맵을 찾을 수 없습니다: 업데이트·삭제되었거나 아직 올라오지 않았을 수 있어요', de: 'Beatmap nicht gefunden: vielleicht aktualisiert, gelöscht oder nicht hochgeladen', es: 'Mapa no encontrado: puede que se haya actualizado, borrado o no esté subido', fr: 'Map introuvable : elle a pu être mise à jour, supprimée ou jamais publiée', ru: 'Карта не найдена: возможно, её обновили, удалили или не загрузили' },
+        '譜面組裡找不到這個難度': { 'zh-Hans': '谱面组里找不到这个难度', en: 'This difficulty isn’t in the beatmap set', ja: '譜面セットにこの難易度がありません', ko: '비트맵 세트에 이 난이도가 없습니다', de: 'Diese Schwierigkeit fehlt im Beatmap-Set', es: 'Esta dificultad no está en el set', fr: 'Cette difficulté n’est pas dans le set', ru: 'В наборе нет этой сложности' },
+        '這是轉換譜（由 Standard 轉成 Mania），目前還不支援': { 'zh-Hans': '这是转换谱（由 Standard 转成 Mania），目前还不支持', en: 'This is a converted map (Standard played as mania): not supported yet', ja: 'コンバート譜面（Standard を mania でプレイ）にはまだ対応していません', ko: '변환 맵(Standard를 mania로 플레이)은 아직 지원하지 않아요', de: 'Konvertierte Map (Standard als mania): noch nicht unterstützt', es: 'Mapa convertido (Standard jugado en mania): aún no compatible', fr: 'Map convertie (Standard jouée en mania) : pas encore prise en charge', ru: 'Конвертированная карта (Standard в mania) пока не поддерживается' },
+        '譜面組裡找不到音樂檔': { 'zh-Hans': '谱面组里找不到音乐文件', en: 'No music file in the beatmap set', ja: '譜面セットに音楽ファイルがありません', ko: '비트맵 세트에 음악 파일이 없습니다', de: 'Keine Musikdatei im Beatmap-Set', es: 'No hay archivo de música en el set', fr: 'Aucun fichier audio dans le set', ru: 'В наборе нет музыки' },
+        '長度': { 'zh-Hans': '长度', en: 'Length', ja: '長さ', ko: '길이', de: 'Länge', es: 'Duración', fr: 'Durée', ru: 'Длина' },
+        '準確率': { 'zh-Hans': '准确率', en: 'Accuracy', ja: '精度', ko: '정확도', de: 'Genauigkeit', es: 'Precisión', fr: 'Précision', ru: 'Точность' },
+        '連擊': { 'zh-Hans': '连击', en: 'Combo', ja: 'コンボ', ko: '콤보', de: 'Combo', es: 'Combo', fr: 'Combo', ru: 'Комбо' },
+        '進度': { 'zh-Hans': '进度', en: 'Progress', ja: '再生位置', ko: '진행', de: 'Position', es: 'Progreso', fr: 'Progression', ru: 'Позиция' },
+        '播放': { 'zh-Hans': '播放', en: 'Play', ja: '再生', ko: '재생', de: 'Abspielen', es: 'Reproducir', fr: 'Lecture', ru: 'Воспроизвести' },
+        '暫停': { 'zh-Hans': '暂停', en: 'Pause', ja: '一時停止', ko: '일시정지', de: 'Pause', es: 'Pausa', fr: 'Pause', ru: 'Пауза' },
+        '靜音': { 'zh-Hans': '静音', en: 'Mute', ja: 'ミュート', ko: '음소거', de: 'Stumm', es: 'Silenciar', fr: 'Muet', ru: 'Без звука' },
+        '音量': { 'zh-Hans': '音量', en: 'Volume', ja: '音量', ko: '음량', de: 'Lautstärke', es: 'Volumen', fr: 'Volume', ru: 'Громкость' },
+        '播放速度': { 'zh-Hans': '播放速度', en: 'Playback speed', ja: '再生速度', ko: '재생 속도', de: 'Wiedergabetempo', es: 'Velocidad de reproducción', fr: 'Vitesse de lecture', ru: 'Скорость воспроизведения' },
+        '速度': { 'zh-Hans': '速度', en: 'Speed', ja: '速度', ko: '속도', de: 'Tempo', es: 'Velocidad', fr: 'Vitesse', ru: 'Скорость' },
+        '捲動速度（Ctrl + ＋／－）': { 'zh-Hans': '滚动速度（Ctrl + ＋／－）', en: 'Scroll speed (Ctrl + / −)', ja: 'スクロール速度（Ctrl + ＋／－）', ko: '스크롤 속도 (Ctrl + / −)', de: 'Scrollgeschwindigkeit (Strg + / −)', es: 'Velocidad de scroll (Ctrl + / −)', fr: 'Vitesse de défilement (Ctrl + / −)', ru: 'Скорость прокрутки (Ctrl + / −)' },
+        '捲動': { 'zh-Hans': '滚动', en: 'Scroll', ja: 'スクロール', ko: '스크롤', de: 'Scroll', es: 'Scroll', fr: 'Défil.', ru: 'Прокрутка' },
+        '捲動速度': { 'zh-Hans': '滚动速度', en: 'Scroll speed', ja: 'スクロール速度', ko: '스크롤 속도', de: 'Scrollgeschwindigkeit', es: 'Velocidad de scroll', fr: 'Vitesse de défilement', ru: 'Скорость прокрутки' },
+        '背景暗度': { 'zh-Hans': '背景暗度', en: 'Background dim', ja: '背景の暗さ', ko: '배경 어둡기', de: 'Hintergrund abdunkeln', es: 'Oscurecer fondo', fr: 'Assombrir le fond', ru: 'Затемнение фона' },
+        '背景': { 'zh-Hans': '背景', en: 'Dim', ja: '背景', ko: '배경', de: 'Abdunkeln', es: 'Fondo', fr: 'Fond', ru: 'Фон' },
+        '畫面大小': { 'zh-Hans': '画面大小', en: 'Window size', ja: '画面サイズ', ko: '화면 크기', de: 'Fenstergröße', es: 'Tamaño de ventana', fr: 'Taille de la fenêtre', ru: 'Размер окна' },
+        '大小': { 'zh-Hans': '大小', en: 'Size', ja: 'サイズ', ko: '크기', de: 'Größe', es: 'Tamaño', fr: 'Taille', ru: 'Размер' },
+        '小': { 'zh-Hans': '小', en: 'Small', ja: '小', ko: '작게', de: 'Klein', es: 'Pequeño', fr: 'Petite', ru: 'Маленький' },
+        '中': { 'zh-Hans': '中', en: 'Medium', ja: '中', ko: '보통', de: 'Mittel', es: 'Mediano', fr: 'Moyenne', ru: 'Средний' },
+        '大': { 'zh-Hans': '大', en: 'Large', ja: '大', ko: '크게', de: 'Groß', es: 'Grande', fr: 'Grande', ru: 'Большой' },
+        '填滿畫面': { 'zh-Hans': '填满画面', en: 'Fill the page', ja: '画面いっぱい', ko: '화면 채우기', de: 'Ganze Seite', es: 'Llenar la página', fr: 'Toute la page', ru: 'На всю страницу' },
+        '全螢幕': { 'zh-Hans': '全屏', en: 'Full screen', ja: '全画面', ko: '전체 화면', de: 'Vollbild', es: 'Pantalla completa', fr: 'Plein écran', ru: 'Полный экран' },
+        'Skin・判定': { 'zh-Hans': 'Skin・判定', en: 'Skin · judgements', ja: 'スキン・判定', ko: '스킨·판정', de: 'Skin · Bewertungen', es: 'Skin · juicios', fr: 'Skin · jugements', ru: 'Скин · попадания' },
+        '使用我的 skin（.osk / .zip）': { 'zh-Hans': '使用我的 skin（.osk / .zip）', en: 'Use my skin (.osk / .zip)', ja: '自分のスキンを使う（.osk / .zip）', ko: '내 스킨 사용 (.osk / .zip)', de: 'Meinen Skin nutzen (.osk / .zip)', es: 'Usar mi skin (.osk / .zip)', fr: 'Utiliser mon skin (.osk / .zip)', ru: 'Свой скин (.osk / .zip)' },
+        '恢復預設': { 'zh-Hans': '恢复默认', en: 'Reset to default', ja: 'デフォルトに戻す', ko: '기본값으로', de: 'Zurücksetzen', es: 'Restablecer', fr: 'Par défaut', ru: 'По умолчанию' },
+        '再按一次確認': { 'zh-Hans': '再按一次确认', en: 'Click again to confirm', ja: 'もう一度押して確定', ko: '한 번 더 눌러 확인', de: 'Zum Bestätigen erneut klicken', es: 'Pulsa otra vez para confirmar', fr: 'Clique encore pour confirmer', ru: 'Нажмите ещё раз' },
+        '預設': { 'zh-Hans': '默认', en: 'Default', ja: 'デフォルト', ko: '기본', de: 'Standard', es: 'Predeterminado', fr: 'Par défaut', ru: 'Стандартный' },
+        '讀取中…': { 'zh-Hans': '读取中…', en: 'Loading…', ja: '読み込み中…', ko: '불러오는 중…', de: 'Wird geladen…', es: 'Cargando…', fr: 'Chargement…', ru: 'Загрузка…' },
+        '讀不到這個 skin': { 'zh-Hans': '读不到这个 skin', en: 'Couldn’t read this skin', ja: 'このスキンを読み込めません', ko: '이 스킨을 읽을 수 없어요', de: 'Skin nicht lesbar', es: 'No se pudo leer el skin', fr: 'Skin illisible', ru: 'Не удалось прочитать скин' },
+        '判定大小': { 'zh-Hans': '判定大小', en: 'Judgement size', ja: '判定の大きさ', ko: '판정 크기', de: 'Bewertungsgröße', es: 'Tamaño del juicio', fr: 'Taille des jugements', ru: 'Размер попаданий' },
+        '連擊大小': { 'zh-Hans': '连击大小', en: 'Combo size', ja: 'コンボの大きさ', ko: '콤보 크기', de: 'Combo-Größe', es: 'Tamaño del combo', fr: 'Taille du combo', ru: 'Размер комбо' },
+        '本站判定': { 'zh-Hans': '本站判定', en: 'Ours', ja: '本サイト', ko: '이 사이트', de: 'Unsere', es: 'Nuestro', fr: 'Le nôtre', ru: 'Наш подсчёт' },
+        '重播紀錄': { 'zh-Hans': '回放记录', en: 'Replay', ja: 'リプレイ記録', ko: '리플레이 기록', de: 'Replay', es: 'Replay', fr: 'Replay', ru: 'Реплей' },
+        '「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。': { 'zh-Hans': '“本站判定”是播放器根据按键时间自己算的，和游戏可能有些微差距；画面上的实时数字也是用它算的。', en: '“Ours” is worked out by this player from the key timings and can differ slightly from the game; the live numbers on screen use it too.', ja: '「本サイト」はキー入力のタイミングからこのプレイヤーが計算したもので、ゲームと少し違うことがあります。画面上のリアルタイムの数字もこれを使っています。', ko: '“이 사이트”는 키 입력 시간으로 이 플레이어가 계산한 값이라 게임과 약간 다를 수 있어요. 화면의 실시간 숫자도 이 값입니다.', de: '„Unsere“ berechnet der Player aus den Tastenzeiten; sie kann leicht vom Spiel abweichen. Die Live-Zahlen nutzen sie auch.', es: '“Nuestro” lo calcula este reproductor a partir de las pulsaciones y puede diferir un poco del juego; los números en vivo también lo usan.', fr: '« Le nôtre » est calculé par ce lecteur d’après les appuis et peut différer un peu du jeu ; les chiffres en direct l’utilisent aussi.', ru: '«Наш подсчёт» плеер считает по нажатиям, он может немного отличаться от игры; живые цифры на экране тоже из него.' },
+        '換一個重播': { 'zh-Hans': '换一个回放', en: 'Another replay', ja: '別のリプレイ', ko: '다른 리플레이', de: 'Anderes Replay', es: 'Otro replay', fr: 'Autre replay', ru: 'Другой реплей' },
+    };
+    window.replayText = function replayText(zh) {
+        const lang = typeof siteLang !== 'undefined' ? siteLang : 'zh';
+        const row = T[zh];
+        return (row && lang !== 'zh' && row[lang]) || zh;
+    };
+    window.REPLAY_TEXT_KEYS = Object.keys(T); // for checking that every string has a row
+})();

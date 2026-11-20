@@ -44,7 +44,7 @@ const SITE_SECTIONS = [
         { tab: 'mappools', label: 'nav_pools', choices: [['mappools', 'nav_pools_wc'], ['cmpool', 'nav_pools_community']] },
         { tab: 'skin-screenshots', label: 'nav_skins', choices: [['skin-screenshots', 'nav_skin_screenshots'], ['skins', 'nav_my_skins']] },
     ] },
-    { id: 'player', label: 'nav_player', tabs: [{ tab: 'lookup', label: 'nav_lookup' }, { tab: 'tournaments', label: 'nav_tournaments' }] },
+    { id: 'player', label: 'nav_player', tabs: [{ tab: 'lookup', label: 'nav_lookup' }, { tab: 'tournaments', label: 'nav_tournaments' }, { action: 'openReplayViewer()', label: 'nav_replay' }] },
     // 私訊 lives inside the chat page's sidebar now (switchTab maps 'dm' to 'chat').
     { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { action: 'focusDiscordCard()', label: 'discord_bot_title' }] },
     { id: 'more', label: 'nav_more', tabs: [

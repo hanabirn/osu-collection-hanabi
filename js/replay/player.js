@@ -12,9 +12,9 @@
    controls; scroll speed, background dim and skin under ⚙).
    The audio element is the clock: its currentTime is song time whatever the
    playback rate (DT/HT), so drawing just follows it.
-   Prototype: osu!mania only; text in Chinese until the design is settled. */
+   osu!mania for now; text in every site language via js/replay/strings.js. */
 (function () {
-    const L = (zh) => zh; // placeholder until the strings go into js/i18n
+    const L = (zh) => (window.replayText ? window.replayText(zh) : zh); // js/replay/strings.js
     const JUDGES = ['MAX', '300', '200', '100', '50', 'MISS'];
     let root = null;
     let session = null; // { audio, raf, urls[], prep, map, replay, view, ro }
@@ -176,7 +176,6 @@
             showStatus(steps, 4);
             await new Promise((r) => setTimeout(r, 0));
             const prep = window.replayMania.prepareMania(map, replay);
-            window.__replayDebug = { prep, map, replay }; // prototype: for checking judgements
             if (savedSkin === undefined) savedSkin = await window.replaySkin.loadSavedSkin();
             const skinCfg = savedSkin ? await savedSkin.forKeys(prep.keys).catch(() => null) : null;
             startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg });
