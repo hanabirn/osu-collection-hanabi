@@ -327,19 +327,27 @@
         const cx = ox + c.x * k;
         const plateHalf = (prep.catchWidth / 2) * k;
 
-        function drawObject(o, x, y, alpha, rot) {
-            const r = radiusOf(o);
+        function drawObject(o, x, y, alpha, rot, scale) {
+            const r = radiusOf(o) * (scale || 1);
             ctx.globalAlpha = alpha;
-            if (o.hyper && o.kind !== 'tiny') {
-                ctx.beginPath();
-                ctx.arc(x, y, r * 1.3, 0, Math.PI * 2);
-                ctx.fillStyle = hyperColour;
-                ctx.globalAlpha = alpha * 0.6;
-                ctx.fill();
-                ctx.globalAlpha = alpha;
-            }
             if (o.kind === 'banana') { drawBanana(ctx, x, y, r * 1.1, rot); ctx.globalAlpha = 1; return; }
             const img = skin && pickImage(skin, o);
+            // hyperdash: the object's own shape, a size bigger, in the hyperdash colour, behind it
+            if (o.hyper && o.kind !== 'tiny') {
+                if (img) {
+                    const big = r * 2 * 1.2;
+                    ctx.save();
+                    ctx.translate(x, y);
+                    if (rot) ctx.rotate(rot);
+                    drawTinted(ctx, img.base, -big / 2, -big / 2, big, big, hyperColour, true);
+                    ctx.restore();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(x, y, r * 1.2, 0, Math.PI * 2);
+                    ctx.fillStyle = hyperColour;
+                    ctx.fill();
+                }
+            }
             if (img) {
                 const size = r * 2;
                 ctx.save();
@@ -370,7 +378,7 @@
             let alpha = 1;
             if (prep.hidden) { const left = (o.time - t) / prep.preempt; alpha = left < 0.4 ? Math.max(0, (left - 0.1) / 0.3) : 1; }
             if (o.time < t) alpha *= Math.max(0, 1 - (t - o.time) / 400); // a miss keeps falling, fading
-            const spin = o.kind === 'droplet' || o.kind === 'tiny' ? (o.time - t) / 300 : o.kind === 'banana' ? (o.time - t) / 500 : 0;
+            const spin = o.kind === 'droplet' || o.kind === 'tiny' ? (o.time - t) / 300 : o.kind === 'banana' ? (o.time - t) / 500 : tiltOf(o);
             drawObject(o, ox + o.ex * k, y, alpha, spin);
         }
 
@@ -413,7 +421,8 @@
         for (let j = ei; j >= 0; j--) { const o = f[j]; if (o.kind === 'fruit' || o.kind === 'droplet') { lastPalpable = o; break; } }
         const hyperActive = lastPalpable && lastPalpable.caught && lastPalpable.hyper;
         const catcherImg = skin && (lastPalpable && !lastPalpable.caught && t - lastPalpable.time < 600 ? skin.catcherFail : kiaiAt(prep, t) ? skin.catcherKiai : skin.catcherIdle);
-        const catcherSize = (img) => [img.bmp.width * img.s * 0.5 * Math.abs(prep.scale) * k, img.bmp.height * img.s * 0.5 * Math.abs(prep.scale) * k];
+        // the catcher sprite is as wide as the catcher (106.75 × its scale), height in proportion
+        const catcherSize = (img) => { const iw = BASE_SIZE * Math.abs(prep.scale) * k; return [iw, (iw * img.bmp.height) / img.bmp.width]; };
         if (hyperActive) {
             for (let n = 6; n >= 1; n--) {
                 const p = prep.catcherAt(t - n * 22);
@@ -439,15 +448,16 @@
         }
 
         // the pile, riding with the plate
+        // caught objects sit on the plate at half size, where they landed on it
         const place = (o, idx, catcherX) => {
-            const off = Math.max(-plateHalf * 0.9, Math.min(plateHalf * 0.9, (o.ex - prep.catcherAt(o.time).x) * k));
-            const r = radiusOf(o);
-            const lift = ((idx * 37) % 11) / 11;
-            return { x: catcherX + off, y: plateY - r * (0.55 + lift * 0.5) };
+            const off = Math.max(-plateHalf, Math.min(plateHalf, (o.ex - prep.catcherAt(o.time).x) * k));
+            const r = radiusOf(o) * 0.5;
+            const lift = ((idx * 37) % 7) / 7;
+            return { x: catcherX + off, y: plateY - r * (0.9 + lift * 0.6) };
         };
         for (let n = pile.length - 1; n >= 0; n--) {
             const p = place(pile[n], n, cx);
-            drawObject(pile[n], p.x, p.y, 1, 0);
+            drawObject(pile[n], p.x, p.y, 1, tiltOf(pile[n]), 0.5);
         }
         if (gone) {
             const p = Math.min(1, (t - gone.at) / 600);
@@ -462,7 +472,7 @@
                 } else {
                     y += 300 * k * p * p;
                 }
-                drawObject(o, x, y, 1 - p, 0);
+                drawObject(o, x, y, 1 - p, tiltOf(o) + (gone.kind === 'explode' ? p * 6 * (n % 2 ? 1 : -1) : 0), 0.5);
             });
         }
 
@@ -474,7 +484,7 @@
             const cy = plateY - h * 0.38;
             if (skin && skin.comboDigits) {
                 const ds = String(combo).split('').map((d) => skin.comboDigits[Number(d)]);
-                const dk = (h / 480) * cs;
+                const dk = (h / 480) * cs * 0.8;
                 const widths = ds.map((d) => d.bmp.width * d.s * dk);
                 const gap = -(skin.comboOverlap || 0) * dk;
                 const total = widths.reduce((a, b) => a + b, 0) + gap * (ds.length - 1);
@@ -482,7 +492,7 @@
                 ds.forEach((d, n) => { const dh = d.bmp.height * d.s * dk; ctx.drawImage(d.bmp, dx, cy - dh / 2, widths[n], dh); dx += widths[n] + gap; });
             } else {
                 ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                ctx.font = `800 ${Math.round(h * 0.06 * cs)}px system-ui, sans-serif`;
+                ctx.font = `800 ${Math.round(h * 0.045 * cs)}px system-ui, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(String(combo), cx, cy);
@@ -497,6 +507,12 @@
             lMiss: 0,
             rMiss: 0,
         };
+    }
+
+    // a fruit's fixed tilt, ±12°, the same every time it is drawn
+    function tiltOf(o) {
+        const x = Math.sin(o.time * 12.9898 + o.ex * 78.233) * 43758.5453;
+        return ((x - Math.floor(x)) - 0.5) * 0.42;
     }
 
     // the caught fruit/droplets of the combo that ends at index end-1
