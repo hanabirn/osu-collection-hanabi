@@ -7183,3 +7183,13 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-scroll-wrap output { position: absolute; bottom: 100%; margin-bottom: 4px; transform: translateX(-50%); padding: 1px 6px; border-radius: 6px; background: var(--pink); color: var(--on-accent, #fff); font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; pointer-events: none; white-space: nowrap; }
 @media (max-width: 1100px) { .rp-mapcard { width: 240px; } .rp-mapcard-cover { height: 70px; } }
 @media (max-width: 760px) { .rp-mapcard { display: none; } }
+/* a narrow player window: the bar drops its word labels and keeps icons/controls */
+.rp-frame { container-type: size; }
+@container (max-width: 1180px) {
+    .rp-ctl-name, .rp-btn-text { display: none; }
+    .rp-bar { gap: 10px; }
+    .rp-ctl input[type="range"] { width: 70px; }
+    .rp-scroll-wrap input[type="range"] { width: 96px; }
+    .rp-hud-top { display: none; }
+}
+@container (max-width: 860px) { .rp-mapcard { display: none; } }

@@ -22,7 +22,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75 };
+    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -241,31 +241,33 @@
                         <button type="button" class="rp-icon" id="rp-mute" aria-label="${L('靜音')}">🔊</button>
                         <input type="range" id="rp-volume" min="0" max="1" step="0.02" value="${prefs.volume}" aria-label="${L('音量')}">
                     </span>
-                    <label class="rp-ctl">${L('速度')}
+                    <label class="rp-ctl" title="${L('播放速度')}"><span class="rp-ctl-name">${L('速度')}</span>
                         <select id="rp-rate">${RATES.map((r) => `<option value="${r}"${r === 1 ? ' selected' : ''}>${r}×</option>`).join('')}</select>
                     </label>
-                    <label class="rp-ctl rp-scroll" title="${L('捲動速度（Ctrl + ＋／－）')}">${L('捲動')}<span class="rp-scroll-wrap"><output id="rp-scroll-val">${Number(prefs.scroll).toFixed(1)}</output><input type="range" id="rp-speed" min="1" max="40" step="0.1" value="${prefs.scroll}" aria-label="${L('捲動速度')}"></span></label>
-                    <label class="rp-ctl">${L('背景')}<input type="range" id="rp-dim" min="0" max="1" step="0.05" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
-                    <label class="rp-ctl">${L('大小')}
+                    <label class="rp-ctl rp-scroll" title="${L('捲動速度（Ctrl + ＋／－）')}"><span class="rp-ctl-name">${L('捲動')}</span><span class="rp-scroll-wrap"><output id="rp-scroll-val">${Number(prefs.scroll).toFixed(1)}</output><input type="range" id="rp-speed" min="1" max="40" step="0.1" value="${prefs.scroll}" aria-label="${L('捲動速度')}"></span></label>
+                    <label class="rp-ctl" title="${L('背景暗度')}"><span class="rp-ctl-name">${L('背景')}</span><input type="range" id="rp-dim" min="0" max="1" step="0.05" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
+                    <label class="rp-ctl" title="${L('畫面大小')}"><span class="rp-ctl-name">${L('大小')}</span>
                         <select id="rp-size">${SIZES.map(([v, n]) => `<option value="${v}"${v === prefs.size ? ' selected' : ''}>${L(n)}</option>`).join('')}</select>
                     </label>
                     <button type="button" class="rp-icon" id="rp-fs" aria-label="${L('全螢幕')}" title="${L('全螢幕')}">⛶</button>
                     <span class="rp-spacer"></span>
                     <details class="rp-menu">
-                        <summary class="rp-btn">⚙ ${L('Skin・判定')}</summary>
+                        <summary class="rp-btn" title="${L('Skin・判定')}">⚙<span class="rp-btn-text"> ${L('Skin・判定')}</span></summary>
                         <div class="rp-menu-panel">
                             <div class="rp-opt">Skin <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkin ? savedSkin.name : L('預設'))}</span>
                                 <span class="rp-skin-btns">
                                     <label class="rp-btn">${L('使用我的 skin（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
                                     <button type="button" class="rp-btn" id="rp-skin-reset">${L('恢復預設')}</button>
                                 </span></div>
+                            <label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>
+                            <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
                                 <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${j}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
                                 <tfoot><tr><th>${L('準確率')}</th><td>${(accOf(prep.counts) * 100).toFixed(2)}%</td><td>${(accOf(record) * 100).toFixed(2)}%</td></tr></tfoot></table>
                             <p class="rp-note">${L('「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。')}</p>
                         </div>
                     </details>
-                    <button type="button" class="rp-btn" onclick="openReplayViewer()">${L('換一個重播')}</button>
+                    <button type="button" class="rp-btn" onclick="openReplayViewer()" title="${L('換一個重播')}" aria-label="${L('換一個重播')}">⏏<span class="rp-btn-text"> ${L('換一個重播')}</span></button>
                 </div>
             </div>`;
 
@@ -280,7 +282,7 @@
         const canvas = $('rp-canvas');
         const stage = $('rp-stage');
         const ctx = canvas.getContext('2d');
-        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg };
+        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6 };
         session = { audio, urls, prep, map, replay, view, raf: 0 };
         // scroll speed as in osu! (1-40, default 24); the value rides above the slider thumb
         function setScroll(v) {
@@ -354,6 +356,13 @@
                 $('rp-skin-name').textContent = L('讀不到這個 skin');
             }
         });
+        for (const [id, key, out] of [['rp-judge-scale', 'judgeScale', 'rp-judge-val'], ['rp-combo-scale', 'comboScale', 'rp-combo-val']]) {
+            $(id).addEventListener('input', (e) => {
+                view[key] = prefs[key] = Number(e.target.value);
+                $(out).textContent = `${Math.round(view[key] * 100)}%`;
+                savePrefs();
+            });
+        }
         $('rp-skin-reset').addEventListener('click', async () => {
             await window.replaySkin.clearSkin();
             savedSkin = null;

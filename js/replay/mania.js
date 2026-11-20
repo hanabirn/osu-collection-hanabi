@@ -340,7 +340,7 @@
         const judgeY = skin ? skin.scorePosition * (h / 480) : h * 0.42;
         if (last && t - last.judgedAt < 400) {
             const a = Math.max(0, 1 - (t - last.judgedAt) / 400);
-            const grow = 1 + 0.12 * (1 - a);
+            const grow = (1 + 0.12 * (1 - a)) * (view.judgeScale || 1);
             ctx.globalAlpha = a;
             const img = skin && skin.hits[last.judge];
             if (img) {
@@ -359,15 +359,16 @@
         if (combo > 0 && skin && skin.comboDigits) {
             const k = h / 480;
             const ds = String(combo).split('').map((d) => skin.comboDigits[Number(d)]);
-            const widths = ds.map((d) => d.bmp.width * d.s * k);
-            const gap = -skin.comboOverlap * k;
+            const cs = view.comboScale || 1;
+            const widths = ds.map((d) => d.bmp.width * d.s * k * cs);
+            const gap = -skin.comboOverlap * k * cs;
             const total = widths.reduce((a, b) => a + b, 0) + gap * (ds.length - 1);
             let dx = cx - total / 2;
             const cy = skin.comboPosition * k;
-            ds.forEach((d, i) => { const dh = d.bmp.height * d.s * k; ctx.drawImage(d.bmp, dx, cy - dh / 2, widths[i], dh); dx += widths[i] + gap; });
+            ds.forEach((d, i) => { const dh = d.bmp.height * d.s * k * cs; ctx.drawImage(d.bmp, dx, cy - dh / 2, widths[i], dh); dx += widths[i] + gap; });
         } else if (combo > 0) {
             ctx.fillStyle = 'rgba(255,255,255,0.92)';
-            ctx.font = `800 ${Math.round(h * 0.055)}px system-ui, sans-serif`;
+            ctx.font = `800 ${Math.round(h * 0.055 * (view.comboScale || 1))}px system-ui, sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(String(combo), cx, judgeY - h * 0.075);
