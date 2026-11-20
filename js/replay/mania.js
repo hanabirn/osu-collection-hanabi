@@ -239,6 +239,16 @@
             }
         }
 
+        const drawSkinKeys = () => {
+            for (let c = 0; c < keys; c++) {
+                const img = held & (1 << c) ? skin.keysDown[c] : skin.keys[c];
+                if (!img) continue;
+                const kh = heightFor(img, colW[c]);
+                drawImg(img, colX[c], h - kh, colW[c], kh);
+            }
+        };
+        if (skin && skin.keysUnderNotes) drawSkinKeys();
+
         // notes
         const now = scrollPos(prep, t);
         const yOf = (time) => hitY - (scrollPos(prep, time) - now) * speed;
@@ -249,7 +259,8 @@
         for (let c = 0; c < keys; c++) {
             const x = colX[c], cw = colW[c];
             const noteImg = skin && skin.notes[c], headImg = skin && skin.heads[c], bodyImg = skin && skin.bodies[c], tailImg = skin && skin.tails[c];
-            const nh = skin && noteImg ? heightFor(noteImg, cw) : Math.max(12, cw * 0.32);
+            const nhW = skin && skin.noteHeightWidth ? skin.noteHeightWidth * (h / 480) : cw;
+            const nh = skin && noteImg ? noteImg.bmp.height * (nhW / noteImg.bmp.width) : Math.max(12, cw * 0.32);
             for (const n of prep.cols[c]) {
                 const endT = n.end ?? n.time;
                 if (endT < t - 400) continue;
@@ -268,7 +279,7 @@
                     if (skin && (bodyImg || headImg)) {
                         if (bodyImg) drawImg(bodyImg, x, top, cw, Math.max(0, bottom - top));
                         if (tailImg) { const th = heightFor(tailImg, cw); drawImg(tailImg, x, top - th / 2, cw, th); }
-                        const hh = heightFor(headImg, cw);
+                        const hh = headImg ? headImg.bmp.height * (nhW / headImg.bmp.width) : 0;
                         drawImg(headImg, x, bottom - hh, cw, hh);
                     } else {
                         ctx.fillStyle = defColor(c);
@@ -291,12 +302,7 @@
         if (skin) {
             if (skin.stageHint) { const hh = heightFor(skin.stageHint, fieldW); drawImg(skin.stageHint, x0, hitY - hh / 2, fieldW, hh); }
             else if (skin.judgementLine) { ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillRect(x0, hitY - 1, fieldW, 2); }
-            for (let c = 0; c < keys; c++) {
-                const img = held & (1 << c) ? skin.keysDown[c] : skin.keys[c];
-                if (!img) continue;
-                const kh = heightFor(img, colW[c]);
-                drawImg(img, colX[c], h - kh, colW[c], kh);
-            }
+            if (!skin.keysUnderNotes) drawSkinKeys();
         } else {
             ctx.fillStyle = 'rgba(255,255,255,0.8)';
             ctx.fillRect(x0, hitY - 1, fieldW, 2);

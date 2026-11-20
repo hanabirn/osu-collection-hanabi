@@ -107,6 +107,9 @@
                 scorePosition: Number(m.ScorePosition ?? 325),
                 comboPosition: Number(m.ComboPosition ?? 111),
                 judgementLine: m.JudgementLine !== '0',
+                // notes are as tall as they'd be in a column this wide (osu! skin.ini)
+                noteHeightWidth: Number(m.WidthForNoteHeightScale) > 0 ? Number(m.WidthForNoteHeightScale) : 0,
+                keysUnderNotes: m.KeysUnderNotes === '1',
                 upsideDown: m.UpsideDown === '1',
                 colours: Array.from({ length: keys }, (_, i) => colour(m[`Colour${i + 1}`])),
                 notes: [], heads: [], bodies: [], tails: [], keys: [], keysDown: [],
