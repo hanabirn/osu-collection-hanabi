@@ -7193,3 +7193,8 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     .rp-hud-top { display: none; }
 }
 @container (max-width: 860px) { .rp-mapcard { display: none; } }
+/* the ⚙ panel was clipped by the bar (it scrolls sideways, so it clips):
+   anchor the panel to the whole bottom area instead, above the bar */
+.rp-menu { position: static; }
+.rp-menu-panel { position: absolute; right: 12px; left: auto; bottom: calc(100% + 10px); width: 300px; max-height: calc(100cqh - 140px); z-index: 6; }
+@media (max-width: 760px) { .rp-menu-panel { left: 10px; right: 10px; width: auto; } }
