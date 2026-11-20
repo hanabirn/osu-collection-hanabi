@@ -179,20 +179,22 @@
         /* osu!catch: fruit (tinted with the combo colours) and their overlays,
            droplets, bananas, the catcher's idle / fail / kiai looks */
         async function forCatch() {
-            const pair = async (n) => ({ base: await image(n), overlay: await image(`${n}-overlay`) });
-            const fruits = await Promise.all(['fruit-pear', 'fruit-grapes', 'fruit-apple', 'fruit-orange'].map(pair));
-            const idle = (await image('fruit-catcher-idle')) || (await image('fruit-ryuuta'));
+            const def = await loadDefaultCatch();
+            // each image on its own: the skin's if it has it, else osu!'s default
+            const pair = async (n, d) => ({ base: (await image(n)) || (d && d.base), overlay: (await image(`${n}-overlay`)) || (d && d.overlay) });
+            const fruits = await Promise.all(['fruit-pear', 'fruit-grapes', 'fruit-apple', 'fruit-orange'].map((n, i) => pair(n, def.fruits[i])));
+            const idle = (await image('fruit-catcher-idle')) || (await image('fruit-ryuuta')) || def.catcherIdle;
             const combo = [];
             for (let i = 1; i <= 8; i++) { const c = colour(ini.colours[`Combo${i}`]); if (c) combo.push(c); }
             const hf = ini.ctb.HyperDashFruit && colour(ini.ctb.HyperDashFruit.split(',').slice(0, 3).join(',') + ',230');
             return {
-                fruits: fruits.map((f) => (f.base || f.overlay ? f : null)),
-                drop: await pair('fruit-drop'),
-                banana: await pair('fruit-bananas'),
+                fruits,
+                drop: await pair('fruit-drop', def.drop),
+                banana: await pair('fruit-bananas', def.banana),
                 catcherIdle: idle,
-                catcherFail: (await image('fruit-catcher-fail')) || idle,
-                catcherKiai: (await image('fruit-catcher-kiai')) || idle,
-                combo,
+                catcherFail: (await image('fruit-catcher-fail')) || def.catcherFail || idle,
+                catcherKiai: (await image('fruit-catcher-kiai')) || def.catcherKiai || idle,
+                combo: combo.length ? combo : def.combo,
                 hyperFruit: hf,
                 comboDigits: await comboFont(),
                 comboOverlap: Number((ini.fonts && ini.fonts.ComboOverlap) || 0),
@@ -200,6 +202,37 @@
         }
 
         return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch };
+    }
+
+    /* osu!stable's default catch images (ppy/osu-resources Skins/Legacy,
+       CC BY-NC 4.0, in assets/osu-resources/skin-legacy): what the game
+       shows for any catch image a skin doesn't have. */
+    const DEFAULT_CATCH_COMBO = ['rgba(255,192,0,1)', 'rgba(0,202,0,1)', 'rgba(18,124,255,1)', 'rgba(242,24,57,1)'];
+    let defaultCatchPromise = null;
+    function loadDefaultCatch() {
+        if (!defaultCatchPromise) {
+            const img = async (n) => {
+                try {
+                    const res = await fetch(`assets/osu-resources/skin-legacy/${n}@2x.png`);
+                    if (!res.ok) return null;
+                    return { bmp: await createImageBitmap(await res.blob()), s: 0.5 };
+                } catch { return null; }
+            };
+            const pair = async (n) => ({ base: await img(n), overlay: await img(`${n}-overlay`) });
+            defaultCatchPromise = (async () => ({
+                fruits: await Promise.all(['fruit-pear', 'fruit-grapes', 'fruit-apple', 'fruit-orange'].map(pair)),
+                drop: { base: await img('fruit-drop'), overlay: null },
+                banana: await pair('fruit-bananas'),
+                catcherIdle: await img('fruit-catcher-idle'),
+                catcherFail: await img('fruit-catcher-fail'),
+                catcherKiai: await img('fruit-catcher-kiai'),
+                combo: DEFAULT_CATCH_COMBO,
+                hyperFruit: null,
+                comboDigits: null,
+                comboOverlap: 0,
+            }))();
+        }
+        return defaultCatchPromise;
     }
 
     async function saveSkin(blob, name) { await idb('readwrite', (s) => s.put({ blob, name }, 'current')); }
@@ -211,5 +244,5 @@
     }
     async function clearSkin() { try { await idb('readwrite', (s) => s.delete('current')); } catch { /* nothing saved */ } }
 
-    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni };
+    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch };
 })();

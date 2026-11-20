@@ -300,7 +300,7 @@
        view: { w, h, bg, bgDim, skin (catch skin config | null), comboScale } */
     function drawCatch(ctx, view, prep, t) {
         const { w, h } = view;
-        const skin = view.skin;
+        const skin = view.skin || prep.defaultSkin || null; // no visitor skin: osu!'s default
         ctx.save();
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
@@ -330,8 +330,8 @@
         function drawObject(o, x, y, alpha, rot, scale) {
             const r = radiusOf(o) * (scale || 1);
             ctx.globalAlpha = alpha;
-            if (o.kind === 'banana') { drawBanana(ctx, x, y, r * 1.1, rot); ctx.globalAlpha = 1; return; }
             const img = skin && pickImage(skin, o);
+            if (o.kind === 'banana' && !img) { drawBanana(ctx, x, y, r * 1.1, rot); ctx.globalAlpha = 1; return; }
             // hyperdash: the object's own shape, a size bigger, in the hyperdash colour, behind it
             if (o.hyper && o.kind !== 'tiny') {
                 if (img) {
@@ -353,7 +353,7 @@
                 ctx.save();
                 ctx.translate(x, y);
                 if (rot) ctx.rotate(rot);
-                drawTinted(ctx, img.base, -size / 2, -size / 2, size, size, colourOf(o));
+                drawTinted(ctx, img.base, -size / 2, -size / 2, size, size, o.kind === 'banana' ? BANANA_COLOURS[Math.abs(Math.round(o.time)) % 3] : colourOf(o));
                 if (img.overlay) ctx.drawImage(img.overlay.bmp, -size / 2, -size / 2, size, size);
                 ctx.restore();
             } else {
@@ -423,9 +423,11 @@
         const catcherImg = skin && (lastPalpable && !lastPalpable.caught && t - lastPalpable.time < 600 ? skin.catcherFail : kiaiAt(prep, t) ? skin.catcherKiai : skin.catcherIdle);
         // the catcher sprite is as wide as the catcher (106.75 × its scale), height in proportion
         const catcherSize = (img) => { const iw = BASE_SIZE * Math.abs(prep.scale) * k; return [iw, (iw * img.bmp.height) / img.bmp.width]; };
-        if (hyperActive) {
+        // red after-images while dash is held, and while hyperdashing
+        if (hyperActive || c.dash) {
             for (let n = 6; n >= 1; n--) {
                 const p = prep.catcherAt(t - n * 22);
+                if (!hyperActive && !p.dash) continue;
                 const gx = ox + p.x * k;
                 ctx.globalAlpha = 0.45 * (1 - n / 7);
                 if (catcherImg) { const [iw, ih] = catcherSize(catcherImg); drawTinted(ctx, catcherImg, gx - iw / 2, plateY, iw, ih, 'rgb(255,40,40)'); }
@@ -508,6 +510,9 @@
             rMiss: 0,
         };
     }
+
+    // banana yellows, as in osu!lazer (one of three per banana)
+    const BANANA_COLOURS = ['rgb(255,240,0)', 'rgb(255,192,0)', 'rgb(214,221,28)'];
 
     // a fruit's fixed tilt, ±12°, the same every time it is drawn
     function tiltOf(o) {

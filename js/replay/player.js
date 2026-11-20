@@ -208,6 +208,7 @@
             showStatus(steps, 4);
             await new Promise((r) => setTimeout(r, 0));
             const prep = M.prepare(map, replay);
+            if (replay.mode === 2 && window.replaySkin.loadDefaultCatch) prep.defaultSkin = await window.replaySkin.loadDefaultCatch().catch(() => null);
             if (savedSkin === undefined) savedSkin = await window.replaySkin.loadSavedSkin();
             const skinCfg = savedSkin ? await M.skin(savedSkin, prep).catch(() => null) : null;
             startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M });
