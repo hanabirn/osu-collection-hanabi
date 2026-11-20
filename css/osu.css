@@ -6995,3 +6995,17 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 /* with the intro, the band's "首頁" title says nothing new */
 .section-band.has-intro .section-band-title { display: none; }
 .ssc-share .osu-add-card > h3 { display: none; } /* the button above already says it */
+/* 熱門新曲 has 8 maps: 4 / 2 columns so the rows are always full (auto-fill
+   gave 7 + 1 alone on a wide screen) */
+#page-home #trending-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 700px) { #page-home #trending-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* 首頁 for a guest: the band intro and the welcome card already ask them to
+   sign in, so the third "sign in" strip goes. (:has on the root: the intro
+   lives in the band, outside #page-home.) */
+html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: none; }
+/* 熱門新曲 on 首頁: one row of 4 that scrolls sideways to the other 4,
+   instead of a second row that pushed 探索更多 below the window */
+#page-home #trending-grid { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - 36px) / 4); overflow-x: auto; scrollbar-width: thin; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+#page-home #trending-grid > .osu-card { scroll-snap-align: start; }
+@media (max-width: 700px) { #page-home #trending-grid { grid-template-columns: none; grid-auto-columns: calc((100% - 12px) / 2); } }
+#page-home #trending-grid { scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
