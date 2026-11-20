@@ -170,6 +170,12 @@
             return cfg;
         }
 
+        async function comboFont() {
+            const prefix = (ini.fonts && ini.fonts.ComboPrefix) || 'score';
+            const ds = await Promise.all(Array.from({ length: 10 }, (_, d) => image(`${prefix}-${d}`)));
+            return ds.every(Boolean) ? ds : null;
+        }
+
         /* osu!catch: fruit (tinted with the combo colours) and their overlays,
            droplets, bananas, the catcher's idle / fail / kiai looks */
         async function forCatch() {
@@ -188,6 +194,8 @@
                 catcherKiai: (await image('fruit-catcher-kiai')) || idle,
                 combo,
                 hyperFruit: hf,
+                comboDigits: await comboFont(),
+                comboOverlap: Number((ini.fonts && ini.fonts.ComboOverlap) || 0),
             };
         }
 

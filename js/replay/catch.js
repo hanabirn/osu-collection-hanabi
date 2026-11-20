@@ -144,6 +144,14 @@
             index++;
         }
         applyOffsets(objects, mods);
+        // the last fruit/droplet of each combo: the plate's pile explodes when it's caught
+        for (let i = 0; i < objects.length; i++) {
+            const nextNew = i === objects.length - 1 || map.objects[i + 1].newCombo;
+            if (!nextNew) continue;
+            const o = objects[i];
+            const list = o.nested ? o.nested.filter((n) => n.kind === 'fruit' || n.kind === 'droplet') : [o];
+            if (list.length) list[list.length - 1].lastInCombo = true;
+        }
         const flat = [];
         for (const o of objects) {
             if (o.nested) flat.push(...o.nested);
@@ -279,7 +287,17 @@
     const DEFAULT_COMBO = ['#ffc04d', '#80d4ff', '#c38cff', '#ff7aa8'];
     const FRUIT_NAMES = ['pear', 'grapes', 'apple', 'orange'];
 
-    /* view: { w, h, bg, bgDim, skin (catch skin config | null), comboScale } */
+    /* One frame at song time t. Everything here is worked out from t, so
+       seeking anywhere draws the same picture:
+       - objects fall from the top of the view to the plate over the
+         approach time (AR), across the whole width (no frame to spill out of);
+       - caught fruit and droplets pile up on the plate and ride with it,
+         explode when the last object of the combo is caught, and fall off
+         when one is missed;
+       - a catch throws a short beam of light in the object's colour;
+       - while hyperdashing the catcher leaves red after-images;
+       - the combo rides above the catcher.
+       view: { w, h, bg, bgDim, skin (catch skin config | null), comboScale } */
     function drawCatch(ctx, view, prep, t) {
         const { w, h } = view;
         const skin = view.skin;
@@ -292,96 +310,183 @@
             ctx.drawImage(view.bg, (w - view.bg.width * s) / 2, (h - view.bg.height * s) / 2, view.bg.width * s, view.bg.height * s);
             ctx.globalAlpha = 1;
         }
-        // playfield: 512 × 384 osu! pixels, centred, as big as fits
-        const k = Math.min((w * 0.94) / WIDTH, (h * 0.86) / HEIGHT);
-        const ox = (w - WIDTH * k) / 2, oy = (h - HEIGHT * k) / 2 + h * 0.03;
-        const catcherY = oy + 340 * k; // where things are caught (the plate)
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.fillRect(ox, 0, WIDTH * k, h);
-
-        const fruitR = (BASE_SIZE / 2) * Math.abs(prep.scale) * 0.6 * k; // a fruit's radius on screen
-        const colours = (skin && skin.combo && skin.combo.length ? skin.combo : DEFAULT_COMBO);
+        // osu!'s scale: the screen is 480 osu! pixels tall (as in osu!stable),
+        // the 512-wide field centred, the plate low in the view
+        const k = Math.min(h / 480, (w * 0.96) / (WIDTH + 80));
+        const ox = (w - WIDTH * k) / 2;
+        const plateY = h * 0.86;
+        const fruitR = 32 * Math.abs(prep.scale) * k;
+        const colours = skin && skin.combo && skin.combo.length ? skin.combo : DEFAULT_COMBO;
         const hyperColour = (skin && skin.hyperFruit) || 'rgba(255,40,40,0.9)';
-        const yOf = (time) => catcherY - ((time - t) / prep.preempt) * 340 * k;
-
-        // falling objects (later ones underneath)
+        const yOf = (time) => plateY - ((time - t) / prep.preempt) * plateY;
+        const radiusOf = (o) => fruitR * (o.kind === 'droplet' ? 0.8 : o.kind === 'tiny' ? 0.4 : 1);
+        const colourOf = (o) => colours[o.combo % colours.length];
         const f = prep.flat;
-        let i = eventBefore(prep, t - 300) + 1;
+        const ei = eventBefore(prep, t);
+        const c = prep.catcherAt(t);
+        const cx = ox + c.x * k;
+        const plateHalf = (prep.catchWidth / 2) * k;
+
+        function drawObject(o, x, y, alpha, rot) {
+            const r = radiusOf(o);
+            ctx.globalAlpha = alpha;
+            if (o.hyper && o.kind !== 'tiny') {
+                ctx.beginPath();
+                ctx.arc(x, y, r * 1.3, 0, Math.PI * 2);
+                ctx.fillStyle = hyperColour;
+                ctx.globalAlpha = alpha * 0.6;
+                ctx.fill();
+                ctx.globalAlpha = alpha;
+            }
+            if (o.kind === 'banana') { drawBanana(ctx, x, y, r * 1.1, rot); ctx.globalAlpha = 1; return; }
+            const img = skin && pickImage(skin, o);
+            if (img) {
+                const size = r * 2;
+                ctx.save();
+                ctx.translate(x, y);
+                if (rot) ctx.rotate(rot);
+                drawTinted(ctx, img.base, -size / 2, -size / 2, size, size, colourOf(o));
+                if (img.overlay) ctx.drawImage(img.overlay.bmp, -size / 2, -size / 2, size, size);
+                ctx.restore();
+            } else {
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = colourOf(o);
+                ctx.fill();
+                if (o.kind === 'fruit') { ctx.lineWidth = Math.max(1.5, r * 0.14); ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.stroke(); }
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // falling objects: later ones underneath
+        let i = eventBefore(prep, t - 400) + 1;
         const visible = [];
         for (; i < f.length && f[i].time <= t + prep.preempt; i++) visible.push(f[i]);
         for (let j = visible.length - 1; j >= 0; j--) {
             const o = visible[j];
             if (o.caught && o.time <= t) continue;
             const y = yOf(o.time);
-            if (y > h + 40) continue;
-            const x = ox + o.ex * k;
+            if (y > h + 60) continue;
             let alpha = 1;
             if (prep.hidden) { const left = (o.time - t) / prep.preempt; alpha = left < 0.4 ? Math.max(0, (left - 0.1) / 0.3) : 1; }
-            if (!o.caught && o.time < t) alpha *= 0.5;
-            ctx.globalAlpha = alpha;
-            const colour = colours[o.combo % colours.length];
-            let r = fruitR;
-            if (o.kind === 'droplet') r *= 0.8;
-            if (o.kind === 'tiny') r *= 0.4;
-            if (o.kind === 'banana') r *= 1;
-            if (o.hyper) {
-                ctx.beginPath();
-                ctx.arc(x, y, r * 1.35, 0, Math.PI * 2);
-                ctx.fillStyle = hyperColour;
-                ctx.globalAlpha = alpha * 0.55;
-                ctx.fill();
-                ctx.globalAlpha = alpha;
+            if (o.time < t) alpha *= Math.max(0, 1 - (t - o.time) / 400); // a miss keeps falling, fading
+            const spin = o.kind === 'droplet' || o.kind === 'tiny' ? (o.time - t) / 300 : o.kind === 'banana' ? (o.time - t) / 500 : 0;
+            drawObject(o, ox + o.ex * k, y, alpha, spin);
+        }
+
+        // what is on the plate now, and what is exploding / falling off
+        const pile = [];
+        let gone = null; // { kind: 'explode' | 'drop', at, items }
+        for (let j = ei; j >= 0 && pile.length < 40; j--) {
+            const o = f[j];
+            if (o.kind === 'tiny' || o.kind === 'banana') continue;
+            if (!o.caught) { // a miss: what was on the plate fell off
+                if (t - o.time < 600) { gone = { kind: 'drop', at: o.time, items: collectBefore(f, j) }; }
+                break;
             }
-            const img = skin && pickImage(skin, o);
-            if (img) {
-                const size = r * 2;
-                if (img.base) drawTinted(ctx, img.base, x - size / 2, y - size / 2, size, size, o.kind === 'banana' ? null : colour);
-                if (img.overlay) ctx.drawImage(img.overlay.bmp, x - size / 2, y - size / 2, size, size);
-            } else {
-                ctx.beginPath();
-                ctx.arc(x, y, r, 0, Math.PI * 2);
-                ctx.fillStyle = o.kind === 'banana' ? '#ffe066' : colour;
-                ctx.fill();
-                if (o.kind === 'fruit') { ctx.lineWidth = Math.max(1.5, r * 0.12); ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.stroke(); }
+            if (o.lastInCombo) { // the combo ended here: the pile exploded at that moment
+                if (pile.length === 0 && t - o.time < 600) gone = { kind: 'explode', at: o.time, items: collectBefore(f, j + 1) };
+                break;
+            }
+            pile.push(o);
+        }
+        // light beams for fresh catches
+        ctx.globalCompositeOperation = 'lighter';
+        for (let j = ei; j >= 0 && t - f[j].time < 260; j--) {
+            const o = f[j];
+            if (!o.caught || o.kind === 'banana') continue;
+            const a = 1 - (t - o.time) / 260;
+            const x = ox + o.ex * k;
+            const bw = radiusOf(o) * (o.kind === 'tiny' ? 1.6 : 1.2);
+            const g = ctx.createLinearGradient(0, plateY - h * 0.35, 0, plateY);
+            g.addColorStop(0, 'rgba(255,255,255,0)');
+            g.addColorStop(1, colourOf(o));
+            ctx.globalAlpha = a * (o.kind === 'tiny' ? 0.35 : 0.6);
+            ctx.fillStyle = g;
+            ctx.fillRect(x - bw / 2, plateY - h * 0.35, bw, h * 0.35);
+        }
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+
+        // hyperdash after-images behind the catcher
+        let lastPalpable = null;
+        for (let j = ei; j >= 0; j--) { const o = f[j]; if (o.kind === 'fruit' || o.kind === 'droplet') { lastPalpable = o; break; } }
+        const hyperActive = lastPalpable && lastPalpable.caught && lastPalpable.hyper;
+        const catcherImg = skin && (lastPalpable && !lastPalpable.caught && t - lastPalpable.time < 600 ? skin.catcherFail : kiaiAt(prep, t) ? skin.catcherKiai : skin.catcherIdle);
+        const catcherSize = (img) => [img.bmp.width * img.s * 0.5 * Math.abs(prep.scale) * k, img.bmp.height * img.s * 0.5 * Math.abs(prep.scale) * k];
+        if (hyperActive) {
+            for (let n = 6; n >= 1; n--) {
+                const p = prep.catcherAt(t - n * 22);
+                const gx = ox + p.x * k;
+                ctx.globalAlpha = 0.45 * (1 - n / 7);
+                if (catcherImg) { const [iw, ih] = catcherSize(catcherImg); drawTinted(ctx, catcherImg, gx - iw / 2, plateY, iw, ih, 'rgb(255,40,40)'); }
+                else { ctx.fillStyle = '#ff3b3b'; ctx.fillRect(gx - plateHalf, plateY, plateHalf * 2, 14 * k); }
             }
             ctx.globalAlpha = 1;
         }
 
-        // catcher
-        const c = prep.catcherAt(t);
-        const cx = ox + c.x * k;
-        const ei = eventBefore(prep, t);
-        const last = ei >= 0 ? f[ei] : null;
-        const recentMiss = last && !last.caught && last.kind !== 'tiny' && last.kind !== 'banana' && t - last.time < 500;
-        const hyperNow = last && last.caught && last.hyper && t - last.time < 600;
-        const catchW = prep.catchWidth * k;
-        const img = skin && (recentMiss ? skin.catcherFail : kiaiAt(prep, t) ? skin.catcherKiai : skin.catcherIdle);
-        if (img) {
-            const iw = img.bmp.width * img.s * 0.5 * Math.abs(prep.scale) * k;
-            const ih = img.bmp.height * img.s * 0.5 * Math.abs(prep.scale) * k;
-            if (hyperNow) { ctx.save(); ctx.filter = 'drop-shadow(0 0 10px rgba(255,40,40,0.9))'; }
-            ctx.drawImage(img.bmp, cx - iw / 2, catcherY, iw, ih);
-            if (hyperNow) ctx.restore();
+        // the catcher
+        if (catcherImg) {
+            const [iw, ih] = catcherSize(catcherImg);
+            if (hyperActive) { ctx.save(); ctx.filter = 'drop-shadow(0 0 8px rgba(255,40,40,0.95))'; }
+            ctx.drawImage(catcherImg.bmp, cx - iw / 2, plateY, iw, ih);
+            if (hyperActive) ctx.restore();
         } else {
-            ctx.fillStyle = hyperNow ? '#ff5050' : c.dash ? '#ffd166' : '#f472b6';
+            ctx.fillStyle = hyperActive ? '#ff5050' : c.dash ? '#ffd166' : '#f472b6';
             ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(cx - catchW / 2, catcherY, catchW, Math.max(10, 14 * k), 6 * k); else ctx.rect(cx - catchW / 2, catcherY, catchW, 14 * k);
+            if (ctx.roundRect) ctx.roundRect(cx - plateHalf, plateY, plateHalf * 2, Math.max(10, 14 * k), 6 * k); else ctx.rect(cx - plateHalf, plateY, plateHalf * 2, 14 * k);
             ctx.fill();
         }
-        if (c.dash) { // dash: a faint trail
-            ctx.fillStyle = 'rgba(255,255,255,0.18)';
-            ctx.fillRect(cx - catchW / 2, catcherY + 18 * k, catchW, 3 * k);
+
+        // the pile, riding with the plate
+        const place = (o, idx, catcherX) => {
+            const off = Math.max(-plateHalf * 0.9, Math.min(plateHalf * 0.9, (o.ex - prep.catcherAt(o.time).x) * k));
+            const r = radiusOf(o);
+            const lift = ((idx * 37) % 11) / 11;
+            return { x: catcherX + off, y: plateY - r * (0.55 + lift * 0.5) };
+        };
+        for (let n = pile.length - 1; n >= 0; n--) {
+            const p = place(pile[n], n, cx);
+            drawObject(pile[n], p.x, p.y, 1, 0);
+        }
+        if (gone) {
+            const p = Math.min(1, (t - gone.at) / 600);
+            const atX = ox + prep.catcherAt(gone.at).x * k;
+            gone.items.forEach((o, n) => {
+                const base = place(o, n, atX);
+                let x = base.x, y = base.y;
+                if (gone.kind === 'explode') {
+                    const dir = ((n * 53) % 13) / 13 - 0.5;
+                    x += dir * 260 * k * p;
+                    y -= (220 * p - 260 * p * p) * k;
+                } else {
+                    y += 300 * k * p * p;
+                }
+                drawObject(o, x, y, 1 - p, 0);
+            });
         }
 
-        // combo, bottom-left of the field
+        // combo above the catcher
+        const last = ei >= 0 ? f[ei] : null;
         const combo = last ? last.comboAfter : 0;
         if (combo > 0) {
             const cs = view.comboScale || 1;
-            ctx.fillStyle = 'rgba(255,255,255,0.92)';
-            ctx.font = `800 ${Math.round(40 * k * cs)}px system-ui, sans-serif`;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'alphabetic';
-            ctx.fillText(`${combo}x`, ox + 8 * k, catcherY - 10 * k);
+            const cy = plateY - h * 0.38;
+            if (skin && skin.comboDigits) {
+                const ds = String(combo).split('').map((d) => skin.comboDigits[Number(d)]);
+                const dk = (h / 480) * cs;
+                const widths = ds.map((d) => d.bmp.width * d.s * dk);
+                const gap = -(skin.comboOverlap || 0) * dk;
+                const total = widths.reduce((a, b) => a + b, 0) + gap * (ds.length - 1);
+                let dx = cx - total / 2;
+                ds.forEach((d, n) => { const dh = d.bmp.height * d.s * dk; ctx.drawImage(d.bmp, dx, cy - dh / 2, widths[n], dh); dx += widths[n] + gap; });
+            } else {
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.font = `800 ${Math.round(h * 0.06 * cs)}px system-ui, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(String(combo), cx, cy);
+            }
         }
         ctx.restore();
         return {
@@ -389,9 +494,43 @@
             acc: last ? last.accAfter : 1,
             counts: last ? last.countsAfter : { FRUIT: 0, DROP: 0, TINY: 0, TINYMISS: 0, MISS: 0 },
             ur: 0,
-            lMiss: last ? last.lMissAfter : 0,
-            rMiss: last ? last.rMissAfter : 0,
+            lMiss: 0,
+            rMiss: 0,
         };
+    }
+
+    // the caught fruit/droplets of the combo that ends at index end-1
+    function collectBefore(f, end) {
+        const out = [];
+        for (let j = end - 1; j >= 0 && out.length < 40; j--) {
+            const o = f[j];
+            if (o.kind === 'tiny' || o.kind === 'banana') continue;
+            if (!o.caught) break;
+            if (o.lastInCombo && j !== end - 1) break;
+            out.push(o);
+        }
+        return out;
+    }
+
+    // a banana, drawn (skins without a banana image)
+    function drawBanana(ctx, x, y, r, rot) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rot || 0);
+        ctx.beginPath();
+        ctx.moveTo(-r, -r * 0.2);
+        ctx.quadraticCurveTo(0, r * 1.05, r, -r * 0.2);
+        ctx.quadraticCurveTo(0, r * 0.45, -r, -r * 0.2);
+        ctx.closePath();
+        ctx.fillStyle = '#ffd84d';
+        ctx.fill();
+        ctx.lineWidth = Math.max(1, r * 0.08);
+        ctx.strokeStyle = '#b8860b';
+        ctx.stroke();
+        ctx.fillStyle = '#5a3d0a';
+        ctx.beginPath(); ctx.arc(-r * 0.98, -r * 0.2, r * 0.09, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(r * 0.98, -r * 0.2, r * 0.09, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
     }
 
     // the skin's image for an object; null (our own drawing, as osu! falls back

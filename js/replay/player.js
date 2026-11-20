@@ -31,6 +31,7 @@
             skin: (skin, prep) => skin.forKeys(prep.keys),
             stats: (map, prep) => [['Keys', `${prep.keys}K`], ['OD', num1(map.od)], ['HP', num1(map.hp)]],
             ur: true,
+            scroll: true, judgeSize: true, hands: true,
         },
         2: {
             judges: ['FRUIT', 'DROP', 'TINY', 'TINYMISS', 'MISS'],
@@ -43,6 +44,7 @@
             skin: (skin) => skin.forCatch(),
             stats: (map, prep) => [['CS', num1(prep.diff.cs)], ['AR', num1(prep.diff.ar)], ['OD', num1(prep.diff.od)], ['HP', num1(prep.diff.hp)]],
             ur: false,
+            scroll: false, judgeSize: false, hands: false,
         },
     };
     let root = null;
@@ -86,7 +88,7 @@
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && e.target.type !== 'range') return;
         if (e.ctrlKey && (e.key === '+' || e.key === '=' || e.key === '-' || e.key === '_')) {
             e.preventDefault();
-            if (session.setScroll) session.setScroll(session.view.scroll + (e.key === '-' || e.key === '_' ? -1 : 1));
+            if (session.setScroll && $('rp-speed')) session.setScroll(session.view.scroll + (e.key === '-' || e.key === '_' ? -1 : 1));
             return;
         }
         if (e.key === ' ') { e.preventDefault(); togglePlay(); }
@@ -269,10 +271,10 @@
                 <dl class="rp-live-counts">${JUDGES.map((j) => `<dt style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</dt><dd id="rp-c-${j}">0</dd>`).join('')}
                     ${M.ur ? '<dt class="rp-ur">UR</dt><dd id="rp-ur">0</dd>' : ''}</dl>
             </div>
-            <div class="rp-hud rp-hud-l">
+            ${M.hands ? `<div class="rp-hud rp-hud-l">
                 <div><small>L MISS</small><b id="rp-lmiss">0</b></div>
                 <div><small>R MISS</small><b id="rp-rmiss">0</b></div>
-            </div>
+            </div>` : ''}
             <div class="rp-bottom">
                 <div class="rp-seekbar" id="rp-seekbar">
                     <span class="rp-seek-t" id="rp-seek-now">0:00</span>
@@ -289,7 +291,7 @@
                     <label class="rp-ctl" title="${L('播放速度')}"><span class="rp-ctl-name">${L('速度')}</span>
                         <select id="rp-rate">${RATES.map((r) => `<option value="${r}"${r === 1 ? ' selected' : ''}>${r}×</option>`).join('')}</select>
                     </label>
-                    <label class="rp-ctl rp-scroll" title="${L('捲動速度（Ctrl + ＋／－）')}"><span class="rp-ctl-name">${L('捲動')}</span><span class="rp-scroll-wrap"><output id="rp-scroll-val">${Number(prefs.scroll).toFixed(1)}</output><input type="range" id="rp-speed" min="1" max="40" step="0.1" value="${prefs.scroll}" aria-label="${L('捲動速度')}"></span></label>
+                    ${M.scroll ? `<label class="rp-ctl rp-scroll" title="${L('捲動速度（Ctrl + ＋／－）')}"><span class="rp-ctl-name">${L('捲動')}</span><span class="rp-scroll-wrap"><output id="rp-scroll-val">${Number(prefs.scroll).toFixed(1)}</output><input type="range" id="rp-speed" min="1" max="40" step="0.1" value="${prefs.scroll}" aria-label="${L('捲動速度')}"></span></label>` : ''}
                     <label class="rp-ctl" title="${L('背景暗度')}"><span class="rp-ctl-name">${L('背景')}</span><input type="range" id="rp-dim" min="0" max="1" step="0.05" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
                     <label class="rp-ctl" title="${L('畫面大小')}"><span class="rp-ctl-name">${L('大小')}</span>
                         <select id="rp-size">${SIZES.map(([v, n]) => `<option value="${v}"${v === prefs.size ? ' selected' : ''}>${L(n)}</option>`).join('')}</select>
@@ -304,7 +306,7 @@
                                     <label class="rp-btn">${L('使用我的 skin（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
                                     <button type="button" class="rp-btn" id="rp-skin-reset">${L('恢復預設')}</button>
                                 </span></div>
-                            <label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>
+                            ${M.judgeSize ? `<label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>` : ''}
                             <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
                                 <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
@@ -422,8 +424,7 @@
         seek.addEventListener('pointerleave', () => { if (!seeking) tip.hidden = true; });
         seek.addEventListener('change', () => { seeking = false; tip.hidden = true; });
         playBtn.addEventListener('click', togglePlay);
-        $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value)));
-        setScroll(view.scroll);
+        if ($('rp-speed')) { $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value))); setScroll(view.scroll); }
         $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });
         $('rp-skin-file').addEventListener('change', async (e) => {
             const f = e.target.files && e.target.files[0];
@@ -441,6 +442,7 @@
             }
         });
         for (const [id, key, out] of [['rp-judge-scale', 'judgeScale', 'rp-judge-val'], ['rp-combo-scale', 'comboScale', 'rp-combo-val']]) {
+            if (!$(id)) continue;
             $(id).addEventListener('input', (e) => {
                 view[key] = prefs[key] = Number(e.target.value);
                 $(out).textContent = `${Math.round(view[key] * 100)}%`;
@@ -480,8 +482,8 @@
                 lastShown = key;
                 accEl.textContent = `${(s.acc * 100).toFixed(2)}%`;
                 if (urEl) urEl.textContent = s.ur.toFixed(0);
-                lEl.textContent = s.lMiss;
-                rEl.textContent = s.rMiss;
+                if (lEl) lEl.textContent = s.lMiss;
+                if (rEl) rEl.textContent = s.rMiss;
                 for (const j of JUDGES) countEls[j].textContent = s.counts[j];
             }
             timeEl.textContent = fmt(t);
