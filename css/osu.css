@@ -6869,3 +6869,34 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .lookup-dash .grade-history-panel .osu-recent-list { max-height: calc(100dvh - 690px); min-height: 240px; }
 .lookup-dash-right #lookup-recs-list { max-height: calc(100dvh - 600px); }
 .sr-info { font-size: var(--fs-12); color: var(--text-dim); cursor: help; }
+
+/* 雙人對比 one screen (option A): radar + trend on the left; Top Play on the
+   right in a box as tall as the left column, scrolling inside it. */
+.pp-compare-dash { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 14px; margin-top: 14px; }
+.pp-compare-dash-left { display: flex; flex-direction: column; gap: 12px; min-width: 0; container-type: inline-size; }
+.pp-compare-dash-left .pp-compare-radar, .pp-compare-dash-left .pp-history-panel { margin: 0; }
+.pp-compare-dash-left .pp-history-panel canvas { max-height: 150px; }
+.pp-compare-dash-right { position: relative; min-width: 0; min-height: 440px; }
+.pp-compare-dash-right #pp-compare-topplays { position: absolute; inset: 0; flex-direction: column; margin: 0; padding: 12px 14px; border-radius: var(--r-card); background: var(--bg-card); border: var(--line) solid var(--border); }
+.pp-compare-dash-right #pp-compare-topplays[style*="block"] { display: flex !important; }
+.pp-compare-dash-right .pp-compare-topplays-title { margin-top: 0; }
+.pp-compare-dash-right .pp-compare-topplays-columns { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; align-items: start; }
+/* radar beside its numbers when the column is wide enough, numbers only otherwise */
+.pp-compare-dash-left .pp-compare-radar .sr-wrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.pp-compare-dash-left .pp-compare-radar .sr-wrap > svg { display: none; }
+.pp-compare-dash-left .sr-h2h-row { grid-template-columns: minmax(0, 1.4fr) minmax(30px, 1fr) 64px minmax(30px, 1fr) minmax(0, 1.4fr); gap: 6px; }
+.pp-compare-dash-left .sr-h2h-val small { white-space: normal; overflow: visible; }
+@container (min-width: 640px) {
+    .pp-compare-dash-left .pp-compare-radar .sr-wrap { grid-template-columns: 200px minmax(0, 1fr); }
+    .pp-compare-dash-left .pp-compare-radar .sr-wrap > svg { display: block; max-width: 200px; }
+}
+@media (max-width: 900px) {
+    .pp-compare-dash { grid-template-columns: minmax(0, 1fr); }
+    .pp-compare-dash-right { min-height: 0; }
+    .pp-compare-dash-right #pp-compare-topplays { position: static; }
+    .pp-compare-dash-right .pp-compare-topplays-columns { max-height: 70dvh; }
+}
+.pp-compare-dash-left .sr-h2h-row { grid-template-columns: minmax(0, 1fr) 40px 58px 40px minmax(0, 1fr); }
+.pp-compare-dash-left .sr-h2h-val small { font-size: var(--fs-11, 11px); }
+.pp-compare-dash-left .sr-h2h { gap: 6px; }
+.pp-compare-dash-left .pp-history-panel canvas { max-height: 130px; }
