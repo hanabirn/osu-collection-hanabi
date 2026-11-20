@@ -14,7 +14,7 @@
    skill model; the raw values are listed under the chart. Data: get_user_best
    (50) and get_beatmaps per map (both through the existing v1 proxy). */
 
-const skillRadarCache = new Map(); // `${userId}:${mode}` -> profile | null
+const skillRadarCache = new Map(); // `${userId}:${mode}:${lang}` -> profile | null
 const skillMapCache = new Map();   // beatmap id -> get_beatmaps row
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
@@ -82,7 +82,9 @@ async function srFetchAttrs(plays, mode) {
 }
 
 async function computeSkillProfile(userId, mode) {
-    const key = `${userId}:${mode}`;
+    // the profile's detail lines (平均 12.07★, OD 10.5…) are already in the
+    // page language, so the language is part of the key
+    const key = `${userId}:${mode}:${typeof siteLang !== 'undefined' ? siteLang : ''}`;
     if (skillRadarCache.has(key)) return skillRadarCache.get(key);
     const plays = await osuFetch(`best=${encodeURIComponent(userId)}&limit=50&m=${mode}`).catch(() => null);
     if (!Array.isArray(plays) || !plays.length) { skillRadarCache.set(key, null); return null; }

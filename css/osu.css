@@ -7044,3 +7044,12 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .howto-feat { grid-template-columns: 165px minmax(0, 1fr); }
 .howto-feat b { hyphens: auto; overflow-wrap: break-word; }
 @media (max-width: 600px) { .howto-feat { grid-template-columns: 1fr; } }
+/* radar head-to-head: the axis name column grows to fit its word
+   (German "Genauigkeit" didn't fit 64px on a phone) */
+@media (max-width: 900px) { .sr-h2h-row { grid-template-columns: minmax(0, 1fr) minmax(64px, max-content) minmax(0, 1fr); } }
+.pp-compare-dash-left .sr-h2h-row { grid-template-columns: minmax(0, 1fr) 40px minmax(58px, max-content) 40px minmax(0, 1fr); }
+@media (max-width: 900px) { .pp-compare-dash-left .sr-h2h-row { grid-template-columns: minmax(0, 1fr) minmax(64px, max-content) minmax(0, 1fr); } }
+/* peak near either end: the label hangs inward instead of off the curve
+   (a peak at the very end pushed the beatmap window 6px wider on a phone) */
+.sc-curve-peak-label.is-end { transform: translateX(-100%); }
+.sc-curve-peak-label.is-start { transform: none; }

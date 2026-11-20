@@ -104,7 +104,7 @@ function scStrainSvg(strains, lengthSec) {
             <line class="sc-curve-peak-line" x1="${px.toFixed(1)}" x2="${px.toFixed(1)}" y1="${py.toFixed(1)}" y2="${H}"/>
         </svg>
         <span class="sc-curve-peak" style="left:${((px / W) * 100).toFixed(1)}%;top:${((py / H) * 100).toFixed(1)}%"></span>
-        ${peakSec != null ? `<span class="sc-curve-peak-label" style="left:${((px / W) * 100).toFixed(1)}%">${escHtml(t('sc_peak'))} ${fmtMapLength(peakSec)}</span>` : ''}
+        ${peakSec != null ? `<span class="sc-curve-peak-label${px / W > 0.85 ? ' is-end' : px / W < 0.15 ? ' is-start' : ''}" style="left:${((px / W) * 100).toFixed(1)}%">${escHtml(t('sc_peak'))} ${fmtMapLength(peakSec)}</span>` : ''}
         <div class="sc-curve-axis"><span>0:00</span><span>${lengthSec ? fmtMapLength(lengthSec / 2) : ''}</span><span>${lengthSec ? fmtMapLength(lengthSec) : ''}</span></div>
     </div>`;
 }
