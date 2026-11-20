@@ -106,6 +106,7 @@ function renderSectionBand(tab) {
             `<button type="button"${c === tab ? ' class="active" aria-pressed="true"' : ' aria-pressed="false"'} onclick="switchTab('${c}')">${escHtml(t(label))}</button>`).join('')}</div>`
         : '';
     if (sec.id === 'collection' && stats) extra.appendChild(stats);
+    if (typeof updateBandRotator === 'function') updateBandRotator(sec.id);
 }
 
 /* ===== 社群 ===== */

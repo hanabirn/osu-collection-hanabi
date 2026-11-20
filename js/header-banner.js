@@ -119,3 +119,76 @@ async function resetHeaderBanner() {
         console.warn('Header banner load failed:', e);
     }
 })();
+
+/* ===== 收藏 band: rotating covers from the visitor's own collection =====
+   On the 收藏 section the band cross-fades through the wide covers
+   (slimcover@2x, 1920x360: the band's shape) of maps in the collection,
+   one every BAND_ROTATE_MS, in a shuffled order. It replaces the uploaded
+   image there only; 首頁 keeps the uploaded one. The next cover is loaded
+   before it fades in, the timer pauses while the tab is hidden, and with
+   reduced motion the covers swap without the fade. */
+const BAND_ROTATE_MS = 8000;
+let bandRotIds = [];
+let bandRotIdx = 0;
+let bandRotTimer = null;
+
+function bandRotLayer() {
+    let el = document.getElementById('band-cover-rotator');
+    if (!el) {
+        const band = document.getElementById('section-band');
+        if (!band) return null;
+        el = document.createElement('div');
+        el.id = 'band-cover-rotator';
+        el.className = 'band-cover-rotator';
+        el.setAttribute('aria-hidden', 'true');
+        el.innerHTML = '<div class="band-cover-img"></div><div class="band-cover-img"></div>';
+        band.insertBefore(el, band.firstChild);
+    }
+    return el;
+}
+
+function bandRotPickIds() {
+    const col = typeof getOsuCollection === 'function' ? getOsuCollection() : {};
+    const ids = [...new Set(Object.values(col).flat().map((s) => s && s.beatmapset_id).filter(Boolean))];
+    for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+    return ids;
+}
+
+function bandRotUrl(id) { return `https://assets.ppy.sh/beatmaps/${encodeURIComponent(id)}/covers/slimcover@2x.jpg`; }
+
+function bandRotShow(tries = 0) {
+    const layer = bandRotLayer();
+    if (!layer || !bandRotIds.length || tries > 5) return;
+    const id = bandRotIds[bandRotIdx % bandRotIds.length];
+    bandRotIdx++;
+    const img = new Image();
+    img.onload = () => {
+        const [a, b] = layer.children;
+        const next = a.classList.contains('is-on') ? b : a;
+        const prev = next === a ? b : a;
+        next.style.backgroundImage = `url("${img.src}")`;
+        next.classList.add('is-on');
+        prev.classList.remove('is-on');
+    };
+    img.onerror = () => bandRotShow(tries + 1); // map without a cover: skip it
+    img.src = bandRotUrl(id);
+}
+
+function bandRotTick() {
+    if (!document.hidden) bandRotShow();
+}
+
+function updateBandRotator(sectionId) {
+    const band = document.getElementById('section-band');
+    const on = sectionId === 'collection';
+    if (on && !bandRotIds.length) bandRotIds = bandRotPickIds();
+    const active = on && bandRotIds.length > 0;
+    if (band) band.classList.toggle('has-rotator', active);
+    if (active && !bandRotTimer) {
+        bandRotShow();
+        bandRotTimer = setInterval(bandRotTick, BAND_ROTATE_MS);
+    } else if (!active && bandRotTimer) {
+        clearInterval(bandRotTimer);
+        bandRotTimer = null;
+    }
+}

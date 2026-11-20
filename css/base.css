@@ -2055,3 +2055,14 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
     .changelog-release { grid-template-columns: minmax(0, 1fr); padding: 16px 0; }
     .changelog-release-date { flex-direction: row; align-items: center; }
 }
+
+/* 收藏 band: rotating collection covers (js/header-banner.js updateBandRotator) */
+.band-cover-rotator { position: absolute; inset: 0; z-index: 0; display: none; pointer-events: none; }
+.section-band.has-rotator .band-cover-rotator { display: block; }
+.section-band.has-rotator .site-header-banner { display: none !important; }
+.band-cover-img { position: absolute; inset: 0; background-size: cover; background-position: center 40%; opacity: 0; transition: opacity 1.2s ease; }
+.band-cover-img.is-on { opacity: 1; }
+.band-cover-rotator::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20, 17, 20, 0.85) 0%, rgba(20, 17, 20, 0.5) 60%, rgba(20, 17, 20, 0.75) 100%); }
+@media (prefers-reduced-motion: reduce) { .band-cover-img { transition: none; } }
+/* the uploaded-image tools only matter where the uploaded image shows (首頁) */
+.section-band.has-rotator .header-banner-tools { display: none !important; }

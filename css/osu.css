@@ -6935,3 +6935,8 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .home-list-side { flex: 0 1 auto; min-width: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* bot commands never break mid-word ("/collect-" + "channel") */
 .community-discord-cmds code { white-space: nowrap; }
+/* room for the language badge follows the page language: CJK labels are
+   short (日文 / 未標記), English medium, German/French/Spanish/Russian long */
+:root { --lang-badge-room: 72px; }
+:root:lang(en) { --lang-badge-room: 96px; }
+:root:lang(de), :root:lang(fr), :root:lang(es), :root:lang(ru) { --lang-badge-room: 124px; }
