@@ -6900,3 +6900,38 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .pp-compare-dash-left .sr-h2h-val small { font-size: var(--fs-11, 11px); }
 .pp-compare-dash-left .sr-h2h { gap: 6px; }
 .pp-compare-dash-left .pp-history-panel canvas { max-height: 130px; }
+/* Compact score rows: FC 模擬 gets its own column so long meta lines never
+   run under it (was absolutely positioned on top of the text). */
+.lookup-dash #visitor-recent-list .osu-recent-info,
+.pp-compare-topplays-col .osu-recent-info { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; align-content: center; }
+.lookup-dash #visitor-recent-list .osu-recent-song, .lookup-dash #visitor-recent-list .osu-recent-meta,
+.pp-compare-topplays-col .osu-recent-song, .pp-compare-topplays-col .osu-recent-meta { grid-column: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lookup-dash #visitor-recent-list .fc-sim-btn,
+.pp-compare-topplays-col .fc-sim-btn { position: static; transform: none; grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+
+/* Layout check 2026-11-20: at 250px columns a map card was 253x101, too
+   small for its 7-button action bar (the last button stuck out 34px) and
+   its title / dots / artist / mapper block (113px), so they piled up.
+   Cards get at least 290px and enough height for the bar plus the text. */
+#osu-collection.osu-collection:not(.osu-collection--wall) { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+#home-new-maps.osu-collection { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+#lookup-recs-list.osu-collection, .lookup-dash-right #lookup-recs-list { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+/* fixed height, not min-height: with aspect-ratio a min-height also widens the card past its column */
+#osu-collection .osu-card, #home-new-maps .osu-card, #lookup-recs-list .osu-card { aspect-ratio: auto; height: 158px; }
+/* The DM sidebar is narrow: text above, button below, so a long label
+   (German "Mit osu! anmelden") stays inside the box. */
+#dm-login-required { flex-direction: column; align-items: stretch; text-align: center; gap: 8px; }
+#dm-login-required .btn { white-space: normal; }
+/* Pill tabs (mode / filter) had ~3px between them. */
+#osu-collection-tabs, #page-tournaments .osu-mode-tabs { column-gap: 6px; }
+/* The language badge sits in the card's bottom-right, beside the mode
+   badge; the artist and mapper lines stop before it (with …) instead of
+   running underneath it. */
+.osu-card:has(.osu-card-lang-corner) .osu-card-artist,
+.osu-card:has(.osu-card-lang-corner) .osu-card-mapper { margin-right: var(--lang-badge-room, 124px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 首頁 lists: a long side note (tournament tags) shrinks with … instead of
+   pushing the name out and spilling past the card. */
+.home-list-main { flex: 1 1 auto; min-width: 40%; }
+.home-list-side { flex: 0 1 auto; min-width: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* bot commands never break mid-word ("/collect-" + "channel") */
+.community-discord-cmds code { white-space: nowrap; }
