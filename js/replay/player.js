@@ -22,7 +22,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
+    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6, cardLayout: 'a' };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -191,6 +191,7 @@
         if (typeof decodeOsuMods === 'function') { const m = decodeOsuMods(mods); return m.length ? m.join('') : 'NM'; }
         return String(mods);
     }
+    const num1 = (v) => { const n = Number(v) || 0; return Number.isInteger(n) ? String(n) : n.toFixed(1); };
     const accOf = (c) => { const n = JUDGES.reduce((s, j) => s + c[j], 0); return n ? (300 * (c.MAX + c[300]) + 200 * c[200] + 100 * c[100] + 50 * c[50]) / (300 * n) : 1; };
 
     function startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg }) {
@@ -201,29 +202,37 @@
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
-            <div class="rp-hud rp-mapcard" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/card@2x.jpg')">
-                <div class="rp-mapcard-cover">
-                    <b class="rp-mapcard-title">${esc(map.metadata.Title || bm.title)}</b>
-                    <span class="rp-mapcard-artist">${esc(map.metadata.Artist || bm.artist)}</span>
+            <div class="rp-hud rp-infocard" id="rp-infocard" data-layout="${esc(prefs.cardLayout || 'a')}">
+                <div class="rp-ic-cover" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/card@2x.jpg')">
+                    <b class="rp-ic-title">${esc(map.metadata.Title || bm.title)}</b>
+                    <span class="rp-ic-artist">${esc(map.metadata.Artist || bm.artist)}</span>
                 </div>
-                <div class="rp-mapcard-body">
-                    <span class="rp-mapcard-diff"><i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i> ${esc(map.metadata.Version || bm.version)}</span>
-                    <span class="rp-mapcard-by">mapped by ${esc(map.metadata.Creator || bm.creator)}</span>
-                    <dl class="rp-mapcard-stats">
+                <div class="rp-ic-sec rp-ic-map">
+                    <div class="rp-ic-line"><i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i><b class="rp-ic-ellip">${esc(map.metadata.Version || bm.version)}</b></div>
+                    <div class="rp-ic-sub rp-ic-ellip">mapped by ${esc(map.metadata.Creator || bm.creator)}</div>
+                    <dl class="rp-ic-stats">
                         <div><dt>Keys</dt><dd>${prep.keys}K</dd></div>
-                        <div><dt>OD</dt><dd>${(+map.od).toFixed(1).replace(/.0$/, '')}</dd></div>
-                        <div><dt>HP</dt><dd>${(+map.hp).toFixed(1).replace(/.0$/, '')}</dd></div>
+                        <div><dt>OD</dt><dd>${num1(map.od)}</dd></div>
+                        <div><dt>HP</dt><dd>${num1(map.hp)}</dd></div>
                         <div><dt>BPM</dt><dd>${Math.round((Number(bm.bpm) || 0) * prep.rate)}</dd></div>
                         <div><dt>${L('長度')}</dt><dd>${fmt(((Number(bm.total_length) || 0) * 1000) / prep.rate)}</dd></div>
                     </dl>
                 </div>
-            </div>
-            <div class="rp-hud rp-hud-top">
-                <img class="rp-avatar" id="rp-avatar" alt="" hidden>
-                <span class="rp-who"><b>${esc(replay.player)}</b><img class="rp-flag" id="rp-flag" alt="" hidden></span>
-                <span class="rp-who-stats" id="rp-who-stats"></span>
-                <span>${esc(modsLabel(replay.mods))}${played ? ` · ${esc(played)}` : ''}</span>
-                <span class="rp-result">${(accOf(record) * 100).toFixed(2)}% · ${replay.maxCombo.toLocaleString()}x · ${JUDGES.map((j) => `<span style="color:${R.JUDGE_COLOR[j]}">${record[j]}</span>`).join('/')}</span>
+                <div class="rp-ic-sec rp-ic-player">
+                    <img class="rp-avatar" id="rp-avatar" alt="" hidden>
+                    <div class="rp-ic-who">
+                        <div class="rp-ic-line"><b class="rp-ic-ellip">${esc(replay.player)}</b><img class="rp-flag" id="rp-flag" alt="" hidden></div>
+                        <div class="rp-ic-sub" id="rp-who-stats">&nbsp;</div>
+                    </div>
+                </div>
+                <div class="rp-ic-sec rp-ic-play">
+                    <div class="rp-ic-line rp-ic-sub"><span class="rp-ic-mods">${esc(modsLabel(replay.mods))}</span>${played ? `<span>${esc(played)}</span>` : ''}</div>
+                    <dl class="rp-ic-stats rp-ic-result">
+                        <div><dt>${L('準確率')}</dt><dd>${(accOf(record) * 100).toFixed(2)}%</dd></div>
+                        <div><dt>${L('連擊')}</dt><dd>${replay.maxCombo.toLocaleString()}x</dd></div>
+                    </dl>
+                    <div class="rp-ic-counts">${JUDGES.map((j) => `<span><i style="color:${R.JUDGE_COLOR[j]}">${j}</i>${record[j]}</span>`).join('')}</div>
+                </div>
             </div>
             <div class="rp-hud rp-hud-tl"><span class="rp-acc" id="rp-acc">100.00%</span></div>
             <div class="rp-hud rp-hud-tr">
@@ -289,7 +298,7 @@
                 fl.hidden = false;
             }
             const n = (v) => Number(v || 0).toLocaleString();
-            $('rp-who-stats').innerHTML = `<b>${n(Math.round(Number(u.pp_raw) || 0))}pp</b> · #${n(u.pp_rank)} · ${esc(u.country || '')} #${n(u.pp_country_rank)}`;
+            $('rp-who-stats').innerHTML = `<b>${n(Math.round(Number(u.pp_raw) || 0))}pp</b> · 🌐 #${n(u.pp_rank)} · ${esc(u.country || '')} #${n(u.pp_country_rank)}`;
         }).catch(() => {});
 
         const audio = new Audio(audioUrl);
