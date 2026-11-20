@@ -430,7 +430,7 @@
                 if (!hyperActive && !p.dash) continue;
                 const gx = ox + p.x * k;
                 ctx.globalAlpha = 0.45 * (1 - n / 7);
-                if (catcherImg) { const [iw, ih] = catcherSize(catcherImg); drawTinted(ctx, catcherImg, gx - iw / 2, plateY, iw, ih, 'rgb(255,40,40)'); }
+                if (catcherImg) { const [iw, ih] = catcherSize(catcherImg); ctx.save(); ctx.translate(gx, plateY); ctx.scale(facingAt(prep, t - n * 22), 1); drawTinted(ctx, catcherImg, -iw / 2, 0, iw, ih, 'rgb(255,40,40)'); ctx.restore(); }
                 else { ctx.fillStyle = '#ff3b3b'; ctx.fillRect(gx - plateHalf, plateY, plateHalf * 2, 14 * k); }
             }
             ctx.globalAlpha = 1;
@@ -440,7 +440,11 @@
         if (catcherImg) {
             const [iw, ih] = catcherSize(catcherImg);
             if (hyperActive) { ctx.save(); ctx.filter = 'drop-shadow(0 0 8px rgba(255,40,40,0.95))'; }
-            ctx.drawImage(catcherImg.bmp, cx - iw / 2, plateY, iw, ih);
+            ctx.save();
+            ctx.translate(cx, plateY);
+            ctx.scale(facingAt(prep, t), 1);
+            ctx.drawImage(catcherImg.bmp, -iw / 2, 0, iw, ih);
+            ctx.restore();
             if (hyperActive) ctx.restore();
         } else {
             ctx.fillStyle = hyperActive ? '#ff5050' : c.dash ? '#ffd166' : '#f472b6';
@@ -513,6 +517,18 @@
 
     // banana yellows, as in osu!lazer (one of three per banana)
     const BANANA_COLOURS = ['rgb(255,240,0)', 'rgb(255,192,0)', 'rgb(214,221,28)'];
+
+    /* Which way the catcher faces at time t: the way it last moved (as in the
+       game, the sprite is mirrored when moving left and stays that way until
+       it moves right again). Looks back at most 8 s. */
+    function facingAt(prep, t) {
+        let x = prep.catcherAt(t).x;
+        for (let back = 16; back <= 8000; back += 16) {
+            const px = prep.catcherAt(t - back).x;
+            if (Math.abs(px - x) > 0.5) return px > x ? -1 : 1;
+        }
+        return 1;
+    }
 
     // a fruit's fixed tilt, ±12°, the same every time it is drawn
     function tiltOf(o) {
