@@ -22,7 +22,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6, cardLayout: 'a' };
+    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -202,7 +202,7 @@
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
-            <div class="rp-hud rp-infocard" id="rp-infocard" data-layout="${esc(prefs.cardLayout || 'a')}">
+            <div class="rp-hud rp-infocard" id="rp-infocard">
                 <div class="rp-ic-cover" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/card@2x.jpg')">
                     <b class="rp-ic-title">${esc(map.metadata.Title || bm.title)}</b>
                     <span class="rp-ic-artist">${esc(map.metadata.Artist || bm.artist)}</span>
@@ -244,7 +244,11 @@
                 <div><small>R MISS</small><b id="rp-rmiss">0</b></div>
             </div>
             <div class="rp-bottom">
-                <input type="range" class="rp-seek" id="rp-seek" min="0" max="1000" step="1" value="0" aria-label="${L('進度')}">
+                <div class="rp-seekbar" id="rp-seekbar">
+                    <span class="rp-seek-t" id="rp-seek-now">0:00</span>
+                    <span class="rp-seek-track"><input type="range" class="rp-seek" id="rp-seek" min="0" max="1000" step="1" value="0" aria-label="${L('進度')}"><output class="rp-seek-tip" id="rp-seek-tip" hidden>0:00</output></span>
+                    <span class="rp-seek-t" id="rp-seek-end">0:00</span>
+                </div>
                 <div class="rp-bar">
                     <button type="button" class="rp-play" id="rp-play" aria-label="${L('播放')}">▶</button>
                     <span class="rp-time"><span id="rp-time">0:00</span> / <span id="rp-dur">0:00</span></span>
@@ -366,13 +370,27 @@
         resize();
 
         const seek = $('rp-seek'), playBtn = $('rp-play');
+        const seekNow = $('rp-seek-now');
         const timeEl = $('rp-time'), durEl = $('rp-dur'), accEl = $('rp-acc'), urEl = $('rp-ur');
         const lEl = $('rp-lmiss'), rEl = $('rp-rmiss');
         const countEls = Object.fromEntries(JUDGES.map((j) => [j, $(`rp-c-${j}`)]));
         const endMs = () => Math.max(prep.lastTime + 1500, (audio.duration || 0) * 1000);
         let seeking = false;
-        seek.addEventListener('input', () => { seeking = true; audio.currentTime = (seek.value / 1000) * endMs() / 1000; });
-        seek.addEventListener('change', () => { seeking = false; });
+        seek.addEventListener('input', () => { seeking = true; audio.currentTime = (seek.value / 1000) * endMs() / 1000; showTip(seek.value / 1000); });
+        // hover: the time under the pointer, in a bubble above it
+        const tip = $('rp-seek-tip');
+        function showTip(frac) {
+            frac = Math.min(1, Math.max(0, frac));
+            tip.textContent = fmt(frac * endMs());
+            tip.style.left = `${frac * 100}%`;
+            tip.hidden = false;
+        }
+        seek.addEventListener('pointermove', (e) => {
+            const r = seek.getBoundingClientRect();
+            showTip((e.clientX - r.left) / r.width);
+        });
+        seek.addEventListener('pointerleave', () => { if (!seeking) tip.hidden = true; });
+        seek.addEventListener('change', () => { seeking = false; tip.hidden = true; });
         playBtn.addEventListener('click', togglePlay);
         $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value)));
         setScroll(view.scroll);
@@ -418,7 +436,7 @@
         });
         audio.addEventListener('play', () => { playBtn.textContent = '❚❚'; playBtn.setAttribute('aria-label', L('暫停')); });
         audio.addEventListener('pause', () => { playBtn.textContent = '▶'; playBtn.setAttribute('aria-label', L('播放')); });
-        audio.addEventListener('loadedmetadata', () => { durEl.textContent = fmt(endMs()); });
+        audio.addEventListener('loadedmetadata', () => { durEl.textContent = fmt(endMs()); $('rp-seek-end').textContent = fmt(endMs()); });
         const first = prep.notes.length ? prep.notes[0].time : 0;
         audio.addEventListener('loadedmetadata', () => { audio.currentTime = Math.max(0, first - 1500) / 1000; }, { once: true });
 
@@ -437,6 +455,7 @@
                 for (const j of JUDGES) countEls[j].textContent = s.counts[j];
             }
             timeEl.textContent = fmt(t);
+            seekNow.textContent = timeEl.textContent;
             if (!seeking) seek.value = String(Math.round((t / endMs()) * 1000));
             session.raf = requestAnimationFrame(tick);
         };

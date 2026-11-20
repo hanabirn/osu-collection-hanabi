@@ -7210,18 +7210,15 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-hud-top .rp-who { flex-direction: row; }
 /* live counts stay readable on bright backgrounds */
 .rp-hud-tr { padding: 8px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.55); }
-/* one info card, top-left: map, player and this play, in one style.
-   data-layout a: map first; b: player first (order only) */
+/* one info card, top-left: map, then player, then this play, in one style */
 .rp-infocard { top: 12px; left: 14px; width: 300px; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; background: rgba(12, 10, 14, 0.84); border: 1px solid rgba(255, 255, 255, 0.1); text-shadow: none; pointer-events: auto; max-height: calc(100cqh - 240px); }
 .rp-ic-cover { order: 1; position: relative; flex: none; height: 84px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.78)), var(--cover) center / cover no-repeat; }
 .rp-ic-map { order: 2; }
 .rp-ic-player { order: 3; }
 .rp-ic-play { order: 4; }
-.rp-infocard[data-layout="b"] .rp-ic-player { order: 0; }
 .rp-ic-title { font-size: var(--fs-16); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); }
 .rp-ic-artist { font-size: var(--fs-12); color: rgba(255, 255, 255, 0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); }
 .rp-ic-sec { padding: 9px 12px; display: flex; flex-direction: column; gap: 5px; border-top: 1px solid rgba(255, 255, 255, 0.07); }
-.rp-infocard[data-layout="b"] .rp-ic-player { border-top: 0; }
 .rp-ic-line { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: var(--fs-13); }
 .rp-ic-ellip { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rp-ic-sub { font-size: var(--fs-12); color: rgba(255, 255, 255, 0.62); }
@@ -7246,3 +7243,19 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 @container (max-width: 1180px) { .rp-infocard { width: 250px; } .rp-ic-cover { height: 64px; } }
 @container (max-height: 700px) { .rp-ic-play { display: none; } }
 @container (max-width: 860px) { .rp-infocard { display: none; } }
+
+/* timeline: current time and length at its ends, the time under the pointer above it */
+.rp-seekbar { position: absolute; left: 0; right: 0; top: -12px; display: flex; align-items: center; gap: 8px; padding: 0 10px; }
+.rp-seek-t { flex: none; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.75); font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+.rp-seek-track { position: relative; flex: 1; display: flex; align-items: center; }
+.rp-seekbar .rp-seek { position: static; flex: 1; width: 100%; }
+.rp-seek-tip { position: absolute; bottom: calc(100% + 4px); transform: translateX(-50%); padding: 2px 7px; border-radius: 6px; background: rgba(0, 0, 0, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; pointer-events: none; white-space: nowrap; }
+.rp-seek-tip[hidden] { display: none; }
+/* the timeline gets its own row above the bar (it overlapped the stage and
+   was hard to hit with the pointer) */
+.rp-seekbar { position: static; height: 28px; padding: 6px 14px 0; gap: 10px; }
+.rp-seek-t { font-size: var(--fs-12); color: rgba(255, 255, 255, 0.8); min-width: 34px; text-align: center; text-shadow: none; }
+.rp-seekbar .rp-seek { height: 22px; }
+.rp-stage { bottom: 104px; }
+.rp-menu-panel { bottom: calc(100% + 10px); }
+@media (max-width: 760px) { .rp-stage { bottom: 92px; } }
