@@ -21,7 +21,8 @@ exports.handler = async () => {
         client_id: process.env.OSU_CLIENT_ID,
         redirect_uri: process.env.OSU_REDIRECT_URI,
         response_type: 'code',
-        scope: 'identify',
+        // friends.read: the 互關 marks in a map's top 50 (osu-callback.js)
+        scope: 'identify friends.read',
         state,
     });
 

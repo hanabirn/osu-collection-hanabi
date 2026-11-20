@@ -76,6 +76,25 @@ exports.handler = async (event) => {
         return fail('me', err.message);
     }
 
+    /* 互關好友 for the top-50 marks: read once here, only mutual ones, ids
+       only; they go back in the fragment and live in the visitor's browser.
+       A login without the friends.read scope (or a failed call) just sends
+       nothing and the site carries on. */
+    let mutuals = null;
+    try {
+        const frRes = await fetch('https://osu.ppy.sh/api/v2/friends', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}`, Accept: 'application/json', 'x-api-version': '20241022' },
+        });
+        if (frRes.ok) {
+            const list = await frRes.json();
+            mutuals = (Array.isArray(list) ? list : [])
+                .filter((r) => r && r.mutual)
+                .map((r) => Number(r.target_id || (r.target && r.target.id)))
+                .filter((n) => Number.isInteger(n) && n > 0)
+                .slice(0, 1000);
+        }
+    } catch { mutuals = null; }
+
     let token;
     try {
         token = signAuthToken({ id: me.id, username: me.username });
@@ -88,6 +107,7 @@ exports.handler = async (event) => {
         osu_login_name: me.username,
         osu_login_token: token,
     });
+    if (mutuals) params.set('osu_mutuals', mutuals.join(','));
     /* In the fragment, not the query: a fragment is never sent to a server,
        never appears in a Referer, and is not part of the URL the service
        worker caches the page under. js/osu.js checkOsuLoginFromUrl() reads it. */

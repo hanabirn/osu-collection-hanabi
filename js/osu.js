@@ -4007,7 +4007,7 @@ function renderOsuCollection() {
         const noteEntry = notes[set.beatmapset_id] || null;
         if (wall) return header + osuWallTileHtml(set, isFav, hardestDiff, noteEntry);
         return header + `
-        <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="window.open('https://osu.ppy.sh/beatmapsets/${set.beatmapset_id}','_blank')">
+        <div class="osu-card" data-set-id="${set.beatmapset_id}" onclick="openBeatmapDrawer(${Number(set.beatmapset_id)})">
             <div class="osu-card-bg" style="background-image:url('${coverUrl}')"></div>
             <div class="osu-card-overlay"></div>
             <button class="osu-play-btn" onclick="playOsuPreview(${set.beatmapset_id}, event)" title="${t('mappools_preview')}" aria-label="${t('mappools_preview')}"${osuPreviewBeatStyle(hardestDiff.bpm)}>${playBtnIcon()}</button>
@@ -5594,6 +5594,18 @@ function closeTrackedLeaderboard() {
    needs to personalize the Lookup tab the same way a manual search does. */
 const OSU_LOGIN_STORAGE_KEY = 'osu_logged_in_user';
 
+/* 互關好友 ids from the last login (osu-callback.js), for the top-50 marks.
+   null = never fetched (an older login without friends.read). */
+const OSU_MUTUALS_KEY = 'osu_mutual_friends_v1';
+function getOsuMutuals() {
+    const me = getLoggedInOsuUser();
+    try {
+        const v = JSON.parse(localStorage.getItem(OSU_MUTUALS_KEY));
+        if (!v || !me || Number(v.user) !== Number(me.id)) return null;
+        return new Set(v.ids || []);
+    } catch { return null; }
+}
+
 function getLoggedInOsuUser() {
     try { return JSON.parse(localStorage.getItem(OSU_LOGIN_STORAGE_KEY)); }
     catch { return null; }
@@ -5652,11 +5664,16 @@ function checkOsuLoginFromUrl() {
             username: src.get('osu_login_name') || '',
             token: src.get('osu_login_token') || null,
         }));
+        if (src.has('osu_mutuals')) {
+            const ids = String(src.get('osu_mutuals') || '').split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0);
+            try { localStorage.setItem(OSU_MUTUALS_KEY, JSON.stringify({ user: Number(id), ids, at: Date.now() })); } catch { /* storage full: no marks */ }
+        }
     }
     if (id || loginFailed) {
         params.delete('osu_login');
         params.delete('osu_login_name');
         params.delete('osu_login_token');
+        params.delete('osu_mutuals');
         params.delete('osu_login_error');
         const qs = params.toString();
         history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + (fromHash ? '' : location.hash));

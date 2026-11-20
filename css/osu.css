@@ -6940,3 +6940,19 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 :root { --lang-badge-room: 72px; }
 :root:lang(en) { --lang-badge-room: 96px; }
 :root:lang(de), :root:lang(fr), :root:lang(es), :root:lang(ru) { --lang-badge-room: 124px; }
+
+/* Top 50: the signed-in player (pink) and their mutual friends (blue). */
+.bm-lb-row.is-me { background: rgba(var(--pink-rgb), 0.16) !important; box-shadow: inset 3px 0 0 var(--pink); }
+.bm-lb-row.is-mutual { background: rgba(78, 163, 255, 0.13) !important; box-shadow: inset 3px 0 0 #4ea3ff; }
+.bm-lb-player .bm-lb-tag { flex: none; overflow: visible; padding: 0 6px; border-radius: 999px; font-size: var(--fs-11); font-weight: 800; line-height: 1.6; }
+.bm-lb-tag.is-me { background: var(--pink); color: var(--on-accent, #fff); }
+.bm-lb-tag.is-mutual { background: #4ea3ff; color: #06121f; }
+.bm-lb-sums { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 8px; vertical-align: middle; }
+.bm-lb-sum { padding: 1px 8px; border-radius: 999px; font-size: var(--fs-12); font-weight: 700; }
+.bm-lb-sum.is-me { background: rgba(var(--pink-rgb), 0.2); color: var(--pink-text, var(--pink)); }
+.bm-lb-sum.is-mutual { background: rgba(78, 163, 255, 0.18); color: #7cc0ff; }
+.bm-lb-sum.is-link { color: var(--text-dim); text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
+.bm-lb-sum.is-link:hover { color: var(--text); }
+.bm-lb-row.is-me .bm-lb-player img { outline: 2px solid var(--pink); outline-offset: 1px; }
+.bm-lb-row.is-mutual .bm-lb-player img { outline: 2px solid #4ea3ff; outline-offset: 1px; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

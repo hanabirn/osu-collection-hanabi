@@ -2066,3 +2066,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 @media (prefers-reduced-motion: reduce) { .band-cover-img { transition: none; } }
 /* the uploaded-image tools only matter where the uploaded image shows (首頁) */
 .section-band.has-rotator .header-banner-tools { display: none !important; }
+/* The band is ~2400x217 on a wide screen, so filling it with a 1920x360
+   cover showed only its middle half and cut heads off. Each cover is shown
+   whole in the middle (::after, contain) over a blurred, enlarged copy of
+   itself that fills the sides (::before). Both pseudo-elements inherit the
+   inline background-image; the element's own copy is sized away. */
+.band-cover-img { background-size: 0 0; overflow: hidden; }
+.band-cover-img::before, .band-cover-img::after { content: ""; position: absolute; background-image: inherit; background-repeat: no-repeat; }
+.band-cover-img::before { inset: -30px; background-size: cover; background-position: center; filter: blur(22px) brightness(0.6); }
+.band-cover-img::after { inset: 0; background-size: contain; background-position: center; }

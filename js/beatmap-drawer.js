@@ -109,7 +109,7 @@ async function openBeatmapDrawer(setId) {
         <div class="bm-main">
             <section class="bm-side" id="bm-side" aria-live="polite"></section>
             <section class="bm-lb" aria-labelledby="bd-lb-h">
-                <h3 class="bm-h" id="bd-lb-h">${escHtml(t('drawer_lb_title'))} <small id="bm-lb-count"></small></h3>
+                <h3 class="bm-h" id="bd-lb-h">${escHtml(t('drawer_lb_title'))} <small id="bm-lb-count"></small><span class="bm-lb-sums" id="bm-lb-sums"></span></h3>
                 <div class="bm-lb-table">
                     <div class="bm-lb-headrow" aria-hidden="true">${[0, 1].map((i) => `
                         <div class="bm-lb-headcols${i ? ' is-second' : ''}">
@@ -190,6 +190,8 @@ async function selectDrawerDiff(beatmapId, mode) {
     side.innerHTML = bmSideHtml(d);
     lb.innerHTML = `<li class="bm-note">${escHtml(t('gallery_loading'))}</li>`;
     count.textContent = '';
+    const sumsEl = document.getElementById('bm-lb-sums');
+    if (sumsEl) sumsEl.innerHTML = '';
     const stale = () => req !== beatmapDrawerDiffReq || drawerReq !== beatmapDrawerReq;
     const accs = [95, 98, 99, 100];
 
@@ -227,7 +229,12 @@ async function selectDrawerDiff(beatmapId, mode) {
                 return;
             }
             drawerLbScores = { beatmapId, mode, scores };
+            const meUser = typeof getLoggedInOsuUser === 'function' ? getLoggedInOsuUser() : null;
+            drawerLbMe = meUser && meUser.id ? Number(meUser.id) : null;
+            drawerLbMutuals = typeof getOsuMutuals === 'function' ? getOsuMutuals() : null;
             count.textContent = `${scores.length}`;
+            const sums = document.getElementById('bm-lb-sums');
+            if (sums) sums.innerHTML = drawerLbSummaryHtml(scores);
             lb.innerHTML = scores.map((s, i) => drawerScoreRowHtml(s, i + 1, mode)).join('');
             return scores;
         });
@@ -284,6 +291,32 @@ function renderMyBest(score, top, beatmapId, mode, me) {
     }
 }
 
+/* 你 / 互關 marks: the signed-in player and their mutual friends (ids from
+   the last login, js/osu.js getOsuMutuals). Read once per leaderboard. */
+let drawerLbMe = null;
+let drawerLbMutuals = null;
+function drawerLbWho(userId) {
+    const id = Number(userId);
+    if (drawerLbMe && id === drawerLbMe) return 'me';
+    if (drawerLbMutuals && drawerLbMutuals.has(id)) return 'mutual';
+    return '';
+}
+
+/* "你 #12 · 互關 3" after the count, or, when signed in without the friends
+   list yet, a link to sign in again so the 互關 marks can show. */
+function drawerLbSummaryHtml(scores) {
+    const parts = [];
+    const myRank = drawerLbMe ? scores.findIndex((s) => Number(s.user_id) === drawerLbMe) : -1;
+    if (myRank >= 0) parts.push(`<span class="bm-lb-sum is-me">${escHtml(t('bm_lb_you'))} #${myRank + 1}</span>`);
+    if (drawerLbMutuals) {
+        const n = scores.filter((s) => drawerLbMutuals.has(Number(s.user_id))).length;
+        if (n) parts.push(`<span class="bm-lb-sum is-mutual">${escHtml(t('bm_lb_mutual_n', { n }))}</span>`);
+    } else if (drawerLbMe) {
+        parts.push(`<a class="bm-lb-sum is-link" href="/.netlify/functions/osu-login">${escHtml(t('bm_lb_mutual_login'))}</a>`);
+    }
+    return parts.join('');
+}
+
 function drawerScoreRowHtml(s, rank, mode) {
     const acc = calcOsuAccuracy(s, mode);
     const mods = decodeOsuMods(s.enabled_mods);
@@ -294,9 +327,13 @@ function drawerScoreRowHtml(s, rank, mode) {
     const d = new Date(String(s.date || '').replace(' ', 'T') + 'Z');
     const date = isNaN(d) ? '' : d.toLocaleDateString(siteLang === 'zh' ? 'zh-TW' : (siteLang || undefined), { year: 'numeric', month: 'numeric', day: 'numeric' });
     const miss = Number(s.countmiss) || 0;
-    return `<li><button type="button" class="bm-lb-row" onclick="openDrawerScore(${rank - 1})" aria-label="${escHtml(t('sc_open', { n: s.username || '#' + s.user_id, r: rank }))}">
+    const who = drawerLbWho(s.user_id);
+    // no visible tag (it would squeeze the name in the two-column table): the
+    // row tint + avatar ring carry it, the heading's pills are the legend
+    const tag = who ? `<span class="visually-hidden"> (${escHtml(t(who === 'me' ? 'bm_lb_you' : 'bm_lb_mutual'))})</span>` : '';
+    return `<li><button type="button" class="bm-lb-row${who ? ' is-' + who : ''}" onclick="openDrawerScore(${rank - 1})" aria-label="${escHtml(t('sc_open', { n: s.username || '#' + s.user_id, r: rank }))}">
         <span class="bm-lb-rank">#${rank}</span>
-        <span class="bm-lb-player"><img src="https://a.ppy.sh/${uid}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span>${escHtml(s.username || '#' + s.user_id)}</span></span>
+        <span class="bm-lb-player"><img src="https://a.ppy.sh/${uid}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span>${escHtml(s.username || '#' + s.user_id)}</span>${tag}</span>
         <span class="lb-grade grade-${OSU_RANK_CLASS[grade] || 'f'}${grade === 'XH' || grade === 'SH' ? ' silver' : ''}">${escHtml(SC_GRADE_LABEL[grade] || grade || '—')}</span>
         <span class="bm-lb-acc">${acc}%</span>
         <span class="bm-lb-combo">${bmNum(s.maxcombo)}x</span>
