@@ -69,7 +69,6 @@ async function openBeatmapDrawer(setId) {
     const diffs = [...maps].sort((a, b) => (Number(a.mode) - Number(b.mode)) || (parseFloat(a.difficultyrating) - parseFloat(b.difficultyrating)));
     beatmapDrawerMaps = diffs;
     const inCollection = OSU_MODES.some((m) => (getOsuCollection()[m] || []).some((s) => s.beatmapset_id === id));
-    const modes = new Set(diffs.map((d) => String(d.mode)));
     const status = BM_STATUS[String(first.approved)] || '';
     const plays = diffs.reduce((n, d) => n + (Number(d.playcount) || 0), 0);
 
@@ -98,7 +97,9 @@ async function openBeatmapDrawer(setId) {
             ${diffs.map((d) => {
                 const sr = parseFloat(d.difficultyrating) || 0;
                 const mode = OSU_MODES[Number(d.mode)] || 'standard';
-                const dot = modes.size > 1 ? modeIconSvg(mode, starRatingColor(sr)) : `<i style="background:${starRatingColor(sr)}"></i>`;
+                // the mode's own icon in the star-rating colour (was a plain dot
+                // unless the set mixed modes)
+                const dot = modeIconSvg(mode, starRatingColor(sr));
                 return `<button type="button" class="bm-diff" data-beatmap-id="${Number(d.beatmap_id)}" aria-pressed="false" onclick="selectDrawerDiff(${Number(d.beatmap_id)}, ${Number(d.mode) || 0})">
                     <span class="bm-diff-dot" aria-hidden="true">${dot}</span>
                     <span class="bm-diff-name">${escHtml(d.version || '')}</span>

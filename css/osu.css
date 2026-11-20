@@ -6152,7 +6152,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .bm-diff[aria-pressed="true"] { color: var(--text); font-weight: 700; border-color: var(--pink); background: rgba(var(--pink-rgb), 0.16); }
 .bm-diff-dot { display: inline-flex; }
 .bm-diff-dot i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.bm-diff-dot svg { width: 16px; height: 16px; }
+.bm-diff-dot svg { width: 17px; height: 17px; margin: 0; }
 .bm-diff-sr { font-variant-numeric: tabular-nums; opacity: 0.8; }
 
 /* two columns */
