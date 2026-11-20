@@ -112,7 +112,9 @@
 
     /* ---------- .osu ---------- */
     function parseOsuFile(text) {
-        const m = { general: {}, metadata: {}, difficulty: {}, background: '', timing: [], objects: [] };
+        const m = { general: {}, metadata: {}, difficulty: {}, colours: [], background: '', timing: [], objects: [], version: 14 };
+        const ver = /osu file format v(d+)/.exec(text.slice(0, 200));
+        if (ver) m.version = Number(ver[1]);
         let section = '';
         for (const raw of text.split(/\r?\n/)) {
             const line = raw.trim();
@@ -134,13 +136,27 @@
                     time: Number(f[0]),
                     beatLength: Number(f[1]),
                     uninherited: f.length > 6 ? f[6] === '1' : true,
+                    kiai: f.length > 7 ? (Number(f[7]) & 1) === 1 : false,
                 });
+            } else if (section === 'Colours') {
+                const i = line.indexOf(':');
+                const k = line.slice(0, i).trim();
+                if (/^Combod+$/.test(k)) m.colours.push(line.slice(i + 1).trim().split(',').map(Number));
             } else if (section === 'HitObjects') {
                 const f = line.split(',');
                 if (f.length < 4) continue;
                 const type = Number(f[3]);
-                const o = { x: Number(f[0]), y: Number(f[1]), time: Number(f[2]), type };
+                const o = { x: Number(f[0]), y: Number(f[1]), time: Number(f[2]), type, newCombo: !!(type & 4), comboSkip: (type >> 4) & 7 };
                 if (type & 128) o.endTime = Number(String(f[5] || '').split(':')[0]); // mania hold
+                if (type & 8) o.endTime = Number(f[5]); // spinner
+                if (type & 2) {
+                    // slider: curve "B|x:y|x:y", slides (= spans), pixel length
+                    const parts = String(f[5] || '').split('|');
+                    o.curveType = parts[0];
+                    o.points = [{ x: o.x, y: o.y }].concat(parts.slice(1).map((p) => { const [px, py] = p.split(':').map(Number); return { x: px, y: py }; }));
+                    o.slides = Math.max(1, Number(f[6]) || 1);
+                    o.length = Number(f[7]) || 0;
+                }
                 m.objects.push(o);
             }
         }
@@ -151,6 +167,9 @@
         m.cs = Number(m.difficulty.CircleSize || 4);
         m.od = Number(m.difficulty.OverallDifficulty || 5);
         m.hp = Number(m.difficulty.HPDrainRate || 5);
+        m.ar = m.difficulty.ApproachRate != null ? Number(m.difficulty.ApproachRate) : m.od; // old maps: AR = OD
+        m.sliderMultiplier = Number(m.difficulty.SliderMultiplier || 1.4);
+        m.sliderTickRate = Number(m.difficulty.SliderTickRate || 1);
         return m;
     }
 

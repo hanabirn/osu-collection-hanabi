@@ -26,7 +26,7 @@
 
     /* skin.ini -> { general: {}, mania: { [keys]: {} } } (keys of [Mania] kept as written) */
     function parseSkinIni(text) {
-        const out = { general: {}, colours: {}, fonts: {}, mania: {} };
+        const out = { general: {}, colours: {}, fonts: {}, ctb: {}, mania: {} };
         let sec = '', cur = null;
         for (const raw of text.split(/\r?\n/)) {
             const line = raw.replace(/\/\/.*$/, '').trim();
@@ -42,6 +42,7 @@
             } else if (sec === 'general') out.general[k] = v;
             else if (sec === 'colours') out.colours[k] = v;
             else if (sec === 'fonts') out.fonts[k] = v;
+            else if (sec === 'catchthebeat') out.ctb[k] = v;
         }
         return out;
     }
@@ -74,7 +75,10 @@
     async function loadSkin(blob, name) {
         const F = window.replayFormats;
         const zip = await F.readZip(await blob.arrayBuffer());
-        const iniEntry = zip.entries.find((e) => /(^|\/)skin\.ini$/i.test(e.name));
+        // the outermost skin.ini (a zip may carry alternates in subfolders)
+        const iniEntry = zip.entries
+            .filter((e) => /(^|\/)skin\.ini$/i.test(e.name))
+            .sort((p, q) => p.name.split('/').length - q.name.split('/').length)[0];
         const ini = iniEntry ? parseSkinIni(new TextDecoder().decode(await zip.read(iniEntry))) : { general: {}, colours: {}, fonts: {}, mania: {} };
         const base = iniEntry ? iniEntry.name.replace(/skin\.ini$/i, '') : '';
         const index = new Map(zip.entries.map((e) => [e.name.toLowerCase().replace(/\\/g, '/'), e]));
@@ -166,7 +170,28 @@
             return cfg;
         }
 
-        return { name: name || ini.general.Name || 'skin', ini, forKeys };
+        /* osu!catch: fruit (tinted with the combo colours) and their overlays,
+           droplets, bananas, the catcher's idle / fail / kiai looks */
+        async function forCatch() {
+            const pair = async (n) => ({ base: await image(n), overlay: await image(`${n}-overlay`) });
+            const fruits = await Promise.all(['fruit-pear', 'fruit-grapes', 'fruit-apple', 'fruit-orange'].map(pair));
+            const idle = (await image('fruit-catcher-idle')) || (await image('fruit-ryuuta'));
+            const combo = [];
+            for (let i = 1; i <= 8; i++) { const c = colour(ini.colours[`Combo${i}`]); if (c) combo.push(c); }
+            const hf = ini.ctb.HyperDashFruit && colour(ini.ctb.HyperDashFruit.split(',').slice(0, 3).join(',') + ',230');
+            return {
+                fruits: fruits.map((f) => (f.base || f.overlay ? f : null)),
+                drop: await pair('fruit-drop'),
+                banana: await pair('fruit-bananas'),
+                catcherIdle: idle,
+                catcherFail: (await image('fruit-catcher-fail')) || idle,
+                catcherKiai: (await image('fruit-catcher-kiai')) || idle,
+                combo,
+                hyperFruit: hf,
+            };
+        }
+
+        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch };
     }
 
     async function saveSkin(blob, name) { await idb('readwrite', (s) => s.put({ blob, name }, 'current')); }

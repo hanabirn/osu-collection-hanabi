@@ -16,6 +16,35 @@
 (function () {
     const L = (zh) => (window.replayText ? window.replayText(zh) : zh); // js/replay/strings.js
     const JUDGES = ['MAX', '300', '200', '100', '50', 'MISS'];
+    /* What differs between modes: how to prepare and draw, the judgement
+       names (and what to call them), the replay's own counts, accuracy,
+       the skin part, and the map numbers on the info card. */
+    const MODES = {
+        3: {
+            judges: ['MAX', '300', '200', '100', '50', 'MISS'],
+            labels: {},
+            colors: () => window.replayMania.JUDGE_COLOR,
+            record: (r) => ({ MAX: r.nGeki, 300: r.n300, 200: r.nKatu, 100: r.n100, 50: r.n50, MISS: r.nMiss }),
+            acc: (c) => { const n = c.MAX + c[300] + c[200] + c[100] + c[50] + c.MISS; return n ? (300 * (c.MAX + c[300]) + 200 * c[200] + 100 * c[100] + 50 * c[50]) / (300 * n) : 1; },
+            prepare: (map, replay) => window.replayMania.prepareMania(map, replay),
+            draw: (ctx, view, prep, t) => window.replayMania.drawMania(ctx, view, prep, t),
+            skin: (skin, prep) => skin.forKeys(prep.keys),
+            stats: (map, prep) => [['Keys', `${prep.keys}K`], ['OD', num1(map.od)], ['HP', num1(map.hp)]],
+            ur: true,
+        },
+        2: {
+            judges: ['FRUIT', 'DROP', 'TINY', 'TINYMISS', 'MISS'],
+            labels: { FRUIT: '水果', DROP: '大水滴', TINY: '小水滴', TINYMISS: '漏小水滴', MISS: 'MISS' },
+            colors: () => window.replayCatch.JUDGE_COLOR,
+            record: (r) => ({ FRUIT: r.n300, DROP: r.n100, TINY: r.n50, TINYMISS: r.nKatu, MISS: r.nMiss }),
+            acc: (c) => { const hit = c.FRUIT + c.DROP + c.TINY; const n = hit + c.TINYMISS + c.MISS; return n ? hit / n : 1; },
+            prepare: (map, replay) => window.replayCatch.prepareCatch(map, replay),
+            draw: (ctx, view, prep, t) => window.replayCatch.drawCatch(ctx, view, prep, t),
+            skin: (skin) => skin.forCatch(),
+            stats: (map, prep) => [['CS', num1(prep.diff.cs)], ['AR', num1(prep.diff.ar)], ['OD', num1(prep.diff.od)], ['HP', num1(prep.diff.hp)]],
+            ur: false,
+        },
+    };
     let root = null;
     let session = null; // { audio, raf, urls[], prep, map, replay, view, ro }
     let savedSkin; // undefined = not looked up yet, null = none
@@ -74,7 +103,7 @@
                 <input type="file" accept=".osr" hidden onchange="if(this.files[0])loadReplayFile(this.files[0])">
                 <span class="rp-drop-icon">▶</span>
                 <b>${L('把 .osr 重播檔拖到這裡，或點一下選擇檔案')}</b>
-                <small>${L('目前支援 osu!mania。譜面和音樂會自動從 osu.direct 下載。')}</small>
+                <small>${L('目前支援 osu!mania 和 osu!catch。譜面和音樂會自動從 osu.direct 下載。')}</small>
                 ${msg ? `<p class="rp-error">${esc(msg)}</p>` : ''}
             </label>`);
         const drop = $('rp-drop');
@@ -143,7 +172,8 @@
         try {
             showStatus(steps, 0);
             const replay = F.parseOsr(await file.arrayBuffer());
-            if (replay.mode !== 3) throw new Error(L('這個重播不是 osu!mania（目前只支援 Mania）'));
+            const M = MODES[replay.mode];
+            if (!M) throw new Error(L('這個模式的重播目前還不支援（支援 Mania 和 Catch）'));
 
             showStatus(steps, 1);
             const found = await osuFetch(`h=${encodeURIComponent(replay.beatmapMd5)}`).catch(() => null);
@@ -163,7 +193,7 @@
                 if (String(m.metadata.BeatmapID) === String(bm.beatmap_id) || m.metadata.Version === bm.version) { map = m; break; }
             }
             if (!map) throw new Error(L('譜面組裡找不到這個難度'));
-            if (map.mode !== 3) throw new Error(L('這是轉換譜（由 Standard 轉成 Mania），目前還不支援'));
+            if (replay.mode === 3 && map.mode !== 3) throw new Error(L('這是轉換譜（由 Standard 轉成 Mania），目前還不支援'));
             const urls = [];
             const audioEntry = zip.byName(map.audio);
             if (!audioEntry) throw new Error(L('譜面組裡找不到音樂檔'));
@@ -175,10 +205,10 @@
 
             showStatus(steps, 4);
             await new Promise((r) => setTimeout(r, 0));
-            const prep = window.replayMania.prepareMania(map, replay);
+            const prep = M.prepare(map, replay);
             if (savedSkin === undefined) savedSkin = await window.replaySkin.loadSavedSkin();
-            const skinCfg = savedSkin ? await savedSkin.forKeys(prep.keys).catch(() => null) : null;
-            startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg });
+            const skinCfg = savedSkin ? await M.skin(savedSkin, prep).catch(() => null) : null;
+            startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M });
         } catch (err) {
             console.error('replay load failed', err);
             open();
@@ -191,11 +221,14 @@
         return String(mods);
     }
     const num1 = (v) => { const n = Number(v) || 0; return Number.isInteger(n) ? String(n) : n.toFixed(1); };
-    const accOf = (c) => { const n = JUDGES.reduce((s, j) => s + c[j], 0); return n ? (300 * (c.MAX + c[300]) + 200 * c[200] + 100 * c[100] + 50 * c[50]) / (300 * n) : 1; };
 
-    function startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg }) {
-        const R = window.replayMania;
-        const record = { MAX: replay.nGeki, 300: replay.n300, 200: replay.nKatu, 100: replay.n100, 50: replay.n50, MISS: replay.nMiss };
+    function startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M }) {
+        const R = { JUDGE_COLOR: M.colors(), MOD: { NC: 512 } };
+        const JUDGES = M.judges;
+        const jl = (j) => esc(L(M.labels[j] || j));
+        const accOf = M.acc;
+        const record = M.record(replay);
+        const mapStats = M.stats(map, prep);
         const sr = Number(bm.difficultyrating) || 0;
         const srColor = typeof starRatingColor === 'function' ? starRatingColor(sr) : '#f472b6';
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
@@ -209,10 +242,8 @@
                 <div class="rp-ic-sec rp-ic-map">
                     <div class="rp-ic-line"><i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i><b class="rp-ic-ellip">${esc(map.metadata.Version || bm.version)}</b></div>
                     <div class="rp-ic-sub rp-ic-ellip">mapped by ${esc(map.metadata.Creator || bm.creator)}</div>
-                    <dl class="rp-ic-stats">
-                        <div><dt>Keys</dt><dd>${prep.keys}K</dd></div>
-                        <div><dt>OD</dt><dd>${num1(map.od)}</dd></div>
-                        <div><dt>HP</dt><dd>${num1(map.hp)}</dd></div>
+                    <dl class="rp-ic-stats" style="grid-template-columns: repeat(${mapStats.length + 2}, minmax(0, 1fr))">
+                        ${mapStats.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
                         <div><dt>BPM</dt><dd>${Math.round((Number(bm.bpm) || 0) * prep.rate)}</dd></div>
                         <div><dt>${L('長度')}</dt><dd>${fmt(((Number(bm.total_length) || 0) * 1000) / prep.rate)}</dd></div>
                     </dl>
@@ -230,13 +261,13 @@
                         <div><dt>${L('準確率')}</dt><dd>${(accOf(record) * 100).toFixed(2)}%</dd></div>
                         <div><dt>${L('連擊')}</dt><dd>${replay.maxCombo.toLocaleString()}x</dd></div>
                     </dl>
-                    <div class="rp-ic-counts">${JUDGES.map((j) => `<span><i style="color:${R.JUDGE_COLOR[j]}">${j}</i>${record[j]}</span>`).join('')}</div>
+                    <div class="rp-ic-counts" style="grid-template-columns: repeat(${JUDGES.length}, minmax(0, 1fr))">${JUDGES.map((j) => `<span><i style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</i>${record[j]}</span>`).join('')}</div>
                 </div>
             </div>
             <div class="rp-hud rp-hud-tl"><span class="rp-acc" id="rp-acc">100.00%</span></div>
             <div class="rp-hud rp-hud-tr">
-                <dl class="rp-live-counts">${JUDGES.map((j) => `<dt style="color:${R.JUDGE_COLOR[j]}">${j}</dt><dd id="rp-c-${j}">0</dd>`).join('')}
-                    <dt class="rp-ur">UR</dt><dd id="rp-ur">0</dd></dl>
+                <dl class="rp-live-counts">${JUDGES.map((j) => `<dt style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</dt><dd id="rp-c-${j}">0</dd>`).join('')}
+                    ${M.ur ? '<dt class="rp-ur">UR</dt><dd id="rp-ur">0</dd>' : ''}</dl>
             </div>
             <div class="rp-hud rp-hud-l">
                 <div><small>L MISS</small><b id="rp-lmiss">0</b></div>
@@ -276,7 +307,7 @@
                             <label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>
                             <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
-                                <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${j}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
+                                <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
                                 <tfoot><tr><th>${L('準確率')}</th><td>${(accOf(prep.counts) * 100).toFixed(2)}%</td><td>${(accOf(record) * 100).toFixed(2)}%</td></tr></tfoot></table>
                             <p class="rp-note">${L('「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。')}</p>
                         </div>
@@ -400,7 +431,7 @@
             $('rp-skin-name').textContent = L('讀取中…');
             try {
                 const skin = await window.replaySkin.loadSkin(f, f.name.replace(/\.(osk|zip)$/i, ''));
-                view.skin = await skin.forKeys(prep.keys);
+                view.skin = await M.skin(skin, prep);
                 savedSkin = skin;
                 await window.replaySkin.saveSkin(f, skin.name).catch(() => {});
                 $('rp-skin-name').textContent = skin.name;
@@ -443,12 +474,12 @@
         const tick = () => {
             const t = audio.currentTime * 1000;
             ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
-            const s = R.drawMania(ctx, view, prep, t);
+            const s = M.draw(ctx, view, prep, t);
             const key = `${s.acc}|${s.ur}|${s.lMiss}|${s.rMiss}|${JUDGES.map((j) => s.counts[j]).join()}`;
             if (key !== lastShown) {
                 lastShown = key;
                 accEl.textContent = `${(s.acc * 100).toFixed(2)}%`;
-                urEl.textContent = s.ur.toFixed(0);
+                if (urEl) urEl.textContent = s.ur.toFixed(0);
                 lEl.textContent = s.lMiss;
                 rEl.textContent = s.rMiss;
                 for (const j of JUDGES) countEls[j].textContent = s.counts[j];
