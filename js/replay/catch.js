@@ -455,11 +455,13 @@
 
         // the pile, riding with the plate
         // caught objects sit on the plate at half size, where they landed on it
+        // where the plate really starts: skins often leave transparent space above it
+        const plateTop = catcherImg ? plateY + topPadding(catcherImg.bmp) * catcherSize(catcherImg)[1] : plateY;
         const place = (o, idx, catcherX) => {
             const off = Math.max(-plateHalf, Math.min(plateHalf, (o.ex - prep.catcherAt(o.time).x) * k));
             const r = radiusOf(o) * 0.5;
             const lift = ((idx * 37) % 7) / 7;
-            return { x: catcherX + off, y: plateY - r * (0.9 + lift * 0.6) };
+            return { x: catcherX + off, y: plateTop - r * (0.8 + lift * 0.35) };
         };
         for (let n = pile.length - 1; n >= 0; n--) {
             const p = place(pile[n], n, cx);
@@ -532,6 +534,27 @@
             if (Math.abs(px - x) > 0.5) return px > x ? -1 : 1;
         }
         return 1;
+    }
+
+    /* The share of an image's height above its first solid row (looked for
+       in the middle third, where the plate is), worked out once per image. */
+    const padCache = new WeakMap();
+    function topPadding(bmp) {
+        if (padCache.has(bmp)) return padCache.get(bmp);
+        let pad = 0;
+        try {
+            const c = document.createElement('canvas');
+            c.width = bmp.width; c.height = bmp.height;
+            const g = c.getContext('2d', { willReadFrequently: true });
+            g.drawImage(bmp, 0, 0);
+            const x0 = Math.floor(bmp.width / 3), w = Math.max(1, Math.floor(bmp.width / 3));
+            const d = g.getImageData(x0, 0, w, bmp.height).data;
+            outer: for (let y = 0; y < bmp.height; y++) {
+                for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 60) { pad = y / bmp.height; break outer; }
+            }
+        } catch { pad = 0; }
+        padCache.set(bmp, pad);
+        return pad;
     }
 
     // a fruit's fixed tilt, ±12°, the same every time it is drawn
