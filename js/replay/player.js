@@ -22,7 +22,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, speed: 1.6, dim: 0.75 };
+    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75 };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -55,6 +55,11 @@
         if (e.key === 'Escape') { closeReplayViewer(); return; }
         if (!session || !session.audio) return;
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && e.target.type !== 'range') return;
+        if (e.ctrlKey && (e.key === '+' || e.key === '=' || e.key === '-' || e.key === '_')) {
+            e.preventDefault();
+            if (session.setScroll) session.setScroll(session.view.scroll + (e.key === '-' || e.key === '_' ? -1 : 1));
+            return;
+        }
         if (e.key === ' ') { e.preventDefault(); togglePlay(); }
         if (e.key === 'ArrowLeft') { e.preventDefault(); seekBy(-5000); }
         if (e.key === 'ArrowRight') { e.preventDefault(); seekBy(5000); }
@@ -196,11 +201,26 @@
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
+            <div class="rp-hud rp-mapcard" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/card@2x.jpg')">
+                <div class="rp-mapcard-cover">
+                    <b class="rp-mapcard-title">${esc(map.metadata.Title || bm.title)}</b>
+                    <span class="rp-mapcard-artist">${esc(map.metadata.Artist || bm.artist)}</span>
+                </div>
+                <div class="rp-mapcard-body">
+                    <span class="rp-mapcard-diff"><i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i> ${esc(map.metadata.Version || bm.version)}</span>
+                    <span class="rp-mapcard-by">mapped by ${esc(map.metadata.Creator || bm.creator)}</span>
+                    <dl class="rp-mapcard-stats">
+                        <div><dt>Keys</dt><dd>${prep.keys}K</dd></div>
+                        <div><dt>OD</dt><dd>${(+map.od).toFixed(1).replace(/.0$/, '')}</dd></div>
+                        <div><dt>HP</dt><dd>${(+map.hp).toFixed(1).replace(/.0$/, '')}</dd></div>
+                        <div><dt>BPM</dt><dd>${Math.round((Number(bm.bpm) || 0) * prep.rate)}</dd></div>
+                        <div><dt>${L('長度')}</dt><dd>${fmt(((Number(bm.total_length) || 0) * 1000) / prep.rate)}</dd></div>
+                    </dl>
+                </div>
+            </div>
             <div class="rp-hud rp-hud-top">
                 <b>${esc(replay.player)}</b>
-                <span class="rp-map">${esc(map.metadata.Title || bm.title)} <span class="rp-diff">[${esc(map.metadata.Version || bm.version)}]</span></span>
-                <i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i>
-                <span>${prep.keys}K · ${esc(modsLabel(replay.mods))}${played ? ` · ${esc(played)}` : ''}</span>
+                <span>${esc(modsLabel(replay.mods))}${played ? ` · ${esc(played)}` : ''}</span>
                 <span class="rp-result">${(accOf(record) * 100).toFixed(2)}% · ${replay.maxCombo.toLocaleString()}x · ${JUDGES.map((j) => `<span style="color:${R.JUDGE_COLOR[j]}">${record[j]}</span>`).join('/')}</span>
             </div>
             <div class="rp-hud rp-hud-tl"><span class="rp-acc" id="rp-acc">100.00%</span></div>
@@ -224,7 +244,7 @@
                     <label class="rp-ctl">${L('速度')}
                         <select id="rp-rate">${RATES.map((r) => `<option value="${r}"${r === 1 ? ' selected' : ''}>${r}×</option>`).join('')}</select>
                     </label>
-                    <label class="rp-ctl">${L('捲動')}<input type="range" id="rp-speed" min="0.6" max="3.5" step="0.05" value="${prefs.speed}"></label>
+                    <label class="rp-ctl rp-scroll" title="${L('捲動速度（Ctrl + ＋／－）')}">${L('捲動')}<span class="rp-scroll-wrap"><output id="rp-scroll-val">${Number(prefs.scroll).toFixed(1)}</output><input type="range" id="rp-speed" min="1" max="40" step="0.1" value="${prefs.scroll}" aria-label="${L('捲動速度')}"></span></label>
                     <label class="rp-ctl">${L('背景')}<input type="range" id="rp-dim" min="0" max="1" step="0.05" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
                     <label class="rp-ctl">${L('大小')}
                         <select id="rp-size">${SIZES.map(([v, n]) => `<option value="${v}"${v === prefs.size ? ' selected' : ''}>${L(n)}</option>`).join('')}</select>
@@ -260,8 +280,21 @@
         const canvas = $('rp-canvas');
         const stage = $('rp-stage');
         const ctx = canvas.getContext('2d');
-        const view = { w: 0, h: 0, dpr: 1, speed: prefs.speed, bg, bgDim: prefs.dim, skin: skinCfg };
+        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg };
         session = { audio, urls, prep, map, replay, view, raf: 0 };
+        // scroll speed as in osu! (1-40, default 24); the value rides above the slider thumb
+        function setScroll(v) {
+            view.scroll = Math.min(40, Math.max(1, Math.round(v * 10) / 10));
+            prefs.scroll = view.scroll;
+            savePrefs();
+            const input = $('rp-speed'), out = $('rp-scroll-val');
+            if (input && Number(input.value) !== view.scroll) input.value = String(view.scroll);
+            if (out) {
+                out.textContent = view.scroll.toFixed(1);
+                out.style.left = `${((view.scroll - 1) / 39) * 100}%`;
+            }
+        }
+        session.setScroll = setScroll;
 
         const muteBtn = $('rp-mute');
         const showMute = () => { muteBtn.textContent = audio.muted || audio.volume === 0 ? '🔇' : '🔊'; };
@@ -303,7 +336,8 @@
         seek.addEventListener('input', () => { seeking = true; audio.currentTime = (seek.value / 1000) * endMs() / 1000; });
         seek.addEventListener('change', () => { seeking = false; });
         playBtn.addEventListener('click', togglePlay);
-        $('rp-speed').addEventListener('input', (e) => { view.speed = Number(e.target.value); prefs.speed = view.speed; savePrefs(); });
+        $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value)));
+        setScroll(view.scroll);
         $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });
         $('rp-skin-file').addEventListener('change', async (e) => {
             const f = e.target.files && e.target.files[0];

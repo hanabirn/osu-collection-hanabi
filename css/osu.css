@@ -7163,3 +7163,23 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     .rp-ctl:not(.rp-vol) { display: none; }
     .rp-menu-panel { position: fixed; left: 10px; right: 10px; bottom: 74px; width: auto; }
 }
+/* beatmap card, top-left: which map this replay is */
+.rp-mapcard { top: 12px; left: 14px; width: 300px; border-radius: 12px; overflow: hidden; background: rgba(12, 10, 14, 0.82); border: 1px solid rgba(255, 255, 255, 0.1); text-shadow: none; pointer-events: auto; }
+.rp-mapcard-cover { position: relative; height: 92px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.75)), var(--cover) center / cover no-repeat; }
+.rp-mapcard-title { font-size: var(--fs-16); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); }
+.rp-mapcard-artist { font-size: var(--fs-12); color: rgba(255, 255, 255, 0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); }
+.rp-mapcard-body { padding: 8px 12px 10px; display: flex; flex-direction: column; gap: 4px; }
+.rp-mapcard-diff { font-size: var(--fs-13); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-mapcard-by { font-size: var(--fs-12); color: rgba(255, 255, 255, 0.6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-mapcard-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 4px 0 0; }
+.rp-mapcard-stats div { display: flex; flex-direction: column; align-items: center; padding: 4px 2px; border-radius: 6px; background: rgba(255, 255, 255, 0.06); }
+.rp-mapcard-stats dt { font-size: 10px; color: rgba(255, 255, 255, 0.55); }
+.rp-mapcard-stats dd { margin: 0; font-size: var(--fs-13); font-weight: 800; font-variant-numeric: tabular-nums; }
+.rp-hud-tl { top: auto; bottom: 110px; left: 22px; }
+.rp-hud-top { left: auto; right: 64px; transform: none; max-width: calc(100% - 400px); }
+/* scroll speed: its value rides above the slider thumb */
+.rp-scroll-wrap { position: relative; display: inline-flex; align-items: center; }
+.rp-scroll-wrap input[type="range"] { width: 120px; }
+.rp-scroll-wrap output { position: absolute; bottom: 100%; margin-bottom: 4px; transform: translateX(-50%); padding: 1px 6px; border-radius: 6px; background: var(--pink); color: var(--on-accent, #fff); font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; pointer-events: none; white-space: nowrap; }
+@media (max-width: 1100px) { .rp-mapcard { width: 240px; } .rp-mapcard-cover { height: 70px; } }
+@media (max-width: 760px) { .rp-mapcard { display: none; } }

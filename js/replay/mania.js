@@ -205,7 +205,9 @@
         const x0 = Math.round((w - fieldW) / 2);
         const colX = [];
         for (let c = 0, x = x0; c < keys; c++) { colX.push(x); x += colW[c] + (gaps[c] || 0); }
-        const speed = view.speed * (h / 1080);
+        // osu! scroll speed (1-40): a note takes 11485 / speed ms to fall to
+        // the hit line (osu!lazer's mania time range), whatever the screen size
+        const speed = hitY / (11485 / Math.max(1, view.scroll || 24));
 
         // stage
         ctx.fillStyle = 'rgba(0,0,0,0.88)';
@@ -217,8 +219,9 @@
         const drawImg = (img, x, y, wd, ht) => { if (img) ctx.drawImage(img.bmp, x, y, wd, ht); };
         const heightFor = (img, wd) => (img ? img.bmp.height * (wd / img.bmp.width) : 0);
         if (skin) {
-            if (skin.stageLeft) { const sw = skin.stageLeft.bmp.width * skin.stageLeft.s * (h / 480); drawImg(skin.stageLeft, x0 - sw, 0, sw, h); }
-            if (skin.stageRight) { const sw = skin.stageRight.bmp.width * skin.stageRight.s * (h / 480); drawImg(skin.stageRight, x0 + fieldW, 0, sw, h); }
+            // as tall as the stage, width in proportion (art on the edges keeps its shape)
+            if (skin.stageLeft) { const sw = skin.stageLeft.bmp.width * (h / skin.stageLeft.bmp.height); drawImg(skin.stageLeft, x0 - sw, 0, sw, h); }
+            if (skin.stageRight) { const sw = skin.stageRight.bmp.width * (h / skin.stageRight.bmp.height); drawImg(skin.stageRight, x0 + fieldW, 0, sw, h); }
         } else {
             ctx.fillStyle = 'rgba(255,255,255,0.14)';
             ctx.fillRect(x0 - 2, 0, 2, h);
@@ -353,7 +356,16 @@
             ctx.globalAlpha = 1;
         }
         const combo = last ? last.comboAfter : 0;
-        if (combo > 0) {
+        if (combo > 0 && skin && skin.comboDigits) {
+            const k = h / 480;
+            const ds = String(combo).split('').map((d) => skin.comboDigits[Number(d)]);
+            const widths = ds.map((d) => d.bmp.width * d.s * k);
+            const gap = -skin.comboOverlap * k;
+            const total = widths.reduce((a, b) => a + b, 0) + gap * (ds.length - 1);
+            let dx = cx - total / 2;
+            const cy = skin.comboPosition * k;
+            ds.forEach((d, i) => { const dh = d.bmp.height * d.s * k; ctx.drawImage(d.bmp, dx, cy - dh / 2, widths[i], dh); dx += widths[i] + gap; });
+        } else if (combo > 0) {
             ctx.fillStyle = 'rgba(255,255,255,0.92)';
             ctx.font = `800 ${Math.round(h * 0.055)}px system-ui, sans-serif`;
             ctx.textAlign = 'center';

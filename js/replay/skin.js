@@ -26,7 +26,7 @@
 
     /* skin.ini -> { general: {}, mania: { [keys]: {} } } (keys of [Mania] kept as written) */
     function parseSkinIni(text) {
-        const out = { general: {}, colours: {}, mania: {} };
+        const out = { general: {}, colours: {}, fonts: {}, mania: {} };
         let sec = '', cur = null;
         for (const raw of text.split(/\r?\n/)) {
             const line = raw.replace(/\/\/.*$/, '').trim();
@@ -41,6 +41,7 @@
                 if (k === 'Keys') out.mania[Number(v)] = cur;
             } else if (sec === 'general') out.general[k] = v;
             else if (sec === 'colours') out.colours[k] = v;
+            else if (sec === 'fonts') out.fonts[k] = v;
         }
         return out;
     }
@@ -74,7 +75,7 @@
         const F = window.replayFormats;
         const zip = await F.readZip(await blob.arrayBuffer());
         const iniEntry = zip.entries.find((e) => /(^|\/)skin\.ini$/i.test(e.name));
-        const ini = iniEntry ? parseSkinIni(new TextDecoder().decode(await zip.read(iniEntry))) : { general: {}, colours: {}, mania: {} };
+        const ini = iniEntry ? parseSkinIni(new TextDecoder().decode(await zip.read(iniEntry))) : { general: {}, colours: {}, fonts: {}, mania: {} };
         const base = iniEntry ? iniEntry.name.replace(/skin\.ini$/i, '') : '';
         const index = new Map(zip.entries.map((e) => [e.name.toLowerCase().replace(/\\/g, '/'), e]));
         const cache = new Map();
@@ -157,6 +158,11 @@
                 hits[j] = await image(m[f] || `mania-${f.toLowerCase().replace('hit', 'hit')}`);
             }
             cfg.hits = hits;
+            // combo number: the skin's combo font (ComboPrefix, default "score")
+            const prefix = (ini.fonts && ini.fonts.ComboPrefix) || 'score';
+            cfg.comboDigits = await Promise.all(Array.from({ length: 10 }, (_, d) => image(`${prefix}-${d}`)));
+            if (cfg.comboDigits.some((d) => !d)) cfg.comboDigits = null;
+            cfg.comboOverlap = Number((ini.fonts && ini.fonts.ComboOverlap) || 0);
             return cfg;
         }
 
