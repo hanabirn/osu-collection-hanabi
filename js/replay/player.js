@@ -320,7 +320,7 @@
             </div>`;
 
         // the player's profile in this mode: avatar, country, total PP, ranks
-        osuFetch(`u=${encodeURIComponent(replay.player)}&type=string&m=3`).then((r) => {
+        osuFetch(`u=${encodeURIComponent(replay.player)}&type=string&m=${replay.mode}`).then((r) => {
             const u = Array.isArray(r) ? r[0] : null;
             if (!u || !$('rp-who-stats')) return;
             const av = $('rp-avatar');
@@ -408,13 +408,15 @@
         const lEl = $('rp-lmiss'), rEl = $('rp-rmiss');
         const countEls = Object.fromEntries(JUDGES.map((j) => [j, $(`rp-c-${j}`)]));
         const endMs = () => Math.max(prep.lastTime + 1500, (audio.duration || 0) * 1000);
+        // times on screen are real time: song time ÷ the mod's speed (DT 1.5, HT 0.75)
+        const fmtReal = (ms) => fmt(ms / (prep.rate || 1));
         let seeking = false;
         seek.addEventListener('input', () => { seeking = true; audio.currentTime = (seek.value / 1000) * endMs() / 1000; showTip(seek.value / 1000); });
         // hover: the time under the pointer, in a bubble above it
         const tip = $('rp-seek-tip');
         function showTip(frac) {
             frac = Math.min(1, Math.max(0, frac));
-            tip.textContent = fmt(frac * endMs());
+            tip.textContent = fmtReal(frac * endMs());
             tip.style.left = `${frac * 100}%`;
             tip.hidden = false;
         }
@@ -469,7 +471,7 @@
         });
         audio.addEventListener('play', () => { playBtn.textContent = '❚❚'; playBtn.setAttribute('aria-label', L('暫停')); });
         audio.addEventListener('pause', () => { playBtn.textContent = '▶'; playBtn.setAttribute('aria-label', L('播放')); });
-        audio.addEventListener('loadedmetadata', () => { durEl.textContent = fmt(endMs()); $('rp-seek-end').textContent = fmt(endMs()); });
+        audio.addEventListener('loadedmetadata', () => { durEl.textContent = fmtReal(endMs()); $('rp-seek-end').textContent = fmtReal(endMs()); });
         const first = prep.notes.length ? prep.notes[0].time : 0;
         audio.addEventListener('loadedmetadata', () => { audio.currentTime = Math.max(0, first - 1500) / 1000; }, { once: true });
 
@@ -487,7 +489,7 @@
                 if (rEl) rEl.textContent = s.rMiss;
                 for (const j of JUDGES) countEls[j].textContent = s.counts[j];
             }
-            timeEl.textContent = fmt(t);
+            timeEl.textContent = fmtReal(t);
             seekNow.textContent = timeEl.textContent;
             if (!seeking) seek.value = String(Math.round((t / endMs()) * 1000));
             session.raf = requestAnimationFrame(tick);

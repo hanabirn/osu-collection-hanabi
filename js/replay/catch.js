@@ -488,6 +488,9 @@
         if (combo > 0) {
             const cs = view.comboScale || 1;
             const cy = plateY - h * 0.38;
+            ctx.save(); // a soft shadow so the number reads on bright backgrounds
+            ctx.shadowColor = 'rgba(0,0,0,0.75)';
+            ctx.shadowBlur = 6;
             if (skin && skin.comboDigits) {
                 const ds = String(combo).split('').map((d) => skin.comboDigits[Number(d)]);
                 const dk = (h / 480) * cs * 0.8;
@@ -503,6 +506,7 @@
                 ctx.textBaseline = 'middle';
                 ctx.fillText(String(combo), cx, cy);
             }
+            ctx.restore();
         }
         ctx.restore();
         return {
