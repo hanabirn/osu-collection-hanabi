@@ -20,6 +20,14 @@
     let session = null; // { audio, raf, urls[], prep, map, replay, view, ro }
     let savedSkin; // undefined = not looked up yet, null = none
 
+    /* the visitor's choices, kept in this browser */
+    const PREFS_KEY = 'osu_replay_prefs_v1';
+    const prefs = { size: 'm', volume: 0.6, muted: false, speed: 1.6, dim: 0.75 };
+    try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
+    const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
+    const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
+    const RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
     const esc = (s) => (typeof escHtml === 'function' ? escHtml(String(s)) : String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`));
     const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
     const $ = (id) => document.getElementById(id);
@@ -32,8 +40,11 @@
         root.setAttribute('aria-modal', 'true');
         root.setAttribute('aria-label', L('重播播放器'));
         root.hidden = true;
-        root.innerHTML = `<div class="rp-body" id="rp-body"></div>
-            <button type="button" class="rp-close" aria-label="${L('關閉')}" onclick="closeReplayViewer()">✕</button>`;
+        root.innerHTML = `<div class="rp-frame" id="rp-frame" data-size="${esc(prefs.size)}">
+                <div class="rp-body" id="rp-body"></div>
+                <button type="button" class="rp-close" aria-label="${L('關閉')}" onclick="closeReplayViewer()">✕</button>
+            </div>`;
+        root.addEventListener('click', (e) => { if (e.target === root) closeReplayViewer(); });
         document.body.appendChild(root);
         document.addEventListener('keydown', onKey);
         return root;
@@ -185,6 +196,13 @@
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
+            <div class="rp-hud rp-hud-top">
+                <b>${esc(replay.player)}</b>
+                <span class="rp-map">${esc(map.metadata.Title || bm.title)} <span class="rp-diff">[${esc(map.metadata.Version || bm.version)}]</span></span>
+                <i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i>
+                <span>${prep.keys}K · ${esc(modsLabel(replay.mods))}${played ? ` · ${esc(played)}` : ''}</span>
+                <span class="rp-result">${(accOf(record) * 100).toFixed(2)}% · ${replay.maxCombo.toLocaleString()}x · ${JUDGES.map((j) => `<span style="color:${R.JUDGE_COLOR[j]}">${record[j]}</span>`).join('/')}</span>
+            </div>
             <div class="rp-hud rp-hud-tl"><span class="rp-acc" id="rp-acc">100.00%</span></div>
             <div class="rp-hud rp-hud-tr">
                 <dl class="rp-live-counts">${JUDGES.map((j) => `<dt style="color:${R.JUDGE_COLOR[j]}">${j}</dt><dd id="rp-c-${j}">0</dd>`).join('')}
@@ -199,21 +217,26 @@
                 <div class="rp-bar">
                     <button type="button" class="rp-play" id="rp-play" aria-label="${L('播放')}">▶</button>
                     <span class="rp-time"><span id="rp-time">0:00</span> / <span id="rp-dur">0:00</span></span>
-                    <div class="rp-who"><small>${L('玩家')}</small><b>${esc(replay.player)}</b></div>
-                    <div class="rp-map"><b>${esc(map.metadata.Title || bm.title)} <span class="rp-diff">[${esc(map.metadata.Version || bm.version)}]</span></b>
-                        <span><i class="rp-sr" style="background:${srColor}">★ ${sr.toFixed(2)}</i> ${prep.keys}K · ${esc(modsLabel(replay.mods))}${played ? ` · ${esc(played)}` : ''}</span></div>
-                    <div class="rp-final"><small>${L('準確率')}</small><b>${(accOf(record) * 100).toFixed(2)}%</b></div>
-                    <div class="rp-final"><small>${L('連擊')}</small><b>${replay.maxCombo.toLocaleString()}x</b></div>
-                    <div class="rp-final rp-final-counts"><small>${L('判定')}</small><b>${JUDGES.map((j) => `<span style="color:${R.JUDGE_COLOR[j]}">${record[j]}</span>`).join('/')}</b></div>
+                    <span class="rp-ctl rp-vol">
+                        <button type="button" class="rp-icon" id="rp-mute" aria-label="${L('靜音')}">🔊</button>
+                        <input type="range" id="rp-volume" min="0" max="1" step="0.02" value="${prefs.volume}" aria-label="${L('音量')}">
+                    </span>
+                    <label class="rp-ctl">${L('速度')}
+                        <select id="rp-rate">${RATES.map((r) => `<option value="${r}"${r === 1 ? ' selected' : ''}>${r}×</option>`).join('')}</select>
+                    </label>
+                    <label class="rp-ctl">${L('捲動')}<input type="range" id="rp-speed" min="0.6" max="3.5" step="0.05" value="${prefs.speed}"></label>
+                    <label class="rp-ctl">${L('背景')}<input type="range" id="rp-dim" min="0" max="1" step="0.05" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
+                    <label class="rp-ctl">${L('大小')}
+                        <select id="rp-size">${SIZES.map(([v, n]) => `<option value="${v}"${v === prefs.size ? ' selected' : ''}>${L(n)}</option>`).join('')}</select>
+                    </label>
+                    <button type="button" class="rp-icon" id="rp-fs" aria-label="${L('全螢幕')}" title="${L('全螢幕')}">⛶</button>
                     <span class="rp-spacer"></span>
                     <details class="rp-menu">
-                        <summary class="rp-btn" aria-label="${L('設定')}">⚙</summary>
+                        <summary class="rp-btn">⚙ ${L('Skin・判定')}</summary>
                         <div class="rp-menu-panel">
-                            <label class="rp-opt">${L('捲動速度')}<input type="range" id="rp-speed" min="0.6" max="3.5" step="0.05" value="1.6"></label>
-                            <label class="rp-opt">${L('背景暗度')}<input type="range" id="rp-dim" min="0" max="1" step="0.05" value="0.75"></label>
                             <div class="rp-opt">Skin <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkin ? savedSkin.name : L('預設'))}</span>
                                 <span class="rp-skin-btns">
-                                    <label class="rp-btn">${L('使用我的 skin（.osk）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
+                                    <label class="rp-btn">${L('使用我的 skin（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
                                     <button type="button" class="rp-btn" id="rp-skin-reset">${L('恢復預設')}</button>
                                 </span></div>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
@@ -228,13 +251,34 @@
 
         const audio = new Audio(audioUrl);
         audio.preload = 'auto';
-        audio.playbackRate = prep.rate;
+        audio.volume = prefs.volume;
+        audio.muted = !!prefs.muted;
+        let userRate = 1;
+        const applyRate = () => { audio.playbackRate = prep.rate * userRate; };
+        applyRate();
         audio.preservesPitch = !(replay.mods & R.MOD.NC);
         const canvas = $('rp-canvas');
         const stage = $('rp-stage');
         const ctx = canvas.getContext('2d');
-        const view = { w: 0, h: 0, dpr: 1, speed: 1.6, bg, bgDim: 0.75, skin: skinCfg };
+        const view = { w: 0, h: 0, dpr: 1, speed: prefs.speed, bg, bgDim: prefs.dim, skin: skinCfg };
         session = { audio, urls, prep, map, replay, view, raf: 0 };
+
+        const muteBtn = $('rp-mute');
+        const showMute = () => { muteBtn.textContent = audio.muted || audio.volume === 0 ? '🔇' : '🔊'; };
+        showMute();
+        muteBtn.addEventListener('click', () => { audio.muted = !audio.muted; prefs.muted = audio.muted; savePrefs(); showMute(); });
+        $('rp-volume').addEventListener('input', (e) => {
+            audio.volume = Number(e.target.value);
+            if (audio.volume > 0 && audio.muted) audio.muted = false;
+            prefs.volume = audio.volume; prefs.muted = audio.muted; savePrefs(); showMute();
+        });
+        $('rp-rate').addEventListener('change', (e) => { userRate = Number(e.target.value) || 1; applyRate(); });
+        $('rp-size').addEventListener('change', (e) => { prefs.size = e.target.value; savePrefs(); $('rp-frame').dataset.size = prefs.size; });
+        $('rp-fs').addEventListener('click', () => {
+            const frame = $('rp-frame');
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+            else if (frame.requestFullscreen) frame.requestFullscreen().catch(() => {});
+        });
 
         const resize = () => {
             const r = stage.getBoundingClientRect();
@@ -259,8 +303,8 @@
         seek.addEventListener('input', () => { seeking = true; audio.currentTime = (seek.value / 1000) * endMs() / 1000; });
         seek.addEventListener('change', () => { seeking = false; });
         playBtn.addEventListener('click', togglePlay);
-        $('rp-speed').addEventListener('input', (e) => { view.speed = Number(e.target.value); });
-        $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); });
+        $('rp-speed').addEventListener('input', (e) => { view.speed = Number(e.target.value); prefs.speed = view.speed; savePrefs(); });
+        $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });
         $('rp-skin-file').addEventListener('change', async (e) => {
             const f = e.target.files && e.target.files[0];
             if (!f) return;

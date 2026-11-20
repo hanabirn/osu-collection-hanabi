@@ -277,8 +277,19 @@
                     const bottom = hit ? hitY : yHead;
                     const top = Math.max(-nh, yTail);
                     if (skin && (bodyImg || headImg)) {
-                        if (bodyImg) drawImg(bodyImg, x, top, cw, Math.max(0, bottom - top));
-                        if (tailImg) { const th = heightFor(tailImg, cw); drawImg(tailImg, x, top - th / 2, cw, th); }
+                        if (bodyImg) drawBody(ctx, bodyImg, x, cw, yTail, bottom, skin.bodyStyle[c]);
+                        if (tailImg) {
+                            const th = tailImg.bmp.height * (nhW / tailImg.bmp.width);
+                            if (skin.flipTail[c]) {
+                                ctx.save();
+                                ctx.translate(0, yTail);
+                                ctx.scale(1, -1);
+                                drawImg(tailImg, x, -th, cw, th);
+                                ctx.restore();
+                            } else {
+                                drawImg(tailImg, x, yTail - th, cw, th);
+                            }
+                        }
                         const hh = headImg ? headImg.bmp.height * (nhW / headImg.bmp.width) : 0;
                         drawImg(headImg, x, bottom - hh, cw, hh);
                     } else {
@@ -377,6 +388,32 @@
             lMiss: last ? last.lMissAfter : 0,
             rMiss: last ? last.rMissAfter : 0,
         };
+    }
+
+    /* A long note's body between its tail (top, yTail) and head (bottom).
+       style 0: the image stretched over the whole length.
+       style 1: laid from the tail down at its own scale, repeated, cut at
+                the head (osu! skin 2.5+ default; a "percy" skin puts a
+                rounded cap and some empty space at the top of a very tall
+                body image, so the end is round and drawn a little short).
+       style 2: the same, laid from the head up. */
+    function drawBody(ctx, img, x, cw, yTail, yBottom, style) {
+        const top = Math.max(yTail, -10), height = yBottom - top;
+        if (height <= 0) return;
+        if (!style) { ctx.drawImage(img.bmp, x, top, cw, height); return; }
+        const texH = img.bmp.height * (cw / img.bmp.width);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x, top, cw, height);
+        ctx.clip();
+        if (style === 2) {
+            for (let y = yBottom - texH; y + texH > top; y -= texH) ctx.drawImage(img.bmp, x, y, cw, texH);
+        } else {
+            let y = yTail;
+            if (y < top - texH) y += Math.floor((top - y) / texH) * texH;
+            for (; y < yBottom; y += texH) ctx.drawImage(img.bmp, x, y, cw, texH);
+        }
+        ctx.restore();
     }
 
     function roundRect(ctx, x, y, w, h, r) {

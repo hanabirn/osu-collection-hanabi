@@ -55,6 +55,13 @@
         return Number.isFinite(r) ? `rgba(${r},${g},${b},${Number.isFinite(a) ? a / 255 : 1})` : null;
     };
 
+    function skinVersion(v) {
+        if (!v) return 1;
+        if (/latest/i.test(v)) return 99;
+        const n = parseFloat(v);
+        return Number.isFinite(n) ? n : 1;
+    }
+
     /* the default image letter for a column: 1/2 alternating out from the
        middle, S for the middle column of an odd key count (4K: 1 2 2 1) */
     function columnType(keys, c) {
@@ -110,6 +117,19 @@
                 // notes are as tall as they'd be in a column this wide (osu! skin.ini)
                 noteHeightWidth: Number(m.WidthForNoteHeightScale) > 0 ? Number(m.WidthForNoteHeightScale) : 0,
                 keysUnderNotes: m.KeysUnderNotes === '1',
+                // skin version: "latest" counts as new; no Version means 1.0.
+                // From 2.5 the long-note body is laid from the top by default
+                // instead of stretched, and the tail image is flipped.
+                version: skinVersion(ini.general.Version),
+                bodyStyle: Array.from({ length: keys }, (_, i) => {
+                    const v = m[`NoteBodyStyle${i}`] ?? m.NoteBodyStyle;
+                    if (v != null && v !== '') return Number(v);
+                    return skinVersion(ini.general.Version) >= 2.5 ? 1 : 0;
+                }),
+                flipTail: Array.from({ length: keys }, (_, i) => {
+                    const v = m[`NoteFlipWhenUpsideDown${i}T`] ?? m.NoteFlipWhenUpsideDownT;
+                    return skinVersion(ini.general.Version) >= 2.5 && v !== '0';
+                }),
                 upsideDown: m.UpsideDown === '1',
                 colours: Array.from({ length: keys }, (_, i) => colour(m[`Colour${i + 1}`])),
                 notes: [], heads: [], bodies: [], tails: [], keys: [], keysDown: [],

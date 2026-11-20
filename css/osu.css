@@ -7128,3 +7128,38 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     .rp-hud-l { display: none; }
     .rp-menu-panel { left: 10px; right: 10px; width: auto; bottom: 74px; }
 }
+/* window sizes (js/replay/player.js prefs.size): the player is a window the
+   visitor sizes; 填滿畫面 fills the browser, ⛶ goes truly full screen */
+.rp-overlay { background: rgba(4, 3, 6, 0.82); display: flex; align-items: center; justify-content: center; padding: 12px; }
+.rp-frame { position: relative; overflow: hidden; background: #000; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    width: min(var(--rp-w), 100%); height: min(var(--rp-h), 100%); --rp-w: 1280px; --rp-h: 780px; }
+.rp-frame[data-size="s"] { --rp-w: 960px; --rp-h: 600px; }
+.rp-frame[data-size="m"] { --rp-w: 1280px; --rp-h: 780px; }
+.rp-frame[data-size="l"] { --rp-w: 1640px; --rp-h: 980px; }
+.rp-frame[data-size="full"] { --rp-w: 100vw; --rp-h: 100dvh; }
+.rp-overlay:has(.rp-frame[data-size="full"]) { padding: 0; }
+.rp-frame[data-size="full"], .rp-frame:fullscreen { border-radius: 0; border: 0; width: 100%; height: 100%; }
+.rp-body { position: absolute; inset: 0; }
+/* top info strip */
+.rp-hud-top { top: 12px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 120px); display: flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); font-size: var(--fs-13); white-space: nowrap; overflow: hidden; }
+.rp-hud-top .rp-map { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.rp-hud-top .rp-result { color: rgba(255, 255, 255, 0.75); }
+.rp-hud-tl { top: 56px; }
+.rp-hud-tr { top: 56px; }
+/* control bar */
+.rp-bar { gap: 14px; }
+.rp-ctl { display: inline-flex; align-items: center; gap: 6px; flex: none; color: rgba(255, 255, 255, 0.65); font-size: var(--fs-12); white-space: nowrap; }
+.rp-ctl input[type="range"] { width: 86px; accent-color: var(--pink); }
+.rp-ctl select { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; padding: 4px 6px; font: inherit; font-size: var(--fs-12); }
+.rp-ctl select option { background: #19151c; }
+.rp-icon { flex: none; width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.06); color: #fff; cursor: pointer; font-size: 15px; line-height: 1; }
+.rp-icon:hover { background: rgba(255, 255, 255, 0.14); }
+.rp-vol { gap: 4px; }
+.rp-menu-panel { position: absolute; right: 0; bottom: 52px; }
+@media (max-width: 760px) {
+    .rp-overlay { padding: 0; }
+    .rp-frame { width: 100%; height: 100%; border-radius: 0; border: 0; }
+    .rp-hud-top { display: none; }
+    .rp-ctl:not(.rp-vol) { display: none; }
+    .rp-menu-panel { position: fixed; left: 10px; right: 10px; bottom: 74px; width: auto; }
+}
