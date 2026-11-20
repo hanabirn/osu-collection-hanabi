@@ -7198,3 +7198,15 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-menu { position: static; }
 .rp-menu-panel { position: absolute; right: 12px; left: auto; bottom: calc(100% + 10px); width: 300px; max-height: calc(100cqh - 140px); z-index: 6; }
 @media (max-width: 760px) { .rp-menu-panel { left: 10px; right: 10px; width: auto; } }
+/* bigger live judgement counts */
+.rp-live-counts { font-size: clamp(15px, 1.5cqw, 22px); gap: 6px 26px; }
+/* player strip: avatar, name + flag, mode PP and ranks */
+.rp-hud-top { gap: 10px; padding: 5px 14px 5px 5px; }
+.rp-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex: none; }
+.rp-who { display: inline-flex; align-items: center; gap: 6px; }
+.rp-flag { width: 20px; height: 15px; border-radius: 2px; object-fit: cover; }
+.rp-who-stats { color: rgba(255, 255, 255, 0.85); }
+.rp-who-stats b { color: var(--pink-text, var(--pink)); }
+.rp-hud-top .rp-who { flex-direction: row; }
+/* live counts stay readable on bright backgrounds */
+.rp-hud-tr { padding: 8px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.55); }

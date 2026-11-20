@@ -219,7 +219,9 @@
                 </div>
             </div>
             <div class="rp-hud rp-hud-top">
-                <b>${esc(replay.player)}</b>
+                <img class="rp-avatar" id="rp-avatar" alt="" hidden>
+                <span class="rp-who"><b>${esc(replay.player)}</b><img class="rp-flag" id="rp-flag" alt="" hidden></span>
+                <span class="rp-who-stats" id="rp-who-stats"></span>
                 <span>${esc(modsLabel(replay.mods))}${played ? ` · ${esc(played)}` : ''}</span>
                 <span class="rp-result">${(accOf(record) * 100).toFixed(2)}% · ${replay.maxCombo.toLocaleString()}x · ${JUDGES.map((j) => `<span style="color:${R.JUDGE_COLOR[j]}">${record[j]}</span>`).join('/')}</span>
             </div>
@@ -271,6 +273,25 @@
                 </div>
             </div>`;
 
+        // the player's profile in this mode: avatar, country, total PP, ranks
+        osuFetch(`u=${encodeURIComponent(replay.player)}&type=string&m=3`).then((r) => {
+            const u = Array.isArray(r) ? r[0] : null;
+            if (!u || !$('rp-who-stats')) return;
+            const av = $('rp-avatar');
+            av.src = `https://a.ppy.sh/${encodeURIComponent(u.user_id)}`;
+            av.hidden = false;
+            av.onerror = () => { av.hidden = true; };
+            if (u.country) {
+                const fl = $('rp-flag');
+                fl.src = `https://flagcdn.com/48x36/${String(u.country).toLowerCase()}.png`;
+                fl.alt = u.country;
+                fl.title = u.country;
+                fl.hidden = false;
+            }
+            const n = (v) => Number(v || 0).toLocaleString();
+            $('rp-who-stats').innerHTML = `<b>${n(Math.round(Number(u.pp_raw) || 0))}pp</b> · #${n(u.pp_rank)} · ${esc(u.country || '')} #${n(u.pp_country_rank)}`;
+        }).catch(() => {});
+
         const audio = new Audio(audioUrl);
         audio.preload = 'auto';
         audio.volume = prefs.volume;
@@ -308,7 +329,13 @@
             prefs.volume = audio.volume; prefs.muted = audio.muted; savePrefs(); showMute();
         });
         $('rp-rate').addEventListener('change', (e) => { userRate = Number(e.target.value) || 1; applyRate(); });
-        $('rp-size').addEventListener('change', (e) => { prefs.size = e.target.value; savePrefs(); $('rp-frame').dataset.size = prefs.size; });
+        $('rp-size').addEventListener('change', (e) => {
+            prefs.size = e.target.value;
+            savePrefs();
+            $('rp-frame').dataset.size = prefs.size;
+            // picking a size means leaving true full screen (⛶)
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        });
         $('rp-fs').addEventListener('click', () => {
             const frame = $('rp-frame');
             if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -363,7 +390,18 @@
                 savePrefs();
             });
         }
-        $('rp-skin-reset').addEventListener('click', async () => {
+        // two steps, so a stray click doesn't throw the visitor's skin away
+        let resetArmed = null;
+        $('rp-skin-reset').addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            if (!resetArmed) {
+                btn.textContent = L('再按一次確認');
+                resetArmed = setTimeout(() => { resetArmed = null; btn.textContent = L('恢復預設'); }, 3000);
+                return;
+            }
+            clearTimeout(resetArmed);
+            resetArmed = null;
+            btn.textContent = L('恢復預設');
             await window.replaySkin.clearSkin();
             savedSkin = null;
             view.skin = null;
