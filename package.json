@@ -5,7 +5,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "http-server . -p 8080 -c-1 --silent",
+    "dev": "http-server . -p 8080 -c-1 --silent --proxy https://osu.hanabirn.xyz",
     "build": "node scripts/build.mjs && node scripts/gen-worker-routes.mjs && node scripts/patch-rosu-wasm.mjs",
     "discord:register": "node scripts/register-discord-commands.mjs",
     "lint": "eslint .",
