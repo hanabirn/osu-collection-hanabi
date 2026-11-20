@@ -102,16 +102,32 @@
         // running combo / accuracy, in the order things were judged
         const events = notes.slice().sort((a, b) => a.judgedAt - b.judgedAt);
         // combo as osu!lazer counts it: a long note's head and tail are one each
+        // each event keeps the running totals up to and including it, so a
+        // frame only looks them up: counts, UR (10 × the standard deviation
+        // of hit offsets in real time), and misses per hand
         let combo = 0, best = 0, got = 0, max = 0;
+        let offN = 0, offSum = 0, offSq = 0, lMiss = 0, rMiss = 0;
+        const rateNow = mods & (MOD.DT | MOD.NC) ? 1.5 : mods & MOD.HT ? 0.75 : 1;
         const counts = { MAX: 0, 300: 0, 200: 0, 100: 0, 50: 0, MISS: 0 };
+        const mid = (keys - 1) / 2;
         for (const n of events) {
             counts[n.judge]++;
             combo = n.judge === 'MISS' ? 0 : combo + (n.end != null ? 2 : 1);
             best = Math.max(best, combo);
             got += JUDGE_VALUE[n.judge];
             max += 300;
+            if (n.judge === 'MISS') {
+                if (n.col < mid) lMiss++; else if (n.col > mid) rMiss++;
+            } else if (n.hitAt != null) {
+                const o = (n.hitAt - n.time) / rateNow;
+                offN++; offSum += o; offSq += o * o;
+            }
             n.comboAfter = combo;
             n.accAfter = max ? got / max : 1;
+            n.countsAfter = { ...counts };
+            n.urAfter = offN > 1 ? 10 * Math.sqrt(Math.max(0, offSq / offN - (offSum / offN) ** 2)) : 0;
+            n.lMissAfter = lMiss;
+            n.rMissAfter = rMiss;
         }
 
         // scroll position from slider velocity (inherited timing points)
@@ -155,12 +171,14 @@
         return ans;
     }
 
-    /* view: { w, h, dpr, speed (px per ms of scroll), bg (image|null), bgDim } */
+    /* One frame at song time t (ms).
+       view: { w, h, speed (scroll px per ms at 1080 px height), bg, bgDim, skin (forKeys() result | null) }
+       Returns the live numbers for the page around the canvas. */
     function drawMania(ctx, view, prep, t) {
         const { w, h } = view;
+        const skin = view.skin;
         ctx.save();
-        ctx.clearRect(0, 0, w, h);
-        ctx.fillStyle = '#0b0a0d';
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
         if (view.bg) {
             const s = Math.max(w / view.bg.width, h / view.bg.height);
@@ -169,121 +187,197 @@
             ctx.globalAlpha = 1;
         }
 
+        // stage geometry: the skin's (in osu!'s 480-high space) or ours
         const keys = prep.keys;
-        const colW = Math.min(64, Math.floor((Math.min(w, 560) - 40) / keys));
-        const fieldW = colW * keys;
+        let colW, gaps, hitY;
+        if (skin) {
+            const k = h / 480;
+            colW = skin.columnWidth.map((x) => x * k);
+            gaps = skin.columnSpacing.map((x) => x * k);
+            hitY = skin.hitPosition * k;
+        } else {
+            const each = Math.min(h * 0.13, (w * 0.62) / keys, 120);
+            colW = Array(keys).fill(each);
+            gaps = Array(Math.max(1, keys - 1)).fill(0);
+            hitY = h - Math.max(90, h * 0.16);
+        }
+        const fieldW = colW.reduce((a, b) => a + b, 0) + gaps.slice(0, keys - 1).reduce((a, b) => a + b, 0);
         const x0 = Math.round((w - fieldW) / 2);
-        const judgeY = h - Math.max(70, h * 0.13);
-        ctx.fillStyle = 'rgba(8, 7, 10, 0.82)';
-        ctx.fillRect(x0 - 2, 0, fieldW + 4, h);
+        const colX = [];
+        for (let c = 0, x = x0; c < keys; c++) { colX.push(x); x += colW[c] + (gaps[c] || 0); }
+        const speed = view.speed * (h / 1080);
 
-        // column lights for held keys
-        const held = heldAt(prep, t);
+        // stage
+        ctx.fillStyle = 'rgba(0,0,0,0.88)';
+        ctx.fillRect(x0, 0, fieldW, h);
         for (let c = 0; c < keys; c++) {
-            const x = x0 + c * colW;
-            ctx.fillStyle = c % 2 ? 'rgba(255,255,255,0.025)' : 'rgba(255,255,255,0.045)';
-            ctx.fillRect(x, 0, colW, judgeY);
-            if (held & (1 << c)) {
-                const g = ctx.createLinearGradient(0, judgeY - 220, 0, judgeY);
+            const col = skin && skin.colours[c];
+            if (col) { ctx.fillStyle = col; ctx.fillRect(colX[c], 0, colW[c], h); }
+        }
+        const drawImg = (img, x, y, wd, ht) => { if (img) ctx.drawImage(img.bmp, x, y, wd, ht); };
+        const heightFor = (img, wd) => (img ? img.bmp.height * (wd / img.bmp.width) : 0);
+        if (skin) {
+            if (skin.stageLeft) { const sw = skin.stageLeft.bmp.width * skin.stageLeft.s * (h / 480); drawImg(skin.stageLeft, x0 - sw, 0, sw, h); }
+            if (skin.stageRight) { const sw = skin.stageRight.bmp.width * skin.stageRight.s * (h / 480); drawImg(skin.stageRight, x0 + fieldW, 0, sw, h); }
+        } else {
+            ctx.fillStyle = 'rgba(255,255,255,0.14)';
+            ctx.fillRect(x0 - 2, 0, 2, h);
+            ctx.fillRect(x0 + fieldW, 0, 2, h);
+            for (let c = 1; c < keys; c++) { ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.fillRect(colX[c] - 0.5, 0, 1, hitY); }
+        }
+
+        // held keys: lane glow
+        const held = heldAt(prep, t);
+        if (!skin) {
+            for (let c = 0; c < keys; c++) {
+                if (!(held & (1 << c))) continue;
+                const g = ctx.createLinearGradient(0, hitY - h * 0.35, 0, hitY);
                 g.addColorStop(0, 'rgba(244,114,182,0)');
-                g.addColorStop(1, 'rgba(244,114,182,0.32)');
+                g.addColorStop(1, 'rgba(244,114,182,0.28)');
                 ctx.fillStyle = g;
-                ctx.fillRect(x, judgeY - 220, colW, 220);
+                ctx.fillRect(colX[c], hitY - h * 0.35, colW[c], h * 0.35);
             }
         }
 
         // notes
         const now = scrollPos(prep, t);
-        const yOf = (time) => judgeY - (scrollPos(prep, time) - now) * view.speed;
-        const noteH = Math.max(10, Math.round(colW * 0.28));
-        const colColor = (c) => {
-            const mid = (keys - 1) / 2;
-            if (keys % 2 === 1 && c === mid) return '#ffd166';
-            return (c < mid ? c : keys - 1 - c) % 2 === 0 ? '#e8e6ee' : '#f472b6';
+        const yOf = (time) => hitY - (scrollPos(prep, time) - now) * speed;
+        const defColor = (c) => {
+            const ty = window.replaySkin ? window.replaySkin.columnType(keys, c) : '1';
+            return ty === 'S' ? '#ffd166' : ty === '1' ? '#eceaf2' : '#f472b6';
         };
         for (let c = 0; c < keys; c++) {
-            const x = x0 + c * colW + 2;
-            const nw = colW - 4;
+            const x = colX[c], cw = colW[c];
+            const noteImg = skin && skin.notes[c], headImg = skin && skin.heads[c], bodyImg = skin && skin.bodies[c], tailImg = skin && skin.tails[c];
+            const nh = skin && noteImg ? heightFor(noteImg, cw) : Math.max(12, cw * 0.32);
             for (const n of prep.cols[c]) {
                 const endT = n.end ?? n.time;
                 if (endT < t - 400) continue;
                 const yHead = yOf(n.time);
-                if (yHead < -noteH - 4000 && n.end == null) break;
-                const hitDone = n.judge !== 'MISS' && n.hitAt != null && n.hitAt <= t;
-                const missed = n.judge === 'MISS' && t > n.time;
+                if (yHead < -h) break;
+                const hit = n.judge !== 'MISS' && n.hitAt != null && n.hitAt <= t;
+                const missed = n.judge === 'MISS' && t > n.time + prep.w[50];
+                ctx.globalAlpha = missed ? 0.35 : 1;
                 if (n.end != null) {
-                    const yTail = yOf(n.end);
-                    if (yTail > h + noteH) continue;
                     const released = n.releaseAt != null && n.releaseAt <= t;
-                    if (released && n.judge !== 'MISS' && t >= n.releaseAt) continue;
-                    const top = Math.max(yTail, -noteH);
-                    const bottom = hitDone && !released ? judgeY : yHead;
-                    if (bottom < -noteH) break;
-                    ctx.globalAlpha = missed ? 0.35 : 0.85;
-                    ctx.fillStyle = colColor(c);
-                    ctx.fillRect(x + nw * 0.18, top, nw * 0.64, Math.max(0, bottom - top));
-                    ctx.globalAlpha = missed ? 0.4 : 1;
-                    ctx.fillRect(x, bottom - noteH / 2, nw, noteH);
-                    ctx.globalAlpha = 1;
+                    if (released && !missed) { ctx.globalAlpha = 1; continue; }
+                    const yTail = yOf(n.end);
+                    if (yTail > h + nh) { ctx.globalAlpha = 1; continue; }
+                    const bottom = hit ? hitY : yHead;
+                    const top = Math.max(-nh, yTail);
+                    if (skin && (bodyImg || headImg)) {
+                        if (bodyImg) drawImg(bodyImg, x, top, cw, Math.max(0, bottom - top));
+                        if (tailImg) { const th = heightFor(tailImg, cw); drawImg(tailImg, x, top - th / 2, cw, th); }
+                        const hh = heightFor(headImg, cw);
+                        drawImg(headImg, x, bottom - hh, cw, hh);
+                    } else {
+                        ctx.fillStyle = defColor(c);
+                        ctx.globalAlpha *= 0.55;
+                        ctx.fillRect(x + cw * 0.14, top, cw * 0.72, Math.max(0, bottom - top));
+                        ctx.globalAlpha = missed ? 0.35 : 1;
+                        roundRect(ctx, x + 2, bottom - nh, cw - 4, nh, nh * 0.35);
+                    }
                 } else {
-                    if (hitDone) continue;
-                    if (yHead < -noteH) break;
-                    if (yHead > h + noteH) continue;
-                    ctx.globalAlpha = missed ? 0.35 : 1;
-                    ctx.fillStyle = colColor(c);
-                    ctx.fillRect(x, yHead - noteH / 2, nw, noteH);
-                    ctx.globalAlpha = 1;
+                    if (hit) { ctx.globalAlpha = 1; continue; }
+                    if (yHead > h + nh) { ctx.globalAlpha = 1; continue; }
+                    if (skin && noteImg) drawImg(noteImg, x, yHead - nh, cw, nh);
+                    else { ctx.fillStyle = defColor(c); roundRect(ctx, x + 2, yHead - nh, cw - 4, nh, nh * 0.35); }
                 }
+                ctx.globalAlpha = 1;
             }
         }
 
-        // judgement line + keys
-        ctx.fillStyle = 'rgba(255,255,255,0.75)';
-        ctx.fillRect(x0, judgeY - 1, fieldW, 2);
-        for (let c = 0; c < keys; c++) {
-            const on = held & (1 << c);
-            ctx.fillStyle = on ? '#f472b6' : 'rgba(255,255,255,0.12)';
-            ctx.fillRect(x0 + c * colW + 3, judgeY + 10, colW - 6, Math.max(18, h - judgeY - 24));
+        // judgement line / stage hint, then keys
+        if (skin) {
+            if (skin.stageHint) { const hh = heightFor(skin.stageHint, fieldW); drawImg(skin.stageHint, x0, hitY - hh / 2, fieldW, hh); }
+            else if (skin.judgementLine) { ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillRect(x0, hitY - 1, fieldW, 2); }
+            for (let c = 0; c < keys; c++) {
+                const img = held & (1 << c) ? skin.keysDown[c] : skin.keys[c];
+                if (!img) continue;
+                const kh = heightFor(img, colW[c]);
+                drawImg(img, colX[c], h - kh, colW[c], kh);
+            }
+        } else {
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.fillRect(x0, hitY - 1, fieldW, 2);
+            for (let c = 0; c < keys; c++) {
+                const on = held & (1 << c);
+                const r = Math.min(colW[c] * 0.4, (h - hitY) * 0.38);
+                ctx.beginPath();
+                ctx.arc(colX[c] + colW[c] / 2, hitY + (h - hitY) / 2, r, 0, Math.PI * 2);
+                ctx.lineWidth = Math.max(3, r * 0.12);
+                ctx.strokeStyle = on ? '#fff' : 'rgba(255,255,255,0.4)';
+                ctx.fillStyle = on ? defColor(c) : 'transparent';
+                if (on) ctx.fill();
+                ctx.stroke();
+            }
         }
 
-        // judgement, combo, hit error
+        // judgement + combo
         const ei = lastEventBefore(prep, t);
         const last = ei >= 0 ? prep.events[ei] : null;
         const cx = x0 + fieldW / 2;
-        if (last && t - last.judgedAt < 350) {
-            const a = 1 - (t - last.judgedAt) / 350;
-            ctx.globalAlpha = Math.max(0, a);
-            ctx.fillStyle = JUDGE_COLOR[last.judge];
-            ctx.font = `800 ${Math.round(colW * 0.5)}px system-ui, sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillText(last.judge, cx, judgeY * 0.42);
+        const judgeY = skin ? skin.scorePosition * (h / 480) : h * 0.42;
+        if (last && t - last.judgedAt < 400) {
+            const a = Math.max(0, 1 - (t - last.judgedAt) / 400);
+            const grow = 1 + 0.12 * (1 - a);
+            ctx.globalAlpha = a;
+            const img = skin && skin.hits[last.judge];
+            if (img) {
+                const iw = img.bmp.width * img.s * (h / 480) * grow, ih = img.bmp.height * img.s * (h / 480) * grow;
+                ctx.drawImage(img.bmp, cx - iw / 2, judgeY - ih / 2, iw, ih);
+            } else {
+                ctx.fillStyle = JUDGE_COLOR[last.judge];
+                ctx.font = `800 ${Math.round(h * 0.045 * grow)}px system-ui, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(last.judge === 'MAX' ? 'MAX' : last.judge, cx, judgeY);
+            }
             ctx.globalAlpha = 1;
         }
         const combo = last ? last.comboAfter : 0;
         if (combo > 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.font = `800 ${Math.round(colW * 0.62)}px system-ui, sans-serif`;
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.font = `800 ${Math.round(h * 0.055)}px system-ui, sans-serif`;
             ctx.textAlign = 'center';
-            ctx.fillText(String(combo), cx, judgeY * 0.3);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(String(combo), cx, judgeY - h * 0.075);
         }
-        // hit error bar: the last 2 s of hits
-        const barW = Math.min(fieldW, 240), barY = judgeY - 20;
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.fillRect(cx - barW / 2, barY - 4, barW, 8);
+
+        // hit error bar under the stage: coloured windows, recent hits as ticks
         const span = prep.w[50];
-        for (let i = ei; i >= 0 && t - prep.events[i].judgedAt < 2000; i--) {
-            const e = prep.events[i];
-            if (e.judge === 'MISS' || e.hitAt == null) continue;
-            const off = e.hitAt - e.time;
-            ctx.globalAlpha = 1 - (t - e.judgedAt) / 2000;
-            ctx.fillStyle = JUDGE_COLOR[e.judge];
-            ctx.fillRect(cx + (off / span) * (barW / 2) - 1, barY - 7, 2, 14);
+        const barW = Math.min(fieldW * 0.9, 300), barY = h - 12;
+        const scale = barW / 2 / span;
+        for (const j of ['50', '100', '200', '300', 'MAX']) {
+            ctx.fillStyle = JUDGE_COLOR[j];
+            ctx.globalAlpha = 0.85;
+            ctx.fillRect(cx - prep.w[j] * scale, barY - 2, prep.w[j] * scale * 2, 4);
         }
         ctx.globalAlpha = 1;
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(cx - 1, barY - 9, 2, 18);
+        for (let i = ei; i >= 0 && t - prep.events[i].judgedAt < 3000; i--) {
+            const e = prep.events[i];
+            if (e.judge === 'MISS' || e.hitAt == null) continue;
+            ctx.globalAlpha = 1 - (t - e.judgedAt) / 3000;
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(cx + (e.hitAt - e.time) * scale - 1, barY - 9, 2, 18);
+        }
+        ctx.globalAlpha = 1;
         ctx.restore();
-        return { combo, acc: last ? last.accAfter : 1, held };
+        return {
+            combo,
+            acc: last ? last.accAfter : 1,
+            counts: last ? last.countsAfter : { MAX: 0, 300: 0, 200: 0, 100: 0, 50: 0, MISS: 0 },
+            ur: last ? last.urAfter : 0,
+            lMiss: last ? last.lMissAfter : 0,
+            rMiss: last ? last.rMissAfter : 0,
+        };
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, w, h, r);
+        else ctx.rect(x, y, w, h);
+        ctx.fill();
     }
 
     window.replayMania = { prepareMania, drawMania, JUDGE, JUDGE_COLOR, MOD };
