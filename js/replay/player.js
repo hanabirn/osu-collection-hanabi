@@ -166,6 +166,7 @@
             showStatus(steps, 4);
             await new Promise((r) => setTimeout(r, 0));
             const prep = window.replayMania.prepareMania(map, replay);
+            window.__replayDebug = { prep, map, replay }; // prototype: for checking judgements
             startPlayer({ replay, map, bm, prep, audioUrl, bg, urls });
         } catch (err) {
             console.error('replay load failed', err);

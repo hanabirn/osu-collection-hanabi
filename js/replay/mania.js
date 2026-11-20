@@ -86,7 +86,10 @@
                     } else {
                         const rel = rs.find((r) => r > at);
                         n.releaseAt = rel == null ? n.end + w.MISS : rel;
-                        n.judge = judgeOffset(head, w) === 'MISS' ? 'MISS' : judgeHold(head, n.releaseAt - n.end, w);
+                        // held past the end: the game settles the note once the late (50)
+                        // window has passed, so a long hold isn't a very late release
+                        const tail = Math.min(n.releaseAt - n.end, w[50]);
+                        n.judge = judgeOffset(head, w) === 'MISS' ? 'MISS' : judgeHold(head, tail, w);
                     }
                 } else {
                     n.judge = 'MISS';
@@ -98,11 +101,12 @@
 
         // running combo / accuracy, in the order things were judged
         const events = notes.slice().sort((a, b) => a.judgedAt - b.judgedAt);
+        // combo as osu!lazer counts it: a long note's head and tail are one each
         let combo = 0, best = 0, got = 0, max = 0;
         const counts = { MAX: 0, 300: 0, 200: 0, 100: 0, 50: 0, MISS: 0 };
         for (const n of events) {
             counts[n.judge]++;
-            combo = n.judge === 'MISS' ? 0 : combo + 1;
+            combo = n.judge === 'MISS' ? 0 : combo + (n.end != null ? 2 : 1);
             best = Math.max(best, combo);
             got += JUDGE_VALUE[n.judge];
             max += 300;

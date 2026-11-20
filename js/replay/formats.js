@@ -59,6 +59,9 @@
             const dw = Number(w);
             if (dw === -12345) continue;
             t += dw;
+            // the game's opening frames (y = -500, x = 256) set up the cursor and
+            // aren't input; in mania x = 256 would read as "key 9 held"
+            if (Number(y) === -500) continue;
             frames.push({ t, x: Number(x), y: Number(y), keys: Number(z) | 0 });
         }
         return frames;
