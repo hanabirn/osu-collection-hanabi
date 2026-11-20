@@ -6956,3 +6956,42 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .bm-lb-row.is-me .bm-lb-player img { outline: 2px solid var(--pink); outline-offset: 1px; }
 .bm-lb-row.is-mutual .bm-lb-player img { outline: 2px solid #4ea3ff; outline-offset: 1px; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+
+/* ===== Newcomer clarity (2026-11-20) ===== */
+/* 首頁 intro in the band (js/main.js renderHomeIntro) */
+.home-intro { flex: 1 0 100%; display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
+.home-intro-title { margin: 0; font-size: clamp(20px, 2.2vw, 28px); font-weight: 800; letter-spacing: 0.01em; color: var(--text); }
+.home-intro-sub { margin: 0; max-width: 62ch; font-size: var(--fs-14); color: var(--text-dim); line-height: 1.5; }
+.home-intro-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.home-intro-actions .btn { padding: 8px 16px; font-size: var(--fs-14); white-space: nowrap; }
+.btn.btn-ghost { background: rgba(255, 255, 255, 0.07); color: var(--text); border: var(--line) solid var(--border); box-shadow: none; }
+.btn.btn-ghost:hover { background: rgba(255, 255, 255, 0.13); }
+.section-band.has-intro .header-banner-tools { display: none !important; }
+/* 首頁 row: no hole when 今日推薦 has nothing to show (a guest has no collection) */
+.home-row:has(.home-featured #featured-beatmap-banner[style*="none"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* PP 查詢 empty state (index.html #lookup-intro) */
+.lookup-intro { padding: 18px 20px; border-radius: var(--r-card); background: var(--bg-card); border: var(--line) solid var(--border); }
+.lookup-intro[hidden] { display: none; }
+.lookup-intro-title { margin: 0 0 10px; font-weight: 800; font-size: var(--fs-16); }
+.lookup-intro-list { margin: 0 0 14px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+.lookup-intro-list li { display: flex; align-items: flex-start; gap: 8px; color: var(--text-dim); font-size: var(--fs-14); line-height: 1.45; }
+.lookup-intro-list li .icon-svg { flex: none; margin-top: 2px; color: var(--pink-text, var(--pink)); }
+.lookup-intro-try { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: var(--fs-14); }
+.lookup-intro-chip { padding: 6px 12px; border-radius: 999px; border: var(--line) solid var(--border); background: var(--bg-input); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+.lookup-intro-chip:hover { border-color: rgba(var(--pink-rgb), 0.5); }
+.lookup-intro-chip.is-compare { background: rgba(78, 163, 255, 0.12); border-color: rgba(78, 163, 255, 0.35); }
+@media (max-width: 700px) { .lookup-intro-list { grid-template-columns: minmax(0, 1fr); } }
+
+/* 皮膚廣場: share form behind a button (index.html #ssc-share) */
+.ssc-share { margin-bottom: 16px; }
+.ssc-share > summary { list-style: none; display: inline-flex; align-items: center; cursor: pointer; }
+.ssc-share > summary::-webkit-details-marker { display: none; }
+.ssc-share[open] > summary { margin-bottom: 12px; }
+
+/* 動態分類 explanation */
+.smart-hint { margin-left: 4px; color: var(--text-dim); cursor: help; font-size: var(--fs-12); }
+/* with the intro, the band's "首頁" title says nothing new */
+.section-band.has-intro .section-band-title { display: none; }
+.ssc-share .osu-add-card > h3 { display: none; } /* the button above already says it */

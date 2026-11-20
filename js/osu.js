@@ -4788,6 +4788,7 @@ async function comparePlayers() {
     const skeleton = document.getElementById('pp-compare-skeleton');
     if (!inputA || !inputB) { clearPpCompareResult(); return; }
     if (!status || !result) return;
+    hideLookupIntro();
 
     status.innerText = '';
     if (skeleton) skeleton.style.display = '';
@@ -5317,7 +5318,33 @@ async function calculatePpGoal() {
     }
 }
 
+/* PP 查詢's empty state (index.html #lookup-intro): runs one of its examples. */
+function lookupExample(a, b) {
+    if (b) {
+        const btn = document.querySelectorAll('.lookup-mode-btn')[1];
+        switchLookupMode('compare', btn);
+        document.getElementById('pp-compare-input-a').value = a;
+        document.getElementById('pp-compare-input-b').value = b;
+        comparePlayers();
+        return;
+    }
+    const btn = document.querySelectorAll('.lookup-mode-btn')[0];
+    switchLookupMode('single', btn);
+    const input = document.getElementById('visitor-lookup-input');
+    loadVisitorProfileById(a, false).then(() => {
+        // show the name, not the id the example passed
+        const name = document.getElementById('visitor-result-name');
+        if (input && name && name.innerText.trim()) input.value = name.innerText.trim();
+    });
+}
+
+function hideLookupIntro() {
+    const intro = document.getElementById('lookup-intro');
+    if (intro) intro.hidden = true;
+}
+
 async function loadVisitorProfileById(input, isUsername) {
+    hideLookupIntro();
     const status = document.getElementById('visitor-lookup-status');
     const result = document.getElementById('visitor-lookup-result');
     const skeleton = document.getElementById('visitor-lookup-skeleton');

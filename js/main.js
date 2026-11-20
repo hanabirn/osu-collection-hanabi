@@ -72,6 +72,34 @@ function goSection(id) {
     switchTab(lastTabInSection[id] || sec.tabs.find((x) => x.tab).tab);
 }
 
+/* 首頁, not signed in: what the site is, in one line, and the three things
+   most people come for. Lives in the band's empty space above the title
+   (the band is tall on 首頁 for the banner). Signed-in visitors already
+   know the site and see their own banner instead. */
+function renderHomeIntro(onHome) {
+    const band = document.getElementById('section-band');
+    const inner = band && band.querySelector('.section-band-in');
+    if (!inner) return;
+    const user = typeof getLoggedInOsuUser === 'function' ? getLoggedInOsuUser() : null;
+    const show = onHome && !(user && user.id);
+    band.classList.toggle('has-intro', show);
+    let el = document.getElementById('home-intro');
+    if (!show) { if (el) el.remove(); return; }
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'home-intro';
+        el.className = 'home-intro';
+        inner.insertBefore(el, inner.firstChild);
+    }
+    el.innerHTML = `<p class="home-intro-title">${escHtml(t('home_intro_title'))}</p>
+        <p class="home-intro-sub">${escHtml(t('home_intro_sub'))}</p>
+        <div class="home-intro-actions">
+            <button type="button" class="btn" onclick="switchTab('collection')">${escHtml(t('home_intro_collect'))}</button>
+            <button type="button" class="btn btn-ghost" onclick="switchTab('lookup')">${escHtml(t('home_intro_pp'))}</button>
+            <button type="button" class="btn btn-ghost" onclick="switchTab('catalog')">${escHtml(t('home_intro_maps'))}</button>
+        </div>`;
+}
+
 function renderSectionBand(tab) {
     const { sec, st } = sectionOfTab(tab);
     currentSiteTab = tab;
@@ -106,6 +134,7 @@ function renderSectionBand(tab) {
             `<button type="button"${c === tab ? ' class="active" aria-pressed="true"' : ' aria-pressed="false"'} onclick="switchTab('${c}')">${escHtml(t(label))}</button>`).join('')}</div>`
         : '';
     if (sec.id === 'collection' && stats) extra.appendChild(stats);
+    renderHomeIntro(sec.id === 'home');
     if (typeof updateBandRotator === 'function') updateBandRotator(sec.id);
 }
 

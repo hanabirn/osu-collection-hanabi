@@ -49,7 +49,7 @@ function renderHomeHero() {
 
     const avatar = user && user.id
         ? `<img class="home-hero-avatar" src="${osuAvatarUrl(user.id)}" alt="" onerror="this.style.visibility='hidden';">`
-        : '<span class="home-hero-avatar" aria-hidden="true"></span>';
+        : ''; // a guest has no avatar: no empty placeholder square
     const hello = user && user.id
         ? t('home_hello', { name: user.username || ('#' + user.id) })
         : t('home_hello_guest');

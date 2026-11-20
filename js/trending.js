@@ -18,6 +18,8 @@ async function loadTrendingSongs() {
         if (!r.ok) throw new Error('bad response');
         const data = await r.json();
         trendingItems = data.items || [];
+        // 首頁's band rotates these covers for a visitor who isn't signed in
+        if (typeof refreshSectionBand === 'function') refreshSectionBand();
         renderTrendingSongs();
     } catch (e) {
         console.error('trending songs load failed:', e);

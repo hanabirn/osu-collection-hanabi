@@ -178,17 +178,34 @@ function bandRotTick() {
     if (!document.hidden) bandRotShow();
 }
 
+let bandRotSource = '';
+let bandRotCollectionIds = [];
+
+/* Which covers the band rotates: the visitor's collection on 收藏, the
+   trending maps (js/trending.js) on 首頁 for a visitor who isn't signed in
+   (whose band would otherwise be a flat colour), nothing elsewhere. */
+function bandRotSourceFor(sectionId) {
+    if (sectionId === 'collection') {
+        if (!bandRotCollectionIds.length) bandRotCollectionIds = bandRotPickIds();
+        return bandRotCollectionIds.length ? ['collection', bandRotCollectionIds] : ['', []];
+    }
+    const user = typeof getLoggedInOsuUser === 'function' ? getLoggedInOsuUser() : null;
+    if (sectionId === 'home' && !(user && user.id) && typeof trendingItems !== 'undefined' && trendingItems.length) {
+        return ['trending', trendingItems.map((it) => it.setId).filter(Boolean)];
+    }
+    return ['', []];
+}
+
 function updateBandRotator(sectionId) {
     const band = document.getElementById('section-band');
-    const on = sectionId === 'collection';
-    if (on && !bandRotIds.length) bandRotIds = bandRotPickIds();
-    const active = on && bandRotIds.length > 0;
-    if (band) band.classList.toggle('has-rotator', active);
-    if (active && !bandRotTimer) {
-        bandRotShow();
-        bandRotTimer = setInterval(bandRotTick, BAND_ROTATE_MS);
-    } else if (!active && bandRotTimer) {
-        clearInterval(bandRotTimer);
-        bandRotTimer = null;
-    }
+    const [source, ids] = bandRotSourceFor(sectionId);
+    if (band) band.classList.toggle('has-rotator', !!source);
+    if (source === bandRotSource) return;
+    bandRotSource = source;
+    if (bandRotTimer) { clearInterval(bandRotTimer); bandRotTimer = null; }
+    bandRotIds = ids;
+    bandRotIdx = 0;
+    if (!source) return;
+    bandRotShow();
+    bandRotTimer = setInterval(bandRotTick, BAND_ROTATE_MS);
 }
