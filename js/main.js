@@ -100,6 +100,61 @@ function renderHomeIntro(onHome) {
         </div>`;
 }
 
+/* 使用手冊: one group at a time. The choice is an attribute on the
+   container, so it survives the language switch replacing the manual's
+   HTML (data-i18n sets innerHTML only). */
+function showHowtoGroup(group) {
+    const manual = document.querySelector('#page-howto .howto-manual');
+    if (!manual) return;
+    manual.dataset.group = group;
+    document.querySelectorAll('#page-howto .howto-jumpnav [data-group]').forEach((b) => {
+        const on = b.dataset.group === group;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-selected', String(on));
+    });
+    const search = document.getElementById('howto-search');
+    if (search && search.value) { search.value = ''; filterHowto(''); }
+}
+
+/* Search across every group: rows (.howto-feat) and page entries
+   (.howto-tab) that don't mention the words are hidden; while searching,
+   all groups show so a match in another group isn't missed. */
+function filterHowto(query) {
+    const manual = document.querySelector('#page-howto .howto-manual');
+    if (!manual) return;
+    const words = String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
+    manual.classList.toggle('is-searching', words.length > 0);
+    // Latin words match from the start of a word ("pp" finds "PP", not "App");
+    // CJK text has no word breaks, so it matches anywhere.
+    const tests = words.map((w) => (/^[a-z0-9]+$/.test(w) ? new RegExp(`(^|[^a-z0-9])${w}`) : null));
+    const has = (text, i) => (tests[i] ? tests[i].test(text) : text.includes(words[i]));
+    const hit = (el) => { const s = el.textContent.toLowerCase(); return words.every((w, i) => has(s, i)); };
+    let any = false;
+    manual.querySelectorAll('.howto-group').forEach((group) => {
+        let groupHit = false;
+        group.querySelectorAll('.howto-feat').forEach((row) => {
+            const show = !words.length || hit(row);
+            row.hidden = !show;
+            if (show) groupHit = true;
+        });
+        group.querySelectorAll('.howto-tab').forEach((tab) => {
+            // a matching entry title/description shows the whole entry;
+            // otherwise only its matching rows (set above) show
+            const head = [...tab.querySelectorAll('.howto-tab-title, .howto-tab-desc')].map((e) => e.textContent.toLowerCase()).join(' ');
+            const headHit = words.length > 0 && words.every((w, i) => has(head, i));
+            const rows = [...tab.querySelectorAll('.howto-feat')];
+            if (headHit) rows.forEach((r) => { r.hidden = false; });
+            const show = !words.length || headHit || rows.some((r) => !r.hidden);
+            tab.hidden = !show;
+            if (show) groupHit = true;
+        });
+        group.hidden = words.length > 0 && !groupHit;
+        if (groupHit) any = true;
+    });
+    const empty = document.getElementById('howto-search-empty');
+    if (empty) empty.hidden = !words.length || any;
+}
+
 function renderSectionBand(tab) {
     const { sec, st } = sectionOfTab(tab);
     currentSiteTab = tab;

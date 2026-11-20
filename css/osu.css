@@ -7009,3 +7009,38 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 #page-home #trending-grid > .osu-card { scroll-snap-align: start; }
 @media (max-width: 700px) { #page-home #trending-grid { grid-template-columns: none; grid-auto-columns: calc((100% - 12px) / 2); } }
 #page-home #trending-grid { scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
+
+
+/* 使用手冊: tabs + search instead of one long page; entries in two columns */
+.howto-jumpnav { justify-content: flex-start; align-items: center; }
+.howto-jumpnav button { font: inherit; font-size: var(--fs-13); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--bg-card-alt); border: var(--line) solid var(--border-card); color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+.howto-jumpnav button:hover { color: var(--text); }
+.howto-jumpnav button.is-on { background: rgba(var(--accent-pink-rgb), 0.16); border-color: rgba(var(--accent-pink-rgb), 0.45); color: var(--pink-text, var(--pink)); }
+.howto-search { margin-left: auto; flex: 0 1 260px; min-width: 160px; padding: 7px 12px; border-radius: 999px; border: var(--line) solid var(--border-card); background: var(--bg-input); color: var(--text); font: inherit; font-size: var(--fs-13); }
+.howto-search-empty { text-align: center; color: var(--text-dim); margin: 24px 0; }
+.howto-search-empty[hidden] { display: none; }
+.howto-manual:not(.is-searching)[data-group="howto-global"] .howto-group:not(#howto-global),
+.howto-manual:not(.is-searching)[data-group="howto-core"] .howto-group:not(#howto-core),
+.howto-manual:not(.is-searching)[data-group="howto-tools"] .howto-group:not(#howto-tools),
+.howto-manual:not(.is-searching)[data-group="howto-resources"] .howto-group:not(#howto-resources) { display: none; }
+.howto-group[hidden], .howto-tab[hidden], .howto-feat[hidden] { display: none !important; }
+/* entries flow into two columns; a single entry never splits across them */
+.howto-group { columns: 2 440px; column-gap: 24px; }
+.howto-group > .howto-group-title { column-span: all; }
+.howto-tab, .howto-feat { break-inside: avoid; }
+.howto-group > .howto-feat { display: grid; }
+.howto-feat { grid-template-columns: 150px minmax(0, 1fr); }
+@media (max-width: 600px) { .howto-search { flex-basis: 100%; margin-left: 0; } .howto-feat { grid-template-columns: 1fr; } }
+/* 核心功能 is long: the manual scrolls in its own box so the page fits */
+#page-howto .howto-manual { max-height: calc(100dvh - 250px); min-height: 320px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.18) transparent; padding-right: 4px; }
+@media (max-width: 700px) { #page-howto .howto-manual { max-height: none; overflow: visible; } }
+
+/* footer: like count hidden until it loads; the two small links on one line, separated */
+.site-like-count:empty { display: none; }
+.footer-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 8px; margin: 4px 0 0; }
+.footer-links .footer-support-link { display: inline-flex; align-items: center; }
+.footer-sep { color: var(--text-dim2, var(--text-dim)); }
+/* long compound words (German "Benachrichtigungsglocke") break with a hyphen */
+.howto-feat { grid-template-columns: 165px minmax(0, 1fr); }
+.howto-feat b { hyphens: auto; overflow-wrap: break-word; }
+@media (max-width: 600px) { .howto-feat { grid-template-columns: 1fr; } }

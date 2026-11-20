@@ -20,6 +20,40 @@ const SORTERS = {
     likes: (a, b) => (b.likeCount || 0) - (a.likeCount || 0),
 };
 
+/* Collections published before the gallery card had its difficulty chart
+   have no diffSpread in the index, so their card showed an empty strip.
+   Work it out once from the stored collection (same banding as
+   collections-publish.js) and save it into the index; after that the
+   entry looks like any other. A few per request keeps it cheap. */
+async function backfillDiffSpread(store, index) {
+    const missing = index.filter((e) => !Array.isArray(e.diffSpread)).slice(0, 5);
+    if (!missing.length) return;
+    const spreads = new Map();
+    for (const entry of missing) {
+        const full = await store.get(`full:${entry.id}`, { type: 'json' }).catch(() => null);
+        if (!full || !full.collection) continue;
+        const spread = new Array(10).fill(0);
+        for (const sets of Object.values(full.collection)) {
+            for (const set of Array.isArray(sets) ? sets : []) {
+                for (const bm of (set && set.beatmaps) || []) {
+                    const r = bm && bm.difficulty_rating;
+                    if (typeof r === 'number' && r > 0) spread[Math.min(10, Math.max(1, Math.floor(r))) - 1]++;
+                }
+            }
+        }
+        spreads.set(entry.id, spread);
+    }
+    if (!spreads.size) return;
+    for (const entry of index) if (spreads.has(entry.id)) entry.diffSpread = spreads.get(entry.id);
+    // re-read right before writing so a publish in between isn't lost
+    const fresh = (await store.get('index', { type: 'json' })) || [];
+    let changed = false;
+    for (const entry of fresh) {
+        if (spreads.has(entry.id) && !Array.isArray(entry.diffSpread)) { entry.diffSpread = spreads.get(entry.id); changed = true; }
+    }
+    if (changed) await store.setJSON('index', fresh);
+}
+
 exports.handler = async (event) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -51,6 +85,7 @@ exports.handler = async (event) => {
     try {
         const store = getCollectionsStore();
         const index = (await store.get('index', { type: 'json' })) || [];
+        await backfillDiffSpread(store, index);
 
         let likedSet = null;
         if (caller) {

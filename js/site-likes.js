@@ -33,7 +33,7 @@
             currentCount = Math.max(0, Math.round(n));
             if (countEl) countEl.textContent = currentCount.toLocaleString();
         } else if (countEl) {
-            countEl.textContent = '–';
+            countEl.textContent = ''; // unknown: hidden (css :empty) rather than a lone "–"
         }
     }
     // Re-trigger the CSS bump animation on the count.

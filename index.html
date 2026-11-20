@@ -1163,13 +1163,18 @@
     <section id="page-howto" class="site-page" style="display:none;">
         <h2 class="osu-page-title" data-i18n="howto_page_title">使用手冊</h2>
         <p class="tournaments-hint" data-i18n="howto_page_hint">依網站選單分類，列出每個分頁跟按鈕的用途與操作方式。</p>
-        <div class="howto-jumpnav">
-            <a href="#howto-global" data-i18n="howto_group_global">站台通用</a>
-            <a href="#howto-core" data-i18n="nav_group_core">核心功能</a>
-            <a href="#howto-tools" data-i18n="nav_group_tools">工具庫</a>
-            <a href="#howto-resources" data-i18n="nav_group_resources">資源區</a>
+        <!-- One group at a time (tabs), two columns, and a search over every
+             group (js/main.js showHowtoGroup / filterHowto). The manual text
+             itself is per-locale HTML in js/i18n (howto_manual_body). -->
+        <div class="howto-jumpnav" role="tablist">
+            <button type="button" role="tab" class="is-on" aria-selected="true" data-group="howto-global" onclick="showHowtoGroup(this.dataset.group)" data-i18n="howto_group_global">站台通用</button>
+            <button type="button" role="tab" aria-selected="false" data-group="howto-core" onclick="showHowtoGroup(this.dataset.group)" data-i18n="nav_group_core">核心功能</button>
+            <button type="button" role="tab" aria-selected="false" data-group="howto-tools" onclick="showHowtoGroup(this.dataset.group)" data-i18n="nav_group_tools">工具庫</button>
+            <button type="button" role="tab" aria-selected="false" data-group="howto-resources" onclick="showHowtoGroup(this.dataset.group)" data-i18n="nav_group_resources">資源區</button>
+            <input type="search" id="howto-search" class="howto-search" autocomplete="off" data-i18n-placeholder="howto_search_placeholder" data-i18n-aria="howto_search_placeholder" placeholder="搜尋功能，例如 PP、匯出" aria-label="搜尋功能，例如 PP、匯出" oninput="filterHowto(this.value)">
         </div>
-        <div class="howto-manual" data-i18n="howto_manual_body"></div>
+        <p class="howto-search-empty" id="howto-search-empty" hidden data-i18n="howto_search_empty">找不到相關的功能</p>
+        <div class="howto-manual" data-group="howto-global" data-i18n="howto_manual_body"></div>
     </section>
 
 </main>
@@ -1380,7 +1385,7 @@
     <div class="site-social">
         <button class="site-social-btn site-like-btn" id="site-like-btn" type="button" onclick="toggleSiteLike()" aria-pressed="false" data-icon="heart" data-i18n-title="site_like_title" title="喜歡這個網站的話，幫我按個讚吧！">
             <span data-i18n="site_like_label">讚</span>
-            <span class="site-like-count" id="site-like-count" aria-hidden="true">–</span>
+            <span class="site-like-count" id="site-like-count" aria-hidden="true"></span>
         </button>
         <button class="site-social-btn" type="button" onclick="openPageFromFooter('howto')" data-icon="bookOpen" data-i18n-title="site_howto_title" title="每個分頁跟按鈕的用途說明">
             <span data-i18n="site_howto_label">使用手冊</span>
@@ -1390,8 +1395,11 @@
         </button>
     </div>
     <p>osu! 歌曲收藏 · osu! is a trademark of ppy Pty Ltd</p>
-    <a class="footer-support-link" href="https://ko-fi.com/hanabirn" target="_blank" rel="noopener noreferrer" data-icon="heart" data-icon-gap><span>Support</span></a>
-    <a class="footer-support-link" href="/gallery.xml" target="_blank" rel="noopener noreferrer"><span>Gallery RSS</span></a>
+    <p class="footer-links">
+        <a class="footer-support-link" href="https://ko-fi.com/hanabirn" target="_blank" rel="noopener noreferrer" data-icon="heart" data-icon-gap data-i18n-title="footer_support_title" title="喜歡這個網站的話，可以在 Ko-fi 請我喝杯咖啡"><span data-i18n="footer_support">支持本站（Ko-fi）</span></a>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a class="footer-support-link" href="/gallery.xml" target="_blank" rel="noopener noreferrer" data-icon="rss" data-icon-gap data-i18n-title="footer_rss_title" title="用 RSS 閱讀器訂閱收藏廣場的新收藏"><span data-i18n="footer_rss">收藏廣場 RSS</span></a>
+    </p>
 </footer>
 
 <div id="site-update-toast" class="share-toast share-toast-clickable" onclick="applySiteUpdate()"></div>

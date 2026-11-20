@@ -51,6 +51,9 @@ function applyLang(lang) {
    bootstrap and the on-demand language switch share it. */
 function applyLangDom(lang) {
     document.documentElement.lang = lang;
+    // the manual's HTML is about to be replaced: drop a search in progress
+    const howtoSearch = document.getElementById('howto-search');
+    if (howtoSearch && howtoSearch.value) { howtoSearch.value = ''; if (typeof filterHowto === 'function') setTimeout(() => filterHowto(''), 0); }
     const t = I18N[lang] || I18N.zh;
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
