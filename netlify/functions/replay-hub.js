@@ -1,6 +1,6 @@
 /* The replay page's lists (js/replay/hub.js), fetched when a visitor asks:
-   GET ?rankings=1&mode=osu|taiko|fruits|mania&country=TW
-       a country's top 50 players (one osu! API v2 call, kept 6 hours)
+   GET ?rankings=1&mode=osu|taiko|fruits|mania[&country=TW]
+       the world's (or a country's) top 50 players (one osu! API v2 call, kept 6 hours)
    GET ?user=NAME_OR_ID&mode=…
        the player and their best 100 scores, marked with whether osu! keeps a
        replay for each (two calls, kept 30 minutes)
@@ -41,12 +41,12 @@ exports.handler = async (event) => {
 
     let key, ttl, build;
     if (qs.rankings) {
-        const country = /^[A-Z]{2}$/.test(String(qs.country || '').toUpperCase()) ? String(qs.country).toUpperCase() : 'TW';
-        key = `replay-hub:v1:rank:${mode}:${country}`;
+        const country = /^[A-Z]{2}$/.test(String(qs.country || '').toUpperCase()) ? String(qs.country).toUpperCase() : '';
+        key = `replay-hub:v1:rank:${mode}:${country || 'ALL'}`;
         ttl = 6 * 3600;
         build = async () => {
-            const data = await api(`rankings/${mode}/performance?country=${country}`);
-            return { country, players: (data.ranking || []).slice(0, 50).map((r) => ({ ...userOut(r.user, r), countryRank: null })) };
+            const data = await api(`rankings/${mode}/performance${country ? `?country=${country}` : ''}`);
+            return { country: country || null, players: (data.ranking || []).slice(0, 50).map((r) => userOut(r.user, r)) };
         };
     } else if (qs.user) {
         const u = String(qs.user).trim();

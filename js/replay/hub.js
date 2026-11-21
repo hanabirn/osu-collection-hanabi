@@ -16,7 +16,7 @@
     const MODE_NUM = { osu: 0, taiko: 1, fruits: 2, mania: 3 };
     const PER_PAGE = 12;
 
-    const state = { pane: 'player', mode: 'mania', country: 'TW', page: 0, players: null, user: null, scores: null, onlyReplays: true, busy: '', error: '' };
+    const state = { pane: 'player', mode: 'mania', country: '', page: 0, players: null, user: null, scores: null, onlyReplays: true, busy: '', error: '' };
     try { const m = localStorage.getItem('replay-hub-mode'); if (MODE_NUM[m] != null) state.mode = m; } catch { /* default */ }
 
     /* ----- 最近觀看: list in localStorage, files in IndexedDB ----- */
@@ -75,7 +75,7 @@
     }
     async function loadPlayers() {
         state.players = null; state.busy = 'players'; state.error = ''; render();
-        try { state.players = (await getJson({ rankings: 1, mode: state.mode, country: state.country })).players || []; }
+        try { state.players = (await getJson(state.country ? { rankings: 1, mode: state.mode, country: state.country } : { rankings: 1, mode: state.mode })).players || []; }
         catch (e) { state.error = e.message; }
         state.busy = ''; render();
     }
@@ -151,7 +151,7 @@
         const shown = list.slice(state.page * PER_PAGE, (state.page + 1) * PER_PAGE);
         return `
             <div class="rh-sub">
-                <h3>${flag(state.country)} ${esc(L('頂尖玩家'))}</h3>
+                <h3>${state.country ? `${flag(state.country)} ${esc(L('頂尖玩家'))}` : `<span aria-hidden="true">🌐</span> ${esc(L('全球頂尖玩家'))}`}</h3>
                 <div class="rh-pager">
                     <button type="button" data-page="-1" aria-label="${esc(L('上一頁'))}" ${state.page ? '' : 'disabled'}>‹</button>
                     <span>${state.page + 1} / ${pages}</span>
@@ -161,7 +161,7 @@
             <div class="rh-grid">${shown.map((p, i) => `
                 <button type="button" class="rh-pcard" data-user="${esc(p.id)}" style="${p.cover ? `--cover:url('${esc(p.cover)}')` : ''}">
                     <img class="rh-av" src="${esc(p.avatar || `https://a.ppy.sh/${p.id}`)}" alt="" loading="lazy">
-                    <span class="rh-pname"><b>${esc(p.name)}</b><small>#${n(state.page * PER_PAGE + i + 1)} · ${n(Math.round(p.pp || 0))}pp</small></span>
+                    <span class="rh-pname"><b>${flag(p.country)} ${esc(p.name)}</b><small>#${n(p.rank || state.page * PER_PAGE + i + 1)} · ${n(Math.round(p.pp || 0))}pp</small></span>
                 </button>`).join('')}
             </div>`;
     }

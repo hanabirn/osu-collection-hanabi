@@ -110,6 +110,7 @@
         '{0} 天前': { 'zh-Hans': '{0} 天前', en: '{0} d ago', ja: '{0}日前', ko: '{0}일 전', de: 'vor {0} T.', es: 'hace {0} d', fr: 'il y a {0} j', ru: '{0} дн назад' },
         '模式': { 'zh-Hans': '模式', en: 'Mode', ja: 'モード', ko: '모드', de: 'Modus', es: 'Modo', fr: 'Mode', ru: 'Режим' },
         '沒有資料': { 'zh-Hans': '没有数据', en: 'Nothing here', ja: 'データがありません', ko: '데이터가 없어요', de: 'Keine Daten', es: 'Sin datos', fr: 'Aucune donnée', ru: 'Нет данных' },
+        '全球頂尖玩家': { 'zh-Hans': '全球顶尖玩家', en: 'Top players worldwide', ja: '世界のトッププレイヤー', ko: '세계 상위 플레이어', de: 'Weltweite Top-Spieler', es: 'Mejores jugadores del mundo', fr: 'Meilleurs joueurs mondiaux', ru: 'Лучшие игроки мира' },
         '頂尖玩家': { 'zh-Hans': '顶尖玩家', en: 'Top players', ja: 'トッププレイヤー', ko: '상위 플레이어', de: 'Top-Spieler', es: 'Mejores jugadores', fr: 'Meilleurs joueurs', ru: 'Лучшие игроки' },
         '上一頁': { 'zh-Hans': '上一页', en: 'Previous page', ja: '前のページ', ko: '이전 페이지', de: 'Vorherige Seite', es: 'Página anterior', fr: 'Page précédente', ru: 'Предыдущая страница' },
         '下一頁': { 'zh-Hans': '下一页', en: 'Next page', ja: '次のページ', ko: '다음 페이지', de: 'Nächste Seite', es: 'Página siguiente', fr: 'Page suivante', ru: 'Следующая страница' },
