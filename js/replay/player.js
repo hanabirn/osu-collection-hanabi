@@ -577,14 +577,16 @@
                     <button type="button" class="rp-icon" id="rp-fs" aria-label="${L('全螢幕')}" title="${L('全螢幕')}">⛶</button>
                     <span class="rp-spacer"></span>
                     <details class="rp-menu">
-                        <summary class="rp-btn" title="${L('Skin・判定')}">⚙<span class="rp-btn-text"> ${L('Skin・判定')}</span></summary>
+                        <summary class="rp-btn" title="${L('皮膚・判定')}">⚙<span class="rp-btn-text"> ${L('皮膚・判定')}</span></summary>
                         <div class="rp-menu-panel">
                             <button type="button" class="rp-menu-close" aria-label="${L('關閉')}" onclick="this.closest('details').open = false">✕</button>
-                            <div class="rp-opt">Skin <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkins[replay.mode] ? savedSkins[replay.mode].name : L('預設'))}</span>
+                            <div class="rp-opt">${L('皮膚')} <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkins[replay.mode] ? savedSkins[replay.mode].name : L('預設'))}</span>
                                 <span class="rp-skin-btns">
-                                    <label class="rp-btn">${L('使用我的 skin（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
+                                    <label class="rp-btn">${L('上傳皮膚（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
                                     <button type="button" class="rp-btn" id="rp-skin-reset">${L('恢復預設')}</button>
-                                </span></div>
+                                </span>
+                                <select class="rp-skin-pick" id="rp-skin-pick" aria-label="${L('從「我的皮膚」選')}" hidden><option value="">${L('從「我的皮膚」選')}</option></select>
+                                <small class="rp-skin-note">${L('上傳的皮膚也會收進「我的皮膚」')}</small></div>
                             ${M.judgeSize ? `<label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>` : ''}
                             <label class="rp-opt">${L('音樂音量')} <output id="rp-music-val">${Math.round(prefs.music * 100)}%</output><input type="range" id="rp-music" min="0" max="1" step="0.01" value="${prefs.music}"></label>
                             <label class="rp-opt">${L('音效音量')} <output id="rp-fx-val">${Math.round(prefs.fx * 100)}%</output><input type="range" id="rp-fx" min="0" max="1" step="0.01" value="${prefs.fx}"></label>
@@ -829,9 +831,25 @@
         };
         if ($('rp-speed')) { $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value))); setScroll(view.scroll); }
         $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });
-        $('rp-skin-file').addEventListener('change', async (e) => {
-            const f = e.target.files && e.target.files[0];
-            if (!f) return;
+        // 我的皮膚 (js/skins.js) is the one place skins are kept: the player picks from it,
+        // and a skin uploaded here is added to it too
+        const fillSkinPick = async () => {
+            const sel = $('rp-skin-pick');
+            if (!sel || typeof getAllSkins !== 'function') return;
+            const list = await getAllSkins().catch(() => []);
+            list.sort((a, b) => b.addedAt - a.addedAt);
+            sel.innerHTML = `<option value="">${esc(L('從「我的皮膚」選'))}</option>${list.map((s) => `<option value="${s.id}">${esc(String(s.name).replace(/\.(osk|zip)$/i, ''))}</option>`).join('')}`;
+            sel.hidden = !list.length;
+        };
+        fillSkinPick();
+        $('rp-skin-pick').addEventListener('change', async (e) => {
+            const id = Number(e.target.value);
+            if (!id || typeof getAllSkins !== 'function') return;
+            const rec = (await getAllSkins().catch(() => [])).find((s) => s.id === id);
+            e.target.value = '';
+            if (rec && rec.file) applySkinFile(new File([rec.file], rec.name), false);
+        });
+        async function applySkinFile(f, keep) {
             $('rp-skin-name').textContent = L('讀取中…');
             try {
                 const skin = await window.replaySkin.loadSkin(f, f.name.replace(/\.(osk|zip)$/i, ''));
@@ -841,11 +859,23 @@
                 if (session.mixer) { session.mixer.close(); session.mixer = window.replaySounds.createMixer(skin); session.mixer.setVolume(fxVol()); }
                 await window.replaySkin.saveSkin(f, skin.name, replay.mode).catch(() => {});
                 $('rp-skin-name').textContent = skin.name;
+                if (keep && typeof getAllSkins === 'function' && typeof addSkinFile === 'function') {
+                    const have = await getAllSkins().catch(() => []);
+                    if (!have.some((s) => s.name === f.name && s.size === f.size)) { await addSkinFile(f).catch(() => {}); fillSkinPick(); }
+                }
+                return skin.name;
             } catch (err) {
                 console.error('skin load failed', err);
-                $('rp-skin-name').textContent = L('讀不到這個 skin');
+                $('rp-skin-name').textContent = L('讀不到這個皮膚');
+                return null;
             }
+        }
+        $('rp-skin-file').addEventListener('change', (e) => {
+            const f = e.target.files && e.target.files[0];
+            if (f) applySkinFile(f, true);
         });
+        window.replayApplySkinFile = (f, keep = true) => applySkinFile(f, keep);
+        window.replayFillSkinPick = fillSkinPick;
         for (const [id, key, out] of [['rp-judge-scale', 'judgeScale', 'rp-judge-val'], ['rp-combo-scale', 'comboScale', 'rp-combo-val']]) {
             if (!$(id)) continue;
             $(id).addEventListener('input', (e) => {

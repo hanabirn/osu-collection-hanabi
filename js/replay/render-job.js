@@ -54,23 +54,39 @@
         const meta = window.replayCurrentMeta ? window.replayCurrentMeta() : {};
         const p = show(`
             <p class="rj-map"><b>${esc(meta.title || '')}</b> [${esc(meta.version || '')}] · ${esc(meta.player || '')}${meta.mods ? ` +${esc(meta.mods)}` : ''}</p>
-            <div class="rj-skin"><span>${esc(L('使用的 skin'))}：<b id="rj-skin-name">${esc(meta.skin || L('預設'))}</b></span>
-                <label class="rh-link rj-skin-btn">${esc(L('換 skin'))}<input type="file" accept=".osk,.zip" hidden></label></div>
+            <div class="rj-skin"><span>${esc(L('使用的皮膚'))}：<b id="rj-skin-name">${esc(meta.skin || L('預設'))}</b></span>
+                <span class="rj-skin-change">
+                    <select class="rj-skin-pick" id="rj-skin-pick" aria-label="${esc(L('從「我的皮膚」選'))}" hidden></select>
+                    <label class="rh-link rj-skin-btn">${esc(L('或上傳新的'))}<input type="file" accept=".osk,.zip" hidden></label>
+                </span></div>
             <p class="rj-hint">${esc(L('影片是 720p 60fps，錄好後會自動貼到 Discord。'))}</p>
             <div class="rj-acts"><button type="button" class="rh-link" data-close>${esc(L('取消'))}</button><button type="button" class="rh-go rh-go-big" data-start>${esc(L('開始錄影'))}</button></div>`);
-        p.querySelector('input[type=file]').addEventListener('change', async (e) => {
-            const f = e.target.files && e.target.files[0];
-            const real = document.getElementById('rp-skin-file');
-            if (!f || !real) return;
-            // hand the file to the player's own skin picker (it loads and saves it)
-            const dt = new DataTransfer(); dt.items.add(f); real.files = dt.files;
-            real.dispatchEvent(new Event('change'));
-            document.getElementById('rj-skin-name').textContent = L('讀取中…');
-            for (let i = 0; i < 60; i++) {
-                await new Promise((r) => setTimeout(r, 250));
-                const nm = document.getElementById('rp-skin-name');
-                if (nm && nm.textContent !== L('讀取中…')) { document.getElementById('rj-skin-name').textContent = nm.textContent; break; }
-            }
+        // the skin: one from 我的皮膚 (js/skins.js), or a new file (it's kept there too)
+        const nameEl = () => document.getElementById('rj-skin-name');
+        const use = async (file, keep) => {
+            if (!window.replayApplySkinFile) return;
+            nameEl().textContent = L('讀取中…');
+            const name = await window.replayApplySkinFile(file, keep);
+            nameEl().textContent = name || L('讀不到這個皮膚');
+            fillPick();
+        };
+        const fillPick = async () => {
+            const sel = document.getElementById('rj-skin-pick');
+            if (!sel || typeof getAllSkins !== 'function') return;
+            const list = (await getAllSkins().catch(() => [])).sort((a, b) => b.addedAt - a.addedAt);
+            sel.innerHTML = `<option value="">${esc(L('從「我的皮膚」選'))}</option>${list.map((k) => `<option value="${k.id}">${esc(String(k.name).replace(/\.(osk|zip)$/i, ''))}</option>`).join('')}`;
+            sel.hidden = !list.length;
+        };
+        fillPick();
+        p.querySelector('#rj-skin-pick').addEventListener('change', async (e) => {
+            const pickId = Number(e.target.value);
+            if (!pickId || typeof getAllSkins !== 'function') return;
+            const rec = (await getAllSkins().catch(() => [])).find((k) => k.id === pickId);
+            if (rec && rec.file) use(new File([rec.file], rec.name), false);
+        });
+        p.querySelector('input[type=file]').addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) use(file, true);
         });
         p.querySelector('[data-start]').addEventListener('click', () => record(id));
     }

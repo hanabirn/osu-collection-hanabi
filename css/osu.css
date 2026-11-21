@@ -7640,6 +7640,10 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rj-map b { color: #fff; }
 .rj-skin { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 10px; background: var(--bg-card); }
 .rj-skin-btn { color: var(--pink); font-weight: 700; cursor: pointer; }
+.rj-skin-change { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rj-skin-pick, .rp-skin-pick { max-width: 220px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-input); color: #fff; font: inherit; font-size: 0.85rem; }
+.rp-skin-pick { margin-top: 6px; max-width: 100%; }
+.rp-skin-note { display: block; margin-top: 4px; font-size: 0.75rem; color: var(--text-dim); }
 .rj-msg { margin: 0; font-weight: 800; }
 .rj-bar { height: 10px; border-radius: 999px; background: var(--bg-input); overflow: hidden; }
 .rj-bar i { display: block; height: 100%; background: var(--pink); transition: width 0.2s; }
