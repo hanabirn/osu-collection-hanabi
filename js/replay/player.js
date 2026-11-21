@@ -1551,6 +1551,7 @@
            (js/vendor/mp4-muxer.js, MIT). The sound is mixed offline: the
            music at the replay's speed and every hit sound at its time.
            opts: { width, height, fps, bitrate, onProgress(0..1), signal } → Blob */
+        const yieldNow = () => new Promise((r) => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
         session.renderVideo = async function renderVideo(opts = {}) {
             const W = opts.width || 1280, H = opts.height || 720, FPS = opts.fps || 60;
             const rate = prep.rate || 1;
@@ -1685,8 +1686,10 @@
                     const frame = new VideoFrame(cv, { timestamp: Math.round(sec * 1e6), duration: Math.round(1e6 / FPS) });
                     venc.encode(frame, { keyFrame: i % (FPS * 2) === 0 });
                     frame.close();
-                    while (venc.encodeQueueSize > 6) await new Promise((r) => setTimeout(r, 1));
-                    if (i % 30 === 0) { say(0.03 + 0.95 * (i / nFrames)); await new Promise((r) => setTimeout(r, 0)); }
+                    // wait for the encoder by its own event, and let the page breathe through a
+                    // message port: timers in a background tab are slowed to once a second or less
+                    while (venc.encodeQueueSize > 6) await new Promise((r) => venc.addEventListener('dequeue', r, { once: true }));
+                    if (i % 30 === 0) { say(0.03 + 0.95 * (i / nFrames)); await yieldNow(); }
                 }
                 await venc.flush();
             } finally { ctx = realCtx; view = realView; }
