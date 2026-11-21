@@ -33,6 +33,7 @@ const {
 } = require('./response-cache');
 const { serveCatalogData } = require('./catalog-data');
 const { matchScoreCardPng, serveScoreCardPng } = require('./score-card-png');
+const { matchVideo, serveVideo, serveRenderApi } = require('./replay-video');
 
 const FN_PREFIX = '/.netlify/functions/';
 
@@ -43,12 +44,17 @@ function resolveRoute(url) {
         const name = path.slice(FN_PREFIX.length).replace(/\/$/, '');
         /* 直接串流 R2，不經 adapter、不進回應快取（見 catalog-data.js）。 */
         if (name === 'catalog-data') return { direct: serveCatalogData };
+        /* 重播影片的上傳（原始位元組、分段），直接進 R2（replay-video.js）。 */
+        if (name === 'replay-render') return { direct: serveRenderApi };
         const fn = ROUTES[name];
         return fn ? { fn } : null;
     }
 
     /* 成績卡圖片：Discord 機器人用，雲端瀏覽器截圖網站自己的成績卡（score-card-png.js）。 */
     if (matchScoreCardPng(path)) return { direct: serveScoreCardPng };
+
+    /* Discord 🎬 Render 錄好的重播影片（replay-video.js）。 */
+    if (matchVideo(path)) return { direct: serveVideo };
 
     /* Discord 的 Interactions Endpoint（Discord 開發者後台登記的網址）。 */
     if (path === '/discord') return { fn: ROUTES['discord-interactions'] };

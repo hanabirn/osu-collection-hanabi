@@ -150,8 +150,35 @@ function scoreActionRow(score, apiMode, origin) {
     const btns = [];
     if (score.id) btns.push({ type: 2, style: 1, label: t('btn_card'), custom_id: `card|${apiMode}|${score.id}` });
     if (setId) btns.push({ type: 2, style: 2, label: t('btn_fav'), custom_id: `fav|${setId}` });
+    // 🎬 Render: only when osu! keeps this score's replay
+    if (score.id && (score.replay || score.has_replay)) btns.push({ type: 2, style: 2, label: t('btn_render'), custom_id: `rend|${apiMode}|${score.id}` });
     if (score.id && origin) btns.push({ type: 2, style: 5, label: t('btn_site'), url: scoreCardSiteUrl(origin, score.id, apiMode) });
     return btns.length ? [{ type: 1, components: btns }] : [];
+}
+
+/* 🎬 Render: a job in KV and a link, seen only by whoever pressed. Their
+   browser draws the replay into a video with the site's player and their
+   own skin, uploads it, and the bot posts it in this channel
+   (worker/replay-video.js). */
+async function startRender(interaction, origin, apiMode, scoreId) {
+    const env = getEnv();
+    const kv = env && env.KV_RESP_CACHE;
+    if (!kv) return L.ephemeral(t('render_unavailable'));
+    const userId = (interaction.member && interaction.member.user && interaction.member.user.id) || (interaction.user && interaction.user.id);
+    const channelId = interaction.channel_id || (interaction.channel && interaction.channel.id);
+    const id = crypto.randomUUID().replace(/-/g, '');
+    const job = { scoreId, mode: apiMode || '', userId, channelId, appId: interaction.application_id, token: interaction.token, created: Date.now(), status: 'new' };
+    try { await kv.put(`render-job:${id}`, JSON.stringify(job), { expirationTtl: 24 * 3600 }); }
+    catch { return L.ephemeral(t('render_unavailable')); }
+    return L.json({
+        type: L.R.MESSAGE,
+        data: {
+            content: t('render_ready'),
+            flags: L.EPHEMERAL,
+            components: [{ type: 1, components: [{ type: 2, style: 5, label: t('btn_render_open'), url: `${origin}/?render=${id}` }] }],
+            allowed_mentions: { parse: [] },
+        },
+    });
 }
 
 /* Answer at once ("thinking…"), then render the card and replace the
@@ -1153,6 +1180,12 @@ async function handleComponent(interaction, origin) {
         const [mode, scoreId] = raw.split('|');
         if (!/^\d{1,20}$/.test(scoreId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
         return startScoreCard(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
+    }
+    // 🎬 Render: rend|<ruleset or ''>|<scoreId>
+    if (id.startsWith('rend|')) {
+        const [, mode, scoreId] = id.split('|');
+        if (!/^\d{1,20}$/.test(scoreId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
+        return startRender(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
     }
     // ➕ 加入收藏: fav|<beatmapsetId>
     if (id.startsWith('fav|')) {

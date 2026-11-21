@@ -1566,7 +1566,7 @@
                 await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'js/vendor/mp4-muxer.js'; sc.onload = res; sc.onerror = () => rej(new Error('mp4-muxer')); document.head.appendChild(sc); });
             }
             const vCodec = 'avc1.64002A';
-            const vCfg = { codec: vCodec, width: W, height: H, bitrate: opts.bitrate || 3_500_000, framerate: FPS, latencyMode: 'quality' };
+            const vCfg = { codec: vCodec, width: W, height: H, bitrate: opts.bitrate || (playSecs > 300 ? 2_000_000 : 3_500_000) /* long maps a little lighter */, framerate: FPS, latencyMode: 'quality' };
             if (!(await VideoEncoder.isConfigSupported(vCfg)).supported) throw new Error(L('這個瀏覽器不支援錄製影片，請用最新版的 Chrome 或 Edge'));
             const SR = 48000;
             const aCfg = { codec: 'mp4a.40.2', sampleRate: SR, numberOfChannels: 2, bitrate: 160_000 };
@@ -1696,6 +1696,13 @@
             return new Blob([target.buffer], { type: 'video/mp4' });
         };
         window.replayRenderVideo = (o) => session.renderVideo(o);
+        // what the Discord message says about the video (worker/replay-video.js)
+        window.replayCurrentMeta = () => ({
+            title: map.metadata.Title || bm.title, version: map.metadata.Version || bm.version, player: replay.player,
+            mods: typeof decodeOsuMods === 'function' ? decodeOsuMods(replay.mods).filter((m) => m !== 'NM').join('') : '',
+            acc: accOf(record), skin: savedSkins[replay.mode] ? savedSkins[replay.mode].name : '',
+        });
+        window.replayPause = () => { if (session.clock && session.clock.running()) session.clock.toggle(); };
     }
 
     function togglePlay() {
