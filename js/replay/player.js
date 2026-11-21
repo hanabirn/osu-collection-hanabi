@@ -458,6 +458,7 @@
                     <details class="rp-menu">
                         <summary class="rp-btn" title="${L('Skin・判定')}">⚙<span class="rp-btn-text"> ${L('Skin・判定')}</span></summary>
                         <div class="rp-menu-panel">
+                            <button type="button" class="rp-menu-close" aria-label="${L('關閉')}" onclick="this.closest('details').open = false">✕</button>
                             <div class="rp-opt">Skin <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkins[replay.mode] ? savedSkins[replay.mode].name : L('預設'))}</span>
                                 <span class="rp-skin-btns">
                                     <label class="rp-btn">${L('使用我的 skin（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
@@ -848,12 +849,12 @@
             const rect = body.getBoundingClientRect();
             const near = e.clientY > rect.bottom - 150;
             if (near) { showBar(true); clearTimeout(barTimer); }
-            else if (body.classList.contains('rp-bar-shown') && !body.querySelector('.rp-bottom:hover, .rp-bottom:focus-within, .rp-menu[open]')) {
+            else if (body.classList.contains('rp-bar-shown') && !body.querySelector('.rp-menu[open]')) {
                 clearTimeout(barTimer);
-                barTimer = setTimeout(() => showBar(false), 900);
+                barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 500);
             }
         });
-        body.addEventListener('mouseleave', () => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (!body.querySelector('.rp-bottom:focus-within, .rp-menu[open]')) showBar(false); }, 600); });
+        body.addEventListener('mouseleave', () => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 500); });
 
         // the counts follow the top-right block down (taiko keeps them under its lane)
         if (replay.mode !== 1 && typeof ResizeObserver === 'function') {
