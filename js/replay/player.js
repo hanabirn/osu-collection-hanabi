@@ -415,14 +415,20 @@
 
     /* early / late hits so far and their mean offset (mania): one pass, looked up by time */
     function timingTimeline(prep) {
-        const ev = (prep.events || []).filter((e) => e.hitAt != null && e.judge !== 'MISS');
+        // hit offsets in map time, whichever way the mode keeps them:
+        // standard's hitOffsets, taiko's events (jt / offset), mania's events (hitAt - time)
+        let hits;
+        if (prep.hitOffsets) hits = prep.hitOffsets.map((h) => ({ t: h.t, off: h.off }));
+        else if ((prep.events || []).some((e) => e.offset != null)) hits = prep.events.filter((e) => e.offset != null && e.result !== 'MISS').map((e) => ({ t: e.jt, off: e.offset }));
+        else hits = (prep.events || []).filter((e) => e.hitAt != null && e.judge !== 'MISS').map((e) => ({ t: e.judgedAt, off: e.hitAt - e.time }));
+        hits.sort((a, b) => a.t - b.t);
         const times = [], early = [], late = [], mean = [];
         let ne = 0, nl = 0, sum = 0;
-        for (const e of ev) {
-            const off = (e.hitAt - e.time) / (prep.rate || 1);
+        for (const h of hits) {
+            const off = h.off / (prep.rate || 1);
             if (off < 0) ne++; else if (off > 0) nl++;
             sum += off;
-            times.push(e.judgedAt); early.push(ne); late.push(nl); mean.push(sum / (ne + nl || 1));
+            times.push(h.t); early.push(ne); late.push(nl); mean.push(sum / (ne + nl || 1));
         }
         return (t) => {
             let lo = 0, hi = times.length - 1, ans = -1;
@@ -510,9 +516,11 @@
                 </div>` : ''}
             </div>
             <div class="rp-pause" id="rp-pause" hidden>
+                <div class="rp-pause-btns">
                 <button type="button" class="rp-pause-btn" data-act="resume"><span class="rp-pause-ic">▶</span>${L('繼續觀看')}</button>
                 <button type="button" class="rp-pause-btn" data-act="restart"><span class="rp-pause-ic">↺</span>${L('從頭再看')}</button>
                 <button type="button" class="rp-pause-btn" data-act="change"><span class="rp-pause-ic">☰</span>${L('換一個重播')}</button>
+                </div>
             </div>
             <div class="rp-results" id="rp-results" hidden>
                 <div class="rp-res-card" role="dialog" aria-label="${L('結算')}">
@@ -940,13 +948,23 @@
         }
 
         const pauseEl = $('rp-pause');
-        const showPause = (on) => { pauseEl.hidden = !on; };
+        // paused during a comparison: the detailed rows (accuracy, UR, judgements,
+        // early / late) sit beside the buttons, then go back when play resumes
+        const showPause = (on) => {
+            pauseEl.hidden = !on;
+            const rows = document.querySelector('#rp-cmp .rp-cmp-rows, #rp-pause .rp-cmp-rows');
+            const home = $('rp-cmp');
+            const inPause = !!(on && rows && session.cmp);
+            pauseEl.classList.toggle('has-cmp', inPause);
+            if (rows) (inPause ? pauseEl : home || pauseEl).appendChild(rows);
+        };
         stage.addEventListener('click', () => {
             if (!pauseEl.hidden) { showPause(false); if (!clock.running()) clock.toggle(); return; }
             if (clock.running()) { clock.toggle(); showPause(true); }
             else clock.toggle();
         });
         pauseEl.addEventListener('click', (e) => {
+            if (e.target.closest('.rp-cmp-rows')) return;
             const b = e.target.closest('[data-act]');
             if (!b) { showPause(false); if (!clock.running()) clock.toggle(); return; }
             showPause(false);
@@ -974,7 +992,7 @@
         /* ===== two replays of one map, side by side (as mania-tracker does) ===== */
         const body2 = $('rp-body');
         const cmpBtn = $('rp-compare-btn');
-        const timed = replay.mode === 3; // modes with hit timing (UR, early / late)
+        const timed = !!M.ur; // modes with hit timing (UR, early / late); not catch
         const timingA = timed ? timingTimeline(prep) : () => ({ early: 0, late: 0, mean: 0 });
         const rateOf = (mods) => (mods & 64 || mods & 512 ? 1.5 : mods & 256 ? 0.75 : 1);
         const CMP_ROWS = [
@@ -987,6 +1005,8 @@
         function closeCompare() {
             session.cmp = null;
             body2.classList.remove('rp-comparing');
+            pauseEl.querySelector('.rp-cmp-rows')?.remove();
+            pauseEl.classList.remove('has-cmp');
             const h = $('rp-cmp'); if (h) h.remove();
         }
         async function startCompare(file) {
@@ -1042,7 +1062,7 @@
                     <button type="button" class="rp-cmp-close" id="rp-cmp-close" title="${L('結束比較')}" aria-label="${L('結束比較')}">✕</button>
                 </div>
                 <div class="rp-cmp-lead"><i id="rp-cmp-lead"></i></div>
-                <dl class="rp-cmp-rows">${CMP_ROWS.map(([k, label, , col]) => `<div class="rp-cmp-row" data-k="${k}"><dd class="is-a" id="rp-cmp-a-${k}">–</dd><dt${col ? ` style="color:${col}"` : ''}>${label}</dt><dd class="is-b" id="rp-cmp-b-${k}">–</dd></div>`).join('')}</dl>`;
+                <dl class="rp-cmp-rows"><div class="rp-cmp-row rp-cmp-names"><dd class="is-a">${esc(replay.player)}</dd><dt>VS</dt><dd class="is-b">${esc(c.replay.player)}</dd></div>${CMP_ROWS.map(([k, label, , col]) => `<div class="rp-cmp-row" data-k="${k}"><dd class="is-a" id="rp-cmp-a-${k}">–</dd><dt${col ? ` style="color:${col}"` : ''}>${label}</dt><dd class="is-b" id="rp-cmp-b-${k}">–</dd></div>`).join('')}</dl>`;
             wrap.insertAdjacentHTML('beforeend', compareResultsHtml());
             body2.appendChild(wrap);
             $('rp-cmp-close').addEventListener('click', closeCompare);
