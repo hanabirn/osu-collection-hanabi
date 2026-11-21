@@ -79,9 +79,20 @@
         if (window.replayPause) window.replayPause();
         try {
             show(bar(L('錄影中…'), 0));
-            let last = 0;
+            let last = 0, t0 = 0, q0 = 0;
             const blob = await window.replayRenderVideo({
-                onProgress: (q) => { const now = performance.now(); if (now - last > 200 || q >= 1) { last = now; show(bar(q < 0.03 ? L('準備中…') : L('錄影中 {0}%').replace('{0}', Math.round(q * 100)), q)); } },
+                onProgress: (q) => {
+                    const now = performance.now();
+                    if (!(now - last > 200 || q >= 1)) return;
+                    last = now;
+                    if (q < 0.03) { show(bar(L('準備中…'), q)); return; }
+                    // time left, from the pace so far (the frames, once the sound is mixed)
+                    if (!t0) { t0 = now; q0 = q; }
+                    const pace = (q - q0) / Math.max(1, now - t0);
+                    const left = pace > 0 && now - t0 > 2000 ? (1 - q) / pace / 1000 : null;
+                    const eta = left == null ? '' : left >= 90 ? L('約剩 {0} 分鐘').replace('{0}', Math.ceil(left / 60)) : L('約剩 {0} 秒').replace('{0}', Math.max(1, Math.round(left)));
+                    show(bar(`${L('錄影中 {0}%').replace('{0}', Math.round(q * 100))}${eta ? ` · ${eta}` : ''}`, q));
+                },
             });
             show(bar(L('上傳中 {0}%').replace('{0}', 0), 0));
             const out = await upload(id, blob, (q) => show(bar(L('上傳中 {0}%').replace('{0}', Math.round(q * 100)), q)));
