@@ -548,8 +548,36 @@
 
         // the results: after the last object (as the game does); going back before it hides them
         const resultsEl = $('rp-results');
-        const resultsAt = prep.lastTime + 1500;
+        /* The way out, as osu! (and mania-tracker) do it, timed on its own clock
+           so it finishes even when the song stops right after the last note:
+             0–500 ms after the last object (+0.4 s): the play fades out, the background brightens;
+             then the background alone; 1.9–2.4 s: it fades to black;
+             2.4–3.0 s: the ranking screen fades in. */
+        const OUTRO = { fade: 500, black: 1900, rank: 2400, rankIn: 600 };
+        const outroAt = prep.lastTime + 400 * (prep.rate || 1);
+        let outroStart = null;
         let resultsDismissed = false;
+        const bgOnly = (alpha) => {
+            if (alpha <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, view.w, view.h);
+            if (bg) {
+                const sc = Math.max(view.w / bg.width, view.h / bg.height);
+                ctx.globalAlpha = alpha * Math.min(1, 1 - view.bgDim * 0.4 + 0.2);
+                ctx.drawImage(bg, (view.w - bg.width * sc) / 2, (view.h - bg.height * sc) / 2, bg.width * sc, bg.height * sc);
+            }
+            ctx.restore();
+        };
+        const blackOver = (alpha) => {
+            if (alpha <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, alpha);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, view.w, view.h);
+            ctx.restore();
+        };
         $('rp-res-hide').addEventListener('click', () => { resultsDismissed = true; resultsEl.hidden = true; });
         $('rp-res-again').addEventListener('click', () => {
             resultsDismissed = false;
@@ -569,23 +597,37 @@
         loadRankSkin(savedSkins[replay.mode]);
         const tick = () => {
             const t = audio.currentTime * 1000;
-            const atEnd = t >= resultsAt || audio.ended;
-            if (!atEnd) resultsDismissed = false;
-            const showRes = atEnd && !resultsDismissed && !seeking;
+            const atEnd = (t >= outroAt || audio.ended) && !seeking;
+            if (!atEnd) { resultsDismissed = false; outroStart = null; }
+            else if (outroStart == null) outroStart = performance.now();
+            const el = outroStart == null || resultsDismissed ? -1 : performance.now() - outroStart;
+            const showRes = el >= OUTRO.rank;
             if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
             // wide views get osu!'s own ranking screen on the canvas; narrow ones the card
             const wide = showRes && view.rankSkin && view.w >= 640;
             resultsEl.classList.toggle('is-wide', !!wide);
             $('rp-body').classList.toggle('rp-show-results', !!wide);
             ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
-            if (resultsEl.classList.contains('is-wide') && !resultsEl.hidden) {
+            let s;
+            if (wide) {
                 const out = window.replayResults.drawResults(ctx, view, resultsData);
                 const acts = $('rp-res-actions');
                 acts.style.top = `${Math.round(out.actions.top)}px`;
                 acts.style.right = `${Math.round(out.actions.right)}px`;
+                const inP = (el - OUTRO.rank) / OUTRO.rankIn;
+                blackOver(1 - inP); // the ranking screen fades in from black
+                acts.style.opacity = String(Math.max(0, Math.min(1, inP)));
+                s = lastStats;
+            } else {
+                s = M.draw(ctx, view, prep, t);
+                if (el >= 0) {
+                    bgOnly(Math.min(1, el / OUTRO.fade)); // the play fades out, the background comes up
+                    if (!showRes) blackOver((el - OUTRO.black) / (OUTRO.rank - OUTRO.black));
+                }
             }
-            const s = resultsEl.classList.contains('is-wide') && !resultsEl.hidden ? lastStats : M.draw(ctx, view, prep, t);
             lastStats = s;
+            // the HUD fades with the play
+            $('rp-body').style.setProperty('--rp-outro', el >= 0 ? String(Math.max(0, 1 - el / OUTRO.fade)) : '1');
             const key = `${s.acc}|${s.ur}|${s.lMiss}|${s.rMiss}|${JUDGES.map((j) => s.counts[j]).join()}`;
             if (key !== lastShown) {
                 lastShown = key;
