@@ -108,6 +108,16 @@ I18N.en = {
                 <div class="howto-feat"><b>Start a conversation</b><span>Login required. Enter their osu! username and click "Start conversation".</span></div>
                 <div class="howto-feat"><b>Conversation list / unread</b><span>Unread counts also show as a badge next to "DM" in the ☰ menu. Opening a conversation shows the thread; "Back" returns to the list.</span></div>
             </div>
+        
+            <div class="howto-tab">
+                <div class="howto-tab-title">Replays <small>nav “Replays”</small></div>
+                <p class="howto-tab-desc">Watch osu! replays on the site (all four modes), compare two side by side, or record one into a video for Discord.</p>
+                <div class="howto-feat"><b>Players</b><span>Top players worldwide (or in a country you pick); open a player for their best or recent scores. ▶ plays a score with an online replay, ⚔ compares it with someone else on the same map. The search box also takes a score link.</span></div>
+                <div class="howto-feat"><b>The player</b><span>Click the picture to pause; the menu resumes, restarts or loads another replay. Arrow keys step through it. “Skin · judgements” picks a skin from My skins, sizes the judgements and combo, and sets music and effect volume.</span></div>
+                <div class="howto-feat"><b>Compare</b><span>Put two scores (links or .osr files) in the Compare tab, or press ⚔ in the player to pick an opponent from the leaderboard. Same map, same speed. It looks like a tournament broadcast and ends with both ranking screens side by side; the volume menu plays the left player’s hit sounds, the right one’s, or both on separate ears.</span></div>
+                <div class="howto-feat"><b>Upload · Recently watched</b><span>Drop an .osr file or paste a score link to play it; Recently watched on the right keeps the last 12 replays this browser played, one click to reopen.</span></div>
+                <div class="howto-feat"><b>🎬 Record a video (Discord)</b><span>Under a score from the Discord bot, press “🎬 Record a video” and open the link: your browser records the replay with this player and your skin into a 720p video and posts it back in the channel. Keep the tab open while it records; videos are kept 30 days.</span></div>
+            </div>
         </div>
 
         <div class="howto-group" id="howto-tools">

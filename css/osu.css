@@ -2297,7 +2297,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 #catalog-list .osu-card-title { font-size: var(--fs-14); }
 #catalog-list .osu-card-artist { font-size: var(--fs-11); }
 #catalog-list .osu-card-mapper {
-    font-size: var(--fs-10);
+    font-size: var(--fs-11);
     margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
@@ -2873,7 +2873,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 .mappool-list .osu-card-title { font-size: var(--fs-14); }
 .mappool-list .osu-card-artist { font-size: var(--fs-11); }
 .mappool-list .osu-card-mapper {
-    font-size: var(--fs-10);
+    font-size: var(--fs-11);
     margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
@@ -3090,7 +3090,7 @@ input[type="file"] { max-width: 100%; box-sizing: border-box; }
 }
 
 .osu-card-mapper {
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.68);
     font-size: var(--fs-12);
     margin-top: 2px;
 }
@@ -7678,3 +7678,22 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     #osu-news-list .news-summary { font-size: var(--fs-13); }
     .tournaments-column-card .news-list { max-height: calc(100vh - 420px); min-height: 360px; overflow-y: auto; padding-right: 4px; }
 }
+
+/* ===== Readability and touch sizes (design review, 2026-11-21) ===== */
+/* mapper lines sit on the cover art: a darker foot under the card's text */
+.osu-card-mapper { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85); }
+/* a computer with a mouse: the card toolbar shows on hover / keyboard focus
+   only (touch screens keep it faint but visible, as before) */
+@media (hover: hover) and (pointer: fine) {
+    .osu-card-actions { opacity: 0; }
+}
+/* 收藏廣場: figures over labels, cards as tall as each other, tags in two rows */
+.pcc-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; text-align: center; }
+.pcc-stats > span { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pcc-stats b { font-size: var(--fs-14); }
+.pcc-stats small { font-size: var(--fs-11); color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcc-tags { max-height: 54px; overflow: hidden; }
+.public-collection-card { display: flex; flex-direction: column; }
+.public-collection-card .pcc-btn-row { margin-top: auto; }
+/* small text buttons get a finger-sized hit area without looking bigger */
+.rh-link, .home-more, .fc-sim-btn, #visitor-track-btn, .tracked-player-remove { min-height: 28px; min-width: 28px; display: inline-flex; align-items: center; justify-content: center; }

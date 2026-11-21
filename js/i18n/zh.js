@@ -563,6 +563,16 @@ I18N.zh = {
                 <div class="howto-feat"><b>開始新對話</b><span>需登入。輸入對方的 osu! 用戶名，按「開始對話」。</span></div>
                 <div class="howto-feat"><b>對話列表 / 未讀</b><span>未讀數字會同步顯示在 ☰ 選單「私訊」旁邊的紅點。點進去就是該對話串，上方「返回」回列表。</span></div>
             </div>
+        
+            <div class="howto-tab">
+                <div class="howto-tab-title">重播 <small>導覽列「重播」</small></div>
+                <p class="howto-tab-desc">在網站上看 osu! 重播（四個模式都支援），也能兩人並排比較，或錄成影片貼到 Discord。</p>
+                <div class="howto-feat"><b>找玩家</b><span>列出全球（或選一個國家）的頂尖玩家；點進玩家可以看他的最佳／最近成績，有線上重播的按 ▶ 播放、⚔ 跟同一張圖的其他人比較。搜尋框也可以直接貼成績網址。</span></div>
+                <div class="howto-feat"><b>播放器</b><span>點畫面暫停，選單可以繼續、從頭看或換一個重播；左右鍵微調進度。「皮膚・判定」裡可以從「我的皮膚」挑皮膚、調判定和連擊大小，還有音樂／音效音量。</span></div>
+                <div class="howto-feat"><b>雙人比較</b><span>「雙人比較」分頁放兩份成績（網址或 .osr），或在播放器按 ⚔ 從排行榜挑對手。兩份要是同一張圖、同樣倍速。畫面是比賽轉播的樣子，結束後兩邊的結算畫面並排；音量選單可以選聽左邊、右邊或兩邊（左右耳分開）的打擊音效。</span></div>
+                <div class="howto-feat"><b>上傳檔案・最近觀看</b><span>拖曳 .osr 檔或貼成績網址就能播放；右邊「最近觀看」記住這個瀏覽器看過的 12 個重播，點一下就能重開。</span></div>
+                <div class="howto-feat"><b>🎬 錄成影片（Discord）</b><span>Discord bot 的成績下面按「🎬 錄成影片」，打開連結後你的瀏覽器會用這裡的播放器和你的皮膚把重播錄成 720p 影片，錄好自動貼回 Discord 頻道。錄影時分頁要開著；影片保留 30 天。</span></div>
+            </div>
         </div>
 
         <div class="howto-group" id="howto-tools">
