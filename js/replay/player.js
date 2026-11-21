@@ -890,6 +890,32 @@
             if (sk.comboDigits) return { digits: sk.comboDigits, x: null, overlap: sk.comboOverlap || 0 };
             return null;
         };
+        // a comparison screen's judgement counts and UR, as on the single-player screen's
+        // right-hand panel: under the mod icons (taiko: under the lane, clear of the notes)
+        function drawSideCounts(st2, x, y, vw, vh) {
+            const counts = st2.counts || {};
+            const rows = JUDGES.map((j) => [L(M.labels[j] || j), String(counts[j] || 0), R.JUDGE_COLOR[j]]);
+            if (M.ur) rows.push(['UR', String(Math.round(st2.ur || 0)), '#8bd5ff']);
+            const rh = Math.max(13, vh * 0.042);
+            ctx.save();
+            ctx.font = `800 ${Math.round(rh * 0.66)}px system-ui, sans-serif`;
+            const labW = Math.max(...rows.map((r) => ctx.measureText(r[0]).width));
+            const valW = Math.max(ctx.measureText('0000').width, ...rows.map((r) => ctx.measureText(r[1]).width));
+            const pad = rh * 0.45, gap = rh * 1.1;
+            const bw = labW + gap + valW + pad * 2, bh = rows.length * rh + pad * 2;
+            const modsBottom = vh * 0.135 + 12 + Math.max(22, Math.min(40, vh * 0.06)) + 10;
+            const by = y + (replay.mode === 1 ? vh * 0.57 : modsBottom);
+            const bx = x + vw - 10 - bw;
+            ctx.fillStyle = 'rgba(0,0,0,0.55)';
+            ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, rh * 0.35) : ctx.rect(bx, by, bw, bh); ctx.fill();
+            ctx.textBaseline = 'middle';
+            rows.forEach(([lab, val, col], k) => {
+                const cy = by + pad + rh * (k + 0.5);
+                ctx.textAlign = 'left'; ctx.fillStyle = col; ctx.fillText(lab, bx + pad, cy);
+                ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.fillText(val, bx + bw - pad, cy);
+            });
+            ctx.restore();
+        }
         // one bump state per screen ('main', or 'a' / 'b' in a comparison)
         const comboAnim = {};
         function drawCombo(st, h = view.h, key = 'main') {
@@ -1439,6 +1465,7 @@
                         ctx.save(); ctx.translate(x, top); ctx.beginPath(); ctx.rect(0, 0, vw, vh); ctx.clip();
                         drawCombo(st[i] || {}, vh, i ? 'b' : 'a');
                         ctx.restore();
+                        drawSideCounts(st[i] || {}, x, top, vw, vh);
                         ctx.fillStyle = col; ctx.fillRect(x, top - 3, vw, 3);
                     });
                     updateBroadcast(scores, { top, vh, below, rightA: W2 - (xs[0] + vw), rightB: W2 - (xs[1] + vw) });
