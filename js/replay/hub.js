@@ -16,8 +16,17 @@
     const MODE_NUM = { osu: 0, taiko: 1, fruits: 2, mania: 3 };
     const PER_PAGE = 12;
 
-    const state = { pane: 'player', mode: 'mania', country: '', page: 0, players: null, user: null, scores: null, onlyReplays: true, busy: '', error: '' };
+    const state = { pane: 'player', mode: 'mania', country: '', scoreType: 'best', page: 0, players: null, user: null, scores: null, onlyReplays: true, busy: '', error: '' };
     try { const m = localStorage.getItem('replay-hub-mode'); if (MODE_NUM[m] != null) state.mode = m; } catch { /* default */ }
+    try { const c = localStorage.getItem('replay-hub-country'); if (/^[A-Z]{2}$/.test(c || '')) state.country = c; } catch { /* worldwide */ }
+    // countries in the menu: where most osu! players are, named in the visitor's language
+    const COUNTRIES = 'US KR JP CN TW HK MO SG MY ID PH TH VN IN AU NZ CA MX BR AR CL PE CO VE UY GB IE FR DE NL BE LU CH AT IT ES PT PL CZ SK HU RO BG GR HR SI RS UA BY RU KZ LT LV EE FI SE NO DK IS TR IL SA AE EG ZA'.split(' ');
+    const countryName = (cc) => {
+        try {
+            const lang = typeof siteLang !== 'undefined' ? ({ zh: 'zh-Hant', 'zh-Hans': 'zh-Hans' }[siteLang] || siteLang) : 'zh-Hant';
+            return new Intl.DisplayNames([lang], { type: 'region' }).of(cc) || cc;
+        } catch { return cc; }
+    };
 
     /* ----- 最近觀看: list in localStorage, files in IndexedDB ----- */
     const RECENT_KEY = 'replay-recent-v1';
@@ -82,7 +91,7 @@
     async function loadUser(name) {
         state.user = { name }; state.scores = null; state.busy = 'user'; state.error = ''; render();
         try {
-            const d = await getJson({ user: name, mode: state.mode });
+            const d = await getJson(state.scoreType === 'recent' ? { user: name, mode: state.mode, type: 'recent' } : { user: name, mode: state.mode });
             state.user = d.user; state.scores = d.scores || [];
         } catch (e) { state.error = e.message; state.user = null; }
         state.busy = ''; render();
@@ -152,6 +161,10 @@
         return `
             <div class="rh-sub">
                 <h3>${state.country ? `${flag(state.country)} ${esc(L('頂尖玩家'))}` : `<span aria-hidden="true">🌐</span> ${esc(L('全球頂尖玩家'))}`}</h3>
+                <select class="rh-country" data-country aria-label="${esc(L('國家／地區'))}">
+                    <option value="">🌐 ${esc(L('全球'))}</option>
+                    ${COUNTRIES.map((cc) => [cc, countryName(cc)]).sort((a, b) => a[1].localeCompare(b[1])).map(([cc, name]) => `<option value="${cc}"${state.country === cc ? ' selected' : ''}>${esc(name)}</option>`).join('')}
+                </select>
                 <div class="rh-pager">
                     <button type="button" data-page="-1" aria-label="${esc(L('上一頁'))}" ${state.page ? '' : 'disabled'}>‹</button>
                     <span>${state.page + 1} / ${pages}</span>
@@ -172,12 +185,13 @@
             <div class="rh-sub">
                 <button type="button" class="rh-back" data-back>‹ ${esc(L('頂尖玩家'))}</button>
                 ${u && u.id ? `<div class="rh-who"><img class="rh-av" src="${esc(u.avatar)}" alt=""><b>${esc(u.name)}</b>${flag(u.country)}<small>${u.rank ? `#${n(u.rank)} · ` : ''}${n(Math.round(u.pp || 0))}pp</small></div>` : `<b>${esc((u && u.name) || '')}</b>`}
+                <div class="rh-seg" role="tablist">${[['best', L('最佳成績')], ['recent', L('最近成績')]].map(([k, lab]) => `<button type="button" role="tab" aria-selected="${state.scoreType === k}" data-type="${k}">${esc(lab)}</button>`).join('')}</div>
                 <label class="rh-only"><input type="checkbox" data-only ${state.onlyReplays ? 'checked' : ''}> ${esc(L('只顯示有重播的'))}</label>
             </div>`;
         if (state.busy === 'user') return head + `<div class="rh-scores">${Array.from({ length: 8 }, () => '<div class="rh-row is-skel"></div>').join('')}</div>`;
         const all = state.scores || [];
         const list = state.onlyReplays ? all.filter((s) => s.replay) : all;
-        if (!list.length) return head + `<p class="rh-empty">${esc(all.length ? L('這位玩家的最佳成績都沒有線上重播') : L('這個模式還沒有最佳成績'))}</p>`;
+        if (!list.length) return head + `<p class="rh-empty">${esc(state.scoreType === 'recent' ? (all.length ? L('最近的成績都沒有線上重播') : L('最近 24 小時沒有通過的成績')) : (all.length ? L('這位玩家的最佳成績都沒有線上重播') : L('這個模式還沒有最佳成績')))}</p>`;
         return head + `<ol class="rh-scores">${list.map((s) => `
             <li class="rh-row${s.replay ? '' : ' is-off'}">
                 <img class="rh-thumb" src="https://assets.ppy.sh/beatmaps/${esc(s.set && s.set.id)}/covers/list@2x.jpg" alt="" loading="lazy">
@@ -280,6 +294,7 @@
                 if (state.user && state.user.id) loadUser(state.user.id); else loadPlayers();
                 return;
             }
+            if ((b = pick('[data-type]'))) { if (state.scoreType !== b.dataset.type) { state.scoreType = b.dataset.type; if (state.user && state.user.id) loadUser(state.user.id); } return; }
             if ((b = pick('[data-page]'))) { state.page += Number(b.dataset.page); render(); return; }
             if ((b = pick('[data-user]'))) { loadUser(b.dataset.user); return; }
             if (pick('[data-back]')) { state.user = null; state.scores = null; state.error = ''; render(); if (!state.players) loadPlayers(); return; }
@@ -292,6 +307,11 @@
         root.addEventListener('change', (e) => {
             const t = e.target;
             if (t.matches('[data-only]')) { state.onlyReplays = t.checked; render(); return; }
+            if (t.matches('[data-country]')) {
+                state.country = t.value; state.page = 0;
+                try { localStorage.setItem('replay-hub-country', state.country); } catch { /* fine */ }
+                loadPlayers(); return;
+            }
             if (t.matches('input[type=file]')) {
                 const f = t.files && t.files[0];
                 if (!f) return;

@@ -1,9 +1,10 @@
 /* The replay page's lists (js/replay/hub.js), fetched when a visitor asks:
    GET ?rankings=1&mode=osu|taiko|fruits|mania[&country=TW]
        the world's (or a country's) top 50 players (one osu! API v2 call, kept 6 hours)
-   GET ?user=NAME_OR_ID&mode=…
-       the player and their best 100 scores, marked with whether osu! keeps a
-       replay for each (two calls, kept 30 minutes)
+   GET ?user=NAME_OR_ID&mode=…[&type=recent]
+       the player and their best 100 scores (or their passes of the last 24
+       hours), marked with whether osu! keeps a replay for each (two calls,
+       kept 30 minutes; recent ones 2 minutes)
    Answers are kept in KV and the edge cache, so repeated looks don't reach
    osu! again (the API terms: on request, cached, no bulk harvesting). */
 const { getOsuToken } = require('./_osu-auth');
@@ -52,11 +53,12 @@ exports.handler = async (event) => {
         const u = String(qs.user).trim();
         if (!u || u.length > 32) return fail(400, 'Missing or invalid user');
         const ref = /^\d{1,10}$/.test(u) ? u : `@${encodeURIComponent(u)}`;
-        key = `replay-hub:v1:user:${mode}:${u.toLowerCase()}`;
-        ttl = 1800;
+        const recent = qs.type === 'recent';
+        key = `replay-hub:v1:user:${recent ? 'recent' : 'best'}:${mode}:${u.toLowerCase()}`;
+        ttl = recent ? 120 : 1800;
         build = async () => {
             const user = await api(`users/${ref}/${mode}`);
-            const scores = await api(`users/${user.id}/scores/best?mode=${mode}&limit=100`);
+            const scores = await api(recent ? `users/${user.id}/scores/recent?mode=${mode}&limit=50` : `users/${user.id}/scores/best?mode=${mode}&limit=100`);
             return {
                 user: userOut(user, user.statistics),
                 scores: (scores || []).map((s) => ({

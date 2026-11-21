@@ -7568,6 +7568,10 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rh-who { display: flex; align-items: center; gap: 8px; margin-right: auto; min-width: 0; }
 .rh-who .rh-av { width: 32px; height: 32px; }
 .rh-who small { color: var(--text-dim); }
+.rh-country { margin-left: auto; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-input); color: #fff; font: inherit; font-size: 0.85rem; max-width: 220px; }
+.rh-seg { display: inline-flex; padding: 3px; gap: 3px; border-radius: 9px; background: var(--bg-card); border: 1px solid var(--border); }
+.rh-seg button { padding: 4px 12px; border: 0; border-radius: 7px; background: none; color: var(--text-dim); font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.rh-seg button[aria-selected="true"] { background: rgba(var(--pink-rgb), 0.22); color: #fff; }
 .rh-only { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-dim); cursor: pointer; white-space: nowrap; }
 .rh-only input { accent-color: var(--pink); }
 .rh-scores { list-style: none; margin: 0; padding: 0 4px 0 0; display: flex; flex-direction: column; gap: 4px; max-height: min(560px, calc(100vh - 330px)); overflow-y: auto; }
