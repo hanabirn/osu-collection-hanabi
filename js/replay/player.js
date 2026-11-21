@@ -972,7 +972,7 @@
             const old = $('rp-cmp'); if (old) old.remove();
             const flag = (r2, side) => `<span class="rp-cmp-who"><img class="rp-flag" id="rp-cmp-flag-${side}" alt="" hidden>${esc(r2.player)}</span>`;
             const wrap = document.createElement('div');
-            wrap.className = 'rp-cmp';
+            wrap.className = replay.mode === 2 ? 'rp-cmp is-strip' : 'rp-cmp';
             wrap.id = 'rp-cmp';
             wrap.innerHTML = `
                 <div class="rp-cmp-top">
@@ -1281,13 +1281,21 @@
             } else {
                 if (session.cmp) {
                     const half = view.w / 2;
-                    const side = { ...view, w: half, maxField: half * 0.6, fitWidth: replay.mode === 2 };
-                    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, half, view.h); ctx.clip();
+                    // catch: each side in a 4:3 screen as the game shows it (as tournament
+                    // broadcasts put them side by side); the numbers go in a strip below
+                    const strip = replay.mode === 2;
+                    const vh = strip ? Math.min(half * 0.75, view.h - 190) : view.h;
+                    const y0 = strip ? 92 : 0;
+                    const side = { ...view, w: half, h: vh, maxField: half * 0.6 };
+                    if (strip) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, view.w, view.h); }
+                    ctx.save(); ctx.translate(0, y0); ctx.beginPath(); ctx.rect(0, 0, half, vh); ctx.clip();
                     s = M.draw(ctx, side, prep, t);
                     ctx.restore();
-                    ctx.save(); ctx.translate(half, 0); ctx.beginPath(); ctx.rect(0, 0, half, view.h); ctx.clip();
+                    ctx.save(); ctx.translate(half, y0); ctx.beginPath(); ctx.rect(0, 0, half, vh); ctx.clip();
                     const sB = M.draw(ctx, side, session.cmp.prep, t);
                     ctx.restore();
+                    if (strip) { ctx.fillStyle = '#f472b6'; ctx.fillRect(0, y0 + vh, half, 3); ctx.fillStyle = '#5fb4ff'; ctx.fillRect(half, y0 + vh, half, 3); }
+                    if (strip) { const rowsEl = document.querySelector('#rp-cmp .rp-cmp-rows'); if (rowsEl) rowsEl.style.top = `${y0 + vh + 16}px`; }
                     updateCompareHud(s, sB, t);
                 } else {
                     s = M.draw(ctx, view, prep, t);
