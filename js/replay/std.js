@@ -336,7 +336,7 @@
         const kiai = map.timing.map((tp) => ({ time: tp.time, kiai: !!tp.kiai }));
         // the map's own combo colours come first, as in osu! (unless a player turns them off)
         const mapColours = (map.colours || []).filter((c) => c.length >= 3 && c.every(Number.isFinite)).map((c) => `rgba(${c[0]},${c[1]},${c[2]},1)`);
-        return { mode: 0, mapColours, keyPress, keyDown, hitOffsets, objs, notes: objs, events, counts, bestCombo: best, posAt, presses, radius, scale, preempt, fadeIn: 400 * Math.min(1, preempt / 450), windows: w, diff, rate, lastTime, kiai, hidden: !!(mods & MOD.HD), flip, cy };
+        return { mode: 0, mapColours, keyPress, keyDown, hitOffsets, objs, notes: objs, events, counts, bestCombo: best, posAt, presses, radius, scale, preempt, fadeIn: 400 * Math.min(1, preempt / 450), windows: w, diff, rate, lastTime, kiai, hidden: !!(mods & MOD.HD), flashlight: !!(mods & MOD.FL), flip, cy };
     }
 
 
@@ -727,6 +727,22 @@
             }
         }
         ctx.globalAlpha = 1;
+
+        // FL: dark but for a circle around the cursor, smaller with combo
+        if (prep.flashlight) {
+            const flScale = (combo) => (combo >= 200 ? 0.75 : combo >= 100 ? 0.875 : 1);
+            const cp = prep.posAt(t);
+            const eFl = eventBefore(ev, t);
+            const R = 130 * k * flScale(eFl >= 0 ? ev[eFl].comboAfter || 0 : 0);
+            const fx = X(cp.x), fy = Y(cp.y);
+            const g = ctx.createRadialGradient(fx, fy, R * 0.65, fx, fy, R);
+            g.addColorStop(0, 'rgba(0,0,0,0)');
+            g.addColorStop(1, 'rgba(0,0,0,1)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.arc(fx, fy, R, 0, Math.PI * 2, true); ctx.fill();
+        }
 
         // the cursor and its trail
         const cur = prep.posAt(t);

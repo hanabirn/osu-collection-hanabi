@@ -269,7 +269,7 @@
         const lastTime = flat.length ? flat[flat.length - 1].time : 0;
         const kiai = map.timing.filter((tp) => tp.uninherited || true).map((tp) => ({ time: tp.time, kiai: !!tp.kiai }));
         const notes = flat; // the player's generic code reads .notes for the first object time
-        return { mode: 2, flat, notes, counts, bestCombo: best, catcherAt, catchWidth, scale, diff, preempt: preemptFor(diff.ar), rate, lastTime, kiai, hidden: !!(mods & 8) };
+        return { mode: 2, flat, notes, counts, bestCombo: best, catcherAt, catchWidth, scale, diff, preempt: preemptFor(diff.ar), rate, lastTime, kiai, hidden: !!(mods & 8), flashlight: !!(mods & 1024) };
     }
 
     function eventBefore(prep, t) {
@@ -486,6 +486,20 @@
                 }
                 drawObject(o, x, y, 1 - p, tiltOf(o) + (gone.kind === 'explode' ? p * 6 * (n % 2 ? 1 : -1) : 0), 0.5);
             });
+        }
+
+        // FL: dark but for a circle around the plate, smaller with combo
+        if (prep.flashlight) {
+            const flScale = (combo) => (combo >= 200 ? 0.75 : combo >= 100 ? 0.875 : 1);
+            const eFl = eventBefore(prep, t);
+            const R = 250 * k * flScale(eFl >= 0 ? prep.flat[eFl].comboAfter || 0 : 0);
+            const g = ctx.createRadialGradient(cx, plateY, R * 0.7, cx, plateY, R);
+            g.addColorStop(0, 'rgba(0,0,0,0)');
+            g.addColorStop(1, 'rgba(0,0,0,1)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.arc(cx, plateY, R, 0, Math.PI * 2, true); ctx.fill();
         }
 
         // combo above the catcher

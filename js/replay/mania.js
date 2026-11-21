@@ -146,7 +146,7 @@
 
         const rate = mods & (MOD.DT | MOD.NC) ? 1.5 : mods & MOD.HT ? 0.75 : 1;
         const lastTime = notes.reduce((m, n) => Math.max(m, n.end ?? n.time), 0);
-        return { keys, notes, cols, presses, releases, frames: replay.frames, w, counts, bestCombo: best, events, sv, rate, lastTime };
+        return { keys, notes, cols, presses, releases, frames: replay.frames, w, counts, bestCombo: best, events, sv, rate, lastTime, hidden: !!(mods & 8), fadeIn: !!(mods & 1048576), flashlight: !!(mods & 1024) };
     }
 
     function scrollPos(prep, t) {
@@ -320,6 +320,18 @@
             }
         }
 
+        // HD: notes fade out over the lower part of the stage; FI: they fade in
+        // from the middle, the top dark (as replayviewer / osu! show them)
+        const shade = (y0s, y1s, fromDark) => {
+            const g = ctx.createLinearGradient(0, y0s, 0, y1s);
+            g.addColorStop(0, fromDark ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0)');
+            g.addColorStop(1, fromDark ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,1)');
+            ctx.fillStyle = g;
+            ctx.fillRect(x0, y0s, fieldW, y1s - y0s);
+        };
+        if (prep.hidden) { shade(hitY * 0.42, hitY * 0.62, false); ctx.fillStyle = '#000'; ctx.fillRect(x0, hitY * 0.62, fieldW, hitY * 0.38); }
+        if (prep.fadeIn) { ctx.fillStyle = '#000'; ctx.fillRect(x0, 0, fieldW, hitY * 0.38); shade(hitY * 0.38, hitY * 0.58, true); }
+
         // judgement line / stage hint, then keys
         if (skin) {
             if (skin.stageHint) { const hh = heightFor(skin.stageHint, fieldW); drawImg(skin.stageHint, x0, hitY - hh / 2, fieldW, hh); }
@@ -339,6 +351,24 @@
                 if (on) ctx.fill();
                 ctx.stroke();
             }
+        }
+
+        // FL: the stage dark but for one band across its middle, narrower with combo
+        if (prep.flashlight) {
+            const eFl = lastEventBefore(prep, t);
+            const flScale = (combo) => (combo >= 200 ? 0.75 : combo >= 100 ? 0.875 : 1);
+            const band = h * 0.1 * flScale(eFl >= 0 ? prep.events[eFl].comboAfter || 0 : 0);
+            const mid = h * 0.5, soft = band * 0.6;
+            const g = ctx.createLinearGradient(0, mid - band / 2 - soft, 0, mid + band / 2 + soft);
+            g.addColorStop(0, 'rgba(0,0,0,1)');
+            g.addColorStop(soft / (band + soft * 2), 'rgba(0,0,0,0)');
+            g.addColorStop(1 - soft / (band + soft * 2), 'rgba(0,0,0,0)');
+            g.addColorStop(1, 'rgba(0,0,0,1)');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x0, 0, fieldW, mid - band / 2 - soft);
+            ctx.fillRect(x0, mid + band / 2 + soft, fieldW, h - (mid + band / 2 + soft));
+            ctx.fillStyle = g;
+            ctx.fillRect(x0, mid - band / 2 - soft, fieldW, band + soft * 2);
         }
 
         // judgement + combo

@@ -272,7 +272,7 @@
         const smallD = bandH * 0.475, bigD = smallD * 1.525;
         const xOf = (time, speed) => hitX + (time - t) * speed * k;
         const kiai = kiaiAt(prep, t);
-        const hideAlpha = (x) => { if (!prep.hidden) return 1; const rel = (x - hitX) / Math.max(1, w - hitX); return Math.max(0, Math.min(1, (rel - 0.22) / 0.2)); };
+        const hideAlpha = (x) => { if (!prep.hidden) return 1; const rel = (x - hitX) / Math.max(1, w - hitX); return Math.max(0, Math.min(1, (rel - 0.5) / 0.3)); };
 
         function drawNote(x, y, d, colour, big, alpha) {
             const base = I[big ? 'taikobigcircle' : 'taikohitcircle'];
