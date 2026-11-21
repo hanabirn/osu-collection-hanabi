@@ -258,6 +258,11 @@
             for (let i = 1; i <= 8; i++) { const c = colour(ini.colours[`Combo${i}`]); if (c) combo.push(c); }
             const g = ini.general || {};
             const yes = (v, d) => (v == null ? d : String(v).trim() === '1');
+            // the combo font: the skin's score digits (ComboPrefix, else ScorePrefix) and its "x"
+            const cPrefix = (ini.fonts && (ini.fonts.ComboPrefix || ini.fonts.ScorePrefix)) || 'score';
+            const cGlyphs = await Promise.all([...Array.from({ length: 10 }, (_, d) => image(`${cPrefix}-${d}`)), image(`${cPrefix}-x`)]);
+            const ownCombo = cGlyphs.slice(0, 10).every(Boolean);
+            const comboFontStd = ownCombo ? { digits: cGlyphs.slice(0, 10), x: cGlyphs[10], overlap: Number((ini.fonts && ini.fonts.ComboOverlap) || 0) } : def.comboFont;
             const ownSpinnerOld = !!((await image('spinner-background')) || (await image('spinner-circle'))) && !(await image('spinner-top'));
             return {
                 img,
@@ -273,6 +278,7 @@
                 cursorExpand: yes(g.CursorExpand, true),
                 cursorCentre: yes(g.CursorCentre, true),
                 spinnerOld: ownSpinnerOld,
+                comboFont: comboFontStd,
             };
         }
 
@@ -370,7 +376,8 @@
     const STD_IMAGES = ['hitcircle', 'hitcircleoverlay', 'sliderstartcircle', 'sliderstartcircleoverlay', 'sliderendcircle', 'sliderendcircleoverlay',
         'approachcircle', 'sliderfollowcircle', 'sliderscorepoint', 'reversearrow', 'followpoint', 'cursor', 'cursormiddle', 'cursortrail',
         'hit0', 'hit50', 'hit100', 'hit300', 'spinner-background', 'spinner-circle', 'spinner-approachcircle', 'spinner-metre',
-        'spinner-glow', 'spinner-bottom', 'spinner-top', 'spinner-middle', 'spinner-middle2', 'spinner-clear', 'spinner-spin'];
+        'spinner-glow', 'spinner-bottom', 'spinner-top', 'spinner-middle', 'spinner-middle2', 'spinner-clear', 'spinner-spin',
+        'inputoverlay-key', 'inputoverlay-background'];
     // parts that are simply absent when a skin doesn't draw them (no default stands in)
     const STD_NO_DEFAULT = new Set(['sliderendcircle', 'sliderendcircleoverlay', 'sliderstartcircle', 'sliderstartcircleoverlay', 'cursormiddle',
         'spinner-background', 'spinner-circle', 'spinner-metre']);
@@ -391,7 +398,9 @@
                 await Promise.all(STD_IMAGES.map(async (n) => { img[n] = await get(n); }));
                 const digits = await Promise.all(Array.from({ length: 10 }, (_, d) => get(`default-${d}`)));
                 const b = await get('sliderb0');
-                return { img, digits: digits.every(Boolean) ? digits : null, sliderb: b ? [b] : [], combo: ['rgba(255,192,0,1)', 'rgba(0,202,0,1)', 'rgba(18,124,255,1)', 'rgba(242,24,57,1)'] };
+                const sd = await Promise.all([...Array.from({ length: 10 }, (_, d) => get(`score-${d}`)), get('score-x')]);
+                const comboFont = sd.slice(0, 10).every(Boolean) ? { digits: sd.slice(0, 10), x: sd[10], overlap: 0 } : null;
+                return { img, comboFont, digits: digits.every(Boolean) ? digits : null, sliderb: b ? [b] : [], combo: ['rgba(255,192,0,1)', 'rgba(0,202,0,1)', 'rgba(18,124,255,1)', 'rgba(242,24,57,1)'] };
             })();
         }
         return defaultStdPromise;

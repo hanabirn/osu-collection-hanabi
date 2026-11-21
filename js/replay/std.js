@@ -198,6 +198,16 @@
             prev = k;
         }
 
+        // each key on its own, for the key overlay: K1 (4), K2 (8), M1 (1 without K1), M2 (2 without K2)
+        const keyPress = { K1: [], K2: [], M1: [], M2: [] };
+        const keyDown = (keys) => ({ K1: !!(keys & 4), K2: !!(keys & 8), M1: !!(keys & 1) && !(keys & 4), M2: !!(keys & 2) && !(keys & 8) });
+        let was = keyDown(0);
+        for (const f of frames) {
+            const now = keyDown(f.keys);
+            for (const key of ['K1', 'K2', 'M1', 'M2']) if (now[key] && !was[key]) keyPress[key].push(f.t);
+            was = now;
+        }
+
         // 1) heads: circles and slider heads, in order, with note lock
         const heads = objs.filter((o) => o.kind !== 'spinner');
         let hi = 0;
@@ -318,12 +328,14 @@
             e.urAfter = offN > 1 ? 10 * Math.sqrt(Math.max(0, offSq / offN - (offSum / offN) ** 2)) : 0;
         }
 
+        // hits with their timing, for the error bar
+        const hitOffsets = heads.filter((o) => o.headResult && o.headResult !== 'MISS' && o.offset != null).map((o) => ({ t: o.headAt, off: o.offset, r: o.headResult })).sort((a, b) => a.t - b.t);
         const last = objs[objs.length - 1];
         const lastTime = last ? (last.kind === 'circle' ? last.time : last.end) : 0;
         const kiai = map.timing.map((tp) => ({ time: tp.time, kiai: !!tp.kiai }));
         // the map's own combo colours come first, as in osu! (unless a player turns them off)
         const mapColours = (map.colours || []).filter((c) => c.length >= 3 && c.every(Number.isFinite)).map((c) => `rgba(${c[0]},${c[1]},${c[2]},1)`);
-        return { mode: 0, mapColours, objs, notes: objs, events, counts, bestCombo: best, posAt, presses, radius, scale, preempt, fadeIn: 400 * Math.min(1, preempt / 450), windows: w, diff, rate, lastTime, kiai, hidden: !!(mods & MOD.HD), flip, cy };
+        return { mode: 0, mapColours, keyPress, keyDown, hitOffsets, objs, notes: objs, events, counts, bestCombo: best, posAt, presses, radius, scale, preempt, fadeIn: 400 * Math.min(1, preempt / 450), windows: w, diff, rate, lastTime, kiai, hidden: !!(mods & MOD.HD), flip, cy };
     }
 
 
@@ -722,17 +734,90 @@
         } else { ctx.beginPath(); ctx.arc(X(cur.x), Y(cur.y), 8 * u, 0, Math.PI * 2); ctx.fillStyle = '#ffd166'; ctx.fill(); }
         if (I.cursormiddle) { const m = I.cursormiddle; const mw = m.bmp.width * m.s * u, mh = m.bmp.height * m.s * u; ctx.drawImage(m.bmp, X(cur.x) - mw / 2, Y(cur.y) - mh / 2, mw, mh); }
 
-        // the combo, bottom left
+        // the combo, bottom left, in the skin's font (it swells a little on each hit)
         const last = ei >= 0 ? ev[ei] : null;
         const combo = last ? last.comboAfter : 0;
         if (combo > 0) {
-            const cs = view.comboScale || 0.6;
-            ctx.fillStyle = 'rgba(255,255,255,0.92)';
-            ctx.font = `700 ${Math.round(h * 0.07 * cs / 0.6)}px system-ui, sans-serif`;
-            ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-            ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 6;
-            ctx.fillText(`${combo}x`, 16, h - 54);
-            ctx.shadowBlur = 0;
+            const cs = (view.comboScale || 0.6) / 0.6;
+            const cf = skin.comboFont;
+            const bump = last && t - last.jt < 120 ? 1 + 0.12 * (1 - (t - last.jt) / 120) : 1;
+            const ch = h * 0.07 * cs * bump;
+            if (cf) {
+                const glyphs = [...String(combo).split('').map((c) => cf.digits[Number(c)]), cf.x].filter(Boolean);
+                const kk = ch / (cf.digits[0].bmp.height * cf.digits[0].s);
+                let dx = 14;
+                for (const g of glyphs) {
+                    const gw = g.bmp.width * g.s * kk, gh = g.bmp.height * g.s * kk;
+                    ctx.drawImage(g.bmp, dx, h - 50 - gh, gw, gh);
+                    dx += gw - (cf.overlap || 0) * kk;
+                }
+            } else {
+                ctx.fillStyle = 'rgba(255,255,255,0.92)';
+                ctx.font = `700 ${Math.round(ch)}px system-ui, sans-serif`;
+                ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                ctx.fillText(`${combo}x`, 14, h - 50);
+            }
+        }
+
+        // the key overlay on the right: K1 K2 M1 M2, lit while held, with their press counts
+        {
+            const down = prep.keyDown(cur.keys);
+            const keyI = I['inputoverlay-key'];
+            const size = h * 0.062;
+            const x0 = w - size * 0.5 - 10, yMid = h * 0.5;
+            ['K1', 'K2', 'M1', 'M2'].forEach((key, i) => {
+                const list = prep.keyPress[key];
+                let lo = 0, hi = list.length - 1, n = 0;
+                while (lo <= hi) { const mid = (lo + hi) >> 1; if (list[mid] <= t) { n = mid + 1; lo = mid + 1; } else hi = mid - 1; }
+                const y = yMid + (i - 1.5) * size * 1.12;
+                const on = down[key];
+                const sc = on ? 0.92 : 1;
+                const col = on ? (key[0] === 'K' ? 'rgba(255,222,0,1)' : 'rgba(248,0,158,1)') : null;
+                if (keyI) {
+                    drawTinted(ctx, keyI, x0 - (size * sc) / 2, y - (size * sc) / 2, size * sc, size * sc, col);
+                    // dark keys don't show a tint, so a held key also gets a coloured wash
+                    if (on) { ctx.globalAlpha = 0.55; ctx.fillStyle = col; ctx.fillRect(x0 - (size * sc) / 2, y - (size * sc) / 2, size * sc, size * sc); ctx.globalAlpha = 1; }
+                }
+                else { ctx.fillStyle = on ? (key[0] === 'K' ? 'rgba(255,222,0,0.9)' : 'rgba(248,0,158,0.9)') : 'rgba(20,20,24,0.75)'; ctx.fillRect(x0 - (size * sc) / 2, y - (size * sc) / 2, size * sc, size * sc); }
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 3;
+                ctx.font = `700 ${Math.round(size * (n > 999 ? 0.3 : 0.38))}px system-ui, sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(n ? String(n) : key, x0, y + 1);
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        // the hit error bar, bottom centre: the windows as colour bands, a tick per hit, an arrow at the average
+        {
+            const wnd = prep.windows;
+            const half = Math.min(w * 0.14, h * 0.2);
+            const scaleX = half / wnd[50];
+            const bx = w / 2, by = h - 70;
+            ctx.globalAlpha = 0.85;
+            const band = (win, col, hh) => { ctx.fillStyle = col; ctx.fillRect(bx - win * scaleX, by - hh / 2, win * 2 * scaleX, hh); };
+            band(wnd[50], 'rgba(218,174,70,1)', 4);
+            band(wnd[100], 'rgba(87,227,19,1)', 4);
+            band(wnd[300], 'rgba(50,188,231,1)', 4);
+            ctx.fillStyle = '#fff'; ctx.fillRect(bx - 1, by - 9, 2, 18);
+            const list = prep.hitOffsets;
+            let lo = 0, hi = list.length - 1, upto = -1;
+            while (lo <= hi) { const mid = (lo + hi) >> 1; if (list[mid].t <= t) { upto = mid; lo = mid + 1; } else hi = mid - 1; }
+            let avg = 0, nAvg = 0;
+            for (let j = upto; j >= 0 && t - list[j].t < 4000; j--) {
+                const e = list[j];
+                const age = (t - e.t) / 4000;
+                ctx.globalAlpha = 0.9 * (1 - age);
+                ctx.fillStyle = e.r === '300' ? 'rgba(50,188,231,1)' : e.r === '100' ? 'rgba(87,227,19,1)' : 'rgba(218,174,70,1)';
+                ctx.fillRect(bx + e.off * scaleX - 1, by - 8, 2, 16);
+                if (nAvg < 20) { avg += e.off; nAvg++; }
+            }
+            if (nAvg) {
+                const ax = bx + (avg / nAvg) * scaleX;
+                ctx.globalAlpha = 0.95; ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.moveTo(ax, by - 11); ctx.lineTo(ax - 5, by - 18); ctx.lineTo(ax + 5, by - 18); ctx.closePath(); ctx.fill();
+            }
+            ctx.globalAlpha = 1;
         }
         ctx.restore();
         return {
