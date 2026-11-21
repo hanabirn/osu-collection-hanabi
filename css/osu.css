@@ -7124,6 +7124,8 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     .rp-bar { height: 64px; gap: 12px; padding: 0 10px; }
     .rp-who, .rp-final, .rp-map { display: none; }
     .rp-hud-tr { top: 54px; right: 10px; }
+    .rp-hud-top { top: 50px; right: 10px; min-width: 0; padding: 6px 8px; }
+    .rp-mods .sc-mod { width: 40px; height: 30px; }
     .rp-live-counts { font-size: 12px; gap: 2px 12px; }
     .rp-hud-l { display: none; }
     .rp-menu-panel { left: 10px; right: 10px; width: auto; bottom: 74px; }
@@ -7294,7 +7296,8 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) .rp-ic-cover { height: 46px; transition-delay: 0.12s; }
 @media (prefers-reduced-motion: reduce) { .rp-body[data-mode="0"] .rp-infocard, .rp-body[data-mode="0"] .rp-infocard > *, .rp-body[data-mode="0"] .rp-ic-cover { transition: none !important; } }
 /* the right column: time pie + accuracy, pp, mods, then the live counts */
-.rp-hud-tr { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 150px; }
+.rp-hud-top { top: 56px; right: 28px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.55); min-width: 150px; box-sizing: border-box; }
+.rp-hud-tr { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 150px; box-sizing: border-box; }
 .rp-gauge { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 .rp-pie { width: 26px; height: 26px; flex: none; }
 .rp-pie circle { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.5; }
@@ -7304,10 +7307,10 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-pp b { font-size: clamp(18px, 1.6cqw, 26px); color: #ffd166; }
 .rp-pp small { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
 .rp-mods { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; pointer-events: auto; }
-.rp-mods .sc-mod { width: 48px; height: 36px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)); }
+.rp-mods .sc-mod { width: 60px; height: 45px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)); }
 .rp-mods .sc-mod img { height: 64%; }
 .rp-mod-text { padding: 2px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.15); font-size: 12px; }
-.rp-hud-tr .rp-live-counts { padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.rp-hud-tr .rp-live-counts { padding-top: 0; border-top: 0; }
 .rp-hands { display: flex; justify-content: space-between; gap: 12px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
 .rp-hands div { display: flex; flex-direction: column; align-items: center; flex: 1; }
 .rp-hands small { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.75); }

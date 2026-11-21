@@ -383,13 +383,15 @@
                     <div class="rp-ic-counts" style="grid-template-columns: repeat(${JUDGES.length}, minmax(0, 1fr))">${JUDGES.map((j) => `<span><i style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</i>${record[j]}</span>`).join('')}</div>
                 </div>
             </div>
-            <div class="rp-hud rp-hud-tr">
+            <div class="rp-hud rp-hud-top" id="rp-hud-top">
                 <div class="rp-gauge">
                     <svg class="rp-pie" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.5"></circle><path id="rp-pie" d=""></path></svg>
                     <span class="rp-acc" id="rp-acc">100.00%</span>
                 </div>
-                <div class="rp-pp" title="${L('目前的 PP')}"><b id="rp-pp">–</b><small>pp</small></div>
                 ${modsHtml(replay.mods)}
+                <div class="rp-pp" title="${L('目前的 PP')}"><b id="rp-pp">–</b><small>pp</small></div>
+            </div>
+            <div class="rp-hud rp-hud-tr" id="rp-hud-stats">
                 <dl class="rp-live-counts">${JUDGES.map((j) => `<dt style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</dt><dd id="rp-c-${j}">0</dd>`).join('')}
                     ${M.ur ? '<dt class="rp-ur">UR</dt><dd id="rp-ur">0</dd>' : ''}</dl>
                 ${M.hands ? `<div class="rp-hands">
@@ -714,6 +716,13 @@
             audio.currentTime = Math.max(0, first - 1500) / 1000;
             audio.play().catch(() => {});
         });
+        // the counts follow the top-right block down (taiko keeps them under its lane)
+        if (replay.mode !== 1 && typeof ResizeObserver === 'function') {
+            const topBox = $('rp-hud-top'), stats = $('rp-hud-stats');
+            const place = () => { stats.style.top = `${topBox.offsetTop + topBox.offsetHeight + 8}px`; };
+            new ResizeObserver(place).observe(topBox);
+            place();
+        }
         // the time pie: how far through the map (first object to last)
         const pieEl = $('rp-pie'), ppEl = $('rp-pp');
         const pieFrom = first, pieTo = Math.max(first + 1, prep.lastTime);
