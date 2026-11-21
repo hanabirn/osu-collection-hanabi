@@ -7439,7 +7439,8 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-cmp.is-strip .rp-cmp-rows { padding: 12px 18px; }
 /* ===== compare: the tournament-broadcast frame ===== */
 .rp-cmp.is-broadcast .rp-cmp-top, .rp-cmp.is-broadcast .rp-cmp-lead, .rp-cmp.is-broadcast .rp-cmp-rows { display: none; }
-.rp-cmp.is-broadcast .rp-cmp-close { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); margin-top: calc(var(--bc-top, 90px) - 44px); pointer-events: auto; z-index: 3; }
+.rp-cmp.is-broadcast .rp-cmp-close { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); margin-top: calc(var(--bc-top, 90px) - 44px); pointer-events: auto; z-index: 3; opacity: var(--rp-outro, 1); }
+.rp-body.rp-show-results .rp-cmp.is-broadcast .rp-cmp-close, .rp-cmpr:not([hidden]) ~ .rp-cmp-close { visibility: hidden; }
 .rp-bc-team { position: absolute; top: max(12px, calc(var(--bc-top, 96px) - 84px)); display: flex; align-items: center; gap: 10px; max-width: 34%; pointer-events: auto; opacity: var(--rp-outro, 1); }
 .rp-bc-team.is-a { left: 16px; }
 .rp-bc-team.is-b { right: 60px; text-align: right; }

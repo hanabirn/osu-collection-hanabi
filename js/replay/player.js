@@ -383,6 +383,20 @@
         if (mode === 3) {
             const v = { MAX: 320, 300: 300, 200: 200, 100: 100, 50: 50, MISS: 0 };
             for (const e of prep.events || []) { sum += v[e.judge] || 0; times.push(e.judgedAt); vals.push(sum); }
+        } else if (mode === 0) {
+            // standard: each object's result with the combo multiplier (stable: × (1 + combo / 25))
+            for (const e of prep.events || []) {
+                if (!e.count) continue;
+                const v = { 300: 300, 100: 100, 50: 50, MISS: 0 }[e.result] || 0;
+                sum += v * (1 + Math.max(0, (e.comboAfter || 1) - 1) / 25);
+                times.push(e.jt); vals.push(sum);
+            }
+        } else if (mode === 1) {
+            // taiko: a hit's value with the combo bonus (up to +100% from 100 combo on, as in stable)
+            for (const e of prep.events || []) {
+                if (e.result !== 'MISS') sum += (e.result === '300' ? 300 : 150) * (1 + Math.min(100, e.comboAfter || 0) / 100);
+                times.push(e.jt); vals.push(sum);
+            }
         } else if (mode === 2) {
             for (const o of prep.flat || []) {
                 if (!o.caught || o.kind === 'banana') continue;
@@ -571,7 +585,7 @@
                             <p class="rp-note">${L('「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。')}</p>
                         </div>
                     </details>
-                    ${replay.mode === 3 || replay.mode === 2 ? `<button type="button" class="rp-btn" id="rp-compare-btn" title="${L('雙人比較')}">⚔<span class="rp-btn-text"> ${L('雙人比較')}</span></button>` : ''}
+                    ${MODES[replay.mode] ? `<button type="button" class="rp-btn" id="rp-compare-btn" title="${L('雙人比較')}">⚔<span class="rp-btn-text"> ${L('雙人比較')}</span></button>` : ''}
                     <button type="button" class="rp-btn" onclick="openReplayViewer()" title="${L('換一個重播')}" aria-label="${L('換一個重播')}">⏏<span class="rp-btn-text"> ${L('換一個重播')}</span></button>
                 </div>
             </div>`;
@@ -983,7 +997,7 @@
                 if (rateOf(rB.mods) !== rateOf(replay.mods)) throw new Error(L('兩個重播的倍速不同（例如一個有 DT），沒辦法並排比較'));
                 if (rB.scoreId && rB.scoreId === replay.scoreId) throw new Error(L('這是同一份成績'));
                 const prepB = M.prepare(map, rB);
-                if (replay.mode === 2 && prep.defaultSkin) prepB.defaultSkin = prep.defaultSkin;
+                if (prep.defaultSkin) prepB.defaultSkin = prep.defaultSkin;
                 session.cmp = { replay: rB, prep: prepB, ppAt: ppLookup(rB, prepB, bm.beatmap_id), timing: timed ? timingTimeline(prepB) : timingA, ppA: ppAt, scoreA: scoreTimeline(replay.mode, prep, replay.score), scoreB: scoreTimeline(rB.mode, prepB, rB.score) };
                 if (pick) pick.remove();
                 renderCompareHud();
@@ -1038,7 +1052,8 @@
                     const u = Array.isArray(res) ? res[0] : null;
                     if (!u) return;
                     const n = (v) => Number(v || 0).toLocaleString();
-                    const line = `${n(Math.round(Number(u.pp_raw) || 0))}pp · #${n(u.pp_rank)}`;
+                    // no ranking (inactive or restricted accounts come back with 0) shows nothing
+                    const line = Number(u.pp_rank) > 0 ? `${n(Math.round(Number(u.pp_raw) || 0))}pp · #${n(u.pp_rank)}` : '';
                     document.querySelectorAll(`#rp-cmp-prof-${side}, #rp-cmpr-prof-${side}`).forEach((el2) => { el2.textContent = line; });
                     if (u.country) {
                         document.querySelectorAll(`#rp-cmp-flag-${side}, #rp-cmpr-flag-${side}`).forEach((fl) => {
@@ -1271,6 +1286,25 @@
             const rb = M.rank ? M.rank(rec, acc) : '';
             const sv = (r2.mods & (8 | 1024)) && (rb === 'SS' || rb === 'S');
             let lb = String(r2.lifeBar || '').split(',').map((x) => { const [a, b] = x.split('|'); return { t: Number(a), hp: Number(b) }; }).filter((x) => Number.isFinite(x.t) && Number.isFinite(x.hp));
+            if (lb.length < 2 && r2.mode === 0) {
+                let hp = 1;
+                lb = [{ t: 0, hp }];
+                for (const e of p2.events) {
+                    if (!e.count) continue;
+                    const q = { 300: 1, 100: 0.5, 50: 0.2, MISS: -1 }[e.result];
+                    hp = Math.min(1, Math.max(0, hp + (q > 0 ? 0.02 * q : q * 0.08)));
+                    lb.push({ t: e.jt, hp });
+                }
+            }
+            if (lb.length < 2 && r2.mode === 1) {
+                let hp = 1;
+                lb = [{ t: 0, hp }];
+                for (const e of p2.events) {
+                    const q = { 300: 1, 100: 0.5, MISS: -1 }[e.result];
+                    hp = Math.min(1, Math.max(0, hp + (q > 0 ? 0.02 * q : q * 0.08)));
+                    lb.push({ t: e.jt, hp });
+                }
+            }
             if (lb.length < 2 && r2.mode === 2) {
                 let hp = 1;
                 lb = [{ t: 0, hp }];
