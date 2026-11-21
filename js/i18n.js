@@ -88,6 +88,7 @@ function applyLangDom(lang) {
         sel.setAttribute('data-auto-aria', '');
     });
     if (typeof refreshSectionBand === 'function') refreshSectionBand();
+    if (typeof refreshReplayHub === 'function') refreshReplayHub();
     document.querySelectorAll('.lang-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });

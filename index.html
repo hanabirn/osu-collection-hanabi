@@ -168,6 +168,7 @@
         <button class="site-nav-sec" type="button" data-section="collection" onclick="goSection('collection')" data-i18n="nav_collection">收藏</button>
         <button class="site-nav-sec" type="button" data-section="explore" onclick="goSection('explore')" data-i18n="nav_explore">探索</button>
         <button class="site-nav-sec" type="button" data-section="player" onclick="goSection('player')" data-i18n="nav_player">玩家</button>
+        <button class="site-nav-sec" type="button" data-section="replay" onclick="goSection('replay')" data-i18n="nav_replay_section">重播</button>
         <button class="site-nav-sec" type="button" data-section="community" onclick="goSection('community')" data-i18n="nav_community">社群</button>
         <button class="site-nav-sec" type="button" data-section="more" onclick="goSection('more')" data-i18n="nav_more">更多</button>
     </nav>
@@ -219,6 +220,10 @@
             <p class="nav-drawer-group-label" data-i18n="nav_player"></p>
             <button class="site-nav-btn" onclick="switchTab('lookup', this)" id="nav-btn-lookup" data-i18n="nav_lookup"></button>
             <button class="site-nav-btn" onclick="switchTab('tournaments', this)" data-i18n="nav_tournaments"></button>
+        </div>
+        <div class="nav-drawer-group">
+            <p class="nav-drawer-group-label" data-i18n="nav_replay_section"></p>
+            <button class="site-nav-btn" onclick="switchTab('replay', this)" data-i18n="nav_replay"></button>
         </div>
         <div class="nav-drawer-group">
             <p class="nav-drawer-group-label" data-i18n="nav_community"></p>
@@ -1104,6 +1109,10 @@
         </div>
     </section>
 
+    <section id="page-replay" class="site-page" style="display:none;">
+        <div id="replay-hub" class="replay-hub"></div>
+    </section>
+
     <section id="page-resources" class="site-page" style="display:none;">
         <p class="eyebrow">RESOURCES</p>
         <h2 class="osu-page-title" data-i18n="resources_title">更多 osu! 資源</h2>
@@ -1476,6 +1485,7 @@ if (typeof applyLangDom === 'function' && window.__LANG && typeof I18N !== 'unde
 <script defer src="js/replay/results.js"></script>
 <script defer src="js/replay/skin.js"></script>
 <script defer src="js/replay/player.js"></script>
+<script defer src="js/replay/hub.js"></script>
 <script defer src="js/catalog.js"></script>
 <script defer src="js/mappools.js"></script>
 <script defer src="js/community-mappools.js"></script>

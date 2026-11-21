@@ -188,7 +188,11 @@
         document.documentElement.classList.add('rp-open');
     }
 
-    window.openReplayViewer = function openReplayViewer() { open(); showPicker(); };
+    // the replay page (nav 重播) when the site has it; the window's own picker otherwise
+    window.openReplayViewer = function openReplayViewer() {
+        if (document.getElementById('page-replay') && typeof switchTab === 'function') { closeReplayViewer(); switchTab('replay'); return; }
+        open(); showPicker();
+    };
     window.closeReplayViewer = function closeReplayViewer() {
         stop();
         if (root) root.hidden = true;
@@ -239,6 +243,12 @@
         if (!res.ok) throw new Error(L('取得重播失敗，稍後再試'));
         return new File([await res.arrayBuffer()], `score-${ref.id}.osr`);
     }
+    // a score link or id → its replay as a file (js/replay/hub.js's comparison)
+    window.replayScoreFile = async function replayScoreFile(text) {
+        const ref = scoreRef(text);
+        if (!ref) throw new Error(L('看不懂這個網址，請貼 osu! 成績頁的網址（osu.ppy.sh/scores/…）或成績 ID'));
+        return fetchScoreReplay(ref);
+    };
     window.loadReplayFromScore = async function loadReplayFromScore(text) {
         const ref = scoreRef(text);
         open();
@@ -296,6 +306,8 @@
             const savedSkin = savedSkins[replay.mode];
             const skinCfg = savedSkin ? await M.skin(savedSkin, prep).catch(() => null) : null;
             startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M });
+            // 最近觀看 on the replay page
+            if (window.replayHub) window.replayHub.remember(file, replay, bm, M.acc(M.record(replay))).catch(() => {});
         } catch (err) {
             console.error('replay load failed', err);
             open();
@@ -1056,8 +1068,15 @@
                 renderCompareHud();
                 body2.classList.add('rp-comparing');
                 lastCmp = '';
-            } catch (err) { say(err && err.message ? err.message : String(err)); }
+                return null;
+            } catch (err) { const m = err && err.message ? err.message : String(err); say(m); return m; }
         }
+        // the replay page starts a comparison of two scores it already has
+        window.replayCompareWith = async (file) => {
+            const err = await startCompare(file);
+            if (err) { if (!$('rp-cmp-pick')) openComparePick(); const el = $('rp-cmp-pick')?.querySelector('.rp-cmp-msg'); if (el) { el.textContent = err; el.hidden = false; } }
+        };
+        window.replayOpenComparePick = () => { if (!$('rp-cmp-pick')) openComparePick(); };
         function renderCompareHud() {
             const c = session.cmp;
             const old = $('rp-cmp'); if (old) old.remove();
@@ -1549,9 +1568,10 @@
         const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
         if (f && /\.osr$/i.test(f.name) && !(root && !root.hidden)) { e.preventDefault(); loadReplayFile(f); }
     });
-    // /?replay opens the window (prototype entry point)
+    // /?replay opens the replay page (the old link to the window keeps working)
     if (/[?&]replay\b/.test(location.search)) {
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => openReplayViewer());
-        else openReplayViewer();
+        const go = () => setTimeout(() => openReplayViewer(), 0);
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+        else go();
     }
 })();
