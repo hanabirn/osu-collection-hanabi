@@ -851,10 +851,10 @@
             if (near) { showBar(true); clearTimeout(barTimer); }
             else if (body.classList.contains('rp-bar-shown') && !body.querySelector('.rp-menu[open]')) {
                 clearTimeout(barTimer);
-                barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 500);
+                barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 150);
             }
         });
-        body.addEventListener('mouseleave', () => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 500); });
+        body.addEventListener('mouseleave', () => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 150); });
 
         // the counts follow the top-right block down (taiko keeps them under its lane)
         if (replay.mode !== 1 && typeof ResizeObserver === 'function') {
