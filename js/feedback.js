@@ -100,16 +100,18 @@ function renderFeedbackMine() {
     if (!fbThreads.length) { box.hidden = true; return; }
     box.hidden = false;
     const seen = fbSeen();
-    box.innerHTML = `<h3 class="home-h"><span>${escHtml(t('feedback_mine_title'))}</span></h3>
-        <ol class="fb-threads">${fbThreads.map((th) => `
-        <li class="fb-thread${(seen[th.id] || 0) < th.updated && th.messages[th.messages.length - 1].from === 'owner' ? ' is-new' : ''}">
-            <div class="fb-thread-head">${fbStatusChip(th.status)}<time>${escHtml(fbTime(th.created))}</time></div>
+    box.innerHTML = `<h3 class="home-h"><span>${escHtml(t('feedback_mine_title'))} <small>${fbThreads.length}</small></span></h3>
+        <ol class="fb-threads fb-mine-list">${fbThreads.map((th, i) => {
+            const fresh = (seen[th.id] || 0) < th.updated && th.messages[th.messages.length - 1].from === 'owner';
+            return `<li class="fb-thread${fresh ? ' is-new' : ''}"><details${i === 0 || fresh ? ' open' : ''}>
+            <summary class="fb-thread-head">${fbStatusChip(th.status)}<span class="fb-preview">${escHtml(th.messages[0].text)}</span><time>${escHtml(fbTime(th.created))}</time></summary>
             ${fbMessages(th, false)}
             <form class="fb-reply" onsubmit="return sendFeedbackReply(event, '${th.id}')">
                 <textarea name="message" rows="2" maxlength="2000" placeholder="${escHtml(t('feedback_reply_placeholder'))}" required></textarea>
                 <button type="submit" class="btn">${escHtml(t('feedback_reply_send'))}</button>
             </form>
-        </li>`).join('')}</ol>`;
+        </details></li>`;
+        }).join('')}</ol>`;
     // everything shown counts as seen
     for (const th of fbThreads) seen[th.id] = th.updated;
     fbSetSeen(seen);
@@ -148,42 +150,76 @@ async function checkFeedbackReplies() {
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
 }
 
-/* ----- the owner: every thread, answer and set its status ----- */
-let fbAll = [], fbFilter = 'active';
+/* ----- the owner: an inbox (the list on the left, the open thread on the right) ----- */
+let fbAll = [], fbFilter = 'active', fbOpenId = null, fbTab = 'send';
+const fbNeedsReply = (th) => th.messages[th.messages.length - 1].from === 'visitor' && (th.status === 'open' || th.status === 'discussing');
+const FB_FILTERS = [
+    ['active', 'feedback_filter_active', (th) => th.status === 'open' || th.status === 'discussing'],
+    ['done', 'feedback_status_done', (th) => th.status === 'done'],
+    ['declined', 'feedback_status_declined', (th) => th.status === 'declined'],
+    ['all', 'osu_filter_all', () => true],
+];
+
+// the page's two tabs, for the owner: 送出建議 / 管理
+function renderFeedbackTabs() {
+    const bar = document.getElementById('feedback-tabs');
+    const admin = document.getElementById('feedback-admin');
+    const layout = document.querySelector('#page-feedback .feedback-layout');
+    if (!bar || !admin || !layout) return;
+    if (!fbIsOwner()) { bar.hidden = true; admin.hidden = true; layout.hidden = false; return; }
+    const waiting = fbAll.filter(fbNeedsReply).length;
+    bar.hidden = false;
+    bar.innerHTML = [['send', t('feedback_tab_send')], ['admin', t('feedback_tab_admin') + (waiting ? ` (${waiting})` : '')]]
+        .map(([k, lab]) => `<button type="button" role="tab" aria-selected="${fbTab === k}" onclick="showFeedbackTab('${k}')">${escHtml(lab)}</button>`).join('');
+    admin.hidden = fbTab !== 'admin';
+    layout.hidden = fbTab === 'admin';
+}
+function showFeedbackTab(k) { fbTab = k; renderFeedbackTabs(); if (k === 'admin') renderFeedbackAdmin(); }
+
 async function loadFeedbackAdmin() {
     const box = document.getElementById('feedback-admin');
     if (!box) return;
-    if (!fbIsOwner()) { box.hidden = true; return; }
-    box.hidden = false;
-    box.innerHTML = `<p class="osu-empty">${escHtml(t('gallery_loading'))}</p>`;
+    if (!fbIsOwner()) { renderFeedbackTabs(); return; }
     try { fbAll = (await fbCall('GET', { action: 'all' })).threads || []; }
-    catch { box.innerHTML = `<p class="osu-empty">${escHtml(t('feedback_fail'))}</p>`; return; }
+    catch { fbAll = []; }
+    renderFeedbackTabs();
     renderFeedbackAdmin();
 }
 function renderFeedbackAdmin() {
     const box = document.getElementById('feedback-admin');
-    if (!box) return;
-    const show = fbAll.filter((th) => (fbFilter === 'active' ? th.status === 'open' || th.status === 'discussing' : fbFilter === 'all' || th.status === fbFilter));
-    const filters = [['active', 'feedback_filter_active'], ['done', 'feedback_status_done'], ['declined', 'feedback_status_declined'], ['all', 'osu_filter_all']];
+    if (!box || box.hidden) return;
+    const pass = (FB_FILTERS.find(([k]) => k === fbFilter) || FB_FILTERS[0])[2];
+    const show = fbAll.filter(pass);
+    if (!show.some((th) => th.id === fbOpenId)) fbOpenId = show.length ? show[0].id : null;
+    const open = fbAll.find((th) => th.id === fbOpenId);
     box.innerHTML = `
-        <h3 class="home-h"><span>${escHtml(t('feedback_admin_title'))} <small>${fbAll.filter((x) => x.status === 'open').length} ${escHtml(t('feedback_status_open'))}</small></span>
-            <span class="fb-filters">${filters.map(([k, lab]) => `<button type="button" class="${fbFilter === k ? 'is-on' : ''}" onclick="fbFilter='${k}';renderFeedbackAdmin()">${escHtml(t(lab))}</button>`).join('')}</span></h3>
-        ${show.length ? `<ol class="fb-threads">${show.map((th) => `
-        <li class="fb-thread" id="fb-${th.id}">
-            <div class="fb-thread-head">${fbStatusChip(th.status)}<span>${escHtml(th.who || t('feedback_visitor'))} · ${escHtml(th.lang || '')}</span><time>${escHtml(fbTime(th.created))}</time></div>
-            ${fbMessages(th, true)}
-            <form class="fb-reply fb-answer" onsubmit="return sendFeedbackAnswer(event, '${th.id}')">
-                <textarea name="message" rows="3" maxlength="2000" placeholder="${escHtml(t('feedback_answer_placeholder'))}"></textarea>
-                <div class="fb-answer-btns">
-                    <button type="submit" class="btn" data-status="discussing">💬 ${escHtml(t('feedback_answer_reply'))}</button>
-                    <button type="submit" class="btn fb-done" data-status="done">✅ ${escHtml(t('feedback_answer_done'))}</button>
-                    <button type="submit" class="btn fb-declined" data-status="declined">❌ ${escHtml(t('feedback_answer_declined'))}</button>
-                </div>
-            </form>
-        </li>`).join('')}</ol>` : `<p class="osu-empty">${escHtml(t('feedback_admin_empty'))}</p>`}`;
-    const hash = location.hash.slice(1);
-    if (hash) { const el = document.getElementById(`fb-${hash}`); if (el) el.scrollIntoView({ block: 'center' }); }
+        <div class="fb-inbox-head">
+            <span class="fb-filters" role="tablist">${FB_FILTERS.map(([k, lab, p]) => `<button type="button" role="tab" aria-selected="${fbFilter === k}" class="${fbFilter === k ? 'is-on' : ''}" onclick="fbFilter='${k}';renderFeedbackAdmin()">${escHtml(t(lab))} <b>${fbAll.filter(p).length}</b></button>`).join('')}</span>
+        </div>
+        <div class="fb-inbox">
+            <ol class="fb-inbox-list">${show.length ? show.map((th) => `
+                <li><button type="button" class="fb-inbox-row${th.id === fbOpenId ? ' is-open' : ''}${fbNeedsReply(th) ? ' needs-reply' : ''}" onclick="openFeedbackThread('${th.id}')">
+                    <span class="fb-inbox-top">${fbStatusChip(th.status)}<time>${escHtml(fbTime(th.updated))}</time></span>
+                    <span class="fb-inbox-preview">${escHtml(th.messages[0].text)}</span>
+                    <small>${escHtml(th.who || t('feedback_visitor'))} · ${th.messages.length} · ${escHtml(th.lang || '')}</small>
+                </button></li>`).join('') : `<li class="osu-empty">${escHtml(t('feedback_admin_empty'))}</li>`}</ol>
+            <div class="fb-inbox-view">${open ? `
+                <div class="fb-thread-head">${fbStatusChip(open.status)}<span>${escHtml(open.who || t('feedback_visitor'))} · ${escHtml(open.lang || '')}</span><time>${escHtml(fbTime(open.created))}</time></div>
+                <div class="fb-inbox-msgs">${fbMessages(open, true)}</div>
+                <form class="fb-reply fb-answer" onsubmit="return sendFeedbackAnswer(event, '${open.id}')">
+                    <textarea name="message" rows="3" maxlength="2000" placeholder="${escHtml(t('feedback_answer_placeholder'))}"></textarea>
+                    <div class="fb-answer-btns">
+                        <button type="submit" class="btn" data-status="discussing">💬 ${escHtml(t('feedback_answer_reply'))}</button>
+                        <button type="submit" class="btn fb-done" data-status="done">✅ ${escHtml(t('feedback_answer_done'))}</button>
+                        <button type="submit" class="btn fb-declined" data-status="declined">❌ ${escHtml(t('feedback_answer_declined'))}</button>
+                    </div>
+                </form>` : `<p class="osu-empty">${escHtml(t('feedback_admin_empty'))}</p>`}
+            </div>
+        </div>`;
+    const msgs = box.querySelector('.fb-inbox-msgs');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
 }
+function openFeedbackThread(id) { fbOpenId = id; renderFeedbackAdmin(); }
 async function sendFeedbackAnswer(event, id) {
     event.preventDefault();
     const form = event.target;
@@ -194,6 +230,7 @@ async function sendFeedbackAnswer(event, id) {
     try {
         const { thread } = await fbCall('POST', null, { action: 'answer', id, message, status });
         fbAll = fbAll.map((x) => (x.id === id ? thread : x));
+        renderFeedbackTabs();
         renderFeedbackAdmin();
     } catch { form.querySelectorAll('button').forEach((b) => { b.disabled = false; }); alertFeedback(t('feedback_fail')); }
     return false;
@@ -201,6 +238,7 @@ async function sendFeedbackAnswer(event, id) {
 
 /* the 建議&改進 page opening */
 async function ensureFeedbackPage() {
+    if (/[?&]feedback=admin\b/.test(location.search)) { fbTab = 'admin'; const h = location.hash.slice(1); if (/^[a-f0-9]{16}$/.test(h)) { fbOpenId = h; fbFilter = 'all'; } }
     await loadFeedbackMine();
     renderFeedbackMine();
     loadFeedbackAdmin();

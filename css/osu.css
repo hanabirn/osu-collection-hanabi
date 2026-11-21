@@ -7755,3 +7755,38 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .fb-filters { display: inline-flex; gap: 4px; flex-wrap: wrap; }
 .fb-filters button { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: none; color: var(--text-dim); font: inherit; font-size: var(--fs-12); cursor: pointer; }
 .fb-filters button.is-on { background: rgba(var(--pink-rgb), 0.2); color: #fff; border-color: var(--pink); }
+
+/* 建議&改進, the owner's side: tabs, and an inbox (list | open thread), one screen tall */
+.fb-tabs { display: flex; justify-content: center; gap: 4px; margin: 0 auto 14px; padding: 4px; width: fit-content; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); }
+.fb-tabs[hidden] { display: none; }
+.fb-tabs button { padding: 7px 18px; border: 0; border-radius: 9px; background: none; color: var(--text-dim); font: inherit; font-weight: 700; cursor: pointer; }
+.fb-tabs button[aria-selected="true"] { background: rgba(var(--pink-rgb), 0.22); color: #fff; }
+.feedback-layout[hidden] { display: none; }
+.feedback-admin { max-width: 1240px; }
+.fb-inbox-head { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.fb-filters b { margin-left: 4px; font-weight: 800; color: #fff; }
+.fb-inbox { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 12px; height: calc(100vh - 300px); min-height: 420px; }
+.fb-inbox-list { list-style: none; margin: 0; padding: 0 4px 0 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.fb-inbox-row { width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text); font: inherit; text-align: left; cursor: pointer; position: relative; }
+.fb-inbox-row:hover { border-color: var(--border-strong); }
+.fb-inbox-row.is-open { border-color: var(--pink); background: rgba(var(--pink-rgb), 0.08); }
+.fb-inbox-row.needs-reply::before { content: ''; position: absolute; top: 12px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--pink); }
+.fb-inbox-top { display: flex; align-items: center; gap: 8px; padding-right: 14px; font-size: var(--fs-12); color: var(--text-dim); }
+.fb-inbox-top time { margin-left: auto; }
+.fb-inbox-preview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--fs-13); line-height: 1.45; }
+.fb-inbox-row small { font-size: var(--fs-11); color: var(--text-faint); }
+.fb-inbox-view { display: flex; flex-direction: column; min-height: 0; padding: 12px; border-radius: 12px; background: var(--bg-input); border: 1px solid var(--border); }
+.fb-inbox-msgs { flex: 1; min-height: 0; overflow-y: auto; padding-right: 4px; }
+.fb-inbox-view .fb-answer { margin-top: 10px; }
+/* 我的建議: a line a thread, opened by a click */
+.fb-mine-list details > summary { list-style: none; cursor: pointer; margin-bottom: 0; }
+.fb-mine-list details > summary::-webkit-details-marker { display: none; }
+.fb-mine-list details[open] > summary { margin-bottom: 8px; }
+.fb-preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: var(--fs-13); }
+.fb-mine-list .fb-thread-head time { margin-left: 0; }
+.fb-mine-list { max-height: 60vh; }
+@media (max-width: 760px) {
+    .fb-inbox { grid-template-columns: minmax(0, 1fr); height: auto; }
+    .fb-inbox-list { max-height: 40vh; }
+    .fb-inbox-view { min-height: 360px; }
+}
