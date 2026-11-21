@@ -217,7 +217,20 @@
             return { img, mascot, comboDigits: own || def.comboDigits, comboOverlap: own ? Number((ini.fonts && ini.fonts.ComboOverlap) || 0) : 0 };
         }
 
-        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko };
+        /* the results screen: ranking images, judgement images, the score font */
+        async function forRanking() {
+            const def = await loadDefaultRanking();
+            const out = { scoreOverlap: Number((ini.fonts && ini.fonts.ScoreOverlap) || 0) };
+            const prefix = (ini.fonts && ini.fonts.ScorePrefix) || 'score';
+            const digits = await Promise.all(SCORE_GLYPHS.map((g) => image(`${prefix}-${g}`)));
+            const ownFont = digits.slice(0, 10).every(Boolean);
+            SCORE_GLYPHS.forEach((g, i) => { out[`score-${g}`] = (ownFont && digits[i]) || def[`score-${g}`] || null; });
+            if (!ownFont) out.scoreOverlap = 0;
+            for (const n of RANK_IMAGES) out[n] = (await image(n)) || def[n] || null;
+            return out;
+        }
+
+        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko, forRanking };
     }
 
     /* osu!stable's default catch images (ppy/osu-resources Skins/Legacy,
@@ -282,6 +295,32 @@
        under 'mode-{n}'. A skin saved before this (under 'current') still
        serves any mode that has none of its own; resetting a mode stores a
        "none" so it shows the default without touching the other modes. */
+    const SCORE_GLYPHS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'x', 'dot', 'percent', 'comma'];
+    const RANK_IMAGES = ['ranking-panel', 'ranking-title', 'ranking-accuracy', 'ranking-maxcombo', 'ranking-graph', 'ranking-perfect',
+        'ranking-X', 'ranking-XH', 'ranking-S', 'ranking-SH', 'ranking-A', 'ranking-B', 'ranking-C', 'ranking-D',
+        'hit0', 'mania-hit0', 'mania-hit50', 'mania-hit100', 'mania-hit200', 'mania-hit300', 'mania-hit300g',
+        'taiko-hit0', 'taiko-hit100', 'taiko-hit300', 'taiko-hit300g', 'taiko-hit100k', 'fruit-pear', 'fruit-pear-overlay', 'fruit-drop'];
+    let defaultRankingPromise = null;
+    function loadDefaultRanking() {
+        if (!defaultRankingPromise) {
+            const get = async (n) => {
+                for (const [file, s] of [[`${n}@2x`, 0.5], [`${n}-0@2x`, 0.5], [n, 1]]) {
+                    try {
+                        const res = await fetch(`assets/osu-resources/skin-legacy/${file}.png`);
+                        if (res.ok) return { bmp: await createImageBitmap(await res.blob()), s };
+                    } catch { /* next */ }
+                }
+                return null;
+            };
+            defaultRankingPromise = (async () => {
+                const out = { scoreOverlap: 0 };
+                await Promise.all([...RANK_IMAGES, ...SCORE_GLYPHS.map((g) => `score-${g}`)].map(async (n) => { out[n] = await get(n); }));
+                return out;
+            })();
+        }
+        return defaultRankingPromise;
+    }
+
     async function saveSkin(blob, name, mode) { await idb('readwrite', (s) => s.put({ blob, name }, mode == null ? 'current' : `mode-${mode}`)); }
     async function loadSavedSkin(mode) {
         try {
@@ -298,5 +337,5 @@
         } catch { /* nothing saved */ }
     }
 
-    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch, loadDefaultTaiko };
+    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch, loadDefaultTaiko, loadDefaultRanking };
 })();

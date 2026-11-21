@@ -60,6 +60,8 @@
         '最大連擊': { 'zh-Hans': '最大连击', en: 'Max combo', ja: '最大コンボ', ko: '최대 콤보', de: 'Max. Combo', es: 'Combo máx.', fr: 'Combo max', ru: 'Макс. комбо' },
         '再看一次': { 'zh-Hans': '再看一次', en: 'Watch again', ja: 'もう一度見る', ko: '다시 보기', de: 'Nochmal ansehen', es: 'Ver de nuevo', fr: 'Revoir', ru: 'Смотреть снова' },
         '關閉結算': { 'zh-Hans': '关闭结算', en: 'Close results', ja: 'リザルトを閉じる', ko: '결과 닫기', de: 'Ergebnis schließen', es: 'Cerrar resultados', fr: 'Fermer les résultats', ru: 'Закрыть результаты' },
+        '譜面作者': { 'zh-Hans': '谱面作者', en: 'Beatmap by', ja: '譜面作者', ko: '비트맵 제작', de: 'Beatmap von', es: 'Mapa de', fr: 'Map par', ru: 'Карта от' },
+        '遊玩者': { 'zh-Hans': '游玩者', en: 'Played by', ja: 'プレイヤー', ko: '플레이어', de: 'Gespielt von', es: 'Jugado por', fr: 'Joué par', ru: 'Игрок' },
         '換一個重播': { 'zh-Hans': '换一个回放', en: 'Another replay', ja: '別のリプレイ', ko: '다른 리플레이', de: 'Anderes Replay', es: 'Otro replay', fr: 'Autre replay', ru: 'Другой реплей' },
     };
     window.replayText = function replayText(zh) {

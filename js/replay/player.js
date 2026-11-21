@@ -260,6 +260,22 @@
         const rankBase = M.rank ? M.rank(record, accOf(record)) : '';
         const silver = (replay.mods & (8 | 1024)) && (rankBase === 'SS' || rankBase === 'S'); // HD / FL
         const rankKey = silver ? `${rankBase}H` : rankBase;
+        const rankImage = (rankBase === 'SS' ? 'X' : rankBase) + (silver ? 'H' : '');
+        let lifeBar = String(replay.lifeBar || '').split(',').map((s) => { const [a, b] = s.split('|'); return { t: Number(a), hp: Number(b) }; }).filter((x) => Number.isFinite(x.t) && Number.isFinite(x.hp));
+        // replays from the website carry no life bar: rebuild one from our own
+        // judgements (up on good hits, down on misses) so the graph still tells the story
+        if (lifeBar.length < 2) {
+            const q = replay.mode === 3 ? prep.events.map((e) => ({ t: e.judgedAt, q: { MAX: 1, 300: 1, 200: 0.6, 100: 0.3, 50: 0, MISS: -1 }[e.judge] }))
+                : replay.mode === 1 ? prep.events.map((e) => ({ t: e.jt, q: { 300: 1, 100: 0.5, MISS: -1 }[e.result] }))
+                : replay.mode === 2 ? prep.flat.filter((o) => o.kind !== 'banana').map((o) => ({ t: o.time, q: o.caught ? (o.kind === 'tiny' ? 0.3 : 1) : o.kind === 'tiny' ? -0.3 : -1 }))
+                : [];
+            let hp = 1;
+            lifeBar = [{ t: q.length ? q[0].t : 0, hp }];
+            for (const e of q) {
+                hp = Math.min(1, Math.max(0, hp + (e.q > 0 ? 0.02 * e.q : e.q * 0.08)));
+                lifeBar.push({ t: e.t, hp });
+            }
+        }
         $('rp-body').dataset.mode = String(replay.mode);
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
@@ -322,7 +338,7 @@
                             <div class="rp-res-mods">${esc(modsLabel(replay.mods))}</div>
                         </div>
                     </div>
-                    <div class="rp-res-actions">
+                    <div class="rp-res-actions" id="rp-res-actions">
                         <button type="button" class="rp-btn" id="rp-res-again">↺ ${L('再看一次')}</button>
                         <button type="button" class="rp-btn" id="rp-res-hide">${L('關閉結算')}</button>
                         <button type="button" class="rp-btn" onclick="openReplayViewer()">⏏ ${L('換一個重播')}</button>
@@ -490,6 +506,7 @@
                 const skin = await window.replaySkin.loadSkin(f, f.name.replace(/\.(osk|zip)$/i, ''));
                 view.skin = await M.skin(skin, prep);
                 savedSkins[replay.mode] = skin;
+                loadRankSkin(skin);
                 await window.replaySkin.saveSkin(f, skin.name, replay.mode).catch(() => {});
                 $('rp-skin-name').textContent = skin.name;
             } catch (err) {
@@ -519,6 +536,7 @@
             btn.textContent = L('恢復預設');
             await window.replaySkin.clearSkin(replay.mode);
             savedSkins[replay.mode] = null;
+            loadRankSkin(null);
             view.skin = null;
             $('rp-skin-name').textContent = L('預設');
         });
@@ -540,14 +558,34 @@
             audio.play().catch(() => {});
         });
         let lastShown = '';
+        let lastStats = { combo: 0, acc: 1, counts: Object.fromEntries(JUDGES.map((j) => [j, 0])), ur: 0, lMiss: 0, rMiss: 0 };
+        const resultsData = {
+            mode: replay.mode, record, replay, rank: rankImage, acc: accOf(record), bg, lifeBar,
+            title: `${map.metadata.Artist || bm.artist} - ${map.metadata.Title || bm.title} [${map.metadata.Version || bm.version}]`,
+            line2: `${L('譜面作者')}: ${map.metadata.Creator || bm.creator}`,
+            line3: `${L('遊玩者')}: ${replay.player}${played ? ` · ${played}` : ''}`,
+        };
+        const loadRankSkin = (sk) => { view.rankSkin = null; (sk ? sk.forRanking() : window.replaySkin.loadDefaultRanking()).then((v) => { view.rankSkin = v; }).catch(() => { window.replaySkin.loadDefaultRanking().then((v) => { view.rankSkin = v; }); }); };
+        loadRankSkin(savedSkins[replay.mode]);
         const tick = () => {
             const t = audio.currentTime * 1000;
             const atEnd = t >= resultsAt || audio.ended;
             if (!atEnd) resultsDismissed = false;
             const showRes = atEnd && !resultsDismissed && !seeking;
             if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
+            // wide views get osu!'s own ranking screen on the canvas; narrow ones the card
+            const wide = showRes && view.rankSkin && view.w >= 640;
+            resultsEl.classList.toggle('is-wide', !!wide);
+            $('rp-body').classList.toggle('rp-show-results', !!wide);
             ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
-            const s = M.draw(ctx, view, prep, t);
+            if (resultsEl.classList.contains('is-wide') && !resultsEl.hidden) {
+                const out = window.replayResults.drawResults(ctx, view, resultsData);
+                const acts = $('rp-res-actions');
+                acts.style.top = `${Math.round(out.actions.top)}px`;
+                acts.style.right = `${Math.round(out.actions.right)}px`;
+            }
+            const s = resultsEl.classList.contains('is-wide') && !resultsEl.hidden ? lastStats : M.draw(ctx, view, prep, t);
+            lastStats = s;
             const key = `${s.acc}|${s.ur}|${s.lMiss}|${s.rMiss}|${JUDGES.map((j) => s.counts[j]).join()}`;
             if (key !== lastShown) {
                 lastShown = key;

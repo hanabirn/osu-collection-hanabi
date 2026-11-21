@@ -7274,6 +7274,13 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 }
 @container (max-height: 560px) { .rp-res-rank { font-size: 4.5rem; } .rp-res-main { padding: 10px 16px; gap: 10px; } .rp-res-head { padding: 10px 16px; } }
 @media (max-width: 760px) { .rp-results { bottom: 92px; } }
+/* wide views: osu!'s ranking screen is on the canvas; only the buttons stay, under the rank letter */
+.rp-results.is-wide { background: none; backdrop-filter: none; padding: 0; display: block; }
+.rp-results.is-wide .rp-res-card { background: none; border: 0; box-shadow: none; width: auto; max-height: none; overflow: visible; }
+.rp-results.is-wide .rp-res-head, .rp-results.is-wide .rp-res-main { display: none; }
+.rp-results.is-wide .rp-res-actions { position: absolute; padding: 0; justify-content: flex-end; }
+.rp-results.is-wide .rp-res-actions .rp-btn { background: rgba(20, 60, 140, 0.85); border-color: rgba(120, 170, 255, 0.5); }
+.rp-show-results .rp-hud { display: none; }
 /* taiko: the lane runs across the upper screen, so the card sits low and the accuracy moves right */
 .rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 110px; }
 .rp-body[data-mode="1"] .rp-hud-tl { left: auto; right: 24px; }
