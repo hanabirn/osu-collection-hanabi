@@ -636,8 +636,8 @@
         audio.preservesPitch = !(replay.mods & R.MOD.NC);
         const canvas = $('rp-canvas');
         const stage = $('rp-stage');
-        const ctx = canvas.getContext('2d');
-        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6, cursorScale: Number(prefs.cursorScale) || 1, errorScale: Number(prefs.errorScale) || 1 };
+        let ctx = canvas.getContext('2d');
+        let view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6, cursorScale: Number(prefs.cursorScale) || 1, errorScale: Number(prefs.errorScale) || 1 };
         session = { audio, urls, prep, map, replay, view, raf: 0 };
         // scroll speed as in osu! (1-40, default 24); the value rides above the slider thumb
         function setScroll(v) {
@@ -1544,6 +1544,158 @@
             session.raf = requestAnimationFrame(tick);
         };
         session.raf = requestAnimationFrame(tick);
+
+        /* ----- the replay as a video file (for Discord) -----
+           Drawn frame by frame as fast as the computer can (not in real time),
+           encoded with WebCodecs (H.264 + AAC) into an mp4 by mp4-muxer
+           (js/vendor/mp4-muxer.js, MIT). The sound is mixed offline: the
+           music at the replay's speed and every hit sound at its time.
+           opts: { width, height, fps, bitrate, onProgress(0..1), signal } → Blob */
+        session.renderVideo = async function renderVideo(opts = {}) {
+            const W = opts.width || 1280, H = opts.height || 720, FPS = opts.fps || 60;
+            const rate = prep.rate || 1;
+            const t0 = Math.max(0, first - 2000);
+            const tPlayEnd = prep.lastTime + 1500 * rate;
+            const RESULTS_S = 5; // the ranking screen at the end, in real seconds
+            const playSecs = (tPlayEnd - t0) / rate / 1000;
+            const total = playSecs + RESULTS_S;
+            const nFrames = Math.ceil(total * FPS);
+            const say = (p) => { if (opts.onProgress) opts.onProgress(Math.max(0, Math.min(1, p))); };
+            if (!window.VideoEncoder || !window.AudioEncoder) throw new Error(L('這個瀏覽器不支援錄製影片，請用最新版的 Chrome 或 Edge'));
+            if (!window.Mp4Muxer) {
+                await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'js/vendor/mp4-muxer.js'; sc.onload = res; sc.onerror = () => rej(new Error('mp4-muxer')); document.head.appendChild(sc); });
+            }
+            const vCodec = 'avc1.64002A';
+            const vCfg = { codec: vCodec, width: W, height: H, bitrate: opts.bitrate || 3_500_000, framerate: FPS, latencyMode: 'quality' };
+            if (!(await VideoEncoder.isConfigSupported(vCfg)).supported) throw new Error(L('這個瀏覽器不支援錄製影片，請用最新版的 Chrome 或 Edge'));
+            const SR = 48000;
+            const aCfg = { codec: 'mp4a.40.2', sampleRate: SR, numberOfChannels: 2, bitrate: 160_000 };
+            const aacOk = (await AudioEncoder.isConfigSupported(aCfg).catch(() => ({ supported: false }))).supported;
+
+            // ---- sound: music + hit sounds, mixed offline ----
+            say(0);
+            const actx = new OfflineAudioContext(2, Math.ceil(total * SR), SR);
+            const master = actx.createGain(); master.connect(actx.destination);
+            try {
+                const music = await actx.decodeAudioData(await (await fetch(audioUrl)).arrayBuffer());
+                const src = actx.createBufferSource(); src.buffer = music; src.playbackRate.value = rate;
+                const g = actx.createGain(); g.gain.value = Math.max(0.05, prefs.music) * 0.8;
+                src.connect(g); g.connect(master);
+                src.start(0, t0 / 1000);
+                // the music fades out under the ranking screen
+                g.gain.setValueAtTime(g.gain.value, playSecs);
+                g.gain.linearRampToValueAtTime(0, total);
+            } catch { /* a silent video rather than none */ }
+            if (window.replaySounds && sounds.length) {
+                const skin = savedSkins[replay.mode];
+                const bufs = new Map();
+                for (const name of new Set(sounds.flatMap((x) => x.names))) {
+                    const data = await window.replaySounds.sampleData(skin, name);
+                    if (data) { try { bufs.set(name, await actx.decodeAudioData(data)); } catch { /* skip */ } }
+                }
+                const fx = actx.createGain(); fx.gain.value = Math.max(0.05, prefs.fx) * 0.8; fx.connect(master);
+                for (const ev of sounds) {
+                    if (ev.t < t0 || ev.t > tPlayEnd) continue;
+                    const at = (ev.t - t0) / rate;
+                    for (const n of ev.names) {
+                        const b = bufs.get(n); if (!b) continue;
+                        const sn = actx.createBufferSource(); sn.buffer = b;
+                        const gv = actx.createGain(); gv.gain.value = Math.max(0, Math.min(1, ev.vol));
+                        sn.connect(gv); gv.connect(fx); sn.start(at);
+                    }
+                }
+            }
+            const mixed = await actx.startRendering();
+            say(0.03);
+
+            // ---- the file ----
+            const M4 = window.Mp4Muxer;
+            const target = new M4.ArrayBufferTarget();
+            const muxer = new M4.Muxer({
+                target, fastStart: 'in-memory',
+                video: { codec: 'avc', width: W, height: H, frameRate: FPS },
+                audio: aacOk ? { codec: 'aac', numberOfChannels: 2, sampleRate: SR } : undefined,
+            });
+            let fail = null;
+            const venc = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { fail = e; } });
+            venc.configure(vCfg);
+            if (aacOk) {
+                const aenc = new AudioEncoder({ output: (chunk, meta) => muxer.addAudioChunk(chunk, meta), error: (e) => { fail = e; } });
+                aenc.configure(aCfg);
+                const L0 = mixed.getChannelData(0), R0 = mixed.getChannelData(1);
+                const STEP = 4096;
+                for (let i = 0; i < mixed.length; i += STEP) {
+                    const n = Math.min(STEP, mixed.length - i);
+                    const buf = new Float32Array(n * 2);
+                    buf.set(L0.subarray(i, i + n), 0); buf.set(R0.subarray(i, i + n), n);
+                    const ad = new AudioData({ format: 'f32-planar', sampleRate: SR, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round((i / SR) * 1e6), data: buf });
+                    aenc.encode(ad); ad.close();
+                }
+                await aenc.flush();
+            }
+
+            // ---- pictures ----
+            const cv = document.createElement('canvas');
+            cv.width = W; cv.height = H;
+            const c2 = cv.getContext('2d');
+            const vview = { ...view, w: W, h: H, dpr: 1 };
+            const realCtx = ctx, realView = view;
+            const mods = typeof decodeOsuMods === 'function' ? decodeOsuMods(replay.mods).filter((m) => m !== 'NM') : [];
+            const head = `${map.metadata.Title || bm.title} [${map.metadata.Version || bm.version}]`;
+            let st = lastStats;
+            try {
+                for (let i = 0; i < nFrames; i++) {
+                    if (opts.signal && opts.signal.aborted) throw new Error('aborted');
+                    if (fail) throw fail;
+                    const sec = i / FPS;
+                    // the drawing helpers use the player's own ctx / view: point them at the video's
+                    ctx = c2; view = vview;
+                    c2.setTransform(1, 0, 0, 1, 0, 0);
+                    if (sec < playSecs) {
+                        const t = t0 + sec * 1000 * rate;
+                        st = M.draw(c2, vview, prep, t);
+                        drawCombo(st, H, 'video');
+                        drawSideCounts(st, 0, 0, W, H);
+                        // top right: accuracy and pp; top left: the map, the player and mods
+                        c2.save();
+                        c2.shadowColor = 'rgba(0,0,0,0.8)'; c2.shadowBlur = 4; c2.fillStyle = '#fff';
+                        c2.textAlign = 'right'; c2.textBaseline = 'top';
+                        c2.font = `800 ${Math.round(H * 0.05)}px system-ui, sans-serif`;
+                        c2.fillText(`${(st.acc * 100).toFixed(2)}%`, W - 14, 12);
+                        const ppNow = ppAt(t);
+                        c2.font = `700 ${Math.round(H * 0.032)}px system-ui, sans-serif`; c2.fillStyle = '#ffcf5a';
+                        if (ppNow != null) c2.fillText(`${Math.round(ppNow).toLocaleString()}pp`, W - 14, 14 + H * 0.055);
+                        c2.textAlign = 'left'; c2.fillStyle = '#fff';
+                        c2.font = `800 ${Math.round(H * 0.028)}px system-ui, sans-serif`;
+                        c2.fillText(head.length > 60 ? `${head.slice(0, 58)}…` : head, 14, 12);
+                        c2.font = `700 ${Math.round(H * 0.024)}px system-ui, sans-serif`; c2.fillStyle = 'rgba(255,255,255,0.8)';
+                        c2.fillText(`${replay.player}${mods.length ? `  +${mods.join('')}` : ''}`, 14, 14 + H * 0.034);
+                        c2.restore();
+                        // the play fades out over its last second
+                        const left = playSecs - sec;
+                        if (left < 1) { c2.fillStyle = `rgba(0,0,0,${1 - left})`; c2.fillRect(0, 0, W, H); }
+                    } else {
+                        resultsData.pp = ppAt(prep.lastTime + 1);
+                        if (vview.rankSkin) window.replayResults.drawResults(c2, vview, resultsData);
+                        else { c2.fillStyle = '#000'; c2.fillRect(0, 0, W, H); }
+                        const inP = (sec - playSecs) / 0.6;
+                        if (inP < 1) { c2.fillStyle = `rgba(0,0,0,${1 - inP})`; c2.fillRect(0, 0, W, H); }
+                    }
+                    ctx = realCtx; view = realView;
+                    const frame = new VideoFrame(cv, { timestamp: Math.round(sec * 1e6), duration: Math.round(1e6 / FPS) });
+                    venc.encode(frame, { keyFrame: i % (FPS * 2) === 0 });
+                    frame.close();
+                    while (venc.encodeQueueSize > 6) await new Promise((r) => setTimeout(r, 1));
+                    if (i % 30 === 0) { say(0.03 + 0.95 * (i / nFrames)); await new Promise((r) => setTimeout(r, 0)); }
+                }
+                await venc.flush();
+            } finally { ctx = realCtx; view = realView; }
+            if (fail) throw fail;
+            muxer.finalize();
+            say(1);
+            return new Blob([target.buffer], { type: 'video/mp4' });
+        };
+        window.replayRenderVideo = (o) => session.renderVideo(o);
     }
 
     function togglePlay() {

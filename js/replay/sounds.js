@@ -136,5 +136,14 @@
         return mixer;
     }
 
-    window.replaySounds = { soundEvents, createMixer };
+    // one sample's file (the skin's, else osu-resources'), for rendering a video's sound offline
+    async function sampleData(skin, name) {
+        let data = skin && skin.sample ? await skin.sample(name).catch(() => null) : null;
+        if (!data) {
+            try { const res = await fetch(`assets/osu-resources/samples/${name}.wav`); if (res.ok) data = await res.arrayBuffer(); } catch { /* none */ }
+        }
+        return data && data.byteLength >= 64 ? data : null;
+    }
+
+    window.replaySounds = { soundEvents, createMixer, sampleData };
 })();
