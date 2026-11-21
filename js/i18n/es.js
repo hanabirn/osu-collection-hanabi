@@ -63,7 +63,7 @@ I18N.es = {
     skins_empty: 'Aún no hay skins guardados', skins_download: 'Descargar', skins_delete: 'Eliminar', skins_delete_confirm: '¿Eliminar este archivo de skin?',
     skins_upload_done: '{n} archivo(s) añadido(s)', skins_upload_fail: 'Error al subir "{n}"', skins_load_fail: 'No se pudo cargar la lista de skins — comprueba que el navegador permite almacenamiento local',
 
-    osu_title: 'Añadir Beatmap', osu_placeholder: 'Ingrese ID o URL', osu_add: 'Añadir',
+    osu_title: 'Añadir Beatmap', osu_placeholder: "ID o enlace de osu!", osu_add: 'Añadir',
     osu_password: 'Poner una contraseña de colección\nPublicar en el gallery e importar / exportar la pedirán después',
     osu_refresh_all_title: 'Volver a obtener los datos de cada mapa (dificultad, estado)',
     tools_group_io: 'Importar / exportar', tools_group_tools: 'Herramientas y ajustes',

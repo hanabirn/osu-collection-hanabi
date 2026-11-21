@@ -33,7 +33,7 @@ I18N.zh = {
     skins_backup_done: '已備份到雲端', skins_backup_fail: '雲端備份失敗，請稍後再試', skins_backup_empty: '雲端還沒有備份任何皮膚',
     skins_backup_restore: '還原到本機', skins_backup_restored: '已還原到本機', skins_by_author: '作者：{author}',
 
-    osu_title: '新增 Beatmap', osu_placeholder: '輸入 ID 或貼上 osu! 網址', osu_add: '新增',
+    osu_title: '新增 Beatmap', osu_placeholder: "ID 或 osu! 網址", osu_add: '新增',
     osu_password: '設定收藏密碼\n之後發佈到 gallery、匯入 / 匯出等操作會要求輸入這組密碼',
     osu_refresh_all_title: '重新抓取所有圖的最新資料（星數、狀態）',
     tools_group_io: '收藏進出', tools_group_tools: '工具・設定',

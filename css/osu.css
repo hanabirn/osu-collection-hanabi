@@ -7653,3 +7653,12 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rj-link { margin: 0; overflow-wrap: anywhere; font-size: 0.85rem; }
 .rj-link a { color: var(--pink); }
 .rj-acts { display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* ===== 聊天室: the room fills the screen; on a phone the conversation comes first,
+   and each message's buttons are big enough for a finger ===== */
+.community-main .chat-messages-list { height: calc(100vh - 330px); }
+@media (max-width: 760px) {
+    .community-main { order: -1; }
+    .community-main .chat-messages-list { height: calc(100vh - 290px); min-height: 320px; }
+    .chat-translate-btn, .chat-reply-btn, .chat-edit-btn, .chat-delete-btn { min-width: 34px; min-height: 34px; display: inline-flex; align-items: center; justify-content: center; }
+}

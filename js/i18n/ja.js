@@ -63,7 +63,7 @@ I18N.ja = {
     skins_empty: 'まだ保存されたスキンはありません', skins_download: 'ダウンロード', skins_delete: '削除', skins_delete_confirm: 'このスキンファイルを削除しますか？',
     skins_upload_done: '{n} 件のファイルを追加しました', skins_upload_fail: '「{n}」のアップロードに失敗しました', skins_load_fail: 'スキン一覧の読み込みに失敗しました。ブラウザのローカルストレージが許可されているか確認してください',
 
-    osu_title: 'ビートマップ追加', osu_placeholder: 'IDまたはURLを入力', osu_add: '追加',
+    osu_title: 'ビートマップ追加', osu_placeholder: "ID か osu! の URL", osu_add: '追加',
     osu_password: 'コレクションのパスワードを設定\n以降、gallery への公開やインポート／エクスポートで入力を求められます',
     osu_refresh_all_title: '全マップの最新データを再取得（星・状態）',
     tools_group_io: 'コレクションの入出力', tools_group_tools: 'ツール・設定',

@@ -159,7 +159,9 @@ function chatEncodeForOnclick(str) {
 
 function chatFormatTime(iso) {
     try {
-        return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        // in the site's language (not the browser's), on a 24-hour clock
+        const lang = typeof siteLang !== 'undefined' ? ({ zh: 'zh-TW', 'zh-Hans': 'zh-CN' }[siteLang] || siteLang) : undefined;
+        return new Date(iso).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
     } catch { return ''; }
 }
 

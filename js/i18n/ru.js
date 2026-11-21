@@ -63,7 +63,7 @@ I18N.ru = {
     skins_empty: 'Пока нет сохранённых скинов', skins_download: 'Скачать', skins_delete: 'Удалить', skins_delete_confirm: 'Удалить этот файл скина?',
     skins_upload_done: 'Добавлено файлов: {n}', skins_upload_fail: 'Не удалось загрузить «{n}»', skins_load_fail: 'Не удалось загрузить список скинов — проверьте, разрешено ли браузеру локальное хранилище',
 
-    osu_title: 'Добавить битмап', osu_placeholder: 'Введите ID или URL', osu_add: 'Добавить',
+    osu_title: 'Добавить битмап', osu_placeholder: "ID или ссылка osu!", osu_add: 'Добавить',
     osu_password: 'Задать пароль коллекции\nПубликация в gallery и импорт / экспорт затем будут его запрашивать',
     osu_refresh_all_title: 'Обновить данные всех карт (звёзды, статус)',
     tools_group_io: 'Импорт / экспорт', tools_group_tools: 'Инструменты и настройки',

@@ -253,6 +253,25 @@ function openPublicChat() {
     document.getElementById('chat-input')?.focus();
 }
 
+/* 收藏 on a phone: 篩選 folds the seven filter menus behind one button
+   (css/base.css .collection-panel-row--filters), with a count of the ones
+   that are set, so the first screen shows maps rather than menus. */
+function toggleCollectionFilters(btn) {
+    const row = btn.closest('.collection-panel-row--filters');
+    const open = !row.classList.contains('is-open');
+    row.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', String(open));
+}
+function updateCollectionFilterCount() {
+    const el = document.getElementById('col-filter-count');
+    if (!el) return;
+    const ids = ['osu-lang-filter', 'osu-genre-filter', 'osu-source-filter', 'osu-artist-filter', 'osu-rating-filter'];
+    const n = ids.filter((id) => { const s = document.getElementById(id); return s && s.style.display !== 'none' && s.value && s.value !== 'all'; }).length;
+    el.textContent = String(n);
+    el.hidden = !n;
+}
+document.addEventListener('change', (e) => { if (e.target.closest && e.target.closest('#collection-filters')) updateCollectionFilterCount(); });
+
 /* 工具 in the 收藏 band: open the collection panel's tools menu. */
 function openCollectionToolsMenu() {
     const d = document.querySelector('details.collection-tools');
@@ -295,6 +314,7 @@ function switchTab(tab, el) {
     if (tab === 'updates') ensureUpdatesLoaded();
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'replay' && typeof ensureReplayHub === 'function') ensureReplayHub();
+    if (tab === 'collection') updateCollectionFilterCount();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();

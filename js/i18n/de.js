@@ -63,7 +63,7 @@ I18N.de = {
     skins_empty: 'Noch keine Skins gespeichert', skins_download: 'Herunterladen', skins_delete: 'Löschen', skins_delete_confirm: 'Diese Skin-Datei löschen?',
     skins_upload_done: '{n} Datei(en) hinzugefügt', skins_upload_fail: 'Hochladen von „{n}" fehlgeschlagen', skins_load_fail: 'Skin-Liste konnte nicht geladen werden — prüfe, ob der Browser lokalen Speicher erlaubt',
 
-    osu_title: 'Beatmap hinzufügen', osu_placeholder: 'ID oder URL eingeben', osu_add: 'Hinzufügen',
+    osu_title: 'Beatmap hinzufügen', osu_placeholder: "ID oder osu!-Link", osu_add: 'Hinzufügen',
     osu_password: 'Ein Sammlungs-Passwort festlegen\nVeröffentlichen im Gallery sowie Import / Export fragen es danach ab',
     osu_refresh_all_title: 'Aktuelle Daten aller Maps neu laden (Sterne, Status)',
     tools_group_io: 'Import / Export', tools_group_tools: 'Werkzeuge & Einstellungen',

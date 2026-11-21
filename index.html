@@ -408,7 +408,7 @@
                         <input type="text" id="osu-search-input" autocomplete="off" data-i18n-placeholder="osu_search_placeholder" placeholder="搜尋曲名或作者..." oninput="filterOsuCollection(this.value)">
                     </div>
                     <div class="input-group collection-add">
-                        <input type="text" id="osuInput" autocomplete="off" data-i18n-placeholder="osu_placeholder" placeholder="輸入 ID 或貼上 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
+                        <input type="text" id="osuInput" autocomplete="off" data-i18n-placeholder="osu_placeholder" placeholder="ID 或 osu! 網址" onkeydown="if(event.key==='Enter')addOsuBeatmap()">
                         <button onclick="addOsuBeatmap()" data-i18n="osu_add">新增</button>
                     </div>
                     <details class="collection-tools">
@@ -472,9 +472,10 @@
                         <span class="collection-panel-label" data-i18n="col_panel_cats">分類</span>
                         <div class="osu-category-tabs-row" id="osu-category-tabs-row"></div>
                     </div>
-                    <div class="collection-panel-row" data-needs-sets>
+                    <div class="collection-panel-row collection-panel-row--filters" data-needs-sets>
                         <span class="collection-panel-label" data-i18n="col_panel_filters">篩選</span>
-                        <div class="osu-search-row collection-filters">
+                        <button type="button" class="col-filter-toggle" aria-expanded="false" aria-controls="collection-filters" onclick="toggleCollectionFilters(this)"><span data-i18n="col_panel_filters">篩選</span><b class="col-filter-count" id="col-filter-count" hidden></b><span aria-hidden="true">▾</span></button>
+                        <div class="osu-search-row collection-filters" id="collection-filters">
                             <select id="osu-lang-filter" onchange="switchOsuLangFilter(this.value)">
                                 <option value="all" data-i18n="osu_lang_filter_all">全部語言</option>
                             </select>

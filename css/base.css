@@ -2075,3 +2075,17 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 .band-cover-img::before, .band-cover-img::after { content: ""; position: absolute; background-image: inherit; background-repeat: no-repeat; }
 .band-cover-img::before { inset: -30px; background-size: cover; background-position: center; filter: blur(22px) brightness(0.6); }
 .band-cover-img::after { inset: 0; background-size: contain; background-position: center; }
+
+/* ===== 收藏 on a phone: the filters fold behind one button (js/main.js toggleCollectionFilters) ===== */
+.col-filter-toggle { display: none; }
+@media (max-width: 600px) {
+    .collection-panel-row--filters > .collection-panel-label { display: none; }
+    .col-filter-toggle {
+        display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px;
+        border-radius: 10px; border: 1px solid var(--border-strong); background: var(--bg-input);
+        color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+    }
+    .col-filter-count { min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--pink); color: #fff; font-size: 0.75rem; text-align: center; }
+    .collection-panel-row--filters:not(.is-open) .collection-filters { display: none; }
+    .collection-panel-row--filters.is-open .collection-filters { margin-top: 8px; }
+}

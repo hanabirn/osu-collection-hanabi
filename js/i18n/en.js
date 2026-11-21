@@ -212,7 +212,7 @@ I18N.en = {
     skins_empty: 'No skins saved yet', skins_download: 'Download', skins_delete: 'Delete', skins_delete_confirm: 'Delete this skin file?',
     skins_upload_done: 'Added {n} file(s)', skins_upload_fail: 'Failed to upload "{n}"', skins_load_fail: 'Failed to load the skins list — check that your browser allows local storage',
 
-    osu_title: 'Add Beatmap', osu_placeholder: 'Enter ID or paste osu! URL', osu_add: 'Add',
+    osu_title: 'Add Beatmap', osu_placeholder: "ID or osu! link", osu_add: 'Add',
     osu_password: 'Set a collection password\nPublishing to the gallery and importing / exporting will then ask for it',
     osu_refresh_all_title: 'Re-fetch the latest data for every map (star rating, status)',
     tools_group_io: 'Import / export', tools_group_tools: 'Tools & settings',

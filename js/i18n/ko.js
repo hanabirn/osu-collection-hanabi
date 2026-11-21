@@ -63,7 +63,7 @@ I18N.ko = {
     skins_empty: '아직 저장된 스킨이 없습니다', skins_download: '다운로드', skins_delete: '삭제', skins_delete_confirm: '이 스킨 파일을 삭제하시겠습니까?',
     skins_upload_done: '{n}개 파일을 추가했습니다', skins_upload_fail: '"{n}" 업로드에 실패했습니다', skins_load_fail: '스킨 목록을 불러오지 못했습니다. 브라우저의 로컬 저장소 허용 여부를 확인해 주세요',
 
-    osu_title: '비트맵 추가', osu_placeholder: 'ID 또는 URL 입력', osu_add: '추가',
+    osu_title: '비트맵 추가', osu_placeholder: "ID 또는 osu! 링크", osu_add: '추가',
     osu_password: '컬렉션 비밀번호 설정\n이후 gallery 공개, 가져오기 / 내보내기에서 입력을 요구합니다',
     osu_refresh_all_title: '모든 맵의 최신 데이터 다시 가져오기 (별점, 상태)',
     tools_group_io: '컬렉션 입출력', tools_group_tools: '도구・설정',
