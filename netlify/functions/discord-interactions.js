@@ -145,13 +145,15 @@ function scoreCardSiteUrl(origin, scoreId, apiMode) {
     return `${origin}/?scorecard=${scoreId}${apiMode ? `&m=${apiMode}` : ''}`;
 }
 
+const hasReplay = (x) => !!x && x.replay !== false && x.has_replay !== false;
+
 function scoreActionRow(score, apiMode, origin) {
     const setId = (score.beatmapset && score.beatmapset.id) || (score.beatmap && score.beatmap.beatmapset_id);
     const btns = [];
     if (score.id) btns.push({ type: 2, style: 1, label: t('btn_card'), custom_id: `card|${apiMode}|${score.id}` });
     if (setId) btns.push({ type: 2, style: 2, label: t('btn_fav'), custom_id: `fav|${setId}` });
     // 🎬 Render: only when osu! keeps this score's replay
-    if (score.id && (score.replay || score.has_replay)) btns.push({ type: 2, style: 2, label: t('btn_render'), custom_id: `rend|${apiMode}|${score.id}` });
+    if (score.id && hasReplay(score)) btns.push({ type: 2, style: 2, label: t('btn_render'), custom_id: `rend|${apiMode}|${score.id}` });
     if (score.id && origin) btns.push({ type: 2, style: 5, label: t('btn_site'), url: scoreCardSiteUrl(origin, score.id, apiMode) });
     return btns.length ? [{ type: 1, components: btns }] : [];
 }
@@ -330,6 +332,18 @@ function topPage(u, apiMode, scores, page) {
                 value: `${apiMode}|${x.id}`,
             })),
         }] });
+        const withReplay = pageScores.map((x, i) => ({ x, n: start + i + 1 })).filter((o) => o.x.id && hasReplay(o.x));
+        if (withReplay.length) {
+            components.push({ type: 1, components: [{
+                type: 3,
+                custom_id: 'rendsel',
+                placeholder: t('render_pick'),
+                options: withReplay.map(({ x, n }) => ({
+                    label: `#${n} ${(x.beatmapset && x.beatmapset.title) || ''} [${(x.beatmap && x.beatmap.version) || ''}]`.slice(0, 100),
+                    value: `${apiMode}|${x.id}`,
+                })),
+            }] });
+        }
     }
     components.push({
         type: 1,
@@ -605,6 +619,18 @@ async function cmdLeaderboard(options) {
             value: `|${sc.id}`,
         })),
     }] }];
+    const lbReplays = scores.filter((sc) => sc.id && hasReplay(sc)).slice(0, 25);
+    if (lbReplays.length) {
+        components.push({ type: 1, components: [{
+            type: 3,
+            custom_id: 'rendsel',
+            placeholder: t('render_pick'),
+            options: lbReplays.map((sc) => ({
+                label: `#${scores.indexOf(sc) + 1} ${(sc.user && sc.user.username) || sc.user_id}${sc.pp != null ? ` — ${Math.round(sc.pp)}pp` : ''}`.slice(0, 100),
+                value: `|${sc.id}`,
+            })),
+        }] });
+    }
     if (bs.id) components.push({ type: 1, components: [{ type: 2, style: 2, label: t('btn_fav'), custom_id: `fav|${bs.id}` }] });
     return L.message({
         ...head,
@@ -1182,8 +1208,9 @@ async function handleComponent(interaction, origin) {
         return startScoreCard(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
     }
     // 🎬 Render: rend|<ruleset or ''>|<scoreId>
-    if (id.startsWith('rend|')) {
-        const [, mode, scoreId] = id.split('|');
+    if (id.startsWith('rend|') || id === 'rendsel') {
+        const raw = id === 'rendsel' ? `rend|${String(((interaction.data && interaction.data.values) || [])[0] || '')}` : id;
+        const [, mode, scoreId] = raw.split('|');
         if (!/^\d{1,20}$/.test(scoreId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
         return startRender(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
     }
