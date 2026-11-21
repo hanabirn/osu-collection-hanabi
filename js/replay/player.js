@@ -509,7 +509,7 @@
         // the timeline runs to the moment the results have faded in (the way out
         // takes about 3 s after the last object), even past the end of the music
         const endMs = () => Math.max(prep.lastTime + 3400 * (prep.rate || 1), (audio.duration || 0) * 1000);
-        const setPlayIcon = (on) => { playBtn.textContent = on ? '❚❚' : '▶'; playBtn.setAttribute('aria-label', L(on ? '暫停' : '播放')); };
+        const setPlayIcon = (on) => { playBtn.textContent = on ? '❚❚' : '▶'; playBtn.setAttribute('aria-label', L(on ? '暫停' : '播放')); $('rp-body').classList.toggle('rp-playing', !!on); };
         /* The player's clock: the music's own time, and once the music has ended,
            a silent stretch that keeps counting (at the same speed) to the end of
            the timeline. Play / pause / seek work the same in both. */

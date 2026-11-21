@@ -7284,6 +7284,12 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-body .rp-hud { opacity: var(--rp-outro, 1); }
 .rp-results:not(.is-wide) .rp-res-card { animation: rp-res-in 0.45s ease-out; }
 @keyframes rp-res-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* standard: notes can appear anywhere, so while playing the card tucks into
+   its cover strip; pausing (or pointing at it) opens it again */
+.rp-body[data-mode="0"] .rp-infocard > :not(.rp-ic-cover) { transition: opacity 0.2s; }
+.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) > :not(.rp-ic-cover) { display: none; }
+.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) { opacity: 0.85; }
+.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) .rp-ic-cover { height: 46px; }
 /* taiko: the lane runs across the upper screen, so the card sits low and the accuracy moves right */
 .rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 110px; }
 .rp-body[data-mode="1"] .rp-hud-tl { left: auto; right: 24px; }
