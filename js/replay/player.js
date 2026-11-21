@@ -480,11 +480,61 @@
         const timeEl = $('rp-time'), durEl = $('rp-dur'), accEl = $('rp-acc'), urEl = $('rp-ur');
         const lEl = $('rp-lmiss'), rEl = $('rp-rmiss');
         const countEls = Object.fromEntries(JUDGES.map((j) => [j, $(`rp-c-${j}`)]));
-        const endMs = () => Math.max(prep.lastTime + 1500, (audio.duration || 0) * 1000);
+        // the timeline runs to the moment the results have faded in (the way out
+        // takes about 3 s after the last object), even past the end of the music
+        const endMs = () => Math.max(prep.lastTime + 3400 * (prep.rate || 1), (audio.duration || 0) * 1000);
+        const setPlayIcon = (on) => { playBtn.textContent = on ? '❚❚' : '▶'; playBtn.setAttribute('aria-label', L(on ? '暫停' : '播放')); };
+        /* The player's clock: the music's own time, and once the music has ended,
+           a silent stretch that keeps counting (at the same speed) to the end of
+           the timeline. Play / pause / seek work the same in both. */
+        const clock = {
+            tail: null, // { base, start, running } past the music's end
+            musicEnd: () => (audio.duration || 0) * 1000,
+            now() {
+                if (!this.tail) return audio.currentTime * 1000;
+                const tl = this.tail;
+                let t = tl.base + (tl.running ? (performance.now() - tl.start) * (audio.playbackRate || 1) : 0);
+                if (t >= endMs()) { t = endMs(); if (tl.running) { tl.base = t; tl.running = false; setPlayIcon(false); } }
+                return t;
+            },
+            running() { return this.tail ? this.tail.running : !audio.paused; },
+            seekTo(ms) {
+                ms = Math.max(0, Math.min(endMs(), ms));
+                const d = this.musicEnd();
+                const wasRunning = this.running();
+                if (d && ms >= d - 5) {
+                    this.tail = { base: ms, start: performance.now(), running: wasRunning };
+                    if (!audio.paused) audio.pause();
+                    audio.currentTime = d / 1000;
+                    setPlayIcon(wasRunning);
+                } else {
+                    const fromTail = !!this.tail;
+                    this.tail = null;
+                    audio.currentTime = ms / 1000;
+                    if (fromTail && wasRunning) audio.play().catch(() => {});
+                    else if (fromTail) setPlayIcon(false);
+                }
+            },
+            toggle() {
+                const tl = this.tail;
+                if (tl) {
+                    if (tl.running) { tl.base = this.now(); tl.running = false; setPlayIcon(false); }
+                    else if (this.now() >= endMs() - 1) { this.tail = null; audio.currentTime = Math.max(0, first - 1500) / 1000; audio.play().catch(() => {}); }
+                    else { tl.start = performance.now(); tl.running = true; setPlayIcon(true); }
+                    return;
+                }
+                if (audio.paused) audio.play().catch((e) => console.warn('play blocked', e));
+                else audio.pause();
+            },
+        };
+        session.clock = clock;
+        audio.addEventListener('ended', () => {
+            if (!clock.tail) { clock.tail = { base: clock.musicEnd(), start: performance.now(), running: true }; setPlayIcon(true); }
+        });
         // times on screen are real time: song time ÷ the mod's speed (DT 1.5, HT 0.75)
         const fmtReal = (ms) => fmt(ms / (prep.rate || 1));
         let seeking = false;
-        seek.addEventListener('input', () => { seeking = true; audio.currentTime = (seek.value / 1000) * endMs() / 1000; showTip(seek.value / 1000); });
+        seek.addEventListener('input', () => { seeking = true; clock.seekTo((seek.value / 1000) * endMs()); showTip(seek.value / 1000); });
         // hover: the time under the pointer, in a bubble above it
         const tip = $('rp-seek-tip');
         function showTip(frac) {
@@ -544,8 +594,8 @@
             view.skin = null;
             $('rp-skin-name').textContent = L('預設');
         });
-        audio.addEventListener('play', () => { playBtn.textContent = '❚❚'; playBtn.setAttribute('aria-label', L('暫停')); });
-        audio.addEventListener('pause', () => { playBtn.textContent = '▶'; playBtn.setAttribute('aria-label', L('播放')); });
+        audio.addEventListener('play', () => setPlayIcon(true));
+        audio.addEventListener('pause', () => { if (!clock.tail) setPlayIcon(false); });
         audio.addEventListener('loadedmetadata', () => { durEl.textContent = fmtReal(endMs()); $('rp-seek-end').textContent = fmtReal(endMs()); });
         const first = prep.notes.length ? prep.notes[0].time : 0;
         audio.addEventListener('loadedmetadata', () => { audio.currentTime = Math.max(0, first - 1500) / 1000; }, { once: true });
@@ -559,7 +609,6 @@
              2.4–3.0 s: the ranking screen fades in. */
         const OUTRO = { fade: 500, black: 1900, rank: 2400, rankIn: 600 };
         const outroAt = prep.lastTime + 400 * (prep.rate || 1);
-        let outroStart = null;
         let resultsDismissed = false;
         const bgOnly = (alpha) => {
             if (alpha <= 0) return;
@@ -586,6 +635,7 @@
         $('rp-res-again').addEventListener('click', () => {
             resultsDismissed = false;
             resultsEl.hidden = true;
+            clock.tail = null;
             audio.currentTime = Math.max(0, first - 1500) / 1000;
             audio.play().catch(() => {});
         });
@@ -600,11 +650,11 @@
         const loadRankSkin = (sk) => { view.rankSkin = null; (sk ? sk.forRanking() : window.replaySkin.loadDefaultRanking()).then((v) => { view.rankSkin = v; }).catch(() => { window.replaySkin.loadDefaultRanking().then((v) => { view.rankSkin = v; }); }); };
         loadRankSkin(savedSkins[replay.mode]);
         const tick = () => {
-            const t = audio.currentTime * 1000;
-            const atEnd = (t >= outroAt || audio.ended) && !seeking;
-            if (!atEnd) { resultsDismissed = false; outroStart = null; }
-            else if (outroStart == null) outroStart = performance.now();
-            const el = outroStart == null || resultsDismissed ? -1 : performance.now() - outroStart;
+            const t = clock.now();
+            // the way out follows the clock, so it pauses, seeks and ends with the timeline
+            const atEnd = t >= outroAt && !seeking;
+            if (!atEnd) resultsDismissed = false;
+            const el = !atEnd || resultsDismissed ? -1 : (t - outroAt) / (audio.playbackRate || 1);
             const showRes = el >= OUTRO.rank;
             if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
             // wide views get osu!'s own ranking screen on the canvas; narrow ones the card
@@ -651,12 +701,14 @@
 
     function togglePlay() {
         if (!session || !session.audio) return;
+        if (session.clock) { session.clock.toggle(); return; }
         const a = session.audio;
         if (a.paused) a.play().catch((e) => console.warn('play blocked', e));
         else a.pause();
     }
     function seekBy(ms) {
         if (!session || !session.audio) return;
+        if (session.clock) { session.clock.seekTo(session.clock.now() + ms); return; }
         session.audio.currentTime = Math.max(0, session.audio.currentTime + ms / 1000);
     }
     window.toggleReplayPlay = togglePlay;
