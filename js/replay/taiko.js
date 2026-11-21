@@ -12,7 +12,7 @@
    - a big note's second key within 30 ms is its bonus, not another hit.
    drawTaiko(ctx, view, prep, t) draws one frame. */
 (function () {
-    const MOD = { EZ: 2, HD: 8, HR: 16, DT: 64, HT: 256, NC: 512 };
+    const MOD = { EZ: 2, HD: 8, HR: 16, DT: 64, HT: 256, NC: 512, FL: 1024 };
     const JUDGE = ['300', '100', 'MISS'];
     const JUDGE_COLOR = { 300: '#8bd5ff', 100: '#7ee787', MISS: '#ff6b6b' };
     const DON = 1 | 4, KAT = 2 | 8;
@@ -203,7 +203,7 @@
         const kiai = map.timing.map((tp) => ({ time: tp.time, kiai: !!tp.kiai }));
         const beatAt = (t) => tt.redAt(t);
         // the player's generic code reads .notes for the first object time
-        return { mode: 1, objects, hits, rolls, swells, events, notes: objects, counts, bestCombo: best, presses, windows: win, diff, rate, lastTime, kiai, beatAt, barlines, hidden: !!(mods & MOD.HD), flash: false };
+        return { mode: 1, objects, hits, rolls, swells, events, notes: objects, counts, bestCombo: best, presses, windows: win, diff, rate, lastTime, kiai, beatAt, barlines, hidden: !!(mods & MOD.HD), flashlight: !!(mods & MOD.FL) };
     }
 
 
@@ -409,6 +409,20 @@
             if (j === 0 || ev[j - 1].jt < e.jt - 380) break;
         }
         ctx.globalAlpha = 1;
+
+        // FL: the lane goes dark past a lit stretch from the drum to just beyond the
+        // hit target (as replayviewer / osu! show it), narrower from 100 and 200 combo
+        if (prep.flashlight) {
+            const cNow = ei >= 0 ? ev[ei].comboAfter || 0 : 0;
+            const sc = cNow >= 200 ? 0.8 : cNow >= 100 ? 0.9 : 1;
+            const edge = hitX + bandH * 1.35 * sc;
+            const soft = bandH * 0.45;
+            const g = ctx.createLinearGradient(edge - soft, 0, edge + soft * 0.3, 0);
+            g.addColorStop(0, 'rgba(0,0,0,0)');
+            g.addColorStop(1, 'rgba(0,0,0,1)');
+            ctx.fillStyle = g;
+            ctx.fillRect(edge - soft, bandTop, w - (edge - soft), bandH);
+        }
 
         // the drum, its halves lighting up for each key
         if (barLeft) ctx.drawImage(barLeft.bmp, 0, bandTop, drumW, bandH);
