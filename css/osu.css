@@ -7437,6 +7437,41 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-cmp.is-strip .rp-cmp-row dd { font-size: 1.2rem; }
 .rp-cmp.is-strip .rp-cmp-row dt { font-size: 0.8rem; }
 .rp-cmp.is-strip .rp-cmp-rows { padding: 12px 18px; }
+/* ===== compare: the tournament-broadcast frame ===== */
+.rp-cmp.is-broadcast .rp-cmp-top, .rp-cmp.is-broadcast .rp-cmp-lead, .rp-cmp.is-broadcast .rp-cmp-rows { display: none; }
+.rp-cmp.is-broadcast .rp-cmp-close { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); margin-top: calc(var(--bc-top, 90px) - 44px); pointer-events: auto; z-index: 3; }
+.rp-bc-team { position: absolute; top: max(12px, calc(var(--bc-top, 96px) - 84px)); display: flex; align-items: center; gap: 10px; max-width: 34%; pointer-events: auto; opacity: var(--rp-outro, 1); }
+.rp-bc-team.is-a { left: 16px; }
+.rp-bc-team.is-b { right: 60px; text-align: right; }
+.rp-bc-team .rp-flag { width: 52px; height: 36px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); flex: none; }
+.rp-bc-team > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rp-bc-team b { display: inline-block; max-width: 100%; padding: 2px 10px; background: #fff; color: #111; font-size: 1.05rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-bc-team.is-a b { box-shadow: inset 4px 0 0 #f472b6; }
+.rp-bc-team.is-b b { box-shadow: inset -4px 0 0 #5fb4ff; align-self: flex-end; }
+.rp-bc-team small { font-size: 0.78rem; font-weight: 700; color: rgba(255, 255, 255, 0.9); }
+.rp-bc-team.is-b small { align-self: flex-end; }
+.rp-bc-mods { color: rgba(255, 255, 255, 0.6) !important; }
+.rp-bc-title { position: absolute; top: max(12px, calc(var(--bc-top, 96px) - 84px)); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; max-width: 30%; text-align: center; opacity: var(--rp-outro, 1); }
+.rp-bc-title b { font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.rp-bc-title small { margin-top: 4px; padding: 1px 8px; background: #fff; color: #111; font-size: 0.72rem; font-weight: 800; }
+.rp-bc-bar { position: absolute; left: 0; right: 0; top: calc(var(--bc-bottom, 600px) + 6px); height: 5px; background: linear-gradient(90deg, #c2185b 0 50%, #1e6fd9 50% 100%); opacity: var(--rp-outro, 1); }
+.rp-bc-push { position: absolute; top: -4px; height: 13px; transition: width 0.25s ease, left 0.25s ease; }
+.rp-bc-push.is-a { background: #f472b6; }
+.rp-bc-push.is-b { background: #5fb4ff; }
+.rp-bc-diff { position: absolute; top: 12px; left: 50%; font-size: 0.8rem; font-weight: 700; color: rgba(255, 255, 255, 0.8); }
+.rp-bc-diff.is-a { transform: translateX(calc(-100% - 8px)); }
+.rp-bc-diff.is-b { transform: translateX(8px); }
+.rp-bc-scores { position: absolute; left: 0; right: 0; top: calc(var(--bc-bottom, 600px) + 22px); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-variant-numeric: tabular-nums; opacity: var(--rp-outro, 1); }
+.rp-bc-scores b { font-size: clamp(1.4rem, 3.2cqw, 2.4rem); font-weight: 800; color: rgba(255, 255, 255, 0.6); }
+.rp-bc-scores b.is-a { text-align: right; }
+.rp-bc-scores b.is-lead { color: #fff; }
+.rp-bc-map { position: absolute; left: 12px; top: calc(var(--bc-bottom, 600px) + 74px); width: calc(50% - 24px); height: 62px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 6px 12px; border: 2px solid #1e6fd9; background: linear-gradient(90deg, rgba(8, 8, 14, 0.9) 35%, rgba(8, 8, 14, 0.35)), var(--cover) center / cover; overflow: hidden; opacity: var(--rp-outro, 1); }
+.rp-bc-map > b { font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-bc-map small { font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-bc-stats { position: absolute; right: 16px; top: calc(var(--bc-bottom, 600px) + 74px); width: calc(50% - 32px); height: 62px; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 14px; align-content: center; font-size: 0.78rem; opacity: var(--rp-outro, 1); }
+.rp-bc-stats div { display: flex; gap: 6px; white-space: nowrap; }
+.rp-bc-stats dt { color: rgba(255, 255, 255, 0.65); }
+.rp-bc-stats dd { margin: 0; font-weight: 800; }
 /* the pause menu, over the play field */
 .rp-body .rp-bottom { z-index: 6; } /* above the pause menu */
 .rp-pause { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(0, 0, 0, 0.55); }

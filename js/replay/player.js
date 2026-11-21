@@ -375,6 +375,30 @@
         };
     }
 
+    /* the running score as the replay goes, shaped like osu!'s (each hit's value,
+       catch's combo bonus) and scaled so it ends exactly on the score the replay recorded */
+    function scoreTimeline(mode, prep, finalScore) {
+        const times = [], vals = [];
+        let sum = 0;
+        if (mode === 3) {
+            const v = { MAX: 320, 300: 300, 200: 200, 100: 100, 50: 50, MISS: 0 };
+            for (const e of prep.events || []) { sum += v[e.judge] || 0; times.push(e.judgedAt); vals.push(sum); }
+        } else if (mode === 2) {
+            for (const o of prep.flat || []) {
+                if (!o.caught || o.kind === 'banana') continue;
+                const base = o.kind === 'fruit' ? 300 : o.kind === 'droplet' ? 100 : 10;
+                sum += base * (1 + Math.max(0, (o.comboAfter || 1) - 1) / 25);
+                times.push(o.time); vals.push(sum);
+            }
+        }
+        const k = sum > 0 ? (Number(finalScore) || 0) / sum : 0;
+        return (t) => {
+            let lo = 0, hi = times.length - 1, ans = -1;
+            while (lo <= hi) { const mid = (lo + hi) >> 1; if (times[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+            return ans < 0 ? 0 : Math.round(vals[ans] * k);
+        };
+    }
+
     /* early / late hits so far and their mean offset (mania): one pass, looked up by time */
     function timingTimeline(prep) {
         const ev = (prep.events || []).filter((e) => e.hitAt != null && e.judge !== 'MISS');
@@ -960,7 +984,7 @@
                 if (rB.scoreId && rB.scoreId === replay.scoreId) throw new Error(L('這是同一份成績'));
                 const prepB = M.prepare(map, rB);
                 if (replay.mode === 2 && prep.defaultSkin) prepB.defaultSkin = prep.defaultSkin;
-                session.cmp = { replay: rB, prep: prepB, ppAt: ppLookup(rB, prepB, bm.beatmap_id), timing: timed ? timingTimeline(prepB) : timingA, ppA: ppAt };
+                session.cmp = { replay: rB, prep: prepB, ppAt: ppLookup(rB, prepB, bm.beatmap_id), timing: timed ? timingTimeline(prepB) : timingA, ppA: ppAt, scoreA: scoreTimeline(replay.mode, prep, replay.score), scoreB: scoreTimeline(rB.mode, prepB, rB.score) };
                 if (pick) pick.remove();
                 renderCompareHud();
                 body2.classList.add('rp-comparing');
@@ -972,10 +996,28 @@
             const old = $('rp-cmp'); if (old) old.remove();
             const flag = (r2, side) => `<span class="rp-cmp-who"><img class="rp-flag" id="rp-cmp-flag-${side}" alt="" hidden>${esc(r2.player)}</span>`;
             const wrap = document.createElement('div');
-            wrap.className = replay.mode === 2 ? 'rp-cmp is-strip' : 'rp-cmp';
+            wrap.className = 'rp-cmp is-broadcast';
             wrap.id = 'rp-cmp';
+            const stats = M.stats(map, prep);
+            const lenMs = ((Number(bm.total_length) || 0) * 1000) / (prep.rate || 1);
             wrap.innerHTML = `
-                <div class="rp-cmp-top">
+                <div class="rp-bc-team is-a"><img class="rp-flag" id="rp-cmp-flag-a" alt="" hidden><div><b>${esc(replay.player)}</b><small id="rp-cmp-prof-a"></small><small class="rp-bc-mods">${esc(modsLabel(replay.mods))}</small></div></div>
+                <div class="rp-bc-title"><b>${esc(map.metadata.Title || bm.title)}</b><small>${L('雙人比較')}</small></div>
+                <div class="rp-bc-team is-b"><div><b>${esc(c.replay.player)}</b><small id="rp-cmp-prof-b"></small><small class="rp-bc-mods">${esc(modsLabel(c.replay.mods))}</small></div><img class="rp-flag" id="rp-cmp-flag-b" alt="" hidden></div>
+                <button type="button" class="rp-cmp-close" id="rp-cmp-close" title="${L('結束比較')}" aria-label="${L('結束比較')}">✕</button>
+                <div class="rp-bc-bar"><i class="rp-bc-push" id="rp-bc-push"></i><span class="rp-bc-diff" id="rp-bc-diff"></span></div>
+                <div class="rp-bc-scores"><b class="is-a" id="rp-bc-sa">0</b><b class="is-b" id="rp-bc-sb">0</b></div>
+                <div class="rp-bc-map" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/cover@2x.jpg')">
+                    <b>${esc(map.metadata.Artist || bm.artist)} - ${esc(map.metadata.Title || bm.title)}</b>
+                    <small>mapper <b>${esc(map.metadata.Creator || bm.creator)}</b> &nbsp; difficulty <b>${esc(map.metadata.Version || bm.version)}</b></small>
+                </div>
+                <dl class="rp-bc-stats">
+                    ${stats.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+                    <div><dt>Star Rating</dt><dd>${sr.toFixed(2)}</dd></div>
+                    <div><dt>Length</dt><dd>${fmt(lenMs)}</dd></div>
+                    <div><dt>BPM</dt><dd>${Math.round((Number(bm.bpm) || 0) * (prep.rate || 1))}</dd></div>
+                </dl>
+                <div class="rp-cmp-top" hidden>
                     <div class="rp-cmp-name is-a"><b>${flag(replay, 'a')}</b><small class="rp-cmp-pp-line" id="rp-cmp-prof-a"></small><small>${esc(modsLabel(replay.mods))}${replay.playedAt && !isNaN(replay.playedAt) ? ` · ${esc(replay.playedAt.toLocaleDateString())}` : ''}</small></div>
                     <div class="rp-cmp-map"><b>${esc(map.metadata.Title || bm.title)}</b><small>[${esc(map.metadata.Version || bm.version)}]</small></div>
                     <div class="rp-cmp-name is-b"><b>${flag(c.replay, 'b')}</b><small class="rp-cmp-pp-line" id="rp-cmp-prof-b"></small><small>${esc(modsLabel(c.replay.mods))}${c.replay.playedAt && !isNaN(c.replay.playedAt) ? ` · ${esc(c.replay.playedAt.toLocaleDateString())}` : ''}</small></div>
@@ -1054,6 +1096,32 @@
             const pa = ppAt(end), pb = session.cmp.ppAt(end);
             $('rp-cmpr-pp-a').textContent = pa == null ? '–' : Math.round(pa).toLocaleString();
             $('rp-cmpr-pp-b').textContent = pb == null ? '–' : Math.round(pb).toLocaleString();
+        }
+        let lastBc = '';
+        function updateBroadcast(scores, geo) {
+            const wrap = $('rp-cmp');
+            if (!wrap) return;
+            const key = `${scores[0]}|${scores[1]}|${geo.top}|${geo.vh}`;
+            if (key === lastBc) return;
+            lastBc = key;
+            wrap.style.setProperty('--bc-top', `${geo.top}px`);
+            wrap.style.setProperty('--bc-bottom', `${geo.top + geo.vh}px`);
+            const [a, b] = scores;
+            $('rp-bc-sa').textContent = a.toLocaleString();
+            $('rp-bc-sb').textContent = b.toLocaleString();
+            $('rp-bc-sa').classList.toggle('is-lead', a > b);
+            $('rp-bc-sb').classList.toggle('is-lead', b > a);
+            // the push: from the middle toward the leader's side, longer the further ahead
+            const d = a - b;
+            const span = Math.max(50000, Math.max(a, b) * 0.15);
+            const frac = Math.min(1, Math.abs(d) / span) * 50;
+            const push = $('rp-bc-push');
+            push.style.width = `${frac}%`;
+            push.style.left = d >= 0 ? `${50 - frac}%` : '50%';
+            push.className = `rp-bc-push ${d >= 0 ? 'is-a' : 'is-b'}`;
+            const diff = $('rp-bc-diff');
+            diff.textContent = d === 0 ? '' : `${d > 0 ? '-' : '-'}${Math.abs(d).toLocaleString()}`;
+            diff.className = `rp-bc-diff ${d > 0 ? 'is-b' : 'is-a'}`;
         }
         let lastCmp = '';
         function updateCompareHud(sA, sB, t) {
@@ -1280,22 +1348,48 @@
                 s = lastStats;
             } else {
                 if (session.cmp) {
-                    const half = view.w / 2;
-                    // catch: each side in a 4:3 screen as the game shows it (as tournament
-                    // broadcasts put them side by side); the numbers go in a strip below
-                    const strip = replay.mode === 2;
-                    const vh = strip ? Math.min(half * 0.75, view.h - 190) : view.h;
-                    const y0 = strip ? 92 : 0;
-                    const side = { ...view, w: half, h: vh, maxField: half * 0.6 };
-                    if (strip) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, view.w, view.h); }
-                    ctx.save(); ctx.translate(0, y0); ctx.beginPath(); ctx.rect(0, 0, half, vh); ctx.clip();
-                    s = M.draw(ctx, side, prep, t);
-                    ctx.restore();
-                    ctx.save(); ctx.translate(half, y0); ctx.beginPath(); ctx.rect(0, 0, half, vh); ctx.clip();
-                    const sB = M.draw(ctx, side, session.cmp.prep, t);
-                    ctx.restore();
-                    if (strip) { ctx.fillStyle = '#f472b6'; ctx.fillRect(0, y0 + vh, half, 3); ctx.fillStyle = '#5fb4ff'; ctx.fillRect(half, y0 + vh, half, 3); }
-                    if (strip) { const rowsEl = document.querySelector('#rp-cmp .rp-cmp-rows'); if (rowsEl) rowsEl.style.top = `${y0 + vh + 16}px`; }
+                    // a tournament-broadcast frame: names in the corners, two 4:3 game
+                    // screens side by side, the score bar and the map below
+                    const W2 = view.w, H2 = view.h;
+                    const head = 96, below = 150; // above: the names; under the screens: the score bar, the scores, the map
+                    const vh = Math.max(120, Math.min((W2 / 2 - 24) * 0.75, H2 - head - below));
+                    // the whole frame centred top to bottom when the screens are width-bound
+                    const top = Math.round(Math.max(head, (H2 - vh - below - head) / 2 + head));
+                    const vw = vh * 4 / 3;
+                    const gap = Math.max(12, (W2 - vw * 2) / 3);
+                    const xs = [gap, W2 - gap - vw];
+                    // the backdrop: the map's background, dim
+                    ctx.fillStyle = '#05040a'; ctx.fillRect(0, 0, W2, H2);
+                    if (bg) { const sc = Math.max(W2 / bg.width, H2 / bg.height); ctx.globalAlpha = 0.28; ctx.drawImage(bg, (W2 - bg.width * sc) / 2, (H2 - bg.height * sc) / 2, bg.width * sc, bg.height * sc); ctx.globalAlpha = 1; }
+                    const side = { ...view, w: vw, h: vh, maxField: vw * 0.72 };
+                    const sides = [[prep, replay, xs[0], '#f472b6'], [session.cmp.prep, session.cmp.replay, xs[1], '#5fb4ff']];
+                    const st = sides.map(([pp2, rr, x]) => {
+                        ctx.save(); ctx.translate(x, top); ctx.beginPath(); ctx.rect(0, 0, vw, vh); ctx.clip();
+                        const out = M.draw(ctx, side, pp2, t);
+                        ctx.restore();
+                        return out;
+                    });
+                    s = st[0];
+                    const sB = st[1];
+                    const scores = [session.cmp.scoreA(t), session.cmp.scoreB(t)];
+                    const pps = [ppAt(t), session.cmp.ppAt(t)];
+                    sides.forEach(([, rr, x, col], i) => {
+                        // on each screen: score and accuracy top right, the name bottom right (as in-game)
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+                        ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
+                        ctx.font = `800 ${Math.round(vh * 0.07)}px system-ui, sans-serif`;
+                        ctx.fillText(String(scores[i]).padStart(8, '0'), x + vw - 10, top + 6);
+                        ctx.font = `700 ${Math.round(vh * 0.04)}px system-ui, sans-serif`;
+                        const acc = `${(st[i].acc * 100).toFixed(2)}%`;
+                        ctx.fillText(acc + (pps[i] != null ? `  ·  ${Math.round(pps[i])}pp` : ''), x + vw - 10, top + 8 + vh * 0.075);
+                        ctx.font = `italic 800 ${Math.round(vh * 0.065)}px system-ui, sans-serif`;
+                        ctx.fillStyle = col; ctx.textBaseline = 'bottom';
+                        ctx.fillText(rr.player, x + vw - 10, top + vh - 8);
+                        ctx.restore();
+                        ctx.fillStyle = col; ctx.fillRect(x, top - 3, vw, 3);
+                    });
+                    updateBroadcast(scores, { top, vh, below });
                     updateCompareHud(s, sB, t);
                 } else {
                     s = M.draw(ctx, view, prep, t);
