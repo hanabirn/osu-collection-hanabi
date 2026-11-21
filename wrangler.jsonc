@@ -81,6 +81,8 @@
     "keep_vars": true,
     "vars": {
         "CF_ACCOUNT_ID": "235a361b807ea77d2acd6c642d1688e6",
+        // 建議&改進：訪客傳建議或回覆時，bot 私訊這位 Discord 使用者（netlify/functions/feedback.js）
+        "DISCORD_OWNER_ID": "857348074342318100",
     },
 
     // 大型資料集與二進位。dataset:osu 已 14.2 MiB 且會隨新圖上架成長，
