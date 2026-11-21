@@ -123,6 +123,7 @@ async function loadMappool() {
         const res = await fetch(`/.netlify/functions/wc-mappools-list?folder=${encodeURIComponent(mappoolCur.folder)}`);
         if (!res.ok) throw new Error('bad response');
         mappoolData = await res.json();
+        mappoolRoundShown = 0;
         renderMappool();
     } catch (e) {
         console.error('Mappool load failed:', e);
@@ -233,17 +234,22 @@ function renderMappoolSummary() {
 }
 
 /* Sticky jump-bar over the round sections. */
+/* One round shows at a time: the chips above are its tabs (a whole World Cup
+   pool is seven rounds, too long a page to scroll through). */
+let mappoolRoundShown = 0;
 function renderMappoolRoundNav() {
     const el = document.getElementById('mappool-round-nav');
     if (!el || !mappoolData) return;
+    el.setAttribute('role', 'tablist');
     el.innerHTML = (mappoolData.rounds || []).map((r, ri) =>
-        `<button class="mappool-round-nav-chip" onclick="scrollToMappoolRound(${ri})">${escHtml(r.name)}</button>`
+        `<button class="mappool-round-nav-chip${ri === mappoolRoundShown ? ' active' : ''}" role="tab" aria-selected="${ri === mappoolRoundShown}" onclick="scrollToMappoolRound(${ri})">${escHtml(r.name)}</button>`
     ).join('');
 }
 
 function scrollToMappoolRound(ri) {
-    const el = document.getElementById(`mappool-round-${ri}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    mappoolRoundShown = ri;
+    document.querySelectorAll('#mappool-rounds .mappool-round').forEach((el, i) => { el.hidden = i !== ri; });
+    renderMappoolRoundNav();
 }
 
 function renderMappool() {
@@ -273,7 +279,7 @@ function renderMappool() {
             return `${mappoolBracketHead(b.label)}<div class="osu-collection mappool-list">${cards}</div>`;
         }).join('');
         return `
-        <div class="mappool-round" id="mappool-round-${ri}">
+        <div class="mappool-round" id="mappool-round-${ri}"${ri === mappoolRoundShown ? '' : ' hidden'}>
             <div class="mappool-round-head">
                 <h3>${escHtml(r.name)}</h3>
                 ${links.length ? `<div class="mappool-round-links">${links.join('')}</div>` : ''}

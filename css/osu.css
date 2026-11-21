@@ -7662,3 +7662,19 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     .community-main .chat-messages-list { height: calc(100vh - 290px); min-height: 320px; }
     .chat-translate-btn, .chat-reply-btn, .chat-edit-btn, .chat-delete-btn { min-width: 34px; min-height: 34px; display: inline-flex; align-items: center; justify-content: center; }
 }
+
+/* 圖池: the round chips are tabs now (js/mappools.js scrollToMappoolRound) */
+.mappool-round-nav-chip.active { color: #fff; border-color: var(--pink); background: rgba(var(--pink-rgb), 0.2); }
+.mappool-round[hidden] { display: none; }
+
+/* ===== One screen for 新聞 and 賽事 =====
+   新聞: three columns of smaller banners; 賽事: each source's list scrolls
+   inside its own column (the page itself stays a screen tall). */
+@media (min-width: 900px) {
+    #osu-news-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    #osu-news-list .news-thumb { height: 120px; }
+    #osu-news-list .news-item-body { padding: 10px 12px 12px; }
+    #osu-news-list .news-title { font-size: var(--fs-14); }
+    #osu-news-list .news-summary { font-size: var(--fs-13); }
+    .tournaments-column-card .news-list { max-height: calc(100vh - 420px); min-height: 360px; overflow-y: auto; padding-right: 4px; }
+}
