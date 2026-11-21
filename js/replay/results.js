@@ -61,10 +61,10 @@
     }
 
     // an image fitted into a box, centred
-    function fit(ctx, img, cx, cy, maxW, maxH, alpha) {
+    function fit(ctx, img, cx, cy, maxW, maxH, alpha, maxScale) {
         if (!img) return;
         const iw = img.bmp.width * img.s, ih = img.bmp.height * img.s;
-        const k = Math.min(maxW / iw, maxH / ih, 1.4);
+        const k = Math.min(maxW / iw, maxH / ih, maxScale || 1.4);
         ctx.globalAlpha = alpha == null ? 1 : alpha;
         ctx.drawImage(img.bmp, cx - (iw * k) / 2, cy - (ih * k) / 2, iw * k, ih * k);
         ctx.globalAlpha = 1;
@@ -74,7 +74,10 @@
     function drawResults(ctx, view, data) {
         const { w, h } = view;
         const I = view.rankSkin || {};
-        const u = Math.min(h / 768, w / 1024);
+        // data.minWidth: lay out as if the view were at least that wide (in osu!'s units),
+        // then scale it all down — so a narrow view (one side of a comparison) keeps the
+        // same arrangement as the full one instead of piling the letter onto the panel
+        const u = Math.min(h / 768, w / Math.max(1024, data.minWidth || 0));
         const W = w / u; // the view's width in stable units
         ctx.save();
         ctx.fillStyle = '#000';
@@ -156,7 +159,7 @@
         const title = I['ranking-title'];
         if (title) { const tw = title.bmp.width * title.s, th = title.bmp.height * title.s; ctx.drawImage(title.bmp, W - tw - 70, 0, tw, th); } // clear of the close button
         const letter = I[`ranking-${data.rank}`] || I[`ranking-${data.rank.replace('H', '')}`];
-        if (letter) fit(ctx, letter, W - 195, 313, 330, 400);
+        if (letter) fit(ctx, letter, W - 195, 313, 330, 400, 1, 1); // the skin's own size, never enlarged
         // the pp of the play, under the letter
         if (data.pp != null) {
             ctx.save();

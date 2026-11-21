@@ -1338,6 +1338,9 @@
             if (!c.resA) { c.resA = resultsDataFor(replay, prep); c.resB = resultsDataFor(c.replay, c.prep); }
             c.resA.pp = ppAt(prep.lastTime + 1);
             c.resB.pp = c.ppAt(c.prep.lastTime + 1);
+            // each half laid out as wide as the single-player screen would be, then scaled into its half
+            const uFull = Math.min(view.h / 768, view.w / 1024);
+            c.resA.minWidth = c.resB.minWidth = view.w / uFull;
             const half = view.w / 2;
             const win = replay.score === c.replay.score ? '' : replay.score > c.replay.score ? 'a' : 'b';
             [['a', c.resA, 0, '#f472b6'], ['b', c.resB, half, '#5fb4ff']].forEach(([side, data, x, col]) => {
