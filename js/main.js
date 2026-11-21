@@ -191,6 +191,8 @@ function renderSectionBand(tab) {
         : '';
     if (sec.id === 'collection' && stats) extra.appendChild(stats);
     renderHomeIntro(sec.id === 'home');
+    // the header is as wide as this page (--page-max differs by page): fit the links again
+    if (typeof queueFitSiteHeader === 'function') queueFitSiteHeader();
     if (typeof updateBandRotator === 'function') updateBandRotator(sec.id);
 }
 
