@@ -30,6 +30,7 @@
             draw: (ctx, view, prep, t) => window.replayMania.drawMania(ctx, view, prep, t),
             skin: (skin, prep) => skin.forKeys(prep.keys),
             stats: (map, prep) => [['Keys', `${prep.keys}K`], ['OD', num1(map.od)], ['HP', num1(map.hp)]],
+            rank: (c, acc) => (acc >= 1 ? 'SS' : acc > 0.95 ? 'S' : acc > 0.9 ? 'A' : acc > 0.8 ? 'B' : acc > 0.7 ? 'C' : 'D'),
             ur: true,
             scroll: true, judgeSize: true, hands: true,
         },
@@ -43,6 +44,7 @@
             draw: (ctx, view, prep, t) => window.replayCatch.drawCatch(ctx, view, prep, t),
             skin: (skin) => skin.forCatch(),
             stats: (map, prep) => [['CS', num1(prep.diff.cs)], ['AR', num1(prep.diff.ar)], ['OD', num1(prep.diff.od)], ['HP', num1(prep.diff.hp)]],
+            rank: (c, acc) => (acc >= 1 ? 'SS' : acc > 0.98 ? 'S' : acc > 0.94 ? 'A' : acc > 0.9 ? 'B' : acc > 0.85 ? 'C' : 'D'),
             ur: false,
             scroll: false, judgeSize: false, hands: false,
         },
@@ -56,6 +58,11 @@
             draw: (ctx, view, prep, t) => window.replayTaiko.drawTaiko(ctx, view, prep, t),
             skin: (skin) => skin.forTaiko(),
             stats: (map, prep) => [['OD', num1(prep.diff.od)], ['HP', num1(prep.diff.hp)], ['SV', num1(map.sliderMultiplier || 1.4)]],
+            // osu!stable's taiko ranks go by the share of 300s and misses
+            rank: (c) => {
+                const n = c[300] + c[100] + c.MISS, r3 = n ? c[300] / n : 1, clean = c.MISS === 0;
+                return r3 >= 1 ? 'SS' : r3 > 0.9 && clean ? 'S' : (r3 > 0.8 && clean) || r3 > 0.9 ? 'A' : (r3 > 0.7 && clean) || r3 > 0.8 ? 'B' : r3 > 0.6 ? 'C' : 'D';
+            },
             ur: true,
             scroll: false, judgeSize: true, hands: false,
         },
@@ -250,6 +257,9 @@
         const sr = Number(bm.difficultyrating) || 0;
         const srColor = typeof starRatingColor === 'function' ? starRatingColor(sr) : '#f472b6';
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
+        const rankBase = M.rank ? M.rank(record, accOf(record)) : '';
+        const silver = (replay.mods & (8 | 1024)) && (rankBase === 'SS' || rankBase === 'S'); // HD / FL
+        const rankKey = silver ? `${rankBase}H` : rankBase;
         $('rp-body').dataset.mode = String(replay.mode);
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
@@ -292,6 +302,33 @@
                 <div><small>L MISS</small><b id="rp-lmiss">0</b></div>
                 <div><small>R MISS</small><b id="rp-rmiss">0</b></div>
             </div>` : ''}
+            <div class="rp-results" id="rp-results" hidden>
+                <div class="rp-res-card" role="dialog" aria-label="${L('結算')}">
+                    <div class="rp-res-head" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/cover@2x.jpg')">
+                        <b class="rp-ic-ellip">${esc(map.metadata.Artist || bm.artist)} - ${esc(map.metadata.Title || bm.title)} [${esc(map.metadata.Version || bm.version)}]</b>
+                        <span class="rp-ic-ellip">mapped by ${esc(map.metadata.Creator || bm.creator)} · ${esc(replay.player)}${played ? ` · ${esc(played)}` : ''}</span>
+                    </div>
+                    <div class="rp-res-main">
+                        <div class="rp-res-left">
+                            <div class="rp-res-score"><small>${L('分數')}</small><b>${(Number(replay.score) || 0).toLocaleString()}</b></div>
+                            <div class="rp-res-counts" style="grid-template-columns: repeat(${Math.min(3, JUDGES.length)}, minmax(0, 1fr))">${JUDGES.map((j) => `<div><small style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</small><b>${record[j]}</b></div>`).join('')}</div>
+                            <div class="rp-res-pair">
+                                <div><small>${L('最大連擊')}</small><b>${replay.maxCombo.toLocaleString()}x</b></div>
+                                <div><small>${L('準確率')}</small><b>${(accOf(record) * 100).toFixed(2)}%</b></div>
+                            </div>
+                        </div>
+                        <div class="rp-res-right">
+                            <div class="rp-res-rank" data-rank="${rankKey}">${rankBase}</div>
+                            <div class="rp-res-mods">${esc(modsLabel(replay.mods))}</div>
+                        </div>
+                    </div>
+                    <div class="rp-res-actions">
+                        <button type="button" class="rp-btn" id="rp-res-again">↺ ${L('再看一次')}</button>
+                        <button type="button" class="rp-btn" id="rp-res-hide">${L('關閉結算')}</button>
+                        <button type="button" class="rp-btn" onclick="openReplayViewer()">⏏ ${L('換一個重播')}</button>
+                    </div>
+                </div>
+            </div>
             <div class="rp-bottom">
                 <div class="rp-seekbar" id="rp-seekbar">
                     <span class="rp-seek-t" id="rp-seek-now">0:00</span>
@@ -491,9 +528,24 @@
         const first = prep.notes.length ? prep.notes[0].time : 0;
         audio.addEventListener('loadedmetadata', () => { audio.currentTime = Math.max(0, first - 1500) / 1000; }, { once: true });
 
+        // the results: after the last object (as the game does); going back before it hides them
+        const resultsEl = $('rp-results');
+        const resultsAt = prep.lastTime + 1500;
+        let resultsDismissed = false;
+        $('rp-res-hide').addEventListener('click', () => { resultsDismissed = true; resultsEl.hidden = true; });
+        $('rp-res-again').addEventListener('click', () => {
+            resultsDismissed = false;
+            resultsEl.hidden = true;
+            audio.currentTime = Math.max(0, first - 1500) / 1000;
+            audio.play().catch(() => {});
+        });
         let lastShown = '';
         const tick = () => {
             const t = audio.currentTime * 1000;
+            const atEnd = t >= resultsAt || audio.ended;
+            if (!atEnd) resultsDismissed = false;
+            const showRes = atEnd && !resultsDismissed && !seeking;
+            if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
             ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
             const s = M.draw(ctx, view, prep, t);
             const key = `${s.acc}|${s.ur}|${s.lMiss}|${s.rMiss}|${JUDGES.map((j) => s.counts[j]).join()}`;

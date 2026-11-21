@@ -416,10 +416,14 @@
             ctx.globalAlpha = a;
             if (img) {
                 const [iw, ih] = size(img);
+                // the centre image is the drum's left half; the rim image is drawn
+                // the other way round (bulging right), as in osu!'s own skins
+                const outer = !(bit & DON);
                 ctx.save();
                 ctx.translate(drumCx, cy);
-                if (right) ctx.scale(-1, 1);
-                ctx.drawImage(img.bmp, -iw, -ih / 2, iw, ih);
+                if (outer ? !right : right) ctx.scale(-1, 1);
+                if (outer) ctx.drawImage(img.bmp, 0, -ih / 2, iw, ih);
+                else ctx.drawImage(img.bmp, -iw, -ih / 2, iw, ih);
                 ctx.restore();
             } else {
                 ctx.beginPath();

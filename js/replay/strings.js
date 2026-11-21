@@ -55,6 +55,11 @@
         '本站判定': { 'zh-Hans': '本站判定', en: 'Ours', ja: '本サイト', ko: '이 사이트', de: 'Unsere', es: 'Nuestro', fr: 'Le nôtre', ru: 'Наш подсчёт' },
         '重播紀錄': { 'zh-Hans': '回放记录', en: 'Replay', ja: 'リプレイ記録', ko: '리플레이 기록', de: 'Replay', es: 'Replay', fr: 'Replay', ru: 'Реплей' },
         '「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。': { 'zh-Hans': '“本站判定”是播放器根据按键时间自己算的，和游戏可能有些微差距；画面上的实时数字也是用它算的。', en: '“Ours” is worked out by this player from the key timings and can differ slightly from the game; the live numbers on screen use it too.', ja: '「本サイト」はキー入力のタイミングからこのプレイヤーが計算したもので、ゲームと少し違うことがあります。画面上のリアルタイムの数字もこれを使っています。', ko: '“이 사이트”는 키 입력 시간으로 이 플레이어가 계산한 값이라 게임과 약간 다를 수 있어요. 화면의 실시간 숫자도 이 값입니다.', de: '„Unsere“ berechnet der Player aus den Tastenzeiten; sie kann leicht vom Spiel abweichen. Die Live-Zahlen nutzen sie auch.', es: '“Nuestro” lo calcula este reproductor a partir de las pulsaciones y puede diferir un poco del juego; los números en vivo también lo usan.', fr: '« Le nôtre » est calculé par ce lecteur d’après les appuis et peut différer un peu du jeu ; les chiffres en direct l’utilisent aussi.', ru: '«Наш подсчёт» плеер считает по нажатиям, он может немного отличаться от игры; живые цифры на экране тоже из него.' },
+        '結算': { 'zh-Hans': '结算', en: 'Results', ja: 'リザルト', ko: '결과', de: 'Ergebnis', es: 'Resultados', fr: 'Résultats', ru: 'Результаты' },
+        '分數': { 'zh-Hans': '分数', en: 'Score', ja: 'スコア', ko: '점수', de: 'Punkte', es: 'Puntuación', fr: 'Score', ru: 'Очки' },
+        '最大連擊': { 'zh-Hans': '最大连击', en: 'Max combo', ja: '最大コンボ', ko: '최대 콤보', de: 'Max. Combo', es: 'Combo máx.', fr: 'Combo max', ru: 'Макс. комбо' },
+        '再看一次': { 'zh-Hans': '再看一次', en: 'Watch again', ja: 'もう一度見る', ko: '다시 보기', de: 'Nochmal ansehen', es: 'Ver de nuevo', fr: 'Revoir', ru: 'Смотреть снова' },
+        '關閉結算': { 'zh-Hans': '关闭结算', en: 'Close results', ja: 'リザルトを閉じる', ko: '결과 닫기', de: 'Ergebnis schließen', es: 'Cerrar resultados', fr: 'Fermer les résultats', ru: 'Закрыть результаты' },
         '換一個重播': { 'zh-Hans': '换一个回放', en: 'Another replay', ja: '別のリプレイ', ko: '다른 리플레이', de: 'Anderes Replay', es: 'Otro replay', fr: 'Autre replay', ru: 'Другой реплей' },
     };
     window.replayText = function replayText(zh) {

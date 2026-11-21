@@ -7240,6 +7240,40 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-ic-counts i { font-style: normal; font-size: 9px; font-weight: 800; }
 /* accuracy and hand misses sit under the card, bottom-left */
 .rp-hud-l { top: auto; bottom: 150px; }
+/* results after the last object, over the play area */
+.rp-results { position: absolute; inset: 0 0 104px 0; z-index: 4; display: grid; place-items: center; padding: 16px; background: rgba(6, 5, 8, 0.6); backdrop-filter: blur(3px); }
+.rp-results[hidden] { display: none; }
+.rp-res-card { width: min(760px, 100%); max-height: 100%; overflow: auto; border-radius: 14px; background: rgba(16, 13, 19, 0.94); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55); color: #fff; }
+.rp-res-head { display: flex; flex-direction: column; gap: 3px; padding: 18px 20px 14px; background: linear-gradient(90deg, rgba(16, 13, 19, 0.95) 30%, rgba(16, 13, 19, 0.55)), var(--cover) center / cover; border-bottom: 1px solid rgba(255, 255, 255, 0.08); min-width: 0; }
+.rp-res-head b { font-size: 1.05rem; }
+.rp-res-head span { font-size: 0.82rem; color: rgba(255, 255, 255, 0.7); }
+.rp-res-main { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 18px; padding: 16px 20px; align-items: center; }
+.rp-res-left { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.rp-res-left small { display: block; font-size: 0.74rem; color: rgba(255, 255, 255, 0.6); font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rp-res-left b { font-variant-numeric: tabular-nums; }
+.rp-res-score b { font-size: 2.1rem; font-weight: 800; letter-spacing: 0.02em; }
+.rp-res-counts { display: grid; gap: 8px; }
+.rp-res-counts > div, .rp-res-pair > div { background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 7px 10px; min-width: 0; }
+.rp-res-counts b { font-size: 1.25rem; }
+.rp-res-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rp-res-pair b { font-size: 1.45rem; }
+.rp-res-right { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.rp-res-rank { font-size: 7.5rem; line-height: 1; font-weight: 900; font-style: italic; padding-right: 0.08em; color: #ff6b6b; text-shadow: 0 0 24px currentColor; }
+.rp-res-rank[data-rank="SS"], .rp-res-rank[data-rank="S"] { color: #ffcf3a; }
+.rp-res-rank[data-rank="SSH"], .rp-res-rank[data-rank="SH"] { color: #dfe7ef; }
+.rp-res-rank[data-rank="A"] { color: #7ee787; }
+.rp-res-rank[data-rank="B"] { color: #5fb4ff; }
+.rp-res-rank[data-rank="C"] { color: #d58cff; }
+.rp-res-mods { font-weight: 800; font-size: 0.95rem; color: rgba(255, 255, 255, 0.85); }
+.rp-res-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding: 0 20px 16px; }
+@container (max-width: 640px) {
+    .rp-res-main { grid-template-columns: 1fr; }
+    .rp-res-right { flex-direction: row; justify-content: center; order: -1; gap: 14px; }
+    .rp-res-rank { font-size: 4.2rem; }
+    .rp-res-score b { font-size: 1.6rem; }
+}
+@container (max-height: 560px) { .rp-res-rank { font-size: 4.5rem; } .rp-res-main { padding: 10px 16px; gap: 10px; } .rp-res-head { padding: 10px 16px; } }
+@media (max-width: 760px) { .rp-results { bottom: 92px; } }
 /* taiko: the lane runs across the upper screen, so the card sits low and the accuracy moves right */
 .rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 110px; }
 .rp-body[data-mode="1"] .rp-hud-tl { left: auto; right: 24px; }
