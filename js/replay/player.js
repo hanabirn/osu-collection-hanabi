@@ -1128,6 +1128,8 @@
             wrap.style.setProperty('--bc-mods-h', `${Math.round(Math.max(22, Math.min(40, geo.vh * 0.06)))}px`);
             wrap.style.setProperty('--bc-right-a', `${geo.rightA + 10}px`);
             wrap.style.setProperty('--bc-right-b', `${geo.rightB + 10}px`);
+            // the flags line up with the outer edges of the two screens below, the same on both sides
+            wrap.style.setProperty('--bc-edge', `${geo.rightB}px`);
             wrap.style.setProperty('--bc-top', `${geo.top}px`);
             wrap.style.setProperty('--bc-bottom', `${geo.top + geo.vh}px`);
             const [a, b] = scores;

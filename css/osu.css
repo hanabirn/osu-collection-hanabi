@@ -7442,8 +7442,8 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-cmp.is-broadcast .rp-cmp-close { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); margin-top: calc(var(--bc-top, 90px) - 44px); pointer-events: auto; z-index: 3; opacity: var(--rp-outro, 1); }
 .rp-body.rp-show-results .rp-cmp.is-broadcast .rp-cmp-close, .rp-cmpr:not([hidden]) ~ .rp-cmp-close { visibility: hidden; }
 .rp-bc-team { position: absolute; top: max(12px, calc(var(--bc-top, 96px) - 84px)); display: flex; align-items: center; gap: 10px; max-width: 34%; pointer-events: auto; opacity: var(--rp-outro, 1); }
-.rp-bc-team.is-a { left: 16px; }
-.rp-bc-team.is-b { right: 60px; text-align: right; }
+.rp-bc-team.is-a { left: var(--bc-edge, 16px); }
+.rp-bc-team.is-b { right: var(--bc-edge, 16px); text-align: right; }
 .rp-bc-team .rp-flag { width: 52px; height: 36px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); flex: none; }
 .rp-bc-team > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .rp-bc-team b { display: inline-block; max-width: 100%; padding: 2px 10px; background: #fff; color: #111; font-size: 1.05rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
