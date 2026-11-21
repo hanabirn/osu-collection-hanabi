@@ -1281,7 +1281,7 @@
             } else {
                 if (session.cmp) {
                     const half = view.w / 2;
-                    const side = { ...view, w: half, maxField: half * 0.6 };
+                    const side = { ...view, w: half, maxField: half * 0.6, fitWidth: replay.mode === 2 };
                     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, half, view.h); ctx.clip();
                     s = M.draw(ctx, side, prep, t);
                     ctx.restore();
