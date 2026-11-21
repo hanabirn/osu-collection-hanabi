@@ -91,7 +91,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, music: 1, fx: 0.7, cursorScale: 1, errorScale: 1, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
+    const prefs = { size: 'm', volume: 0.6, muted: false, music: 1, fx: 0.7, cursorScale: 1, errorScale: 1, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6, cmpSound: 'a' };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -576,6 +576,9 @@
                             ${M.judgeSize ? `<label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>` : ''}
                             <label class="rp-opt">${L('音樂音量')} <output id="rp-music-val">${Math.round(prefs.music * 100)}%</output><input type="range" id="rp-music" min="0" max="1" step="0.01" value="${prefs.music}"></label>
                             <label class="rp-opt">${L('音效音量')} <output id="rp-fx-val">${Math.round(prefs.fx * 100)}%</output><input type="range" id="rp-fx" min="0" max="1" step="0.01" value="${prefs.fx}"></label>
+                            <div class="rp-opt rp-opt-cmp">${L('比較時的打擊音效')}
+                                <span class="rp-seg" id="rp-cmp-sound" role="radiogroup">${[['a', L('左邊玩家')], ['b', L('右邊玩家')], ['both', L('兩邊')]].map(([v, lab]) => `<button type="button" role="radio" data-v="${v}" aria-checked="${(prefs.cmpSound || 'a') === v}">${lab}</button>`).join('')}</span>
+                                <small class="rp-opt-hint">${L('兩邊：左耳是左邊玩家，右耳是右邊玩家')}</small></div>
                             ${replay.mode === 0 ? `<label class="rp-opt">${L('游標大小')} <output id="rp-cursor-val">${Math.round(prefs.cursorScale * 100)}%</output><input type="range" id="rp-cursor" min="0.5" max="2" step="0.05" value="${prefs.cursorScale}"></label>` : ''}
                             ${M.ur ? `<label class="rp-opt">${L('誤差條大小')} <output id="rp-error-val">${Math.round(prefs.errorScale * 100)}%</output><input type="range" id="rp-error" min="0.5" max="2.5" step="0.05" value="${prefs.errorScale}"></label>` : ''}
                             <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
@@ -664,6 +667,12 @@
         };
         volSlider('rp-music', 'music', 'rp-music-val');
         volSlider('rp-fx', 'fx', 'rp-fx-val');
+        $('rp-cmp-sound').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-v]');
+            if (!b) return;
+            prefs.cmpSound = b.dataset.v; savePrefs();
+            for (const x of $('rp-cmp-sound').children) x.setAttribute('aria-checked', String(x === b));
+        });
         volSlider('rp-cursor', 'cursorScale', 'rp-cursor-val');
         volSlider('rp-error', 'errorScale', 'rp-error-val');
         $('rp-rate').addEventListener('change', (e) => { userRate = Number(e.target.value) || 1; applyRate(); });
@@ -772,8 +781,11 @@
         const sounds = window.replaySounds ? window.replaySounds.soundEvents(replay.mode, map, prep) : [];
         session.mixer = window.replaySounds ? window.replaySounds.createMixer(savedSkins[replay.mode]) : null;
         if (session.mixer) session.mixer.setVolume(fxVol());
+        // one cursor through a list of hit sounds; a comparison has one per player
+        const makeSoundPlayer = (list) => {
         let soundAt = null, soundIdx = 0, warmed = false;
-        const playSounds = (t, running) => {
+        const sounds = list;
+        return (t, running, pan) => {
             if (!session.mixer || !sounds.length) return;
             if (!running || seeking || soundAt == null || t < soundAt || t - soundAt > 300) {
                 // paused, seeking or jumped: start again from here without playing what was skipped
@@ -786,9 +798,22 @@
             if (!warmed) { warmed = true; session.mixer.warm([...new Set(sounds.flatMap((s2) => s2.names))]); }
             while (soundIdx < sounds.length && sounds[soundIdx].t <= t) {
                 const s2 = sounds[soundIdx++];
-                if (t - s2.t < 120) session.mixer.play(s2.names, s2.vol);
+                if (t - s2.t < 120) session.mixer.play(s2.names, s2.vol, pan);
             }
             soundAt = t;
+        };
+        };
+        const playA = makeSoundPlayer(sounds);
+        // comparing: the left player's hit sounds, the right one's, or both (left ear / right ear)
+        const playSounds = (t, running) => {
+            const c = session.cmp;
+            const pick = c ? prefs.cmpSound || 'a' : 'a';
+            const both = pick === 'both';
+            playA(t, running && pick !== 'b', both ? -0.75 : 0);
+            if (c && window.replaySounds) {
+                if (!c.playSounds) c.playSounds = makeSoundPlayer(window.replaySounds.soundEvents(c.replay.mode, map, c.prep));
+                c.playSounds(t, running && pick !== 'a', both ? 0.75 : 0);
+            }
         };
         if ($('rp-speed')) { $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value))); setScroll(view.scroll); }
         $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });

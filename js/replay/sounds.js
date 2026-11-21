@@ -115,7 +115,8 @@
             volume: 1,
             setVolume(v) { mixer.volume = v; if (gain) gain.gain.value = v; },
             warm(names) { ensure(); for (const n of names) load(n); },
-            play(names, vol) {
+            // pan: -1 left ear … 1 right ear (a comparison plays each player on one side)
+            play(names, vol, pan) {
                 if (!ensure() || mixer.volume <= 0) return;
                 for (const n of names) {
                     load(n).then((buf) => {
@@ -124,7 +125,8 @@
                         src.buffer = buf;
                         const g = ctx.createGain();
                         g.gain.value = Math.max(0, Math.min(1, vol));
-                        src.connect(g); g.connect(gain);
+                        src.connect(g);
+                        if (pan && ctx.createStereoPanner) { const pn = ctx.createStereoPanner(); pn.pan.value = Math.max(-1, Math.min(1, pan)); g.connect(pn); pn.connect(gain); } else g.connect(gain);
                         src.start();
                     });
                 }
