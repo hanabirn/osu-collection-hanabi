@@ -7286,15 +7286,15 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-body .rp-hud { opacity: var(--rp-outro, 1); }
 .rp-results:not(.is-wide) .rp-res-card { animation: rp-res-in 0.45s ease-out; }
 @keyframes rp-res-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-/* standard: notes can appear anywhere, so while playing the card tucks into
-   its cover strip; pausing (or pointing at it) opens it again */
-.rp-body[data-mode="0"] .rp-infocard { transition: opacity 0.35s ease; }
-.rp-body[data-mode="0"] .rp-infocard > :not(.rp-ic-cover) { max-height: 260px; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, padding 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
-.rp-body[data-mode="0"] .rp-ic-cover { transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
-.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) > :not(.rp-ic-cover) { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; border-top-width: 0; transition-delay: 0.12s; }
-.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) { opacity: 0.85; }
-.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) .rp-ic-cover { height: 46px; transition-delay: 0.12s; }
-@media (prefers-reduced-motion: reduce) { .rp-body[data-mode="0"] .rp-infocard, .rp-body[data-mode="0"] .rp-infocard > *, .rp-body[data-mode="0"] .rp-ic-cover { transition: none !important; } }
+/* every mode: while playing the card tucks into its cover strip; pausing (or
+   pointing at it) opens it again */
+.rp-body .rp-infocard { transition: opacity 0.35s ease; }
+.rp-body .rp-infocard > :not(.rp-ic-cover) { max-height: 260px; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, padding 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.rp-body .rp-ic-cover { transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.rp-body.rp-playing .rp-infocard:not(:hover) > :not(.rp-ic-cover) { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; border-top-width: 0; transition-delay: 0.12s; }
+.rp-body.rp-playing .rp-infocard:not(:hover) { opacity: 0.85; }
+.rp-body.rp-playing .rp-infocard:not(:hover) .rp-ic-cover { height: 46px; transition-delay: 0.12s; }
+@media (prefers-reduced-motion: reduce) { .rp-body .rp-infocard, .rp-body .rp-infocard > *, .rp-body .rp-ic-cover { transition: none !important; } }
 /* the right column: time pie + accuracy, pp, mods, then the live counts */
 .rp-hud-top { top: 56px; right: 28px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.55); min-width: 150px; box-sizing: border-box; }
 .rp-hud-tr { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 150px; box-sizing: border-box; }
@@ -7321,6 +7321,25 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-body[data-mode="1"] .rp-ic-counts, .rp-body[data-mode="1"] .rp-ic-result { display: none; }
 /* taiko: the live column sits under the lane, on the right */
 .rp-body[data-mode="1"] .rp-hud-tr { top: calc((100% - 104px) * 0.525 + 14px); }
+
+/* with a mouse, the play field fills the frame and the control bar slides up
+   from the bottom when the pointer comes near (as mania-tracker does) */
+@media (hover: hover) and (pointer: fine) {
+    .rp-body .rp-stage { bottom: 0; }
+    .rp-body .rp-results { bottom: 0; }
+    .rp-body .rp-bottom { transform: translateY(100%); opacity: 0; transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease; }
+    .rp-body.rp-bar-shown .rp-bottom, .rp-body .rp-bottom:focus-within { transform: none; opacity: 1; }
+    .rp-body[data-mode="1"] .rp-hud-tr { top: calc(100% * 0.525 + 14px); }
+    .rp-body[data-mode="1"] .rp-infocard { bottom: 96px; }
+}
+/* the pause menu, over the play field */
+.rp-body .rp-bottom { z-index: 6; } /* above the pause menu */
+.rp-pause { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(0, 0, 0, 0.55); }
+.rp-pause[hidden] { display: none; }
+.rp-pause-btn { display: flex; align-items: center; gap: 14px; min-width: 220px; padding: 0; border: 0; background: none; color: #fff; font: inherit; font-size: 1.05rem; font-weight: 800; cursor: pointer; text-align: left; }
+.rp-pause-ic { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #fff; color: #111; font-size: 1.1rem; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); transition: transform 0.15s ease; }
+.rp-pause-btn:hover .rp-pause-ic, .rp-pause-btn:focus-visible .rp-pause-ic { transform: scale(1.08); background: var(--pink, #f472b6); color: #fff; }
+.rp-pause-btn:focus-visible { outline: none; }
 /* taiko: the lane runs across the upper screen, so the card sits low and the accuracy moves right */
 .rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 196px; } /* room under it for the combo */
 .rp-body[data-mode="1"] .rp-hud-tl { left: auto; right: 24px; }

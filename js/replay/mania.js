@@ -114,6 +114,7 @@
             counts[n.judge]++;
             combo = n.judge === 'MISS' ? 0 : combo + (n.end != null ? 2 : 1);
             best = Math.max(best, combo);
+            n.bestAfter = best;
             got += JUDGE_VALUE[n.judge];
             max += 300;
             if (n.judge === 'MISS') {
@@ -395,6 +396,7 @@
         ctx.restore();
         return {
             combo,
+            best: last ? last.bestAfter || 0 : 0,
             acc: last ? last.accAfter : 1,
             counts: last ? last.countsAfter : { MAX: 0, 300: 0, 200: 0, 100: 0, 50: 0, MISS: 0 },
             ur: last ? last.urAfter : 0,

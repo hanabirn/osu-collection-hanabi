@@ -91,7 +91,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
+    const prefs = { size: 'm', volume: 0.6, muted: false, music: 1, fx: 0.7, cursorScale: 1, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -171,6 +171,7 @@
         if (session.audio) { session.audio.pause(); session.audio.src = ''; }
         (session.urls || []).forEach((u) => URL.revokeObjectURL(u));
         if (session.ro) session.ro.disconnect();
+        if (session.mixer) session.mixer.close();
         session = null;
     }
 
@@ -399,6 +400,11 @@
                     <div><small>R MISS</small><b id="rp-rmiss">0</b></div>
                 </div>` : ''}
             </div>
+            <div class="rp-pause" id="rp-pause" hidden>
+                <button type="button" class="rp-pause-btn" data-act="resume"><span class="rp-pause-ic">▶</span>${L('繼續觀看')}</button>
+                <button type="button" class="rp-pause-btn" data-act="restart"><span class="rp-pause-ic">↺</span>${L('從頭再看')}</button>
+                <button type="button" class="rp-pause-btn" data-act="change"><span class="rp-pause-ic">☰</span>${L('換一個重播')}</button>
+            </div>
             <div class="rp-results" id="rp-results" hidden>
                 <div class="rp-res-card" role="dialog" aria-label="${L('結算')}">
                     <div class="rp-res-head" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/cover@2x.jpg')">
@@ -437,7 +443,7 @@
                     <span class="rp-time"><span id="rp-time">0:00</span> / <span id="rp-dur">0:00</span></span>
                     <span class="rp-ctl rp-vol">
                         <button type="button" class="rp-icon" id="rp-mute" aria-label="${L('靜音')}">🔊</button>
-                        <input type="range" id="rp-volume" min="0" max="1" step="0.01" value="${prefs.volume}" aria-label="${L('音量')}">
+                        <input type="range" id="rp-volume" min="0" max="1" step="0.01" value="${prefs.volume}" aria-label="${L('總音量')}" title="${L('總音量')}">
                     </span>
                     <label class="rp-ctl" title="${L('播放速度')}"><span class="rp-ctl-name">${L('速度')}</span>
                         <select id="rp-rate">${RATES.map((r) => `<option value="${r}"${r === 1 ? ' selected' : ''}>${r}×</option>`).join('')}</select>
@@ -458,6 +464,9 @@
                                     <button type="button" class="rp-btn" id="rp-skin-reset">${L('恢復預設')}</button>
                                 </span></div>
                             ${M.judgeSize ? `<label class="rp-opt">${L('判定大小')} <output id="rp-judge-val">${Math.round((prefs.judgeScale || 0.6) * 100)}%</output><input type="range" id="rp-judge-scale" min="0.2" max="1.5" step="0.05" value="${prefs.judgeScale || 0.6}"></label>` : ''}
+                            <label class="rp-opt">${L('音樂音量')} <output id="rp-music-val">${Math.round(prefs.music * 100)}%</output><input type="range" id="rp-music" min="0" max="1" step="0.01" value="${prefs.music}"></label>
+                            <label class="rp-opt">${L('音效音量')} <output id="rp-fx-val">${Math.round(prefs.fx * 100)}%</output><input type="range" id="rp-fx" min="0" max="1" step="0.01" value="${prefs.fx}"></label>
+                            ${replay.mode === 0 ? `<label class="rp-opt">${L('游標大小')} <output id="rp-cursor-val">${Math.round(prefs.cursorScale * 100)}%</output><input type="range" id="rp-cursor" min="0.5" max="2" step="0.05" value="${prefs.cursorScale}"></label>` : ''}
                             <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
                                 <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
@@ -490,7 +499,9 @@
 
         const audio = new Audio(audioUrl);
         audio.preload = 'auto';
-        audio.volume = prefs.volume;
+        const musicVol = () => Math.max(0, Math.min(1, prefs.volume * prefs.music));
+        const fxVol = () => (prefs.muted ? 0 : Math.max(0, Math.min(1, prefs.volume * prefs.fx)));
+        audio.volume = musicVol();
         audio.muted = !!prefs.muted;
         let userRate = 1;
         const applyRate = () => { audio.playbackRate = prep.rate * userRate; };
@@ -499,7 +510,7 @@
         const canvas = $('rp-canvas');
         const stage = $('rp-stage');
         const ctx = canvas.getContext('2d');
-        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6 };
+        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6, cursorScale: Number(prefs.cursorScale) || 1 };
         session = { audio, urls, prep, map, replay, view, raf: 0 };
         // scroll speed as in osu! (1-40, default 24); the value rides above the slider thumb
         function setScroll(v) {
@@ -516,14 +527,31 @@
         session.setScroll = setScroll;
 
         const muteBtn = $('rp-mute');
-        const showMute = () => { muteBtn.textContent = audio.muted || audio.volume === 0 ? '🔇' : '🔊'; };
+        const showMute = () => { muteBtn.textContent = audio.muted || prefs.volume === 0 ? '🔇' : '🔊'; };
         showMute();
-        muteBtn.addEventListener('click', () => { audio.muted = !audio.muted; prefs.muted = audio.muted; savePrefs(); showMute(); });
+        muteBtn.addEventListener('click', () => { audio.muted = !audio.muted; prefs.muted = audio.muted; savePrefs(); showMute(); if (session && session.mixer) session.mixer.setVolume(fxVol()); });
         $('rp-volume').addEventListener('input', (e) => {
-            audio.volume = Number(e.target.value);
-            if (audio.volume > 0 && audio.muted) audio.muted = false;
-            prefs.volume = audio.volume; prefs.muted = audio.muted; savePrefs(); showMute();
+            prefs.volume = Number(e.target.value);
+            if (prefs.volume > 0 && audio.muted) audio.muted = false;
+            audio.volume = musicVol();
+            prefs.muted = audio.muted; savePrefs(); showMute();
+            if (session && session.mixer) session.mixer.setVolume(fxVol());
         });
+        const volSlider = (id, key, out) => {
+            const el = $(id);
+            if (!el) return;
+            el.addEventListener('input', (e) => {
+                prefs[key] = Number(e.target.value);
+                $(out).textContent = `${Math.round(prefs[key] * 100)}%`;
+                savePrefs();
+                audio.volume = musicVol();
+                if (session && session.mixer) session.mixer.setVolume(fxVol());
+                if (key === 'cursorScale') view.cursorScale = prefs.cursorScale;
+            });
+        };
+        volSlider('rp-music', 'music', 'rp-music-val');
+        volSlider('rp-fx', 'fx', 'rp-fx-val');
+        volSlider('rp-cursor', 'cursorScale', 'rp-cursor-val');
         $('rp-rate').addEventListener('change', (e) => { userRate = Number(e.target.value) || 1; applyRate(); });
         $('rp-size').addEventListener('change', (e) => {
             prefs.size = e.target.value;
@@ -627,6 +655,27 @@
         seek.addEventListener('pointerleave', () => { if (!seeking) tip.hidden = true; });
         seek.addEventListener('change', () => { seeking = false; tip.hidden = true; });
         playBtn.addEventListener('click', togglePlay);
+        const sounds = window.replaySounds ? window.replaySounds.soundEvents(replay.mode, map, prep) : [];
+        session.mixer = window.replaySounds ? window.replaySounds.createMixer(savedSkins[replay.mode]) : null;
+        if (session.mixer) session.mixer.setVolume(fxVol());
+        let soundAt = null, soundIdx = 0, warmed = false;
+        const playSounds = (t, running) => {
+            if (!session.mixer || !sounds.length) return;
+            if (!running || seeking || soundAt == null || t < soundAt || t - soundAt > 300) {
+                // paused, seeking or jumped: start again from here without playing what was skipped
+                soundAt = t;
+                let lo = 0, hi = sounds.length;
+                while (lo < hi) { const mid = (lo + hi) >> 1; if (sounds[mid].t <= t) lo = mid + 1; else hi = mid; }
+                soundIdx = lo;
+                return;
+            }
+            if (!warmed) { warmed = true; session.mixer.warm([...new Set(sounds.flatMap((s2) => s2.names))]); }
+            while (soundIdx < sounds.length && sounds[soundIdx].t <= t) {
+                const s2 = sounds[soundIdx++];
+                if (t - s2.t < 120) session.mixer.play(s2.names, s2.vol);
+            }
+            soundAt = t;
+        };
         if ($('rp-speed')) { $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value))); setScroll(view.scroll); }
         $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });
         $('rp-skin-file').addEventListener('change', async (e) => {
@@ -638,6 +687,7 @@
                 view.skin = await M.skin(skin, prep);
                 savedSkins[replay.mode] = skin;
                 loadRankSkin(skin);
+                if (session.mixer) { session.mixer.close(); session.mixer = window.replaySounds.createMixer(skin); session.mixer.setVolume(fxVol()); }
                 await window.replaySkin.saveSkin(f, skin.name, replay.mode).catch(() => {});
                 $('rp-skin-name').textContent = skin.name;
             } catch (err) {
@@ -668,6 +718,7 @@
             await window.replaySkin.clearSkin(replay.mode);
             savedSkins[replay.mode] = null;
             loadRankSkin(null);
+            if (session.mixer) { session.mixer.close(); session.mixer = window.replaySounds.createMixer(null); session.mixer.setVolume(fxVol()); }
             view.skin = null;
             $('rp-skin-name').textContent = L('預設');
         });
@@ -716,6 +767,94 @@
             audio.currentTime = Math.max(0, first - 1500) / 1000;
             audio.play().catch(() => {});
         });
+        // the combo at the bottom left, in the skin's font where it has one;
+        // once it has broken, the best so far sits above it
+        const comboFont = () => {
+            const sk = view.skin || prep.defaultSkin;
+            if (!sk) return null;
+            if (sk.comboFont) return sk.comboFont;
+            if (sk.comboDigits) return { digits: sk.comboDigits, x: null, overlap: sk.comboOverlap || 0 };
+            return null;
+        };
+        let comboShownAt = 0, comboShown = 0;
+        function drawCombo(st) {
+            const combo = st.combo || 0, best = st.best || 0;
+            if (combo !== comboShown) { if (combo > comboShown) comboShownAt = performance.now(); comboShown = combo; }
+            const h = view.h;
+            const cs = (view.comboScale || 0.6) / 0.6;
+            const bump = 1 + 0.12 * Math.max(0, 1 - (performance.now() - comboShownAt) / 120);
+            const ch = h * 0.065 * cs;
+            const base = h - 16;
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 6;
+            const cf = comboFont();
+            const drawNum = (text, size, y, alpha) => {
+                ctx.globalAlpha = alpha;
+                if (cf) {
+                    const kk = size / (cf.digits[0].bmp.height * cf.digits[0].s);
+                    let dx = 14;
+                    for (const ch2 of text) {
+                        if (ch2 === 'x') {
+                            if (cf.x) { const gw = cf.x.bmp.width * cf.x.s * kk, gh = cf.x.bmp.height * cf.x.s * kk; ctx.drawImage(cf.x.bmp, dx, y - gh, gw, gh); dx += gw; }
+                            else { ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(size * 0.7)}px system-ui, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText('x', dx + 2, y); }
+                            continue;
+                        }
+                        const g = cf.digits[Number(ch2)];
+                        const gw = g.bmp.width * g.s * kk, gh = g.bmp.height * g.s * kk;
+                        ctx.drawImage(g.bmp, dx, y - gh, gw, gh);
+                        dx += gw - (cf.overlap || 0) * kk;
+                    }
+                } else {
+                    ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(size)}px system-ui, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                    ctx.fillText(text, 14, y);
+                }
+            };
+            if (combo > 0) drawNum(`${combo}x`, ch * bump, base, 1);
+            if (best > combo) {
+                // the best combo so far, smaller, above
+                ctx.globalAlpha = 0.85;
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.font = `800 ${Math.round(ch * 0.32)}px system-ui, sans-serif`;
+                ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                const y = base - (combo > 0 ? ch * 1.08 : 0);
+                ctx.fillText(L('最大連擊'), 16, y - ch * 0.5);
+                drawNum(`${best}x`, ch * 0.5, y, 0.85);
+            }
+            ctx.restore();
+        }
+
+        const pauseEl = $('rp-pause');
+        const showPause = (on) => { pauseEl.hidden = !on; };
+        stage.addEventListener('click', () => {
+            if (!pauseEl.hidden) { showPause(false); if (!clock.running()) clock.toggle(); return; }
+            if (clock.running()) { clock.toggle(); showPause(true); }
+            else clock.toggle();
+        });
+        pauseEl.addEventListener('click', (e) => {
+            const b = e.target.closest('[data-act]');
+            if (!b) { showPause(false); if (!clock.running()) clock.toggle(); return; }
+            showPause(false);
+            if (b.dataset.act === 'resume') { if (!clock.running()) clock.toggle(); }
+            else if (b.dataset.act === 'restart') { clock.tail = null; audio.currentTime = Math.max(0, first - 1500) / 1000; audio.play().catch(() => {}); }
+            else if (b.dataset.act === 'change') openReplayViewer();
+        });
+        audio.addEventListener('play', () => showPause(false));
+
+        // the control bar slides out when the pointer comes near the bottom (devices with a mouse)
+        const body = $('rp-body');
+        let barTimer = 0;
+        const showBar = (on) => { body.classList.toggle('rp-bar-shown', on); };
+        body.addEventListener('mousemove', (e) => {
+            const rect = body.getBoundingClientRect();
+            const near = e.clientY > rect.bottom - 150;
+            if (near) { showBar(true); clearTimeout(barTimer); }
+            else if (body.classList.contains('rp-bar-shown') && !body.querySelector('.rp-bottom:hover, .rp-bottom:focus-within, .rp-menu[open]')) {
+                clearTimeout(barTimer);
+                barTimer = setTimeout(() => showBar(false), 900);
+            }
+        });
+        body.addEventListener('mouseleave', () => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (!body.querySelector('.rp-bottom:focus-within, .rp-menu[open]')) showBar(false); }, 600); });
+
         // the counts follow the top-right block down (taiko keeps them under its lane)
         if (replay.mode !== 1 && typeof ResizeObserver === 'function') {
             const topBox = $('rp-hud-top'), stats = $('rp-hud-stats');
@@ -770,6 +909,7 @@
         loadRankSkin(savedSkins[replay.mode]);
         const tick = () => {
             const t = clock.now();
+            playSounds(t, clock.running());
             // the way out follows the clock, so it pauses, seeks and ends with the timeline
             const atEnd = t >= outroAt && !seeking;
             if (!atEnd) resultsDismissed = false;
@@ -793,6 +933,7 @@
                 s = lastStats;
             } else {
                 s = M.draw(ctx, view, prep, t);
+                drawCombo(s);
                 if (el >= 0) {
                     bgOnly(Math.min(1, el / OUTRO.fade)); // the play fades out, the background comes up
                     if (!showRes) blackOver((el - OUTRO.black) / (OUTRO.rank - OUTRO.black));

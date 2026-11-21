@@ -321,6 +321,7 @@
                 }
             }
             best = Math.max(best, combo);
+            e.bestAfter = best;
             const n = counts[300] + counts[100] + counts[50] + counts.MISS;
             e.comboAfter = combo;
             e.accAfter = n ? (300 * counts[300] + 100 * counts[100] + 50 * counts[50]) / (300 * n) : 1;
@@ -731,7 +732,7 @@
         const cur = prep.posAt(t);
         const trail = I.cursortrail;
         if (trail) {
-            const tw = trail.bmp.width * trail.s * u, th = trail.bmp.height * trail.s * u;
+            const tw = trail.bmp.width * trail.s * u * (view.cursorScale || 1), th = trail.bmp.height * trail.s * u * (view.cursorScale || 1);
             const steps = I.cursormiddle ? 24 : 8;
             for (let n = steps; n >= 1; n--) {
                 const p = prep.posAt(t - n * (I.cursormiddle ? 4 : 16));
@@ -744,38 +745,18 @@
         const pressed = (cur.keys & 3) !== 0;
         if (ci) {
             const sc = skin.cursorExpand && pressed ? 1.2 : 1;
-            const cw = ci.bmp.width * ci.s * u * sc, ch = ci.bmp.height * ci.s * u * sc;
+            const cz = view.cursorScale || 1;
+            const cw = ci.bmp.width * ci.s * u * sc * cz, ch = ci.bmp.height * ci.s * u * sc * cz;
             ctx.save(); ctx.translate(X(cur.x), Y(cur.y));
             if (skin.cursorRotate) ctx.rotate((t / 10000) * Math.PI * 2);
             if (skin.cursorCentre) ctx.drawImage(ci.bmp, -cw / 2, -ch / 2, cw, ch); else ctx.drawImage(ci.bmp, 0, 0, cw, ch);
             ctx.restore();
         } else { ctx.beginPath(); ctx.arc(X(cur.x), Y(cur.y), 8 * u, 0, Math.PI * 2); ctx.fillStyle = '#ffd166'; ctx.fill(); }
-        if (I.cursormiddle) { const m = I.cursormiddle; const mw = m.bmp.width * m.s * u, mh = m.bmp.height * m.s * u; ctx.drawImage(m.bmp, X(cur.x) - mw / 2, Y(cur.y) - mh / 2, mw, mh); }
+        if (I.cursormiddle) { const m = I.cursormiddle; const mw = m.bmp.width * m.s * u * (view.cursorScale || 1), mh = m.bmp.height * m.s * u * (view.cursorScale || 1); ctx.drawImage(m.bmp, X(cur.x) - mw / 2, Y(cur.y) - mh / 2, mw, mh); }
 
-        // the combo, bottom left, in the skin's font (it swells a little on each hit)
+        // (the combo at the bottom left is drawn by the player for every mode)
         const last = ei >= 0 ? ev[ei] : null;
         const combo = last ? last.comboAfter : 0;
-        if (combo > 0) {
-            const cs = (view.comboScale || 0.6) / 0.6;
-            const cf = skin.comboFont;
-            const bump = last && t - last.jt < 120 ? 1 + 0.12 * (1 - (t - last.jt) / 120) : 1;
-            const ch = h * 0.07 * cs * bump;
-            if (cf) {
-                const glyphs = [...String(combo).split('').map((c) => cf.digits[Number(c)]), cf.x].filter(Boolean);
-                const kk = ch / (cf.digits[0].bmp.height * cf.digits[0].s);
-                let dx = 14;
-                for (const g of glyphs) {
-                    const gw = g.bmp.width * g.s * kk, gh = g.bmp.height * g.s * kk;
-                    ctx.drawImage(g.bmp, dx, h - 50 - gh, gw, gh);
-                    dx += gw - (cf.overlap || 0) * kk;
-                }
-            } else {
-                ctx.fillStyle = 'rgba(255,255,255,0.92)';
-                ctx.font = `700 ${Math.round(ch)}px system-ui, sans-serif`;
-                ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-                ctx.fillText(`${combo}x`, 14, h - 50);
-            }
-        }
 
         // the key overlay on the right: K1 K2 M1 M2, lit while held, with their press counts
         {
@@ -841,6 +822,7 @@
         ctx.restore();
         return {
             combo,
+            best: last ? last.bestAfter || 0 : 0,
             acc: last ? last.accAfter : 1,
             counts: last ? last.countsAfter : { 300: 0, 100: 0, 50: 0, MISS: 0 },
             ur: last ? last.urAfter : 0,

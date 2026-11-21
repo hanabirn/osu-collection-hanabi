@@ -66,6 +66,12 @@
         '下載不到這張譜面（osu.direct 上還沒有），稍後再試': { 'zh-Hans': '下载不到这张谱面（osu.direct 上还没有），稍后再试', en: 'Couldn’t download this beatmap (osu.direct doesn’t have it yet). Try again later.', ja: 'この譜面をダウンロードできませんでした（osu.direct にまだありません）。後でもう一度お試しください。', ko: '이 비트맵을 받지 못했어요 (osu.direct에 아직 없어요). 나중에 다시 시도해 주세요.', de: 'Diese Beatmap ließ sich nicht laden (osu.direct hat sie noch nicht). Später erneut versuchen.', es: 'No se pudo descargar este mapa (osu.direct aún no lo tiene). Inténtalo más tarde.', fr: 'Impossible de télécharger cette map (osu.direct ne l’a pas encore). Réessaie plus tard.', ru: 'Не удалось скачать карту (на osu.direct её пока нет). Попробуйте позже.' },
         '下載譜面失敗（HTTP {0}），稍後再試': { 'zh-Hans': '下载谱面失败（HTTP {0}），稍后再试', en: 'Beatmap download failed (HTTP {0}). Try again later.', ja: '譜面のダウンロードに失敗しました（HTTP {0}）。後でもう一度お試しください。', ko: '비트맵 다운로드 실패 (HTTP {0}). 나중에 다시 시도해 주세요.', de: 'Download der Beatmap fehlgeschlagen (HTTP {0}). Später erneut versuchen.', es: 'Falló la descarga del mapa (HTTP {0}). Inténtalo más tarde.', fr: 'Échec du téléchargement de la map (HTTP {0}). Réessaie plus tard.', ru: 'Не удалось скачать карту (HTTP {0}). Попробуйте позже.' },
         '目前的 PP': { 'zh-Hans': '目前的 PP', en: 'Current pp', ja: '現在の PP', ko: '현재 PP', de: 'Aktuelle PP', es: 'PP actuales', fr: 'PP actuels', ru: 'Текущие PP' },
+        '總音量': { 'zh-Hans': '总音量', en: 'Master volume', ja: '全体音量', ko: '전체 볼륨', de: 'Gesamtlautstärke', es: 'Volumen general', fr: 'Volume général', ru: 'Общая громкость' },
+        '音樂音量': { 'zh-Hans': '音乐音量', en: 'Music', ja: '音楽', ko: '음악', de: 'Musik', es: 'Música', fr: 'Musique', ru: 'Музыка' },
+        '音效音量': { 'zh-Hans': '音效音量', en: 'Effects', ja: '効果音', ko: '효과음', de: 'Effekte', es: 'Efectos', fr: 'Effets', ru: 'Эффекты' },
+        '游標大小': { 'zh-Hans': '光标大小', en: 'Cursor size', ja: 'カーソルの大きさ', ko: '커서 크기', de: 'Cursorgröße', es: 'Tamaño del cursor', fr: 'Taille du curseur', ru: 'Размер курсора' },
+        '繼續觀看': { 'zh-Hans': '继续观看', en: 'Continue', ja: '続きを見る', ko: '계속 보기', de: 'Weiter', es: 'Continuar', fr: 'Continuer', ru: 'Продолжить' },
+        '從頭再看': { 'zh-Hans': '从头再看', en: 'Watch from the start', ja: '最初から見る', ko: '처음부터 보기', de: 'Von vorne', es: 'Desde el inicio', fr: 'Depuis le début', ru: 'С начала' },
         '換一個重播': { 'zh-Hans': '换一个回放', en: 'Another replay', ja: '別のリプレイ', ko: '다른 리플레이', de: 'Anderes Replay', es: 'Otro replay', fr: 'Autre replay', ru: 'Другой реплей' },
     };
     window.replayText = function replayText(zh) {

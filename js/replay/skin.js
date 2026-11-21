@@ -282,7 +282,16 @@
             };
         }
 
-        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko, forRanking, forStd };
+        // a sound from the skin (hit sounds): wav, ogg or mp3; null when it has none
+        async function sample(n) {
+            for (const ext of ['.wav', '.ogg', '.mp3']) {
+                const e = index.get(`${base}${n}${ext}`.toLowerCase()) || index.get(`${n}${ext}`);
+                if (e) return (await zip.read(e)).slice().buffer; // a copy: stored entries are views into the zip
+            }
+            return null;
+        }
+
+        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko, forRanking, forStd, sample };
     }
 
     /* osu!stable's default catch images (ppy/osu-resources Skins/Legacy,

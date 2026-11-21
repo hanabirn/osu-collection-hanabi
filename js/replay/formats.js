@@ -138,6 +138,8 @@
                     uninherited: f.length > 6 ? f[6] === '1' : true,
                     kiai: f.length > 7 ? (Number(f[7]) & 1) === 1 : false,
                     meter: Number(f[2]) || 4,
+                    sampleSet: Number(f[3]) || 0, // 1 normal, 2 soft, 3 drum
+                    volume: f.length > 5 ? Number(f[5]) : 100,
                     omitBarline: f.length > 7 ? (Number(f[7]) & 8) === 8 : false,
                 });
             } else if (section === 'Colours') {
@@ -158,6 +160,14 @@
                     o.points = [{ x: o.x, y: o.y }].concat(parts.slice(1).map((p) => { const [px, py] = p.split(':').map(Number); return { x: px, y: py }; }));
                     o.slides = Math.max(1, Number(f[6]) || 1);
                     o.length = Number(f[7]) || 0;
+                }
+                // hit sample "normalSet:additionSet:index:volume:file" (last field; for holds it follows the end time)
+                const hsField = type & 128 ? String(f[5] || '').split(':').slice(1).join(':') : f[type & 2 ? 10 : type & 8 ? 6 : 5];
+                if (hsField) { const hs = String(hsField).split(':').map(Number); o.normalSet = hs[0] || 0; o.additionSet = hs[1] || 0; o.sampleVolume = hs[3] || 0; }
+                if (type & 2) {
+                    // per-node sounds and sets (head, repeats, tail)
+                    o.edgeSounds = f[8] ? String(f[8]).split('|').map(Number) : null;
+                    o.edgeSets = f[9] ? String(f[9]).split('|').map((p) => p.split(':').map(Number)) : null;
                 }
                 m.objects.push(o);
             }

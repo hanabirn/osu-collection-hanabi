@@ -258,6 +258,7 @@
                 total++;
             }
             best = Math.max(best, combo);
+            o.bestAfter = best;
             o.comboAfter = combo;
             o.accAfter = total ? hit / total : 1;
             o.countsAfter = { ...counts };
@@ -515,6 +516,7 @@
         ctx.restore();
         return {
             combo,
+            best: last ? last.bestAfter || 0 : 0,
             acc: last ? last.accAfter : 1,
             counts: last ? last.countsAfter : { FRUIT: 0, DROP: 0, TINY: 0, TINYMISS: 0, MISS: 0 },
             ur: 0,
