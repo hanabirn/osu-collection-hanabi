@@ -791,15 +791,16 @@
         // the hit error bar, bottom centre: the windows as colour bands, a tick per hit, an arrow at the average
         {
             const wnd = prep.windows;
-            const half = Math.min(w * 0.14, h * 0.2);
+            const es = view.errorScale || 1;
+            const half = Math.min(150, w * 0.14) * es;
             const scaleX = half / wnd[50];
-            const bx = w / 2, by = h - 70;
+            const bx = w / 2, by = h - 12 * es; // at the very bottom, as in mania
             ctx.globalAlpha = 0.85;
-            const band = (win, col, hh) => { ctx.fillStyle = col; ctx.fillRect(bx - win * scaleX, by - hh / 2, win * 2 * scaleX, hh); };
+            const band = (win, col, hh) => { ctx.fillStyle = col; ctx.fillRect(bx - win * scaleX, by - (hh * es) / 2, win * 2 * scaleX, hh * es); };
             band(wnd[50], 'rgba(218,174,70,1)', 4);
             band(wnd[100], 'rgba(87,227,19,1)', 4);
             band(wnd[300], 'rgba(50,188,231,1)', 4);
-            ctx.fillStyle = '#fff'; ctx.fillRect(bx - 1, by - 9, 2, 18);
+            ctx.fillStyle = '#fff'; ctx.fillRect(bx - es, by - 9 * es, 2 * es, 18 * es);
             const list = prep.hitOffsets;
             let lo = 0, hi = list.length - 1, upto = -1;
             while (lo <= hi) { const mid = (lo + hi) >> 1; if (list[mid].t <= t) { upto = mid; lo = mid + 1; } else hi = mid - 1; }
@@ -809,13 +810,13 @@
                 const age = (t - e.t) / 4000;
                 ctx.globalAlpha = 0.9 * (1 - age);
                 ctx.fillStyle = e.r === '300' ? 'rgba(50,188,231,1)' : e.r === '100' ? 'rgba(87,227,19,1)' : 'rgba(218,174,70,1)';
-                ctx.fillRect(bx + e.off * scaleX - 1, by - 8, 2, 16);
+                ctx.fillRect(bx + e.off * scaleX - es, by - 8 * es, 2 * es, 16 * es);
                 if (nAvg < 20) { avg += e.off; nAvg++; }
             }
             if (nAvg) {
                 const ax = bx + (avg / nAvg) * scaleX;
                 ctx.globalAlpha = 0.95; ctx.fillStyle = '#fff';
-                ctx.beginPath(); ctx.moveTo(ax, by - 11); ctx.lineTo(ax - 5, by - 18); ctx.lineTo(ax + 5, by - 18); ctx.closePath(); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(ax, by - 11 * es); ctx.lineTo(ax - 5 * es, by - 18 * es); ctx.lineTo(ax + 5 * es, by - 18 * es); ctx.closePath(); ctx.fill();
             }
             ctx.globalAlpha = 1;
         }

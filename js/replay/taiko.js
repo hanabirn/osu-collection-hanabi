@@ -469,6 +469,27 @@
             ctx.restore();
         }
 
+        // hit error bar at the bottom, as in mania and standard: the 300 / 100 windows, a tick per hit
+        {
+            const es = view.errorScale || 1;
+            const wnd = prep.windows;
+            const half = Math.min(150, w * 0.14) * es;
+            const sx = half / wnd.ok;
+            const bx = w / 2, by = h - 12 * es;
+            ctx.globalAlpha = 0.85;
+            ctx.fillStyle = 'rgba(87,227,19,1)'; ctx.fillRect(bx - wnd.ok * sx, by - 2 * es, wnd.ok * 2 * sx, 4 * es);
+            ctx.fillStyle = 'rgba(50,188,231,1)'; ctx.fillRect(bx - wnd.great * sx, by - 2 * es, wnd.great * 2 * sx, 4 * es);
+            ctx.fillStyle = '#fff'; ctx.fillRect(bx - es, by - 9 * es, 2 * es, 18 * es);
+            for (let j = ei; j >= 0 && t - ev[j].jt < 3000; j--) {
+                const e = ev[j];
+                if (e.result === 'MISS' || e.offset == null) continue;
+                ctx.globalAlpha = 0.9 * (1 - (t - e.jt) / 3000);
+                ctx.fillStyle = e.result === '300' ? 'rgba(50,188,231,1)' : 'rgba(87,227,19,1)';
+                ctx.fillRect(bx + e.offset * sx - es, by - 8 * es, 2 * es, 16 * es);
+            }
+            ctx.globalAlpha = 1;
+        }
+
         // hit notes (and roll ticks) flying up towards the mascot
         const flyTo = { x: drumW * 0.7, y: bandTop - bandH * 1.25 };
         const fly = (time, d, colour, big) => {

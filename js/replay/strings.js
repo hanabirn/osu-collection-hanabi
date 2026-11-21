@@ -72,6 +72,7 @@
         '游標大小': { 'zh-Hans': '光标大小', en: 'Cursor size', ja: 'カーソルの大きさ', ko: '커서 크기', de: 'Cursorgröße', es: 'Tamaño del cursor', fr: 'Taille du curseur', ru: 'Размер курсора' },
         '繼續觀看': { 'zh-Hans': '继续观看', en: 'Continue', ja: '続きを見る', ko: '계속 보기', de: 'Weiter', es: 'Continuar', fr: 'Continuer', ru: 'Продолжить' },
         '從頭再看': { 'zh-Hans': '从头再看', en: 'Watch from the start', ja: '最初から見る', ko: '처음부터 보기', de: 'Von vorne', es: 'Desde el inicio', fr: 'Depuis le début', ru: 'С начала' },
+        '誤差條大小': { 'zh-Hans': '误差条大小', en: 'Hit error bar size', ja: '誤差バーの大きさ', ko: '오차 막대 크기', de: 'Größe der Fehlerleiste', es: 'Tamaño de la barra de error', fr: 'Taille de la barre d’erreur', ru: 'Размер полосы ошибок' },
         '換一個重播': { 'zh-Hans': '换一个回放', en: 'Another replay', ja: '別のリプレイ', ko: '다른 리플레이', de: 'Anderes Replay', es: 'Otro replay', fr: 'Autre replay', ru: 'Другой реплей' },
     };
     window.replayText = function replayText(zh) {

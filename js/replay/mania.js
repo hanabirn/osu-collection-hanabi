@@ -377,12 +377,13 @@
 
         // hit error bar under the stage: coloured windows, recent hits as ticks
         const span = prep.w[50];
-        const barW = Math.min(fieldW * 0.9, 300), barY = h - 12;
+        const es = view.errorScale || 1;
+        const barW = Math.min(fieldW * 0.9, 300) * es, barY = h - 12 * es;
         const scale = barW / 2 / span;
         for (const j of ['50', '100', '200', '300', 'MAX']) {
             ctx.fillStyle = JUDGE_COLOR[j];
             ctx.globalAlpha = 0.85;
-            ctx.fillRect(cx - prep.w[j] * scale, barY - 2, prep.w[j] * scale * 2, 4);
+            ctx.fillRect(cx - prep.w[j] * scale, barY - 2 * es, prep.w[j] * scale * 2, 4 * es);
         }
         ctx.globalAlpha = 1;
         for (let i = ei; i >= 0 && t - prep.events[i].judgedAt < 3000; i--) {
@@ -390,7 +391,7 @@
             if (e.judge === 'MISS' || e.hitAt == null) continue;
             ctx.globalAlpha = 1 - (t - e.judgedAt) / 3000;
             ctx.fillStyle = '#fff';
-            ctx.fillRect(cx + (e.hitAt - e.time) * scale - 1, barY - 9, 2, 18);
+            ctx.fillRect(cx + (e.hitAt - e.time) * scale - es, barY - 9 * es, 2 * es, 18 * es);
         }
         ctx.globalAlpha = 1;
         ctx.restore();

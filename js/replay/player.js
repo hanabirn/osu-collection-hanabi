@@ -91,7 +91,7 @@
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
-    const prefs = { size: 'm', volume: 0.6, muted: false, music: 1, fx: 0.7, cursorScale: 1, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
+    const prefs = { size: 'm', volume: 0.6, muted: false, music: 1, fx: 0.7, cursorScale: 1, errorScale: 1, scroll: 24, dim: 0.75, judgeScale: 0.6, comboScale: 0.6 };
     try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
     const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* per-device nicety */ } };
     const SIZES = [['s', '小'], ['m', '中'], ['l', '大'], ['full', '填滿畫面']];
@@ -468,6 +468,7 @@
                             <label class="rp-opt">${L('音樂音量')} <output id="rp-music-val">${Math.round(prefs.music * 100)}%</output><input type="range" id="rp-music" min="0" max="1" step="0.01" value="${prefs.music}"></label>
                             <label class="rp-opt">${L('音效音量')} <output id="rp-fx-val">${Math.round(prefs.fx * 100)}%</output><input type="range" id="rp-fx" min="0" max="1" step="0.01" value="${prefs.fx}"></label>
                             ${replay.mode === 0 ? `<label class="rp-opt">${L('游標大小')} <output id="rp-cursor-val">${Math.round(prefs.cursorScale * 100)}%</output><input type="range" id="rp-cursor" min="0.5" max="2" step="0.05" value="${prefs.cursorScale}"></label>` : ''}
+                            ${M.ur ? `<label class="rp-opt">${L('誤差條大小')} <output id="rp-error-val">${Math.round(prefs.errorScale * 100)}%</output><input type="range" id="rp-error" min="0.5" max="2.5" step="0.05" value="${prefs.errorScale}"></label>` : ''}
                             <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
                                 <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
@@ -511,7 +512,7 @@
         const canvas = $('rp-canvas');
         const stage = $('rp-stage');
         const ctx = canvas.getContext('2d');
-        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6, cursorScale: Number(prefs.cursorScale) || 1 };
+        const view = { w: 0, h: 0, dpr: 1, scroll: Number(prefs.scroll) || 24, bg, bgDim: prefs.dim, skin: skinCfg, judgeScale: Number(prefs.judgeScale) || 0.6, comboScale: Number(prefs.comboScale) || 0.6, cursorScale: Number(prefs.cursorScale) || 1, errorScale: Number(prefs.errorScale) || 1 };
         session = { audio, urls, prep, map, replay, view, raf: 0 };
         // scroll speed as in osu! (1-40, default 24); the value rides above the slider thumb
         function setScroll(v) {
@@ -548,11 +549,13 @@
                 audio.volume = musicVol();
                 if (session && session.mixer) session.mixer.setVolume(fxVol());
                 if (key === 'cursorScale') view.cursorScale = prefs.cursorScale;
+                if (key === 'errorScale') view.errorScale = prefs.errorScale;
             });
         };
         volSlider('rp-music', 'music', 'rp-music-val');
         volSlider('rp-fx', 'fx', 'rp-fx-val');
         volSlider('rp-cursor', 'cursorScale', 'rp-cursor-val');
+        volSlider('rp-error', 'errorScale', 'rp-error-val');
         $('rp-rate').addEventListener('change', (e) => { userRate = Number(e.target.value) || 1; applyRate(); });
         $('rp-size').addEventListener('change', (e) => {
             prefs.size = e.target.value;
