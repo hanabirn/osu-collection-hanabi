@@ -7750,8 +7750,11 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .fb-reply textarea { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-card); color: #fff; font: inherit; font-size: var(--fs-13); resize: vertical; }
 .fb-answer { flex-direction: column; align-items: stretch; }
 .fb-answer-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.fb-answer .fb-done { background: rgba(126, 224, 138, 0.2); }
-.fb-answer .fb-declined { background: rgba(255, 143, 163, 0.18); }
+/* all three answer buttons as solid as each other: pink reply, green done, red declined */
+.fb-answer .fb-done { background: #2f9e5b; color: #fff; }
+.fb-answer .fb-done:hover { background: #38b56a; }
+.fb-answer .fb-declined { background: #d9485f; color: #fff; }
+.fb-answer .fb-declined:hover { background: #e85b72; }
 .fb-filters { display: inline-flex; gap: 4px; flex-wrap: wrap; }
 .fb-filters button { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: none; color: var(--text-dim); font: inherit; font-size: var(--fs-12); cursor: pointer; }
 .fb-filters button.is-on { background: rgba(var(--pink-rgb), 0.2); color: #fff; border-color: var(--pink); }
