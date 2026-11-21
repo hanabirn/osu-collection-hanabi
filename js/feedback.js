@@ -79,6 +79,7 @@ async function handleFeedbackSubmit(event) {
         form.reset();
         if (status) { status.textContent = t('feedback_success'); status.className = 'feedback-status is-ok'; }
         renderFeedbackMine();
+        if (fbIsOwner()) loadFeedbackAdmin(); // the owner's own test shows up in the list too
     } catch (e) {
         if (status) { status.textContent = e.status === 429 ? t('feedback_too_many') : t('feedback_fail'); status.className = 'feedback-status is-err'; }
     }

@@ -17,6 +17,7 @@
    (DISCORD_OWNER_ID). Threads live in the DM store under feedback:… keys. */
 const { getDmStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
+const { getEnv } = require('./_cf-env');
 
 const H = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const OWNER_OSU_ID = process.env.CHAT_OWNER_OSU_ID || '26696007';
@@ -56,18 +57,22 @@ function userFrom(event) {
 const publicThread = (t) => ({ id: t.id, created: t.created, updated: t.updated, status: t.status, messages: t.messages });
 
 async function notifyOwner(text) {
-    const token = process.env.DISCORD_BOT_TOKEN, owner = process.env.DISCORD_OWNER_ID;
-    if (!token || !owner) return;
+    // on Cloudflare the worker's env holds the vars and secrets (process.env may not)
+    const env = getEnv() || {};
+    const token = env.DISCORD_BOT_TOKEN || process.env.DISCORD_BOT_TOKEN;
+    const owner = env.DISCORD_OWNER_ID || process.env.DISCORD_OWNER_ID;
+    if (!token || !owner) { console.error('feedback: no bot token or owner id for the DM'); return; }
     try {
         const ch = await fetch('https://discord.com/api/v10/users/@me/channels', {
             method: 'POST', headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ recipient_id: owner }),
-        }).then((r) => (r.ok ? r.json() : null));
+        }).then(async (r) => (r.ok ? r.json() : (console.error('feedback: DM channel', r.status, await r.text()), null)));
         if (!ch || !ch.id) return;
-        await fetch(`https://discord.com/api/v10/channels/${ch.id}/messages`, {
+        const sent = await fetch(`https://discord.com/api/v10/channels/${ch.id}/messages`, {
             method: 'POST', headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: text.slice(0, 1900), allowed_mentions: { parse: [] } }),
         });
+        if (!sent.ok) console.error('feedback: DM send', sent.status, await sent.text());
     } catch (err) { console.error('feedback: owner DM failed', err); }
 }
 
@@ -87,7 +92,8 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: H, body: '' };
     const store = getDmStore();
     const user = userFrom(event);
-    const isOwner = !!(user && String(user.id) === OWNER_OSU_ID);
+    const ownerId = (getEnv() || {}).CHAT_OWNER_OSU_ID || OWNER_OSU_ID;
+    const isOwner = !!(user && String(user.id) === ownerId);
 
     try {
         if (event.httpMethod === 'GET') {
