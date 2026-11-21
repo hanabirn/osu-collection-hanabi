@@ -143,7 +143,7 @@
             } else if (section === 'Colours') {
                 const i = line.indexOf(':');
                 const k = line.slice(0, i).trim();
-                if (/^Combod+$/.test(k)) m.colours.push(line.slice(i + 1).trim().split(',').map(Number));
+                if (/^Combo\d+$/.test(k)) m.colours.push(line.slice(i + 1).trim().split(',').map(Number));
             } else if (section === 'HitObjects') {
                 const f = line.split(',');
                 if (f.length < 4) continue;

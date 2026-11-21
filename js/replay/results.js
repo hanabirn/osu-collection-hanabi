@@ -10,6 +10,13 @@
 
     // the judgement rows: [left, right] per row, each { key, img, value }
     function rowsFor(mode, rec, replay) {
+        if (mode === 0) {
+            return [
+                [{ img: 'hit300', v: rec[300] }, { img: 'hit300g', v: replay.nGeki }],
+                [{ img: 'hit100', v: rec[100] }, { img: 'hit100k', v: replay.nKatu }],
+                [{ img: 'hit50', v: rec[50] }, { img: 'hit0', v: rec.MISS }],
+            ];
+        }
         if (mode === 3) {
             return [
                 [{ img: 'mania-hit300', v: rec[300] }, { img: 'mania-hit300g', v: rec.MAX }],

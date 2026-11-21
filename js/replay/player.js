@@ -20,6 +20,24 @@
        names (and what to call them), the replay's own counts, accuracy,
        the skin part, and the map numbers on the info card. */
     const MODES = {
+        0: {
+            judges: ['300', '100', '50', 'MISS'],
+            labels: {},
+            colors: () => window.replayStd.JUDGE_COLOR,
+            record: (r) => ({ 300: r.n300, 100: r.n100, 50: r.n50, MISS: r.nMiss }),
+            acc: (c) => { const n = c[300] + c[100] + c[50] + c.MISS; return n ? (300 * c[300] + 100 * c[100] + 50 * c[50]) / (300 * n) : 1; },
+            prepare: (map, replay) => window.replayStd.prepareStd(map, replay),
+            draw: (ctx, view, prep, t) => window.replayStd.drawStd(ctx, view, prep, t),
+            skin: (skin) => skin.forStd(),
+            stats: (map, prep) => [['CS', num1(prep.diff.cs)], ['AR', num1(prep.diff.ar)], ['OD', num1(prep.diff.od)], ['HP', num1(prep.diff.hp)]],
+            // osu!stable: by the share of 300s, 50s and misses
+            rank: (c) => {
+                const n = c[300] + c[100] + c[50] + c.MISS, r3 = n ? c[300] / n : 1, r5 = n ? c[50] / n : 0, clean = c.MISS === 0;
+                return r3 >= 1 ? 'SS' : r3 > 0.9 && r5 <= 0.01 && clean ? 'S' : (r3 > 0.8 && clean) || r3 > 0.9 ? 'A' : (r3 > 0.7 && clean) || r3 > 0.8 ? 'B' : r3 > 0.6 ? 'C' : 'D';
+            },
+            ur: true,
+            scroll: false, judgeSize: true, hands: false,
+        },
         3: {
             judges: ['MAX', '300', '200', '100', '50', 'MISS'],
             labels: {},
@@ -129,7 +147,7 @@
                 <input type="file" accept=".osr" hidden onchange="if(this.files[0])loadReplayFile(this.files[0])">
                 <span class="rp-drop-icon">▶</span>
                 <b>${L('把 .osr 重播檔拖到這裡，或點一下選擇檔案')}</b>
-                <small>${L('目前支援 osu!mania、osu!catch 和 osu!taiko。譜面和音樂會自動從 osu.direct 下載。')}</small>
+                <small>${L('支援 osu! 全部四個模式。譜面和音樂會自動從 osu.direct 下載。')}</small>
                 ${msg ? `<p class="rp-error">${esc(msg)}</p>` : ''}
             </label>`);
         const drop = $('rp-drop');
@@ -241,6 +259,7 @@
             const prep = M.prepare(map, replay);
             if (replay.mode === 2 && window.replaySkin.loadDefaultCatch) prep.defaultSkin = await window.replaySkin.loadDefaultCatch().catch(() => null);
             if (replay.mode === 1 && window.replaySkin.loadDefaultTaiko) prep.defaultSkin = await window.replaySkin.loadDefaultTaiko().catch(() => null);
+            if (replay.mode === 0 && window.replaySkin.loadDefaultStd) prep.defaultSkin = await window.replaySkin.loadDefaultStd().catch(() => null);
             if (savedSkins[replay.mode] === undefined) savedSkins[replay.mode] = await window.replaySkin.loadSavedSkin(replay.mode);
             const savedSkin = savedSkins[replay.mode];
             const skinCfg = savedSkin ? await M.skin(savedSkin, prep).catch(() => null) : null;

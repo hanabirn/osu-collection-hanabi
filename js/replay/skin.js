@@ -108,6 +108,16 @@
             return p;
         }
 
+        // whether the skin has a file for this element at all (a blank one still counts:
+        // it means "draw nothing", not "use the default")
+        function exists(path) {
+            const key = path.toLowerCase();
+            for (const suffix of ['@2x', '']) for (const frame of ['', '-0']) for (const ext of ['.png', '.jpg']) {
+                if (index.has(`${base}${key}${frame}${suffix}${ext}`.toLowerCase()) || index.has(`${key}${frame}${suffix}${ext}`)) return true;
+            }
+            return false;
+        }
+
         /* everything drawMania needs for a key count, images loaded */
         async function forKeys(keys) {
             const m = ini.mania[keys] || {};
@@ -230,7 +240,43 @@
             return out;
         }
 
-        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko, forRanking };
+        /* osu! (standard): circles, sliders, spinners, cursor, judgements and
+           the skin.ini settings that change how they look */
+        async function forStd() {
+            const def = await loadDefaultStd();
+            const img = {};
+            for (const n of STD_IMAGES) img[n] = (await image(n)) || null;
+            // a skin's own circle stands in for its slider start; osu!'s default only when it has neither
+            if (!img.sliderstartcircle) { img.sliderstartcircle = img.hitcircle; img.sliderstartcircleoverlay = img.hitcircleoverlay; }
+            for (const n of STD_IMAGES) if (!img[n] && def.img[n] && !STD_NO_DEFAULT.has(n) && !exists(n)) img[n] = def.img[n];
+            const sliderb = [];
+            for (let i = 0; i < 10; i++) { const f = await image(`sliderb${i}`); if (!f) break; sliderb.push(f); }
+            if (!sliderb.length) { const one = await image('sliderb'); if (one) sliderb.push(one); }
+            const prefix = (ini.fonts && ini.fonts.HitCirclePrefix) || 'default';
+            const digits = await Promise.all(Array.from({ length: 10 }, (_, d) => image(`${prefix}-${d}`)));
+            const combo = [];
+            for (let i = 1; i <= 8; i++) { const c = colour(ini.colours[`Combo${i}`]); if (c) combo.push(c); }
+            const g = ini.general || {};
+            const yes = (v, d) => (v == null ? d : String(v).trim() === '1');
+            const ownSpinnerOld = !!((await image('spinner-background')) || (await image('spinner-circle'))) && !(await image('spinner-top'));
+            return {
+                img,
+                sliderb: sliderb.length ? sliderb : def.sliderb,
+                digits: digits.every(Boolean) ? digits : def.digits,
+                overlap: digits.every(Boolean) ? Number((ini.fonts && ini.fonts.HitCircleOverlap) || -2) : -2,
+                combo: combo.length ? combo : def.combo,
+                sliderBorder: colour(ini.colours.SliderBorder) || 'rgba(255,255,255,1)',
+                sliderTrack: colour(ini.colours.SliderTrackOverride) || null,
+                allowBallTint: yes(g.AllowSliderBallTint, false),
+                overlayAbove: yes(g.HitCircleOverlayAboveNumber ?? g.HitCircleOverlayAboveNumer, true),
+                cursorRotate: yes(g.CursorRotate, true),
+                cursorExpand: yes(g.CursorExpand, true),
+                cursorCentre: yes(g.CursorCentre, true),
+                spinnerOld: ownSpinnerOld,
+            };
+        }
+
+        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko, forRanking, forStd };
     }
 
     /* osu!stable's default catch images (ppy/osu-resources Skins/Legacy,
@@ -298,7 +344,7 @@
     const SCORE_GLYPHS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'x', 'dot', 'percent', 'comma'];
     const RANK_IMAGES = ['ranking-panel', 'ranking-title', 'ranking-accuracy', 'ranking-maxcombo', 'ranking-graph', 'ranking-perfect',
         'ranking-X', 'ranking-XH', 'ranking-S', 'ranking-SH', 'ranking-A', 'ranking-B', 'ranking-C', 'ranking-D',
-        'hit0', 'mania-hit0', 'mania-hit50', 'mania-hit100', 'mania-hit200', 'mania-hit300', 'mania-hit300g',
+        'hit0', 'hit50', 'hit100', 'hit300', 'hit300g', 'hit100k', 'mania-hit0', 'mania-hit50', 'mania-hit100', 'mania-hit200', 'mania-hit300', 'mania-hit300g',
         'taiko-hit0', 'taiko-hit100', 'taiko-hit300', 'taiko-hit300g', 'taiko-hit100k', 'fruit-pear', 'fruit-pear-overlay', 'fruit-drop'];
     let defaultRankingPromise = null;
     function loadDefaultRanking() {
@@ -321,6 +367,36 @@
         return defaultRankingPromise;
     }
 
+    const STD_IMAGES = ['hitcircle', 'hitcircleoverlay', 'sliderstartcircle', 'sliderstartcircleoverlay', 'sliderendcircle', 'sliderendcircleoverlay',
+        'approachcircle', 'sliderfollowcircle', 'sliderscorepoint', 'reversearrow', 'followpoint', 'cursor', 'cursormiddle', 'cursortrail',
+        'hit0', 'hit50', 'hit100', 'hit300', 'spinner-background', 'spinner-circle', 'spinner-approachcircle', 'spinner-metre',
+        'spinner-glow', 'spinner-bottom', 'spinner-top', 'spinner-middle', 'spinner-middle2', 'spinner-clear', 'spinner-spin'];
+    // parts that are simply absent when a skin doesn't draw them (no default stands in)
+    const STD_NO_DEFAULT = new Set(['sliderendcircle', 'sliderendcircleoverlay', 'sliderstartcircle', 'sliderstartcircleoverlay', 'cursormiddle',
+        'spinner-background', 'spinner-circle', 'spinner-metre']);
+    let defaultStdPromise = null;
+    function loadDefaultStd() {
+        if (!defaultStdPromise) {
+            const get = async (n) => {
+                for (const [file, s] of [[`${n}@2x`, 0.5], [`${n}-0@2x`, 0.5], [n, 1]]) {
+                    try {
+                        const res = await fetch(`assets/osu-resources/skin-legacy/${file}.png`);
+                        if (res.ok) return { bmp: await createImageBitmap(await res.blob()), s };
+                    } catch { /* next */ }
+                }
+                return null;
+            };
+            defaultStdPromise = (async () => {
+                const img = {};
+                await Promise.all(STD_IMAGES.map(async (n) => { img[n] = await get(n); }));
+                const digits = await Promise.all(Array.from({ length: 10 }, (_, d) => get(`default-${d}`)));
+                const b = await get('sliderb0');
+                return { img, digits: digits.every(Boolean) ? digits : null, sliderb: b ? [b] : [], combo: ['rgba(255,192,0,1)', 'rgba(0,202,0,1)', 'rgba(18,124,255,1)', 'rgba(242,24,57,1)'] };
+            })();
+        }
+        return defaultStdPromise;
+    }
+
     async function saveSkin(blob, name, mode) { await idb('readwrite', (s) => s.put({ blob, name }, mode == null ? 'current' : `mode-${mode}`)); }
     async function loadSavedSkin(mode) {
         try {
@@ -337,5 +413,5 @@
         } catch { /* nothing saved */ }
     }
 
-    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch, loadDefaultTaiko, loadDefaultRanking };
+    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch, loadDefaultTaiko, loadDefaultRanking, loadDefaultStd };
 })();
