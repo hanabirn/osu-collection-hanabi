@@ -272,6 +272,12 @@ function updateCollectionFilterCount() {
 }
 document.addEventListener('change', (e) => { if (e.target.closest && e.target.closest('#collection-filters')) updateCollectionFilterCount(); });
 
+/* 首頁 熱門新曲: ‹ › page the row sideways (its scrollbar is hidden) */
+function scrollTrending(dir) {
+    const g = document.getElementById('trending-grid');
+    if (g) g.scrollBy({ left: dir * g.clientWidth, behavior: 'smooth' });
+}
+
 /* 工具 in the 收藏 band: open the collection panel's tools menu. */
 function openCollectionToolsMenu() {
     const d = document.querySelector('details.collection-tools');
@@ -315,6 +321,7 @@ function switchTab(tab, el) {
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'replay' && typeof ensureReplayHub === 'function') ensureReplayHub();
     if (tab === 'collection') updateCollectionFilterCount();
+    if (tab === 'feedback') renderFeedbackRecent();
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();
@@ -448,6 +455,19 @@ function changelogItemText(item) {
     if (typeof item === 'string') return item;
     return item[siteLang] || item.en || item.zh || '';
 }
+/* 建議&改進: the latest releases beside the form, so a visitor sees what has
+   changed (and what may already have been asked for). */
+function renderFeedbackRecent() {
+    const list = document.getElementById('feedback-recent-list');
+    if (!list || typeof SITE_CHANGELOG === 'undefined') return;
+    const rows = [];
+    for (const entry of SITE_CHANGELOG) {
+        for (const item of entry.items) { if (rows.length < 6) rows.push({ date: entry.date, text: changelogItemText(item) }); }
+        if (rows.length >= 6) break;
+    }
+    list.innerHTML = rows.map((r) => `<li><time datetime="${escHtml(r.date)}">${escHtml(r.date.slice(5).replace('-', '/'))}</time><span>${escHtml(r.text)}</span></li>`).join('');
+}
+
 /* 更新紀錄 page: one row per release, the date on the left and what
    changed on the right, newest first (the newest is marked). */
 function renderChangelogPage() {
@@ -481,6 +501,7 @@ function refreshDynamicContent() {
     if (typeof renderTrackButtonState === 'function') renderTrackButtonState();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();
     if (typeof renderResourcesList === 'function') renderResourcesList();
+    renderFeedbackRecent();
     if (typeof renderNotificationBell === 'function') renderNotificationBell();
     if (typeof renderFarmMapsList === 'function') renderFarmMapsList();
     if (typeof refreshCatalogLocalized === 'function') refreshCatalogLocalized();

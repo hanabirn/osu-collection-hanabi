@@ -7697,3 +7697,27 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .public-collection-card .pcc-btn-row { margin-top: auto; }
 /* small text buttons get a finger-sized hit area without looking bigger */
 .rh-link, .home-more, .fc-sim-btn, #visitor-track-btn, .tracked-player-remove { min-height: 28px; min-width: 28px; display: inline-flex; align-items: center; justify-content: center; }
+
+/* 首頁 熱門新曲: a card like the others, paged with ‹ › instead of a scrollbar */
+#page-home .trending-row .home-h { align-items: center; text-align: left; letter-spacing: 0; color: var(--text); }
+.trending-nav { display: inline-flex; gap: 6px; }
+.trending-arrow { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-input); color: #fff; font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.trending-arrow:hover { border-color: var(--pink); }
+#page-home #trending-grid { scrollbar-width: none; }
+#page-home #trending-grid::-webkit-scrollbar { display: none; }
+.osu-start-slot .trending-row.home-card { background: none; border: 0; padding: 0; }
+
+/* 建議&改進: the form, and the latest site updates beside it */
+.feedback-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; max-width: 1040px; margin: 0 auto; }
+.feedback-layout .feedback-card { max-width: none; margin: 0; }
+.feedback-layout .feedback-textarea { min-height: 220px; }
+.feedback-recent { padding: 16px 18px; border-radius: var(--r-card); border: var(--line) solid var(--border); background: var(--bg-card); }
+.feedback-recent-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.feedback-recent-list li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; font-size: var(--fs-13); line-height: 1.55; color: var(--text-dim); }
+.feedback-recent-list time { color: var(--pink); font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .feedback-layout { grid-template-columns: minmax(0, 1fr); } }
+
+/* empty states: three short next steps under the message */
+.empty-steps { margin: 12px auto 0; padding: 0; list-style: none; counter-reset: es; display: flex; flex-direction: column; gap: 6px; max-width: 420px; text-align: left; font-size: var(--fs-13); color: var(--text-dim); }
+.empty-steps li { counter-increment: es; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; }
+.empty-steps li::before { content: counter(es); width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; background: rgba(var(--pink-rgb), 0.18); color: var(--pink); font-weight: 800; font-size: var(--fs-12); }

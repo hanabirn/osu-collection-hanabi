@@ -8,6 +8,66 @@
    works (shown as-is in every language). */
 const SITE_CHANGELOG = [
     {
+        date: '2026-11-21',
+        items: [
+            {
+                zh: "新的「重播」專區：找全球或各國的頂尖玩家、看他們有重播的最佳／最近成績，直接在網站上播放（四個模式都支援）",
+                'zh-Hans': "新的「回放」专区：找全球或各国的顶尖玩家、看他们有回放的最佳／最近成绩，直接在网站上播放（四个模式都支持）",
+                en: "New Replays section: find top players worldwide or by country, see their best and recent scores with replays, and watch them on the site (all four modes)",
+                ja: "新しい「リプレイ」コーナー：世界や国別のトッププレイヤーを探し、リプレイ付きのベスト／最近のスコアをサイト上で再生（全4モード対応）",
+                ko: "새 「리플레이」 코너: 전 세계나 국가별 상위 플레이어를 찾고, 리플레이가 있는 최고/최근 기록을 사이트에서 바로 재생 (4개 모드 모두)",
+                ru: "Новый раздел «Реплеи»: лучшие игроки мира и стран, их лучшие и недавние результаты с реплеями — смотрите прямо на сайте (все четыре режима)",
+                fr: "Nouvelle section Replays : les meilleurs joueurs mondiaux ou par pays, leurs meilleurs scores et scores récents avec replay, à regarder sur le site (les quatre modes)",
+                es: "Nueva sección Replays: los mejores jugadores del mundo o por país, sus mejores puntuaciones y recientes con replay, para ver en el sitio (los cuatro modos)",
+                de: "Neuer Bereich Replays: Top-Spieler weltweit oder pro Land, ihre besten und neuesten Scores mit Replay, direkt auf der Seite ansehen (alle vier Modi)",
+            },
+            {
+                zh: "雙人比較：兩份同一張圖的重播並排播放，做成比賽轉播的樣子，結束後兩邊的結算畫面並排，還能選聽哪一邊的打擊音效",
+                'zh-Hans': "双人比较：两份同一张图的回放并排播放，做成比赛转播的样子，结束后两边的结算画面并排，还能选听哪一边的打击音效",
+                en: "Compare two replays of the same map side by side, styled like a tournament broadcast, with both ranking screens at the end and a choice of whose hit sounds you hear",
+                ja: "2人比較：同じ譜面のリプレイを大会配信風に並べて再生。最後は両方のリザルトが並び、どちらのヒット音を聞くかも選べます",
+                ko: "2인 비교: 같은 맵의 리플레이 두 개를 대회 중계처럼 나란히 재생하고, 끝나면 양쪽 결과 화면이 나란히 나와요. 어느 쪽 타격음을 들을지도 고를 수 있어요",
+                ru: "Сравнение двух реплеев одной карты рядом, как в трансляции турнира: в конце оба экрана результатов, можно выбрать, чьи звуки ударов слышать",
+                fr: "Compare deux replays de la même map côte à côte, façon diffusion de tournoi, avec les deux écrans de résultats à la fin et le choix des sons de frappe entendus",
+                es: "Compara dos replays del mismo mapa lado a lado, como una transmisión de torneo, con ambas pantallas de resultados al final y elección de qué golpes oír",
+                de: "Zwei Replays derselben Map nebeneinander vergleichen, wie eine Turnierübertragung, mit beiden Ergebnisbildschirmen am Ende und Wahl der hörbaren Treffersounds",
+            },
+            {
+                zh: "Discord bot 可以把重播錄成影片：按成績下面的「🎬 錄成影片」，你的瀏覽器會用網站的播放器和你的皮膚錄好，直接貼回頻道播放",
+                'zh-Hans': "Discord bot 可以把回放录成视频：按成绩下面的「🎬 录成视频」，你的浏览器会用网站的播放器和你的皮肤录好，直接发回频道播放",
+                en: "The Discord bot can turn a replay into a video: press “🎬 Record a video” under a score and your browser records it with the site’s player and your skin, then it’s posted in the channel",
+                ja: "Discord ボットでリプレイを動画に：スコアの「🎬 動画にする」を押すと、ブラウザがサイトのプレイヤーとあなたのスキンで録画し、チャンネルに投稿されます",
+                ko: "Discord 봇으로 리플레이를 영상으로: 기록 아래 「🎬 영상으로」를 누르면 브라우저가 사이트 플레이어와 내 스킨으로 녹화해 채널에 올려 줘요",
+                ru: "Бот Discord записывает реплей в видео: нажмите «🎬 Видео» под результатом, браузер запишет его плеером сайта с вашим скином и опубликует в канале",
+                fr: "Le bot Discord transforme un replay en vidéo : « 🎬 Vidéo » sous un score, ton navigateur l’enregistre avec le lecteur du site et ton skin, puis la publie dans le salon",
+                es: "El bot de Discord convierte un replay en video: pulsa «🎬 Video» bajo una puntuación y tu navegador lo graba con el reproductor del sitio y tu skin, y se publica en el canal",
+                de: "Der Discord-Bot macht aus einem Replay ein Video: „🎬 Video“ unter einem Score drücken, dein Browser nimmt es mit dem Player der Seite und deinem Skin auf, dann wird es im Kanal gepostet",
+            },
+            {
+                zh: "「我的皮膚」和重播播放器用同一個皮膚收藏庫；手機版的收藏頁和聊天室第一屏就看得到內容；圖池、賽事、新聞改成一頁看完",
+                'zh-Hans': "「我的皮肤」和回放播放器用同一个皮肤收藏库；手机版的收藏页和聊天室第一屏就看得到内容；图池、赛事、新闻改成一页看完",
+                en: "My skins and the replay player now share one skin library; on phones the collection and chat show their content on the first screen; mappools, tournaments and news fit about a screen",
+                ja: "「マイスキン」とリプレイプレイヤーが同じスキン庫に。スマホではコレクションとチャットの内容が最初の画面に。マッププール・大会・ニュースはほぼ1画面に",
+                ko: "「내 스킨」과 리플레이 플레이어가 같은 스킨 보관함을 써요. 휴대폰에서 컬렉션과 채팅 내용이 첫 화면에 보이고, 맵풀·대회·뉴스는 한 화면 정도로 줄었어요",
+                ru: "«Мои скины» и плеер реплеев теперь общая библиотека; на телефоне коллекция и чат видны с первого экрана; маппулы, турниры и новости помещаются примерно на экран",
+                fr: "Mes skins et le lecteur de replays partagent une seule bibliothèque ; sur téléphone, collection et chat s’affichent dès le premier écran ; mappools, tournois et news tiennent sur un écran",
+                es: "Mis skins y el reproductor de replays comparten una biblioteca; en el móvil la colección y el chat se ven en la primera pantalla; mappools, torneos y noticias caben en una pantalla",
+                de: "Meine Skins und der Replay-Player teilen eine Skin-Sammlung; am Handy zeigen Sammlung und Chat sofort Inhalt; Mappools, Turniere und News passen etwa auf einen Bildschirm",
+            },
+            {
+                zh: "日文、韓文、德文、西班牙文、法文、俄文補齊了原本顯示成中文的文字（皮膚廣場、FC 模擬等）",
+                'zh-Hans': "日文、韩文、德文、西班牙文、法文、俄文补齐了原本显示成中文的文字（皮肤广场、FC 模拟等）",
+                en: "Japanese, Korean, German, Spanish, French and Russian no longer show Chinese text in places like the skin plaza and FC sim",
+                ja: "日本語・韓国語・ドイツ語・スペイン語・フランス語・ロシア語で、スキン広場や FC 試算などが中国語のまま表示されていた部分を翻訳しました",
+                ko: "일본어·한국어·독일어·스페인어·프랑스어·러시아어에서 스킨 광장, FC 계산 등 중국어로 나오던 문구를 번역했어요",
+                ru: "На японском, корейском, немецком, испанском, французском и русском больше нет китайского текста (галерея скинов, расчёт FC и др.)",
+                fr: "Japonais, coréen, allemand, espagnol, français et russe n’affichent plus de texte chinois (galerie de skins, simulation FC…)",
+                es: "Japonés, coreano, alemán, español, francés y ruso ya no muestran texto en chino (plaza de skins, simular FC…)",
+                de: "Japanisch, Koreanisch, Deutsch, Spanisch, Französisch und Russisch zeigen keinen chinesischen Text mehr (Skin-Galerie, FC-Rechner …)",
+            },
+        ],
+    },
+    {
         date: '2026-11-14',
         items: [
             {

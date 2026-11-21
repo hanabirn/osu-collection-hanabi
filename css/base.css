@@ -1941,8 +1941,12 @@ a.contact-info-item:hover { background: var(--bg-stat); text-decoration: none; }
 :root[data-section="home"], :root[data-section="collection"], :root[data-section="catalog"],
 :root[data-section="public-collections"], :root[data-section="skin-screenshots"],
 :root[data-section="lookup"], :root[data-section="chat"], :root[data-section="mappools"], :root[data-section="updates"] { --page-max: 1640px; }
-.site-header { padding-inline: max(var(--page-pad), calc((100% - var(--page-max)) / 2 + var(--page-pad))); }
-.section-band-in { max-width: var(--page-max); padding-inline: var(--page-pad); }
+/* The header and the band keep one width on every page (--chrome-max), so the
+   logo, the links and the page title never shift when moving between pages;
+   only the content below is narrower on reading pages. */
+:root { --chrome-max: 1640px; }
+.site-header { padding-inline: max(var(--page-pad), calc((100% - var(--chrome-max)) / 2 + var(--page-pad))); }
+.section-band-in { max-width: var(--chrome-max); padding-inline: var(--page-pad); }
 /* Brand: a 40px mark, centred in the 60px bar, beside a larger wordmark. */
 .site-header-top { align-self: center; }
 .site-header .header-logo { gap: 12px; align-items: center; }

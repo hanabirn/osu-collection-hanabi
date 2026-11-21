@@ -145,6 +145,7 @@ function renderSkinScreenshotsList() {
         listEl.innerHTML = `<div class="empty-state">
             <div class="empty-state-icon">${icon(hasFilter ? 'search' : 'camera', { size: '1.5rem' })}</div>
             <div class="empty-state-sub">${escapeHtmlOsu(t(hasFilter ? 'ssc_no_results' : 'ssc_empty'))}</div>
+            ${hasFilter ? '' : `<ol class="empty-steps"><li>${escHtml(t('ssc_step1'))}</li><li>${escHtml(t('ssc_step2'))}</li><li>${escHtml(t('ssc_step3'))}</li></ol>`}
         </div>`;
         if (pageEl) pageEl.innerHTML = '';
         return;

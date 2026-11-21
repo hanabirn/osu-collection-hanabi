@@ -308,8 +308,9 @@
 
             </div>
         </div>
-        <section class="trending-row" id="trending-row" style="display:none;" aria-labelledby="trending-title">
-            <h3 id="trending-title" data-i18n="trending_title">熱門新曲</h3>
+        <section class="trending-row home-card" id="trending-row" style="display:none;" aria-labelledby="trending-title">
+            <h3 class="home-h"><span id="trending-title" data-i18n="trending_title">熱門新曲</span>
+                <span class="trending-nav"><button type="button" class="trending-arrow" onclick="scrollTrending(-1)" data-i18n-aria="trending_prev" aria-label="上一組">‹</button><button type="button" class="trending-arrow" onclick="scrollTrending(1)" data-i18n-aria="trending_next" aria-label="下一組">›</button></span></h3>
             <div class="trending-grid" id="trending-grid"></div>
         </section>
         <section class="explore-row" aria-labelledby="explore-title">
@@ -1098,6 +1099,7 @@
     <section id="page-feedback" class="site-page" style="display:none;">
         <p class="eyebrow">FEEDBACK</p>
         <h2 class="osu-page-title" data-i18n="feedback_title">建議&改進</h2>
+        <div class="feedback-layout">
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
@@ -1108,6 +1110,11 @@
                 <button type="submit" class="btn feedback-submit" data-i18n="feedback_submit">送出</button>
             </form>
             <div id="feedback-success" class="feedback-success" style="display:none;" data-i18n="feedback_success">您的回覆訊息已傳送，感謝您的回饋！</div>
+        </div>
+        <aside class="feedback-recent" aria-labelledby="feedback-recent-title">
+            <h3 class="home-h"><span id="feedback-recent-title" data-i18n="feedback_recent_title">最近的網站更新</span><button type="button" class="home-more" onclick="switchTab('changelog')" data-i18n="home_see_all">全部</button></h3>
+            <ul class="feedback-recent-list" id="feedback-recent-list"></ul>
+        </aside>
         </div>
     </section>
 

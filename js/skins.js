@@ -188,7 +188,11 @@ async function renderSkinsList() {
     }
     skins.sort((a, b) => b.addedAt - a.addedAt);
     if (skins.length === 0) {
-        container.innerHTML = `<p class="skins-empty">${t('skins_empty')}</p>`;
+        container.innerHTML = `<div class="empty-state">
+            <div class="empty-state-icon">${icon('package', { size: '1.5rem' })}</div>
+            <div class="empty-state-sub">${t('skins_empty')}</div>
+            <ol class="empty-steps"><li>${escHtml(t('skins_step1'))}</li><li>${escHtml(t('skins_step2'))}</li><li>${escHtml(t('skins_step3'))}</li></ol>
+        </div>`;
         return;
     }
     container.innerHTML = skins.map(s => {
