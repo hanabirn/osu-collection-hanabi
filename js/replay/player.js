@@ -547,7 +547,7 @@
                             <p class="rp-note">${L('「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。')}</p>
                         </div>
                     </details>
-                    ${replay.mode === 3 ? `<button type="button" class="rp-btn" id="rp-compare-btn" title="${L('雙人比較')}">⚔<span class="rp-btn-text"> ${L('雙人比較')}</span></button>` : ''}
+                    ${replay.mode === 3 || replay.mode === 2 ? `<button type="button" class="rp-btn" id="rp-compare-btn" title="${L('雙人比較')}">⚔<span class="rp-btn-text"> ${L('雙人比較')}</span></button>` : ''}
                     <button type="button" class="rp-btn" onclick="openReplayViewer()" title="${L('換一個重播')}" aria-label="${L('換一個重播')}">⏏<span class="rp-btn-text"> ${L('換一個重播')}</span></button>
                 </div>
             </div>`;
@@ -934,12 +934,14 @@
         /* ===== two replays of one map, side by side (as mania-tracker does) ===== */
         const body2 = $('rp-body');
         const cmpBtn = $('rp-compare-btn');
-        const timingA = replay.mode === 3 ? timingTimeline(prep) : null;
+        const timed = replay.mode === 3; // modes with hit timing (UR, early / late)
+        const timingA = timed ? timingTimeline(prep) : () => ({ early: 0, late: 0, mean: 0 });
         const rateOf = (mods) => (mods & 64 || mods & 512 ? 1.5 : mods & 256 ? 0.75 : 1);
         const CMP_ROWS = [
-            ['acc', L('準確率'), 'hi'], ['ur', 'UR', 'lo'],
-            ...JUDGES.map((j) => [j, jl(j), j === 'MAX' || j === '300' ? 'hi' : 'lo', R.JUDGE_COLOR[j]]),
-            ['early', L('偏早'), ''], ['late', L('偏晚'), ''], ['mean', L('平均偏差'), 'abs'],
+            ['acc', L('準確率'), 'hi'], ...(timed ? [['ur', 'UR', 'lo']] : []),
+            // more of the good judgements is better, fewer of the rest
+            ...JUDGES.map((j) => [j, jl(j), ['MAX', '300', 'FRUIT', 'DROP', 'TINY'].includes(j) ? 'hi' : 'lo', R.JUDGE_COLOR[j]]),
+            ...(timed ? [['early', L('偏早'), ''], ['late', L('偏晚'), ''], ['mean', L('平均偏差'), 'abs']] : []),
             ['pp', 'PP', 'hi'],
         ];
         function closeCompare() {
@@ -957,7 +959,8 @@
                 if (rateOf(rB.mods) !== rateOf(replay.mods)) throw new Error(L('兩個重播的倍速不同（例如一個有 DT），沒辦法並排比較'));
                 if (rB.scoreId && rB.scoreId === replay.scoreId) throw new Error(L('這是同一份成績'));
                 const prepB = M.prepare(map, rB);
-                session.cmp = { replay: rB, prep: prepB, ppAt: ppLookup(rB, prepB, bm.beatmap_id), timing: timingTimeline(prepB), ppA: ppAt };
+                if (replay.mode === 2 && prep.defaultSkin) prepB.defaultSkin = prep.defaultSkin;
+                session.cmp = { replay: rB, prep: prepB, ppAt: ppLookup(rB, prepB, bm.beatmap_id), timing: timed ? timingTimeline(prepB) : timingA, ppA: ppAt };
                 if (pick) pick.remove();
                 renderCompareHud();
                 body2.classList.add('rp-comparing');
@@ -1193,6 +1196,16 @@
             const rb = M.rank ? M.rank(rec, acc) : '';
             const sv = (r2.mods & (8 | 1024)) && (rb === 'SS' || rb === 'S');
             let lb = String(r2.lifeBar || '').split(',').map((x) => { const [a, b] = x.split('|'); return { t: Number(a), hp: Number(b) }; }).filter((x) => Number.isFinite(x.t) && Number.isFinite(x.hp));
+            if (lb.length < 2 && r2.mode === 2) {
+                let hp = 1;
+                lb = [{ t: 0, hp }];
+                for (const o of p2.flat) {
+                    if (o.kind === 'banana') continue;
+                    const q = o.caught ? (o.kind === 'tiny' ? 0.3 : 1) : o.kind === 'tiny' ? -0.3 : -1;
+                    hp = Math.min(1, Math.max(0, hp + (q > 0 ? 0.02 * q : q * 0.08)));
+                    lb.push({ t: o.time, hp });
+                }
+            }
             if (lb.length < 2 && r2.mode === 3) {
                 let hp = 1;
                 lb = [{ t: p2.events.length ? p2.events[0].judgedAt : 0, hp }];
