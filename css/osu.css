@@ -7466,10 +7466,10 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-bc-scores b { font-size: clamp(1.4rem, 3.2cqw, 2.4rem); font-weight: 800; color: rgba(255, 255, 255, 0.6); }
 .rp-bc-scores b.is-a { text-align: right; }
 .rp-bc-scores b.is-lead { color: #fff; }
-.rp-bc-map { position: absolute; left: 12px; top: calc(var(--bc-bottom, 600px) + 74px); width: calc(50% - 24px); height: 62px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 6px 12px; border: 2px solid #1e6fd9; background: linear-gradient(90deg, rgba(8, 8, 14, 0.9) 35%, rgba(8, 8, 14, 0.35)), var(--cover) center / cover; overflow: hidden; opacity: var(--rp-outro, 1); }
-.rp-bc-map > b { font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rp-bc-map small { font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rp-bc-stats { position: absolute; right: 16px; top: calc(var(--bc-bottom, 600px) + 74px); width: calc(50% - 32px); height: 62px; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 14px; align-content: center; font-size: 0.78rem; opacity: var(--rp-outro, 1); }
+.rp-bc-map { position: absolute; left: 12px; top: calc(var(--bc-bottom, 600px) + 74px); width: calc(50% - 24px); height: 88px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 8px 16px; border: 2px solid #1e6fd9; background: linear-gradient(90deg, rgba(8, 8, 14, 0.9) 35%, rgba(8, 8, 14, 0.35)), var(--cover) center / cover; overflow: hidden; opacity: var(--rp-outro, 1); }
+.rp-bc-map > b { font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-bc-map small { font-size: 0.88rem; color: rgba(255, 255, 255, 0.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-bc-stats { position: absolute; right: 16px; top: calc(var(--bc-bottom, 600px) + 74px); width: calc(50% - 32px); height: 88px; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 18px; align-content: center; font-size: 1rem; opacity: var(--rp-outro, 1); }
 .rp-bc-stats div { display: flex; gap: 6px; white-space: nowrap; }
 .rp-bc-stats dt { color: rgba(255, 255, 255, 0.65); }
 .rp-bc-stats dd { margin: 0; font-weight: 800; }

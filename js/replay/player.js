@@ -1395,7 +1395,7 @@
                     // a tournament-broadcast frame: names in the corners, two 4:3 game
                     // screens side by side, the score bar and the map below
                     const W2 = view.w, H2 = view.h;
-                    const head = 96, below = 150; // above: the names; under the screens: the score bar, the scores, the map
+                    const head = 96, below = 176; // above: the names; under the screens: the score bar, the scores, the map
                     const vh = Math.max(120, Math.min((W2 / 2 - 24) * 0.75, H2 - head - below));
                     // the whole frame centred top to bottom when the screens are width-bound
                     const top = Math.round(Math.max(head, (H2 - vh - below - head) / 2 + head));
