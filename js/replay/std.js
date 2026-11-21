@@ -675,6 +675,24 @@
                         ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(turn) * R * 3, cy + Math.sin(turn) * R * 3); ctx.stroke();
                     }
                 }
+                // turns beyond the ones needed score a bonus, counted up under the centre
+                const extra = Math.floor(Math.abs(turn) / (2 * Math.PI) - o.required);
+                if (extra >= 1 && t <= o.end + 200) {
+                    const bonus = String(extra * 1000);
+                    const cf = skin.comboFont;
+                    const bh = h * 0.07;
+                    const by = cy + h * 0.2;
+                    if (cf) {
+                        const gs = bonus.split('').map((d) => cf.digits[Number(d)]);
+                        const kk = bh / (gs[0].bmp.height * gs[0].s);
+                        const total = gs.reduce((a2, g) => a2 + g.bmp.width * g.s * kk, 0);
+                        let bx = cx - total / 2;
+                        for (const g of gs) { const gw = g.bmp.width * g.s * kk; ctx.drawImage(g.bmp, bx, by - bh / 2, gw, bh); bx += gw; }
+                    } else {
+                        ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(bh)}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(bonus, cx, by);
+                    }
+                }
                 if (done >= 1 && I['spinner-clear'] && t <= o.end) {
                     const sc = I['spinner-clear'];
                     const cw = sc.bmp.width * sc.s * u, ch = sc.bmp.height * sc.s * u;
@@ -764,7 +782,8 @@
             const down = prep.keyDown(cur.keys);
             const keyI = I['inputoverlay-key'];
             const size = h * 0.062;
-            const x0 = w - size * 0.5 - 10, yMid = h * 0.5;
+            // below the right-hand column (accuracy, pp, mods, counts)
+            const x0 = w - size * 0.5 - 10, yMid = h * 0.72;
             ['K1', 'K2', 'M1', 'M2'].forEach((key, i) => {
                 const list = prep.keyPress[key];
                 let lo = 0, hi = list.length - 1, n = 0;

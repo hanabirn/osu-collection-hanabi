@@ -275,7 +275,51 @@
         if (typeof decodeOsuMods === 'function') { const m = decodeOsuMods(mods); return m.length ? m.join('') : 'NM'; }
         return String(mods);
     }
+    function modsHtml(mods) {
+        const list = typeof decodeOsuMods === 'function' ? decodeOsuMods(mods) : [];
+        const shown = list.filter((m) => m !== 'NM' && !(m === 'DT' && list.includes('NC')) && !(m === 'SD' && list.includes('PF')));
+        if (!shown.length) return '';
+        const badge = (m) => (typeof scModBadge === 'function' ? scModBadge(m) : `<b class="rp-mod-text">${esc(m)}</b>`);
+        return `<div class="rp-mods" aria-label="Mods">${shown.map(badge).join('')}</div>`;
+    }
     const num1 = (v) => { const n = Number(v) || 0; return Number.isInteger(n) ? String(n) : n.toFixed(1); };
+
+    /* the score after each judged object, in the shape rosu-pp's gradual
+       calculation wants: standard counts every object, taiko its hits,
+       catch its fruit and droplets, mania its notes */
+    function ppStatesFor(mode, prep) {
+        const out = [];
+        let best = 0;
+        if (mode === 0) {
+            for (const e of prep.events) {
+                best = Math.max(best, e.comboAfter || 0);
+                if (!e.count) continue;
+                const c = e.countsAfter;
+                out.push({ t: e.jt, n: out.length + 1, combo: best, n300: c[300], n100: c[100], n50: c[50], miss: c.MISS });
+            }
+        } else if (mode === 1) {
+            for (const e of prep.events) {
+                best = Math.max(best, e.comboAfter || 0);
+                const c = e.countsAfter;
+                out.push({ t: e.jt, n: out.length + 1, combo: best, n300: c[300], n100: c[100], miss: c.MISS });
+            }
+        } else if (mode === 2) {
+            for (const o of prep.flat) {
+                best = Math.max(best, o.comboAfter || 0);
+                if (o.kind !== 'fruit' && o.kind !== 'droplet') continue;
+                const c = o.countsAfter;
+                out.push({ t: o.time, n: out.length + 1, combo: best, n300: c.FRUIT, n100: c.DROP, n50: c.TINY, katu: c.TINYMISS, miss: c.MISS });
+            }
+        } else if (mode === 3) {
+            for (const e of prep.events) {
+                best = Math.max(best, e.comboAfter || 0);
+                const c = e.countsAfter;
+                out.push({ t: e.judgedAt, n: out.length + 1, combo: best, geki: c.MAX, n300: c[300], katu: c[200], n100: c[100], n50: c[50], miss: c.MISS });
+            }
+        }
+        // fewer than a few thousand: one per object is fine
+        return out;
+    }
 
     function startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M }) {
         const R = { JUDGE_COLOR: M.colors(), MOD: { NC: 512 } };
@@ -339,15 +383,20 @@
                     <div class="rp-ic-counts" style="grid-template-columns: repeat(${JUDGES.length}, minmax(0, 1fr))">${JUDGES.map((j) => `<span><i style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</i>${record[j]}</span>`).join('')}</div>
                 </div>
             </div>
-            <div class="rp-hud rp-hud-tl"><span class="rp-acc" id="rp-acc">100.00%</span></div>
             <div class="rp-hud rp-hud-tr">
+                <div class="rp-gauge">
+                    <svg class="rp-pie" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.5"></circle><path id="rp-pie" d=""></path></svg>
+                    <span class="rp-acc" id="rp-acc">100.00%</span>
+                </div>
+                <div class="rp-pp" title="${L('目前的 PP')}"><b id="rp-pp">–</b><small>pp</small></div>
+                ${modsHtml(replay.mods)}
                 <dl class="rp-live-counts">${JUDGES.map((j) => `<dt style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</dt><dd id="rp-c-${j}">0</dd>`).join('')}
                     ${M.ur ? '<dt class="rp-ur">UR</dt><dd id="rp-ur">0</dd>' : ''}</dl>
+                ${M.hands ? `<div class="rp-hands">
+                    <div><small>L MISS</small><b id="rp-lmiss">0</b></div>
+                    <div><small>R MISS</small><b id="rp-rmiss">0</b></div>
+                </div>` : ''}
             </div>
-            ${M.hands ? `<div class="rp-hud rp-hud-l">
-                <div><small>L MISS</small><b id="rp-lmiss">0</b></div>
-                <div><small>R MISS</small><b id="rp-rmiss">0</b></div>
-            </div>` : ''}
             <div class="rp-results" id="rp-results" hidden>
                 <div class="rp-res-card" role="dialog" aria-label="${L('結算')}">
                     <div class="rp-res-head" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/cover@2x.jpg')">
@@ -665,6 +714,41 @@
             audio.currentTime = Math.max(0, first - 1500) / 1000;
             audio.play().catch(() => {});
         });
+        // the time pie: how far through the map (first object to last)
+        const pieEl = $('rp-pie'), ppEl = $('rp-pp');
+        const pieFrom = first, pieTo = Math.max(first + 1, prep.lastTime);
+        let lastPie = -1;
+        const drawPie = (t) => {
+            const f = Math.max(0, Math.min(1, (t - pieFrom) / (pieTo - pieFrom)));
+            const q = Math.round(f * 400) / 400;
+            if (q === lastPie) return;
+            lastPie = q;
+            if (q <= 0) { pieEl.setAttribute('d', ''); return; }
+            if (q >= 1) { pieEl.setAttribute('d', 'M18 18 m-15.5 0 a15.5 15.5 0 1 0 31 0 a15.5 15.5 0 1 0 -31 0'); return; }
+            const a = q * Math.PI * 2 - Math.PI / 2;
+            const x = 18 + 15.5 * Math.cos(a), y = 18 + 15.5 * Math.sin(a);
+            pieEl.setAttribute('d', `M18 18 L18 2.5 A15.5 15.5 0 ${q > 0.5 ? 1 : 0} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z`);
+        };
+        // the pp as the replay goes: worked out on the server in one pass
+        const ppStates = ppStatesFor(replay.mode, prep);
+        let ppTimes = null, ppValues = null, lastPp = null;
+        if (ppStates.length && bm.beatmap_id) {
+            fetch(window.REPLAY_PP_ENDPOINT || '/.netlify/functions/replay-pp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Number(bm.beatmap_id), mods: replay.mods >>> 0, mode: replay.mode, states: ppStates.map(({ t: _t, ...rest }) => rest) }),
+            }).then((res) => (res.ok ? res.json() : null)).then((data) => {
+                if (!data || !Array.isArray(data.pp) || data.pp.length !== ppStates.length) return;
+                ppTimes = ppStates.map((s2) => s2.t);
+                ppValues = data.pp;
+            }).catch(() => {});
+        }
+        const ppAt = (t) => {
+            if (!ppTimes) return null;
+            let lo = 0, hi = ppTimes.length - 1, ans = -1;
+            while (lo <= hi) { const mid = (lo + hi) >> 1; if (ppTimes[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+            return ans < 0 ? 0 : ppValues[ans];
+        };
         let lastShown = '';
         let lastStats = { combo: 0, acc: 1, counts: Object.fromEntries(JUDGES.map((j) => [j, 0])), ur: 0, lMiss: 0, rMiss: 0 };
         const resultsData = {
@@ -717,6 +801,9 @@
                 if (rEl) rEl.textContent = s.rMiss;
                 for (const j of JUDGES) countEls[j].textContent = s.counts[j];
             }
+            drawPie(t);
+            const ppNow = ppAt(t);
+            if (ppNow !== lastPp) { lastPp = ppNow; ppEl.textContent = ppNow == null ? '–' : Math.round(ppNow).toLocaleString(); }
             timeEl.textContent = fmtReal(t);
             seekNow.textContent = timeEl.textContent;
             if (!seeking) seek.value = String(Math.round((t / endMs()) * 1000));

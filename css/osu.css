@@ -7286,12 +7286,40 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 @keyframes rp-res-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* standard: notes can appear anywhere, so while playing the card tucks into
    its cover strip; pausing (or pointing at it) opens it again */
-.rp-body[data-mode="0"] .rp-infocard > :not(.rp-ic-cover) { transition: opacity 0.2s; }
-.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) > :not(.rp-ic-cover) { display: none; }
+.rp-body[data-mode="0"] .rp-infocard { transition: opacity 0.35s ease; }
+.rp-body[data-mode="0"] .rp-infocard > :not(.rp-ic-cover) { max-height: 260px; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, padding 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.rp-body[data-mode="0"] .rp-ic-cover { transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) > :not(.rp-ic-cover) { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; border-top-width: 0; transition-delay: 0.12s; }
 .rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) { opacity: 0.85; }
-.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) .rp-ic-cover { height: 46px; }
+.rp-body[data-mode="0"].rp-playing .rp-infocard:not(:hover) .rp-ic-cover { height: 46px; transition-delay: 0.12s; }
+@media (prefers-reduced-motion: reduce) { .rp-body[data-mode="0"] .rp-infocard, .rp-body[data-mode="0"] .rp-infocard > *, .rp-body[data-mode="0"] .rp-ic-cover { transition: none !important; } }
+/* the right column: time pie + accuracy, pp, mods, then the live counts */
+.rp-hud-tr { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 150px; }
+.rp-gauge { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.rp-pie { width: 26px; height: 26px; flex: none; }
+.rp-pie circle { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.5; }
+.rp-pie path { fill: rgba(255, 255, 255, 0.85); }
+.rp-gauge .rp-acc { font-size: clamp(20px, 1.9cqw, 30px); font-weight: 800; line-height: 1; }
+.rp-pp { display: flex; align-items: baseline; justify-content: flex-end; gap: 4px; font-weight: 800; }
+.rp-pp b { font-size: clamp(18px, 1.6cqw, 26px); color: #ffd166; }
+.rp-pp small { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
+.rp-mods { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; pointer-events: auto; }
+.rp-mods .sc-mod { width: 48px; height: 36px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)); }
+.rp-mods .sc-mod img { height: 64%; }
+.rp-mod-text { padding: 2px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.15); font-size: 12px; }
+.rp-hud-tr .rp-live-counts { padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.rp-hands { display: flex; justify-content: space-between; gap: 12px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.rp-hands div { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.rp-hands small { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.75); }
+.rp-hands b { font-size: clamp(18px, 1.6cqw, 26px); }
+.rp-hud-tr { top: 56px; }
+/* the card no longer repeats the counts the column shows (mania, catch); taiko drops the result rows too */
+.rp-body[data-mode="3"] .rp-ic-counts, .rp-body[data-mode="2"] .rp-ic-counts { display: none; }
+.rp-body[data-mode="1"] .rp-ic-counts, .rp-body[data-mode="1"] .rp-ic-result { display: none; }
+/* taiko: the live column sits under the lane, on the right */
+.rp-body[data-mode="1"] .rp-hud-tr { top: calc((100% - 104px) * 0.525 + 14px); }
 /* taiko: the lane runs across the upper screen, so the card sits low and the accuracy moves right */
-.rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 110px; }
+.rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 196px; } /* room under it for the combo */
 .rp-body[data-mode="1"] .rp-hud-tl { left: auto; right: 24px; }
 @container (max-width: 1180px) { .rp-infocard { width: 250px; } .rp-ic-cover { height: 64px; } }
 @container (max-height: 700px) { .rp-ic-play { display: none; } }

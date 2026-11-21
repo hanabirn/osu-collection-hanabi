@@ -468,6 +468,25 @@
             ctx.restore();
         }
 
+        // the combo again at the bottom left, as osu! shows it, swelling on each hit
+        if (combo > 0) {
+            const cs = (view.comboScale || 0.6) / 0.6;
+            const bump = last && t - last.jt < 120 ? 1 + 0.12 * (1 - (t - last.jt) / 120) : 1;
+            const ch = h * 0.065 * cs * bump;
+            let dx = 14;
+            const base = h - 14;
+            if (skin.comboDigits) {
+                const ds = String(combo).split('').map((d) => skin.comboDigits[Number(d)]);
+                const kk = ch / (ds[0].bmp.height * ds[0].s);
+                for (const g of ds) { const gw = g.bmp.width * g.s * kk, gh = g.bmp.height * g.s * kk; ctx.drawImage(g.bmp, dx, base - gh, gw, gh); dx += gw - (skin.comboOverlap || 0) * kk; }
+                ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(ch * 0.7)}px system-ui, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                ctx.fillText('x', dx + 2, base);
+            } else {
+                ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(ch)}px system-ui, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                ctx.fillText(`${combo}x`, dx, base);
+            }
+        }
+
         // hit notes (and roll ticks) flying up towards the mascot
         const flyTo = { x: drumW * 0.7, y: bandTop - bandH * 1.25 };
         const fly = (time, d, colour, big) => {
