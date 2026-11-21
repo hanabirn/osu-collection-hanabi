@@ -137,6 +137,8 @@
                     beatLength: Number(f[1]),
                     uninherited: f.length > 6 ? f[6] === '1' : true,
                     kiai: f.length > 7 ? (Number(f[7]) & 1) === 1 : false,
+                    meter: Number(f[2]) || 4,
+                    omitBarline: f.length > 7 ? (Number(f[7]) & 8) === 8 : false,
                 });
             } else if (section === 'Colours') {
                 const i = line.indexOf(':');
@@ -146,7 +148,7 @@
                 const f = line.split(',');
                 if (f.length < 4) continue;
                 const type = Number(f[3]);
-                const o = { x: Number(f[0]), y: Number(f[1]), time: Number(f[2]), type, newCombo: !!(type & 4), comboSkip: (type >> 4) & 7 };
+                const o = { x: Number(f[0]), y: Number(f[1]), time: Number(f[2]), type, hitSound: Number(f[4]) | 0, newCombo: !!(type & 4), comboSkip: (type >> 4) & 7 };
                 if (type & 128) o.endTime = Number(String(f[5] || '').split(':')[0]); // mania hold
                 if (type & 8) o.endTime = Number(f[5]); // spinner
                 if (type & 2) {

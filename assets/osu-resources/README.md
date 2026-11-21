@@ -11,8 +11,9 @@ The licence does not cover the "osu!" or "ppy" branding.
 
 ## skin-legacy/
 
-osu!stable's default osu!catch images (fruit, droplet, bananas, catcher),
+osu!stable's default osu!catch and osu!taiko images (fruit, droplet,
+bananas, catcher; notes, drum, lane, mascot frames; score digits),
 copied unchanged from `osu.Game.Resources/Skins/Legacy` in the same
 repository, same licence (CC BY-NC 4.0, © ppy Pty Ltd). The replay player
 (js/replay/skin.js) uses them for any catch image a visitor's skin doesn't
-have, as the game does.
+have, as the game does (and the whole set when a visitor has no skin).

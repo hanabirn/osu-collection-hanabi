@@ -46,10 +46,23 @@
             ur: false,
             scroll: false, judgeSize: false, hands: false,
         },
+        1: {
+            judges: ['300', '100', 'MISS'],
+            labels: {},
+            colors: () => window.replayTaiko.JUDGE_COLOR,
+            record: (r) => ({ 300: r.n300, 100: r.n100, MISS: r.nMiss }),
+            acc: (c) => { const n = c[300] + c[100] + c.MISS; return n ? (c[300] + 0.5 * c[100]) / n : 1; },
+            prepare: (map, replay) => window.replayTaiko.prepareTaiko(map, replay),
+            draw: (ctx, view, prep, t) => window.replayTaiko.drawTaiko(ctx, view, prep, t),
+            skin: (skin) => skin.forTaiko(),
+            stats: (map, prep) => [['OD', num1(prep.diff.od)], ['HP', num1(prep.diff.hp)], ['SV', num1(map.sliderMultiplier || 1.4)]],
+            ur: true,
+            scroll: false, judgeSize: true, hands: false,
+        },
     };
     let root = null;
     let session = null; // { audio, raf, urls[], prep, map, replay, view, ro }
-    let savedSkin; // undefined = not looked up yet, null = none
+    const savedSkins = {}; // by mode; undefined = not looked up yet, null = none
 
     /* the visitor's choices, kept in this browser */
     const PREFS_KEY = 'osu_replay_prefs_v1';
@@ -105,7 +118,7 @@
                 <input type="file" accept=".osr" hidden onchange="if(this.files[0])loadReplayFile(this.files[0])">
                 <span class="rp-drop-icon">▶</span>
                 <b>${L('把 .osr 重播檔拖到這裡，或點一下選擇檔案')}</b>
-                <small>${L('目前支援 osu!mania 和 osu!catch。譜面和音樂會自動從 osu.direct 下載。')}</small>
+                <small>${L('目前支援 osu!mania、osu!catch 和 osu!taiko。譜面和音樂會自動從 osu.direct 下載。')}</small>
                 ${msg ? `<p class="rp-error">${esc(msg)}</p>` : ''}
             </label>`);
         const drop = $('rp-drop');
@@ -175,7 +188,7 @@
             showStatus(steps, 0);
             const replay = F.parseOsr(await file.arrayBuffer());
             const M = MODES[replay.mode];
-            if (!M) throw new Error(L('這個模式的重播目前還不支援（支援 Mania 和 Catch）'));
+            if (!M) throw new Error(L('這個模式的重播目前還不支援（支援 Mania、Catch 和 Taiko）'));
 
             showStatus(steps, 1);
             const found = await osuFetch(`h=${encodeURIComponent(replay.beatmapMd5)}`).catch(() => null);
@@ -209,7 +222,9 @@
             await new Promise((r) => setTimeout(r, 0));
             const prep = M.prepare(map, replay);
             if (replay.mode === 2 && window.replaySkin.loadDefaultCatch) prep.defaultSkin = await window.replaySkin.loadDefaultCatch().catch(() => null);
-            if (savedSkin === undefined) savedSkin = await window.replaySkin.loadSavedSkin();
+            if (replay.mode === 1 && window.replaySkin.loadDefaultTaiko) prep.defaultSkin = await window.replaySkin.loadDefaultTaiko().catch(() => null);
+            if (savedSkins[replay.mode] === undefined) savedSkins[replay.mode] = await window.replaySkin.loadSavedSkin(replay.mode);
+            const savedSkin = savedSkins[replay.mode];
             const skinCfg = savedSkin ? await M.skin(savedSkin, prep).catch(() => null) : null;
             startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M });
         } catch (err) {
@@ -235,6 +250,7 @@
         const sr = Number(bm.difficultyrating) || 0;
         const srColor = typeof starRatingColor === 'function' ? starRatingColor(sr) : '#f472b6';
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
+        $('rp-body').dataset.mode = String(replay.mode);
         $('rp-body').innerHTML = `
             <div class="rp-stage" id="rp-stage"><canvas id="rp-canvas"></canvas></div>
             <div class="rp-hud rp-infocard" id="rp-infocard">
@@ -302,7 +318,7 @@
                     <details class="rp-menu">
                         <summary class="rp-btn" title="${L('Skin・判定')}">⚙<span class="rp-btn-text"> ${L('Skin・判定')}</span></summary>
                         <div class="rp-menu-panel">
-                            <div class="rp-opt">Skin <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkin ? savedSkin.name : L('預設'))}</span>
+                            <div class="rp-opt">Skin <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkins[replay.mode] ? savedSkins[replay.mode].name : L('預設'))}</span>
                                 <span class="rp-skin-btns">
                                     <label class="rp-btn">${L('使用我的 skin（.osk / .zip）')}<input type="file" accept=".osk,.zip" hidden id="rp-skin-file"></label>
                                     <button type="button" class="rp-btn" id="rp-skin-reset">${L('恢復預設')}</button>
@@ -436,8 +452,8 @@
             try {
                 const skin = await window.replaySkin.loadSkin(f, f.name.replace(/\.(osk|zip)$/i, ''));
                 view.skin = await M.skin(skin, prep);
-                savedSkin = skin;
-                await window.replaySkin.saveSkin(f, skin.name).catch(() => {});
+                savedSkins[replay.mode] = skin;
+                await window.replaySkin.saveSkin(f, skin.name, replay.mode).catch(() => {});
                 $('rp-skin-name').textContent = skin.name;
             } catch (err) {
                 console.error('skin load failed', err);
@@ -464,8 +480,8 @@
             clearTimeout(resetArmed);
             resetArmed = null;
             btn.textContent = L('恢復預設');
-            await window.replaySkin.clearSkin();
-            savedSkin = null;
+            await window.replaySkin.clearSkin(replay.mode);
+            savedSkins[replay.mode] = null;
             view.skin = null;
             $('rp-skin-name').textContent = L('預設');
         });

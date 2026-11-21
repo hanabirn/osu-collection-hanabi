@@ -201,7 +201,23 @@
             };
         }
 
-        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch };
+        /* osu!taiko: every image by name (the skin's, else osu!'s default), the
+           mascot's animation frames, the combo font */
+        async function forTaiko() {
+            const def = await loadDefaultTaiko();
+            const img = {};
+            for (const n of TAIKO_IMAGES) img[n] = (await image(n)) || def.img[n] || null;
+            const frames = async (state) => {
+                const out = [];
+                for (let i = 0; i < 30; i++) { const f = await image(`pippidon${state}${i}`); if (!f) break; out.push(f); }
+                return out.length ? out : def.mascot[state];
+            };
+            const mascot = { idle: await frames('idle'), kiai: await frames('kiai'), fail: await frames('fail'), clear: await frames('clear') };
+            const own = await comboFont();
+            return { img, mascot, comboDigits: own || def.comboDigits, comboOverlap: own ? Number((ini.fonts && ini.fonts.ComboOverlap) || 0) : 0 };
+        }
+
+        return { name: name || ini.general.Name || 'skin', ini, forKeys, forCatch, forTaiko };
     }
 
     /* osu!stable's default catch images (ppy/osu-resources Skins/Legacy,
@@ -235,14 +251,52 @@
         return defaultCatchPromise;
     }
 
-    async function saveSkin(blob, name) { await idb('readwrite', (s) => s.put({ blob, name }, 'current')); }
-    async function loadSavedSkin() {
+    /* osu!stable's default taiko images (same source and licence as above) */
+    const TAIKO_IMAGES = ['taiko-bar-left', 'taiko-bar-right', 'taiko-bar-right-glow', 'taiko-barline', 'taiko-drum-inner', 'taiko-drum-outer', 'taiko-glow', 'taiko-hit0', 'taiko-hit100', 'taiko-hit300', 'taiko-hit100k', 'taiko-hit300k', 'taiko-roll-end', 'taiko-roll-middle', 'taiko-slider', 'taiko-slider-fail', 'taikobigcircle', 'taikobigcircleoverlay', 'taikohitcircle', 'taikohitcircleoverlay', 'spinner-warning', 'spinner-circle', 'spinner-approachcircle', 'approachcircle'];
+    let defaultTaikoPromise = null;
+    function loadDefaultTaiko() {
+        if (!defaultTaikoPromise) {
+            const get = async (n) => {
+                for (const [suffix, s] of [['@2x', 0.5], ['', 1]]) {
+                    try {
+                        const res = await fetch(`assets/osu-resources/skin-legacy/${n}${suffix}.png`);
+                        if (res.ok) return { bmp: await createImageBitmap(await res.blob()), s };
+                    } catch { /* next */ }
+                }
+                return null;
+            };
+            const COUNTS = { idle: 2, kiai: 2, fail: 3, clear: 9 };
+            defaultTaikoPromise = (async () => {
+                const img = {};
+                await Promise.all(TAIKO_IMAGES.map(async (n) => { img[n] = await get(n); }));
+                const mascot = {};
+                for (const [state, n] of Object.entries(COUNTS)) mascot[state] = (await Promise.all(Array.from({ length: n }, (_, i) => get(`pippidon${state}${i}`)))).filter(Boolean);
+                const digits = await Promise.all(Array.from({ length: 10 }, (_, d) => get(`score-${d}`)));
+                return { img, mascot, comboDigits: digits.every(Boolean) ? digits : null, comboOverlap: 0 };
+            })();
+        }
+        return defaultTaikoPromise;
+    }
+
+    /* One skin per mode (players often use a different skin for each), kept
+       under 'mode-{n}'. A skin saved before this (under 'current') still
+       serves any mode that has none of its own; resetting a mode stores a
+       "none" so it shows the default without touching the other modes. */
+    async function saveSkin(blob, name, mode) { await idb('readwrite', (s) => s.put({ blob, name }, mode == null ? 'current' : `mode-${mode}`)); }
+    async function loadSavedSkin(mode) {
         try {
-            const v = await idb('readonly', (s) => s.get('current'));
+            let v = mode == null ? null : await idb('readonly', (s) => s.get(`mode-${mode}`));
+            if (v && v.none) return null;
+            if (!v) v = await idb('readonly', (s) => s.get('current'));
             return v && v.blob ? loadSkin(v.blob, v.name) : null;
         } catch { return null; }
     }
-    async function clearSkin() { try { await idb('readwrite', (s) => s.delete('current')); } catch { /* nothing saved */ } }
+    async function clearSkin(mode) {
+        try {
+            if (mode == null) await idb('readwrite', (s) => s.delete('current'));
+            else await idb('readwrite', (s) => s.put({ none: true }, `mode-${mode}`));
+        } catch { /* nothing saved */ }
+    }
 
-    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch };
+    window.replaySkin = { loadSkin, saveSkin, loadSavedSkin, clearSkin, columnType, parseSkinIni, loadDefaultCatch, loadDefaultTaiko };
 })();

@@ -7240,6 +7240,9 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-ic-counts i { font-style: normal; font-size: 9px; font-weight: 800; }
 /* accuracy and hand misses sit under the card, bottom-left */
 .rp-hud-l { top: auto; bottom: 150px; }
+/* taiko: the lane runs across the upper screen, so the card sits low and the accuracy moves right */
+.rp-body[data-mode="1"] .rp-infocard { top: auto; bottom: 110px; }
+.rp-body[data-mode="1"] .rp-hud-tl { left: auto; right: 24px; }
 @container (max-width: 1180px) { .rp-infocard { width: 250px; } .rp-ic-cover { height: 64px; } }
 @container (max-height: 700px) { .rp-ic-play { display: none; } }
 @container (max-width: 860px) { .rp-infocard { display: none; } }
