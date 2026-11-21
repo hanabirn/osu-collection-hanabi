@@ -1031,6 +1031,7 @@
                 <div class="rp-cmpr-card" role="dialog" aria-label="${L('結算')}">
                     <div class="rp-cmpr-head"><b>${esc(map.metadata.Artist || bm.artist)} - ${esc(map.metadata.Title || bm.title)}</b><small>[${esc(map.metadata.Version || bm.version)}]</small></div>
                     <div class="rp-cmpr-grid">${col(A)}<div class="rp-cmpr-vs">VS</div>${col(B)}</div>
+                    ${win ? `<span class="rp-cmpr-wincrown is-${win}">👑 ${L('勝利')}</span>` : ''}
                     <div class="rp-res-actions">
                         <button type="button" class="rp-btn" data-act="again">↺ ${L('再看一次')}</button>
                         <button type="button" class="rp-btn" data-act="end">${L('結束比較')}</button>
@@ -1039,9 +1040,10 @@
                 </div>
             </div>`;
         }
-        function showCompareResults(on, fade) {
+        function showCompareResults(on, fade, onCanvas) {
             const el2 = $('rp-cmpr');
             if (!el2) return;
+            el2.classList.toggle('is-wide', !!onCanvas);
             if (el2.hidden === on) el2.hidden = !on;
             if (!on) return;
             el2.style.opacity = String(Math.max(0, Math.min(1, fade)));
@@ -1185,6 +1187,49 @@
             line2: `${L('譜面作者')}: ${map.metadata.Creator || bm.creator}`,
             line3: `${L('遊玩者')}: ${replay.player}${played ? ` · ${played}` : ''}`,
         };
+        function resultsDataFor(r2, p2) {
+            const rec = M.record(r2);
+            const acc = accOf(rec);
+            const rb = M.rank ? M.rank(rec, acc) : '';
+            const sv = (r2.mods & (8 | 1024)) && (rb === 'SS' || rb === 'S');
+            let lb = String(r2.lifeBar || '').split(',').map((x) => { const [a, b] = x.split('|'); return { t: Number(a), hp: Number(b) }; }).filter((x) => Number.isFinite(x.t) && Number.isFinite(x.hp));
+            if (lb.length < 2 && r2.mode === 3) {
+                let hp = 1;
+                lb = [{ t: p2.events.length ? p2.events[0].judgedAt : 0, hp }];
+                for (const e of p2.events) {
+                    const q = { MAX: 1, 300: 1, 200: 0.6, 100: 0.3, 50: 0, MISS: -1 }[e.judge];
+                    hp = Math.min(1, Math.max(0, hp + (q > 0 ? 0.02 * q : q * 0.08)));
+                    lb.push({ t: e.judgedAt, hp });
+                }
+            }
+            const pl = r2.playedAt && !isNaN(r2.playedAt) ? r2.playedAt.toLocaleDateString() : '';
+            return {
+                mode: r2.mode, record: rec, replay: r2, rank: (rb === 'SS' ? 'X' : rb) + (sv ? 'H' : ''), acc, bg, lifeBar: lb,
+                title: `${map.metadata.Title || bm.title} [${map.metadata.Version || bm.version}]`,
+                line2: `${L('譜面作者')}: ${map.metadata.Creator || bm.creator}`,
+                line3: `${L('遊玩者')}: ${r2.player}${pl ? ` · ${pl}` : ''}`,
+            };
+        }
+        // two ranking screens side by side, each in its half; the winner framed in its colour
+        function drawCompareRanking(fadeIn) {
+            const c = session.cmp;
+            if (!c.resA) { c.resA = resultsDataFor(replay, prep); c.resB = resultsDataFor(c.replay, c.prep); }
+            const half = view.w / 2;
+            const win = replay.score === c.replay.score ? '' : replay.score > c.replay.score ? 'a' : 'b';
+            [['a', c.resA, 0, '#f472b6'], ['b', c.resB, half, '#5fb4ff']].forEach(([side, data, x, col]) => {
+                ctx.save();
+                ctx.translate(x, 0);
+                ctx.beginPath(); ctx.rect(0, 0, half, view.h); ctx.clip();
+                window.replayResults.drawResults(ctx, { ...view, w: half }, data);
+                ctx.fillStyle = col;
+                ctx.fillRect(0, 0, half, 4);
+                if (win === side) { ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.strokeRect(3, 3, half - 6, view.h - 6); }
+                ctx.restore();
+            });
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.fillRect(half - 1, 0, 2, view.h);
+            blackOver(1 - fadeIn);
+        }
         const loadRankSkin = (sk) => { view.rankSkin = null; (sk ? sk.forRanking() : window.replaySkin.loadDefaultRanking()).then((v) => { view.rankSkin = v; }).catch(() => { window.replaySkin.loadDefaultRanking().then((v) => { view.rankSkin = v; }); }); };
         loadRankSkin(savedSkins[replay.mode]);
         const tick = () => {
@@ -1197,14 +1242,18 @@
             const showResAll = el >= OUTRO.rank;
             const showRes = showResAll && !session.cmp;
             if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
-            if (session.cmp) showCompareResults(showResAll, (el - OUTRO.rank) / OUTRO.rankIn);
+            const cmpWide = !!(session.cmp && showResAll && view.rankSkin && view.w >= 640);
+            if (session.cmp) showCompareResults(showResAll, (el - OUTRO.rank) / OUTRO.rankIn, cmpWide);
             // wide views get osu!'s own ranking screen on the canvas; narrow ones the card
             const wide = showRes && view.rankSkin && view.w >= 640;
             resultsEl.classList.toggle('is-wide', !!wide);
             $('rp-body').classList.toggle('rp-show-results', !!wide);
             ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
             let s;
-            if (wide) {
+            if (cmpWide) {
+                drawCompareRanking(Math.max(0, Math.min(1, (el - OUTRO.rank) / OUTRO.rankIn)));
+                s = lastStats;
+            } else if (wide) {
                 const out = window.replayResults.drawResults(ctx, view, resultsData);
                 const acts = $('rp-res-actions');
                 acts.style.top = `${Math.round(out.actions.top)}px`;
