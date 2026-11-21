@@ -890,11 +890,13 @@
             if (sk.comboDigits) return { digits: sk.comboDigits, x: null, overlap: sk.comboOverlap || 0 };
             return null;
         };
-        let comboShownAt = 0, comboShown = 0;
-        function drawCombo(st) {
+        // one bump state per screen ('main', or 'a' / 'b' in a comparison)
+        const comboAnim = {};
+        function drawCombo(st, h = view.h, key = 'main') {
             const combo = st.combo || 0, best = st.best || 0;
-            if (combo !== comboShown) { if (combo > comboShown) comboShownAt = performance.now(); comboShown = combo; }
-            const h = view.h;
+            const an = comboAnim[key] || (comboAnim[key] = { shown: 0, at: 0 });
+            if (combo !== an.shown) { if (combo > an.shown) an.at = performance.now(); an.shown = combo; }
+            const comboShownAt = an.at;
             const cs = (view.comboScale || 0.6) / 0.6;
             const bump = 1 + 0.12 * Math.max(0, 1 - (performance.now() - comboShownAt) / 120);
             const ch = h * 0.065 * cs;
@@ -1430,6 +1432,10 @@
                         ctx.font = `italic 800 ${Math.round(vh * 0.065)}px system-ui, sans-serif`;
                         ctx.fillStyle = col; ctx.textBaseline = 'bottom';
                         ctx.fillText(rr.player, x + vw - 10, top + vh - 8);
+                        ctx.restore();
+                        // combo and best combo bottom left, as on the single-player screen
+                        ctx.save(); ctx.translate(x, top); ctx.beginPath(); ctx.rect(0, 0, vw, vh); ctx.clip();
+                        drawCombo(st[i] || {}, vh, i ? 'b' : 'a');
                         ctx.restore();
                         ctx.fillStyle = col; ctx.fillRect(x, top - 3, vw, 3);
                     });
