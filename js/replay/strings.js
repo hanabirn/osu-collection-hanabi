@@ -95,6 +95,7 @@
         '偏早': { 'zh-Hans': '偏早', en: 'Early', ja: '早い', ko: '빠름', de: 'Früh', es: 'Antes', fr: 'En avance', ru: 'Рано' },
         '偏晚': { 'zh-Hans': '偏晚', en: 'Late', ja: '遅い', ko: '늦음', de: 'Spät', es: 'Tarde', fr: 'En retard', ru: 'Поздно' },
         '平均偏差': { 'zh-Hans': '平均偏差', en: 'Mean offset', ja: '平均ずれ', ko: '평균 오차', de: 'Mittlere Abweichung', es: 'Desvío medio', fr: 'Décalage moyen', ru: 'Среднее смещение' },
+        '勝利': { 'zh-Hans': '胜利', en: 'Winner', ja: '勝利', ko: '승리', de: 'Sieg', es: 'Victoria', fr: 'Victoire', ru: 'Победа' },
         '換一個重播': { 'zh-Hans': '换一个回放', en: 'Another replay', ja: '別のリプレイ', ko: '다른 리플레이', de: 'Anderes Replay', es: 'Otro replay', fr: 'Autre replay', ru: 'Другой реплей' },
     };
     window.replayText = function replayText(zh) {

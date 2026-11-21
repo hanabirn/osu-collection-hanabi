@@ -7379,6 +7379,44 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-cmp-rank { color: rgba(255, 255, 255, 0.5); font-weight: 800; }
 .rp-cmp-mods { color: rgba(255, 255, 255, 0.6); font-size: 0.75rem; }
 .rp-cmp-pp { text-align: right; color: #ffd166; font-weight: 800; }
+.rp-cmp-who { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.rp-cmp-who .rp-flag { width: 20px; height: 15px; border-radius: 2px; flex: none; }
+.rp-cmp-name.is-b .rp-cmp-who { flex-direction: row-reverse; }
+.rp-cmp-pp-line { color: rgba(255, 255, 255, 0.85) !important; font-weight: 700; }
+.rp-cmp-top, .rp-cmp-lead, .rp-cmp-rows { opacity: var(--rp-outro, 1); }
+/* the comparison's results: both players side by side */
+.rp-cmpr { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: rgba(6, 5, 8, 0.55); pointer-events: auto; }
+.rp-cmpr[hidden] { display: none; }
+.rp-cmpr-card { width: min(860px, 100%); max-height: 100%; overflow: auto; box-sizing: border-box; padding: 16px 20px; border-radius: 14px; background: rgba(16, 13, 19, 0.94); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55); display: flex; flex-direction: column; gap: 12px; }
+.rp-cmpr-head { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.rp-cmpr-head small { color: rgba(255, 255, 255, 0.65); }
+.rp-cmpr-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 14px; align-items: stretch; }
+.rp-cmpr-vs { align-self: center; font-weight: 900; font-size: 1.4rem; color: rgba(255, 255, 255, 0.5); }
+.rp-cmpr-side { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 2px solid transparent; min-width: 0; }
+.rp-cmpr-side.is-a.is-winner { border-color: var(--pink, #f472b6); }
+.rp-cmpr-side.is-b.is-winner { border-color: #5fb4ff; }
+.rp-cmpr-crown { font-weight: 900; font-size: 0.85rem; color: #ffd166; min-height: 1.2em; }
+.rp-cmpr-player { display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
+.rp-cmpr-av { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; flex: none; }
+.rp-cmpr-player > div { display: flex; flex-direction: column; min-width: 0; }
+.rp-cmpr-player b { display: flex; align-items: center; gap: 6px; font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-cmpr-player .rp-flag { width: 20px; height: 15px; border-radius: 2px; }
+.rp-cmpr-player small { color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; }
+.rp-cmpr-side.is-a .rp-cmpr-player b { color: var(--pink, #f472b6); }
+.rp-cmpr-side.is-b .rp-cmpr-player b { color: #5fb4ff; }
+.rp-cmpr-side .rp-res-rank { font-size: 4.2rem; }
+.rp-cmpr-score { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rp-cmpr-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+.rp-cmpr-pair > div, .rp-cmpr-counts > div { display: flex; flex-direction: column; align-items: center; padding: 5px 4px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); min-width: 0; }
+.rp-cmpr-pair small, .rp-cmpr-counts small { font-size: 0.7rem; font-weight: 800; color: rgba(255, 255, 255, 0.6); white-space: nowrap; }
+.rp-cmpr-pair b { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.rp-cmpr-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.rp-cmpr-counts b { font-variant-numeric: tabular-nums; }
+.rp-cmpr-pp { display: flex; align-items: baseline; gap: 4px; }
+.rp-cmpr-pp b { font-size: 1.4rem; color: #ffd166; }
+.rp-cmpr-pp small { color: rgba(255, 255, 255, 0.7); }
+.rp-cmpr-mods { font-weight: 800; font-size: 0.85rem; color: rgba(255, 255, 255, 0.75); }
+@container (max-width: 640px) { .rp-cmpr-grid { grid-template-columns: 1fr; } .rp-cmpr-vs { justify-self: center; } }
 /* the pause menu, over the play field */
 .rp-body .rp-bottom { z-index: 6; } /* above the pause menu */
 .rp-pause { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(0, 0, 0, 0.55); }

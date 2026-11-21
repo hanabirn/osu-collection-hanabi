@@ -967,21 +967,88 @@
         function renderCompareHud() {
             const c = session.cmp;
             const old = $('rp-cmp'); if (old) old.remove();
-            const flag = (r2) => esc(r2.player);
+            const flag = (r2, side) => `<span class="rp-cmp-who"><img class="rp-flag" id="rp-cmp-flag-${side}" alt="" hidden>${esc(r2.player)}</span>`;
             const wrap = document.createElement('div');
             wrap.className = 'rp-cmp';
             wrap.id = 'rp-cmp';
             wrap.innerHTML = `
                 <div class="rp-cmp-top">
-                    <div class="rp-cmp-name is-a"><b>${flag(replay)}</b><small>${esc(modsLabel(replay.mods))}${replay.playedAt && !isNaN(replay.playedAt) ? ` · ${esc(replay.playedAt.toLocaleDateString())}` : ''}</small></div>
+                    <div class="rp-cmp-name is-a"><b>${flag(replay, 'a')}</b><small class="rp-cmp-pp-line" id="rp-cmp-prof-a"></small><small>${esc(modsLabel(replay.mods))}${replay.playedAt && !isNaN(replay.playedAt) ? ` · ${esc(replay.playedAt.toLocaleDateString())}` : ''}</small></div>
                     <div class="rp-cmp-map"><b>${esc(map.metadata.Title || bm.title)}</b><small>[${esc(map.metadata.Version || bm.version)}]</small></div>
-                    <div class="rp-cmp-name is-b"><b>${flag(c.replay)}</b><small>${esc(modsLabel(c.replay.mods))}${c.replay.playedAt && !isNaN(c.replay.playedAt) ? ` · ${esc(c.replay.playedAt.toLocaleDateString())}` : ''}</small></div>
+                    <div class="rp-cmp-name is-b"><b>${flag(c.replay, 'b')}</b><small class="rp-cmp-pp-line" id="rp-cmp-prof-b"></small><small>${esc(modsLabel(c.replay.mods))}${c.replay.playedAt && !isNaN(c.replay.playedAt) ? ` · ${esc(c.replay.playedAt.toLocaleDateString())}` : ''}</small></div>
                     <button type="button" class="rp-cmp-close" id="rp-cmp-close" title="${L('結束比較')}" aria-label="${L('結束比較')}">✕</button>
                 </div>
                 <div class="rp-cmp-lead"><i id="rp-cmp-lead"></i></div>
                 <dl class="rp-cmp-rows">${CMP_ROWS.map(([k, label, , col]) => `<div class="rp-cmp-row" data-k="${k}"><dd class="is-a" id="rp-cmp-a-${k}">–</dd><dt${col ? ` style="color:${col}"` : ''}>${label}</dt><dd class="is-b" id="rp-cmp-b-${k}">–</dd></div>`).join('')}</dl>`;
+            wrap.insertAdjacentHTML('beforeend', compareResultsHtml());
             body2.appendChild(wrap);
             $('rp-cmp-close').addEventListener('click', closeCompare);
+            wrap.querySelector('[data-act="again"]').addEventListener('click', () => { clock.tail = null; audio.currentTime = Math.max(0, first - 1500) / 1000; audio.play().catch(() => {}); });
+            wrap.querySelector('[data-act="end"]').addEventListener('click', closeCompare);
+            // each player's flag and standing in this mode
+            for (const [side, r2] of [['a', replay], ['b', c.replay]]) {
+                osuFetch(`u=${encodeURIComponent(r2.player)}&type=string&m=${r2.mode}`).then((res) => {
+                    const u = Array.isArray(res) ? res[0] : null;
+                    if (!u) return;
+                    const n = (v) => Number(v || 0).toLocaleString();
+                    const line = `${n(Math.round(Number(u.pp_raw) || 0))}pp · #${n(u.pp_rank)}`;
+                    document.querySelectorAll(`#rp-cmp-prof-${side}, #rp-cmpr-prof-${side}`).forEach((el2) => { el2.textContent = line; });
+                    if (u.country) {
+                        document.querySelectorAll(`#rp-cmp-flag-${side}, #rp-cmpr-flag-${side}`).forEach((fl) => {
+                            fl.src = `https://flagcdn.com/48x36/${String(u.country).toLowerCase()}.png`;
+                            fl.alt = u.country; fl.title = u.country; fl.hidden = false;
+                        });
+                    }
+                    document.querySelectorAll(`#rp-cmpr-av-${side}`).forEach((av) => { av.src = `https://a.ppy.sh/${encodeURIComponent(u.user_id)}`; av.hidden = false; });
+                }).catch(() => {});
+            }
+        }
+        // the results for both players, from what each replay recorded (as the game shows it)
+        function compareResultsHtml() {
+            const c = session.cmp;
+            const sides = [['a', replay], ['b', c.replay]].map(([side, r2]) => {
+                const rec = M.record(r2);
+                const acc = accOf(rec);
+                const rk = M.rank ? M.rank(rec, acc) : '';
+                const silver = (r2.mods & (8 | 1024)) && (rk === 'SS' || rk === 'S');
+                return { side, r2, rec, acc, rk, key: silver ? `${rk}H` : rk };
+            });
+            const [A, B] = sides;
+            const win = A.r2.score === B.r2.score ? '' : A.r2.score > B.r2.score ? 'a' : 'b';
+            const col = (x) => `
+                <div class="rp-cmpr-side is-${x.side}${win === x.side ? ' is-winner' : ''}">
+                    ${win === x.side ? `<span class="rp-cmpr-crown">👑 ${L('勝利')}</span>` : '<span class="rp-cmpr-crown is-empty"></span>'}
+                    <div class="rp-cmpr-player"><img class="rp-cmpr-av" id="rp-cmpr-av-${x.side}" alt="" hidden>
+                        <div><b><img class="rp-flag" id="rp-cmpr-flag-${x.side}" alt="" hidden>${esc(x.r2.player)}</b><small id="rp-cmpr-prof-${x.side}"></small></div></div>
+                    <div class="rp-res-rank" data-rank="${x.key}">${x.rk}</div>
+                    <div class="rp-cmpr-score">${(Number(x.r2.score) || 0).toLocaleString()}</div>
+                    <div class="rp-cmpr-pair"><div><small>${L('準確率')}</small><b>${(x.acc * 100).toFixed(2)}%</b></div><div><small>${L('最大連擊')}</small><b>${x.r2.maxCombo.toLocaleString()}x</b></div></div>
+                    <div class="rp-cmpr-counts">${JUDGES.map((j) => `<div><small style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</small><b>${x.rec[j]}</b></div>`).join('')}</div>
+                    <div class="rp-cmpr-pp"><b id="rp-cmpr-pp-${x.side}">–</b><small>pp</small></div>
+                    <div class="rp-cmpr-mods">${esc(modsLabel(x.r2.mods))}</div>
+                </div>`;
+            return `<div class="rp-cmpr" id="rp-cmpr" hidden>
+                <div class="rp-cmpr-card" role="dialog" aria-label="${L('結算')}">
+                    <div class="rp-cmpr-head"><b>${esc(map.metadata.Artist || bm.artist)} - ${esc(map.metadata.Title || bm.title)}</b><small>[${esc(map.metadata.Version || bm.version)}]</small></div>
+                    <div class="rp-cmpr-grid">${col(A)}<div class="rp-cmpr-vs">VS</div>${col(B)}</div>
+                    <div class="rp-res-actions">
+                        <button type="button" class="rp-btn" data-act="again">↺ ${L('再看一次')}</button>
+                        <button type="button" class="rp-btn" data-act="end">${L('結束比較')}</button>
+                        <button type="button" class="rp-btn" onclick="openReplayViewer()">⏏ ${L('換一個重播')}</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+        function showCompareResults(on, fade) {
+            const el2 = $('rp-cmpr');
+            if (!el2) return;
+            if (el2.hidden === on) el2.hidden = !on;
+            if (!on) return;
+            el2.style.opacity = String(Math.max(0, Math.min(1, fade)));
+            const end = prep.lastTime + 1;
+            const pa = ppAt(end), pb = session.cmp.ppAt(end);
+            $('rp-cmpr-pp-a').textContent = pa == null ? '–' : Math.round(pa).toLocaleString();
+            $('rp-cmpr-pp-b').textContent = pb == null ? '–' : Math.round(pb).toLocaleString();
         }
         let lastCmp = '';
         function updateCompareHud(sA, sB, t) {
@@ -1126,9 +1193,11 @@
             // the way out follows the clock, so it pauses, seeks and ends with the timeline
             const atEnd = t >= outroAt && !seeking;
             if (!atEnd) resultsDismissed = false;
-            const el = !atEnd || resultsDismissed || session.cmp ? -1 : (t - outroAt) / (audio.playbackRate || 1);
-            const showRes = el >= OUTRO.rank;
+            const el = !atEnd || resultsDismissed ? -1 : (t - outroAt) / (audio.playbackRate || 1);
+            const showResAll = el >= OUTRO.rank;
+            const showRes = showResAll && !session.cmp;
             if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
+            if (session.cmp) showCompareResults(showResAll, (el - OUTRO.rank) / OUTRO.rankIn);
             // wide views get osu!'s own ranking screen on the canvas; narrow ones the card
             const wide = showRes && view.rankSkin && view.w >= 640;
             resultsEl.classList.toggle('is-wide', !!wide);
