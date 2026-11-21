@@ -193,6 +193,7 @@ async function checkForNotifications(force) {
     await Promise.all([
         checkTrackedPlayers(), checkNewTournamentPosts(),
         typeof loadDmConversations === 'function' ? loadDmConversations() : Promise.resolve(),
+        typeof checkFeedbackReplies === 'function' ? checkFeedbackReplies() : Promise.resolve(),
     ]);
     renderNotificationBell();
 }
@@ -215,7 +216,7 @@ function renderNotificationBell() {
 
     list.innerHTML = notifs.map(n => {
         const timeStr = new Date(n.createdAt).toLocaleString();
-        const ICON_BY_TYPE = { pp: 'trendingUp', mapper: 'palette', 'mapper-graveyard': 'palette', 'mapper-loved': 'heart', achievement: 'trophy' };
+        const ICON_BY_TYPE = { feedback: 'messageCircle', pp: 'trendingUp', mapper: 'palette', 'mapper-graveyard': 'palette', 'mapper-loved': 'heart', achievement: 'trophy' };
         const iconName = ICON_BY_TYPE[n.type] || 'trophy';
         const body = `
             <span class="notif-item-icon">${icon(iconName)}</span>
@@ -227,6 +228,9 @@ function renderNotificationBell() {
         const cls = `notif-item${n.read ? '' : ' unread'}`;
         if (['tournament', 'mapper', 'mapper-graveyard', 'mapper-loved', 'achievement'].includes(n.type) && n.url) {
             return `<a href="${n.url}" target="_blank" rel="noopener noreferrer" class="${cls}">${body}</a>`;
+        }
+        if (n.type === 'feedback') {
+            return `<div class="${cls}" onclick="toggleNotifDropdown(false);switchTab('feedback')">${body}</div>`;
         }
         if (n.type === 'pp' && n.playerId) {
             return `<div class="${cls}" onclick="openNotifPlayer('${n.playerId}')">${body}</div>`;

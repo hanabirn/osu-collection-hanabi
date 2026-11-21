@@ -7721,3 +7721,37 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .empty-steps { margin: 12px auto 0; padding: 0; list-style: none; counter-reset: es; display: flex; flex-direction: column; gap: 6px; max-width: 420px; text-align: left; font-size: var(--fs-13); color: var(--text-dim); }
 .empty-steps li { counter-increment: es; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; }
 .empty-steps li::before { content: counter(es); width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; background: rgba(var(--pink-rgb), 0.18); color: var(--pink); font-weight: 800; font-size: var(--fs-12); }
+
+/* 建議&改進: 我的建議 (the visitor's threads) and the owner's list */
+.feedback-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.feedback-status { margin: 8px 0 0; min-height: 1.2em; font-size: var(--fs-13); text-align: center; }
+.feedback-status.is-ok { color: #7ee08a; }
+.feedback-status.is-err { color: #ff8fa3; }
+.feedback-mine, .feedback-admin { padding: 16px 18px; border-radius: var(--r-card); border: var(--line) solid var(--border); background: var(--bg-card); }
+.feedback-admin { max-width: 1040px; margin: 0 auto 16px; }
+.feedback-mine[hidden], .feedback-admin[hidden] { display: none; }
+.fb-threads { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; max-height: 70vh; overflow-y: auto; }
+.fb-thread { padding: 12px; border-radius: 12px; background: var(--bg-input); border: 1px solid var(--border); }
+.fb-thread.is-new { border-color: var(--pink); }
+.fb-thread-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: var(--fs-12); color: var(--text-dim); margin-bottom: 8px; }
+.fb-thread-head time { margin-left: auto; }
+.fb-status { padding: 2px 8px; border-radius: 999px; font-weight: 800; font-size: var(--fs-11); }
+.fb-status.is-open { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.fb-status.is-discussing { background: rgba(95, 180, 255, 0.2); color: #8cc8ff; }
+.fb-status.is-done { background: rgba(126, 224, 138, 0.2); color: #7ee08a; }
+.fb-status.is-declined { background: rgba(255, 143, 163, 0.18); color: #ff8fa3; }
+.fb-msgs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.fb-msg { max-width: 88%; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); }
+.fb-msg.is-owner { align-self: flex-start; background: rgba(var(--pink-rgb), 0.14); }
+.fb-msg.is-visitor { align-self: flex-end; }
+.fb-msg-who { display: block; font-size: var(--fs-11); color: var(--text-dim); margin-bottom: 2px; }
+.fb-msg p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--fs-13); line-height: 1.55; }
+.fb-reply { display: flex; gap: 8px; margin-top: 10px; align-items: flex-end; }
+.fb-reply textarea { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-card); color: #fff; font: inherit; font-size: var(--fs-13); resize: vertical; }
+.fb-answer { flex-direction: column; align-items: stretch; }
+.fb-answer-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.fb-answer .fb-done { background: rgba(126, 224, 138, 0.2); }
+.fb-answer .fb-declined { background: rgba(255, 143, 163, 0.18); }
+.fb-filters { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.fb-filters button { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: none; color: var(--text-dim); font: inherit; font-size: var(--fs-12); cursor: pointer; }
+.fb-filters button.is-on { background: rgba(var(--pink-rgb), 0.2); color: #fff; border-color: var(--pink); }

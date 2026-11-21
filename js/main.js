@@ -321,7 +321,7 @@ function switchTab(tab, el) {
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'replay' && typeof ensureReplayHub === 'function') ensureReplayHub();
     if (tab === 'collection') updateCollectionFilterCount();
-    if (tab === 'feedback') renderFeedbackRecent();
+    if (tab === 'feedback') { renderFeedbackRecent(); if (typeof ensureFeedbackPage === 'function') ensureFeedbackPage(); }
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
     if (tab === 'mappools' && typeof ensureMappoolsLoaded === 'function') ensureMappoolsLoaded();

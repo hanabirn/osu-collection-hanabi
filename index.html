@@ -1099,7 +1099,9 @@
     <section id="page-feedback" class="site-page" style="display:none;">
         <p class="eyebrow">FEEDBACK</p>
         <h2 class="osu-page-title" data-i18n="feedback_title">建議&改進</h2>
+        <div id="feedback-admin" class="feedback-admin" hidden></div>
         <div class="feedback-layout">
+        <div class="feedback-left">
         <div class="osu-add-card feedback-card">
             <div class="card-corner tl"></div><div class="card-corner tr"></div>
             <div class="card-corner bl"></div><div class="card-corner br"></div>
@@ -1109,7 +1111,9 @@
                 <input type="text" name="website" class="feedback-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
                 <button type="submit" class="btn feedback-submit" data-i18n="feedback_submit">送出</button>
             </form>
-            <div id="feedback-success" class="feedback-success" style="display:none;" data-i18n="feedback_success">您的回覆訊息已傳送，感謝您的回饋！</div>
+            <p id="feedback-status" class="feedback-status" aria-live="polite"></p>
+        </div>
+        <div id="feedback-mine" class="feedback-mine" hidden></div>
         </div>
         <aside class="feedback-recent" aria-labelledby="feedback-recent-title">
             <h3 class="home-h"><span id="feedback-recent-title" data-i18n="feedback_recent_title">最近的網站更新</span><button type="button" class="home-more" onclick="switchTab('changelog')" data-i18n="home_see_all">全部</button></h3>
