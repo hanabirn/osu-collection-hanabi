@@ -1001,10 +1001,12 @@
             const stats = M.stats(map, prep);
             const lenMs = ((Number(bm.total_length) || 0) * 1000) / (prep.rate || 1);
             wrap.innerHTML = `
-                <div class="rp-bc-team is-a"><img class="rp-flag" id="rp-cmp-flag-a" alt="" hidden><div><b>${esc(replay.player)}</b><small id="rp-cmp-prof-a"></small><small class="rp-bc-mods">${esc(modsLabel(replay.mods))}</small></div></div>
+                <div class="rp-bc-team is-a"><img class="rp-flag" id="rp-cmp-flag-a" alt="" hidden><div><b>${esc(replay.player)}</b><small id="rp-cmp-prof-a"></small></div></div>
                 <div class="rp-bc-title"><b>${esc(map.metadata.Title || bm.title)}</b><small>${L('雙人比較')}</small></div>
-                <div class="rp-bc-team is-b"><div><b>${esc(c.replay.player)}</b><small id="rp-cmp-prof-b"></small><small class="rp-bc-mods">${esc(modsLabel(c.replay.mods))}</small></div><img class="rp-flag" id="rp-cmp-flag-b" alt="" hidden></div>
+                <div class="rp-bc-team is-b"><div><b>${esc(c.replay.player)}</b><small id="rp-cmp-prof-b"></small></div><img class="rp-flag" id="rp-cmp-flag-b" alt="" hidden></div>
                 <button type="button" class="rp-cmp-close" id="rp-cmp-close" title="${L('結束比較')}" aria-label="${L('結束比較')}">✕</button>
+                <div class="rp-bc-screenmods is-a">${modsHtml(replay.mods)}</div>
+                <div class="rp-bc-screenmods is-b">${modsHtml(c.replay.mods)}</div>
                 <div class="rp-bc-bar"><i class="rp-bc-push" id="rp-bc-push"></i><span class="rp-bc-diff" id="rp-bc-diff"></span></div>
                 <div class="rp-bc-scores"><b class="is-a" id="rp-bc-sa">0</b><b class="is-b" id="rp-bc-sb">0</b></div>
                 <div class="rp-bc-map" style="--cover:url('https://assets.ppy.sh/beatmaps/${encodeURIComponent(bm.beatmapset_id)}/covers/cover@2x.jpg')">
@@ -1101,9 +1103,14 @@
         function updateBroadcast(scores, geo) {
             const wrap = $('rp-cmp');
             if (!wrap) return;
-            const key = `${scores[0]}|${scores[1]}|${geo.top}|${geo.vh}`;
+            const key = `${scores[0]}|${scores[1]}|${geo.top}|${geo.vh}|${geo.rightA}`;
             if (key === lastBc) return;
             lastBc = key;
+            // the mod badges sit on each screen, under its score / accuracy / pp
+            wrap.style.setProperty('--bc-mods-top', `${geo.top + geo.vh * 0.135 + 12}px`);
+            wrap.style.setProperty('--bc-mods-h', `${Math.round(Math.max(22, Math.min(40, geo.vh * 0.06)))}px`);
+            wrap.style.setProperty('--bc-right-a', `${geo.rightA + 10}px`);
+            wrap.style.setProperty('--bc-right-b', `${geo.rightB + 10}px`);
             wrap.style.setProperty('--bc-top', `${geo.top}px`);
             wrap.style.setProperty('--bc-bottom', `${geo.top + geo.vh}px`);
             const [a, b] = scores;
@@ -1389,7 +1396,7 @@
                         ctx.restore();
                         ctx.fillStyle = col; ctx.fillRect(x, top - 3, vw, 3);
                     });
-                    updateBroadcast(scores, { top, vh, below });
+                    updateBroadcast(scores, { top, vh, below, rightA: W2 - (xs[0] + vw), rightB: W2 - (xs[1] + vw) });
                     updateCompareHud(s, sB, t);
                 } else {
                     s = M.draw(ctx, view, prep, t);

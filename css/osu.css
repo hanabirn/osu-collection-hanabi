@@ -7472,6 +7472,11 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-bc-stats div { display: flex; gap: 6px; white-space: nowrap; }
 .rp-bc-stats dt { color: rgba(255, 255, 255, 0.65); }
 .rp-bc-stats dd { margin: 0; font-weight: 800; }
+.rp-bc-screenmods { position: absolute; top: var(--bc-mods-top, 200px); opacity: var(--rp-outro, 1); }
+.rp-bc-screenmods.is-a { right: var(--bc-right-a, 50%); }
+.rp-bc-screenmods.is-b { right: var(--bc-right-b, 16px); }
+.rp-bc-screenmods .rp-mods { gap: 3px; }
+.rp-bc-screenmods .sc-mod { height: var(--bc-mods-h, 30px); width: calc(var(--bc-mods-h, 30px) * 1.35); }
 /* the pause menu, over the play field */
 .rp-body .rp-bottom { z-index: 6; } /* above the pause menu */
 .rp-pause { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(0, 0, 0, 0.55); }
