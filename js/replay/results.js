@@ -157,9 +157,29 @@
         if (title) { const tw = title.bmp.width * title.s, th = title.bmp.height * title.s; ctx.drawImage(title.bmp, W - tw - 70, 0, tw, th); } // clear of the close button
         const letter = I[`ranking-${data.rank}`] || I[`ranking-${data.rank.replace('H', '')}`];
         if (letter) fit(ctx, letter, W - 195, 313, 330, 400);
+        // the pp of the play, under the letter
+        if (data.pp != null) {
+            ctx.save();
+            ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+            ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 8;
+            ctx.fillStyle = '#ffd166';
+            ctx.font = '800 54px system-ui, sans-serif';
+            const num = Math.round(data.pp).toLocaleString();
+            const nw = ctx.measureText(num).width;
+            ctx.font = '700 26px system-ui, sans-serif';
+            const uw = ctx.measureText(' pp').width;
+            const x0 = W - 195 - (nw + uw) / 2;
+            ctx.font = '800 54px system-ui, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(num, x0, 545);
+            ctx.font = '700 26px system-ui, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillText(' pp', x0 + nw, 545);
+            ctx.restore();
+        }
         ctx.restore();
         // where the buttons go (below the letter, right-aligned), in screen px
-        const top = (Math.max(0, oy) + 540) * u;
+        const top = (Math.max(0, oy) + (data.pp != null ? 575 : 540)) * u;
         return { actions: { right: 24 * u, top } };
     }
 

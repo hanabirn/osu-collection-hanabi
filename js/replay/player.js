@@ -1214,6 +1214,8 @@
         function drawCompareRanking(fadeIn) {
             const c = session.cmp;
             if (!c.resA) { c.resA = resultsDataFor(replay, prep); c.resB = resultsDataFor(c.replay, c.prep); }
+            c.resA.pp = ppAt(prep.lastTime + 1);
+            c.resB.pp = c.ppAt(c.prep.lastTime + 1);
             const half = view.w / 2;
             const win = replay.score === c.replay.score ? '' : replay.score > c.replay.score ? 'a' : 'b';
             [['a', c.resA, 0, '#f472b6'], ['b', c.resB, half, '#5fb4ff']].forEach(([side, data, x, col]) => {
@@ -1254,6 +1256,7 @@
                 drawCompareRanking(Math.max(0, Math.min(1, (el - OUTRO.rank) / OUTRO.rankIn)));
                 s = lastStats;
             } else if (wide) {
+                resultsData.pp = ppAt(prep.lastTime + 1);
                 const out = window.replayResults.drawResults(ctx, view, resultsData);
                 const acts = $('rp-res-actions');
                 acts.style.top = `${Math.round(out.actions.top)}px`;
