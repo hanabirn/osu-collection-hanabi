@@ -171,8 +171,15 @@
     };
 
     async function fetchWithProgress(url, onProgress) {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        let res = await fetch(url);
+        // a mirror's "not found" can stick in the browser's cache after the map has
+        // been mirrored since; ask again past the cache before giving up
+        if (!res.ok) res = await fetch(url, { cache: 'reload' });
+        if (!res.ok) {
+            const err = new Error(res.status === 404 ? L('下載不到這張譜面（osu.direct 上還沒有），稍後再試') : L('下載譜面失敗（HTTP {0}），稍後再試').replace('{0}', res.status));
+            err.friendly = true;
+            throw err;
+        }
         const total = Number(res.headers.get('content-length')) || 0;
         if (!res.body || !res.body.getReader) return new Uint8Array(await res.arrayBuffer());
         const reader = res.body.getReader();
