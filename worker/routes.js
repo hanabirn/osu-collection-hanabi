@@ -1,5 +1,5 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
- * 端點數: 64
+ * 端點數: 66
  * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
  *       Discord 0 個（延後）、死程式碼 1 個
  */
@@ -54,7 +54,9 @@ const ROUTES = {
     "osu-user-beatmapsets": adapt(require('../netlify/functions/osu-user-beatmapsets').handler),
     "push-config": adapt(require('../netlify/functions/push-config').handler),
     "push-subscribe": adapt(require('../netlify/functions/push-subscribe').handler),
+    "replay-fetch": adapt(require('../netlify/functions/replay-fetch').handler),
     "replay-pp": adapt(require('../netlify/functions/replay-pp').handler),
+    "replay-scores": adapt(require('../netlify/functions/replay-scores').handler),
     "site-likes": adapt(require('../netlify/functions/site-likes').handler),
     "skin-screenshots-delete": adapt(require('../netlify/functions/skin-screenshots-delete').handler),
     "skin-screenshots-download": adapt(require('../netlify/functions/skin-screenshots-download').handler),

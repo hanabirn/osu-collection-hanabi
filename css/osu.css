@@ -7334,6 +7334,49 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .rp-menu-close { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); font-size: 15px; cursor: pointer; }
 .rp-menu-close:hover, .rp-menu-close:focus-visible { background: rgba(255, 255, 255, 0.18); color: #fff; }
 .rp-menu-panel > .rp-opt:first-of-type { padding-right: 34px; }
+/* the picker: a score link instead of a file */
+.rp-url { display: flex; align-items: center; gap: 8px; width: min(520px, 100%); margin: 14px auto 0; }
+.rp-url input[type=text] { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.06); color: #fff; font: inherit; }
+.rp-url-or { color: rgba(255, 255, 255, 0.6); font-size: var(--fs-13); }
+/* comparing two replays */
+.rp-body.rp-comparing .rp-hud-top, .rp-body.rp-comparing .rp-hud-tr, .rp-body.rp-comparing .rp-infocard { display: none; }
+.rp-cmp { position: absolute; inset: 0; z-index: 2; pointer-events: none; color: #fff; font-variant-numeric: tabular-nums; }
+.rp-cmp-top { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: center; gap: 14px; width: min(760px, calc(100% - 120px)); padding: 8px 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.6); pointer-events: auto; }
+.rp-cmp-name { display: flex; flex-direction: column; min-width: 0; }
+.rp-cmp-name b { font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-cmp-name small, .rp-cmp-map small { font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); }
+.rp-cmp-name.is-a b { color: var(--pink, #f472b6); }
+.rp-cmp-name.is-b { text-align: right; }
+.rp-cmp-name.is-b b { color: #5fb4ff; }
+.rp-cmp-map { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 260px; min-width: 0; }
+.rp-cmp-map b { font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.rp-cmp-close { width: 28px; height: 28px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.1); color: #fff; cursor: pointer; }
+.rp-cmp-close:hover, .rp-cmp-close:focus-visible { background: rgba(255, 255, 255, 0.22); }
+.rp-cmp-lead { position: absolute; top: 74px; left: 50%; transform: translateX(-50%); width: min(760px, calc(100% - 120px)); height: 5px; border-radius: 3px; background: #5fb4ff; overflow: hidden; }
+.rp-cmp-lead i { display: block; height: 100%; width: 50%; background: var(--pink, #f472b6); transition: width 0.3s ease; }
+.rp-cmp-rows { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(250px, 19%); margin: 0; padding: 12px 10px; border-radius: 12px; background: rgba(0, 0, 0, 0.62); display: flex; flex-direction: column; gap: 5px; }
+.rp-cmp-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; gap: 8px; }
+.rp-cmp-row dt { font-size: 0.72rem; font-weight: 800; color: rgba(255, 255, 255, 0.7); text-align: center; white-space: nowrap; }
+.rp-cmp-row dd { margin: 0; font-weight: 800; font-size: 0.95rem; color: rgba(255, 255, 255, 0.55); }
+.rp-cmp-row dd.is-a { text-align: right; }
+.rp-cmp-row dd.is-win.is-a { color: var(--pink, #f472b6); }
+.rp-cmp-row dd.is-win.is-b { color: #5fb4ff; }
+.rp-cmp-row[data-k="acc"] dd { font-size: 1.15rem; }
+.rp-cmp-row[data-k="early"], .rp-cmp-row[data-k="pp"] { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.rp-cmp-pick { position: absolute; inset: 0; z-index: 7; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: rgba(0, 0, 0, 0.6); }
+.rp-cmp-pick-card { position: relative; margin: 0; box-sizing: border-box; width: min(560px, 100%); max-height: min(85%, 640px); display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 14px; background: #19151c; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6); color: #fff; }
+.rp-cmp-pick-title { font-size: 1.05rem; padding-right: 34px; }
+.rp-cmp-pick-card > small { color: rgba(255, 255, 255, 0.6); }
+.rp-cmp-pick .rp-url { margin: 4px 0 0; width: 100%; }
+.rp-cmp-list { overflow-y: auto; display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+.rp-cmp-item { display: grid; grid-template-columns: 34px 28px minmax(0, 1fr) auto auto 62px; align-items: center; gap: 10px; padding: 6px 8px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: #fff; font: inherit; font-size: 0.85rem; text-align: left; cursor: pointer; }
+.rp-cmp-item:hover:not([disabled]), .rp-cmp-item:focus-visible { background: rgba(255, 255, 255, 0.12); }
+.rp-cmp-item[disabled] { opacity: 0.4; cursor: not-allowed; }
+.rp-cmp-item img, .rp-cmp-item > i { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: rgba(255, 255, 255, 0.1); }
+.rp-cmp-item b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-cmp-rank { color: rgba(255, 255, 255, 0.5); font-weight: 800; }
+.rp-cmp-mods { color: rgba(255, 255, 255, 0.6); font-size: 0.75rem; }
+.rp-cmp-pp { text-align: right; color: #ffd166; font-weight: 800; }
 /* the pause menu, over the play field */
 .rp-body .rp-bottom { z-index: 6; } /* above the pause menu */
 .rp-pause { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(0, 0, 0, 0.55); }

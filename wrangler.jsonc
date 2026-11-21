@@ -92,5 +92,7 @@
         { "binding": "R2_CHAT_MEDIA", "bucket_name": "osu-media" },
         { "binding": "R2_SKIN_BACKUPS", "bucket_name": "osu-skin-backups" },
         { "binding": "R2_SKIN_SCREENSHOTS", "bucket_name": "osu-skin-screenshots" },
+        // 重播播放器向 osu! 取過的 .osr（90 天後自動刪除，見 R2 lifecycle）
+        { "binding": "R2_REPLAYS", "bucket_name": "osu-replays" },
     ],
 }

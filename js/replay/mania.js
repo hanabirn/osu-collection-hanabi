@@ -202,7 +202,14 @@
             gaps = Array(Math.max(1, keys - 1)).fill(0);
             hitY = h - Math.max(90, h * 0.16);
         }
-        const fieldW = colW.reduce((a, b) => a + b, 0) + gaps.slice(0, keys - 1).reduce((a, b) => a + b, 0);
+        let fieldW = colW.reduce((a, b) => a + b, 0) + gaps.slice(0, keys - 1).reduce((a, b) => a + b, 0);
+        // a narrower view (side-by-side comparison) shrinks the stage to fit
+        if (view.maxField && fieldW > view.maxField) {
+            const f = view.maxField / fieldW;
+            colW = colW.map((x) => x * f);
+            gaps = gaps.map((x) => x * f);
+            fieldW = view.maxField;
+        }
         const x0 = Math.round((w - fieldW) / 2);
         const colX = [];
         for (let c = 0, x = x0; c < keys; c++) { colX.push(x); x += colW[c] + (gaps[c] || 0); }

@@ -149,7 +149,13 @@
                 <b>${L('把 .osr 重播檔拖到這裡，或點一下選擇檔案')}</b>
                 <small>${L('支援 osu! 全部四個模式。譜面和音樂會自動從 osu.direct 下載。')}</small>
                 ${msg ? `<p class="rp-error">${esc(msg)}</p>` : ''}
-            </label>`);
+            </label>
+            <form class="rp-url" id="rp-url-form">
+                <span class="rp-url-or">${L('或')}</span>
+                <input type="text" id="rp-url" inputmode="url" autocomplete="off" placeholder="${L('貼上 osu! 成績網址或成績 ID')}" aria-label="${L('貼上 osu! 成績網址或成績 ID')}">
+                <button type="submit" class="rp-btn">${L('載入')}</button>
+            </form>`);
+        $('rp-url-form').addEventListener('submit', (e) => { e.preventDefault(); loadReplayFromScore($('rp-url').value); });
         const drop = $('rp-drop');
         drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('is-over'); });
         drop.addEventListener('dragleave', () => drop.classList.remove('is-over'));
@@ -216,6 +222,31 @@
         for (const part of parts) { out.set(part, p); p += part.length; }
         return out;
     }
+
+    // "https://osu.ppy.sh/scores/123", ".../scores/mania/456" (legacy) or just an id
+    function scoreRef(text) {
+        const s = String(text || '').trim();
+        let m = s.match(/scores\/(osu|taiko|fruits|mania)\/(\d+)/);
+        if (m) return { mode: m[1], id: m[2] };
+        m = s.match(/scores\/(\d+)/) || s.match(/^(\d{5,12})$/);
+        return m ? { id: m[1] } : null;
+    }
+    async function fetchScoreReplay(ref) {
+        const q = new URLSearchParams({ score: ref.id });
+        if (ref.mode) q.set('mode', ref.mode);
+        const res = await fetch(`/.netlify/functions/replay-fetch?${q}`);
+        if (res.status === 404) throw new Error(L('這份成績沒有線上重播（osu! 只保留部分成績的重播）'));
+        if (!res.ok) throw new Error(L('取得重播失敗，稍後再試'));
+        return new File([await res.arrayBuffer()], `score-${ref.id}.osr`);
+    }
+    window.loadReplayFromScore = async function loadReplayFromScore(text) {
+        const ref = scoreRef(text);
+        open();
+        if (!ref) { showPicker(L('看不懂這個網址，請貼 osu! 成績頁的網址（osu.ppy.sh/scores/…）或成績 ID')); return; }
+        card(`<ol class="rp-steps"><li class="is-now">${esc(L('從 osu! 取得重播'))}</li></ol>`);
+        try { await loadReplayFile(await fetchScoreReplay(ref)); }
+        catch (err) { showPicker(err && err.message ? err.message : String(err)); }
+    };
 
     window.loadReplayFile = async function loadReplayFile(file) {
         open();
@@ -320,6 +351,46 @@
         }
         // fewer than a few thousand: one per object is fine
         return out;
+    }
+
+    function ppLookup(replay, prep, beatmapId) {
+        const states = ppStatesFor(replay.mode, prep);
+        const out = { times: null, values: null };
+        if (states.length && beatmapId) {
+            fetch(window.REPLAY_PP_ENDPOINT || '/.netlify/functions/replay-pp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Number(beatmapId), mods: replay.mods >>> 0, mode: replay.mode, states: states.map(({ t: _t, ...rest }) => rest) }),
+            }).then((res) => (res.ok ? res.json() : null)).then((data) => {
+                if (!data || !Array.isArray(data.pp) || data.pp.length !== states.length) return;
+                out.times = states.map((s2) => s2.t);
+                out.values = data.pp;
+            }).catch(() => {});
+        }
+        return (t) => {
+            if (!out.times) return null;
+            let lo = 0, hi = out.times.length - 1, ans = -1;
+            while (lo <= hi) { const mid = (lo + hi) >> 1; if (out.times[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+            return ans < 0 ? 0 : out.values[ans];
+        };
+    }
+
+    /* early / late hits so far and their mean offset (mania): one pass, looked up by time */
+    function timingTimeline(prep) {
+        const ev = (prep.events || []).filter((e) => e.hitAt != null && e.judge !== 'MISS');
+        const times = [], early = [], late = [], mean = [];
+        let ne = 0, nl = 0, sum = 0;
+        for (const e of ev) {
+            const off = (e.hitAt - e.time) / (prep.rate || 1);
+            if (off < 0) ne++; else if (off > 0) nl++;
+            sum += off;
+            times.push(e.judgedAt); early.push(ne); late.push(nl); mean.push(sum / (ne + nl || 1));
+        }
+        return (t) => {
+            let lo = 0, hi = times.length - 1, ans = -1;
+            while (lo <= hi) { const mid = (lo + hi) >> 1; if (times[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+            return ans < 0 ? { early: 0, late: 0, mean: 0 } : { early: early[ans], late: late[ans], mean: mean[ans] };
+        };
     }
 
     function startPlayer({ replay, map, bm, prep, audioUrl, bg, urls, skinCfg, M }) {
@@ -476,6 +547,7 @@
                             <p class="rp-note">${L('「本站判定」是播放器依按鍵時間自己算的，和遊戲可能有些微差距；畫面上的即時數字也是用它算的。')}</p>
                         </div>
                     </details>
+                    ${replay.mode === 3 ? `<button type="button" class="rp-btn" id="rp-compare-btn" title="${L('雙人比較')}">⚔<span class="rp-btn-text"> ${L('雙人比較')}</span></button>` : ''}
                     <button type="button" class="rp-btn" onclick="openReplayViewer()" title="${L('換一個重播')}" aria-label="${L('換一個重播')}">⏏<span class="rp-btn-text"> ${L('換一個重播')}</span></button>
                 </div>
             </div>`;
@@ -859,6 +931,142 @@
         });
         body.addEventListener('mouseleave', () => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (!body.querySelector('.rp-menu[open]')) showBar(false); }, 150); });
 
+        /* ===== two replays of one map, side by side (as mania-tracker does) ===== */
+        const body2 = $('rp-body');
+        const cmpBtn = $('rp-compare-btn');
+        const timingA = replay.mode === 3 ? timingTimeline(prep) : null;
+        const rateOf = (mods) => (mods & 64 || mods & 512 ? 1.5 : mods & 256 ? 0.75 : 1);
+        const CMP_ROWS = [
+            ['acc', L('準確率'), 'hi'], ['ur', 'UR', 'lo'],
+            ...JUDGES.map((j) => [j, jl(j), j === 'MAX' || j === '300' ? 'hi' : 'lo', R.JUDGE_COLOR[j]]),
+            ['early', L('偏早'), ''], ['late', L('偏晚'), ''], ['mean', L('平均偏差'), 'abs'],
+            ['pp', 'PP', 'hi'],
+        ];
+        function closeCompare() {
+            session.cmp = null;
+            body2.classList.remove('rp-comparing');
+            const h = $('rp-cmp'); if (h) h.remove();
+        }
+        async function startCompare(file) {
+            const pick = $('rp-cmp-pick');
+            const say = (msg) => { const el = pick && pick.querySelector('.rp-cmp-msg'); if (el) { el.textContent = msg; el.hidden = !msg; } };
+            try {
+                say(L('讀取中…'));
+                const rB = window.replayFormats.parseOsr(await file.arrayBuffer());
+                if (rB.beatmapMd5 !== replay.beatmapMd5) throw new Error(L('這個重播不是同一張譜面（或譜面版本不同）'));
+                if (rateOf(rB.mods) !== rateOf(replay.mods)) throw new Error(L('兩個重播的倍速不同（例如一個有 DT），沒辦法並排比較'));
+                if (rB.scoreId && rB.scoreId === replay.scoreId) throw new Error(L('這是同一份成績'));
+                const prepB = M.prepare(map, rB);
+                session.cmp = { replay: rB, prep: prepB, ppAt: ppLookup(rB, prepB, bm.beatmap_id), timing: timingTimeline(prepB), ppA: ppAt };
+                if (pick) pick.remove();
+                renderCompareHud();
+                body2.classList.add('rp-comparing');
+                lastCmp = '';
+            } catch (err) { say(err && err.message ? err.message : String(err)); }
+        }
+        function renderCompareHud() {
+            const c = session.cmp;
+            const old = $('rp-cmp'); if (old) old.remove();
+            const flag = (r2) => esc(r2.player);
+            const wrap = document.createElement('div');
+            wrap.className = 'rp-cmp';
+            wrap.id = 'rp-cmp';
+            wrap.innerHTML = `
+                <div class="rp-cmp-top">
+                    <div class="rp-cmp-name is-a"><b>${flag(replay)}</b><small>${esc(modsLabel(replay.mods))}${replay.playedAt && !isNaN(replay.playedAt) ? ` · ${esc(replay.playedAt.toLocaleDateString())}` : ''}</small></div>
+                    <div class="rp-cmp-map"><b>${esc(map.metadata.Title || bm.title)}</b><small>[${esc(map.metadata.Version || bm.version)}]</small></div>
+                    <div class="rp-cmp-name is-b"><b>${flag(c.replay)}</b><small>${esc(modsLabel(c.replay.mods))}${c.replay.playedAt && !isNaN(c.replay.playedAt) ? ` · ${esc(c.replay.playedAt.toLocaleDateString())}` : ''}</small></div>
+                    <button type="button" class="rp-cmp-close" id="rp-cmp-close" title="${L('結束比較')}" aria-label="${L('結束比較')}">✕</button>
+                </div>
+                <div class="rp-cmp-lead"><i id="rp-cmp-lead"></i></div>
+                <dl class="rp-cmp-rows">${CMP_ROWS.map(([k, label, , col]) => `<div class="rp-cmp-row" data-k="${k}"><dd class="is-a" id="rp-cmp-a-${k}">–</dd><dt${col ? ` style="color:${col}"` : ''}>${label}</dt><dd class="is-b" id="rp-cmp-b-${k}">–</dd></div>`).join('')}</dl>`;
+            body2.appendChild(wrap);
+            $('rp-cmp-close').addEventListener('click', closeCompare);
+        }
+        let lastCmp = '';
+        function updateCompareHud(sA, sB, t) {
+            const c = session.cmp;
+            const tA = timingA(t), tB = c.timing(t);
+            const ppA = ppAt(t), ppB = c.ppAt(t);
+            const val = {
+                acc: [sA.acc, sB.acc], ur: [sA.ur, sB.ur],
+                ...Object.fromEntries(JUDGES.map((j) => [j, [sA.counts[j], sB.counts[j]]])),
+                early: [tA.early, tB.early], late: [tA.late, tB.late], mean: [tA.mean, tB.mean], pp: [ppA, ppB],
+            };
+            const key = JSON.stringify(val);
+            if (key === lastCmp) return;
+            lastCmp = key;
+            const fmtV = (k, v) => (v == null ? '–' : k === 'acc' ? `${(v * 100).toFixed(2)}%` : k === 'ur' ? v.toFixed(1) : k === 'mean' ? `${v > 0 ? '+' : ''}${v.toFixed(1)}ms` : k === 'pp' ? Math.round(v).toLocaleString() : String(v));
+            for (const [k, , better] of CMP_ROWS) {
+                const [a, b] = val[k];
+                const ea = $(`rp-cmp-a-${k}`), eb = $(`rp-cmp-b-${k}`);
+                ea.textContent = fmtV(k, a); eb.textContent = fmtV(k, b);
+                let win = 0;
+                if (a != null && b != null && a !== b && better) {
+                    if (better === 'hi') win = a > b ? -1 : 1;
+                    else if (better === 'lo') win = a < b ? -1 : 1;
+                    else if (better === 'abs') win = Math.abs(a) < Math.abs(b) ? -1 : 1;
+                }
+                ea.classList.toggle('is-win', win === -1); eb.classList.toggle('is-win', win === 1);
+            }
+            // the lead bar: pp share once known, accuracy until then
+            const pa = ppA != null && ppB != null && ppA + ppB > 0 ? ppA / (ppA + ppB) : sA.acc + sB.acc > 0 ? sA.acc / (sA.acc + sB.acc) : 0.5;
+            $('rp-cmp-lead').style.width = `${(pa * 100).toFixed(1)}%`;
+        }
+        function openComparePick() {
+            const old = $('rp-cmp-pick'); if (old) { old.remove(); return; }
+            const pick = document.createElement('div');
+            pick.className = 'rp-cmp-pick';
+            pick.id = 'rp-cmp-pick';
+            pick.innerHTML = `
+                <div class="rp-cmp-pick-card" role="dialog" aria-label="${L('雙人比較')}">
+                    <button type="button" class="rp-menu-close" aria-label="${L('關閉')}">✕</button>
+                    <b class="rp-cmp-pick-title">${L('選另一份成績來比較')}</b>
+                    <small>${L('同一張譜面、倍速相同的成績才能比較。')}</small>
+                    <form class="rp-url" id="rp-cmp-url"><input type="text" autocomplete="off" placeholder="${L('貼上 osu! 成績網址或成績 ID')}" aria-label="${L('貼上 osu! 成績網址或成績 ID')}"><button type="submit" class="rp-btn">${L('載入')}</button>
+                        <label class="rp-btn">${L('上傳 .osr')}<input type="file" accept=".osr" hidden></label></form>
+                    <p class="rp-cmp-msg rp-error" hidden></p>
+                    <div class="rp-cmp-list"><p class="rp-note">${L('讀取排行榜…')}</p></div>
+                </div>`;
+            body2.appendChild(pick);
+            pick.querySelector('.rp-menu-close').addEventListener('click', () => pick.remove());
+            pick.addEventListener('click', (e) => { if (e.target === pick) pick.remove(); });
+            const say = (msg) => { const el = pick.querySelector('.rp-cmp-msg'); el.textContent = msg; el.hidden = !msg; };
+            pick.querySelector('input[type=file]').addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; if (f) startCompare(f); });
+            pick.querySelector('#rp-cmp-url').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const ref = scoreRef(e.target.querySelector('input[type=text]').value);
+                if (!ref) { say(L('看不懂這個網址，請貼 osu! 成績頁的網址（osu.ppy.sh/scores/…）或成績 ID')); return; }
+                try { say(L('從 osu! 取得重播')); await startCompare(await fetchScoreReplay(ref)); } catch (err) { say(err.message); }
+            });
+            const modeName = ['osu', 'taiko', 'fruits', 'mania'][replay.mode];
+            fetch(`/.netlify/functions/replay-scores?b=${encodeURIComponent(bm.beatmap_id)}&mode=${modeName}`)
+                .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+                .then((data) => {
+                    const list = pick.querySelector('.rp-cmp-list');
+                    const rate = rateOf(replay.mods);
+                    const bits = { DT: 64, NC: 512, HT: 256 };
+                    const rows = (data.scores || []).map((s, i) => {
+                        const sr = s.mods.reduce((acc, m) => acc | (bits[m] || 0), 0);
+                        const ok = rateOf(sr) === rate && String(s.id) !== String(replay.scoreId) && String(s.legacyId) !== String(replay.scoreId);
+                        return `<button type="button" class="rp-cmp-item" data-id="${s.id}"${ok ? '' : ' disabled'} title="${ok ? '' : esc(L('倍速不同或是同一份成績'))}">
+                            <span class="rp-cmp-rank">#${i + 1}</span>
+                            ${s.user && s.user.avatar ? `<img src="${esc(s.user.avatar)}" alt="" loading="lazy">` : '<i></i>'}
+                            <b>${esc(s.user ? s.user.name : '?')}</b>
+                            <span class="rp-cmp-mods">${esc(s.mods.join('') || 'NM')}</span>
+                            <span>${(s.acc * 100).toFixed(2)}%</span>
+                            <span class="rp-cmp-pp">${s.pp ? `${Math.round(s.pp)}pp` : ''}</span>
+                        </button>`;
+                    });
+                    list.innerHTML = rows.length ? rows.join('') : `<p class="rp-note">${L('排行榜上沒有可以下載重播的成績')}</p>`;
+                    list.querySelectorAll('.rp-cmp-item:not([disabled])').forEach((b) => b.addEventListener('click', async () => {
+                        try { say(L('從 osu! 取得重播')); await startCompare(await fetchScoreReplay({ id: b.dataset.id })); } catch (err) { say(err.message); }
+                    }));
+                })
+                .catch(() => { pick.querySelector('.rp-cmp-list').innerHTML = `<p class="rp-note">${L('讀不到排行榜，可以貼成績網址或上傳 .osr')}</p>`; });
+        }
+        if (cmpBtn) cmpBtn.addEventListener('click', openComparePick);
+
         // the counts follow the top-right block down (taiko keeps them under its lane)
         if (replay.mode !== 1 && typeof ResizeObserver === 'function') {
             const topBox = $('rp-hud-top'), stats = $('rp-hud-stats');
@@ -902,6 +1110,7 @@
             return ans < 0 ? 0 : ppValues[ans];
         };
         let lastShown = '';
+        session.cmp = null;
         let lastStats = { combo: 0, acc: 1, counts: Object.fromEntries(JUDGES.map((j) => [j, 0])), ur: 0, lMiss: 0, rMiss: 0 };
         const resultsData = {
             mode: replay.mode, record, replay, rank: rankImage, acc: accOf(record), bg, lifeBar,
@@ -917,7 +1126,7 @@
             // the way out follows the clock, so it pauses, seeks and ends with the timeline
             const atEnd = t >= outroAt && !seeking;
             if (!atEnd) resultsDismissed = false;
-            const el = !atEnd || resultsDismissed ? -1 : (t - outroAt) / (audio.playbackRate || 1);
+            const el = !atEnd || resultsDismissed || session.cmp ? -1 : (t - outroAt) / (audio.playbackRate || 1);
             const showRes = el >= OUTRO.rank;
             if (resultsEl.hidden === showRes) resultsEl.hidden = !showRes;
             // wide views get osu!'s own ranking screen on the canvas; narrow ones the card
@@ -936,8 +1145,20 @@
                 acts.style.opacity = String(Math.max(0, Math.min(1, inP)));
                 s = lastStats;
             } else {
-                s = M.draw(ctx, view, prep, t);
-                drawCombo(s);
+                if (session.cmp) {
+                    const half = view.w / 2;
+                    const side = { ...view, w: half, maxField: half * 0.6 };
+                    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, half, view.h); ctx.clip();
+                    s = M.draw(ctx, side, prep, t);
+                    ctx.restore();
+                    ctx.save(); ctx.translate(half, 0); ctx.beginPath(); ctx.rect(0, 0, half, view.h); ctx.clip();
+                    const sB = M.draw(ctx, side, session.cmp.prep, t);
+                    ctx.restore();
+                    updateCompareHud(s, sB, t);
+                } else {
+                    s = M.draw(ctx, view, prep, t);
+                    drawCombo(s);
+                }
                 if (el >= 0) {
                     bgOnly(Math.min(1, el / OUTRO.fade)); // the play fades out, the background comes up
                     if (!showRes) blackOver((el - OUTRO.black) / (OUTRO.rank - OUTRO.black));
