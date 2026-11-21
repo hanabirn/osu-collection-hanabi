@@ -348,9 +348,13 @@
                 if (finished) continue;
                 const x = open ? hitX : xOf(o.time, o.speed);
                 if (x > w + bigD) continue;
-                const warn = I['spinner-warning'];
-                if (warn) ctx.drawImage(warn.bmp, x - bigD / 2, cy - bigD / 2, bigD, bigD);
-                else drawNote(x, cy, bigD, SWELL_COLOUR, true, 1);
+                // the swell note comes in like any note and is gone once it reaches the target;
+                // then the swell itself shows
+                if (!open) {
+                    const warn = I['spinner-warning'];
+                    if (warn) ctx.drawImage(warn.bmp, x - bigD / 2, cy - bigD / 2, bigD, bigD);
+                    else drawNote(x, cy, bigD, SWELL_COLOUR, true, 1);
+                }
                 if (open) {
                     // the swell: a big circle with the hits still needed, its ring closing in
                     const left = o.required - o.hits.filter((ht) => ht <= t).length;
@@ -358,7 +362,11 @@
                     const R = bandH * 1.1, sx = hitX + bandH * 1.6, sy = cy;
                     const circ = I['spinner-circle'], appr = I['spinner-approachcircle'];
                     ctx.globalAlpha = 0.92;
-                    if (circ) ctx.drawImage(circ.bmp, sx - R, sy - R, R * 2, R * 2);
+                    // the hand turns with the hits: each one swings it on by an eighth of a turn,
+                    // eased over 150 ms, so faster drumming spins it faster
+                    let turn = 0;
+                    for (const ht of o.hits) { if (ht > t) break; const q = Math.min(1, (t - ht) / 150); turn += (Math.PI / 4) * (1 - (1 - q) * (1 - q)); }
+                    if (circ) { ctx.save(); ctx.translate(sx, sy); ctx.rotate(turn); ctx.drawImage(circ.bmp, -R, -R, R * 2, R * 2); ctx.restore(); }
                     else { ctx.beginPath(); ctx.arc(sx, sy, R, 0, Math.PI * 2); ctx.fillStyle = 'rgba(30,30,30,0.85)'; ctx.fill(); }
                     const ar = R * (1 - p * 0.75);
                     if (appr) ctx.drawImage(appr.bmp, sx - ar, sy - ar, ar * 2, ar * 2);
