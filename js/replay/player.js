@@ -111,6 +111,10 @@
             if (session.setScroll && $('rp-speed')) session.setScroll(session.view.scroll + (e.key === '-' || e.key === '_' ? -1 : 1));
             return;
         }
+        // a slider the visitor last touched (volume, scroll speed, dim, sizes) takes the arrow keys
+        // for fine steps; only the timeline (or nothing) seeks with them
+        const slider = e.target && e.target.type === 'range' && e.target.id !== 'rp-seek';
+        if (slider && /^Arrow/.test(e.key)) return;
         if (e.key === ' ') { e.preventDefault(); togglePlay(); }
         if (e.key === 'ArrowLeft') { e.preventDefault(); seekBy(-5000); }
         if (e.key === 'ArrowRight') { e.preventDefault(); seekBy(5000); }
@@ -356,13 +360,13 @@
                     <span class="rp-time"><span id="rp-time">0:00</span> / <span id="rp-dur">0:00</span></span>
                     <span class="rp-ctl rp-vol">
                         <button type="button" class="rp-icon" id="rp-mute" aria-label="${L('靜音')}">🔊</button>
-                        <input type="range" id="rp-volume" min="0" max="1" step="0.02" value="${prefs.volume}" aria-label="${L('音量')}">
+                        <input type="range" id="rp-volume" min="0" max="1" step="0.01" value="${prefs.volume}" aria-label="${L('音量')}">
                     </span>
                     <label class="rp-ctl" title="${L('播放速度')}"><span class="rp-ctl-name">${L('速度')}</span>
                         <select id="rp-rate">${RATES.map((r) => `<option value="${r}"${r === 1 ? ' selected' : ''}>${r}×</option>`).join('')}</select>
                     </label>
                     ${M.scroll ? `<label class="rp-ctl rp-scroll" title="${L('捲動速度（Ctrl + ＋／－）')}"><span class="rp-ctl-name">${L('捲動')}</span><span class="rp-scroll-wrap"><output id="rp-scroll-val">${Number(prefs.scroll).toFixed(1)}</output><input type="range" id="rp-speed" min="1" max="40" step="0.1" value="${prefs.scroll}" aria-label="${L('捲動速度')}"></span></label>` : ''}
-                    <label class="rp-ctl" title="${L('背景暗度')}"><span class="rp-ctl-name">${L('背景')}</span><input type="range" id="rp-dim" min="0" max="1" step="0.05" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
+                    <label class="rp-ctl" title="${L('背景暗度')}"><span class="rp-ctl-name">${L('背景')}</span><input type="range" id="rp-dim" min="0" max="1" step="0.01" value="${prefs.dim}" aria-label="${L('背景暗度')}"></label>
                     <label class="rp-ctl" title="${L('畫面大小')}"><span class="rp-ctl-name">${L('大小')}</span>
                         <select id="rp-size">${SIZES.map(([v, n]) => `<option value="${v}"${v === prefs.size ? ' selected' : ''}>${L(n)}</option>`).join('')}</select>
                     </label>
