@@ -85,13 +85,16 @@
         // the top bar with the map and the player
         ctx.fillStyle = 'rgba(0,0,0,0.8)';
         ctx.fillRect(0, -Math.max(0, oy), W, 96 + Math.max(0, oy));
+        // the text stops short of the Ranking title on the right
+        const titleImg = I['ranking-title'];
+        const textMax = W - (titleImg ? titleImg.bmp.width * titleImg.s + 70 : 120) - 24;
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'left'; ctx.textBaseline = 'top';
         ctx.font = '400 30px system-ui, sans-serif';
-        ctx.fillText(data.title, 6, 4, W - 420);
+        ctx.fillText(data.title, 6, 4, textMax);
         ctx.font = '400 22px system-ui, sans-serif';
-        ctx.fillText(data.line2, 6, 40, W - 420);
-        ctx.fillText(data.line3, 6, 64, W - 420);
+        ctx.fillText(data.line2, 6, 40, textMax);
+        ctx.fillText(data.line3, 6, 64, textMax);
 
         // the panel, the score, the judgements
         const panel = I['ranking-panel'];
