@@ -376,7 +376,9 @@
             const y = yOf(o.time);
             if (y > h + 60) continue;
             let alpha = 1;
-            if (prep.hidden) { const left = (o.time - t) / prep.preempt; alpha = left < 0.4 ? Math.max(0, (left - 0.1) / 0.3) : 1; }
+            // HD: gone by the time it is a little past halfway down (checked against replayviewer.com):
+            // full until 40% of the fall, fading out by 60%, nothing near the plate
+            if (prep.hidden) { const done = 1 - (o.time - t) / prep.preempt; alpha = done < 0.4 ? 1 : Math.max(0, 1 - (done - 0.4) / 0.2); }
             if (o.time < t) alpha *= Math.max(0, 1 - (t - o.time) / 400); // a miss keeps falling, fading
             const spin = o.kind === 'droplet' || o.kind === 'tiny' ? (o.time - t) / 300 : o.kind === 'banana' ? (o.time - t) / 500 : tiltOf(o);
             drawObject(o, ox + o.ex * k, y, alpha, spin);
