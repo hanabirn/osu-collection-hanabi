@@ -55,7 +55,7 @@ async function serveVideoPage(request, env, url) {
     const video = `${url.origin}/video/${id}.mp4`;
     // as o!rdr's: "[6.16 ⭐] PLAYER | Artist - Title [Diff] +MODS 72.55%"
     const title = meta.title
-        ? `${meta.stars ? `[${Number(meta.stars).toFixed(2)} ⭐] ` : ''}${meta.player || ''} | ${meta.artist ? `${meta.artist} - ` : ''}${meta.title} [${meta.version || ''}]${meta.mods ? ` +${meta.mods}` : ''}${Number.isFinite(meta.acc) ? ` ${(meta.acc * 100).toFixed(2)}%` : ''}`
+        ? `${meta.stars ? `[${Number(meta.stars).toFixed(2)} ⭐] ` : ''}${meta.player || ''}${meta.playerB ? ` 🆚 ${meta.playerB}` : ''} | ${meta.artist ? `${meta.artist} - ` : ''}${meta.title} [${meta.version || ''}]${meta.mods ? ` +${meta.mods}` : ''}${Number.isFinite(meta.acc) ? ` ${(meta.acc * 100).toFixed(2)}%` : ''}${meta.playerB && Number.isFinite(meta.accB) ? ` / ${(meta.accB * 100).toFixed(2)}%` : ''}`
         : 'osu! replay';
     const desc = 'osu! Collection';
     const image = thumb ? `${url.origin}/video/${id}.jpg` : meta.setId ? `https://assets.ppy.sh/beatmaps/${Number(meta.setId)}/covers/card@2x.jpg` : `${url.origin}/assets/icons/icon-512.png`;
@@ -166,7 +166,7 @@ async function serveRenderApi(request, env, url) {
     const origin = `${url.protocol}//${url.host}`;
 
     if (request.method === 'GET' && !action) {
-        return json(200, { scoreId: job.scoreId, mode: job.mode, status: job.status, video: job.status === 'done' ? `${origin}/video/${id}.mp4` : null });
+        return json(200, { scoreId: job.scoreId, scoreIdB: job.scoreIdB || null, mode: job.mode, status: job.status, video: job.status === 'done' ? `${origin}/video/${id}.mp4` : null });
     }
     if (!env.R2_REPLAYS) return json(503, { error: 'Storage unavailable' });
     if (job.status === 'done') return json(409, { error: 'Already rendered', video: `${origin}/video/${id}.mp4` });
@@ -205,7 +205,7 @@ async function serveRenderApi(request, env, url) {
         delete job.uploadId;
         const m0 = (data && data.meta) || {};
         // kept for the /v/{id} page's preview
-        job.meta = { artist: String(m0.artist || '').slice(0, 80), stars: Number(m0.stars) || 0, title: String(m0.title || '').slice(0, 120), version: String(m0.version || '').slice(0, 80), player: String(m0.player || '').slice(0, 40), mods: String(m0.mods || '').slice(0, 30), acc: Number(m0.acc), setId: Number(m0.setId) || 0 };
+        job.meta = { playerB: String(m0.playerB || '').slice(0, 40), accB: Number(m0.accB), artist: String(m0.artist || '').slice(0, 80), stars: Number(m0.stars) || 0, title: String(m0.title || '').slice(0, 120), version: String(m0.version || '').slice(0, 80), player: String(m0.player || '').slice(0, 40), mods: String(m0.mods || '').slice(0, 30), acc: Number(m0.acc), setId: Number(m0.setId) || 0 };
         // before the link goes out: Discord reads the page the moment it is posted
         try { await env.R2_REPLAYS.put(`video/${id}.json`, JSON.stringify(job.meta), { httpMetadata: { contentType: 'application/json' } }); } catch { /* the page falls back to the job */ }
         await saveJob(env, id, job);

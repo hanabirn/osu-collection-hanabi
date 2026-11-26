@@ -18,6 +18,9 @@ const LOC = {
     cmd_rt: { en: 'Most recent osu!taiko score', 'zh-TW': '最近一筆 osu!taiko 成績', 'zh-CN': '最近一笔 osu!taiko 成绩', ja: '直近の osu!taiko スコア', fr: 'Dernier score osu!taiko', de: 'Letzter osu!taiko-Score', ru: 'Последний результат osu!taiko', 'es-ES': 'Última puntuación de osu!taiko', ko: '최근 osu!taiko 기록' },
     cmd_rc: { en: 'Most recent osu!catch score', 'zh-TW': '最近一筆 osu!catch 成績', 'zh-CN': '最近一笔 osu!catch 成绩', ja: '直近の osu!catch スコア', fr: 'Dernier score osu!catch', de: 'Letzter osu!catch-Score', ru: 'Последний результат osu!catch', 'es-ES': 'Última puntuación de osu!catch', ko: '최근 osu!catch 기록' },
     cmd_rm: { en: 'Most recent osu!mania score', 'zh-TW': '最近一筆 osu!mania 成績', 'zh-CN': '最近一笔 osu!mania 成绩', ja: '直近の osu!mania スコア', fr: 'Dernier score osu!mania', de: 'Letzter osu!mania-Score', ru: 'Последний результат osu!mania', 'es-ES': 'Última puntuación de osu!mania', ko: '최근 osu!mania 기록' },
+    cmd_versus: { en: 'A video of two scores on the same map, side by side', 'zh-TW': '把同一張圖的兩筆成績錄成對比影片', 'zh-CN': '把同一张图的两笔成绩录成对比视频', ja: '同じ譜面の2つのスコアを比較動画にする', fr: 'Une vidéo de deux scores sur la même map, côte à côte', de: 'Ein Video zweier Scores derselben Map nebeneinander', ru: 'Видео двух результатов на одной карте рядом', 'es-ES': 'Un vídeo de dos puntuaciones del mismo mapa, lado a lado', ko: '같은 맵의 두 기록을 비교 영상으로' },
+    opt_versus_a: { en: 'First score: osu! score link or ID', 'zh-TW': '第一筆：osu! 成績連結或 ID', 'zh-CN': '第一笔：osu! 成绩链接或 ID', ja: '1つ目：osu! スコアのリンクか ID', fr: 'Premier score : lien ou ID de score osu!', de: 'Erster Score: osu!-Score-Link oder ID', ru: 'Первый результат: ссылка или ID', 'es-ES': 'Primera puntuación: enlace o ID de osu!', ko: '첫 번째 기록: osu! 기록 링크나 ID' },
+    opt_versus_b: { en: 'Second score: osu! score link or ID', 'zh-TW': '第二筆：osu! 成績連結或 ID', 'zh-CN': '第二笔：osu! 成绩链接或 ID', ja: '2つ目：osu! スコアのリンクか ID', fr: 'Second score : lien ou ID de score osu!', de: 'Zweiter Score: osu!-Score-Link oder ID', ru: 'Второй результат: ссылка или ID', 'es-ES': 'Segunda puntuación: enlace o ID de osu!', ko: '두 번째 기록: osu! 기록 링크나 ID' },
     cmd_help: { en: 'How to use this bot: every command', 'zh-TW': '這個 bot 怎麼用：所有指令一覽', 'zh-CN': '这个 bot 怎么用：所有指令一览', ja: 'このボットの使い方：全コマンド一覧', fr: 'Comment utiliser ce bot : toutes les commandes', de: 'So benutzt du diesen Bot: alle Befehle', ru: 'Как пользоваться ботом: все команды', 'es-ES': 'Cómo usar este bot: todos los comandos', ko: '이 봇 사용법: 모든 명령어' },
     cmd_top: { en: "Show a player's best scores", 'zh-TW': '查看某位玩家的最佳成績', 'zh-CN': '查看某位玩家的最佳成绩', ja: 'プレイヤーのベストスコアを表示', fr: "Afficher les meilleurs scores d'un joueur", de: 'Die Bestscores eines Spielers anzeigen', ru: 'Показать лучшие результаты игрока', 'es-ES': 'Mostrar las mejores puntuaciones de un jugador', ko: '플레이어의 최고 기록 표시' },
     cmd_map: { en: "Show a beatmap's info and PP values", 'zh-TW': '顯示一張圖譜的資訊與 PP 值', 'zh-CN': '显示一张谱面的信息与 PP 值', ja: '譜面の情報と PP 値を表示', fr: "Afficher les infos et les valeurs de PP d'une beatmap", de: 'Infos und PP-Werte einer Beatmap anzeigen', ru: 'Показать сведения о карте и значения PP', 'es-ES': 'Mostrar la info y los valores de PP de un beatmap', ko: '비트맵 정보와 PP 값 표시' },
@@ -151,6 +154,7 @@ const commands = [
             ],
         }],
     },
+    { name: 'versus', ...d('cmd_versus'), options: [{ type: 3, name: 'score_a', required: true, ...d('opt_versus_a') }, { type: 3, name: 'score_b', required: true, ...d('opt_versus_b') }] },
     { name: 'help', ...d('cmd_help') },
 ];
 

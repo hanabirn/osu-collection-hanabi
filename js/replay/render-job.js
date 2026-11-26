@@ -55,7 +55,7 @@
         if (window.replayPause) window.replayPause();
         const meta = window.replayCurrentMeta ? window.replayCurrentMeta() : {};
         const p = show(`
-            <p class="rj-map"><b>${esc(meta.title || '')}</b> [${esc(meta.version || '')}] · ${esc(meta.player || '')}${meta.mods ? ` +${esc(meta.mods)}` : ''}</p>
+            <p class="rj-map"><b>${esc(meta.title || '')}</b> [${esc(meta.version || '')}] · ${esc(meta.player || '')}${meta.playerB ? ` 🆚 ${esc(meta.playerB)}` : ''}${meta.mods ? ` +${esc(meta.mods)}` : ''}</p>
             <div class="rj-skin"><span>${esc(L('使用的皮膚'))}：<b id="rj-skin-name">${esc(meta.skin || L('預設'))}</b></span>
                 <span class="rj-skin-change">
                     <select class="rj-skin-pick" id="rj-skin-pick" aria-label="${esc(L('從「我的皮膚」選'))}" hidden></select>
@@ -133,6 +133,11 @@
         try {
             await window.loadReplayFromScore(`https://osu.ppy.sh/scores/${job.mode ? `${job.mode}/` : ''}${job.scoreId}`);
             if (!window.replayCurrentMeta || !document.getElementById('rp-dur')) throw new Error(L('取得重播失敗，稍後再試'));
+            // 🆚: the second score, played against the first
+            if (job.scoreIdB) {
+                const err = window.replayCompareWithScore ? await window.replayCompareWithScore(`https://osu.ppy.sh/scores/${job.mode ? `${job.mode}/` : ''}${job.scoreIdB}`) : L('取得重播失敗，稍後再試');
+                if (err) throw new Error(err);
+            }
             ready(id);
         } catch (e) { fail(e && e.message ? e.message : String(e)); }
     }

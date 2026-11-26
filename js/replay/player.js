@@ -1210,7 +1210,7 @@
             c.fillText(`mapped by ${map.metadata.Creator || bm.creator}`, cx, y); y += h * 0.042;
             const modTxt = modsLabel(replay.mods);
             // "played by NAME [flag]  +MODS", centred as one line
-            const who = `played by ${replay.player}`;
+            const who = session.cmp ? `${replay.player}  vs  ${session.cmp.replay.player}` : `played by ${replay.player}`;
             const modPart = modTxt && modTxt !== 'NM' ? `  +${modTxt.replace(/^\+/, '')}` : '';
             const hasFlag = introFlag.complete && introFlag.naturalWidth > 0;
             const fs2 = h * 0.028, fw = hasFlag ? fs2 * 1.3 : 0, gap = hasFlag ? fs2 * 0.35 : 0;
@@ -1221,6 +1221,130 @@
             if (hasFlag) { c.shadowBlur = 0; c.drawImage(introFlag, lx, y + fs2 * 0.55 - fw / 2, fw, fw); c.shadowBlur = 6; lx += fw; }
             c.fillText(modPart, lx, y);
             c.restore();
+        }
+
+        /* Two players in a video, laid out per mode so each stays large in Discord's
+           small preview: standard on one field with both cursors (B's drawn in blue),
+           taiko as two full-width lanes one above the other, mania and catch side by
+           side; the score bar along the bottom. */
+        const CMP_A = '#f472b6', CMP_B = '#5fb4ff';
+        const cmpScratch = document.createElement('canvas').getContext('2d');
+        const cmpFlagB = new Image();
+        cmpFlagB.crossOrigin = 'anonymous';
+        function twemojiFlag(code) {
+            if (!/^[A-Za-z]{2}$/.test(code || '')) return '';
+            const cps = [...String(code).toUpperCase()].map((ch) => (0x1f1e6 + ch.charCodeAt(0) - 65).toString(16)).join('-');
+            return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${cps}.png`;
+        }
+        function cmpLabel(c, x, y, align, col, name, flag, st2, ppV, size, modBits) {
+            c.save();
+            c.textBaseline = 'top'; c.shadowColor = 'rgba(0,0,0,0.85)'; c.shadowBlur = 4;
+            c.font = `italic 800 ${Math.round(size)}px system-ui, sans-serif`;
+            const nw = c.measureText(name).width;
+            const fw = flag && flag.complete && flag.naturalWidth ? size * 1.1 : 0;
+            const x0 = align === 'left' ? x : x - nw - (fw ? fw + size * 0.3 : 0);
+            c.fillStyle = col; c.textAlign = 'left';
+            c.fillText(name, x0, y);
+            if (fw) { c.shadowBlur = 0; c.drawImage(flag, x0 + nw + size * 0.3, y - size * 0.02, fw, fw); c.shadowBlur = 4; }
+            const counts = st2.counts || {};
+            const ml = modsLabel(modBits || 0);
+            const line = `${ml && ml !== 'NM' ? `+${ml} · ` : ''}${((st2.acc ?? 1) * 100).toFixed(2)}%${ppV != null ? ` · ${Math.round(ppV)}pp` : ''} · ${(st2.combo || 0).toLocaleString()}x · ${counts.MISS || 0} miss`;
+            c.font = `700 ${Math.round(size * 0.62)}px system-ui, sans-serif`; c.fillStyle = 'rgba(255,255,255,0.92)';
+            c.textAlign = align;
+            c.fillText(line, x, y + size * 1.12);
+            c.restore();
+        }
+        function cmpScoreBar(c, w, h, top, sA, sB) {
+            const bh = h - top;
+            c.save();
+            c.fillStyle = 'rgba(8,6,14,0.92)'; c.fillRect(0, top, w, bh);
+            const m = w * 0.04, ty = top + bh * 0.2, th = Math.max(6, bh * 0.14);
+            c.fillStyle = 'rgba(255,255,255,0.12)'; c.fillRect(m, ty, w - m * 2, th);
+            const d = sA - sB, span = Math.max(50000, Math.max(sA, sB) * 0.15);
+            const frac = Math.min(1, Math.abs(d) / span) * 0.5 * (w - m * 2);
+            c.fillStyle = d >= 0 ? CMP_A : CMP_B;
+            if (d >= 0) c.fillRect(w / 2 - frac, ty, frac, th); else c.fillRect(w / 2, ty, frac, th);
+            c.fillStyle = '#fff'; c.fillRect(w / 2 - 1, ty - 3, 2, th + 6);
+            c.textBaseline = 'top';
+            const fs = Math.round(bh * 0.36), sy = ty + th + bh * 0.1;
+            c.font = `800 ${fs}px system-ui, sans-serif`;
+            c.textAlign = 'left'; c.fillStyle = d >= 0 ? CMP_A : 'rgba(255,255,255,0.75)'; c.fillText(sA.toLocaleString(), m, sy);
+            c.textAlign = 'right'; c.fillStyle = d < 0 ? CMP_B : 'rgba(255,255,255,0.75)'; c.fillText(sB.toLocaleString(), w - m, sy);
+            if (d) {
+                c.textAlign = 'center'; c.font = `700 ${Math.round(fs * 0.62)}px system-ui, sans-serif`;
+                c.fillStyle = d > 0 ? CMP_A : CMP_B; c.fillText(`+${Math.abs(d).toLocaleString()}`, w / 2, sy + fs * 0.2);
+            }
+            c.restore();
+        }
+        function drawCompareVideo(c, v, t) {
+            const cmp = session.cmp;
+            const { w, h } = v;
+            const barTop = Math.round(h * 0.875);
+            const sA = cmp.scoreA(t), sB = cmp.scoreB(t);
+            const pA = ppAt(t), pB = cmp.ppAt(t);
+            let stA, stB;
+            c.fillStyle = '#05040a'; c.fillRect(0, 0, w, h);
+            const lab = h * 0.034;
+            if (replay.mode === 0) {
+                // one field: A as usual, then B's cursor and trail over it
+                const fv = { ...v, h: barTop };
+                stA = M.draw(c, fv, prep, t);
+                stB = M.draw(cmpScratch, fv, cmp.prep, t); // only for B's numbers
+                const k = Math.min((barTop * 0.8) / 384, (w * 0.92) / 512);
+                const ox = (w - 512 * k) / 2, oy = (barTop - 384 * k) / 2 + 4 * k;
+                const flipB = !!cmp.prep.flip !== !!prep.flip;
+                const P = (p) => [ox + p.x * k, oy + (flipB ? 384 - p.y : p.y) * k];
+                c.save();
+                for (let n = 10; n >= 1; n--) {
+                    const [x, y] = P(cmp.prep.posAt(t - n * 12));
+                    c.globalAlpha = (1 - n / 11) * 0.55; c.fillStyle = CMP_B;
+                    c.beginPath(); c.arc(x, y, h * 0.009, 0, Math.PI * 2); c.fill();
+                }
+                c.globalAlpha = 1;
+                const [bx, by] = P(cmp.prep.posAt(t));
+                c.lineWidth = Math.max(2, h * 0.004); c.strokeStyle = '#fff'; c.fillStyle = CMP_B;
+                c.beginPath(); c.arc(bx, by, h * 0.016, 0, Math.PI * 2); c.fill(); c.stroke();
+                // name tags by both cursors
+                const [ax, ay] = P(prep.posAt(t));
+                c.font = `800 ${Math.round(h * 0.022)}px system-ui, sans-serif`; c.textBaseline = 'middle'; c.textAlign = 'left';
+                c.shadowColor = 'rgba(0,0,0,0.9)'; c.shadowBlur = 4;
+                c.fillStyle = CMP_A; c.fillText(replay.player, ax + h * 0.03, ay - h * 0.03);
+                c.fillStyle = CMP_B; c.fillText(cmp.replay.player, bx + h * 0.03, by + h * 0.03);
+                c.restore();
+                cmpLabel(c, 14, 10, 'left', CMP_A, replay.player, introFlag, stA, pA, lab, replay.mods);
+                cmpLabel(c, w - 14, 10, 'right', CMP_B, cmp.replay.player, cmpFlagB, stB, pB, lab, cmp.replay.mods);
+            } else if (replay.mode === 1) {
+                // two full-width lanes, one above the other (taiko.js puts its lane at
+                // 0.3 h – 0.525 h of the view it is given)
+                const hv = h * 0.85, band = hv * 0.225;
+                const ys = [h * 0.15, h * 0.15 + band + h * 0.12];
+                [[prep, 0, CMP_A], [cmp.prep, 1, CMP_B]].forEach(([pp2, i, col]) => {
+                    c.save();
+                    c.beginPath(); c.rect(0, ys[i], w, band); c.clip();
+                    c.translate(0, ys[i] - hv * 0.3);
+                    const s2 = M.draw(c, { ...v, h: hv }, pp2, t);
+                    c.restore();
+                    if (i) stB = s2; else stA = s2;
+                    c.fillStyle = col; c.fillRect(0, ys[i] - 3, w, 3);
+                });
+                cmpLabel(c, 14, ys[0] - lab * 2.05, 'left', CMP_A, replay.player, introFlag, stA, pA, lab, replay.mods);
+                cmpLabel(c, 14, ys[1] - lab * 2.05, 'left', CMP_B, cmp.replay.player, cmpFlagB, stB, pB, lab, cmp.replay.mods);
+            } else {
+                // mania / catch: two halves side by side
+                const half = w / 2;
+                [[prep, 0, CMP_A], [cmp.prep, 1, CMP_B]].forEach(([pp2, i, col]) => {
+                    c.save();
+                    c.beginPath(); c.rect(i * half, 0, half, barTop); c.clip();
+                    c.translate(i * half, 0);
+                    const s2 = M.draw(c, { ...v, w: half, h: barTop, maxField: half * 0.8 }, pp2, t);
+                    c.restore();
+                    if (i) stB = s2; else stA = s2;
+                });
+                c.fillStyle = 'rgba(255,255,255,0.5)'; c.fillRect(half - 1, 0, 2, barTop);
+                cmpLabel(c, 14, 10, 'left', CMP_A, replay.player, introFlag, stA, pA, lab * 0.9, replay.mods);
+                cmpLabel(c, half + 14, 10, 'left', CMP_B, cmp.replay.player, cmpFlagB, stB, pB, lab * 0.9, cmp.replay.mods);
+            }
+            cmpScoreBar(c, w, h, barTop, sA, sB);
         }
 
         const pauseEl = $('rp-pause');
@@ -1298,6 +1422,12 @@
             if (err) { if (!$('rp-cmp-pick')) openComparePick(); const el = $('rp-cmp-pick')?.querySelector('.rp-cmp-msg'); if (el) { el.textContent = err; el.hidden = false; } }
         };
         window.replayOpenComparePick = () => { if (!$('rp-cmp-pick')) openComparePick(); };
+        // the 🆚 render job: the second score by its osu! link / id; null when it worked, else the reason
+        window.replayCompareWithScore = async (text) => {
+            const ref = scoreRef(text);
+            if (!ref) return L('看不懂這個網址，請貼 osu! 成績頁的網址（osu.ppy.sh/scores/…）或成績 ID');
+            try { return await startCompare(await fetchScoreReplay(ref)); } catch (err) { return err && err.message ? err.message : String(err); }
+        };
         function renderCompareHud() {
             const c = session.cmp;
             const old = $('rp-cmp'); if (old) old.remove();
@@ -1868,6 +1998,13 @@
             // the flag needs the profile: wait a little for it, not forever
             await Promise.race([profileP, new Promise((r) => setTimeout(r, 4000))]);
             if (introFlag.src) { try { await introFlag.decode(); } catch { /* no flag */ } }
+            if (session.cmp && !cmpFlagB.src) {
+                try {
+                    const r = await Promise.race([osuFetch(`u=${encodeURIComponent(session.cmp.replay.player)}&type=string&m=${replay.mode}`), new Promise((res) => setTimeout(() => res(null), 4000))]);
+                    const u = Array.isArray(r) ? r[0] : null;
+                    if (u && twemojiFlag(u.country)) { cmpFlagB.src = twemojiFlag(u.country); await cmpFlagB.decode(); }
+                } catch { /* no flag */ }
+            }
             const realCtx = ctx, realView = view;
             const mods = typeof decodeOsuMods === 'function' ? decodeOsuMods(replay.mods).filter((m) => m !== 'NM') : [];
             const head = `${map.metadata.Title || bm.title} [${map.metadata.Version || bm.version}]`;
@@ -1889,7 +2026,18 @@
                     // the drawing helpers use the player's own ctx / view: point them at the video's
                     ctx = c2; view = vview;
                     c2.setTransform(1, 0, 0, 1, 0, 0);
-                    if (sec < playSecs) {
+                    if (sec < playSecs && session.cmp) {
+                        // two players: a layout per mode (drawCompareVideo)
+                        const t = t0 + sec * 1000 * rate;
+                        drawCompareVideo(c2, vview, t);
+                        const left = playSecs - sec;
+                        if (left < 1) { c2.fillStyle = `rgba(0,0,0,${1 - left})`; c2.fillRect(0, 0, W, H); }
+                        if (sec < INTRO_S) drawIntro(c2, vview, sec, INTRO_S);
+                    } else if (sec >= playSecs && session.cmp) {
+                        drawCompareRanking(Math.min(1, (sec - playSecs) / 0.6));
+                        const inP = (sec - playSecs) / 0.6;
+                        if (inP < 1) { c2.fillStyle = `rgba(0,0,0,${1 - inP})`; c2.fillRect(0, 0, W, H); }
+                    } else if (sec < playSecs) {
                         const t = t0 + sec * 1000 * rate;
                         st = M.draw(c2, vview, prep, t);
                         drawFieldBorder(c2, vview);
@@ -1956,6 +2104,8 @@
             acc: accOf(record), skin: savedSkins[replay.mode] ? savedSkins[replay.mode].name : '',
             setId: Number(bm.beatmapset_id) || 0, // the cover on the video's link preview
             artist: map.metadata.Artist || bm.artist || '', stars: sr,
+            playerB: session.cmp ? session.cmp.replay.player : '',
+            accB: session.cmp ? M.acc(M.record(session.cmp.replay)) : null,
         });
         window.replayPause = () => { if (session.clock && session.clock.running()) session.clock.toggle(); };
     }

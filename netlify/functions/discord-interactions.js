@@ -154,6 +154,9 @@ function scoreActionRow(score, apiMode, origin) {
     if (setId) btns.push({ type: 2, style: 2, label: t('btn_fav'), custom_id: `fav|${setId}` });
     // 🎬 Render: only when osu! keeps this score's replay
     if (score.id && hasReplay(score)) btns.push({ type: 2, style: 2, label: t('btn_render'), custom_id: `rend|${apiMode}|${score.id}` });
+    // 🆚: a video of this score against another one on the map's leaderboard
+    const mapId = score.beatmap && score.beatmap.id;
+    if (score.id && mapId && hasReplay(score)) btns.push({ type: 2, style: 2, label: t('btn_vs'), custom_id: `vs|${apiMode}|${score.id}|${mapId}` });
     if (score.id && origin) btns.push({ type: 2, style: 5, label: t('btn_site'), url: scoreCardSiteUrl(origin, score.id, apiMode) });
     return btns.length ? [{ type: 1, components: btns }] : [];
 }
@@ -162,14 +165,14 @@ function scoreActionRow(score, apiMode, origin) {
    browser draws the replay into a video with the site's player and their
    own skin, uploads it, and the bot posts it in this channel
    (worker/replay-video.js). */
-async function startRender(interaction, origin, apiMode, scoreId) {
+async function startRender(interaction, origin, apiMode, scoreId, scoreIdB) {
     const env = getEnv();
     const kv = env && env.KV_RESP_CACHE;
     if (!kv) return L.ephemeral(t('render_unavailable'));
     const userId = (interaction.member && interaction.member.user && interaction.member.user.id) || (interaction.user && interaction.user.id);
     const channelId = interaction.channel_id || (interaction.channel && interaction.channel.id);
     const id = crypto.randomUUID().replace(/-/g, '');
-    const job = { scoreId, mode: apiMode || '', userId, channelId, appId: interaction.application_id, token: interaction.token, created: Date.now(), status: 'new' };
+    const job = { scoreId, scoreIdB: scoreIdB || null, mode: apiMode || '', userId, channelId, appId: interaction.application_id, token: interaction.token, created: Date.now(), status: 'new' };
     try { await kv.put(`render-job:${id}`, JSON.stringify(job), { expirationTtl: 24 * 3600 }); }
     catch { return L.ephemeral(t('render_unavailable')); }
     return L.json({
@@ -181,6 +184,48 @@ async function startRender(interaction, origin, apiMode, scoreId) {
             allowed_mentions: { parse: [] },
         },
     });
+}
+
+/* 🆚: the map's leaderboard scores that have a replay and the same speed
+   (DT / HT), as a menu seen only by whoever pressed. */
+const RATE_CLASS = (mods) => { const m = (mods || []).map((x) => (typeof x === 'string' ? x : x && x.acronym)); return m.some((x) => x === 'DT' || x === 'NC') ? 'fast' : m.some((x) => x === 'HT' || x === 'DC') ? 'slow' : 'normal'; };
+async function versusPick(origin, apiMode, scoreId, mapId) {
+    let list = [];
+    try {
+        const r = await fetch(`${origin}/.netlify/functions/replay-scores?b=${mapId}&mode=${apiMode}`);
+        if (r.ok) list = ((await r.json()).scores || []).map((s, i) => ({ ...s, place: i + 1 }));
+    } catch { list = []; }
+    const me = list.find((s) => String(s.id) === String(scoreId));
+    // the pressed score may not be on the board: its speed then comes from osu!
+    let cls = me ? RATE_CLASS(me.mods) : null;
+    if (!cls) {
+        try {
+            const token = await getOsuToken();
+            const r = await fetch(`https://osu.ppy.sh/api/v2/scores/${scoreId}`, { headers: { Authorization: `Bearer ${token}`, 'x-api-version': '20240529' } });
+            cls = r.ok ? RATE_CLASS((await r.json()).mods) : 'normal';
+        } catch { cls = 'normal'; }
+    }
+    const options = list.filter((s) => s.replay !== false && String(s.id) !== String(scoreId) && RATE_CLASS(s.mods) === cls).slice(0, 25).map((s) => ({
+        label: `#${s.place} ${s.user ? s.user.name : '?'}`.slice(0, 100),
+        description: `${s.mods.length ? '+' + s.mods.join('') + ' · ' : ''}${(s.acc * 100).toFixed(2)}%${s.pp ? ` · ${Math.round(s.pp)}pp` : ''}`.slice(0, 100),
+        value: String(s.id),
+    }));
+    if (!options.length) return L.ephemeral(t('vs_none'));
+    return L.json({ type: L.R.MESSAGE, data: { flags: L.EPHEMERAL, content: t('vs_intro'), components: [{ type: 1, components: [{ type: 3, custom_id: `vssel|${apiMode}|${scoreId}`, placeholder: t('vs_pick'), options }] }], allowed_mentions: { parse: [] } } });
+}
+
+/* /versus: two osu! score links (or ids) → a 🆚 video of the two. */
+function scoreLinkRef(text) {
+    const s = String(text || '').trim();
+    const m = /scores\/(?:(osu|taiko|fruits|mania)\/)?(\d{1,20})/.exec(s) || (/^\d{1,20}$/.test(s) ? [s, null, s] : null);
+    return m ? { mode: m[1] || '', id: m[2] } : null;
+}
+async function cmdVersus(options, interaction, origin) {
+    const a = scoreLinkRef(L.optVal(options, 'score_a'));
+    const b = scoreLinkRef(L.optVal(options, 'score_b'));
+    if (!a || !b) return L.ephemeral(t('vs_bad_link'));
+    if (a.id === b.id) return L.ephemeral(t('vs_same'));
+    return startRender(interaction, origin, a.mode || b.mode || '', a.id, b.id);
 }
 
 /* Answer at once ("thinking…"), then render the card and replace the
@@ -502,7 +547,7 @@ async function cmdRecent(options, interaction, origin, forcedMode) {
    from the same definitions Discord shows in its picker. Commands are
    clickable mentions (</name:id>) once their ids are known. */
 const HELP_GROUPS = [
-    ['help_sec_scores', ['link', 'recent', '#short', 'top', 'pp', 'leaderboard']],
+    ['help_sec_scores', ['link', 'recent', '#short', 'top', 'pp', 'leaderboard', 'versus']],
     ['help_sec_maps', ['map', 'mappool', 'tourneypool']],
     ['help_sec_collections', ['collection', 'gallery', 'collect-channel', 'follow', 'unfollow', 'following', 'skin']],
     ['help_sec_settings', ['unlink', 'language', 'help']],
@@ -1403,6 +1448,19 @@ async function handleComponent(interaction, origin) {
         if (!/^\d{1,20}$/.test(scoreId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
         return startRender(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
     }
+    // 🆚 vs|<mode>|<scoreId>|<beatmapId>: pick the other score from the map's top 50
+    if (id.startsWith('vs|')) {
+        const [, mode, scoreId, mapId] = id.split('|');
+        if (!/^\d{1,20}$/.test(scoreId || '') || !/^\d{1,10}$/.test(mapId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
+        return versusPick(origin, L.API_MODE[mode] || 'osu', scoreId, mapId);
+    }
+    // vssel|<mode>|<scoreId> with the picked score as the value
+    if (id.startsWith('vssel|')) {
+        const [, mode, scoreId] = id.split('|');
+        const other = String(((interaction.data && interaction.data.values) || [])[0] || '');
+        if (!/^\d{1,20}$/.test(scoreId || '') || !/^\d{1,20}$/.test(other)) return L.json({ type: L.R.DEFERRED_UPDATE });
+        return startRender(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId, other);
+    }
     // ➕ 加入收藏: fav|<beatmapsetId>
     if (id.startsWith('fav|')) {
         const setId = id.slice(4);
@@ -1598,6 +1656,7 @@ async function handleInteraction(event) {
                 case 'rc': return await cmdRecent(options, interaction, origin, 'fruits');
                 case 'rm': return await cmdRecent(options, interaction, origin, 'mania');
                 case 'help': return await cmdHelp(interaction);
+                case 'versus': return await cmdVersus(options, interaction, origin);
                 case 'top': return await cmdTop(options, interaction, origin);
                 case 'leaderboard': return await cmdLeaderboard(options);
                 case 'map': return await cmdMap(options, origin);
