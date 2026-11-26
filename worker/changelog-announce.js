@@ -88,7 +88,10 @@ async function announceChangelog(env) {
 /* The 🌐 menu under an announcement (discord-interactions.js): that entry's
    notes in the picked language. */
 async function changelogInLanguage(origin, id, lang) {
-    const res = await fetch(`${origin}/changelog.json`);
+    // the static file straight from the site's assets: a Worker fetching its own
+    // domain doesn't reach them (that request fails), so only fall back to it
+    const env = require('../netlify/functions/_cf-env').getEnv();
+    const res = env && env.ASSETS ? await env.ASSETS.fetch(new Request(`${SITE}/changelog.json`)) : await fetch(`${origin}/changelog.json`);
     if (!res.ok) return null;
     for (const e of await res.json()) if ((await idOf(e)) === id) return embedFor(e, LANGS.some(([k]) => k === lang) ? lang : 'en');
     return null;
