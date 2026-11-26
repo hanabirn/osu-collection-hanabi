@@ -7969,3 +7969,7 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .srv-featured-card::before { opacity: .38; }
 .srv-featured-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(16, 14, 24, 0.88) 0%, rgba(16, 14, 24, 0.55) 55%, rgba(16, 14, 24, 0.25) 100%); pointer-events: none; }
 .srv-featured-card > * { z-index: 1; }
+
+/* the update toast names what changed; Discord bot entries in the changelog are tagged */
+.site-update-what { display: block; margin-top: 4px; font-size: var(--fs-12); opacity: .85; }
+.changelog-kind-bot { margin-left: 8px; font-size: var(--fs-12); padding: 1px 8px; border-radius: 10px; background: rgba(88, 101, 242, 0.25); color: #c9cdfb; }

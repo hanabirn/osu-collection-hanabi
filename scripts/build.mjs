@@ -12,6 +12,7 @@ import { rm, mkdir, cp, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
 import { transform } from 'esbuild';
 import * as OpenCC from 'opencc-js';
 
@@ -109,23 +110,40 @@ async function main() {
     }
     for (const f of MINIFY_ROOT_FILES) targets.push(join(ROOT, f));
 
-    // sw.js's BUILD_ID placeholder gets a real per-deploy value here so the
-    // file's bytes always differ from the previous deploy's — see its own
-    // comment for why that's what makes the "site updated" prompt reliable.
-    // Netlify sets COMMIT_REF during a real build; a local `npm run build`
-    // falls back to a timestamp.
-    const buildId = process.env.COMMIT_REF ? process.env.COMMIT_REF.slice(0, 8) : Date.now().toString(36);
-
     let totalBefore = 0, totalAfter = 0;
     for (const abs of targets) {
         const rel = abs.slice(ROOT.length).replace(/^[/\\]/, '');
-        const srcOverride = rel === 'sw.js'
-            ? (await readFile(abs, 'utf8')).replace("const BUILD_ID = 'dev';", `const BUILD_ID = '${buildId}';`)
-            : undefined;
-        const r = await minifyFile(abs, rel, srcOverride);
+        if (rel === 'sw.js') continue; // last, once the site's id is known
+        const r = await minifyFile(abs, rel);
         totalBefore += r.before;
         totalAfter += r.after;
     }
+
+    // The update notes as JSON, for the worker's Discord announcer
+    // (worker/changelog-announce.js), which can't run the browser file itself.
+    const clSrc = await readFile(join(ROOT, 'js/site-changelog-data.js'), 'utf8');
+    const clBox = {};
+    vm.runInNewContext(`${clSrc}\n;this.out = SITE_CHANGELOG;`, clBox, { filename: 'site-changelog-data.js' });
+    await writeFile(join(OUT, 'changelog.json'), JSON.stringify(clBox.out));
+
+    // sw.js's BUILD_ID: a hash of the site's own files, so the "site updated"
+    // prompt (see sw.js) comes only when something visitors load changed, not on
+    // a deploy that only touched the Discord bot or the server functions. The
+    // update notes are left out: a bot-only entry there isn't a site change.
+    const hash = createHash('sha256');
+    for (const abs of (await walk(OUT)).sort()) {
+        const rel = abs.slice(OUT.length).replace(/^[/\\]/, '').replace(/\\/g, '/');
+        if (rel === 'sw.js' || rel === 'changelog.json' || rel === 'js/site-changelog-data.js') continue;
+        hash.update(rel);
+        hash.update(await readFile(abs));
+    }
+    const buildId = hash.digest('hex').slice(0, 12);
+    const swAbs = join(ROOT, 'sw.js');
+    const swSrc = (await readFile(swAbs, 'utf8')).replace("const BUILD_ID = 'dev';", `const BUILD_ID = '${buildId}';`);
+    const sw = await minifyFile(swAbs, 'sw.js', swSrc);
+    totalBefore += sw.before;
+    totalAfter += sw.after;
+    console.log(`site id ${buildId}`);
 
     const pct = ((1 - totalAfter / totalBefore) * 100).toFixed(1);
     console.log(`minified ${targets.length} files: ${(totalBefore / 1024).toFixed(0)} KiB -> ${(totalAfter / 1024).toFixed(0)} KiB (-${pct}%)`);

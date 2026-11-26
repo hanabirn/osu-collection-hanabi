@@ -63,6 +63,15 @@ function notifySiteUpdateAvailable(registration) {
     if (toast && typeof t === 'function') {
         toast.textContent = t('site_update_available');
         toast.classList.add('show');
+        // what changed: the newest site entry of the new version's update notes
+        // (Discord-bot-only entries don't change the site, so they're skipped)
+        fetch('/changelog.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((list) => {
+            const e = (list || []).find((x) => x.kind !== 'bot');
+            const it = e && e.items && e.items[0];
+            const txt = it && (typeof it === 'string' ? it : (it[siteLang] || it.en || it.zh));
+            if (!txt) return;
+            toast.innerHTML = `${escHtml(t('site_update_available'))}<small class="site-update-what">${escHtml(txt.length > 90 ? `${txt.slice(0, 88)}…` : txt)}</small>`;
+        }).catch(() => {});
     }
 }
 

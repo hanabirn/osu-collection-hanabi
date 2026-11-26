@@ -299,6 +299,8 @@ function switchTab(tab, el) {
     if (tab === 'dm') tab = 'chat';
     document.querySelectorAll('.site-page').forEach(p => p.style.display = 'none');
     const page = document.getElementById('page-' + tab);
+    // remembered for this browser tab, so a reload (or 更新網站) comes back here
+    try { sessionStorage.setItem('lastSiteTab', tab); } catch { /* private mode */ }
     page.style.display = 'block';
     // Force a reflow so removing+re-adding the class restarts the CSS
     // animation even when switching back to a tab that already has it.
@@ -484,7 +486,7 @@ function renderChangelogPage() {
     }
     list.innerHTML = entries.map((entry, i) => `
         <li class="changelog-release${i === 0 ? ' is-latest' : ''}">
-            <div class="changelog-release-date"><time datetime="${escHtml(entry.date)}">${escHtml(entry.date)}</time>${i === 0 ? `<span class="changelog-latest">${escHtml(t('changelog_latest'))}</span>` : ''}</div>
+            <div class="changelog-release-date"><time datetime="${escHtml(entry.date)}">${escHtml(entry.date)}</time>${i === 0 ? `<span class="changelog-latest">${escHtml(t('changelog_latest'))}</span>` : ''}${entry.kind === 'bot' ? '<span class="changelog-kind-bot">Discord bot</span>' : ''}</div>
             <ul class="changelog-release-list">
                 ${entry.items.map(item => `<li>${escHtml(changelogItemText(item))}</li>`).join('')}
             </ul>
@@ -701,6 +703,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof checkGalleryDeepLink === 'function') checkGalleryDeepLink();
     if (typeof checkCmpoolDeepLink === 'function') checkCmpoolDeepLink();
     if (typeof checkGamesDeepLink === 'function') checkGamesDeepLink();
+    // After a reload (or the 更新網站 button) come back to the page this browser tab
+    // was on, unless a link already chose one. A fresh visit still starts at 首頁.
+    try {
+        const last = sessionStorage.getItem('lastSiteTab');
+        const shown = [...document.querySelectorAll('.site-page')].find((p) => p.style.display !== 'none');
+        const onHome = !shown || shown.id === 'page-home';
+        if (last && last !== 'home' && onHome && !location.search && document.getElementById('page-' + last)) switchTab(last);
+    } catch { /* private mode */ }
     // 首頁 is the landing page: fill it once sign-in state is known (above).
     if (typeof ensureHomeLoaded === 'function' && document.getElementById('page-home')?.style.display !== 'none') ensureHomeLoaded();
     if (typeof renderTrackedPlayersList === 'function') renderTrackedPlayersList();

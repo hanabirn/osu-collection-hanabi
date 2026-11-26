@@ -34,6 +34,7 @@ const {
 const { serveCatalogData } = require('./catalog-data');
 const { matchScoreCardPng, serveScoreCardPng } = require('./score-card-png');
 const { matchVideo, serveVideo, matchVideoPage, serveVideoPage, matchThumb, serveThumb, serveRenderApi } = require('./replay-video');
+const { announceChangelog } = require('./changelog-announce');
 
 const FN_PREFIX = '/.netlify/functions/';
 
@@ -93,6 +94,12 @@ const CRON_SCHEDULE = {
 
 export default {
     async scheduled(event, env, ctx) {
+        /* 每 30 分鐘順便把新的「網站更新紀錄」貼到 Discord 頻道（changelog-announce.js）。 */
+        if (event.cron === '20,50 * * * *') {
+            ctx.waitUntil(announceChangelog(env)
+                .then((r) => console.log('更新公告:', r))
+                .catch((err) => console.error('更新公告失敗:', err?.stack || err)));
+        }
         const name = CRON_SCHEDULE[event.cron];
         const handler = name && CRON_HANDLERS[name];
         if (!handler) {
