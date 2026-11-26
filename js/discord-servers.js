@@ -77,7 +77,8 @@ function renderServersPage() {
     if (!list) return;
     if (!shown.length) { list.innerHTML = `<p class="osu-empty srv-empty">${srvEsc(t('servers_empty'))}</p>`; return; }
     list.innerHTML = shown.map((s) => `
-        <article class="srv-card">
+        <article class="srv-card${s.banner ? ' has-banner' : ''}">
+            ${s.banner ? `<div class="srv-banner" style="background-image:url('${srvEsc(s.banner)}')"></div>` : ''}
             <div class="srv-card-head">${srvIcon(s)}<div class="srv-card-title"><div class="srv-name" title="${srvEsc(s.name)}">${srvEsc(s.name)}</div><div class="srv-counts">${srvCounts(s)}</div></div></div>
             <div class="srv-card-tags">${(s.tags || []).map((x) => `<span class="srv-chip">${srvEsc(SRV_TAG_LABEL[x] || x)}</span>`).join('')}${s.lang && s.lang !== 'other' ? `<span class="srv-chip srv-lang">${srvEsc((SRV_LANGS.find(([k]) => k === s.lang) || [, s.lang])[1])}</span>` : ''}</div>
             <p class="srv-desc">${srvEsc(s.description)}</p>

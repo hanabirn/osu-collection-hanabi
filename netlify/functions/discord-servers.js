@@ -44,7 +44,9 @@ async function lookupInvite(code) {
     const g = d.guild;
     return {
         code, guildId: g.id, name: g.name, icon: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.${g.icon.startsWith('a_') ? 'gif' : 'png'}?size=128` : null,
-        banner: g.banner ? `https://cdn.discordapp.com/banners/${g.id}/${g.banner}.png?size=600` : null,
+        // the server's banner, or else its invite background (splash): shown across the card's top
+        banner: g.banner ? `https://cdn.discordapp.com/banners/${g.id}/${g.banner}.${g.banner.startsWith('a_') ? 'gif' : 'webp'}?size=1024`
+            : g.splash ? `https://cdn.discordapp.com/splashes/${g.id}/${g.splash}.webp?size=1024` : null,
         members: d.approximate_member_count || 0, online: d.approximate_presence_count || 0,
         expires: d.expires_at || null, checkedAt: Date.now(),
     };
@@ -100,9 +102,9 @@ exports.handler = async (event) => {
                 }
                 if (changed) await saveAll(list);
                 let featured = await store.get('servers:featured', { type: 'json' });
-                if (!featured || Date.now() - (featured.checkedAt || 0) > REFRESH_MS) {
+                if (!featured || !('banner' in featured) || featured.v !== 2 || Date.now() - (featured.checkedAt || 0) > REFRESH_MS) {
                     const fresh = await lookupInvite(FEATURED_INVITE).catch(() => null);
-                    if (fresh) { featured = fresh; await store.setJSON('servers:featured', featured); }
+                    if (fresh) { featured = { ...fresh, v: 2 }; await store.setJSON('servers:featured', featured); }
                 }
                 const approved = list.filter((s) => s.status === 'approved' && !s.dead)
                     .sort((a, b) => (b.online || 0) - (a.online || 0)).map(pub);
