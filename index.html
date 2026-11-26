@@ -900,7 +900,11 @@
         <h2 class="osu-page-title" data-i18n="ssc_page_title">皮膚截圖廣場</h2>
         <p class="tournaments-hint" data-i18n="ssc_page_hint">分享你實際遊玩時的皮膚截圖給其他人參考——下載連結或 .osk 檔案至少擇一，這樣別人才能下載到這個皮膚。</p>
 
-        <button type="button" class="btn ssc-share-btn" onclick="openSkinShare()" data-icon="upload" data-icon-gap><span data-i18n="ssc_share_skin">分享皮膚</span></button>
+        <div class="ssc-top-actions">
+            <button type="button" class="btn ssc-share-btn" onclick="openSkinShare()" data-icon="upload" data-icon-gap><span data-i18n="ssc_share_skin">分享皮膚</span></button>
+            <!-- more skins elsewhere: osuck's gallery (a link only; nothing of theirs is copied here) -->
+            <a class="btn ssc-more-btn" href="https://skins.osuck.net/" target="_blank" rel="noopener noreferrer" data-icon="externalLink" data-icon-gap><span data-i18n="ssc_more_osuck">在 osuck 找更多皮膚</span></a>
+        </div>
 
         <div class="osu-search-row">
             <input type="text" id="ssc-search-input" autocomplete="off" data-i18n-placeholder="ssc_search_placeholder" placeholder="搜尋皮膚名稱或作者..." oninput="searchSkinScreenshots(this.value)">

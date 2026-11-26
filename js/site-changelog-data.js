@@ -8,6 +8,22 @@
    works (shown as-is in every language). */
 const SITE_CHANGELOG = [
     {
+        date: '2026-11-27',
+        items: [
+            {
+                zh: "皮膚廣場加上「在 osuck 找更多皮膚」的連結，想找更多皮膚可以到 skins.osuck.net",
+                'zh-Hans': "皮肤广场加上「在 osuck 找更多皮肤」的链接，想找更多皮肤可以到 skins.osuck.net",
+                en: "The skin gallery now links to skins.osuck.net for more skins",
+                ja: "スキン広場に skins.osuck.net へのリンク「osuck でもっとスキンを探す」を追加",
+                ko: "스킨 광장에 skins.osuck.net으로 가는 「osuck에서 스킨 더 찾기」 링크 추가",
+                de: "Die Skin-Galerie verlinkt jetzt auf skins.osuck.net für weitere Skins",
+                es: "La galería de skins ahora enlaza a skins.osuck.net para encontrar más",
+                fr: "La galerie de skins renvoie maintenant vers skins.osuck.net pour en trouver d’autres",
+                ru: "В галерее скинов появилась ссылка на skins.osuck.net, где их ещё больше",
+            },
+        ],
+    },
+    {
         date: '2026-11-26',
         items: [
             {
