@@ -63,7 +63,7 @@ function renderServersPage() {
                     <div class="srv-counts">${srvCounts(f)}</div>
                     <p class="srv-bot-note">🤖 ${srvEsc(t('servers_bot_note'))}</p>
                 </div>
-                <a class="btn srv-join" href="https://discord.gg/${encodeURIComponent(f.code)}" target="_blank" rel="noopener noreferrer">${typeof icon === 'function' ? icon('discord', { extraClass: 'icon-label-gap' }) : ''}${srvEsc(t('servers_join'))}</a>
+                <a class="btn srv-join" href="https://discord.gg/${encodeURIComponent(f.code)}" target="_blank" rel="noopener noreferrer">${typeof icon === 'function' ? icon('discord', { extraClass: 'icon-label-gap', brand: true, color: '#fff', size: '1.15em' }) : ''}${srvEsc(t('servers_join'))}</a>
             </div>` : '';
     }
     const tagsEl = document.getElementById('servers-tag-filter');
