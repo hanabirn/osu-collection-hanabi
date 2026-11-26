@@ -1,5 +1,5 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
- * 端點數: 68
+ * 端點數: 69
  * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
  *       Discord 0 個（延後）、死程式碼 1 個
  */
@@ -26,6 +26,7 @@ const ROUTES = {
     "community-mappools-list": adapt(require('../netlify/functions/community-mappools-list').handler),
     "discord-inbox": adapt(require('../netlify/functions/discord-inbox').handler),
     "discord-interactions": adapt(require('../netlify/functions/discord-interactions').handler),
+    "discord-servers": adapt(require('../netlify/functions/discord-servers').handler),
     "dm-conversations": adapt(require('../netlify/functions/dm-conversations').handler),
     "dm-messages": adapt(require('../netlify/functions/dm-messages').handler),
     "dm-read": adapt(require('../netlify/functions/dm-read').handler),
