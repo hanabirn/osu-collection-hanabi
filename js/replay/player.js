@@ -1871,6 +1871,14 @@
             const realCtx = ctx, realView = view;
             const mods = typeof decodeOsuMods === 'function' ? decodeOsuMods(replay.mods).filter((m) => m !== 'NM') : [];
             const head = `${map.metadata.Title || bm.title} [${map.metadata.Version || bm.version}]`;
+            // the mod badges under the pp (the live player shows them as page elements,
+            // which a recording doesn't see): the bot's hexagons, assets/discord-emoji/
+            const modList = mods.filter((m) => !(m === 'DT' && mods.includes('NC')) && !(m === 'SD' && mods.includes('PF')));
+            const modImgs = (await Promise.all(modList.map((m) => new Promise((res) => {
+                const im = new Image();
+                im.onload = () => res(im); im.onerror = () => res(null);
+                im.src = `assets/discord-emoji/m_${m.toLowerCase()}.png`;
+            })))).filter(Boolean);
             let st = lastStats;
             try {
                 for (let i = 0; i < nFrames; i++) {
@@ -1896,6 +1904,12 @@
                         const ppNow = ppAt(t);
                         c2.font = `700 ${Math.round(H * 0.032)}px system-ui, sans-serif`; c2.fillStyle = '#ffcf5a';
                         if (ppNow != null) c2.fillText(`${Math.round(ppNow).toLocaleString()}pp`, W - 14, 14 + H * 0.055);
+                        if (modImgs.length) {
+                            const ms = Math.round(H * 0.06), my = 18 + H * 0.055 + H * 0.04;
+                            c2.shadowBlur = 0;
+                            modImgs.forEach((im, k) => c2.drawImage(im, W - 14 - ms * (modImgs.length - k) - 4 * (modImgs.length - 1 - k), my, ms, ms));
+                            c2.shadowBlur = 4;
+                        }
                         c2.textAlign = 'left'; c2.fillStyle = '#fff';
                         c2.font = `800 ${Math.round(H * 0.028)}px system-ui, sans-serif`;
                         c2.fillText(head.length > 60 ? `${head.slice(0, 58)}…` : head, 14, 12);
