@@ -355,20 +355,189 @@ function topPage(u, apiMode, scores, page) {
     return { embeds, components };
 }
 
-async function cmdRecent(options, interaction, origin) {
+/* One score in detail (/recent, /rs…, /top index): the hit counts, pp next
+   to pp if FC, the map's numbers with the score's mods, and for a fail how
+   far it got. `ex` comes from _score-calc (null if the map file couldn't be
+   read: the embed then shows what the API alone gives). */
+const trimNum = (v, d = 1) => (v == null || !Number.isFinite(v) ? '?' : String(Number(v.toFixed(d))));
+const STATUS_LABEL = { ranked: 'Ranked', approved: 'Approved', qualified: 'Qualified', loved: 'Loved', pending: 'Pending', wip: 'WIP', graveyard: 'Graveyard' };
+
+function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading } = {}) {
+    const bs = score.beatmapset || {};
+    const bm = score.beatmap || {};
+    const mode = score.mode || apiMode;
+    const modStr = L.modsTag(score.mods);
+    const passed = score.passed !== false;
+    const acc = score.accuracy != null ? `${(score.accuracy * 100).toFixed(2)}%` : '—';
+    const pp = ex ? ex.pp : (score.pp != null ? Number(score.pp) : null);
+    const ppFc = ex ? ex.ppFc : null;
+    const maxCombo = (ex && ex.maxCombo) || bm.max_combo;
+
+    let ppPart;
+    if (!passed) ppPart = ppFc != null ? `FC ${Math.round(ppFc)}pp` : t('not_passed');
+    else if (pp == null) ppPart = '—';
+    else if (ppFc != null && Math.round(ppFc) > Math.round(pp)) ppPart = `**${Math.round(pp)}pp** / FC ${Math.round(ppFc)}pp`;
+    else ppPart = `**${Math.round(pp)}pp**`;
+
+    const hits = (() => {
+        try {
+            const { hitLine } = require('./_score-calc');
+            return hitLine(score, mode).map(([k, v]) => (k === 'miss' ? `❌ ${v}` : `${k}: ${L.fmtNum(v)}`)).join(' · ');
+        } catch { return ''; }
+    })();
+
+    const stars = ex && ex.stars != null ? ex.stars : bm.difficulty_rating;
+    const len = ex ? ex.length : bm.total_length;
+    const bpm = ex ? ex.bpm : bm.bpm;
+    const mapLine = [`⏱ ${L.fmtLen(len)}`, `♪ ${trimNum(bpm, 0)} BPM`, `${stars != null ? Number(stars).toFixed(2) : '?'}★`].join(' · ');
+    let attrLine = '';
+    if (ex) {
+        if (mode === 'mania') attrLine = `${ex.keys}K · OD ${trimNum(ex.od)} · HP ${trimNum(ex.hp)}`;
+        else if (mode === 'taiko') attrLine = `OD ${trimNum(ex.od)} · HP ${trimNum(ex.hp)}`;
+        else attrLine = `CS ${trimNum(ex.cs)} · AR ${trimNum(ex.ar)} · OD ${trimNum(ex.od)} · HP ${trimNum(ex.hp)}`;
+    } else if (bm.cs != null) {
+        attrLine = mode === 'mania' ? `${Math.round(bm.cs)}K · OD ${bm.accuracy} · HP ${bm.drain}` : `CS ${bm.cs} · AR ${bm.ar} · OD ${bm.accuracy} · HP ${bm.drain}`;
+    }
+
+    const lines = [
+        // ### heading: Discord sizes emojis with the text, so the grade and
+        // mod badges come out larger than on a normal line.
+        `### ${passed ? L.gradeTag(score.rank) : '**F**'}${modStr ? ' ' + modStr : ''} · ${acc} · ${ppPart}`,
+        `${L.fmtNum(score.score ?? score.legacy_total_score ?? score.total_score)} · ${L.fmtNum(score.max_combo)}x${maxCombo ? ` / ${L.fmtNum(maxCombo)}x` : ''}`,
+        hits,
+        mapLine,
+        attrLine,
+    ];
+    if (!passed && ex && ex.progress != null) {
+        lines.push(`❌ ${t('fail_line', { p: Math.round(ex.progress * 100), pp: ex.ppIfPassed != null ? Math.round(ex.ppIfPassed) : '?' })}`);
+    }
+
+    const st = user && user.statistics;
+    const flag = L.flagEmoji(user && (user.country_code || (user.country && user.country.code)));
+    const rankBit = st && st.global_rank
+        ? ` · #${L.fmtNum(st.global_rank)}${st.country_rank ? ` (${user.country_code} #${L.fmtNum(st.country_rank)})` : ''}`
+        : '';
+    const status = STATUS_LABEL[bs.status || bm.status] || '';
+    const footBits = [tries > 1 ? t('try_n', { n: tries }) : '', bs.creator ? t('mapper', { n: bs.creator }) : '', status].filter(Boolean);
+    const covers = bs.covers || {};
+    const mTag = L.modeTag(mode);
+
+    return {
+        author: user ? {
+            name: `${user.username}${flag ? ' ' + flag : ''}${rankBit}`,
+            url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
+            icon_url: user.avatar_url || undefined,
+        } : undefined,
+        title: `${heading ? heading + ' · ' : ''}${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+        url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
+        description: lines.filter(Boolean).join('\n'),
+        thumbnail: { url: covers['list@2x'] || covers.list || covers.card || undefined },
+        color: passed ? L.srColor(stars) : 0x9aa0a6,
+        footer: L.siteFooter(footBits.join(' · ')),
+        timestamp: score.created_at || score.ended_at || undefined,
+    };
+}
+
+// Deferred: fetching the map file and running rosu-pp can pass Discord's
+// 3 s window, so answer "thinking…" now and edit the message when done.
+function deferInto(interaction, work) {
+    const hook = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`;
+    const patch = (body) => fetch(hook, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allowed_mentions: { parse: [] }, ...body }),
+    }).catch(() => null);
+    const job = (async () => {
+        try {
+            const out = await work();
+            if (typeof out === 'string') await patch({ content: out });
+            else await patch({ content: '', embeds: [out.embed], components: out.components || [] });
+        } catch (err) {
+            console.error('deferred command failed:', err && (err.stack || err));
+            await patch({ content: t('export_fail') });
+        }
+    })();
+    const ctx = getCtx();
+    if (ctx && ctx.waitUntil) ctx.waitUntil(job);
+    return L.json({ type: L.R.DEFERRED_MESSAGE });
+}
+
+async function cmdRecent(options, interaction, origin, forcedMode) {
     const who = await resolveWho(options, interaction);
     if (!who) return L.ephemeral(t('need_name_or_link'));
-    const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
+    const apiMode = forcedMode || L.API_MODE[L.optVal(options, 'mode')] || 'osu';
     const idx = Math.max(1, Math.min(50, Number(L.optVal(options, 'index')) || 1));
 
-    const token = await getOsuToken();
-    const u = await L.resolveOsuUser(token, who, apiMode);
-    if (!u) return L.ephemeral(t('user_not_found', { name: who }));
+    return deferInto(interaction, async () => {
+        const token = await getOsuToken();
+        const u = await L.resolveOsuUser(token, who, apiMode);
+        if (!u) return t('user_not_found', { name: who });
 
-    const scores = await fetchScores(token, u.id, 'recent', apiMode, idx, true);
-    if (!scores.length) return L.ephemeral(t('recent_none', { name: u.username, mode: L.MODE_LABEL[apiMode] }));
-    const score = scores[Math.min(idx, scores.length) - 1];
-    return L.message(scoreEmbed(score, u, apiMode), scoreActionRow(score, apiMode, origin));
+        const scores = await fetchScores(token, u.id, 'recent', apiMode, 50, true);
+        if (!scores.length) return t('recent_none', { name: u.username, mode: L.MODE_LABEL[apiMode] });
+        const at = Math.min(idx, scores.length) - 1;
+        const score = scores[at];
+        // Tries: this play plus the older ones right before it on the same map.
+        let tries = 1;
+        const mapId = score.beatmap && score.beatmap.id;
+        for (let i = at + 1; i < scores.length && scores[i].beatmap && scores[i].beatmap.id === mapId; i++) tries++;
+
+        const { scoreExtras } = require('./_score-calc');
+        const ex = await scoreExtras(score, score.mode || apiMode, L.modsList(score.mods));
+        const embed = detailedScoreEmbed(score, u, apiMode, ex, { tries });
+        return { embed, components: scoreActionRow(score, apiMode, origin) };
+    });
+}
+
+/* /help: every command, grouped, in the caller's language. Descriptions come
+   from the same definitions Discord shows in its picker. Commands are
+   clickable mentions (</name:id>) once their ids are known. */
+const HELP_GROUPS = [
+    ['help_sec_scores', ['link', 'recent', '#short', 'top', 'pp', 'leaderboard']],
+    ['help_sec_maps', ['map', 'mappool', 'tourneypool']],
+    ['help_sec_collections', ['collection', 'gallery', 'collect-channel', 'follow', 'unfollow', 'following', 'skin']],
+    ['help_sec_settings', ['unlink', 'language', 'help']],
+];
+const DISCORD_LOCALE = { zh: 'zh-TW', zhs: 'zh-CN', es: 'es-ES' };
+let commandIds = null; // name -> id, cached per isolate
+
+async function loadCommandIds(appId) {
+    if (commandIds) return commandIds;
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    if (!botToken || !appId) return {};
+    try {
+        const r = await fetch(`https://discord.com/api/v10/applications/${appId}/commands`, { headers: { Authorization: `Bot ${botToken}` } });
+        if (!r.ok) return {};
+        const list = await r.json();
+        commandIds = Object.fromEntries(list.map((c) => [c.name, c.id]));
+        return commandIds;
+    } catch { return {}; }
+}
+
+async function cmdHelp(interaction) {
+    const { commands } = require('./_discord-commands');
+    const byName = Object.fromEntries(commands.map((c) => [c.name, c]));
+    const ids = await loadCommandIds(interaction.application_id);
+    const lang = getLocale();
+    const dl = DISCORD_LOCALE[lang] || lang;
+    const mention = (name) => (ids[name] ? `</${name}:${ids[name]}>` : `\`/${name}\``);
+    const desc = (c) => (lang !== 'en' && c.description_localizations && c.description_localizations[dl]) || c.description;
+
+    const fields = HELP_GROUPS.map(([sec, names]) => ({
+        name: t(sec),
+        value: names.map((n) => {
+            if (n === '#short') return `${['rs', 'rt', 'rc', 'rm'].map(mention).join(' ')} — ${t('help_recent_short')}`;
+            const c = byName[n];
+            return c ? `${mention(n)} — ${desc(c)}` : '';
+        }).filter(Boolean).join('\n').slice(0, 1024),
+    }));
+    return L.message({
+        title: t('help_title'),
+        description: t('help_intro'),
+        color: PINK,
+        fields,
+        footer: L.siteFooter(),
+    });
 }
 
 async function cmdTop(options, interaction, origin) {
@@ -1404,6 +1573,11 @@ async function handleInteraction(event) {
                 case 'farm':
                 case 'practice': return L.ephemeral(t('feature_retired'));
                 case 'recent': return await cmdRecent(options, interaction, origin);
+                case 'rs': return await cmdRecent(options, interaction, origin, 'osu');
+                case 'rt': return await cmdRecent(options, interaction, origin, 'taiko');
+                case 'rc': return await cmdRecent(options, interaction, origin, 'fruits');
+                case 'rm': return await cmdRecent(options, interaction, origin, 'mania');
+                case 'help': return await cmdHelp(interaction);
                 case 'top': return await cmdTop(options, interaction, origin);
                 case 'leaderboard': return await cmdLeaderboard(options);
                 case 'map': return await cmdMap(options, origin);

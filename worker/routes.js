@@ -1,5 +1,5 @@
 /* 自動產生，請勿手動編輯 —— 改用 `node scripts/gen-worker-routes.mjs`。
- * 端點數: 66
+ * 端點數: 68
  * 排除: 排程 4 個（階段 4 改走 scheduled handler）、
  *       Discord 0 個（延後）、死程式碼 1 個
  */
@@ -31,6 +31,7 @@ const ROUTES = {
     "dm-read": adapt(require('../netlify/functions/dm-read').handler),
     "dm-send": adapt(require('../netlify/functions/dm-send').handler),
     "embed-collection": adapt(require('../netlify/functions/embed-collection').handler),
+    "feedback": adapt(require('../netlify/functions/feedback').handler),
     "gallery-comments-delete": adapt(require('../netlify/functions/gallery-comments-delete').handler),
     "gallery-comments-list": adapt(require('../netlify/functions/gallery-comments-list').handler),
     "gallery-comments-post": adapt(require('../netlify/functions/gallery-comments-post').handler),
@@ -55,6 +56,7 @@ const ROUTES = {
     "push-config": adapt(require('../netlify/functions/push-config').handler),
     "push-subscribe": adapt(require('../netlify/functions/push-subscribe').handler),
     "replay-fetch": adapt(require('../netlify/functions/replay-fetch').handler),
+    "replay-hub": adapt(require('../netlify/functions/replay-hub').handler),
     "replay-pp": adapt(require('../netlify/functions/replay-pp').handler),
     "replay-scores": adapt(require('../netlify/functions/replay-scores').handler),
     "site-likes": adapt(require('../netlify/functions/site-likes').handler),
