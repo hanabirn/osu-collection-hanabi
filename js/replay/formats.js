@@ -44,12 +44,36 @@
         p += len;
         try { r.scoreId = p + 8 <= bytes.length ? Number(i64()) : 0; } catch { r.scoreId = 0; }
         r.frames = parseFrames(new TextDecoder().decode(window.lzmaDecode(compressed)));
+        // osu!lazer's exports carry its own score after that (LZMA JSON): every mod, CL
+        // included, and the statistics its accuracy is worked out from
+        r.lazer = null;
+        try {
+            if (r.version >= 30000016 && p + 4 <= bytes.length) {
+                const n2 = i32();
+                if (n2 > 0 && p + n2 <= bytes.length) r.lazer = JSON.parse(new TextDecoder().decode(window.lzmaDecode(bytes.subarray(p, p + n2))));
+            }
+        } catch { r.lazer = null; }
+        r.lazerAcc = lazerAccuracy(r);
         return r;
     }
 
     /* "w|x|y|z," — w: ms since the previous frame, x/y: cursor (in mania x
        is the bitmask of held keys), z: keys. A final w = -12345 frame holds
        the RNG seed and isn't input. Times become absolute. */
+    /* osu!lazer's accuracy for a standard score set without CL: slider ticks (30)
+       and slider ends (150) count as well as the objects (300 / 100 / 50). null
+       when it doesn't apply (stable, CL, other modes, no lazer data). */
+    function lazerAccuracy(r) {
+        const z = r.lazer;
+        if (!z || r.mode !== 0 || !z.statistics || !z.maximum_statistics) return null;
+        if ((z.mods || []).some((m) => (m && m.acronym) === 'CL')) return null;
+        const W = { great: 300, ok: 100, meh: 50, miss: 0, large_tick_hit: 30, small_tick_hit: 10, slider_tail_hit: 150 };
+        let got = 0, max = 0;
+        for (const [k, v] of Object.entries(z.statistics)) if (k in W) got += W[k] * (Number(v) || 0);
+        for (const [k, v] of Object.entries(z.maximum_statistics)) if (k in W) max += W[k] * (Number(v) || 0);
+        return max > 0 ? got / max : null;
+    }
+
     function parseFrames(text) {
         const frames = [];
         let t = 0;

@@ -24,8 +24,9 @@
             judges: ['300', '100', '50', 'MISS'],
             labels: {},
             colors: () => window.replayStd.JUDGE_COLOR,
-            record: (r) => ({ 300: r.n300, 100: r.n100, 50: r.n50, MISS: r.nMiss }),
-            acc: (c) => { const n = c[300] + c[100] + c[50] + c.MISS; return n ? (300 * c[300] + 100 * c[100] + 50 * c[50]) / (300 * n) : 1; },
+            // a lazer score's accuracy as osu! shows it (slider ticks and ends count; js/replay/formats.js)
+            record: (r) => ({ 300: r.n300, 100: r.n100, 50: r.n50, MISS: r.nMiss, lazerAcc: r.lazerAcc }),
+            acc: (c) => { if (c.lazerAcc != null) return c.lazerAcc; const n = c[300] + c[100] + c[50] + c.MISS; return n ? (300 * c[300] + 100 * c[100] + 50 * c[50]) / (300 * n) : 1; },
             prepare: (map, replay) => window.replayStd.prepareStd(map, replay),
             draw: (ctx, view, prep, t) => window.replayStd.drawStd(ctx, view, prep, t),
             skin: (skin) => skin.forStd(),
@@ -339,7 +340,7 @@
                 best = Math.max(best, e.comboAfter || 0);
                 if (!e.count) continue;
                 const c = e.countsAfter;
-                out.push({ t: e.jt, n: out.length + 1, combo: best, n300: c[300], n100: c[100], n50: c[50], miss: c.MISS });
+                out.push({ t: e.jt, n: out.length + 1, combo: best, n300: c[300], n100: c[100], n50: c[50], miss: c.MISS, lt: e.ltAfter || 0, se: e.seAfter || 0 });
             }
         } else if (mode === 1) {
             for (const e of prep.events) {
@@ -372,7 +373,7 @@
             fetch(window.REPLAY_PP_ENDPOINT || '/.netlify/functions/replay-pp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: Number(beatmapId), mods: replay.mods >>> 0, mode: replay.mode, states: states.map(({ t: _t, ...rest }) => rest) }),
+                body: JSON.stringify({ id: Number(beatmapId), mods: replay.mods >>> 0, mode: replay.mode, lazer: replay.mode === 0 && replay.lazerAcc != null, states: states.map(({ t: _t, ...rest }) => rest) }),
             }).then((res) => (res.ok ? res.json() : null)).then((data) => {
                 if (!data || !Array.isArray(data.pp) || data.pp.length !== states.length) return;
                 out.times = states.map((s2) => s2.t);
@@ -453,7 +454,9 @@
         const sr = Number(bm.difficultyrating) || 0;
         const srColor = typeof starRatingColor === 'function' ? starRatingColor(sr) : '#f472b6';
         const played = replay.playedAt && !isNaN(replay.playedAt) ? replay.playedAt.toLocaleDateString() : '';
-        const rankBase = M.rank ? M.rank(record, accOf(record)) : '';
+        // a lazer score's grade as osu! gave it (lazer grades by accuracy, stable by the 300 share)
+        const lzRank = replay.lazer && replay.lazer.rank ? ({ X: 'SS', XH: 'SS', SH: 'S' }[replay.lazer.rank] || replay.lazer.rank) : '';
+        const rankBase = lzRank || (M.rank ? M.rank(record, accOf(record)) : '');
         const silver = (replay.mods & (8 | 1024)) && (rankBase === 'SS' || rankBase === 'S'); // HD / FL
         const rankKey = silver ? `${rankBase}H` : rankBase;
         const rankImage = (rankBase === 'SS' ? 'X' : rankBase) + (silver ? 'H' : '');
@@ -1464,7 +1467,7 @@
             const sides = [['a', replay], ['b', c.replay]].map(([side, r2]) => {
                 const rec = M.record(r2);
                 const acc = accOf(rec);
-                const rk = M.rank ? M.rank(rec, acc) : '';
+                const rk = (r2.lazer && r2.lazer.rank ? ({ X: 'SS', XH: 'SS', SH: 'S' }[r2.lazer.rank] || r2.lazer.rank) : '') || (M.rank ? M.rank(rec, acc) : '');
                 const silver = (r2.mods & (8 | 1024)) && (rk === 'SS' || rk === 'S');
                 return { side, r2, rec, acc, rk, key: silver ? `${rk}H` : rk };
             });
@@ -1676,7 +1679,7 @@
         function resultsDataFor(r2, p2) {
             const rec = M.record(r2);
             const acc = accOf(rec);
-            const rb = M.rank ? M.rank(rec, acc) : '';
+            const rb = (r2.lazer && r2.lazer.rank ? ({ X: 'SS', XH: 'SS', SH: 'S' }[r2.lazer.rank] || r2.lazer.rank) : '') || (M.rank ? M.rank(rec, acc) : '');
             const sv = (r2.mods & (8 | 1024)) && (rb === 'SS' || rb === 'S');
             let lb = String(r2.lifeBar || '').split(',').map((x) => { const [a, b] = x.split('|'); return { t: Number(a), hp: Number(b) }; }).filter((x) => Number.isFinite(x.t) && Number.isFinite(x.hp));
             if (lb.length < 2 && r2.mode === 0) {

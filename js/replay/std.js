@@ -174,6 +174,8 @@
         }
         const w = windows(diff.od);
         const frames = replay.frames;
+        // a lazer score without CL: its accuracy counts slider ticks and ends (formats.js)
+        const lazerAcc = replay.lazerAcc != null;
         // the cursor between frames, and the key state of the frame before
         const posAt = (t) => {
             if (!frames.length) return { x: W / 2, y: H / 2, keys: 0 };
@@ -304,15 +306,18 @@
             else if (o.kind === 'slider') {
                 for (const p of o.parts) {
                     if (p.type === 'head') events.push({ o, jt: p.hit ? p.at : o.time + w[50], combo: p.hit ? 1 : 'break' });
-                    else if (p.type === 'legacylast') events.push({ o, jt: p.time, combo: p.hit ? 1 : 0 });
-                    else events.push({ o, jt: p.time, combo: p.hit ? 1 : 'break' });
+                    else if (p.type === 'legacylast') events.push({ o, jt: p.time, combo: p.hit ? 1 : 0, part: 'end', hit: p.hit });
+                    else events.push({ o, jt: p.time, combo: p.hit ? 1 : 'break', part: 'tick', hit: p.hit });
                 }
-                events.push({ o, jt: o.end, result: o.result, combo: 0, count: true });
+                // lazer (no CL) judges a slider by its head's timing; stable by all its parts
+                events.push({ o, jt: o.end, result: lazerAcc ? o.headResult : o.result, combo: 0, count: true });
             } else events.push({ o, jt: o.end, result: o.result, combo: o.result !== 'MISS' ? 1 : 0, count: true });
         }
         events.sort((a, b) => a.jt - b.jt);
         const counts = { 300: 0, 100: 0, 50: 0, MISS: 0 };
         let combo = 0, best = 0, offN = 0, offSum = 0, offSq = 0;
+        let lzGot = 0, lzMax = 0; // lazer accuracy: objects, slider ticks (30) and ends (150)
+        let ltHit = 0, seHit = 0; // slider ticks / repeats hit, slider ends hit (lazer pp)
         const rate = mods & (MOD.DT | MOD.NC) ? 1.5 : mods & MOD.HT ? 0.75 : 1;
         for (const e of events) {
             if (e.combo === 'break') combo = 0; else combo += e.combo;
@@ -328,7 +333,13 @@
             e.bestAfter = best;
             const n = counts[300] + counts[100] + counts[50] + counts.MISS;
             e.comboAfter = combo;
-            e.accAfter = n ? (300 * counts[300] + 100 * counts[100] + 50 * counts[50]) / (300 * n) : 1;
+            if (lazerAcc) {
+                if (e.count) { lzMax += 300; lzGot += { 300: 300, 100: 100, 50: 50 }[e.result] || 0; }
+                else if (e.part === 'tick') { lzMax += 30; if (e.hit) { lzGot += 30; ltHit++; } }
+                else if (e.part === 'end') { lzMax += 150; if (e.hit) { lzGot += 150; seHit++; } }
+                e.ltAfter = ltHit; e.seAfter = seHit;
+                e.accAfter = lzMax ? lzGot / lzMax : 1;
+            } else e.accAfter = n ? (300 * counts[300] + 100 * counts[100] + 50 * counts[50]) / (300 * n) : 1;
             e.countsAfter = { ...counts };
             e.urAfter = offN > 1 ? 10 * Math.sqrt(Math.max(0, offSq / offN - (offSum / offN) ** 2)) : 0;
         }

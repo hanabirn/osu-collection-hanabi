@@ -21,6 +21,8 @@ exports.handler = async (event) => {
     const mode = [0, 1, 2, 3].includes(input.mode) ? input.mode : 0;
     const states = Array.isArray(input.states) ? input.states.slice(0, MAX_STATES) : [];
     const num = (v) => (Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0);
+    // lazer: a standard score set on osu!lazer without CL (slider ticks and ends count)
+    const lazer = input.lazer === true;
 
     try {
         const res = await fetch(`https://osu.ppy.sh/osu/${id}`, {
@@ -31,7 +33,7 @@ exports.handler = async (event) => {
         const map = new rosu.Beatmap(text);
         // a map converted from standard to another mode
         if (map.mode !== mode) map.convert(mode, mods);
-        const difficulty = new rosu.Difficulty({ mods, lazer: false });
+        const difficulty = new rosu.Difficulty({ mods, lazer });
         const gradual = new rosu.GradualPerformance(difficulty, map);
         const pp = [];
         let done = 0; // objects processed so far
@@ -40,7 +42,7 @@ exports.handler = async (event) => {
             const state = {
                 maxCombo: num(s.combo), nGeki: num(s.geki), nKatu: num(s.katu),
                 n300: num(s.n300), n100: num(s.n100), n50: num(s.n50), misses: num(s.miss),
-                osuLargeTickHits: 0, osuSmallTickHits: 0, sliderEndHits: 0,
+                osuLargeTickHits: lazer ? num(s.lt) : 0, osuSmallTickHits: 0, sliderEndHits: lazer ? num(s.se) : 0,
             };
             let attrs;
             if (n > done) { attrs = gradual.nth(state, n - done - 1); done = n; }
