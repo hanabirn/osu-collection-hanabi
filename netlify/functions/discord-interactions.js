@@ -1448,6 +1448,14 @@ async function handleComponent(interaction, origin) {
         if (!/^\d{1,20}$/.test(scoreId || '')) return L.json({ type: L.R.DEFERRED_UPDATE });
         return startRender(interaction, origin, L.API_MODE[mode] ? L.API_MODE[mode] : '', scoreId);
     }
+    // 🌐 under a site-update announcement: cltr|<entry id>, the picked language as the value
+    if (id.startsWith('cltr|')) {
+        const lang = String(((interaction.data && interaction.data.values) || [])[0] || 'en');
+        let embed = null;
+        try { embed = await require('../../worker/changelog-announce').changelogInLanguage(origin, id.slice(5), lang); } catch { embed = null; }
+        if (!embed) return L.ephemeral(t('export_fail'));
+        return L.json({ type: L.R.MESSAGE, data: { flags: L.EPHEMERAL, embeds: [embed], allowed_mentions: { parse: [] } } });
+    }
     // 🆚 vs|<mode>|<scoreId>|<beatmapId>: pick the other score from the map's top 50
     if (id.startsWith('vs|')) {
         const [, mode, scoreId, mapId] = id.split('|');

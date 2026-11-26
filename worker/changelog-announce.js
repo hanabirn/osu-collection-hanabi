@@ -20,16 +20,26 @@ async function idOf(entry) {
     return `${entry.date}#${[...new Uint8Array(buf)].slice(0, 6).map((b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
-function embedFor(entry) {
+// the languages the 🌐 menu offers (the site's nine)
+const LANGS = [['zh', '繁體中文', '🇹🇼'], ['zh-Hans', '简体中文', '🇨🇳'], ['en', 'English', '🇬🇧'], ['ja', '日本語', '🇯🇵'], ['ko', '한국어', '🇰🇷'], ['de', 'Deutsch', '🇩🇪'], ['es', 'Español', '🇪🇸'], ['fr', 'Français', '🇫🇷'], ['ru', 'Русский', '🇷🇺']];
+
+// lang given: that language alone (the 🌐 menu's answer); none: Chinese with English under it
+function embedFor(entry, lang) {
     const bot = entry.kind === 'bot';
     const lines = (entry.items || []).map((it) => {
+        if (lang) return `• ${text(it, lang)}`;
         const zh = text(it, 'zh'), en = text(it, 'en');
         return en && en !== zh ? `• ${zh}\n  ${en}` : `• ${zh}`;
     });
     let description = lines.join('\n');
     if (description.length > 3900) description = `${description.slice(0, 3890)}…`;
+    const T = {
+        zh: ['網站更新', 'Discord bot 更新'], 'zh-Hans': ['网站更新', 'Discord bot 更新'], en: ['Site update', 'Discord bot update'],
+        ja: ['サイト更新', 'Discord ボット更新'], ko: ['사이트 업데이트', '디스코드 봇 업데이트'], de: ['Seiten-Update', 'Discord-Bot-Update'],
+        es: ['Actualización del sitio', 'Actualización del bot de Discord'], fr: ['Mise à jour du site', 'Mise à jour du bot Discord'], ru: ['Обновление сайта', 'Обновление Discord-бота'],
+    }[lang || 'zh'] || ['網站更新', 'Discord bot 更新'];
     return {
-        title: `${bot ? '🤖 Discord bot 更新' : '🌐 網站更新'} · ${entry.date}`,
+        title: `${bot ? `🤖 ${T[1]}` : `🌐 ${T[0]}`} · ${entry.date}`,
         url: bot ? undefined : SITE,
         description,
         color: bot ? 0x5865f2 : 0xf472b6,
@@ -60,7 +70,12 @@ async function announceChangelog(env) {
         const r = await fetch(`https://discord.com/api/v10/channels/${channel}/messages`, {
             method: 'POST',
             headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ embeds: [embedFor(e)], allowed_mentions: { parse: [] } }),
+            body: JSON.stringify({
+                embeds: [embedFor(e)],
+                // 🌐: anyone picks a language and gets the notes in it, seen only by them
+                components: [{ type: 1, components: [{ type: 3, custom_id: `cltr|${id}`, placeholder: '🌐 翻譯 · Translate · 翻訳 · 번역', options: LANGS.map(([value, label, emoji]) => ({ value, label, emoji: { name: emoji } })) }] }],
+                allowed_mentions: { parse: [] },
+            }),
         });
         if (!r.ok) { console.error('changelog announce failed', r.status, await r.text().catch(() => '')); break; }
         done.push(id);
@@ -70,4 +85,13 @@ async function announceChangelog(env) {
     return `posted ${posted}`;
 }
 
-module.exports = { announceChangelog };
+/* The 🌐 menu under an announcement (discord-interactions.js): that entry's
+   notes in the picked language. */
+async function changelogInLanguage(origin, id, lang) {
+    const res = await fetch(`${origin}/changelog.json`);
+    if (!res.ok) return null;
+    for (const e of await res.json()) if ((await idOf(e)) === id) return embedFor(e, LANGS.some(([k]) => k === lang) ? lang : 'en');
+    return null;
+}
+
+module.exports = { announceChangelog, changelogInLanguage };
