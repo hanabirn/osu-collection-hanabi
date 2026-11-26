@@ -314,7 +314,8 @@
         // osu!'s scale: the screen is 480 osu! pixels tall (as in osu!stable),
         // the 512-wide field centred, the plate low in the view
         // side by side (view.fitWidth) the field takes its half's whole width
-        const k = view.fitWidth ? Math.min(h / 480, (w * 0.99) / WIDTH) : Math.min(h / 480, (w * 0.96) / (WIDTH + 80));
+        const z = view.zoom || 1; // a larger field (the Discord videos)
+        const k = view.fitWidth ? Math.min(h / 480, (w * 0.99) / WIDTH) : Math.min((h / 480) * z, (w * 0.96) / (WIDTH + 80));
         const ox = (w - WIDTH * k) / 2;
         const plateY = h * 0.86;
         const fruitR = 32 * Math.abs(prep.scale) * k;

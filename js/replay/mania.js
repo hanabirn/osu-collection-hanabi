@@ -203,6 +203,11 @@
             hitY = h - Math.max(90, h * 0.16);
         }
         let fieldW = colW.reduce((a, b) => a + b, 0) + gaps.slice(0, keys - 1).reduce((a, b) => a + b, 0);
+        // view.zoom: a wider stage (the Discord videos), up to 62% of the width
+        if (view.zoom && view.zoom !== 1) {
+            const f = Math.min(view.zoom, (w * 0.62) / fieldW);
+            if (f > 1) { colW = colW.map((x) => x * f); gaps = gaps.map((x) => x * f); fieldW *= f; }
+        }
         // a narrower view (side-by-side comparison) shrinks the stage to fit
         if (view.maxField && fieldW > view.maxField) {
             const f = view.maxField / fieldW;

@@ -16,6 +16,7 @@ const VIDEO_RE = /^\/video\/([a-f0-9]{32})\.mp4$/;
 const MAX_PART = 64 * 1024 * 1024;     // Workers 的請求本文上限之內
 const MAX_PARTS = 12;                  // 最多約 768MB，實際影片遠小於此
 const JOB_TTL = 24 * 3600;
+const PAGE_RE = /^[/]v[/]([a-f0-9]{32})[/]?$/;
 
 const json = (status, body) => new Response(JSON.stringify(body), {
     status,
@@ -28,6 +29,50 @@ async function readJob(env, id) {
     try { return await env.KV_RESP_CACHE.get(jobKey(id), 'json'); } catch { return null; }
 }
 const saveJob = (env, id, job) => env.KV_RESP_CACHE.put(jobKey(id), JSON.stringify(job), { expirationTtl: JOB_TTL });
+
+function matchVideoPage(pathname) {
+    const m = PAGE_RE.exec(pathname);
+    return m ? m[1] : null;
+}
+
+/* /v/{id}: a page for the video with Open Graph video tags (as o!rdr's links
+   have), so Discord shows it as a video embed with the map's cover, rather
+   than the small player it gives a bare .mp4 link. In a browser it is just
+   the video. */
+async function serveVideoPage(request, env, url) {
+    const id = matchVideoPage(url.pathname);
+    const job = id ? await readJob(env, id) : null;
+    const head = id && env.R2_REPLAYS ? await env.R2_REPLAYS.head(`video/${id}.mp4`) : null;
+    if (!head) return new Response('not found', { status: 404 });
+    const meta = (job && job.meta) || {};
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const video = `${url.origin}/video/${id}.mp4`;
+    // as o!rdr's: "[6.16 ⭐] PLAYER | Artist - Title [Diff] +MODS 72.55%"
+    const title = meta.title
+        ? `${meta.stars ? `[${Number(meta.stars).toFixed(2)} ⭐] ` : ''}${meta.player || ''} | ${meta.artist ? `${meta.artist} - ` : ''}${meta.title} [${meta.version || ''}]${meta.mods ? ` +${meta.mods}` : ''}${Number.isFinite(meta.acc) ? ` ${(meta.acc * 100).toFixed(2)}%` : ''}`
+        : 'osu! replay';
+    const desc = 'osu! Collection';
+    const image = meta.setId ? `https://assets.ppy.sh/beatmaps/${Number(meta.setId)}/covers/card@2x.jpg` : `${url.origin}/assets/icons/icon-512.png`;
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>
+<meta property="og:site_name" content="osu! Collection">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:type" content="video.other">
+<meta property="og:url" content="${esc(`${url.origin}/v/${id}`)}">
+<meta property="og:image" content="${esc(image)}">
+<meta property="og:video" content="${esc(video)}">
+<meta property="og:video:url" content="${esc(video)}">
+<meta property="og:video:secure_url" content="${esc(video)}">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1280">
+<meta property="og:video:height" content="720">
+<meta name="theme-color" content="#f472b6">
+<style>html,body{margin:0;height:100%;background:#000}video{width:100%;height:100%}</style>
+</head><body><video src="${esc(video)}" controls autoplay playsinline></video></body></html>`;
+    return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
+}
 
 function matchVideo(pathname) {
     const m = VIDEO_RE.exec(pathname);
@@ -69,14 +114,10 @@ async function serveVideo(request, env, url) {
 }
 
 // the message that brings the video into the channel the button was pressed in
-async function postToDiscord(env, job, videoUrl, meta) {
-    const clip = (s, n) => String(s == null ? '' : s).replace(/[\r\n`*_~|>@#<]/g, ' ').trim().slice(0, n);
-    const lines = [
-        `🎬 <@${job.userId}>`,
-        `**${clip(meta.title, 90)}** [${clip(meta.version, 60)}] · ${clip(meta.player, 32)}${meta.mods ? ` +${clip(meta.mods, 30)}` : ''}${Number.isFinite(meta.acc) ? ` · ${(meta.acc * 100).toFixed(2)}%` : ''}`,
-        videoUrl,
-    ];
-    const body = JSON.stringify({ content: lines.join('\n'), allowed_mentions: { users: [String(job.userId)] } });
+async function postToDiscord(env, job, pageUrl) {
+    // the /v/ page: Discord turns its Open Graph tags into a video embed (map,
+    // player and mods in its title), larger than the player a bare .mp4 gets
+    const body = JSON.stringify({ content: `${pageUrl} 🎬 <@${job.userId}>`, allowed_mentions: { users: [String(job.userId)] } });
     // the bot's own message in the channel (works however long the render took)
     if (env.DISCORD_BOT_TOKEN && job.channelId) {
         const res = await fetch(`https://discord.com/api/v10/channels/${job.channelId}/messages`, {
@@ -137,7 +178,10 @@ async function serveRenderApi(request, env, url) {
         const videoUrl = `${origin}/video/${id}.mp4`;
         job.status = 'done';
         delete job.uploadId;
-        const posted = await postToDiscord(env, job, videoUrl, (data && data.meta) || {});
+        const m0 = (data && data.meta) || {};
+        // kept for the /v/{id} page's preview
+        job.meta = { artist: String(m0.artist || '').slice(0, 80), stars: Number(m0.stars) || 0, title: String(m0.title || '').slice(0, 120), version: String(m0.version || '').slice(0, 80), player: String(m0.player || '').slice(0, 40), mods: String(m0.mods || '').slice(0, 30), acc: Number(m0.acc), setId: Number(m0.setId) || 0 };
+        const posted = await postToDiscord(env, job, `${origin}/v/${id}`);
         delete job.token; // not needed any more
         await saveJob(env, id, job);
         return json(200, { video: videoUrl, posted });
@@ -145,4 +189,4 @@ async function serveRenderApi(request, env, url) {
     return json(400, { error: 'Unknown action' });
 }
 
-module.exports = { matchVideo, serveVideo, serveRenderApi, jobKey, JOB_TTL };
+module.exports = { matchVideo, serveVideo, matchVideoPage, serveVideoPage, serveRenderApi, jobKey, JOB_TTL };

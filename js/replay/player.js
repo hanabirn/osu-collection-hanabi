@@ -975,7 +975,7 @@
             const counts = st2.counts || {};
             const rows = JUDGES.map((j) => [L(M.labels[j] || j), String(counts[j] || 0), R.JUDGE_COLOR[j]]);
             if (M.ur) rows.push(['UR', String(Math.round(st2.ur || 0)), '#8bd5ff']);
-            const rh = Math.max(13, vh * 0.042);
+            const rh = Math.max(13, vh * 0.042) * (view.hud || 1);
             ctx.save();
             ctx.font = `800 ${Math.round(rh * 0.66)}px system-ui, sans-serif`;
             const labW = Math.max(...rows.map((r) => ctx.measureText(r[0]).width));
@@ -983,7 +983,9 @@
             const pad = rh * 0.45, gap = rh * 1.1;
             const bw = labW + gap + valW + pad * 2, bh = rows.length * rh + pad * 2;
             const modsBottom = vh * 0.135 + 12 + Math.max(22, Math.min(40, vh * 0.06)) + 10;
-            const by = y + (replay.mode === 1 ? vh * 0.57 : modsBottom);
+            // taiko: under the lane (lower and taller in the videos, see taiko.js)
+            const laneBottom = (view.zoom || 1) > 1 ? 0.46 + 0.1125 * Math.min(1.4, view.zoom) + 0.015 : 0.57;
+            const by = y + (replay.mode === 1 ? vh * laneBottom : modsBottom);
             const bx = x + vw - 10 - bw;
             ctx.fillStyle = 'rgba(0,0,0,0.55)';
             ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, rh * 0.35) : ctx.rect(bx, by, bw, bh); ctx.fill();
@@ -1052,12 +1054,12 @@
             const { w, h } = v;
             let x0, x1, y0, y1;
             if (replay.mode === 0) {
-                const k = Math.min((h * 0.8) / 384, (w * 0.92) / 512);
+                const k = Math.min((h * 0.8 * (v.zoom || 1)) / 384, (w * 0.92) / 512);
                 const R = (prep.radius || 32) * k;
                 const ox = (w - 512 * k) / 2, oy = (h - 384 * k) / 2 + 4 * k;
                 x0 = ox - R; x1 = ox + 512 * k + R; y0 = Math.max(1, oy - R); y1 = Math.min(h - 1, oy + 384 * k + R);
             } else if (replay.mode === 2) {
-                const k = Math.min(h / 480, (w * 0.96) / 592);
+                const k = Math.min((h / 480) * (v.zoom || 1), (w * 0.96) / 592);
                 const ox = (w - 512 * k) / 2;
                 x0 = ox - 24 * k; x1 = ox + 512 * k + 24 * k; y0 = 1; y1 = h - 1;
             } else return null;
@@ -1112,7 +1114,7 @@
         function drawBoard(c, v, t, st2 = {}) {
             if (!board) return;
             const { w, h } = v;
-            const nRows = replay.mode === 1 ? 5 : 6;
+            const nRows = replay.mode === 1 ? ((v.zoom || 1) > 1 ? 4 : 5) : 6;
             const score = liveScore(t);
             const pos = board.filter((e) => e.score > score).length; // places above the player
             const me = { name: replay.player, score, combo: st2.best || st2.combo || 0, me: true };
@@ -1121,10 +1123,10 @@
             else rows = [{ ...board[0], rank: 1 }, ...board.slice(pos - (nRows - 2), pos).map((e, i) => ({ ...e, rank: pos - (nRows - 2) + i + 1 })), { ...me, rank: pos + 1 }];
             const fb = fieldBounds(v);
             // left of the field's border (standard / catch), so the two frames don't overlap
-            const rw = Math.max(96, Math.min(230, w * 0.15, fb ? fb.x0 - 16 : 230)), rh = Math.max(24, Math.min(h * 0.05, rw * 0.26));
+            const rw = Math.max(96, Math.min(230, w * 0.15, fb ? fb.x0 - 16 : 230)), rh = Math.max(24, Math.min(h * 0.05 * (v.hud || 1), rw * 0.3));
             const x = 8;
             // below the info card's corner (the player) and the lane (taiko)
-            let y = replay.mode === 1 ? h * 0.575 : Math.max(h * 0.42, (h - rows.length * (rh + 3)) / 2);
+            let y = replay.mode === 1 ? h * ((v.zoom || 1) > 1 ? 0.46 + 0.1125 * Math.min(1.4, v.zoom) + 0.015 : 0.575) : Math.max(h * 0.42, (h - rows.length * (rh + 3)) / 2);
             c.save();
             c.textBaseline = 'alphabetic';
             for (const r of rows) {
@@ -1863,7 +1865,10 @@
             const cv = document.createElement('canvas');
             cv.width = W; cv.height = H;
             const c2 = cv.getContext('2d');
-            const vview = { ...view, w: W, h: H, dpr: 1, bgDim: Math.max(0.85, Number(view.bgDim) || 0) };
+            // the videos are mostly watched in Discord's small preview: a larger field and HUD
+            const HUD = 1.35;
+            const vview = { ...view, w: W, h: H, dpr: 1, bgDim: Math.max(0.85, Number(view.bgDim) || 0),
+                zoom: [1, 1.3, 1.12, 1.35][replay.mode] || 1, hud: HUD, comboScale: (Number(view.comboScale) || 0.6) * 1.3 };
             try { await introIcon.decode(); } catch { /* the drawn ring instead */ }
             // the flag needs the profile: wait a little for it, not forever
             await Promise.race([profileP, new Promise((r) => setTimeout(r, 4000))]);
@@ -1891,16 +1896,16 @@
                         c2.save();
                         c2.shadowColor = 'rgba(0,0,0,0.8)'; c2.shadowBlur = 4; c2.fillStyle = '#fff';
                         c2.textAlign = 'right'; c2.textBaseline = 'top';
-                        c2.font = `800 ${Math.round(H * 0.05)}px system-ui, sans-serif`;
+                        c2.font = `800 ${Math.round(H * 0.05 * HUD)}px system-ui, sans-serif`;
                         c2.fillText(`${(st.acc * 100).toFixed(2)}%`, W - 14, 12);
                         const ppNow = ppAt(t);
-                        c2.font = `700 ${Math.round(H * 0.032)}px system-ui, sans-serif`; c2.fillStyle = '#ffcf5a';
-                        if (ppNow != null) c2.fillText(`${Math.round(ppNow).toLocaleString()}pp`, W - 14, 14 + H * 0.055);
+                        c2.font = `700 ${Math.round(H * 0.032 * HUD)}px system-ui, sans-serif`; c2.fillStyle = '#ffcf5a';
+                        if (ppNow != null) c2.fillText(`${Math.round(ppNow).toLocaleString()}pp`, W - 14, 14 + H * 0.055 * HUD);
                         c2.textAlign = 'left'; c2.fillStyle = '#fff';
-                        c2.font = `800 ${Math.round(H * 0.028)}px system-ui, sans-serif`;
-                        c2.fillText(head.length > 60 ? `${head.slice(0, 58)}…` : head, 14, 12);
-                        c2.font = `700 ${Math.round(H * 0.024)}px system-ui, sans-serif`; c2.fillStyle = 'rgba(255,255,255,0.8)';
-                        c2.fillText(`${replay.player}${mods.length ? `  +${mods.join('')}` : ''}`, 14, 14 + H * 0.034);
+                        c2.font = `800 ${Math.round(H * 0.028 * HUD)}px system-ui, sans-serif`;
+                        c2.fillText(head.length > 44 ? `${head.slice(0, 42)}…` : head, 14, 12);
+                        c2.font = `700 ${Math.round(H * 0.024 * HUD)}px system-ui, sans-serif`; c2.fillStyle = 'rgba(255,255,255,0.8)';
+                        c2.fillText(`${replay.player}${mods.length ? `  +${mods.join('')}` : ''}`, 14, 14 + H * 0.034 * HUD);
                         c2.restore();
                         // the play fades out over its last second
                         const left = playSecs - sec;
@@ -1935,6 +1940,8 @@
             title: map.metadata.Title || bm.title, version: map.metadata.Version || bm.version, player: replay.player,
             mods: typeof decodeOsuMods === 'function' ? decodeOsuMods(replay.mods).filter((m) => m !== 'NM').join('') : '',
             acc: accOf(record), skin: savedSkins[replay.mode] ? savedSkins[replay.mode].name : '',
+            setId: Number(bm.beatmapset_id) || 0, // the cover on the video's link preview
+            artist: map.metadata.Artist || bm.artist || '', stars: sr,
         });
         window.replayPause = () => { if (session.clock && session.clock.running()) session.clock.toggle(); };
     }
