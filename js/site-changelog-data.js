@@ -11,6 +11,22 @@ const SITE_CHANGELOG = [
         date: '2026-11-26',
         items: [
             {
+                zh: "重新整理或按「更新網站」後，會停在原本的頁面，不再跳回首頁；更新提示也會寫出這次改了什麼",
+                'zh-Hans': "重新整理或按「更新网站」后，会停在原本的页面，不再跳回首页；更新提示也会写出这次改了什么",
+                en: "Reloading or pressing “Update site” now keeps you on the page you were on instead of going back to Home, and the update notice says what changed",
+                ja: "再読み込みや「サイトを更新」の後も元のページのまま（ホームに戻りません）。更新のお知らせに変更内容も表示",
+                ko: "새로고침하거나 「사이트 업데이트」를 눌러도 보던 페이지에 그대로 머물러요 (홈으로 돌아가지 않음). 업데이트 알림에 바뀐 내용도 표시",
+                de: "Neu laden oder „Seite aktualisieren“ behält jetzt die aktuelle Seite statt zur Startseite zu springen, und der Hinweis sagt, was neu ist",
+                es: "Al recargar o pulsar «Actualizar sitio» sigues en la misma página en vez de volver al inicio, y el aviso dice qué ha cambiado",
+                fr: "Recharger ou appuyer sur « Mettre à jour » garde maintenant la page en cours au lieu de revenir à l’accueil, et l’avis dit ce qui a changé",
+                ru: "После перезагрузки или кнопки «Обновить сайт» вы остаётесь на той же странице, а не на главной; уведомление говорит, что изменилось",
+            },
+        ],
+    },
+    {
+        date: '2026-11-26',
+        items: [
+            {
                 zh: "皮膚廣場改版：一份皮膚可以放最多 8 張截圖，下載連結支援 Google Drive、MEGA、MediaFire 等，點開可看大圖和下載按鈕",
                 'zh-Hans': "皮肤广场改版：一份皮肤可以放最多 8 张截图，下载链接支持 Google Drive、MEGA、MediaFire 等，点开可看大图和下载按钮",
                 en: "Skin gallery redesign: up to 8 screenshots per skin, download links to Google Drive, MEGA, MediaFire and more, and a window with large shots and download buttons",

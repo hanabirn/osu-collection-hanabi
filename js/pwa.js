@@ -71,6 +71,8 @@ function notifySiteUpdateAvailable(registration) {
             const txt = it && (typeof it === 'string' ? it : (it[siteLang] || it.en || it.zh));
             if (!txt) return;
             toast.innerHTML = `${escHtml(t('site_update_available'))}<small class="site-update-what">${escHtml(txt.length > 90 ? `${txt.slice(0, 88)}…` : txt)}</small>`;
+            // the header's ↻ button says it too, on hover
+            if (btn) btn.title = `${t('site_update_btn_title')}\n${txt}`;
         }).catch(() => {});
     }
 }
