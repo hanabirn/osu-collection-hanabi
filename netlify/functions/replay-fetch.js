@@ -36,8 +36,15 @@ exports.handler = async (event) => {
 
     try {
         const token = await getOsuToken();
-        const path = mode ? `scores/${mode}/${id}/download` : `scores/${id}/download`;
-        const res = await fetch(`https://osu.ppy.sh/api/v2/${path}`, { headers: { Authorization: `Bearer ${token}` }, redirect: 'follow' });
+        // /scores/{mode}/{id} only knows legacy (stable) ids and /scores/{id} only the
+        // new ones, and a link can carry a mode with either kind (the Discord bot's
+        // 🎬 Render always does): try the other form when the first has nothing
+        const paths = mode ? [`scores/${mode}/${id}/download`, `scores/${id}/download`] : [`scores/${id}/download`];
+        let res;
+        for (const path of paths) {
+            res = await fetch(`https://osu.ppy.sh/api/v2/${path}`, { headers: { Authorization: `Bearer ${token}` }, redirect: 'follow' });
+            if (res.status !== 404) break;
+        }
         if (res.status === 404) return fail(404, 'This score has no online replay');
         if (!res.ok) return fail(502, `osu! answered ${res.status}`);
         const bytes = new Uint8Array(await res.arrayBuffer());
