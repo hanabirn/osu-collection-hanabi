@@ -121,6 +121,24 @@ exports.handler = async (event) => {
                 if (!user) return json(401, { error: 'Sign in first' });
                 return json(200, { servers: (await all()).filter((s) => s.submittedBy && String(s.submittedBy.id) === String(user.id)).map(pub) });
             }
+            // who asked to join our server (owner): newest first
+            if (qs.action === 'joins') {
+                if (!isOwner) return json(403, { error: 'Owner only' });
+                return json(200, { joins: ((await store.get('servers:joins', { type: 'json' })) || []).slice(0, 100) });
+            }
+            // the join form's osu! lookup: name and country to fill in
+            if (qs.action === 'osu') {
+                const ref = String(qs.u || '').trim().slice(0, 40);
+                if (!ref) return json(400, { error: 'osu' });
+                try {
+                    const { getOsuToken } = require('./_osu-auth');
+                    const token = await getOsuToken();
+                    const r = await fetch(`https://osu.ppy.sh/api/v2/users/${encodeURIComponent(ref)}?key=${/^\d+$/.test(ref) ? 'id' : 'username'}`, { headers: { Authorization: `Bearer ${token}` } });
+                    if (!r.ok) return json(404, { error: 'osu' });
+                    const u = await r.json();
+                    return json(200, { id: u.id, username: u.username, country: u.country_code || '', avatar: u.avatar_url || null });
+                } catch { return json(502, { error: 'osu' }); }
+            }
             if (qs.action === 'pending') {
                 if (!isOwner) return json(403, { error: 'Owner only' });
                 return json(200, { servers: (await all()).filter((s) => s.status === 'pending').map((s) => ({ ...pub(s), submittedById: s.submittedBy && s.submittedBy.id })) });
@@ -131,6 +149,38 @@ exports.handler = async (event) => {
         if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed' });
         let body;
         try { body = JSON.parse(event.body || '{}'); } catch { return json(400, { error: 'Invalid JSON' }); }
+
+        /* Joining our own server: who they are on Discord and osu!, and where
+           from, so the owner can give the right roles; then the invite. */
+        if (body.action === 'join') {
+            const discord = typeof body.discord === 'string' ? body.discord.trim().replace(/^@/, '') : '';
+            if (!/^[A-Za-z0-9_.]{2,32}$/.test(discord) && !/^.{2,32}#\d{4}$/.test(discord)) return json(422, { error: 'discord' });
+            const osuIn = typeof body.osu === 'string' ? body.osu.trim() : '';
+            const osuRef = (/osu\.ppy\.sh\/(?:users|u)\/([^/?#\s]+)/.exec(osuIn) || [, osuIn])[1];
+            if (!osuRef || osuRef.length > 40) return json(422, { error: 'osu' });
+            let osuUser = null;
+            try {
+                const { getOsuToken } = require('./_osu-auth');
+                const token = await getOsuToken();
+                const key = /^\d+$/.test(osuRef) ? 'id' : 'username';
+                const r = await fetch(`https://osu.ppy.sh/api/v2/users/${encodeURIComponent(osuRef)}?key=${key}`, { headers: { Authorization: `Bearer ${token}` } });
+                if (r.ok) osuUser = await r.json();
+            } catch { osuUser = null; }
+            if (!osuUser || !osuUser.id) return json(422, { error: 'osu' });
+            const country = /^[A-Z]{2}$/.test(String(body.country || '').toUpperCase()) ? String(body.country).toUpperCase() : (osuUser.country_code || '');
+            const ip = event.headers['cf-connecting-ip'] || event.headers['x-forwarded-for'] || '';
+            const rateKey = `servers:joinrate:${crypto.createHash('sha256').update(`${ip}|${Math.floor(Date.now() / 3600000)}`).digest('hex').slice(0, 24)}`;
+            const n = Number(await store.get(rateKey, { type: 'text' })) || 0;
+            if (n >= 5) return json(429, { error: 'Too many requests this hour' });
+            await store.set(rateKey, String(n + 1));
+            const entry = { at: Date.now(), discord, osuId: osuUser.id, osuName: osuUser.username, country, osuCountry: osuUser.country_code || '', signedIn: user ? user.username : null };
+            const joins = (await store.get('servers:joins', { type: 'json' })) || [];
+            joins.unshift(entry);
+            await store.setJSON('servers:joins', joins.slice(0, 300));
+            const flag = (c) => (/^[A-Z]{2}$/.test(c) ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : '');
+            await notifyOwner(`🙋 有人要加入伺服器\nDiscord：${discord}\nosu!：${osuUser.username}（https://osu.ppy.sh/users/${osuUser.id}）\n國家／地區：${flag(country)} ${country}${country !== entry.osuCountry && entry.osuCountry ? `（osu! 上是 ${entry.osuCountry}）` : ''}`);
+            return json(200, { invite: `https://discord.gg/${FEATURED_INVITE}`, osuName: osuUser.username, country });
+        }
 
         if (body.action === 'submit') {
             if (!user) return json(401, { error: 'Sign in first' });

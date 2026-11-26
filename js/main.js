@@ -241,6 +241,8 @@ function setupDiscordInvite() {
     const a = document.getElementById('discord-invite-btn');
     if (!a) return;
     a.href = OUR_DISCORD_SERVER;
+    // the join form first (Discord name, osu! profile, country: for roles), then the invite
+    a.onclick = (e) => (typeof openServerJoin === 'function' ? openServerJoin(e) : true);
     a.hidden = false;
 }
 function focusDiscordCard() {

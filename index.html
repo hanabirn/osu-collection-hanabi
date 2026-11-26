@@ -1082,6 +1082,7 @@
             <button type="button" class="btn" onclick="openServerSubmit()" data-icon="plus" data-icon-gap><span data-i18n="servers_submit">提交我的伺服器</span></button>
         </div>
         <div id="servers-review" class="srv-review" hidden></div>
+        <div id="servers-joins" class="srv-review" hidden></div>
         <div id="servers-list" class="srv-grid"></div>
         <div id="servers-mine" class="srv-mine" hidden></div>
     </section>
@@ -1223,6 +1224,24 @@
 </div>
 
 <!-- 皮膚廣場: one skin (js/skin-screenshots.js) -->
+<!-- 社群 → Discord 伺服器: joining our own server (who you are, for roles) -->
+<div id="servers-join-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeServerJoin()">
+    <div class="pp-calc-modal srv-modal">
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeServerJoin()" data-icon="x"></button>
+        <h3 class="pp-calc-title" data-i18n="join_title">加入我們的伺服器</h3>
+        <p class="srv-label" data-i18n="join_hint">填一下這些資料，方便站長幫你設定身分組（國家、模式等）。</p>
+        <div class="srv-form">
+            <label class="srv-label"><span data-i18n="join_discord">Discord 使用者名稱</span>
+                <input type="text" id="join-discord" maxlength="40" autocomplete="off" placeholder="username"></label>
+            <label class="srv-label"><span data-i18n="join_osu">osu! 名稱或個人檔案網址</span>
+                <input type="text" id="join-osu" maxlength="80" autocomplete="off" placeholder="osu.ppy.sh/users/…" onchange="lookupJoinOsu()"></label>
+            <div id="join-osu-found" class="srv-preview"></div>
+            <label class="srv-label srv-inline"><span data-i18n="join_country">國家／地區</span><select id="join-country"></select></label>
+            <button type="button" class="btn srv-join" id="join-send" onclick="submitServerJoin()" data-i18n="join_send">送出並加入</button>
+            <p id="join-status" class="status"></p>
+        </div>
+    </div>
+</div>
 <!-- 社群 → Discord 伺服器: submitting a server -->
 <div id="servers-submit-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeServerSubmit()">
     <div class="pp-calc-modal srv-modal">

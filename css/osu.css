@@ -7979,3 +7979,10 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .ssc-top-actions .ssc-share-btn { margin-bottom: 0; }
 .ssc-more-btn { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); display: inline-flex; align-items: center; text-decoration: none; }
 .ssc-more-btn:hover { border-color: var(--pink); background: rgba(var(--accent-pink-rgb), 0.1); }
+
+/* the owner's list of who asked to join our server */
+.srv-joins { width: 100%; border-collapse: collapse; font-size: var(--fs-13); }
+.srv-joins td { padding: 5px 8px; border-top: 1px solid rgba(255, 255, 255, 0.06); white-space: nowrap; }
+.srv-joins td:first-child { color: var(--text-dim2); font-size: var(--fs-12); }
+.srv-form label.srv-label { display: flex; flex-direction: column; gap: 4px; }
+.srv-form label.srv-label.srv-inline { flex-direction: row; align-items: center; }

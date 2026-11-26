@@ -39,7 +39,7 @@ async function ensureServersPage() {
     try { srvData = await srvCall('GET', { action: 'list' }); } catch { srvData = srvData || { featured: null, servers: [], tags: [] }; }
     renderServersPage();
     loadServersMine();
-    if (srvIsOwner()) loadServersReview();
+    if (srvIsOwner()) { loadServersReview(); loadServerJoins(); }
 }
 
 function srvCounts(s) {
@@ -63,7 +63,7 @@ function renderServersPage() {
                     <div class="srv-counts">${srvCounts(f)}</div>
                     <p class="srv-bot-note">🤖 ${srvEsc(t('servers_bot_note'))}</p>
                 </div>
-                <a class="btn srv-join" href="https://discord.gg/${encodeURIComponent(f.code)}" target="_blank" rel="noopener noreferrer">${typeof icon === 'function' ? icon('discord', { extraClass: 'icon-label-gap', brand: true, color: '#fff', size: '1.15em' }) : ''}${srvEsc(t('servers_join'))}</a>
+                <a class="btn srv-join" href="https://discord.gg/${encodeURIComponent(f.code)}" target="_blank" rel="noopener noreferrer" onclick="return openServerJoin(event)">${typeof icon === 'function' ? icon('discord', { extraClass: 'icon-label-gap', brand: true, color: '#fff', size: '1.15em' }) : ''}${srvEsc(t('servers_join'))}</a>
             </div>` : '';
     }
     const tagsEl = document.getElementById('servers-tag-filter');
@@ -187,4 +187,73 @@ async function submitServer() {
 if (/[?&]servers=review\b/.test(location.search)) {
     const go = () => setTimeout(() => { if (typeof switchTab === 'function') switchTab('servers'); }, 300);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+}
+
+/* ----- joining our own server: Discord name, osu! profile and country first,
+   so the owner can give roles; then the invite opens ----- */
+const SRV_COUNTRIES = 'AF AL DZ AD AO AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI KH CM CA CV CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HK HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG MK NO OM PK PW PS PA PG PY PE PH PL PT PR QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA KR SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW'.split(' ');
+function srvFlag(c) { return /^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : ''; }
+function openServerJoin(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    const modal = document.getElementById('servers-join-modal');
+    if (!modal) { window.open('https://discord.gg/vVuGsm5YZF', '_blank', 'noopener'); return false; }
+    modal.style.display = 'flex';
+    const sel = document.getElementById('join-country');
+    const lang = typeof siteLang === 'string' ? siteLang : 'en';
+    let names = null;
+    try { names = new Intl.DisplayNames([lang === 'zh' ? 'zh-Hant' : lang], { type: 'region' }); } catch { names = null; }
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">—</option>${SRV_COUNTRIES.map((c) => [c, names ? names.of(c) : c]).sort((a, b) => a[1].localeCompare(b[1], lang)).map(([c, n]) => `<option value="${c}">${srvFlag(c)} ${srvEsc(n)}</option>`).join('')}`;
+    sel.value = cur;
+    const me = typeof getLoggedInOsuUser === 'function' && getLoggedInOsuUser();
+    const osu = document.getElementById('join-osu');
+    if (me && !osu.value) { osu.value = me.username || String(me.id); lookupJoinOsu(); }
+    return false;
+}
+// a country code -> its name in the site's language (Windows shows flag emoji as two letters)
+function srvCountryName(c) { try { return new Intl.DisplayNames([siteLang === 'zh' ? 'zh-Hant' : siteLang], { type: 'region' }).of(c); } catch { return c; } }
+function closeServerJoin() { document.getElementById('servers-join-modal').style.display = 'none'; }
+async function lookupJoinOsu() {
+    const box = document.getElementById('join-osu-found');
+    const raw = document.getElementById('join-osu').value.trim();
+    const ref = (/osu\.ppy\.sh\/(?:users|u)\/([^/?#\s]+)/.exec(raw) || [, raw])[1];
+    if (!ref) { box.innerHTML = ''; return; }
+    try {
+        const u = await srvCall('GET', { action: 'osu', u: ref });
+        box.innerHTML = `<div class="srv-card-head">${u.avatar ? `<img class="srv-icon" src="${srvEsc(u.avatar)}" alt="" width="40" height="40">` : ''}<div class="srv-card-title"><div class="srv-name">${srvEsc(u.username)}</div><div class="srv-counts">${srvEsc(srvCountryName(u.country))}</div></div></div>`;
+        const sel = document.getElementById('join-country');
+        if (u.country && !sel.value) sel.value = u.country;
+    } catch { box.innerHTML = `<span class="srv-warn">${srvEsc(t('join_osu_not_found'))}</span>`; }
+}
+async function submitServerJoin() {
+    const status = document.getElementById('join-status');
+    const btn = document.getElementById('join-send');
+    const say = (k) => { status.textContent = t(k); status.style.color = '#ff5252'; };
+    const discord = document.getElementById('join-discord').value.trim();
+    const osu = document.getElementById('join-osu').value.trim();
+    if (!discord) return say('join_need_discord');
+    if (!osu) return say('join_osu_not_found');
+    btn.disabled = true;
+    status.textContent = '';
+    try {
+        const r = await srvCall('POST', null, { action: 'join', discord, osu, country: document.getElementById('join-country').value });
+        status.textContent = t('join_sent');
+        status.style.color = '';
+        window.open(r.invite, '_blank', 'noopener');
+        setTimeout(closeServerJoin, 1200);
+    } catch (e) {
+        say(e.message === 'discord' ? 'join_need_discord' : e.message === 'osu' ? 'join_osu_not_found' : 'feedback_fail');
+    } finally { btn.disabled = false; }
+}
+
+// the owner's list of who asked to join
+async function loadServerJoins() {
+    const box = document.getElementById('servers-joins');
+    if (!box || !srvIsOwner()) return;
+    let list = [];
+    try { list = (await srvCall('GET', { action: 'joins' })).joins || []; } catch { list = []; }
+    box.hidden = !list.length;
+    box.innerHTML = list.length ? `<h3 class="home-h"><span>${srvEsc(t('join_list_title'))} <small>${list.length}</small></span></h3>
+        <table class="srv-joins"><tbody>${list.slice(0, 50).map((j) => `<tr><td>${srvEsc(new Date(j.at).toLocaleString())}</td><td><b>${srvEsc(j.discord)}</b></td>
+            <td><a href="https://osu.ppy.sh/users/${encodeURIComponent(j.osuId)}" target="_blank" rel="noopener noreferrer">${srvEsc(j.osuName)}</a></td><td>${srvFlag(j.country)} ${srvEsc(j.country)}</td></tr>`).join('')}</tbody></table>` : '';
 }
