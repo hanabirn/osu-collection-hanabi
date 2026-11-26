@@ -754,7 +754,7 @@ function catalogCardHtml(item, collectionSet) {
             <div class="osu-card-artist">${escHtml(item.artist || '')}</div>
             <div class="osu-card-mapper">${t('mapped_by', { n: escHtml(item.creator || '') })}</div>
             <div class="catalog-card-meta">
-                ${stars ? `<span>${stars}★ · ${item.diff_count}譜</span>` : ''}
+                ${stars ? `<span>${stars}★ · ${item.diff_count} ${escHtml(t('drawer_diffs'))}</span>` : ''}
                 ${langBadge}${genreBadge}${sourceBadge}
             </div>
         </div>

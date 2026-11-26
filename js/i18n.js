@@ -79,7 +79,7 @@ function applyLangDom(lang) {
     // A <select> without a <label> is named by its first option ("全部語言",
     // "預設排序"), which says what it controls. Re-run here so the name
     // follows the language; only names this code set itself are replaced.
-    document.querySelectorAll('select').forEach(sel => {
+    const labelSelects = () => document.querySelectorAll('select').forEach(sel => {
         if (sel.labels && sel.labels.length) return;
         if (sel.hasAttribute('aria-label') && !sel.hasAttribute('data-auto-aria')) return;
         const first = sel.options[0];
@@ -87,6 +87,10 @@ function applyLangDom(lang) {
         sel.setAttribute('aria-label', first.textContent.trim());
         sel.setAttribute('data-auto-aria', '');
     });
+    labelSelects();
+    // again once the pages have redrawn their own menus in the new language
+    // (the collection page's language / genre filters are filled from script)
+    setTimeout(labelSelects, 0);
     if (typeof refreshSectionBand === 'function') refreshSectionBand();
     if (typeof refreshReplayHub === 'function') refreshReplayHub();
     document.querySelectorAll('.lang-pill').forEach(btn => {

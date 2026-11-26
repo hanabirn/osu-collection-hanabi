@@ -516,6 +516,11 @@ function refreshDynamicContent() {
     if (typeof refreshTrendingLocalized === 'function') refreshTrendingLocalized();
     if (typeof renderChangelogPage === 'function') renderChangelogPage();
     if (typeof refreshHomeLocalized === 'function') refreshHomeLocalized();
+    // pages drawn from script whose labels come from t(): 皮膚廣場, Discord 伺服器, 我的建議
+    if (typeof renderSkinScreenshotsFilterTabs === 'function') renderSkinScreenshotsFilterTabs();
+    if (typeof skinScreenshotsLoaded !== 'undefined' && skinScreenshotsLoaded && typeof renderSkinScreenshotsList === 'function') renderSkinScreenshotsList();
+    if (typeof srvData !== 'undefined' && srvData && typeof renderServersPage === 'function') renderServersPage();
+    if (typeof renderFeedbackMine === 'function') renderFeedbackMine();
 }
 
 /* ===== Keyboard shortcuts =====
