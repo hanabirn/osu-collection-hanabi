@@ -1223,12 +1223,10 @@
             c.restore();
         }
 
-        /* Two players in a video, laid out per mode so each stays large in Discord's
-           small preview: standard on one field with both cursors (B's drawn in blue),
-           taiko as two full-width lanes one above the other, mania and catch side by
-           side; the score bar along the bottom. */
+        /* Two players in a video: taiko as two full-width lanes one above the other,
+           standard, mania and catch side by side (each player's own field, cursor and
+           judgements); the score bar along the bottom. */
         const CMP_A = '#f472b6', CMP_B = '#5fb4ff';
-        const cmpScratch = document.createElement('canvas').getContext('2d');
         const cmpFlagB = new Image();
         cmpFlagB.crossOrigin = 'anonymous';
         function twemojiFlag(code) {
@@ -1285,35 +1283,7 @@
             let stA, stB;
             c.fillStyle = '#05040a'; c.fillRect(0, 0, w, h);
             const lab = h * 0.034;
-            if (replay.mode === 0) {
-                // one field: A as usual, then B's cursor and trail over it
-                const fv = { ...v, h: barTop };
-                stA = M.draw(c, fv, prep, t);
-                stB = M.draw(cmpScratch, fv, cmp.prep, t); // only for B's numbers
-                const k = Math.min((barTop * 0.8) / 384, (w * 0.92) / 512);
-                const ox = (w - 512 * k) / 2, oy = (barTop - 384 * k) / 2 + 4 * k;
-                const flipB = !!cmp.prep.flip !== !!prep.flip;
-                const P = (p) => [ox + p.x * k, oy + (flipB ? 384 - p.y : p.y) * k];
-                c.save();
-                for (let n = 10; n >= 1; n--) {
-                    const [x, y] = P(cmp.prep.posAt(t - n * 12));
-                    c.globalAlpha = (1 - n / 11) * 0.55; c.fillStyle = CMP_B;
-                    c.beginPath(); c.arc(x, y, h * 0.009, 0, Math.PI * 2); c.fill();
-                }
-                c.globalAlpha = 1;
-                const [bx, by] = P(cmp.prep.posAt(t));
-                c.lineWidth = Math.max(2, h * 0.004); c.strokeStyle = '#fff'; c.fillStyle = CMP_B;
-                c.beginPath(); c.arc(bx, by, h * 0.016, 0, Math.PI * 2); c.fill(); c.stroke();
-                // name tags by both cursors
-                const [ax, ay] = P(prep.posAt(t));
-                c.font = `800 ${Math.round(h * 0.022)}px system-ui, sans-serif`; c.textBaseline = 'middle'; c.textAlign = 'left';
-                c.shadowColor = 'rgba(0,0,0,0.9)'; c.shadowBlur = 4;
-                c.fillStyle = CMP_A; c.fillText(replay.player, ax + h * 0.03, ay - h * 0.03);
-                c.fillStyle = CMP_B; c.fillText(cmp.replay.player, bx + h * 0.03, by + h * 0.03);
-                c.restore();
-                cmpLabel(c, 14, 10, 'left', CMP_A, replay.player, introFlag, stA, pA, lab, replay.mods);
-                cmpLabel(c, w - 14, 10, 'right', CMP_B, cmp.replay.player, cmpFlagB, stB, pB, lab, cmp.replay.mods);
-            } else if (replay.mode === 1) {
+            if (replay.mode === 1) {
                 // two full-width lanes, one above the other (taiko.js puts its lane at
                 // 0.3 h – 0.525 h of the view it is given)
                 const hv = h * 0.85, band = hv * 0.225;
@@ -1330,13 +1300,13 @@
                 cmpLabel(c, 14, ys[0] - lab * 2.05, 'left', CMP_A, replay.player, introFlag, stA, pA, lab, replay.mods);
                 cmpLabel(c, 14, ys[1] - lab * 2.05, 'left', CMP_B, cmp.replay.player, cmpFlagB, stB, pB, lab, cmp.replay.mods);
             } else {
-                // mania / catch: two halves side by side
+                // standard, mania and catch: two halves side by side
                 const half = w / 2;
                 [[prep, 0, CMP_A], [cmp.prep, 1, CMP_B]].forEach(([pp2, i, col]) => {
                     c.save();
                     c.beginPath(); c.rect(i * half, 0, half, barTop); c.clip();
                     c.translate(i * half, 0);
-                    const s2 = M.draw(c, { ...v, w: half, h: barTop, maxField: half * 0.8 }, pp2, t);
+                    const s2 = M.draw(c, { ...v, w: half, h: barTop, maxField: half * 0.8, fieldW: 0.76 }, pp2, t);
                     c.restore();
                     if (i) stB = s2; else stA = s2;
                 });
