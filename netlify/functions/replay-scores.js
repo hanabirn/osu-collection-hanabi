@@ -1,7 +1,7 @@
-/* The scores on a beatmap that have an online replay, for picking the other
-   side of a replay comparison. GET ?b=BEATMAP_ID&mode=osu|taiko|fruits|mania
-   One osu! API v2 call (/beatmaps/{id}/scores, the global top 50), kept
-   for 10 minutes in KV so repeated looks don't hit osu! again. */
+/* A beatmap's global top 50, for the replay player: its in-replay leaderboard
+   shows them all, and the comparison picker the ones with an online replay
+   (`replay`). GET ?b=BEATMAP_ID&mode=osu|taiko|fruits|mania. One osu! API v2
+   call (/beatmaps/{id}/scores), kept for 10 minutes in KV. */
 const { getOsuToken } = require('./_osu-auth');
 const { getEnv } = require('./_cf-env');
 
@@ -16,7 +16,7 @@ exports.handler = async (event) => {
     if (!/^\d{1,10}$/.test(b)) return { statusCode: 400, headers: { ...H, 'Cache-Control': 'no-store' }, body: JSON.stringify({ error: 'Missing or invalid beatmap id' }) };
     const mode = MODES.includes(qs.mode) ? qs.mode : 'osu';
     const kv = getEnv()?.KV_RESP_CACHE ?? null;
-    const cacheKey = `replay-scores:v1:${b}:${mode}`;
+    const cacheKey = `replay-scores:v2:${b}:${mode}`;
     if (kv) {
         try { const hit = await kv.get(cacheKey); if (hit) return { statusCode: 200, headers: { ...H, 'Cache-Control': `public, max-age=${TTL}` }, body: hit }; } catch { /* ask osu! */ }
     }
@@ -27,14 +27,19 @@ exports.handler = async (event) => {
         });
         if (!res.ok) return { statusCode: res.status === 404 ? 404 : 502, headers: { ...H, 'Cache-Control': 'no-store' }, body: JSON.stringify({ error: `osu! answered ${res.status}` }) };
         const data = await res.json();
-        const scores = (data.scores || []).filter((s) => s.has_replay).map((s) => ({
+        // all of the top 50: the player's in-replay leaderboard shows them all; the
+        // comparison picker keeps the ones with a replay (`replay`)
+        const scores = (data.scores || []).map((s) => ({
             id: s.id,
+            replay: !!s.has_replay,
             legacyId: s.legacy_score_id || null,
             user: s.user ? { id: s.user.id, name: s.user.username, country: s.user.country_code, avatar: s.user.avatar_url } : null,
             acc: s.accuracy,
             pp: s.pp,
             combo: s.max_combo,
             score: s.legacy_total_score || s.total_score,
+            legacy: s.legacy_total_score || 0, // stable's score (0: set on lazer only)
+            total: s.total_score || 0,         // lazer's standardised score
             mods: (s.mods || []).map((m) => (typeof m === 'string' ? m : m.acronym)).filter((m) => m && m !== 'CL'),
             rank: s.rank,
             ended: s.ended_at,

@@ -595,6 +595,8 @@
                                 <small class="rp-opt-hint">${L('兩邊：左耳是左邊玩家，右耳是右邊玩家')}</small></div>
                             ${replay.mode === 0 ? `<label class="rp-opt">${L('游標大小')} <output id="rp-cursor-val">${Math.round(prefs.cursorScale * 100)}%</output><input type="range" id="rp-cursor" min="0.5" max="2" step="0.05" value="${prefs.cursorScale}"></label>` : ''}
                             ${M.ur ? `<label class="rp-opt">${L('誤差條大小')} <output id="rp-error-val">${Math.round(prefs.errorScale * 100)}%</output><input type="range" id="rp-error" min="0.5" max="2.5" step="0.05" value="${prefs.errorScale}"></label>` : ''}
+                            ${replay.mode === 0 || replay.mode === 2 ? `<label class="rp-opt rp-opt-check"><input type="checkbox" id="rp-border"${prefs.border !== false ? ' checked' : ''}> ${L('遊戲區邊框')}</label>` : ''}
+                            <label class="rp-opt rp-opt-check"><input type="checkbox" id="rp-board"${prefs.board !== false ? ' checked' : ''}> ${L('左側排行榜')}</label>
                             <label class="rp-opt">${L('連擊大小')} <output id="rp-combo-val">${Math.round((prefs.comboScale || 0.6) * 100)}%</output><input type="range" id="rp-combo-scale" min="0.2" max="1.5" step="0.05" value="${prefs.comboScale || 0.6}"></label>
                             <table class="rp-counts"><thead><tr><th></th><th>${L('本站判定')}</th><th>${L('重播紀錄')}</th></tr></thead>
                                 <tbody>${JUDGES.map((j) => `<tr><th style="color:${R.JUDGE_COLOR[j]}">${jl(j)}</th><td>${prep.counts[j]}</td><td>${record[j]}</td></tr>`).join('')}</tbody>
@@ -608,8 +610,16 @@
             </div>`;
 
         // the player's profile in this mode: avatar, country, total PP, ranks
-        osuFetch(`u=${encodeURIComponent(replay.player)}&type=string&m=${replay.mode}`).then((r) => {
+        // the video's opening shows the player's flag: Twemoji (CC BY 4.0), which
+        // sends CORS headers, so the canvas stays recordable
+        const introFlag = new Image();
+        introFlag.crossOrigin = 'anonymous';
+        const profileP = osuFetch(`u=${encodeURIComponent(replay.player)}&type=string&m=${replay.mode}`).then((r) => {
             const u = Array.isArray(r) ? r[0] : null;
+            if (u && /^[A-Za-z]{2}$/.test(u.country || '')) {
+                const cps = [...String(u.country).toUpperCase()].map((ch) => (0x1f1e6 + ch.charCodeAt(0) - 65).toString(16)).join('-');
+                introFlag.src = `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${cps}.png`;
+            }
             if (!u || !$('rp-who-stats')) return;
             const av = $('rp-avatar');
             av.src = `https://a.ppy.sh/${encodeURIComponent(u.user_id)}`;
@@ -830,6 +840,8 @@
             }
         };
         if ($('rp-speed')) { $('rp-speed').addEventListener('input', (e) => setScroll(Number(e.target.value))); setScroll(view.scroll); }
+        if ($('rp-border')) $('rp-border').addEventListener('change', (e) => { prefs.border = e.target.checked; savePrefs(); });
+        $('rp-board').addEventListener('change', (e) => { prefs.board = e.target.checked; savePrefs(); });
         $('rp-dim').addEventListener('input', (e) => { view.bgDim = Number(e.target.value); prefs.dim = view.bgDim; savePrefs(); });
         // 我的皮膚 (js/skins.js) is the one place skins are kept: the player picks from it,
         // and a skin uploaded here is added to it too
@@ -1030,6 +1042,185 @@
                 drawNum(`${best}x`, ch * 0.5, y, 0.85);
             }
             ctx.restore();
+        }
+
+        /* The playfield border (standard and catch; taiko's lane and mania's stage
+           are their own frame): a thin outline round where the notes can be, the
+           area outside a little darker, as danser draws it. Same geometry as
+           std.js / catch.js. */
+        function fieldBounds(v) {
+            const { w, h } = v;
+            let x0, x1, y0, y1;
+            if (replay.mode === 0) {
+                const k = Math.min((h * 0.8) / 384, (w * 0.92) / 512);
+                const R = (prep.radius || 32) * k;
+                const ox = (w - 512 * k) / 2, oy = (h - 384 * k) / 2 + 4 * k;
+                x0 = ox - R; x1 = ox + 512 * k + R; y0 = Math.max(1, oy - R); y1 = Math.min(h - 1, oy + 384 * k + R);
+            } else if (replay.mode === 2) {
+                const k = Math.min(h / 480, (w * 0.96) / 592);
+                const ox = (w - 512 * k) / 2;
+                x0 = ox - 24 * k; x1 = ox + 512 * k + 24 * k; y0 = 1; y1 = h - 1;
+            } else return null;
+            return { x0, x1, y0, y1 };
+        }
+        function drawFieldBorder(c, v) {
+            const fb = fieldBounds(v);
+            if (!fb) return;
+            const { w, h } = v;
+            const { x0, x1, y0, y1 } = fb;
+            c.save();
+            c.fillStyle = 'rgba(0,0,0,0.28)';
+            c.fillRect(0, 0, x0, h); c.fillRect(x1, 0, w - x1, h);
+            if (y0 > 1) { c.fillRect(x0, 0, x1 - x0, y0); c.fillRect(x0, y1, x1 - x0, h - y1); }
+            c.strokeStyle = 'rgba(255,255,255,0.45)';
+            c.lineWidth = Math.max(1, h / 540);
+            c.strokeRect(Math.round(x0) + 0.5, Math.round(y0) + 0.5, Math.round(x1 - x0), Math.round(y1 - y0));
+            c.restore();
+        }
+
+        /* The map's global top 50 down the left side, with this play's score
+           climbing through it as it goes (as in-game / danser): #1 always, then the
+           places just above the player. The player's own scores on the board are
+           left out. */
+        let mapScoresP = null;
+        function mapScores() {
+            if (!mapScoresP) {
+                const modeName = ['osu', 'taiko', 'fruits', 'mania'][replay.mode];
+                mapScoresP = fetch(`/.netlify/functions/replay-scores?b=${encodeURIComponent(bm.beatmap_id)}&mode=${modeName}`)
+                    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))));
+                mapScoresP.catch(() => { mapScoresP = null; });
+            }
+            return mapScoresP;
+        }
+        let board = null; // [{ name, score, combo }], best first
+        const liveScore = scoreTimeline(replay.mode, prep, replay.score);
+        mapScores().then((d) => {
+            const me = String(replay.player || '').toLowerCase();
+            // the board in the replay's own kind of score: stable's (millions, combo-
+            // weighted) or lazer's standardised (up to ~1M); scores without that kind
+            // are left out rather than mixed in
+            const big = (Number(replay.score) || 0) > 1.2e6;
+            const pick = (s) => {
+                if (big) return Number(s.legacy) || (Number(s.score) > 1.2e6 ? Number(s.score) : 0);
+                return Number(s.total) || (Number(s.score) <= 1.2e6 ? Number(s.score) : 0);
+            };
+            board = (d.scores || []).filter((s) => s.user && s.user.name.toLowerCase() !== me)
+                .map((s) => ({ name: s.user.name, score: pick(s), combo: Number(s.combo) || 0 }))
+                .filter((e) => e.score > 0)
+                .sort((a, b) => b.score - a.score);
+        }).catch(() => { board = []; });
+        function drawBoard(c, v, t, st2 = {}) {
+            if (!board) return;
+            const { w, h } = v;
+            const nRows = replay.mode === 1 ? 5 : 6;
+            const score = liveScore(t);
+            const pos = board.filter((e) => e.score > score).length; // places above the player
+            const me = { name: replay.player, score, combo: st2.best || st2.combo || 0, me: true };
+            let rows;
+            if (pos < nRows) rows = [...board.slice(0, pos), me, ...board.slice(pos)].slice(0, nRows).map((e, i) => ({ ...e, rank: i + 1 }));
+            else rows = [{ ...board[0], rank: 1 }, ...board.slice(pos - (nRows - 2), pos).map((e, i) => ({ ...e, rank: pos - (nRows - 2) + i + 1 })), { ...me, rank: pos + 1 }];
+            const fb = fieldBounds(v);
+            // left of the field's border (standard / catch), so the two frames don't overlap
+            const rw = Math.max(96, Math.min(230, w * 0.15, fb ? fb.x0 - 16 : 230)), rh = Math.max(24, Math.min(h * 0.05, rw * 0.26));
+            const x = 8;
+            // below the info card's corner (the player) and the lane (taiko)
+            let y = replay.mode === 1 ? h * 0.575 : Math.max(h * 0.42, (h - rows.length * (rh + 3)) / 2);
+            c.save();
+            c.textBaseline = 'alphabetic';
+            for (const r of rows) {
+                c.fillStyle = r.me ? 'rgba(244,114,182,0.38)' : 'rgba(0,0,0,0.42)';
+                c.beginPath(); c.roundRect ? c.roundRect(x, y, rw, rh, rh * 0.18) : c.rect(x, y, rw, rh); c.fill();
+                if (r.me) { c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 1; c.stroke(); }
+                const pad = rh * 0.16;
+                // line 1: the name, and the place small at the right
+                c.textAlign = 'right'; c.fillStyle = 'rgba(255,255,255,0.55)';
+                c.font = `700 ${Math.round(rh * 0.34)}px system-ui, sans-serif`;
+                const rankText = `#${r.me && pos >= board.length && board.length >= 50 ? '50+' : r.rank}`;
+                c.fillText(rankText, x + rw - pad, y + rh * 0.44);
+                const rankW = c.measureText(rankText).width;
+                c.textAlign = 'left'; c.fillStyle = '#fff';
+                c.font = `700 ${Math.round(rh * 0.4)}px system-ui, sans-serif`;
+                let name = r.name || '';
+                const maxW = rw - pad * 3 - rankW;
+                while (name.length > 1 && c.measureText(name).width > maxW) name = name.slice(0, -1);
+                if (name !== r.name) name = name.slice(0, -1) + '…';
+                c.fillText(name, x + pad, y + rh * 0.44);
+                // line 2: the score at the left, the combo at the right
+                c.font = `600 ${Math.round(rh * 0.32)}px system-ui, sans-serif`;
+                c.fillStyle = 'rgba(255,255,255,0.85)';
+                c.fillText(r.score.toLocaleString(), x + pad, y + rh * 0.86);
+                c.textAlign = 'right'; c.fillStyle = '#7fd3ff';
+                c.font = `800 ${Math.round(rh * 0.32)}px system-ui, sans-serif`;
+                c.fillText(`${r.combo.toLocaleString()}x`, x + rw - pad, y + rh * 0.86);
+                y += rh + 3;
+            }
+            c.restore();
+        }
+
+        /* The opening of a video: the map's background, our logo beating at the
+           map's BPM, and the map / player under it; it fades into the play. */
+        const introIcon = new Image();
+        introIcon.src = `assets/replay-intro/${['osu', 'taiko', 'fruits', 'mania'][replay.mode] || 'osu'}.png`;
+        function drawIntro(c, v, sec, total) {
+            const { w, h } = v;
+            const a = Math.min(1, sec / 0.4) * Math.min(1, Math.max(0, (total - sec) / 0.6));
+            if (a <= 0) return;
+            c.save();
+            c.globalAlpha = a;
+            c.fillStyle = '#05040a'; c.fillRect(0, 0, w, h);
+            if (bg) {
+                const zoom = 1.04 + 0.03 * (sec / total);
+                const s = Math.max(w / bg.width, h / bg.height) * zoom;
+                c.globalAlpha = a * 0.22;
+                c.drawImage(bg, (w - bg.width * s) / 2, (h - bg.height * s) / 2, bg.width * s, bg.height * s);
+                c.globalAlpha = a;
+            }
+            // the logo: the site's icon (gradient disc, ring, dot), pulsing on the beat
+            const bpm = Number(bm.bpm) * (prep.rate || 1) || 120;
+            const beat = (sec * bpm / 60) % 1;
+            const pulse = 1 + 0.045 * Math.exp(-beat * 6);
+            const cx = w / 2, cy = h * 0.4, r = h * 0.17 * pulse;
+            c.save();
+            c.shadowColor = 'rgba(0,0,0,0.5)'; c.shadowBlur = h * 0.03;
+            const g = c.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+            g.addColorStop(0, '#a855f7'); g.addColorStop(1, '#f472b6');
+            c.fillStyle = g; c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
+            c.restore();
+            if (introIcon.complete && introIcon.naturalWidth) {
+                // the mode's icon (assets/replay-intro/, the site owner's own; it has its own ring)
+                const s2 = r * 1.72;
+                c.drawImage(introIcon, cx - s2 / 2, cy - s2 / 2, s2, s2);
+            } else {
+                c.fillStyle = '#fff'; c.strokeStyle = '#fff'; c.lineWidth = r * 0.1;
+                c.beginPath(); c.arc(cx, cy, r * 0.7, 0, Math.PI * 2); c.stroke();
+                c.beginPath(); c.arc(cx, cy, r * 0.36, 0, Math.PI * 2); c.fill();
+            }
+            // the words
+            c.textAlign = 'center'; c.textBaseline = 'top';
+            c.shadowColor = 'rgba(0,0,0,0.8)'; c.shadowBlur = 6;
+            let y = cy + h * 0.17 * 1.05 + h * 0.03;
+            c.font = `800 ${Math.round(h * 0.024)}px system-ui, sans-serif`; c.fillStyle = 'rgba(255,255,255,0.7)';
+            c.fillText('osu! Collection', cx, y); y += h * 0.05;
+            const fit = (text, max) => { let s2 = text; while (s2.length > 4 && c.measureText(s2).width > max) s2 = s2.slice(0, -2); return s2 === text ? text : s2 + '…'; };
+            c.font = `800 ${Math.round(h * 0.046)}px system-ui, sans-serif`; c.fillStyle = '#fff';
+            c.fillText(fit(`${map.metadata.Artist || bm.artist} - ${map.metadata.Title || bm.title}`, w * 0.86), cx, y); y += h * 0.06;
+            c.font = `700 ${Math.round(h * 0.032)}px system-ui, sans-serif`; c.fillStyle = srColor || '#f472b6';
+            c.fillText(fit(`[${map.metadata.Version || bm.version}]  ${sr.toFixed(2)}★`, w * 0.86), cx, y); y += h * 0.05;
+            c.font = `600 ${Math.round(h * 0.028)}px system-ui, sans-serif`; c.fillStyle = 'rgba(255,255,255,0.85)';
+            c.fillText(`mapped by ${map.metadata.Creator || bm.creator}`, cx, y); y += h * 0.042;
+            const modTxt = modsLabel(replay.mods);
+            // "played by NAME [flag]  +MODS", centred as one line
+            const who = `played by ${replay.player}`;
+            const modPart = modTxt && modTxt !== 'NM' ? `  +${modTxt.replace(/^\+/, '')}` : '';
+            const hasFlag = introFlag.complete && introFlag.naturalWidth > 0;
+            const fs2 = h * 0.028, fw = hasFlag ? fs2 * 1.3 : 0, gap = hasFlag ? fs2 * 0.35 : 0;
+            const wWho = c.measureText(who).width, wMod = c.measureText(modPart).width;
+            let lx = cx - (wWho + gap + fw + wMod) / 2;
+            c.textAlign = 'left';
+            c.fillText(who, lx, y); lx += wWho + gap;
+            if (hasFlag) { c.shadowBlur = 0; c.drawImage(introFlag, lx, y + fs2 * 0.55 - fw / 2, fw, fw); c.shadowBlur = 6; lx += fw; }
+            c.fillText(modPart, lx, y);
+            c.restore();
         }
 
         const pauseEl = $('rp-pause');
@@ -1305,14 +1496,12 @@
                 if (!ref) { say(L('看不懂這個網址，請貼 osu! 成績頁的網址（osu.ppy.sh/scores/…）或成績 ID')); return; }
                 try { say(L('從 osu! 取得重播')); await startCompare(await fetchScoreReplay(ref)); } catch (err) { say(err.message); }
             });
-            const modeName = ['osu', 'taiko', 'fruits', 'mania'][replay.mode];
-            fetch(`/.netlify/functions/replay-scores?b=${encodeURIComponent(bm.beatmap_id)}&mode=${modeName}`)
-                .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+            mapScores()
                 .then((data) => {
                     const list = pick.querySelector('.rp-cmp-list');
                     const rate = rateOf(replay.mods);
                     const bits = { DT: 64, NC: 512, HT: 256 };
-                    const rows = (data.scores || []).map((s, i) => {
+                    const rows = (data.scores || []).map((s, i) => [s, i]).filter(([s]) => s.replay !== false).map(([s, i]) => {
                         const sr = s.mods.reduce((acc, m) => acc | (bits[m] || 0), 0);
                         const ok = rateOf(sr) === rate && String(s.id) !== String(replay.scoreId) && String(s.legacyId) !== String(replay.scoreId);
                         return `<button type="button" class="rp-cmp-item" data-id="${s.id}"${ok ? '' : ' disabled'} title="${ok ? '' : esc(L('倍速不同或是同一份成績'))}">
@@ -1546,6 +1735,8 @@
                     updateCompareHud(s, sB, t);
                 } else {
                     s = M.draw(ctx, view, prep, t);
+                    if (prefs.border !== false) drawFieldBorder(ctx, view);
+                    if (prefs.board !== false) drawBoard(ctx, view, t, s);
                     drawCombo(s);
                 }
                 if (el >= 0) {
@@ -1585,11 +1776,13 @@
         session.renderVideo = async function renderVideo(opts = {}) {
             const W = opts.width || 1280, H = opts.height || 720, FPS = opts.fps || 60;
             const rate = prep.rate || 1;
-            const t0 = Math.max(0, first - 2000);
+            const INTRO_S = 3; // the opening card, in real seconds, over the song's own lead-in
+            const t0 = Math.max(0, first - 2000) - INTRO_S * 1000 * rate;
             const tPlayEnd = prep.lastTime + 1500 * rate;
             const RESULTS_S = 5; // the ranking screen at the end, in real seconds
             const playSecs = (tPlayEnd - t0) / rate / 1000;
-            const total = playSecs + RESULTS_S;
+            // opts.previewSecs: only the first seconds (to check the opening without recording a whole map)
+            const total = opts.previewSecs ? Math.min(opts.previewSecs, playSecs + RESULTS_S) : playSecs + RESULTS_S;
             const nFrames = Math.ceil(total * FPS);
             const say = (p) => { if (opts.onProgress) opts.onProgress(Math.max(0, Math.min(1, p))); };
             if (!window.VideoEncoder || !window.AudioEncoder) throw new Error(L('這個瀏覽器不支援錄製影片，請用最新版的 Chrome 或 Edge'));
@@ -1612,7 +1805,8 @@
                 const src = actx.createBufferSource(); src.buffer = music; src.playbackRate.value = rate;
                 const g = actx.createGain(); g.gain.value = Math.max(0.05, prefs.music) * 0.8;
                 src.connect(g); g.connect(master);
-                src.start(0, t0 / 1000);
+                // the song starts where the video's time reaches 0 (before that: silence)
+                src.start(Math.max(0, -t0 / 1000 / rate), Math.max(0, t0 / 1000));
                 // the music fades out under the ranking screen
                 g.gain.setValueAtTime(g.gain.value, playSecs);
                 g.gain.linearRampToValueAtTime(0, total);
@@ -1669,7 +1863,11 @@
             const cv = document.createElement('canvas');
             cv.width = W; cv.height = H;
             const c2 = cv.getContext('2d');
-            const vview = { ...view, w: W, h: H, dpr: 1 };
+            const vview = { ...view, w: W, h: H, dpr: 1, bgDim: Math.max(0.85, Number(view.bgDim) || 0) };
+            try { await introIcon.decode(); } catch { /* the drawn ring instead */ }
+            // the flag needs the profile: wait a little for it, not forever
+            await Promise.race([profileP, new Promise((r) => setTimeout(r, 4000))]);
+            if (introFlag.src) { try { await introFlag.decode(); } catch { /* no flag */ } }
             const realCtx = ctx, realView = view;
             const mods = typeof decodeOsuMods === 'function' ? decodeOsuMods(replay.mods).filter((m) => m !== 'NM') : [];
             const head = `${map.metadata.Title || bm.title} [${map.metadata.Version || bm.version}]`;
@@ -1685,6 +1883,8 @@
                     if (sec < playSecs) {
                         const t = t0 + sec * 1000 * rate;
                         st = M.draw(c2, vview, prep, t);
+                        drawFieldBorder(c2, vview);
+                        drawBoard(c2, vview, t, st);
                         drawCombo(st, H, 'video');
                         drawSideCounts(st, 0, 0, W, H);
                         // top right: accuracy and pp; top left: the map, the player and mods
@@ -1705,6 +1905,7 @@
                         // the play fades out over its last second
                         const left = playSecs - sec;
                         if (left < 1) { c2.fillStyle = `rgba(0,0,0,${1 - left})`; c2.fillRect(0, 0, W, H); }
+                        if (sec < INTRO_S) drawIntro(c2, vview, sec, INTRO_S);
                     } else {
                         resultsData.pp = ppAt(prep.lastTime + 1);
                         if (vview.rankSkin) window.replayResults.drawResults(c2, vview, resultsData);
