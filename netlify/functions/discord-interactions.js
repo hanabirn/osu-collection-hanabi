@@ -242,32 +242,6 @@ async function addToCollectionInbox(interaction, setId) {
     return L.ephemeral(t('fav_added', { name: link.osuUsername }));
 }
 
-function scoreEmbed(score, user, apiMode) {
-    const bs = score.beatmapset || {};
-    const bm = score.beatmap || {};
-    const modStr = L.modsTag(score.mods);
-    const acc = score.accuracy != null ? `${(score.accuracy * 100).toFixed(2)}%` : '—';
-    const pp = score.pp != null ? `${Math.round(score.pp)}pp` : (score.passed === false ? t('not_passed') : '—');
-    const combo = `${L.fmtNum(score.max_combo)}x${bm.max_combo ? ` / ${L.fmtNum(bm.max_combo)}x` : ''}`;
-    const covers = bs.covers || {};
-    const mTag = L.modeTag(L.API_MODE[bm.mode] || apiMode);
-    return {
-        author: L.osuAuthor(user, apiMode),
-        title: `${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
-        url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
-        description: [
-            // ### heading: Discord sizes emojis with the text, so the grade and
-            // mod badges come out larger than on a normal line.
-            `### ${L.gradeTag(score.rank)}${modStr ? ' ' + modStr : ''} · ${acc} · ${pp}`,
-            `${L.fmtNum(score.score)} · ${combo}`,
-            `${bm.difficulty_rating != null ? Number(bm.difficulty_rating).toFixed(2) : '?'}★ · ${L.ago(score.created_at)}`,
-        ].join('\n'),
-        thumbnail: { url: covers['list@2x'] || covers.list || covers.card || undefined },
-        color: L.srColor(bm.difficulty_rating),
-        footer: L.siteFooter(),
-    };
-}
-
 // apiVersion '20240529' = the lazer score format (total_score, statistics
 // great/ok/..., mod objects), which has the score lazer plays show; the
 // legacy format gives those a score of 0.
@@ -581,18 +555,29 @@ async function cmdTop(options, interaction, origin) {
     const apiMode = L.API_MODE[L.optVal(options, 'mode')] || 'osu';
     const idxOpt = L.optVal(options, 'index');
 
+    // one score in detail: the same embed as /rs (deferred: it reads the map file)
+    if (idxOpt != null) {
+        const idx = Math.max(1, Math.min(100, Number(idxOpt) || 1));
+        return deferInto(interaction, async () => {
+            const token = await getOsuToken();
+            const u = await L.resolveOsuUser(token, who, apiMode);
+            if (!u) return t('user_not_found', { name: who });
+            const scores = await fetchScores(token, u.id, 'best', apiMode, idx, false, '20240529');
+            if (scores.length < idx) return t('top_no_nth', { name: u.username, idx, mode: L.MODE_LABEL[apiMode] });
+            const score = scores[idx - 1];
+            const { scoreExtras } = require('./_score-calc');
+            const [ex, rankedDate] = await Promise.all([
+                scoreExtras(score, apiMode, L.modsList(score.mods)),
+                fetchRankedDate(token, score),
+            ]);
+            const embed = detailedScoreEmbed(score, u, apiMode, ex, { heading: `#${idx}`, rankedDate });
+            return { embed, components: scoreActionRow(score, apiMode, origin) };
+        });
+    }
+
     const token = await getOsuToken();
     const u = await L.resolveOsuUser(token, who, apiMode);
     if (!u) return L.ephemeral(t('user_not_found', { name: who }));
-
-    if (idxOpt != null) {
-        const idx = Math.max(1, Math.min(100, Number(idxOpt) || 1));
-        const scores = await fetchScores(token, u.id, 'best', apiMode, idx, false);
-        if (scores.length < idx) return L.ephemeral(t('top_no_nth', { name: u.username, idx, mode: L.MODE_LABEL[apiMode] }));
-        const e = scoreEmbed(scores[idx - 1], u, apiMode);
-        e.title = `#${idx} · ${e.title}`;
-        return L.message(e, scoreActionRow(scores[idx - 1], apiMode, origin));
-    }
 
     const scores = await fetchScores(token, u.id, 'best', apiMode, TOP_MAX, false);
     if (!scores.length) return L.ephemeral(t('top_none', { name: u.username, mode: L.MODE_LABEL[apiMode] }));
