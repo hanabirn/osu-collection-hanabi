@@ -33,7 +33,7 @@ const {
 } = require('./response-cache');
 const { serveCatalogData } = require('./catalog-data');
 const { matchScoreCardPng, serveScoreCardPng } = require('./score-card-png');
-const { matchVideo, serveVideo, matchVideoPage, serveVideoPage, serveRenderApi } = require('./replay-video');
+const { matchVideo, serveVideo, matchVideoPage, serveVideoPage, matchThumb, serveThumb, serveRenderApi } = require('./replay-video');
 
 const FN_PREFIX = '/.netlify/functions/';
 
@@ -56,6 +56,7 @@ function resolveRoute(url) {
     /* Discord 🎬 Render 錄好的重播影片（replay-video.js）。 */
     if (matchVideo(path)) return { direct: serveVideo };
     if (matchVideoPage(path)) return { direct: serveVideoPage };
+    if (matchThumb(path)) return { direct: serveThumb };
 
     /* Discord 的 Interactions Endpoint（Discord 開發者後台登記的網址）。 */
     if (path === '/discord') return { fn: ROUTES['discord-interactions'] };

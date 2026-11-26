@@ -1880,6 +1880,7 @@
                 im.src = `assets/discord-emoji/m_${m.toLowerCase()}.png`;
             })))).filter(Boolean);
             let st = lastStats;
+            let thumb = null;
             try {
                 for (let i = 0; i < nFrames; i++) {
                     if (opts.signal && opts.signal.aborted) throw new Error('aborted');
@@ -1928,6 +1929,8 @@
                         if (inP < 1) { c2.fillStyle = `rgba(0,0,0,${1 - inP})`; c2.fillRect(0, 0, W, H); }
                     }
                     ctx = realCtx; view = realView;
+                    // one frame of play (40% in, past the opening) as the link preview's picture
+                    if (!thumb && sec >= INTRO_S + (playSecs - INTRO_S) * 0.4 && sec < playSecs) thumb = await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.85));
                     const frame = new VideoFrame(cv, { timestamp: Math.round(sec * 1e6), duration: Math.round(1e6 / FPS) });
                     venc.encode(frame, { keyFrame: i % (FPS * 2) === 0 });
                     frame.close();
@@ -1941,7 +1944,9 @@
             if (fail) throw fail;
             muxer.finalize();
             say(1);
-            return new Blob([target.buffer], { type: 'video/mp4' });
+            const out = new Blob([target.buffer], { type: 'video/mp4' });
+            out.thumb = thumb; // a JPEG of the play, for the Discord preview
+            return out;
         };
         window.replayRenderVideo = (o) => session.renderVideo(o);
         // what the Discord message says about the video (worker/replay-video.js)

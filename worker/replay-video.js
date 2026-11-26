@@ -17,6 +17,8 @@ const MAX_PART = 64 * 1024 * 1024;     // Workers 的請求本文上限之內
 const MAX_PARTS = 12;                  // 最多約 768MB，實際影片遠小於此
 const JOB_TTL = 24 * 3600;
 const PAGE_RE = /^[/]v[/]([a-f0-9]{32})[/]?$/;
+const THUMB_RE = /^[/]video[/]([a-f0-9]{32})[.]jpg$/;
+const MAX_THUMB = 2 * 1024 * 1024;
 
 const json = (status, body) => new Response(JSON.stringify(body), {
     status,
@@ -41,10 +43,14 @@ function matchVideoPage(pathname) {
    the video. */
 async function serveVideoPage(request, env, url) {
     const id = matchVideoPage(url.pathname);
-    const job = id ? await readJob(env, id) : null;
     const head = id && env.R2_REPLAYS ? await env.R2_REPLAYS.head(`video/${id}.mp4`) : null;
     if (!head) return new Response('not found', { status: 404 });
-    const meta = (job && job.meta) || {};
+    // the meta sits in R2 next to the video (written before the link is posted, and R2
+    // reads are at once consistent; KV could still answer with the old job)
+    let meta = {};
+    try { const o = await env.R2_REPLAYS.get(`video/${id}.json`); if (o) meta = await o.json(); } catch { /* none */ }
+    if (!meta.title) { const job = await readJob(env, id); meta = (job && job.meta) || {}; }
+    const thumb = await env.R2_REPLAYS.head(`video/${id}.jpg`).catch(() => null);
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const video = `${url.origin}/video/${id}.mp4`;
     // as o!rdr's: "[6.16 ⭐] PLAYER | Artist - Title [Diff] +MODS 72.55%"
@@ -52,7 +58,7 @@ async function serveVideoPage(request, env, url) {
         ? `${meta.stars ? `[${Number(meta.stars).toFixed(2)} ⭐] ` : ''}${meta.player || ''} | ${meta.artist ? `${meta.artist} - ` : ''}${meta.title} [${meta.version || ''}]${meta.mods ? ` +${meta.mods}` : ''}${Number.isFinite(meta.acc) ? ` ${(meta.acc * 100).toFixed(2)}%` : ''}`
         : 'osu! replay';
     const desc = 'osu! Collection';
-    const image = meta.setId ? `https://assets.ppy.sh/beatmaps/${Number(meta.setId)}/covers/card@2x.jpg` : `${url.origin}/assets/icons/icon-512.png`;
+    const image = thumb ? `${url.origin}/video/${id}.jpg` : meta.setId ? `https://assets.ppy.sh/beatmaps/${Number(meta.setId)}/covers/card@2x.jpg` : `${url.origin}/assets/icons/icon-512.png`;
     const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title>
@@ -61,7 +67,7 @@ async function serveVideoPage(request, env, url) {
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:type" content="video.other">
 <meta property="og:url" content="${esc(`${url.origin}/v/${id}`)}">
-<meta property="og:image" content="${esc(image)}">
+<meta property="og:image" content="${esc(image)}">${thumb ? '\n<meta property="og:image:width" content="1280">\n<meta property="og:image:height" content="720">' : ''}
 <meta property="og:video" content="${esc(video)}">
 <meta property="og:video:url" content="${esc(video)}">
 <meta property="og:video:secure_url" content="${esc(video)}">
@@ -72,6 +78,19 @@ async function serveVideoPage(request, env, url) {
 <style>html,body{margin:0;height:100%;background:#000}video{width:100%;height:100%}</style>
 </head><body><video src="${esc(video)}" controls autoplay playsinline></video></body></html>`;
     return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
+}
+
+function matchThumb(pathname) {
+    const m = THUMB_RE.exec(pathname);
+    return m ? m[1] : null;
+}
+
+// /video/{id}.jpg: the frame of play the link preview shows
+async function serveThumb(request, env, url) {
+    const id = matchThumb(url.pathname);
+    const obj = id && env.R2_REPLAYS ? await env.R2_REPLAYS.get(`video/${id}.jpg`) : null;
+    if (!obj) return new Response('not found', { status: 404 });
+    return new Response(obj.body, { status: 200, headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=86400', 'Access-Control-Allow-Origin': '*' } });
 }
 
 function matchVideo(pathname) {
@@ -168,6 +187,12 @@ async function serveRenderApi(request, env, url) {
         const part = await up.uploadPart(n, request.body);
         return json(200, { partNumber: part.partNumber, etag: part.etag });
     }
+    if (action === 'thumb' && request.method === 'PUT') {
+        const len = Number(request.headers.get('content-length') || 0);
+        if (!len || len > MAX_THUMB) return json(413, { error: 'Picture too large' });
+        await env.R2_REPLAYS.put(`video/${id}.jpg`, request.body, { httpMetadata: { contentType: 'image/jpeg' } });
+        return json(200, { ok: true });
+    }
     if (action === 'complete' && request.method === 'POST') {
         if (!job.uploadId) return json(400, { error: 'Not started' });
         const data = await request.json().catch(() => null);
@@ -181,6 +206,9 @@ async function serveRenderApi(request, env, url) {
         const m0 = (data && data.meta) || {};
         // kept for the /v/{id} page's preview
         job.meta = { artist: String(m0.artist || '').slice(0, 80), stars: Number(m0.stars) || 0, title: String(m0.title || '').slice(0, 120), version: String(m0.version || '').slice(0, 80), player: String(m0.player || '').slice(0, 40), mods: String(m0.mods || '').slice(0, 30), acc: Number(m0.acc), setId: Number(m0.setId) || 0 };
+        // before the link goes out: Discord reads the page the moment it is posted
+        try { await env.R2_REPLAYS.put(`video/${id}.json`, JSON.stringify(job.meta), { httpMetadata: { contentType: 'application/json' } }); } catch { /* the page falls back to the job */ }
+        await saveJob(env, id, job);
         const posted = await postToDiscord(env, job, `${origin}/v/${id}`);
         delete job.token; // not needed any more
         await saveJob(env, id, job);
@@ -189,4 +217,4 @@ async function serveRenderApi(request, env, url) {
     return json(400, { error: 'Unknown action' });
 }
 
-module.exports = { matchVideo, serveVideo, matchVideoPage, serveVideoPage, serveRenderApi, jobKey, JOB_TTL };
+module.exports = { matchVideo, serveVideo, matchVideoPage, serveVideoPage, matchThumb, serveThumb, serveRenderApi, jobKey, JOB_TTL };

@@ -45,6 +45,8 @@
             }
             onProgress((i + 1) / n);
         }
+        // a frame of the play for the link preview (no harm if it fails)
+        if (blob.thumb) { try { await api(id, 'action=thumb', { method: 'PUT', body: blob.thumb }); } catch { /* the map's cover instead */ } }
         const meta = window.replayCurrentMeta ? window.replayCurrentMeta() : {};
         return api(id, 'action=complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ parts, meta }) });
     }
