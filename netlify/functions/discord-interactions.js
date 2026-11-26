@@ -362,7 +362,7 @@ function topPage(u, apiMode, scores, page) {
 const trimNum = (v, d = 1) => (v == null || !Number.isFinite(v) ? '?' : String(Number(v.toFixed(d))));
 const STATUS_LABEL = { ranked: 'Ranked', approved: 'Approved', qualified: 'Qualified', loved: 'Loved', pending: 'Pending', wip: 'WIP', graveyard: 'Graveyard' };
 
-function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading } = {}) {
+function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading, rankedDate } = {}) {
     const bs = score.beatmapset || {};
     const bm = score.beatmap || {};
     const mode = score.mode || apiMode;
@@ -373,11 +373,12 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading } = {}) {
     const ppFc = ex ? ex.ppFc : null;
     const maxCombo = (ex && ex.maxCombo) || bm.max_combo;
 
+    const p1 = (v) => Number(v).toFixed(1);
     let ppPart;
-    if (!passed) ppPart = ppFc != null ? `FC ${Math.round(ppFc)}pp` : t('not_passed');
+    if (!passed) ppPart = ppFc != null ? `FC ${p1(ppFc)}pp` : t('not_passed');
     else if (pp == null) ppPart = '—';
-    else if (ppFc != null && Math.round(ppFc) > Math.round(pp)) ppPart = `**${Math.round(pp)}pp** / FC ${Math.round(ppFc)}pp`;
-    else ppPart = `**${Math.round(pp)}pp**`;
+    else if (ppFc != null && ppFc > pp && p1(ppFc) !== p1(pp)) ppPart = `**${p1(pp)}** / FC ${p1(ppFc)}pp`;
+    else ppPart = `**${p1(pp)}pp**`;
 
     const hits = (() => {
         try {
@@ -389,15 +390,16 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading } = {}) {
     const stars = ex && ex.stars != null ? ex.stars : bm.difficulty_rating;
     const len = ex ? ex.length : bm.total_length;
     const bpm = ex ? ex.bpm : bm.bpm;
-    const mapLine = [`⏱ ${L.fmtLen(len)}`, `♪ ${trimNum(bpm, 0)} BPM`, `${stars != null ? Number(stars).toFixed(2) : '?'}★`].join(' · ');
     let attrLine = '';
     if (ex) {
-        if (mode === 'mania') attrLine = `${ex.keys}K · OD ${trimNum(ex.od)} · HP ${trimNum(ex.hp)}`;
-        else if (mode === 'taiko') attrLine = `OD ${trimNum(ex.od)} · HP ${trimNum(ex.hp)}`;
-        else attrLine = `CS ${trimNum(ex.cs)} · AR ${trimNum(ex.ar)} · OD ${trimNum(ex.od)} · HP ${trimNum(ex.hp)}`;
+        if (mode === 'mania') attrLine = `${ex.keys}K OD ${trimNum(ex.od)} HP ${trimNum(ex.hp)}`;
+        else if (mode === 'taiko') attrLine = `OD ${trimNum(ex.od)} HP ${trimNum(ex.hp)}`;
+        else attrLine = `CS ${trimNum(ex.cs)} AR ${trimNum(ex.ar)} OD ${trimNum(ex.od)} HP ${trimNum(ex.hp)}`;
     } else if (bm.cs != null) {
-        attrLine = mode === 'mania' ? `${Math.round(bm.cs)}K · OD ${bm.accuracy} · HP ${bm.drain}` : `CS ${bm.cs} · AR ${bm.ar} · OD ${bm.accuracy} · HP ${bm.drain}`;
+        attrLine = mode === 'mania' ? `${Math.round(bm.cs)}K OD ${bm.accuracy} HP ${bm.drain}` : `CS ${bm.cs} AR ${bm.ar} OD ${bm.accuracy} HP ${bm.drain}`;
     }
+    // One line of grey code chips: length · map numbers · BPM.
+    const mapLine = ['`' + L.fmtLen(len) + '`', attrLine ? '`' + attrLine + '`' : '', `♪ ${trimNum(bpm, 0)}`].filter(Boolean).join(' · ');
 
     const lines = [
         // ### heading: Discord sizes emojis with the text, so the grade and
@@ -406,29 +408,30 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading } = {}) {
         `${L.fmtNum(score.score ?? score.legacy_total_score ?? score.total_score)} · ${L.fmtNum(score.max_combo)}x${maxCombo ? ` / ${L.fmtNum(maxCombo)}x` : ''}`,
         hits,
         mapLine,
-        attrLine,
     ];
     if (!passed && ex && ex.progress != null) {
-        lines.push(`❌ ${t('fail_line', { p: Math.round(ex.progress * 100), pp: ex.ppIfPassed != null ? Math.round(ex.ppIfPassed) : '?' })}`);
+        lines.push(`❌ ${t('fail_line', { p: Math.round(ex.progress * 100), pp: ex.ppIfPassed != null ? p1(ex.ppIfPassed) : '?' })}`);
     }
 
     const st = user && user.statistics;
     const flag = L.flagEmoji(user && (user.country_code || (user.country && user.country.code)));
     const rankBit = st && st.global_rank
-        ? ` · #${L.fmtNum(st.global_rank)}${st.country_rank ? ` (${user.country_code} #${L.fmtNum(st.country_rank)})` : ''}`
+        ? ` (#${L.fmtNum(st.global_rank)}${st.country_rank ? ` ${user.country_code} #${L.fmtNum(st.country_rank)}` : ''})`
         : '';
-    const status = STATUS_LABEL[bs.status || bm.status] || '';
-    const footBits = [tries > 1 ? t('try_n', { n: tries }) : '', bs.creator ? t('mapper', { n: bs.creator }) : '', status].filter(Boolean);
+    const totalPp = st && st.pp ? `: ${L.fmtNum(Math.round(st.pp))}pp` : '';
+    const rd = rankedDate || bs.ranked_date;
+    const status = [STATUS_LABEL[bs.status || bm.status] || '', rd ? String(rd).slice(0, 10) : ''].filter(Boolean).join(' ');
+    const footBits = [tries > 1 ? t('try_n', { n: tries }) : '', bs.creator ? t('mapped_by', { n: bs.creator }) : '', status].filter(Boolean);
     const covers = bs.covers || {};
     const mTag = L.modeTag(mode);
 
     return {
         author: user ? {
-            name: `${user.username}${flag ? ' ' + flag : ''}${rankBit}`,
+            name: `${user.username}${flag ? ' ' + flag : ''}${totalPp}${rankBit}`,
             url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
             icon_url: user.avatar_url || undefined,
         } : undefined,
-        title: `${heading ? heading + ' · ' : ''}${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]`.slice(0, 250),
+        title: `${heading ? heading + ' · ' : ''}${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]${stars != null ? ` [${Number(stars).toFixed(2)}★]` : ''}`.slice(0, 250),
         url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
         description: lines.filter(Boolean).join('\n'),
         thumbnail: { url: covers['list@2x'] || covers.list || covers.card || undefined },
@@ -462,6 +465,19 @@ function deferInto(interaction, work) {
     return L.json({ type: L.R.DEFERRED_MESSAGE });
 }
 
+// The score's beatmapset carries no ranked date; the beatmap lookup does.
+async function fetchRankedDate(token, score) {
+    const bs = score.beatmapset || {};
+    if (bs.ranked_date) return bs.ranked_date;
+    if (!score.beatmap || !score.beatmap.id || !['ranked', 'approved', 'loved', 'qualified'].includes(bs.status)) return null;
+    try {
+        const r = await fetch(`https://osu.ppy.sh/api/v2/beatmaps/${score.beatmap.id}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!r.ok) return null;
+        const b = await r.json();
+        return (b.beatmapset && b.beatmapset.ranked_date) || null;
+    } catch { return null; }
+}
+
 async function cmdRecent(options, interaction, origin, forcedMode) {
     const who = await resolveWho(options, interaction);
     if (!who) return L.ephemeral(t('need_name_or_link'));
@@ -483,8 +499,11 @@ async function cmdRecent(options, interaction, origin, forcedMode) {
         for (let i = at + 1; i < scores.length && scores[i].beatmap && scores[i].beatmap.id === mapId; i++) tries++;
 
         const { scoreExtras } = require('./_score-calc');
-        const ex = await scoreExtras(score, score.mode || apiMode, L.modsList(score.mods));
-        const embed = detailedScoreEmbed(score, u, apiMode, ex, { tries });
+        const [ex, rankedDate] = await Promise.all([
+            scoreExtras(score, score.mode || apiMode, L.modsList(score.mods)),
+            fetchRankedDate(token, score),
+        ]);
+        const embed = detailedScoreEmbed(score, u, apiMode, ex, { tries, rankedDate });
         return { embed, components: scoreActionRow(score, apiMode, origin) };
     });
 }
