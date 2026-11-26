@@ -7889,3 +7889,74 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
 .ssc-share-right input:focus, .ssc-share-right textarea:focus, .ssc-share-right select:focus { outline: none; border-color: var(--accent-light-purple); }
 .ssc-share-right textarea { resize: vertical; min-height: 64px; }
 .ssc-share-right select { padding: 5px 10px; }
+
+/* ===== 社群 → Discord 伺服器 (js/discord-servers.js) ===== */
+.srv-featured-card { position: relative; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 18px 20px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(88, 101, 242, 0.45); background: linear-gradient(120deg, rgba(88, 101, 242, 0.28), rgba(244, 114, 182, 0.14)); }
+.srv-featured-card::before { content: ''; position: absolute; inset: 0; background: var(--banner, none) center / cover; opacity: .18; pointer-events: none; }
+.srv-featured-card > * { position: relative; }
+.srv-featured-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.srv-featured-tag { font-size: var(--fs-12); color: #c9cdfb; font-weight: 700; letter-spacing: .02em; }
+.srv-bot-note { margin: 4px 0 0; font-size: var(--fs-13); color: rgba(255, 255, 255, 0.88); line-height: 1.5; }
+.srv-icon { border-radius: 30%; flex: none; object-fit: cover; background: #2b2d31; }
+.srv-icon-blank { display: inline-flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; background: #5865f2; }
+.srv-name { font-weight: 800; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.srv-counts { display: flex; flex-wrap: wrap; gap: 12px; font-size: var(--fs-12); color: var(--text-dim2); }
+.srv-count { display: inline-flex; align-items: center; gap: 5px; }
+.srv-dot { width: 8px; height: 8px; border-radius: 50%; background: #80848e; display: inline-block; }
+.srv-dot.on { background: #23a55a; }
+.srv-join { background: #5865f2; border-color: #5865f2; color: #fff; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
+.srv-join:hover { background: #4752c4; }
+
+.srv-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 12px; }
+.srv-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.srv-tag { padding: 4px 11px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.15); background: transparent; color: var(--text-dim2); cursor: pointer; font-size: var(--fs-12); }
+.srv-tag.on { border-color: #5865f2; background: rgba(88, 101, 242, 0.22); color: #fff; }
+
+.srv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.srv-card { display: flex; flex-direction: column; gap: 9px; padding: 14px; border-radius: 10px; background: var(--card-bg, #1b1820); border: 1px solid rgba(255, 255, 255, 0.08); }
+.srv-card-head { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.srv-card-title { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.srv-card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.srv-chip { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; padding: 2px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); }
+.srv-chip.srv-lang { text-transform: none; background: rgba(88, 101, 242, 0.2); }
+.srv-desc { margin: 0; font-size: var(--fs-13); line-height: 1.5; color: rgba(255, 255, 255, 0.82); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; }
+.srv-card .srv-join { margin-top: auto; }
+.srv-empty { grid-column: 1 / -1; }
+
+.srv-review { margin: 6px 0 16px; padding: 12px; border-radius: 10px; border: 1px dashed rgba(244, 114, 182, 0.5); }
+.srv-review-row { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.srv-review-main { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.srv-review-main a { font-size: var(--fs-12); color: #9da5ff; }
+.srv-review-acts { display: flex; flex-direction: column; gap: 6px; }
+.srv-ok { background: #2f9e5b; border-color: #2f9e5b; color: #fff; }
+.srv-no { background: #d9485f; border-color: #d9485f; color: #fff; }
+
+.srv-mine { margin-top: 18px; }
+.srv-mine-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.srv-mine-list li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); }
+.srv-mine-list small { color: var(--text-dim2); flex-basis: 100%; }
+.srv-state { font-size: var(--fs-12); padding: 1px 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.1); }
+.srv-state.is-approved { background: rgba(47, 158, 91, 0.3); }
+.srv-state.is-rejected { background: rgba(217, 72, 95, 0.3); }
+.srv-state.is-pending { background: rgba(240, 180, 60, 0.25); }
+.srv-x { margin-left: auto; background: none; border: 0; color: var(--text-dim2); cursor: pointer; font-size: var(--fs-12); }
+
+.pp-calc-modal.srv-modal { max-width: 560px; }
+.srv-form { display: flex; flex-direction: column; gap: 10px; }
+.srv-invite-row { display: flex; gap: 8px; }
+.srv-invite-row input { flex: 1; min-width: 0; }
+.srv-form input[type="text"], .srv-form textarea, .srv-form select { padding: 9px 12px; border-radius: var(--r-card); border: var(--line) solid var(--border-input); background-color: var(--bg-input); color: var(--text); font: inherit; font-size: var(--fs-14); box-sizing: border-box; }
+.srv-form textarea { width: 100%; resize: vertical; min-height: 70px; }
+.srv-form select { padding: 5px 10px; }
+.srv-preview:empty { display: none; }
+.srv-preview { padding: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); }
+.srv-label { font-size: var(--fs-12); color: var(--text-dim2); }
+.srv-inline { display: flex; align-items: center; gap: 8px; }
+.srv-warn { color: #ff8a8a; font-size: var(--fs-12); }
+@media (max-width: 640px) {
+    .srv-featured-card { grid-template-columns: auto 1fr; }
+    .srv-featured-card .srv-join { grid-column: 1 / -1; }
+    .srv-grid { grid-template-columns: 1fr; }
+    .srv-review-row { grid-template-columns: auto 1fr; }
+    .srv-review-acts { grid-column: 1 / -1; flex-direction: row; }
+}
