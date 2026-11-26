@@ -1902,11 +1902,23 @@
             const master = actx.createGain(); master.connect(actx.destination);
             try {
                 const music = await actx.decodeAudioData(await (await fetch(audioUrl)).arrayBuffer());
-                const src = actx.createBufferSource(); src.buffer = music; src.playbackRate.value = rate;
+                const src = actx.createBufferSource();
+                // DT / HT keep the song's pitch, as in the game: the music is time-stretched
+                // (js/replay/stretch.js) and played at its own rate. NC (512) is meant to sound
+                // higher, so it keeps the plain faster playback.
+                let stretched = false;
+                if (rate !== 1 && !(replay.mods & 512) && window.replayStretch) {
+                    const chans = Array.from({ length: music.numberOfChannels }, (_, i) => music.getChannelData(i));
+                    const outCh = await window.replayStretch(chans, rate, music.sampleRate, yieldNow);
+                    const buf = actx.createBuffer(outCh.length, outCh[0].length, music.sampleRate);
+                    outCh.forEach((d, i) => buf.copyToChannel(d, i));
+                    src.buffer = buf; src.playbackRate.value = 1; stretched = true;
+                } else { src.buffer = music; src.playbackRate.value = rate; }
                 const g = actx.createGain(); g.gain.value = Math.max(0.05, prefs.music) * 0.8;
                 src.connect(g); g.connect(master);
-                // the song starts where the video's time reaches 0 (before that: silence)
-                src.start(Math.max(0, -t0 / 1000 / rate), Math.max(0, t0 / 1000));
+                // the song starts where the video's time reaches 0 (before that: silence);
+                // the offset is in the buffer's own seconds (a stretched buffer is 1/rate as long)
+                src.start(Math.max(0, -t0 / 1000 / rate), Math.max(0, t0 / 1000) / (stretched ? rate : 1));
                 // the music fades out under the ranking screen
                 g.gain.setValueAtTime(g.gain.value, playSecs);
                 g.gain.linearRampToValueAtTime(0, total);
