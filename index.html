@@ -899,44 +899,14 @@
         <h2 class="osu-page-title" data-i18n="ssc_page_title">皮膚截圖廣場</h2>
         <p class="tournaments-hint" data-i18n="ssc_page_hint">分享你實際遊玩時的皮膚截圖給其他人參考——下載連結或 .osk 檔案至少擇一，這樣別人才能下載到這個皮膚。</p>
 
-        <!-- The share form is behind a button so the shots come first -->
-        <details class="ssc-share" id="ssc-share">
-            <summary class="btn ssc-share-btn" data-icon="upload" data-icon-gap><span data-i18n="ssc_upload_title">分享我的皮膚截圖</span></summary>
-        <div class="osu-add-card">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-            <h3 data-i18n="ssc_upload_title">分享我的皮膚截圖</h3>
-            <div class="ssc-upload-form">
-                <div class="input-group">
-                    <input type="text" id="ssc-upload-name" autocomplete="off" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
-                </div>
-                <div class="input-group">
-                    <input type="text" id="ssc-upload-author" autocomplete="off" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
-                </div>
-                <div class="input-group">
-                    <input type="text" id="ssc-upload-url" autocomplete="off" data-i18n-placeholder="ssc_upload_url_placeholder" placeholder="下載連結" maxlength="300">
-                </div>
-                <p class="ssc-upload-hint" data-i18n="ssc_upload_link_or_file_hint">下載連結、或直接上傳 .osk 檔案，兩者至少擇一，這樣別人才能下載到這個皮膚（.osk 檔案上限 2.5MB，太大的皮膚建議改附連結）。</p>
-                <div class="skin-upload-row">
-                    <input type="file" id="ssc-upload-osk-file" accept=".osk" onchange="previewSkinScreenshotOskFile(this)">
-                </div>
-                <div id="ssc-upload-osk-name" class="ssc-upload-osk-name"></div>
-                <div class="osu-mode-tabs" id="ssc-upload-mode-tabs"></div>
-                <div class="skin-upload-row">
-                    <input type="file" id="ssc-upload-file" accept="image/*" onchange="previewSkinScreenshotFile(this)">
-                </div>
-                <div id="ssc-upload-preview" class="ssc-upload-preview"></div>
-                <button class="btn" onclick="uploadSkinScreenshot()" data-i18n="ssc_upload_btn">發布截圖</button>
-                <p id="ssc-upload-status" class="status"></p>
-            </div>
-        </div>
-        </details>
+        <button type="button" class="btn ssc-share-btn" onclick="openSkinShare()" data-icon="upload" data-icon-gap><span data-i18n="ssc_share_skin">分享皮膚</span></button>
 
         <div class="osu-search-row">
             <input type="text" id="ssc-search-input" autocomplete="off" data-i18n-placeholder="ssc_search_placeholder" placeholder="搜尋皮膚名稱或作者..." oninput="searchSkinScreenshots(this.value)">
             <select id="ssc-sort-select" onchange="switchSkinScreenshotsSort(this.value)">
                 <option value="recent" data-i18n="gallery_sort_recent">最新發布</option>
                 <option value="likes" data-i18n="gallery_sort_likes">❤ 最熱門</option>
+                <option value="downloads" data-i18n="ssc_sort_downloads">⬇ 最多下載</option>
             </select>
         </div>
         <div class="osu-mode-tabs" id="skin-screenshots-mode-filter"></div>
@@ -1229,6 +1199,47 @@
         <div id="pp-calc-result" class="pp-calc-result" style="display:none;"></div>
         <div id="pp-calc-radar-wrap" class="pp-calc-graph-wrap" style="display:none;"></div>
         <div id="pp-calc-graph-wrap" class="pp-calc-graph-wrap" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- 皮膚廣場: one skin (js/skin-screenshots.js) -->
+<div id="ssc-detail-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeSkinDetail()">
+    <div class="pp-calc-modal ssc-modal">
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeSkinDetail()" data-icon="x"></button>
+        <div id="ssc-detail-body"></div>
+    </div>
+</div>
+<!-- 皮膚廣場: sharing a skin -->
+<div id="ssc-share-modal" class="pp-calc-modal-overlay" style="display:none;" onclick="if(event.target===this) closeSkinShare()">
+    <div class="pp-calc-modal ssc-modal">
+        <button class="pp-calc-close" data-i18n-aria="close_label" aria-label="關閉" onclick="closeSkinShare()" data-icon="x"></button>
+        <h3 class="pp-calc-title" data-i18n="ssc_share_skin">分享皮膚</h3>
+        <div class="ssc-share">
+            <div class="ssc-share-left">
+                <div class="ssc-field-label" data-i18n="ssc_images_label">截圖（最多 8 張，第一張是封面）</div>
+                <div id="ssc-picked" class="ssc-picked"></div>
+            </div>
+            <div class="ssc-share-right">
+                <input type="text" id="ssc-upload-name" autocomplete="off" data-i18n-placeholder="ssc_upload_name_placeholder" placeholder="皮膚名稱" maxlength="100">
+                <div class="ssc-two">
+                    <input type="text" id="ssc-upload-author" autocomplete="off" data-i18n-placeholder="ssc_upload_author_placeholder" placeholder="作者（選填）" maxlength="100">
+                    <input type="text" id="ssc-upload-version" autocomplete="off" data-i18n-placeholder="ssc_version_placeholder" placeholder="版本（選填，例如 v1.2）" maxlength="40">
+                </div>
+                <div class="ssc-field-label" data-i18n="ssc_modes_label">支援的模式</div>
+                <div id="ssc-share-modes" class="ssc-mode-toggles"></div>
+                <label class="ssc-field-label ssc-inline"><span data-i18n="ssc_aspect_label">畫面比例</span>
+                    <select id="ssc-upload-aspect"><option value="" data-i18n="ssc_aspect_any">不指定</option><option>16:9</option><option>16:10</option><option>4:3</option><option>21:9</option></select></label>
+                <textarea id="ssc-upload-desc" rows="3" maxlength="1000" data-i18n-placeholder="ssc_desc_placeholder" placeholder="介紹（選填）"></textarea>
+                <div class="ssc-field-label" data-i18n="ssc_links_label">下載連結（Google Drive、MEGA、MediaFire…，最多 5 個）</div>
+                <div id="ssc-links"></div>
+                <button type="button" class="ssc-link-add" id="ssc-link-add" onclick="addSscLinkRow()" data-icon="plus" data-icon-gap><span data-i18n="ssc_link_add">再加一個連結</span></button>
+                <label class="ssc-field-label ssc-inline"><span data-i18n="ssc_osk_optional">或附上 .osk 檔案（2.5MB 以內）</span>
+                    <input type="file" id="ssc-upload-osk-file" accept=".osk" onchange="previewSkinScreenshotOskFile(this)"></label>
+                <div id="ssc-upload-osk-name" class="ssc-upload-osk-name"></div>
+                <button class="btn" id="ssc-upload-btn" onclick="uploadSkinScreenshot()" data-i18n="ssc_publish">發布</button>
+                <p id="ssc-upload-status" class="status"></p>
+            </div>
+        </div>
     </div>
 </div>
 

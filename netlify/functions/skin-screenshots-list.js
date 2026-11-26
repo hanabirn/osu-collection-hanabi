@@ -7,11 +7,24 @@
 const { getSkinScreenshotsStore } = require('./_blobs-store');
 const { verifyAuthToken } = require('./_auth-token');
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 12;
 const SORTERS = {
     recent: (a, b) => b.uploadedAt.localeCompare(a.uploadedAt),
     likes: (a, b) => (b.likeCount || 0) - (a.likeCount || 0),
+    downloads: (a, b) => (b.downloads || 0) - (a.downloads || 0),
 };
+
+/* Entries from before the multi-screenshot gallery had one image stored under
+   the entry's own id, one mode and one downloadUrl: shown in the new shape. */
+function normalize(e) {
+    return {
+        ...e,
+        images: Array.isArray(e.images) && e.images.length ? e.images : [{ key: e.id, w: e.width || null, h: e.height || null }],
+        modes: Array.isArray(e.modes) && e.modes.length ? e.modes : [e.mode || 'standard'],
+        links: Array.isArray(e.links) ? e.links : (e.downloadUrl ? [e.downloadUrl] : []),
+        downloads: e.downloads || 0,
+    };
+}
 
 exports.handler = async (event) => {
     const headers = {
@@ -44,7 +57,7 @@ exports.handler = async (event) => {
 
     try {
         const store = getSkinScreenshotsStore();
-        const index = (await store.get('index', { type: 'json' })) || [];
+        const index = ((await store.get('index', { type: 'json' })) || []).map(normalize);
 
         let likedSet = null;
         if (caller) {
@@ -55,7 +68,7 @@ exports.handler = async (event) => {
         let filtered = index;
         if (mine) filtered = filtered.filter(entry => entry.userId === caller.id);
         if (likedOnly) filtered = filtered.filter(entry => likedSet.has(entry.id));
-        if (mode) filtered = filtered.filter(entry => entry.mode === mode);
+        if (mode) filtered = filtered.filter(entry => entry.modes.includes(mode));
         if (q) {
             filtered = filtered.filter(entry =>
                 (entry.skinName || '').toLowerCase().includes(q) ||

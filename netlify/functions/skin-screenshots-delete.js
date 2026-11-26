@@ -49,7 +49,10 @@ exports.handler = async (event) => {
             return { statusCode: 404, headers, body: JSON.stringify({ error: 'Screenshot not found' }) };
         }
 
-        await store.delete(`image:${id}`);
+        const index0 = (await store.get('index', { type: 'json' })) || [];
+        const entry = index0.find((e) => e.id === id);
+        const keys = entry && Array.isArray(entry.images) && entry.images.length ? entry.images.map((im) => im.key) : [id];
+        for (const k of keys) await store.delete(`image:${k}`);
         await store.delete(`osk:${id}`);
         await store.delete(`likers:${id}`);
         await store.setJSON(`owner:${user.id}`, owned.filter(v => v !== id));

@@ -25,11 +25,22 @@ exports.handler = async (event) => {
         const store = getSkinScreenshotsStore();
         const index = (await store.get('index', { type: 'json' })) || [];
         const entry = index.find(e => e.id === id);
+        // ?link=n: one of the entry's download links (Google Drive, MEGA…), counted, then off there
+        const linkN = (event.queryStringParameters || {}).link;
+        if (entry && linkN != null) {
+            const links = Array.isArray(entry.links) ? entry.links : (entry.downloadUrl ? [entry.downloadUrl] : []);
+            const url = links[Number(linkN)];
+            if (!url || !/^https?:\/\//i.test(url)) return { statusCode: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Not found' }) };
+            entry.downloads = (entry.downloads || 0) + 1;
+            await store.setJSON('index', index);
+            return { statusCode: 302, headers: { ...corsHeaders, Location: url, 'Cache-Control': 'no-store' }, body: '' };
+        }
         if (!entry || !entry.oskFilename) {
             return { statusCode: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Not found' }) };
         }
 
         const data = await store.get(`osk:${id}`, { type: 'arrayBuffer' });
+        if (data) { entry.downloads = (entry.downloads || 0) + 1; await store.setJSON('index', index); }
         if (!data) {
             return { statusCode: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Not found' }) };
         }

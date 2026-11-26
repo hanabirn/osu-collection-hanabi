@@ -34,7 +34,8 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 ...corsHeaders,
-                'Content-Type': 'image/jpeg',
+                // the new gallery stores WebP, the first entries JPEG
+                'Content-Type': new Uint8Array(data, 8, 4).every((c, i) => c === 'WEBP'.charCodeAt(i)) ? 'image/webp' : 'image/jpeg',
                 'Cache-Control': 'public, max-age=86400',
             },
             body: Buffer.from(data).toString('base64'),
