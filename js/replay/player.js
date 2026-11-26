@@ -580,7 +580,7 @@
                     <button type="button" class="rp-icon" id="rp-fs" aria-label="${L('全螢幕')}" title="${L('全螢幕')}">⛶</button>
                     <span class="rp-spacer"></span>
                     <details class="rp-menu">
-                        <summary class="rp-btn" title="${L('皮膚・判定')}">⚙<span class="rp-btn-text"> ${L('皮膚・判定')}</span></summary>
+                        <summary class="rp-btn" title="${L('皮膚・設定')}">⚙<span class="rp-btn-text"> ${L('皮膚・設定')}</span></summary>
                         <div class="rp-menu-panel">
                             <button type="button" class="rp-menu-close" aria-label="${L('關閉')}" onclick="this.closest('details').open = false">✕</button>
                             <div class="rp-opt">${L('皮膚')} <span class="rp-skin-name" id="rp-skin-name">${esc(savedSkins[replay.mode] ? savedSkins[replay.mode].name : L('預設'))}</span>

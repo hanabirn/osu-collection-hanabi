@@ -44,7 +44,7 @@
         '大': { 'zh-Hans': '大', en: 'Large', ja: '大', ko: '크게', de: 'Groß', es: 'Grande', fr: 'Grande', ru: 'Большой' },
         '填滿畫面': { 'zh-Hans': '填满画面', en: 'Fill the page', ja: '画面いっぱい', ko: '화면 채우기', de: 'Ganze Seite', es: 'Llenar la página', fr: 'Toute la page', ru: 'На всю страницу' },
         '全螢幕': { 'zh-Hans': '全屏', en: 'Full screen', ja: '全画面', ko: '전체 화면', de: 'Vollbild', es: 'Pantalla completa', fr: 'Plein écran', ru: 'Полный экран' },
-        '皮膚・判定': { 'zh-Hans': '皮肤・判定', en: 'Skin · judgements', ja: 'スキン・判定', ko: '스킨·판정', de: 'Skin · Bewertungen', es: 'Skin · juicios', fr: 'Skin · jugements', ru: 'Скин · попадания' },
+        '皮膚・設定': { 'zh-Hans': '皮肤・设置', en: 'Skin · settings', ja: 'スキン・設定', ko: '스킨·설정', de: 'Skin · Einstellungen', es: 'Skin · ajustes', fr: 'Skin · réglages', ru: 'Скин · настройки' },
         '上傳皮膚（.osk / .zip）': { 'zh-Hans': '上传皮肤（.osk / .zip）', en: 'Use my skin (.osk / .zip)', ja: '自分のスキンを使う（.osk / .zip）', ko: '내 스킨 사용 (.osk / .zip)', de: 'Meinen Skin nutzen (.osk / .zip)', es: 'Usar mi skin (.osk / .zip)', fr: 'Utiliser mon skin (.osk / .zip)', ru: 'Свой скин (.osk / .zip)' },
         '恢復預設': { 'zh-Hans': '恢复默认', en: 'Reset to default', ja: 'デフォルトに戻す', ko: '기본값으로', de: 'Zurücksetzen', es: 'Restablecer', fr: 'Par défaut', ru: 'По умолчанию' },
         '再按一次確認': { 'zh-Hans': '再按一次确认', en: 'Click again to confirm', ja: 'もう一度押して確定', ko: '한 번 더 눌러 확인', de: 'Zum Bestätigen erneut klicken', es: 'Pulsa otra vez para confirmar', fr: 'Clique encore pour confirmer', ru: 'Нажмите ещё раз' },
