@@ -428,8 +428,7 @@
             ctx.drawImage(view.bg, (w - view.bg.width * s) / 2, (h - view.bg.height * s) / 2, view.bg.width * s, view.bg.height * s);
             ctx.globalAlpha = 1;
         }
-        // view.zoom: a larger field (the Discord videos, watched in a small preview)
-        const k = Math.min((h * 0.8 * (view.zoom || 1)) / H, (w * 0.92) / W);
+        const k = Math.min((h * 0.8) / H, (w * 0.92) / W);
         const ox = (w - W * k) / 2, oy = (h - H * k) / 2 + 8 * k * 0.5;
         const X = (x) => ox + x * k, Y = (y) => oy + y * k;
         const r = prep.radius, R = r * k;

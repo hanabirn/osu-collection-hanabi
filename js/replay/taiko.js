@@ -261,10 +261,7 @@
             ctx.drawImage(view.bg, (w - view.bg.width * s) / 2, (h - view.bg.height * s) / 2, view.bg.width * s, view.bg.height * s);
             ctx.globalAlpha = 1;
         }
-        // view.zoom: a taller lane (the Discord videos), a little lower so the
-        // mascot above it stays clear of the title in the corner
-        const z = Math.min(1.4, view.zoom || 1);
-        const bandH = h * 0.225 * z, bandTop = (z > 1 ? h * 0.46 : h * 0.4125) - bandH / 2, cy = bandTop + bandH / 2;
+        const bandH = h * 0.225, bandTop = h * 0.3, cy = bandTop + bandH / 2;
         const u = bandH / 200; // screen px per skin pixel (the drum is 200 tall)
         const size = (img) => [img.bmp.width * img.s * u, img.bmp.height * img.s * u];
         const barLeft = I['taiko-bar-left'];
