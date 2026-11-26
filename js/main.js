@@ -47,7 +47,7 @@ const SITE_SECTIONS = [
     { id: 'player', label: 'nav_player', tabs: [{ tab: 'lookup', label: 'nav_lookup' }, { tab: 'tournaments', label: 'nav_tournaments' }] },
     { id: 'replay', label: 'nav_replay_section', tabs: [{ tab: 'replay', label: 'nav_replay' }] },
     // 私訊 lives inside the chat page's sidebar now (switchTab maps 'dm' to 'chat').
-    { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { action: 'focusDiscordCard()', label: 'discord_bot_title' }] },
+    { id: 'community', label: 'nav_community', tabs: [{ tab: 'chat', label: 'nav_chat' }, { tab: 'servers', label: 'nav_servers' }] },
     { id: 'more', label: 'nav_more', tabs: [
         { tab: 'howto', label: 'nav_howto' }, { tab: 'updates', label: 'nav_updates' }, { tab: 'changelog', label: 'nav_changelog' },
         { tab: 'resources', label: 'nav_resources' },
@@ -234,10 +234,13 @@ if (document.fonts) {
     if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', queueFitSiteHeader);
 }
 
+/* The bot is still being tested and only runs in our own server, so the card
+   invites people there rather than offering the bot for theirs. */
+const OUR_DISCORD_SERVER = 'https://discord.gg/vVuGsm5YZF';
 function setupDiscordInvite() {
     const a = document.getElementById('discord-invite-btn');
-    if (!a || !DISCORD_BOT_INVITE_URL.startsWith('https://discord.com/')) return;
-    a.href = DISCORD_BOT_INVITE_URL;
+    if (!a) return;
+    a.href = OUR_DISCORD_SERVER;
     a.hidden = false;
 }
 function focusDiscordCard() {
@@ -321,6 +324,7 @@ function switchTab(tab, el) {
     if (tab === 'tournaments') ensureTournamentsLoaded();
     if (tab === 'replay' && typeof ensureReplayHub === 'function') ensureReplayHub();
     if (tab === 'collection') updateCollectionFilterCount();
+    if (tab === 'servers' && typeof ensureServersPage === 'function') ensureServersPage();
     if (tab === 'feedback') { renderFeedbackRecent(); if (typeof ensureFeedbackPage === 'function') ensureFeedbackPage(); }
     if (tab === 'public-collections') ensurePublicCollectionsLoaded();
     if (tab === 'catalog') ensureCatalogLoaded();
