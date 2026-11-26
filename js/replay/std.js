@@ -202,7 +202,13 @@
 
         // each key on its own, for the key overlay: K1 (4), K2 (8), M1 (1 without K1), M2 (2 without K2)
         const keyPress = { K1: [], K2: [], M1: [], M2: [] };
-        const keyDown = (keys) => ({ K1: !!(keys & 4), K2: !!(keys & 8), M1: !!(keys & 1) && !(keys & 4), M2: !!(keys & 2) && !(keys & 8) });
+        // osu!lazer's replays record only a left and a right button (lazer doesn't tell keys
+        // from mouse buttons): shown as K1 / K2, as most players use the keyboard
+        const lazerButtons = replay.version >= 30000000 && !frames.some((f) => f.keys & 12);
+        const keyDown = lazerButtons
+            ? (keys) => ({ K1: !!(keys & 1), K2: !!(keys & 2), M1: false, M2: false })
+            : (keys) => ({ K1: !!(keys & 4), K2: !!(keys & 8), M1: !!(keys & 1) && !(keys & 4), M2: !!(keys & 2) && !(keys & 8) });
+        const keyList = lazerButtons ? ['K1', 'K2'] : ['K1', 'K2', 'M1', 'M2'];
         // Counted only from when the first object appears: the frames before it hold
         // whatever the keys did while the game loaded or the intro was skipped (a lone
         // M1, all four at once...), which made keyboard players look like mouse players.
@@ -210,7 +216,7 @@
         let was = keyDown(0);
         for (const f of frames) {
             const now = keyDown(f.keys);
-            if (f.t >= countFrom) for (const key of ['K1', 'K2', 'M1', 'M2']) if (now[key] && !was[key]) keyPress[key].push(f.t);
+            if (f.t >= countFrom) for (const key of keyList) if (now[key] && !was[key]) keyPress[key].push(f.t);
             was = now;
         }
 
@@ -351,7 +357,7 @@
         const kiai = map.timing.map((tp) => ({ time: tp.time, kiai: !!tp.kiai }));
         // the map's own combo colours come first, as in osu! (unless a player turns them off)
         const mapColours = (map.colours || []).filter((c) => c.length >= 3 && c.every(Number.isFinite)).map((c) => `rgba(${c[0]},${c[1]},${c[2]},1)`);
-        return { mode: 0, mapColours, keyPress, keyDown, hitOffsets, objs, notes: objs, events, counts, bestCombo: best, posAt, presses, radius, scale, preempt, fadeIn: 400 * Math.min(1, preempt / 450), windows: w, diff, rate, lastTime, kiai, hidden: !!(mods & MOD.HD), flashlight: !!(mods & MOD.FL), flip, cy };
+        return { mode: 0, mapColours, keyPress, keyDown, keyList, hitOffsets, objs, notes: objs, events, counts, bestCombo: best, posAt, presses, radius, scale, preempt, fadeIn: 400 * Math.min(1, preempt / 450), windows: w, diff, rate, lastTime, kiai, hidden: !!(mods & MOD.HD), flashlight: !!(mods & MOD.FL), flip, cy };
     }
 
 
@@ -798,11 +804,12 @@
             const size = h * 0.062;
             // below the right-hand column (accuracy, pp, mods, counts)
             const x0 = w - size * 0.5 - 10, yMid = h * 0.72;
-            ['K1', 'K2', 'M1', 'M2'].forEach((key, i) => {
+            const keys = prep.keyList || ['K1', 'K2', 'M1', 'M2'];
+            keys.forEach((key, i) => {
                 const list = prep.keyPress[key];
                 let lo = 0, hi = list.length - 1, n = 0;
                 while (lo <= hi) { const mid = (lo + hi) >> 1; if (list[mid] <= t) { n = mid + 1; lo = mid + 1; } else hi = mid - 1; }
-                const y = yMid + (i - 1.5) * size * 1.12;
+                const y = yMid + (i - (keys.length - 1) / 2) * size * 1.12;
                 const on = down[key];
                 const sc = on ? 0.92 : 1;
                 const col = on ? (key[0] === 'K' ? 'rgba(255,222,0,1)' : 'rgba(248,0,158,1)') : null;
