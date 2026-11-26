@@ -201,10 +201,14 @@
         // each key on its own, for the key overlay: K1 (4), K2 (8), M1 (1 without K1), M2 (2 without K2)
         const keyPress = { K1: [], K2: [], M1: [], M2: [] };
         const keyDown = (keys) => ({ K1: !!(keys & 4), K2: !!(keys & 8), M1: !!(keys & 1) && !(keys & 4), M2: !!(keys & 2) && !(keys & 8) });
+        // Counted only from when the first object appears: the frames before it hold
+        // whatever the keys did while the game loaded or the intro was skipped (a lone
+        // M1, all four at once...), which made keyboard players look like mouse players.
+        const countFrom = objs.length ? objs[0].time - preempt : 0;
         let was = keyDown(0);
         for (const f of frames) {
             const now = keyDown(f.keys);
-            for (const key of ['K1', 'K2', 'M1', 'M2']) if (now[key] && !was[key]) keyPress[key].push(f.t);
+            if (f.t >= countFrom) for (const key of ['K1', 'K2', 'M1', 'M2']) if (now[key] && !was[key]) keyPress[key].push(f.t);
             was = now;
         }
 
