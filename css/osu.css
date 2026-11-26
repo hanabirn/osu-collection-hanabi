@@ -7795,3 +7795,8 @@ html:has(.section-band.has-intro) #collection-digest .digest-prompt { display: n
     .fb-inbox-list { max-height: 40vh; }
     .fb-inbox-view { min-height: 360px; }
 }
+
+/* 我的建議: the 🔔 reply-notification button beside the heading */
+.fb-mine-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.fb-push-btn { font-size: var(--fs-12); padding: 5px 12px; white-space: nowrap; }
+.fb-push-btn.is-on { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.75); }

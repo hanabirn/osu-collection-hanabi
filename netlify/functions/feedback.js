@@ -41,6 +41,31 @@ const RELOAD_NOTE = {
     ru: '(Сайт обновлён — перезагрузите страницу, чтобы получить последнюю версию.)',
 };
 
+// A push to the visitor when the owner answers (if they turned it on under 我的建議):
+// Web Push with the site's VAPID keys (_web-push.js), in the visitor's language.
+const NOTIF_TITLE = {
+    zh: '站長回覆了你的建議', 'zh-Hans': '站长回复了你的建议', en: 'The site owner replied to your suggestion',
+    ja: '管理人があなたの提案に返信しました', ko: '운영자가 제안에 답장했습니다', de: 'Der Betreiber hat auf deinen Vorschlag geantwortet',
+    es: 'El dueño del sitio respondió a tu sugerencia', fr: 'Le responsable a répondu à ta suggestion', ru: 'Владелец сайта ответил на ваше предложение',
+};
+const MAX_PUSH = 5; // subscriptions kept per visitor key (browsers / devices)
+async function pushVisitor(store, t, text) {
+    if (!t.keyHash || !process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return;
+    const key = `feedback:push:${t.keyHash}`;
+    const subs = (await store.get(key, { type: 'json' })) || [];
+    if (!subs.length) return;
+    const webpush = require('./_web-push');
+    const vapid = { subject: process.env.VAPID_SUBJECT || 'mailto:admin@example.com', publicKey: process.env.VAPID_PUBLIC_KEY, privateKey: process.env.VAPID_PRIVATE_KEY };
+    const gone = new Set();
+    for (const x of subs) {
+        const lang = x.lang || t.lang || 'en';
+        const payload = JSON.stringify({ title: NOTIF_TITLE[lang] || NOTIF_TITLE.en, body: String(text || '').slice(0, 140), url: `${SITE}/?feedback=mine#${t.id}`, tag: `feedback-${t.id}` });
+        try { await webpush.sendNotification(x.sub, payload, vapid); }
+        catch (err) { if (err && (err.statusCode === 404 || err.statusCode === 410)) gone.add(x.sub.endpoint); }
+    }
+    if (gone.size) await store.setJSON(key, subs.filter((x) => !gone.has(x.sub.endpoint)));
+}
+
 const json = (statusCode, body) => ({ statusCode, headers: H, body: JSON.stringify(body) });
 
 async function sha256(text) {
@@ -129,6 +154,22 @@ exports.handler = async (event) => {
         const message = typeof body.message === 'string' ? body.message.trim() : '';
         const now = Date.now();
 
+        // turn reply notifications on / off for this visitor key
+        if (body.action === 'push') {
+            if (!/^[a-f0-9]{32}$/.test(body.key || '')) return json(400, { error: 'Missing key' });
+            const sub = body.subscription;
+            const endpoint = sub && typeof sub.endpoint === 'string' ? sub.endpoint : '';
+            if (!endpoint.startsWith('https://') || endpoint.length > 1000) return json(400, { error: 'Bad subscription' });
+            const key = `feedback:push:${await sha256(body.key)}`;
+            let subs = ((await store.get(key, { type: 'json' })) || []).filter((x) => x.sub && x.sub.endpoint !== endpoint);
+            if (!body.off) {
+                if (!sub.keys || typeof sub.keys.p256dh !== 'string' || typeof sub.keys.auth !== 'string') return json(400, { error: 'Bad subscription' });
+                subs = [{ sub: { endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, lang: String(body.lang || 'en').slice(0, 8) }, ...subs].slice(0, MAX_PUSH);
+            }
+            await store.setJSON(key, subs);
+            return json(200, { ok: true, on: !body.off });
+        }
+
         if (body.action === 'create') {
             if (!message) return json(422, { error: 'Empty message' });
             if (message.length > MAX_LEN) return json(422, { error: `Over ${MAX_LEN} characters` });
@@ -185,6 +226,7 @@ exports.handler = async (event) => {
             t.updated = now;
             await store.setJSON(`feedback:thread:${id}`, t);
             await updateIndex(store, t);
+            try { await pushVisitor(store, t, text || message); } catch (err) { console.error('feedback push failed', err); }
             return json(200, { thread: { ...publicThread(t), lang: t.lang, who: t.osuName || null } });
         }
         return json(400, { error: 'Unknown action' });

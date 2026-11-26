@@ -100,7 +100,8 @@ function renderFeedbackMine() {
     if (!fbThreads.length) { box.hidden = true; return; }
     box.hidden = false;
     const seen = fbSeen();
-    box.innerHTML = `<h3 class="home-h"><span>${escHtml(t('feedback_mine_title'))} <small>${fbThreads.length}</small></span></h3>
+    const pushBtn = fbPushAvailable() ? `<button type="button" class="btn fb-push-btn${fbPushOn() ? ' is-on' : ''}" onclick="toggleFeedbackPush(this)">${escHtml(t(fbPushOn() ? 'feedback_push_off' : 'feedback_push_on'))}</button>` : '';
+    box.innerHTML = `<h3 class="home-h fb-mine-head"><span>${escHtml(t('feedback_mine_title'))} <small>${fbThreads.length}</small></span>${pushBtn}</h3>
         <ol class="fb-threads fb-mine-list">${fbThreads.map((th, i) => {
             const fresh = (seen[th.id] || 0) < th.updated && th.messages[th.messages.length - 1].from === 'owner';
             return `<li class="fb-thread${fresh ? ' is-new' : ''}"><details${i === 0 || fresh ? ' open' : ''}>
@@ -115,6 +116,45 @@ function renderFeedbackMine() {
     // everything shown counts as seen
     for (const th of fbThreads) seen[th.id] = th.updated;
     fbSetSeen(seen);
+}
+
+/* 🔔 a push when the owner answers, even with the site closed: the browser's push
+   subscription is kept under this visitor's key (netlify/functions/feedback.js,
+   action 'push'). The same subscription as js/pwa.js's PP alerts, if any. */
+const FB_PUSH_KEY = 'feedbackPushOn';
+let fbVapid = null;
+const fbPushOn = () => localStorage.getItem(FB_PUSH_KEY) === '1' && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+const fbPushAvailable = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && !!fbVapid;
+async function loadFeedbackPushKey() {
+    if (fbVapid !== null) return fbVapid;
+    try { fbVapid = (await (await fetch('/.netlify/functions/push-config')).json()).vapidPublicKey || ''; } catch { fbVapid = ''; }
+    return fbVapid;
+}
+async function toggleFeedbackPush(btn) {
+    if (btn) btn.disabled = true;
+    const toast = (k) => { if (typeof showShareToast === 'function') showShareToast(t(k)); };
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        let sub = await reg.pushManager.getSubscription();
+        if (fbPushOn()) {
+            if (sub) await fbCall('POST', null, { action: 'push', off: true, key: fbKey(), subscription: sub.toJSON() });
+            localStorage.removeItem(FB_PUSH_KEY);
+        } else {
+            if ((await Notification.requestPermission()) !== 'granted') throw new Error('blocked');
+            if (!sub) {
+                const pad = '='.repeat((4 - (fbVapid.length % 4)) % 4);
+                const raw = atob((fbVapid + pad).replace(/-/g, '+').replace(/_/g, '/'));
+                sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: Uint8Array.from([...raw].map((c) => c.charCodeAt(0))) });
+            }
+            await fbCall('POST', null, { action: 'push', key: fbKey(), subscription: sub.toJSON(), lang: siteLang });
+            localStorage.setItem(FB_PUSH_KEY, '1');
+            toast('feedback_push_done');
+        }
+    } catch (e) {
+        console.error('feedback push failed', e);
+        toast('feedback_push_fail');
+    }
+    renderFeedbackMine();
 }
 
 async function sendFeedbackReply(event, id) {
@@ -239,12 +279,20 @@ async function sendFeedbackAnswer(event, id) {
 /* the 建議&改進 page opening */
 async function ensureFeedbackPage() {
     if (/[?&]feedback=admin\b/.test(location.search)) { fbTab = 'admin'; const h = location.hash.slice(1); if (/^[a-f0-9]{16}$/.test(h)) { fbOpenId = h; fbFilter = 'all'; } }
-    await loadFeedbackMine();
+    await Promise.all([loadFeedbackMine(), loadFeedbackPushKey()]);
     renderFeedbackMine();
     loadFeedbackAdmin();
+    // from a reply notification: that thread, open, in view
+    const h = location.hash.slice(1);
+    if (/[?&]feedback=mine\b/.test(location.search) && /^[a-f0-9]{16}$/.test(h)) {
+        const i = fbThreads.findIndex((x) => x.id === h);
+        const li = i >= 0 ? document.querySelectorAll('#feedback-mine .fb-thread')[i] : null;
+        if (li) { const d = li.querySelector('details'); if (d) d.open = true; li.scrollIntoView({ block: 'center' }); }
+    }
 }
-// ?feedback=admin (the link in the owner's Discord DM) opens the page
-if (/[?&]feedback=admin\b/.test(location.search)) {
+// ?feedback=admin (the link in the owner's Discord DM) and ?feedback=mine (a reply
+// notification to the visitor) open the page
+if (/[?&]feedback=(admin|mine)\b/.test(location.search)) {
     const go = () => setTimeout(() => { if (typeof switchTab === 'function') switchTab('feedback'); }, 300);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 }
