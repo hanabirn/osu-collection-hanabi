@@ -268,11 +268,14 @@ function scoreEmbed(score, user, apiMode) {
     };
 }
 
-async function fetchScores(token, userId, type, apiMode, limit, includeFails) {
+// apiVersion '20240529' = the lazer score format (total_score, statistics
+// great/ok/..., mod objects), which has the score lazer plays show; the
+// legacy format gives those a score of 0.
+async function fetchScores(token, userId, type, apiMode, limit, includeFails, apiVersion) {
     const p = new URLSearchParams({ mode: apiMode, limit: String(limit) });
     if (type === 'recent') p.set('include_fails', includeFails ? '1' : '0');
     const res = await fetch(`https://osu.ppy.sh/api/v2/users/${userId}/scores/${type}?${p}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, ...(apiVersion ? { 'x-api-version': apiVersion } : {}) },
     });
     if (!res.ok) throw new Error(`osu! API ${res.status}`);
     return res.json();
@@ -362,6 +365,14 @@ function topPage(u, apiMode, scores, page) {
 const trimNum = (v, d = 1) => (v == null || !Number.isFinite(v) ? '?' : String(Number(v.toFixed(d))));
 const STATUS_LABEL = { ranked: 'Ranked', approved: 'Approved', qualified: 'Qualified', loved: 'Loved', pending: 'Pending', wip: 'WIP', graveyard: 'Graveyard' };
 
+// Country code -> a Twemoji flag PNG (CC BY 4.0, credited on the 資源 page).
+// Not osu-web's own flag art (AGPL).
+function flagImageUrl(code) {
+    if (!/^[A-Za-z]{2}$/.test(code || '')) return null;
+    const cps = [...code.toUpperCase()].map((c) => (0x1f1e6 + c.charCodeAt(0) - 65).toString(16)).join('-');
+    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${cps}.png`;
+}
+
 function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading, rankedDate } = {}) {
     const bs = score.beatmapset || {};
     const bm = score.beatmap || {};
@@ -383,8 +394,11 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading, rankedDa
     const hits = (() => {
         try {
             const { hitLine } = require('./_score-calc');
-            return hitLine(score, mode).map(([k, v]) => (k === 'miss' ? `❌ ${v}` : `${k}: ${L.fmtNum(v)}`)).join(' · ');
+            return hitLine(score, mode).filter(([k]) => k !== 'miss').map(([k, v]) => `${k} ${v}`).join(' · ');
         } catch { return ''; }
+    })();
+    const missCount = (() => {
+        try { return require('./_score-calc').hitCounts(score, { osu: 0, taiko: 1, fruits: 2, mania: 3 }[mode] ?? 0).misses; } catch { return 0; }
     })();
 
     const stars = ex && ex.stars != null ? ex.stars : bm.difficulty_rating;
@@ -399,14 +413,14 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading, rankedDa
         attrLine = mode === 'mania' ? `${Math.round(bm.cs)}K OD ${bm.accuracy} HP ${bm.drain}` : `CS ${bm.cs} AR ${bm.ar} OD ${bm.accuracy} HP ${bm.drain}`;
     }
     // One line of grey code chips: length · map numbers · BPM.
-    const mapLine = ['`' + L.fmtLen(len) + '`', attrLine ? '`' + attrLine + '`' : '', `♪ ${trimNum(bpm, 0)}`].filter(Boolean).join(' · ');
+    const mapLine = ['`' + L.fmtLen(len) + '`', attrLine ? '`' + attrLine + '`' : '', '`' + trimNum(bpm, 0) + ' BPM`'].filter(Boolean).join(' · ');
 
     const lines = [
         // ### heading: Discord sizes emojis with the text, so the grade and
         // mod badges come out larger than on a normal line.
-        `### ${passed ? L.gradeTag(score.rank) : '**F**'}${modStr ? ' ' + modStr : ''} · ${acc} · ${ppPart}`,
-        `${L.fmtNum(score.score ?? score.legacy_total_score ?? score.total_score)} · ${L.fmtNum(score.max_combo)}x${maxCombo ? ` / ${L.fmtNum(maxCombo)}x` : ''}`,
-        hits,
+        `### ${passed ? L.gradeTag(score.rank) : '**F**'}${modStr ? ' ' + modStr : ''} · ${L.fmtNum(score.total_score || score.score || score.legacy_total_score || 0)}`,
+        [ppPart, `**${L.fmtNum(score.max_combo)}x**${maxCombo ? `/${L.fmtNum(maxCombo)}x` : ''}`, `${missCount} ❌`, acc].join(' · '),
+        hits ? '`' + hits + '`' : '',
         mapLine,
     ];
     if (!passed && ex && ex.progress != null) {
@@ -414,7 +428,6 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading, rankedDa
     }
 
     const st = user && user.statistics;
-    const flag = L.flagEmoji(user && (user.country_code || (user.country && user.country.code)));
     const rankBit = st && st.global_rank
         ? ` (#${L.fmtNum(st.global_rank)}${st.country_rank ? ` ${user.country_code} #${L.fmtNum(st.country_rank)}` : ''})`
         : '';
@@ -427,17 +440,20 @@ function detailedScoreEmbed(score, user, apiMode, ex, { tries, heading, rankedDa
 
     return {
         author: user ? {
-            name: `${user.username}${flag ? ' ' + flag : ''}${totalPp}${rankBit}`,
+            // The flag is the author icon, as on Bathbot: a flag emoji in the
+            // name shows as the letters "TW" on Windows.
+            name: `${user.username}${totalPp}${rankBit}`,
             url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
-            icon_url: user.avatar_url || undefined,
+            icon_url: flagImageUrl(user.country_code) || user.avatar_url || undefined,
         } : undefined,
-        title: `${heading ? heading + ' · ' : ''}${mTag ? mTag + ' ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]${stars != null ? ` [${Number(stars).toFixed(2)}★]` : ''}`.slice(0, 250),
+        title: `${heading ? heading + ' · ' : ''}${bs.artist || ''} - ${bs.title || ''} [${bm.version || ''}]${stars != null ? ` [${Number(stars).toFixed(2)}★]` : ''}`.slice(0, 250),
         url: bm.url || (bm.id ? `https://osu.ppy.sh/b/${bm.id}` : undefined),
         description: lines.filter(Boolean).join('\n'),
         thumbnail: { url: covers['list@2x'] || covers.list || covers.card || undefined },
         color: passed ? L.srColor(stars) : 0x9aa0a6,
-        footer: L.siteFooter(footBits.join(' · ')),
-        timestamp: score.created_at || score.ended_at || undefined,
+        // The mode icon leads the footer, as on Bathbot.
+        footer: { text: footBits.join(' · ') || t('site_footer'), icon_url: L.emojiImageUrl(mTag) || L.SITE_ICON },
+        timestamp: score.ended_at || score.created_at || undefined,
     };
 }
 
@@ -489,7 +505,7 @@ async function cmdRecent(options, interaction, origin, forcedMode) {
         const u = await L.resolveOsuUser(token, who, apiMode);
         if (!u) return t('user_not_found', { name: who });
 
-        const scores = await fetchScores(token, u.id, 'recent', apiMode, 50, true);
+        const scores = await fetchScores(token, u.id, 'recent', apiMode, 50, true, '20240529');
         if (!scores.length) return t('recent_none', { name: u.username, mode: L.MODE_LABEL[apiMode] });
         const at = Math.min(idx, scores.length) - 1;
         const score = scores[at];
